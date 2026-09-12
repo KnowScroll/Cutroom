@@ -1,19 +1,36 @@
 #!/usr/bin/env node
 /**
- * One job: assert the module boundaries in .dependency-cruiser.cjs, and prove each rule
- * can actually catch what it forbids.
+ * One job: assert the module boundaries in .dependency-cruiser.cjs, prove each rule can
+ * actually catch what it forbids, and report any rule that has quietly stopped applying to
+ * anything.
  *
  *   node scripts/drift.mjs            check this repository
  *   node scripts/drift.mjs --prove    build a deliberate violation of every rule in a
  *                                     temporary folder and fail if any rule stays silent
+ *   node scripts/drift.mjs --audit    report which folders each rule names, and fail when a
+ *                                     rule names a folder that is missing from a package
+ *                                     that HAS source — the shape of a rename
  *
- * --prove exists because of a specific failure in the steering repository: two boundary
- * rules the architecture rested on were described in prose for weeks and were not in the
- * config at all. A rule nobody has seen fire is a comment.
+ * All three exist because of the same failure, found twice in the steering repository:
+ *
+ *   1. Two boundary rules the architecture rested on were described in prose for weeks and
+ *      were not in the config at all.
+ *   2. Its `.dependency-cruiser.cjs` carries seven rules — and dependency-cruiser is not
+ *      installed there, so `drift.mjs` skips the entire block behind an `existsSync` check.
+ *      None of those seven has ever run, once.
+ *
+ * Configured-but-dead is worse than absent, because it reads as covered. So: the tool is a
+ * real dependency here, `--prove` watches every rule fire, and `--audit` watches for the
+ * rule that still reads correctly while matching nothing.
  */
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { REPO, bold, dim, fail, green, pass, red, run, yellow } from './_lib.mjs'
+
+// .dependency-cruiser.cjs is CommonJS — the format the tool loads — and --audit reads the
+// rules themselves rather than a copy of them kept in this file.
+const loadRules = createRequire(import.meta.url)
 
 const DEPCRUISE = join(REPO, 'node_modules', 'dependency-cruiser', 'bin', 'dependency-cruise.mjs')
 const CONFIG = join(REPO, '.dependency-cruiser.cjs')
@@ -88,11 +105,29 @@ const CASES = [
     "import '../../../packages/domain/src/deep/thing.ts'",
   ],
   ['no-circular', 'apps/worker/src/ping.ts', "import './pong.ts'"],
+
+  // The four rules between two folders of ONE package. Every import below is relative,
+  // which is exactly why matching import text could never catch them.
+  ['plan-no-epistemic', 'packages/pipeline/src/plan/index.ts', "import '../epistemic/index.ts'"],
+  ['split-no-cinematic', 'packages/pipeline/src/split/index.ts', "import '../cinematic/types.ts'"],
+  [
+    'split-imported-only-by-plan',
+    'packages/pipeline/src/epistemic/reaches-split.ts',
+    "import '../split/index.ts'",
+  ],
+  [
+    'split-entered-through-its-index',
+    'packages/pipeline/src/plan/deep.ts',
+    "import '../split/internal/cut.ts'",
+  ],
 ]
 
 const EXTRA_FILES = [
   ['packages/domain/src/deep/thing.ts', 'export const thing = 1'],
   ['apps/worker/src/pong.ts', "import './ping.ts'"],
+  ['packages/pipeline/src/epistemic/index.ts', 'export const fullScript = 1'],
+  ['packages/pipeline/src/cinematic/types.ts', 'export type Shot = { camera: string }'],
+  ['packages/pipeline/src/split/internal/cut.ts', 'export const cut = 1'],
 ]
 
 /** A legal shape. Nothing here may be reported, or the rules are too eager to be trusted. */
@@ -110,6 +145,21 @@ const LEGAL = [
   ],
   ['packages/domain/src/index.ts', 'export const tables = {}'],
   ['apps/worker/src/helper.ts', "import './index.ts'"],
+
+  // The legal version of the four folder rules: the planner calls the splitter through its
+  // index, the splitter knows only prose, and the epistemic layer keeps the full script to
+  // itself. None of this may be reported.
+  [
+    'packages/pipeline/src/plan/index.ts',
+    "import type { Port } from '../../../contracts/src/index.ts'\n" +
+      "import '../split/index.ts'\n" +
+      'export type Plan = Port',
+  ],
+  ['packages/pipeline/src/split/index.ts', 'export const split = (prose: string) => [prose]'],
+  [
+    'packages/pipeline/src/epistemic/index.ts',
+    "import type { Port } from '../../../contracts/src/index.ts'\nexport type Epistemic = Port",
+  ],
 ]
 
 function build(dir, files) {
@@ -178,5 +228,136 @@ function prove() {
   }
 }
 
-if (process.argv.includes('--prove')) prove()
+// ---------------------------------------------------------------- audit
+
+/**
+ * Expand a rule's path pattern into the concrete folders it names.
+ *
+ * Simple alternations are expanded — `src/(plan|cinematic)/` gives two folders — and each
+ * variant is then cut at the first remaining regex metacharacter. Patterns too broad to
+ * name anything (`^(apps|packages)/`, a list of Node core modules) name no folder and are
+ * skipped: there is nothing about them that can go stale.
+ */
+function namedFolders(pattern) {
+  if (typeof pattern !== 'string' || !pattern) return []
+
+  let variants = [pattern.replace(/^\^/, '')]
+  for (let guard = 0; guard < 6; guard += 1) {
+    let expanded = false
+    const next = []
+    for (const variant of variants) {
+      const group = /\(([A-Za-z0-9_|./:-]+)\)/.exec(variant)
+      if (group && group[1].includes('|')) {
+        expanded = true
+        for (const option of group[1].split('|')) {
+          next.push(
+            variant.slice(0, group.index) + option + variant.slice(group.index + group[0].length),
+          )
+        }
+      } else {
+        next.push(variant)
+      }
+    }
+    variants = next
+    if (!expanded) break
+  }
+
+  const folders = new Set()
+  for (const variant of variants) {
+    const meta = /[([{?*+|\\$)]/.exec(variant)
+    let path = variant
+    if (meta) {
+      // Keep only what is literal, and drop a half-named segment: `src/(?!index.ts$)` leaves
+      // `src/`, not `src/(`. A pattern with no metacharacter is already a complete path and
+      // must be kept whole — cutting `packages/pipeline` back to `packages` names nothing.
+      path = variant.slice(0, meta.index)
+      if (!path.endsWith('/')) {
+        const lastSlash = path.lastIndexOf('/')
+        path = lastSlash > 0 ? path.slice(0, lastSlash + 1) : ''
+      }
+    }
+    path = path.replace(/\/+$/, '')
+    // Two segments minimum: `packages` or `apps` alone names nothing in particular.
+    if (path.split('/').length >= 2) folders.add(path)
+  }
+  return [...folders]
+}
+
+function hasSourceFiles(dir) {
+  const full = join(REPO, dir)
+  if (!existsSync(full)) return false
+  const stack = [full]
+  while (stack.length > 0) {
+    const at = stack.pop()
+    for (const entry of readdirSync(at, { withFileTypes: true })) {
+      if (entry.name === 'node_modules' || entry.name === 'dist') continue
+      const child = join(at, entry.name)
+      if (entry.isDirectory()) stack.push(child)
+      else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.test.ts')) return true
+    }
+  }
+  return false
+}
+
+function audit() {
+  const { forbidden } = loadRules(CONFIG)
+
+  console.log(`\n${bold('Does every rule still apply to something?')}\n`)
+
+  let dead = 0
+  let inert = 0
+  let live = 0
+
+  for (const rule of forbidden) {
+    const folders = [...new Set([...namedFolders(rule.from?.path), ...namedFolders(rule.to?.path)])]
+    if (folders.length === 0) {
+      // Nothing path-shaped to go stale: a circularity rule, or a list of core modules.
+      console.log(`  ${dim('n/a')}     ${rule.name}`)
+      continue
+    }
+
+    const missing = folders.filter((folder) => !existsSync(join(REPO, folder)))
+    if (missing.length === 0) {
+      live += 1
+      console.log(`  ${green('live')}    ${rule.name}  ${dim(folders.join(' '))}`)
+      continue
+    }
+
+    // A folder that is missing while its PACKAGE already has source is the shape of a
+    // rename: the rule still reads correctly and now guards nothing.
+    const renamed = missing.filter((folder) => {
+      const pkg = folder.split('/').slice(0, 2).join('/')
+      return hasSourceFiles(pkg)
+    })
+
+    if (renamed.length > 0) {
+      dead += 1
+      console.log(`  ${red('DEAD')}    ${rule.name}`)
+      for (const folder of renamed) {
+        const pkg = folder.split('/').slice(0, 2).join('/')
+        console.log(`          ${dim(`${folder} does not exist, but ${pkg} has source files`)}`)
+      }
+    } else {
+      inert += 1
+      console.log(
+        `  ${yellow('inert')}   ${rule.name}  ${dim(`${missing.join(' ')} — not written yet`)}`,
+      )
+    }
+  }
+
+  console.log('')
+  if (dead > 0) {
+    fail(
+      `${dead} rule(s) name a folder that does not exist in a package that already has source.\n` +
+        `      Either the folder was renamed and the rule now guards nothing, or the rule is wrong.\n` +
+        `      A rule that reads correctly and matches nothing is the failure this check exists for.`,
+    )
+  } else {
+    pass(`${live} rule(s) live, ${inert} waiting on folders that are not written yet, 0 dead`)
+  }
+}
+
+const argv = process.argv
+if (argv.includes('--prove')) prove()
+else if (argv.includes('--audit')) audit()
 else check()

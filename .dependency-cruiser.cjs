@@ -125,6 +125,72 @@ module.exports = {
       from: {},
       to: { circular: true },
     },
+
+    // ---------------------------------------------------------------------------------
+    // Rules BETWEEN TWO FOLDERS OF ONE PACKAGE.
+    //
+    // These are the rules the steering repository's `drift` could not express, because it
+    // matches the TEXT of an import specifier against a prefix: it sees
+    // `from '@knowscroll/domain'` and is blind to `from '../../domain'`. Inside one package
+    // every import between folders is relative, so no specifier prefix can ever match one.
+    //
+    // dependency-cruiser resolves each import to a file path, so the spelling does not
+    // matter. That is the whole reason these four exist here and could not exist there.
+    //
+    // The folder names come from the decisions (D-067, D-073, D-085). None of these folders
+    // exists yet — the gates that create them are still in review. `drift --audit` reports
+    // every rule whose folders are absent, and FAILS once the package has source files and
+    // the folder a rule names is still missing, which is what a rename would look like.
+    // ---------------------------------------------------------------------------------
+    {
+      name: 'plan-no-epistemic',
+      severity: 'error',
+      comment:
+        'D-085: the planning and cinematic code receives a NARROWED VIEW of the script, with the ' +
+        'epistemic (truth) fields absent, so reading or writing one is a compile error. The type is ' +
+        'the real enforcement and this rule is the backstop — it catches the case the type cannot: ' +
+        'a plan module importing the epistemic module directly and reaching the full script through ' +
+        'it. D-067 put both layers in one package, so this import is relative and the steering ' +
+        "repository's specifier matching could never see it. That is why D-085 had to replace the " +
+        'rule D-034 asked for rather than build it.',
+      from: { path: '^packages/pipeline/src/(plan|cinematic)/' },
+      to: { path: '^packages/pipeline/src/epistemic/' },
+    },
+    {
+      name: 'split-no-cinematic',
+      severity: 'error',
+      comment:
+        'D-073: the splitter cuts claim-referenced prose into narration units and knows nothing ' +
+        'about shots, cameras or styles. A cinematic type reaching it would let a cut be decided by ' +
+        'how it will be filmed, which is what makes two storyboards of ONE script comparable ' +
+        "(D-062's shotCount axis). Matched anywhere in the path, so it holds whether the cinematic " +
+        'types end up in contracts or in pipeline.',
+      from: { path: '^packages/pipeline/src/split/' },
+      to: { path: 'cinematic' },
+    },
+    {
+      name: 'split-imported-only-by-plan',
+      severity: 'error',
+      comment:
+        'D-073: the planner calls the splitter, with a target unit count. Nothing else imports it. ' +
+        'A second caller means a second authority over where a narration unit begins, which is the ' +
+        'shape D-045 removed from the keyframe scorer.',
+      from: {
+        path: '^(packages|apps)/',
+        pathNot: '^packages/pipeline/src/(plan|split)/',
+      },
+      to: { path: '^packages/pipeline/src/split/' },
+    },
+    {
+      name: 'split-entered-through-its-index',
+      severity: 'error',
+      comment:
+        'D-073: the planner MAY CALL the splitter and MAY NOT REACH INSIDE it. The module-level ' +
+        'rule above this one only guards package boundaries; inside a package a deep import is ' +
+        'relative, and this is the folder-level equivalent. Enter through split/index.ts.',
+      from: { path: '^packages/pipeline/src/(plan|cinematic)/' },
+      to: { path: '^packages/pipeline/src/split/(?!index\\.ts$).+' },
+    },
   ],
   options: {
     doNotFollow: { path: 'node_modules' },

@@ -31,7 +31,7 @@ node scripts/check.mjs --code  # only the checks about code in this repo
 node scripts/check.mjs
 ```
 
-Eight steps. The first six are about this repository's code and must be green:
+Nine steps. The first seven are about this repository's code and must be green:
 
 | step                | what it proves                                              |
 | ------------------- | ----------------------------------------------------------- |
@@ -40,6 +40,7 @@ Eight steps. The first six are about this repository's code and must be green:
 | `format`            | prettier, check only                                        |
 | `boundaries`        | no forbidden edge exists right now                          |
 | `boundaries proven` | each rule still **catches** a violation written to break it |
+| `no dead rule`      | no rule names a folder a package has since lost             |
 | `tests`             | `node --test` with type stripping                           |
 
 The last two are about the authority, which lives in another repository:
@@ -58,6 +59,7 @@ node node_modules/prettier/bin/prettier.cjs --check .
 node node_modules/prettier/bin/prettier.cjs --write .     # fix formatting
 node scripts/drift.mjs                                    # boundaries now
 node scripts/drift.mjs --prove                            # boundaries can still bite
+node scripts/drift.mjs --audit                            # no rule has gone quietly inert
 node --experimental-strip-types --test "tests/**/*.test.ts"
 ```
 

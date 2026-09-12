@@ -21,6 +21,7 @@ const CODE = [
   ['format', node, [bin('prettier', 'bin', 'prettier.cjs'), '--check', '.']],
   ['boundaries', node, ['scripts/drift.mjs']],
   ['boundaries proven', node, ['scripts/drift.mjs', '--prove']],
+  ['no dead rule', node, ['scripts/drift.mjs', '--audit']],
   [
     'tests',
     node,

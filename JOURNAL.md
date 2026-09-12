@@ -45,3 +45,48 @@ cannot read the decisions that govern it. **(2) A decision about CI**, because e
 runs locally and nothing enforces them on a push. **(3) `reel-engine`'s gates**, which are being
 reviewed there; when they are approved, their feature files move here (D-089) and slice 1 is the
 schemas. Not before.
+
+---
+
+## 2026-09-12 — session 02, four rules that the other repository's checker could not express
+
+**Changed.** Four boundary rules added, bringing the set to **fifteen**: `plan-no-epistemic`
+(D-085's backstop), and `split-no-cinematic`, `split-imported-only-by-plan`,
+`split-entered-through-its-index` (D-073, whose stated check had no buildable form before now).
+A third mode, `drift --audit`, reports every rule as live, inert or **DEAD**. New checks: `no dead
+rule` in `check.mjs`, and three assertions in `tests/boundaries.test.ts` — one of which simply
+asserts dependency-cruiser is installed. **S-013** and **S-014** in `DECISIONS.md`. Still no
+feature code.
+
+**Observed.**
+
+- **The owner's correction was right, and the state next door is worse than he said.**
+  `node_modules` in the steering repository is **empty — nothing is installed at all**, and
+  `scripts/drift.mjs:115` wraps the whole dependency-cruiser invocation in
+  `existsSync(node_modules/.bin/depcruise)`. So its seven rules, `contracts-are-a-leaf` and
+  `no-circular` among them, have **never executed once**, and the config reads as coverage.
+- **All four new rules are between two folders of ONE package**, so every import they forbid is
+  relative — `'../epistemic/index.ts'`, not `'@cutroom/pipeline'`. Specifier-prefix matching
+  cannot see any of them. This is not a shortcoming anyone has to argue about: **D-085 exists
+  precisely because the rule D-034 demanded could not be built**, and D-073's `Confirmed-by` asks
+  for an edge in the same unbuildable shape. On resolved paths all four are ordinary, and all four
+  are proven firing against relative-import violations.
+- **A rule can read correctly and guard nothing.** The four name folders that do not exist yet,
+  because the gates that create them are in review. So `--audit` distinguishes _inert_ (the folder
+  is not written yet — fine) from _DEAD_ (the folder is missing from a package that already has
+  source — a rename). Demonstrated: one `.ts` file dropped into `packages/pipeline/src/` turns all
+  four DEAD and exits 1; removing it returns to 0 dead.
+- **The audit found a bug in itself first.** Its first version cut every literal path back to its
+  parent, so the nine package-level rules all reported `n/a` — an audit that could not see the
+  rules it was auditing. Fixed by cutting only patterns that actually contain a metacharacter.
+
+**Why.** The correction came with the reason already attached: configured-but-dead is worse than
+absent, because it reads as covered. `--prove` answers _can this rule fire_, and `--audit` answers
+_does it still apply to anything_. Neither question is answerable by reading the config, which is
+the only thing anyone was doing next door.
+
+**Next.** Unchanged and still first: **push the steering repository** — the pin reads 76 of 89
+decisions. Then the CI decision. **One offer standing for the owner**: a one-line change to the
+steering repository's `drift.mjs` so a missing dependency-cruiser is a loud failure instead of a
+silent skip. Not applied — it is that repository's script, another session is active in it, and it
+would turn its `pnpm drift` red until someone installs there.

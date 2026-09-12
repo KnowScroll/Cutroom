@@ -58,9 +58,22 @@ a journey, and journeys for these features run here once their gates are approve
 `providers`. `providers` never imports `domain` or `pipeline`. `contracts` imports nothing
 internal. A package is entered only through its `src/index.ts`.
 
-These are not conventions. They are eleven rules checked against the real dependency graph, and
-`node scripts/drift.mjs --prove` writes a file to break each one and fails if the rule does not
-notice.
+Four more are **between two folders of one package** — the planner may not import the epistemic
+module (D-085), and the splitter may not import cinematic types, may be imported only by the
+planner, and may be entered only through its index (D-073).
+
+These are not conventions. They are **fifteen** rules checked against the real dependency graph,
+and they are expressed on **resolved file paths**, never on the text of an import line — which is
+the only reason those four can exist at all, since inside one package every import is relative.
+
+```bash
+node scripts/drift.mjs --prove    # writes a file to break each rule; fails if one stays silent
+node scripts/drift.mjs --audit    # fails when a rule names a folder that a renamed package lost
+```
+
+Never assume a configured rule runs. In the steering repository seven rules sit in a
+`.dependency-cruiser.cjs` while the tool itself is not installed, and the script skips the whole
+block in silence — so none of them has ever executed. Configured-but-dead reads as covered.
 
 ## Things that will waste your time if you have not read them
 

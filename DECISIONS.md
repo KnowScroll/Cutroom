@@ -206,3 +206,68 @@ review. (b) Leaving the tooling out, so the first schema session has to choose a
 while also designing tables.
 
 **Caught by.** The failure is the mechanism: drizzle-kit reports the missing schema path.
+---
+
+## S-013 | 2026-09-12 | Boundary rules are matched on resolved file paths, which is what makes a rule between two folders of one package possible
+
+**Chose.** Every rule is expressed as a **file path pattern over the resolved dependency graph**,
+never as a match against the text of an import line. On that basis four rules were added that the
+steering repository's approach cannot express at all, bringing the set to fifteen. **Supersedes the
+count in S-006**, not its substance.
+
+- `plan-no-epistemic` — **D-085**: the planning and cinematic code must not import the module
+  holding the truth fields. The narrowed-view type is the real enforcement; this is the backstop
+  for the one thing a type cannot catch, a plan module reaching the full script through the
+  epistemic module.
+- `split-no-cinematic` — **D-073**: the splitter cuts prose and knows nothing about how a shot
+  will be filmed. Matched on `cinematic` anywhere in the path, so it holds wherever those types
+  land.
+- `split-imported-only-by-plan` — **D-073**: the planner calls the splitter; nothing else imports
+  it. A second caller is a second authority over where a narration unit begins.
+- `split-entered-through-its-index` — **D-073**: _may call it, may not reach inside it_. The
+  package-level internals rule only guards package boundaries; inside a package a deep import is
+  relative, and this is its folder-level equivalent.
+
+**Why.** The steering repository's `scripts/drift.mjs` matches an **import specifier prefix**, so
+it sees `from '@knowscroll/domain'` and is blind to `from '../../domain'` — the same import, a
+different spelling. D-067 put the planning and epistemic layers in **one package**, so every import
+between them is relative and no prefix can ever match one. **D-085 exists because of that limit**:
+it replaced the rule D-034 demanded rather than building it. D-073's `Confirmed-by` asks for a
+`drift` edge that was likewise unbuildable there. Resolved paths make all four ordinary.
+
+**Rejected.** **Matching import text**, which cannot see a relative import and silently passes.
+**Splitting the folders into separate packages** so specifier matching would work — it would, and
+it undoes D-067, which put them together deliberately. **Leaving D-073's edge unbuilt** because its
+`Confirmed-by` was written against a tool that could not express it.
+
+**Caught by.** `node scripts/drift.mjs --prove` builds a relative-import violation of each of the
+four and fails if any stays silent, then builds the legal shape — planner calling `split/index.ts`,
+epistemic keeping the full script — and fails if any rule fires on it. Both run in `pnpm test`.
+
+---
+
+## S-014 | 2026-09-12 | A rule must be provably live, not merely present
+
+**Chose.** `node scripts/drift.mjs --audit` reads the rules themselves, expands the folders each
+one names, and reports them as **live**, **inert** (the folder is not written yet) or **DEAD** — a
+folder that does not exist in a package that **already has source files**, which is the shape of a
+rename. DEAD fails the run. It is a step in `node scripts/check.mjs` and an assertion in
+`tests/boundaries.test.ts`, which also asserts dependency-cruiser is installed and declared.
+
+**Why.** In the steering repository `.dependency-cruiser.cjs` carries seven rules — including
+`contracts-are-a-leaf` and `no-circular` — and the tool is **not installed**; `node_modules` there
+is empty. `scripts/drift.mjs:115` wraps the entire invocation in
+`existsSync(node_modules/.bin/depcruise)`, so the block is skipped **in silence** and none of those
+seven rules has run once. **Configured-but-dead is worse than absent, because it reads as covered.**
+The same failure has a second form this repository is exposed to: four of its rules name folders
+that do not exist yet, so a gate that renames one would leave a rule reading perfectly and guarding
+nothing.
+
+**Rejected.** **Trusting that a configured rule runs** — the state next door. **Failing on any rule
+whose folder is missing** — every one of the four would fail today, before the gates that create
+those folders are even approved, and a check that is red by design gets ignored. **A comment asking
+a future session to remember** — the thing every mechanism here exists to replace.
+
+**Caught by.** The audit's own demonstration: with one `.ts` file dropped into
+`packages/pipeline/src/`, all four folder rules report DEAD and the run exits 1. Removing the file
+returns it to 0 dead.

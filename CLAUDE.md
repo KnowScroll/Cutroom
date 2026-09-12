@@ -37,11 +37,25 @@ apps/worker          the runner. The only place that knows both a stage and a ta
 apps/api             submitting work, reading records. Never calls a provider.
 ```
 
-All six are **empty on purpose**. Eleven boundary rules are enforced on the real dependency
+All six are **empty on purpose**. **Fifteen** boundary rules are enforced on the real dependency
 graph, and `node scripts/drift.mjs --prove` builds a deliberate violation of each one and fails
 if any rule stays silent. The load-bearing ones: **pipeline imports no domain, no providers, no
 app, and no I/O at all** — no filesystem, no network, no process, no database driver. A stage is
 handed a port; it never reaches for one.
+
+**Four of the fifteen are between two folders of one package**, and they are the reason this is
+dependency-cruiser rather than a script matching import text. It resolves every import to a file
+path, so `'../epistemic/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
+
+- `plan-no-epistemic` — **D-085**'s backstop. The narrowed view type is the real enforcement.
+- `split-no-cinematic`, `split-imported-only-by-plan`, `split-entered-through-its-index` — **D-073**,
+  whose stated check was never buildable against import text, because inside one package every
+  import is relative.
+
+**None of those four folders exists yet.** `node scripts/drift.mjs --audit` reports every rule
+whose folders are absent, and **fails** once a package has source files while a folder one of its
+rules names is still missing — which is what a rename looks like. A rule that reads correctly and
+matches nothing is the worst state to be in, because it reads as coverage.
 
 A package is entered **only** through its `src/index.ts`. Adding a package's first file also
 means adding its reference to the root `tsconfig.json` — `tests/workspace.test.ts` fails if you
