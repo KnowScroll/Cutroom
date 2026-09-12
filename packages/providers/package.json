@@ -1,0 +1,13 @@
+{
+  "name": "@cutroom/providers",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Adapters behind the ports, including the stand-ins. Writes no durable state.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

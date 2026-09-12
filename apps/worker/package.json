@@ -1,0 +1,13 @@
+{
+  "name": "@cutroom/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The runner. The only place that knows both a stage and a table.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

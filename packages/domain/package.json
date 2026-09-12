@@ -1,0 +1,13 @@
+{
+  "name": "@cutroom/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Tables, migrations, the job queue, the budget ledger.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

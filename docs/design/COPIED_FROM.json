@@ -1,0 +1,31 @@
+{
+  "sourceRepo": "github.com/Legend101Zz/Knowscroll-v2",
+  "sourceCommit": "a93a65a685d2fc04b9a1d8a445392737c23bd6a3",
+  "sourceCommitNote": "These three files are byte-identical at this commit and at the steering repo local HEAD 691c3d4; git diff reports no change between them.",
+  "copiedOn": "2026-09-12",
+  "why": "The owner chose to copy rather than move, so both repositories hold these. Two copies of one document is drift by default, so pnpm docs:check compares them and fails when they diverge.",
+  "comparison": "Line endings are normalised (CRLF -> LF) on BOTH sides before comparing, because the steering repository has no .gitattributes and checks out CRLF on Windows. A LONE CR is NOT normalised: contentions.md contains one deliberately, inside a code span, as prose about this exact problem.",
+  "files": [
+    {
+      "path": "docs/design/VideoGenerationFlow.md",
+      "sourcePath": "docs/founding/reel-creation-engine/VideoGenerationFlow.md",
+      "sha256": "269a9044613cfc831c1bf1316f9dc9fb33b9ca2b7f4f630741de62f07f575501",
+      "bytes": 67635,
+      "loneCarriageReturns": 0
+    },
+    {
+      "path": "docs/design/multi-reel-pipeline.md",
+      "sourcePath": "docs/founding/reel-creation-engine/multi-reel-pipeline.md",
+      "sha256": "94564e7dbbd0aa0db4754761af9a3a9d90e02475ffd96976f43c6d47a28a8550",
+      "bytes": 14817,
+      "loneCarriageReturns": 0
+    },
+    {
+      "path": "docs/design/contentions.md",
+      "sourcePath": "docs/founding/reel-creation-engine/contentions.md",
+      "sha256": "5d41949bcabb6013fff82d6ef6c85a7f585a807bb79a5c0a485597cef5c60131",
+      "bytes": 41632,
+      "loneCarriageReturns": 1
+    }
+  ]
+}

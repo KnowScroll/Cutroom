@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+
+    // The runtime is Node with type stripping (--experimental-strip-types), not a
+    // bundler. So resolution is Node's, and a relative import names the file that
+    // actually exists on disk: './thing.ts', never './thing.js'.
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+
+    // There is no build step between internal packages: each exports src/index.ts
+    // directly. tsc emits declarations only — types for the editor, never JS that
+    // could be imported by accident and go stale.
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+    "incremental": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

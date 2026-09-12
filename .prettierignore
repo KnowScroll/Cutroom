@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+db/migrations/
+docs/design/
+steering-ref/
+.artifacts/
+.tmp/

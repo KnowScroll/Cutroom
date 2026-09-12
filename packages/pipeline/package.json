@@ -1,0 +1,13 @@
+{
+  "name": "@cutroom/pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure functions - stages and gates. No database, no provider, no filesystem, no network.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

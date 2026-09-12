@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(corepack pnpm install)",
+      "Bash(corepack pnpm run:*)",
+      "Bash(node scripts/check.mjs:*)",
+      "Bash(node scripts/drift.mjs:*)",
+      "Bash(node scripts/decisions.mjs:*)",
+      "Bash(node scripts/docs-check.mjs:*)",
+      "Bash(node --experimental-strip-types --test:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git submodule status:*)",
+      "Bash(git show:*)"
+    ],
+    "ask": ["Bash(git push:*)", "Bash(git submodule update:*)", "Bash(corepack pnpm add:*)"],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Bash(git push --force:*)"]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-gate.sh",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@cutroom/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared types, and the port interfaces. The leaf: imports nothing internal.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+
+  // Solution file. It references every project that HAS source files.
+  //
+  // A package with no source files is not referenced, because `tsc -b` fails on a
+  // project with no inputs. Adding the first file to a package therefore also means
+  // adding its reference here — and tests/workspace.test.ts fails if you forget,
+  // because an unreferenced package is a package nothing typechecks.
+  "files": [],
+  "references": [{ "path": "./tsconfig.tooling.json" }]
+}

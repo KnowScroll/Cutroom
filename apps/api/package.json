@@ -1,0 +1,13 @@
+{
+  "name": "@cutroom/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Submitting work and reading records. Never calls a provider.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

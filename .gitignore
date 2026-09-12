@@ -1,0 +1,51 @@
+# --- Cutroom. Nothing generated, nothing personal, no keys. ---
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# D-086: every generated artifact goes to ONE configured path, whose default is a
+# gitignored folder inside this repository. Pictures, audio, video, stills, anything
+# the pipeline writes. Never a hardcoded absolute path.
+.artifacts/
+
+# D-087: stand-in providers write REAL files at run time. They are never committed.
+.tmp/
+
+# The database (D-001) and everything derived from it
+data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+
+# Media, wherever it lands, never in git
+*.mp4
+*.mov
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.png
+*.jpg
+*.jpeg
+*.webp
+!docs/**/*.png
+
+# Node
+node_modules/
+.pnpm-store/
+dist/
+build/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# Logs
+*.log
+logs/

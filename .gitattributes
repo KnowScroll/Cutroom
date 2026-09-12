@@ -1,0 +1,26 @@
+# Line endings are decided here, not by each machine's git config.
+#
+# The working tree may be CRLF (this is a Windows machine; core.autocrlf=true).
+# The repository is always LF. Without this file, .editorconfig's `end_of_line = lf`
+# is advice to editors and nothing more, and a tool that reads bytes — a hash check,
+# a regex over a line ending — behaves differently per clone.
+#
+# sed/awk/grep in Git Bash strip \r on read, so they cannot be trusted to report this.
+# Count bytes instead:  tr -cd '\r' < file | wc -c
+* text=auto eol=lf
+
+# Shell scripts must be LF even on Windows, or bash fails with '\r': command not found
+*.sh text eol=lf
+
+# Never touched
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.mp4 binary
+*.mov binary
+*.webm binary
+*.wav binary
+*.mp3 binary
+*.m4a binary
+*.sqlite binary

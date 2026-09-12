@@ -1,0 +1,13 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# Native builds this repository will genuinely need. Listed here and NOT under
+# package.json's `pnpm` key: on pnpm 10 the package.json key does nothing, which is
+# the whole afternoon recorded in the steering repo's run skill.
+#
+#   better-sqlite3 — the database (D-001). Not installed yet; no schema exists.
+#   esbuild        — drizzle-kit runs on it
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
