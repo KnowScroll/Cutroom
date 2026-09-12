@@ -24,7 +24,16 @@ node scripts/drift.mjs 2>&1 | sed 's/^/  /'
 echo
 echo "---------------- last 2 journal entries ----------------"
 if [ -f JOURNAL.md ]; then
-  awk '/^## /{n++} n>0' JOURNAL.md | awk -v RS='\n## ' 'NR>1{print "## " $0}' | tail -n 40
+  # Start at the second-to-last entry heading, or the last one when there is only one.
+  # The steering repository's version of this splits on a record separator and drops the
+  # first record, which prints NOTHING for a journal with a single entry — exactly the
+  # state a new repository is in, and exactly when a session most needs to read it.
+  START="$(grep -n '^## ' JOURNAL.md | tail -2 | head -1 | cut -d: -f1)"
+  if [ -n "$START" ]; then
+    tail -n +"$START" JOURNAL.md | head -n 60
+  else
+    echo "  (no entries yet)"
+  fi
 else
   echo "  (no journal yet)"
 fi
