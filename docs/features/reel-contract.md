@@ -426,9 +426,11 @@ _Behaviour — against the stand-in_
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-14 journey=FAIL at f8e1584 — the check 'decisions pin' failed
+
 ## Divergence (the first broken boundary, or "none")
 
-none
+the check 'decisions pin' failed
 
 ## Pending human decisions
 
