@@ -407,7 +407,7 @@ _Behaviour — against the stand-in_
       version, and **the new `reel-contract-is-a-leaf` rule in the engine repository's boundary config**, with a
       `drift:prove` case importing by package name. **Proves: 1–9, and 10 once the engine repository's resolver
       fix has landed.**
-- [ ] **Slice 2 — ask, and be answered at once.** A stand-in service in `tests/` with durable storage from the
+- [x] **Slice 2 — ask, and be answered at once.** A stand-in service in `tests/` with durable storage from the
       start, answering submit, the lookup by `requestId`, and status. **Proves: 11, 12, 13, 14, 15, 16.**
 - [ ] **Slice 3 — follow and receive.** Events, status, result and record for a completed run of each
       `until`. **Proves: 17, 18, 19, 20, 21.**

@@ -160,3 +160,35 @@ directly — the exact messages, with their checks built in, instead of copying 
 **Next.** Slices 2–5: a stand-in service in `tests/` with durable storage, and the behaviour checks 11–27 —
 answered-at-once refusals and asking twice, following events, the answers that are not a reel, and surviving a
 restart.
+
+## 2026-09-14 — session 05, reel-contract Slice 2: asking, and being answered at once
+
+**Intent.** The owner said carry on with the contract. Slice 2: a stand-in service in `tests/` with durable
+storage, answering submit, lookup by `requestId` and status — checks 11–16.
+
+**Changed.** `tests/stand-in/reel-engine-stand-in.ts` — an HTTP service on the loopback address over a real
+SQLite file (`node:sqlite`, no new dependency), with `runs` and `events` tables from the start so Slice 5 can
+restart it on the same storage. `tests/stand-in/fixtures.ts`. `tests/reel-contract-asking.test.ts` — checks
+11–16 over real HTTP. Slice 2 ticked.
+
+**Observed.**
+
+- **Tests first, seen failing.** The new test file ran against no stand-in and failed; with the stand-in, 11 of
+  11 pass.
+- **Five deliberate breaks; four caught at once, and the fifth taught something.** Checking a reused
+  `requestId` before validity (check 11), stripping `sources` instead of refusing (check 12), accepting any
+  `until` (check 14) and answering an empty lookup with 404 (check 15) were each caught by the intended test.
+  **Removing the key-sorting from the request fingerprint was caught by nothing** — because the fingerprint is
+  taken over the _parsed_ request, and zod rebuilds a strict object in its schema's key order, so key order is
+  normalised before the sorting runs. That mutation was not a realistic bug. The realistic one — fingerprinting
+  the raw body as sent — was then made, and check 13 caught it. The sorting is kept, with a comment saying why,
+  so the rule does not rest on one library's output order.
+- **Validity comes before identity, in code order, not by accident.** Version, then schema, then producibility,
+  and only then the `requestId` comparison — so an invalid body is 422 even when its id was used before, which
+  the contract's route table states and check 11 now proves.
+- `node scripts/check.mjs`: everything green.
+
+**Why.** A stand-in that stores to a real file from the first slice is what lets Slice 5 prove "a run survives
+a restart" without rebuilding it.
+
+**Next.** Slice 3: events, status, result and record for a completed run of each `until` — checks 17–21.
