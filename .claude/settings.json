@@ -8,6 +8,7 @@
       "Bash(node scripts/drift.mjs:*)",
       "Bash(node scripts/decisions.mjs:*)",
       "Bash(node scripts/docs-check.mjs:*)",
+      "Bash(node scripts/journey.mjs:*)",
       "Bash(node --experimental-strip-types --test:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",

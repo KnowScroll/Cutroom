@@ -86,6 +86,16 @@ node scripts/check.mjs
 Six code checks plus two about the authority. `--code` runs only the first six. A red
 `decisions pin` is not yours to fix by editing anything here.
 
+**A feature in `docs/features/` is verified only by its journey** (S-016), run after its last slice is
+committed:
+
+```bash
+node scripts/journey.mjs <slug>
+```
+
+It runs every check and `tests/<slug>-*.test.ts`, and writes the evidence, the status and the divergence. Never
+type any of the three by hand. A FAIL is the finding: stop and report.
+
 ## Copy voice, when anything becomes user-visible
 
 The design's words, not ours: "kept things" not Relics, "checked out" not documented, "a place"

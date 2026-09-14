@@ -298,3 +298,46 @@ diverge", and a moved feature is the opposite.
 **Caught by.** Nothing mechanical yet. With one moved feature there is nothing to be inconsistent with; the
 second move is the moment to add a test that every `docs/features/*.md` carries front matter and a moved-from
 note.
+
+---
+
+## S-016 | 2026-09-14 | A feature here is marked verified by `scripts/journey.mjs`, and by nothing typed
+
+**Chose.** `node scripts/journey.mjs <slug>` judges a feature in `docs/features/`. It **refuses and writes
+nothing** unless all four gates read APPROVED, every slice is ticked, at least one test is named
+`tests/<slug>-*.test.ts`, and the working tree is clean. Then it runs **every check** (`scripts/check.mjs`) and
+**the feature's own tests**, and writes one evidence line — date, PASS or FAIL, the commit, and the test count or
+what broke — above any earlier line. **PASS** flips `Status:` to `verified` and sets Divergence to `none`.
+**FAIL** fills Divergence and leaves `Status:` alone. It never commits.
+
+**Why.** `reel-contract` finished all five slices with every check green, and nothing was allowed to say so. Its
+file says evidence is "appended by the journey, never typed by hand"; S-002 declined to port the steering
+repository's `journey`, and D-089 says no proof goes back there. So the rule existed and the thing it names did
+not. **The owner chose on 2026-09-14** to build a small one here, over counting a fully ticked slice list as
+done. A ticked list is typed by the same hand that ticks it; a script run at a named commit is not.
+
+**Why a clean tree.** The evidence line names a commit. With uncommitted changes, the commit is not what ran.
+
+**Why the feature's tests as well as every check.** `check.mjs` already runs them. The second run is what gives
+the evidence a count, and it means a feature with no tests of its own cannot be verified by a green repository.
+
+**Why FAIL leaves Status alone.** A failing run proves nothing new about the feature, and a status that
+changes on failure invites running it again until it doesn't.
+
+**Supersedes S-002, in part.** S-002 rejected "porting `state`, `journey` and `proof` to read a local steering
+tree". This is not that: it reads no steering tree, writes no proof bundle and nothing goes back to the steering
+repository. `state` and `proof` stay unported.
+
+**Rejected.** **Ticked slices mean verified** — nothing independent of the person ticking. **Porting the steering
+repository's `journey.mjs`** — it runs Playwright journey specs, writes proof bundles under `proof/` and has a
+`--red` mode, none of which exists or is needed here; red-first is shown in `JOURNAL.md` by deliberate breaks.
+**Only the feature's tests, not every check** — a feature verified while a boundary rule is red. **A `--check`
+flag to choose the check command** — a way to verify a feature against a weaker check. Only `--repo` exists,
+and it judges a feature in another repository, never one here.
+
+**Caught by.** `tests/journey.test.ts` — eleven cases, each run against a small throwaway git repository with a
+check script that passes or fails on command. Eleven deliberate breaks to the script, each caught by the case
+meant for it. **Not caught:** an evidence line typed by hand. Nothing stops that, here or in the steering
+repository.
+
+**Confirmed-by.** The owner, 2026-09-14: _"Small script in the engine repo"_.
