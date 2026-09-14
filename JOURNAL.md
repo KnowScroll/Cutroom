@@ -192,3 +192,30 @@ restart it on the same storage. `tests/stand-in/fixtures.ts`. `tests/reel-contra
 a restart" without rebuilding it.
 
 **Next.** Slice 3: events, status, result and record for a completed run of each `until` — checks 17–21.
+
+## 2026-09-14 — session 05, reel-contract Slice 3: following a run and receiving it
+
+**Changed.** The stand-in now progresses runs step by step — each run's planned steps are decided at acceptance
+and stored in its database row, so a restarted stand-in continues the same run. New routes: events, result,
+record. New `tests/stand-in/client.ts`, which checks every reply against the schema the contract assigns to
+that route and status. New `tests/reel-contract-following.test.ts` (checks 17–21); Slice 2's tests now use the
+same client. Slice 3 ticked.
+
+**Observed.**
+
+- **One test passed before any code existed, and was rewritten.** "Unknown run → 404 on events, result and
+  record" passed against a stand-in with none of those routes, because it answered 404 to every path it did not
+  know. It now also requires a _known_ run not to get 404 on the same routes, which the old code fails. All 9
+  failed before the code; all 9 pass after.
+- **Six deliberate breaks, six caught**: ignoring `since`, serving a result before the run finishes, leaving a
+  chosen picture out of the result, timestamps with an offset instead of UTC, accepting a negative `since`, and
+  relative artifact paths. The UTC break was caught by five tests at once — the shared client rejects a
+  non-UTC `at` on every reply, not only in check 18.
+- **Slice 2's tests gained check 18 for free** by moving onto the client, so submit, lookup and status replies
+  are now schema-checked too.
+- **Writing a long script through the shell failed on quoting** — the trap this repository's `CLAUDE.md` names.
+  Nothing was written; the file was written directly instead, and its regexes were checked on disk afterwards.
+- `node scripts/check.mjs`: everything green.
+
+**Next.** Slice 4: the answers that are not a reel — plan-only estimates, budget refusal and stop, rule stop,
+failure, cancel — checks 22–26.

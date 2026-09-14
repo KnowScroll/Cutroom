@@ -409,7 +409,7 @@ _Behaviour — against the stand-in_
       fix has landed.**
 - [x] **Slice 2 — ask, and be answered at once.** A stand-in service in `tests/` with durable storage from the
       start, answering submit, the lookup by `requestId`, and status. **Proves: 11, 12, 13, 14, 15, 16.**
-- [ ] **Slice 3 — follow and receive.** Events, status, result and record for a completed run of each
+- [x] **Slice 3 — follow and receive.** Events, status, result and record for a completed run of each
       `until`. **Proves: 17, 18, 19, 20, 21.**
 - [ ] **Slice 4 — the answers that are not a reel.** Plan-only estimates, budget refusal and stop, rule stop,
       cancel — each outcome forced through the stand-in. **Proves: 22, 23, 24, 25, 26.**

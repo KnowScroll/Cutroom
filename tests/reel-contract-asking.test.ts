@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { after, before, test } from 'node:test'
 import { ErrorResponse, RunStatus, SubmitResponse } from '@cutroom/reel-contract'
+import { client } from './stand-in/client.ts'
 import { startStandIn, type StandIn } from './stand-in/reel-engine-stand-in.ts'
 import { validRequest } from './stand-in/fixtures.ts'
 
@@ -13,12 +14,14 @@ import { validRequest } from './stand-in/fixtures.ts'
 
 let service: StandIn
 let storageDir: string
+let api: ReturnType<typeof client>
 
 before(async () => {
   storageDir = mkdtempSync(join(tmpdir(), 'reel-contract-slice2-'))
   // Can plan and make stills, but not video yet — the shape a real engine has before its
   // second half exists, and what check 14 needs.
   service = await startStandIn({ storageDir, canProduce: ['plan', 'stills'] })
+  api = client(service.baseUrl)
 })
 
 after(async () => {
@@ -26,16 +29,11 @@ after(async () => {
   rmSync(storageDir, { recursive: true, force: true })
 })
 
-async function call(method: string, path: string, body?: unknown, raw?: string) {
-  const res = await fetch(`${service.baseUrl}${path}`, {
-    method,
-    headers: { 'content-type': 'application/json' },
-    body: raw ?? (body === undefined ? undefined : JSON.stringify(body)),
-  })
-  return { status: res.status, json: (await res.json()) as Record<string, unknown> }
-}
-
-const submit = (body: unknown) => call('POST', '/v1/runs', body)
+// Every reply goes through ./stand-in/client.ts, which fails the test on a body the contract
+// does not describe for that route and status (check 18).
+const call = (method: string, path: string, body?: unknown, raw?: string) =>
+  api.call(method, path, body, raw)
+const submit = (body: unknown) => api.submit(body)
 
 /** The same object with every key inserted in reverse order, at every depth. */
 function reversedKeys(value: unknown): unknown {
