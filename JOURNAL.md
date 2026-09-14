@@ -304,3 +304,13 @@ it: **Status: verified**.
   soon after a steering push will fail first.
 
 **Next.** `reel-engine`'s plan fix pass, in the steering repository.
+
+## 2026-09-14 — session 05, pin bumped after the steering repository's handoff
+
+**Changed.** `steering-ref` pinned to the steering repository's handoff commit. Nothing else.
+
+**Observed.** The steering repository rewrote `docs/founding/reel-creation-engine/handoff.md` for the `reel-engine`
+fix pass. No decision changed. The bump keeps `decisions pin` green, as the previous entry said every steering
+push would require.
+
+**Next.** Unchanged: `reel-engine`'s plan, in the steering repository, once the owner picks the method.
