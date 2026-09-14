@@ -245,3 +245,31 @@ New `tests/reel-contract-endings.test.ts` (checks 22–26). Slice 4 ticked.
 
 **Next.** Slice 5: stop and restart the stand-in on the same storage, find the run by `requestId`, resume events
 without gaps or repeats — check 27 — then every check together.
+
+## 2026-09-14 — session 05, reel-contract Slice 5: restart, and every check together
+
+**Changed.** New `tests/reel-contract-restart.test.ts` (check 27). No change to the stand-in. Slice 5 ticked — all
+five slices of `reel-contract` are now done.
+
+**Observed.**
+
+- **The restart test passed the first time it ran, before any change.** That was expected, not luck: Slice 2
+  gave the stand-in durable storage from the start, precisely so this slice would need none. A test that has
+  never failed proves nothing, so it was made to fail instead.
+- **Six deliberate breaks to the storage, six caught.** Keeping the database in memory, opening a new file on
+  each start, wiping the tables on start, and keeping `requestId` lookups in memory were each caught as "the run
+  was not found by requestId after the restart". Keeping the step cursor in memory was caught as "the run started
+  again from the beginning". Counting event numbers in memory was caught by the database itself refusing a second
+  event 1 — a crash, not a wrong answer, and the test still fails.
+- **The test also replays the same request after the restart** and gets the same run back. Check 27 names only
+  the lookup; a caller recovering from a crash will resubmit, so the replay is where it would really be hurt.
+- **Every check, together:** `node scripts/check.mjs` green, which includes `drift --prove` with the
+  by-package-name probe that is check 10. **55 tests, 55 pass** — checks 1–27.
+
+**Gap, not closed here.** The feature file says its Evidence is "appended by the journey, never typed by hand",
+and that the journey flips its status. This repository has no journey runner (S-002 declined to port one), and
+D-089 says no proof goes back to the steering repository. So nothing is allowed to write Evidence or flip
+`Status: planned`, and neither was done by hand. Put to the owner.
+
+**Next.** The owner decides how a finished feature is marked verified here. Then `reel-engine`'s plan, in the
+steering repository, against today's decisions and this contract.
