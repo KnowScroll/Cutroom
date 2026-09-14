@@ -314,3 +314,35 @@ fix pass. No decision changed. The bump keeps `decisions pin` green, as the prev
 push would require.
 
 **Next.** Unchanged: `reel-engine`'s plan, in the steering repository, once the owner picks the method.
+
+## 2026-09-14 — session 06, engine decisions move here, and a first native feature
+
+**Intent.** The owner asked to stop making Cutroom decisions in the steering repository and do the work here,
+and to add a video-editing feature among the first.
+
+**Changed.** `DECISIONS.md` — **S-017**: decisions about the engine and Cutroom are written here now; the
+steering repository's D-001…D-114 bind until an entry here supersedes one by name (the steering side is
+**D-115**). `CLAUDE.md` — says so, says new features are planned here, and corrects two stale facts (sixteen
+rules, not fifteen; `reel-contract` has source). `docs/features/video-edits.md` — a stub: free edits instead of
+paying for new generation, what D-058, D-057, D-025, D-036, D-054/55/59 and I-12 already decide, and five
+questions to settle before its gates. Its gates come next after `reel-plan`'s are approved.
+
+**Observed.**
+
+- **The old decisions are not copied.** They stay in the steering repository and are read through the pin, as
+  the owner chose; only new ones are written here.
+- **`reel-plan`, `reel-stills` and `reel-render` stay in the steering repository until approved** — the owner kept
+  D-089's timing — so for a while a plan there will cite decisions here.
+- **An experiment against this repository's installed dependency-cruiser, for `reel-plan`'s review, found the
+  config cannot see npm imports at all**: `options.exclude` drops every `node_modules` path from the graph, so a
+  rule about `ai` or `drizzle-orm` never fires. With `node_modules` out of `exclude` (and `doNotFollow` kept),
+  two proposed rules fired on all six violating imports and stayed silent on `zod` in pnpm's store and on
+  workspace links; this repository's real source stayed clean. The tool also refuses a pattern with a repeat
+  inside a repeated group. Nothing in the config was changed — that is `reel-plan`'s Slice 2.
+
+**`reel-plan` moved here.** Its gates were approved in the steering repository after three narrow checks, and
+under D-089, D-105 and S-015 it now lives at `docs/features/reel-plan.md`, with a move note. Checked against the
+steering copy: all 24 headings, every numbered check, and every letter and digit kept through the formatter.
+
+**Next.** Push the steering repository, then bump the `steering-ref` pin here — `decisions pin` stays red until
+then. Then `reel-plan` Slice 1. After `reel-plan`, `video-edits`' gates.

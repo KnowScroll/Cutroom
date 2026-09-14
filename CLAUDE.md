@@ -1,24 +1,30 @@
 # Cutroom — how to work in this repo
 
-**The authority is not here.** `steering/DECISIONS.md` lives in the KnowScroll repository and is
-binding on this one (**D-088**). Read it at `steering-ref/steering/DECISIONS.md`, and run
-`node scripts/decisions.mjs` first: it tells you whether what you can see is current. **If it
-says commits are unpushed over there, the decisions that exist are newer than anything you can
-read — say so and stop, rather than deciding for yourself.**
+**Two files of decisions, read in this order** (**D-115**, **S-017**, 2026-09-14):
 
-This repository never gets its own copy of that file. Two copies of one authority is the drift
-the whole mechanism exists to catch.
+1. **`steering-ref/steering/DECISIONS.md`** — the KnowScroll repository's D-001 to D-114, read
+   through the pin. They bind this repository. Nothing new about Cutroom is written there any more.
+   Run `node scripts/decisions.mjs` first: it tells you whether what you can see is current. **If it
+   says commits are unpushed over there, say so and stop, rather than deciding for yourself.**
+2. **`DECISIONS.md` here** — every decision about the engine and Cutroom from 2026-09-14 on, as `S-`
+   entries. **An entry here that names a D-entry in `Supersedes` wins over it.**
+
+This repository never gets a copy of the D-entries. Two copies of one authority is the drift the
+whole mechanism exists to catch.
 
 ## The rules that carry over, and are not negotiable
 
 1. **Gates before code.** No implementation file for a feature whose four planning gates —
    product, architecture, program design, slices — are not approved by an adversarial reviewer.
-   The gates are written and reviewed **in the steering repository**. Trivial fixes (one file, no
-   new route, table, job or screen) skip to a slice.
+   **New features are planned here**, in `docs/features/`. `reel-plan`, `reel-stills` and
+   `reel-render` are the exception: their gates are still in the steering repository and move here
+   once approved (S-015, S-017). Trivial fixes (one file, no new route, table, job or screen) skip
+   to a slice.
 2. **Any choice between real alternatives becomes a written decision** with what was rejected and
-   how a violation will be caught. Not in chat, not in your head. Setup choices go in this
-   repository's `DECISIONS.md` as `S-` entries; anything about the product goes in the steering
-   repository's.
+   how a violation will be caught. Not in chat, not in your head. Anything about the engine or
+   Cutroom goes in this repository's `DECISIONS.md` as an `S-` entry (S-017); anything about
+   KnowScroll's side — the script, the epistemic layer, the orchestrator, the player — goes in the
+   steering repository's.
 3. **Never weaken a check or a test to reach green.** Add, never subtract. If `drift --prove`
    fails, a rule stopped working — that is the finding, not an obstacle.
 4. **Never commit** media, the SQLite file, generated artifacts, or a secret. `.gitignore` covers
@@ -37,13 +43,15 @@ apps/worker          the runner. The only place that knows both a stage and a ta
 apps/api             submitting work, reading records. Never calls a provider.
 ```
 
-All six are **empty on purpose**. **Fifteen** boundary rules are enforced on the real dependency
+A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094) and the only one
+with source; the six above are **empty until their features' gates are approved**. **Sixteen**
+boundary rules are enforced on the real dependency
 graph, and `node scripts/drift.mjs --prove` builds a deliberate violation of each one and fails
 if any rule stays silent. The load-bearing ones: **pipeline imports no domain, no providers, no
 app, and no I/O at all** — no filesystem, no network, no process, no database driver. A stage is
 handed a port; it never reaches for one.
 
-**Four of the fifteen are between two folders of one package**, and they are the reason this is
+**Four of the sixteen are between two folders of one package**, and they are the reason this is
 dependency-cruiser rather than a script matching import text. It resolves every import to a file
 path, so `'../epistemic/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
 

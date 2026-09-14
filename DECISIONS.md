@@ -341,3 +341,33 @@ meant for it. **Not caught:** an evidence line typed by hand. Nothing stops that
 repository.
 
 **Confirmed-by.** The owner, 2026-09-14: _"Small script in the engine repo"_.
+
+---
+
+## S-017 | 2026-09-14 | Decisions about the engine and Cutroom are written here now; the steering repository's D-entries bind until one here supersedes them
+
+**Chose.** From 2026-09-14 this file holds **every new decision about the engine and Cutroom**, not only setup
+choices. The numbering continues as `S-`. The steering repository's **D-001 to D-114 stay there**, read at
+`steering-ref/steering/DECISIONS.md`, and **bind this repository until an entry here supersedes one by naming
+it** (`Supersedes: D-0nn`). **New features are planned here**: gates written and reviewed in `docs/features/`.
+The three engine feature files still in the steering repository — `reel-plan`, `reel-stills`, `reel-render` —
+stay there until their gates are approved, then move here (S-015). Decisions about KnowScroll's side — the
+script, the epistemic layer, the orchestrator, the player — stay in the steering repository.
+
+**Supersedes** this file's opening scope note, which says anything about the product, the pipeline or the data
+model belongs in the steering repository and that no entry here may contradict it. An entry here may now
+supersede a D-entry, and must name it when it does.
+
+**Why.** **D-115**, the steering repository's last decision about Cutroom, chosen by the owner on 2026-09-14:
+_"lets stop making decisions for cutroom here, and do work there"_. The code, the boundary rules, the journey
+and the first verified feature were already here; only the deciding was not.
+
+**Rejected.** **Copying the D-entries into this file** — two copies of one authority, the drift D-088 was
+written against; the owner chose to leave them where they are. **A second prefix for engine decisions beside
+`S-`** — two numbering sequences in one file, and nothing a reader gains from telling them apart.
+
+**Caught by.** Nothing mechanical. `scripts/decisions.mjs` still reports whether the pin can see the steering
+repository's decisions, which still bind. A D-entry superseded here carries no mark over there — D-115 records
+that cost, and says to read this file after that one for engine questions.
+
+**Confirmed-by.** The owner, 2026-09-14, through D-115.
