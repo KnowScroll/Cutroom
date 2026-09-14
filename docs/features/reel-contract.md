@@ -11,7 +11,7 @@ authority: plan
 
 # reel-contract — how anything outside the engine asks it for a reel, and what it gets back
 
-Status: planned
+Status: verified
 Decisions: D-020, D-042, D-047, D-056, D-062, D-063, D-064, D-069, D-073, D-083, D-092, D-093, D-094, D-095, D-096, D-097, D-098, D-099, D-100, D-101, D-102, D-105, D-106, I-4, I-14
 Named only in Pending, as notes or as work handed to the engine features: D-015, D-034, D-054, D-059, D-082, D-085, D-103, D-104
 Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED 2026-09-14 adversarial-reviewer · program-design APPROVED 2026-09-14 adversarial-reviewer · slices APPROVED 2026-09-14 adversarial-reviewer
@@ -426,11 +426,12 @@ _Behaviour — against the stand-in_
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-14 journey=PASS at 0ae20f8 — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-14 journey=FAIL at f8e1584 — the check 'decisions pin' failed
 
 ## Divergence (the first broken boundary, or "none")
 
-the check 'decisions pin' failed
+none
 
 ## Pending human decisions
 

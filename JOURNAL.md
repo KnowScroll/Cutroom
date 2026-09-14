@@ -273,3 +273,34 @@ D-089 says no proof goes back to the steering repository. So nothing is allowed 
 
 **Next.** The owner decides how a finished feature is marked verified here. Then `reel-engine`'s plan, in the
 steering repository, against today's decisions and this contract.
+
+## 2026-09-14 — session 05, a journey for this repository, and reel-contract verified
+
+**Intent.** The owner chose a small script here to mark a finished feature verified, over counting ticked slices
+as done.
+
+**Changed.** `scripts/journey.mjs` and `tests/journey.test.ts` (S-016). `CLAUDE.md` says how a feature is verified;
+`.claude/settings.json` allows the script. The `steering-ref` pin bumped to `8bac8a8`. `reel-contract` run through
+it: **Status: verified**.
+
+**Observed.**
+
+- **Tests first, then breaks.** All eleven cases failed with no script; after it, eleven deliberate breaks —
+  loosening the gate match, allowing an unticked slice, a dirty tree, trusting the check alone, flipping status on
+  a fail, replacing old evidence, dropping CRLF, and others — were each caught by the case meant for it.
+- **One trap, found by the tests.** Under Node's test runner a child gets `NODE_TEST_CONTEXT`, and a nested
+  `node --test` that inherits it reports to the runner in its own format and prints no TAP — so the count found
+  nothing and every pass read as "ran no tests". The script clears it.
+- **The tests never run the journey against this repository.** Its check runs the tests, which would run the
+  journey again. They build throwaway git repositories with a check that passes or fails on command, and pass
+  `--repo`.
+- **The first real run was a FAIL, and a true one.** `decisions pin` was red: two journal-only commits in the
+  steering repository had left the pin two behind. No decision had changed — 106 either way — but the check cannot
+  know that, and should not guess. Bumped, committed, run again: **PASS at `0ae20f8`, 41 tests in
+  `tests/reel-contract-*.test.ts`**. The FAIL line stays, below the PASS; evidence is never
+  cleaned up.
+- **This will recur.** Any push to the steering repository — even a journal entry about work done here — turns this
+  repository's check red until the pin is bumped. That is D-090 working, not a fault, and it means a journey run
+  soon after a steering push will fail first.
+
+**Next.** `reel-engine`'s plan fix pass, in the steering repository.
