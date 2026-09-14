@@ -199,5 +199,16 @@ module.exports = {
     // Type-only imports count. A boundary crossed by `import type` is still a boundary
     // crossed: it means the module was designed against the wrong thing.
     tsPreCompilationDeps: true,
+
+    // Resolve a workspace import by PACKAGE NAME. Every package here declares only
+    // `exports` — no `main` — and without this the resolver never reads it, so an import of
+    // `@cutroom/domain` stays unresolved and every cross-package rule is silent on it, while
+    // the relative-path --prove cases still pass. Found by an experiment from the steering
+    // repository on 2026-09-14; `drift --prove` now has by-name cases that go SILENT if this
+    // line is ever removed. Tested alone, this setting is sufficient; `conditionNames` alone
+    // and `extensions` alone are not.
+    enhancedResolveOptions: {
+      exportsFields: ['exports'],
+    },
   },
 }

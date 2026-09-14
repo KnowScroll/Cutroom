@@ -23,7 +23,7 @@
  * real dependency here, `--prove` watches every rule fire, and `--audit` watches for the
  * rule that still reads correctly while matching nothing.
  */
-import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { REPO, bold, dim, fail, green, pass, red, run, yellow } from './_lib.mjs'
@@ -130,6 +130,72 @@ const EXTRA_FILES = [
   ['packages/pipeline/src/split/internal/cut.ts', 'export const cut = 1'],
 ]
 
+/**
+ * The same cross-package rules, broken the way real code will break them: by PACKAGE NAME.
+ *
+ * Every case above imports by relative path. Code in one package will import another as
+ * `@cutroom/domain`, and an experiment run from the steering repository on 2026-09-14 showed
+ * that dependency-cruiser left every such import UNRESOLVED under this config — packages
+ * declare only `exports`, and the resolver was not reading it — so each of these rules stayed
+ * silent on exactly the import real code writes, while the relative-path cases above passed.
+ * Proven and still dead. These cases are the reason that cannot happen again unnoticed.
+ *
+ * Each entry: [rule, importing package folder, specifier]. Package names are `@cutroom/<folder>`.
+ */
+const BY_NAME_CASES = [
+  ['pipeline-no-domain', 'packages/pipeline', '@cutroom/domain'],
+  ['pipeline-no-providers', 'packages/pipeline', '@cutroom/providers'],
+  ['pipeline-no-apps', 'packages/pipeline', '@cutroom/api'],
+  ['api-no-providers', 'apps/api', '@cutroom/providers'],
+  ['providers-no-domain', 'packages/providers', '@cutroom/domain'],
+  ['providers-no-pipeline', 'packages/providers', '@cutroom/pipeline'],
+  ['domain-no-pipeline-or-providers', 'packages/domain', '@cutroom/pipeline'],
+  ['contracts-are-a-leaf', 'packages/contracts', '@cutroom/domain'],
+]
+
+/** The legal shape again, by package name. Nothing here may be reported. */
+const BY_NAME_LEGAL = [
+  ['apps/worker', '@cutroom/pipeline'],
+  ['apps/worker', '@cutroom/domain'],
+  ['packages/pipeline', '@cutroom/contracts'],
+]
+
+const PACKAGE_FOLDERS = [
+  'packages/contracts',
+  'packages/domain',
+  'packages/pipeline',
+  'packages/providers',
+  'apps/api',
+  'apps/worker',
+]
+
+/**
+ * A miniature workspace: every package with a package.json that declares only `exports`, the
+ * way the real ones do, and a workspace link placed where pnpm places it — inside the
+ * IMPORTING package's node_modules. Then one file per import.
+ */
+function buildByName(dir, imports) {
+  rmSync(dir, { recursive: true, force: true })
+  for (const folder of PACKAGE_FOLDERS) {
+    const name = `@cutroom/${folder.split('/')[1]}`
+    mkdirSync(join(dir, folder, 'src'), { recursive: true })
+    const manifest = { name, type: 'module', exports: { '.': './src/index.ts' } }
+    writeFileSync(join(dir, folder, 'package.json'), `${JSON.stringify(manifest)}\n`, 'utf8')
+    writeFileSync(join(dir, folder, 'src', 'index.ts'), 'export const x = 1\n', 'utf8')
+  }
+  imports.forEach(([from, specifier], i) => {
+    const target = PACKAGE_FOLDERS.find((f) => `@cutroom/${f.split('/')[1]}` === specifier)
+    const link = join(dir, from, 'node_modules', ...specifier.split('/'))
+    if (!existsSync(link)) {
+      mkdirSync(join(link, '..'), { recursive: true })
+      symlinkSync(join(dir, target), link, 'junction')
+    }
+    writeFileSync(join(dir, from, 'src', `by-name-${i}.ts`), `import '${specifier}'\n`, 'utf8')
+  })
+  const tsconfig = '{ "compilerOptions": { "allowImportingTsExtensions": true, "noEmit": true } }'
+  writeFileSync(join(dir, 'tsconfig.json'), `${tsconfig}\n`, 'utf8')
+}
+
 /** A legal shape. Nothing here may be reported, or the rules are too eager to be trusted. */
 const LEGAL = [
   ['packages/contracts/src/index.ts', 'export type Port = { run(): Promise<void> }'],
@@ -198,6 +264,29 @@ function prove() {
     }
   }
 
+  // 1b. The cross-package rules again, imported by PACKAGE NAME — the form real code uses.
+  const byName = join(root, 'by-name')
+  buildByName(
+    byName,
+    BY_NAME_CASES.map(([, from, specifier]) => [from, specifier]),
+  )
+  const dirtyByName = cruise(byName, SCAN)
+  console.log(`\n${bold('The cross-package rules, imported by package name')}\n`)
+  if (dirtyByName.error) {
+    console.log(`  ${red('ERROR')}   ${dirtyByName.error}`)
+    silent += BY_NAME_CASES.length
+  } else {
+    const firedByName = new Set(dirtyByName.violations.map((v) => v.rule))
+    for (const [rule, , specifier] of BY_NAME_CASES) {
+      if (firedByName.has(rule)) {
+        console.log(`  ${green('caught')}  ${rule}  ${dim(specifier)}`)
+      } else {
+        console.log(`  ${red('SILENT')}  ${rule}  ${dim(specifier)}`)
+        silent += 1
+      }
+    }
+  }
+
   // 2. A legal shape must come back clean, or the rules are wrong rather than the code.
   const legal = join(root, 'legal')
   build(legal, LEGAL)
@@ -216,6 +305,24 @@ function prove() {
     }
   }
 
+  // 2b. The legal shape by package name. A resolver fix that made rules over-eager on
+  // workspace imports would show up here, not in the relative-path shape above.
+  const legalByName = join(root, 'legal-by-name')
+  buildByName(legalByName, BY_NAME_LEGAL)
+  const cleanByName = cruise(legalByName, SCAN)
+  console.log(`\n${bold('The legal shape, by package name')}\n`)
+  if (cleanByName.error) {
+    console.log(`  ${red('ERROR')}   ${cleanByName.error}`)
+    overeager += 1
+  } else if (cleanByName.violations.length === 0) {
+    console.log(`  ${green('clean')}   ${cleanByName.modules} modules, nothing reported`)
+  } else {
+    overeager += cleanByName.violations.length
+    for (const v of cleanByName.violations) {
+      console.log(`  ${red('EAGER')}   ${v.rule}  ${v.from} -> ${v.to}`)
+    }
+  }
+
   rmSync(root, { recursive: true, force: true })
   console.log('')
 
@@ -224,7 +331,10 @@ function prove() {
   } else if (overeager > 0) {
     fail(`${overeager} rule(s) fired on a legal import. The rules are wrong, not the code.`)
   } else {
-    pass(`${CASES.length} rules proven to fire, and silent on a legal shape`)
+    pass(
+      `${CASES.length} rules proven to fire, ${BY_NAME_CASES.length} of them again by package ` +
+        'name, and silent on a legal shape both ways',
+    )
   }
 }
 
