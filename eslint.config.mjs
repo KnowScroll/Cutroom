@@ -11,7 +11,9 @@ export default [
   {
     ignores: [
       'node_modules/**',
-      'dist/**',
+      // Every package's tsc output, not only the root's: declarations Drizzle's inferred types
+      // produce in packages/domain/dist are generated, and never source anyone wrote.
+      '**/dist/**',
       '.artifacts/**',
       '.tmp/**',
       'steering-ref/**',

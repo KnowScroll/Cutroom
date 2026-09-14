@@ -371,3 +371,45 @@ repository's decisions, which still bind. A D-entry superseded here carries no m
 that cost, and says to read this file after that one for engine questions.
 
 **Confirmed-by.** The owner, 2026-09-14, through D-115.
+
+---
+
+## S-018 | 2026-09-14 | The engine's service is Node's own `http` module, with no web framework
+
+**Chose.** `apps/api/src/server.ts` serves the contract's seven routes on `node:http`: a few path patterns, bodies
+read whole, every request body validated by `@cutroom/reel-contract`'s own schemas, every answer typed by them.
+No dependency is added to `apps/api` beyond the two workspace packages it needs.
+
+**Why.** Seven routes on the loopback address, for one caller (D-098). The schemas that describe every body
+already exist and are the contract (D-094); what a framework adds is routing and a validation layer, and the
+first is a dozen lines. The contract's stand-in, in `tests/`, had already served the same routes this way and
+been held to the contract by 27 checks.
+
+**Rejected.** **Hono** — a dependency and a router for seven routes. **Fastify** — its JSON-schema validation
+would be a second description of every body beside the zod schemas, the two-copies drift the contract package
+exists to prevent; skipping it would leave a framework used for little more than routing.
+
+**Caught by.** Nothing mechanical keeps a framework out; one would arrive as a dependency in
+`apps/api/package.json`, where a review sees it. What matters about the choice is checked whatever serves the
+routes: `reel-plan`'s check 13 produces every status the contract gives every route, and parses each body under
+its schema.
+
+---
+
+## S-019 | 2026-09-14 | The engine brings its database up to date itself, when it opens the file
+
+**Chose.** `openDatabase` in `packages/domain` opens the SQLite file with better-sqlite3 in WAL mode (D-001),
+turns foreign keys on, waits up to five seconds on a lock, and runs Drizzle's migrator against `db/migrations` —
+the folder `drizzle-kit generate` writes to (S-012). The API and the worker each call it on start. Migrations are
+committed; a new one is made with `drizzle-kit generate` after `schema.ts` changes.
+
+**Rejected.** **Running `drizzle-kit migrate` by hand before starting the service** — a step to forget, and a
+service on an old file fails at its first query rather than at start. **`CREATE TABLE IF NOT EXISTS` in code, as
+the contract's stand-in does** — a second description of the tables beside `schema.ts`, and no path for the second
+migration.
+
+**Caught by.** Every `reel-plan` test starts the engine on an empty file in a temporary folder, so a table the
+migration does not create fails them; check 16 reads `job` straight from the file. **Not caught:** `schema.ts`
+changed without a new migration — the tests then run against the old tables and pass if nothing reads the new
+column. **Not handled:** two processes opening a brand-new file at the same instant both try the first migration;
+the tests start the API before the worker. `reel-plan`'s Slice 5, which restarts both, is where that is met.

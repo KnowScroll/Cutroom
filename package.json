@@ -21,7 +21,9 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "devDependencies": {
+    "@cutroom/api": "workspace:*",
     "@cutroom/reel-contract": "workspace:*",
+    "@cutroom/worker": "workspace:*",
     "@eslint/js": "^9.38.0",
     "@types/node": "^22.15.0",
     "dependency-cruiser": "^17.0.0",

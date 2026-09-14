@@ -14,10 +14,10 @@ import {
 
 type Schema = { safeParse(x: unknown): { success: boolean } }
 
-type Route = 'submit' | 'lookup' | 'status' | 'events' | 'result' | 'record' | 'cancel'
+export type Route = 'submit' | 'lookup' | 'status' | 'events' | 'result' | 'record' | 'cancel'
 
 /** The contract's route table: which schema each status code's body must parse under. */
-const EXPECTED: Record<Route, Record<number, Schema>> = {
+export const EXPECTED: Record<Route, Record<number, Schema>> = {
   submit: { 202: SubmitResponse, 409: SubmitResponse, 422: SubmitResponse, 500: ErrorResponse },
   lookup: { 200: RunStatus, 400: ErrorResponse, 404: ErrorResponse, 500: ErrorResponse },
   status: { 200: RunStatus, 404: ErrorResponse, 500: ErrorResponse },

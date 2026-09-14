@@ -9,5 +9,9 @@
   },
   "files": [
     "src"
-  ]
+  ],
+  "dependencies": {
+    "@cutroom/domain": "workspace:*",
+    "@cutroom/reel-contract": "workspace:*"
+  }
 }

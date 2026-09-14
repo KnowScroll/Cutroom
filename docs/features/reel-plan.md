@@ -514,7 +514,7 @@ _How a run ends_
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the service answers, and a run finishes.** The five tables and their migration; the routes
+- [x] **Slice 1 — the service answers, and a run finishes.** The five tables and their migration; the routes
       on loopback; validation, `unsupported`, asking twice; the event record; the worker claiming `reel.plan`.
       Planning does not exist yet, so the worker finishes every run as `failed` with the detail _"planning is
       not built"_ — a contract-valid answer that no check asserts, and that Slice 3 replaces.

@@ -346,3 +346,57 @@ steering copy: all 24 headings, every numbered check, and every letter and digit
 
 **Next.** Push the steering repository, then bump the `steering-ref` pin here — `decisions pin` stays red until
 then. Then `reel-plan` Slice 1. After `reel-plan`, `video-edits`' gates.
+
+## 2026-09-14 — session 07, reel-plan Slice 1: the service answers, and a run finishes
+
+**Intent.** The owner asked for `reel-plan` Slice 1 only — checks 10–16 — tests first, each seen failing, each
+broken on purpose once after it passed.
+
+**Changed.**
+
+- `packages/domain` — its first source. `schema.ts`: the five tables, `run`, `run_event`, `job` (D-002's full
+  column list), `plan`, `model_receipt`. The migration, `db/migrations/0000_reel_plan_tables.sql`, by drizzle-kit. `db.ts` opens the file (WAL, foreign keys, busy timeout) and migrates it (**S-019**). `runs.ts`:
+  submit, asking twice by canonical JSON, the event record numbered inside immediate transactions, finishing a run
+  in one transaction with its job. `queue.ts`: enqueue, claim by one `UPDATE … RETURNING`, complete, bury.
+  Dependencies `better-sqlite3` 13 and `drizzle-orm` 0.45 (D-001); the native build compiled on this machine.
+- `apps/api/src/server.ts` — the contract's seven routes on `127.0.0.1`, on `node:http` (**S-018**); refuses
+  `until` other than `plan` (D-108) and `planVaryOn` other than `shotCount` (D-110) as `unsupported`, saying "not
+  built yet".
+- `apps/worker` — `worker.ts` polls and claims `reel.plan`; `plan-job.ts` starts the plan stage and finishes the
+  run `failed`, _"planning is not built"_, which Slice 3 replaces.
+- `tests/engine/harness.ts` starts the real API and worker on a temporary file. `tests/reel-plan-asking.test.ts`
+  (10, 11, 14), `tests/reel-plan-service.test.ts` (12, 13), `tests/reel-plan-run.test.ts` (15, 16).
+  `tests/stand-in/client.ts` now exports its route table, so check 13 can require every status in it.
+- Wiring: workspace dependencies, project references in the root, tooling and package `tsconfig`s, the four
+  `.gitkeep`s removed. `eslint.config.mjs` ignores `**/dist/**` instead of `dist/**`.
+- Slice 1 ticked.
+
+**Observed.**
+
+- **Tests first, seen failing** — but only at the import: all three files failed on the missing package
+  `@cutroom/api`. Written whole, the code then passed 9 of 9 at the first run, so no assertion had been seen red
+  before the breaks. The breaks are what show each assertion can fail.
+- **Seven deliberate breaks, seven caught, each by its own check and by no other test in its file:** accepting any
+  `until` (10); accepting `planVaryOn 'order'` (11); listening on `0.0.0.0` while reporting loopback (12 — caught
+  by the address the operating system reports, and this machine has two LAN addresses the test also connects
+  through); answering a 500 with `error: 'server'` (13 — caught only by the part of the test that drops the tables
+  under a running service, which is how the real service is made to produce a 500 on every route with no hook in
+  its code); comparing the raw body instead of canonical content (14); `since=n` including event `n` (15); asking
+  twice enqueuing a second job (16).
+- **Check 13 now requires coverage, not only validity.** It fails if any status the contract gives any route was
+  never produced — so an answer cannot go unchecked because no test asked for it. All 26 are produced.
+- **Lint scanned generated declarations.** `tsc -b` writes `packages/domain/dist/*.d.ts`, and Drizzle's inferred
+  types there contain `{}`, which lint refused in 57 places. The ignore said `dist/**`, which matched only the root's;
+  the intent — never lint tsc output — is unchanged, and no source file is newly ignored.
+- **A deleted `.gitkeep` fails the line-endings test until the deletion is staged**: the test reads every path git
+  still tracks.
+- **Not built, on purpose:** re-claiming a job whose lease expired, reading the cancel flag, and writing
+  `stage.started` once across a restart — checks 45 and 46, Slice 5. The API and worker have no process entry
+  point yet; nothing outside the tests starts them, and Gate 3 names none. Two processes migrating a brand-new file
+  at once is not handled (S-019).
+- **Two files Gate 3 does not name:** `packages/domain/src/db.ts` and `apps/worker/src/worker.ts`. Opening the file
+  and the polling loop had to live somewhere; neither is a stage or a route.
+- `node scripts/check.mjs`: everything green, 75 tests.
+
+**Next.** `reel-plan` Slice 2: `cinematic.ts`, `model.ts`, `settings.ts`, and the boundary-rule changes with their
+`drift:prove` cases — checks 1–5, 8, 9.
