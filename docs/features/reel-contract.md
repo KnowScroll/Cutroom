@@ -411,7 +411,7 @@ _Behaviour — against the stand-in_
       start, answering submit, the lookup by `requestId`, and status. **Proves: 11, 12, 13, 14, 15, 16.**
 - [x] **Slice 3 — follow and receive.** Events, status, result and record for a completed run of each
       `until`. **Proves: 17, 18, 19, 20, 21.**
-- [ ] **Slice 4 — the answers that are not a reel.** Plan-only estimates, budget refusal and stop, rule stop,
+- [x] **Slice 4 — the answers that are not a reel.** Plan-only estimates, budget refusal and stop, rule stop,
       cancel — each outcome forced through the stand-in. **Proves: 22, 23, 24, 25, 26.**
 - [ ] **Slice 5 — restart, and the journey.** Stop and restart the stand-in on the same storage, then run every
       check. **Proves: 27, and re-runs 1–26. The journey cannot pass until check 10 can — so the engine

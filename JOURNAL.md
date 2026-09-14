@@ -219,3 +219,29 @@ same client. Slice 3 ticked.
 
 **Next.** Slice 4: the answers that are not a reel — plan-only estimates, budget refusal and stop, rule stop,
 failure, cancel — checks 22–26.
+
+## 2026-09-14 — session 05, reel-contract Slice 4: the answers that are not a reel
+
+**Changed.** The stand-in can be scripted per request — `complete` (with the contract's budget rules applied to
+its estimate), `allPlansOverCap`, `stopBudget`, `stopRule`, `fail` — can cancel a run through
+`POST /v1/runs/:runId/cancel`, and can be told to fail the next request with 500. Its per-reel cap is an option.
+New `tests/reel-contract-endings.test.ts` (checks 22–26). Slice 4 ticked.
+
+**Observed.**
+
+- **All 9 failed before the code, all 9 pass after**, and Slices 1–3 still pass (31 tests).
+- **Eight deliberate breaks, eight caught**: refusing a plan-only request against the caller's ceiling, reporting
+  every-plan-over-cap as limit `ceiling`, starting a stills stage before a ceiling refusal, a budget stop
+  forgetting its spend, a rule stop losing its step, a forced failure that never switched off, ignoring cancel,
+  and refusing to cancel a finished run.
+- **The budget rules live in one function**, `stepsFor`, in the order the contract states them: every plan over
+  the per-reel cap is refused with `limit: 'reel'` for any `until`; a full run over the caller's ceiling is
+  refused with `limit: 'ceiling'` before any picture; a plan-only request is never refused against the ceiling.
+  Reading that function is reading the contract's "Budget answers".
+- **Cancel takes effect at the next step, not instantly** — the cancel reply says `running`, and the run finishes
+  as `cancelled` when it next advances, with no stage started after the cancel. That is the contract's wording,
+  and the test pins it by reading events after the cancel's `lastSeq`.
+- `node scripts/check.mjs`: everything green.
+
+**Next.** Slice 5: stop and restart the stand-in on the same storage, find the run by `requestId`, resume events
+without gaps or repeats — check 27 — then every check together.

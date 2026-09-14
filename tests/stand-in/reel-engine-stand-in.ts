@@ -33,15 +33,34 @@ export interface StandInOptions {
   storageDir: string
   /** Which `until` values this stand-in will accept — anything else is refused as unsupported. */
   canProduce: readonly Until[]
+  /** The per-reel cap this stand-in applies, in cents. Defaults to 300. */
+  capCents?: number
 }
+
+/**
+ * How a run will go, set by a test before submitting. A request with no script completes.
+ * `complete` still applies the contract's budget rules to its estimate: over the per-reel cap is
+ * refused with limit 'reel'; over the caller's ceiling is refused with limit 'ceiling', unless the
+ * request is plan-only.
+ */
+export type Scenario =
+  | { kind: 'complete'; estimateCents?: number }
+  | { kind: 'allPlansOverCap'; lowestEstimateCents: number }
+  | { kind: 'stopBudget'; estimateCents: number; spentCents: number; limit: 'reel' | 'ceiling' }
+  | { kind: 'stopRule'; rule: string; step: string; detail: string }
+  | { kind: 'fail'; detail: string }
 
 export interface StandIn {
   baseUrl: string
   storagePath: string
+  /** Decide how the run for this requestId will go. Must be called before it is submitted. */
+  script(requestId: string, scenario: Scenario): void
   /** Move a run forward by one step: append that step's events, and finish it if it was the last. */
   advance(runId: string): void
   /** Advance a run until its last event says it has finished. */
   runToEnd(runId: string): void
+  /** Make the next HTTP request fail with 500, to exercise the contract's internal-error answer. */
+  failNextRequest(): void
   stop(): Promise<void>
 }
 
@@ -102,6 +121,7 @@ async function readBody(req: IncomingMessage): Promise<string> {
 
 const RUN_ROUTE = /^\/v1\/runs\/([^/]+)$/
 const RUN_SUB_ROUTE = /^\/v1\/runs\/([^/]+)\/(events|result|record)$/
+const CANCEL_ROUTE = /^\/v1\/runs\/([^/]+)\/cancel$/
 const WHOLE_NUMBER = /^\d+$/
 
 export async function startStandIn(options: StandInOptions): Promise<StandIn> {
@@ -117,7 +137,8 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
       steps      TEXT NOT NULL,
       cursor     INTEGER NOT NULL DEFAULT 0,
       result     TEXT,
-      record     TEXT
+      record     TEXT,
+      cancel_requested INTEGER NOT NULL DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS events (
       run_id TEXT    NOT NULL,
@@ -144,6 +165,12 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
   const eventsAfter = db.prepare(
     'SELECT body FROM events WHERE run_id = ? AND seq > ? ORDER BY seq',
   )
+  const requestCancel = db.prepare('UPDATE runs SET cancel_requested = 1 WHERE run_id = ?')
+  const cancelRequested = db.prepare('SELECT cancel_requested AS flag FROM runs WHERE run_id = ?')
+
+  const capCents = options.capCents ?? 300
+  const scripts = new Map<string, Scenario>()
+  let failNext = false
 
   function status(runId: string): RunStatus | undefined {
     const run = runById.get(runId) as
@@ -166,12 +193,117 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
     insertEvent.run(runId, seq, JSON.stringify(event))
   }
 
+  /**
+   * The steps a run will take, decided at acceptance. Applies the contract's budget answers
+   * (docs/features/reel-contract.md, "Budget answers") before any picture stage begins.
+   */
+  function stepsFor(runId: string, request: SubmitRequest, scenario: Scenario): Step[] {
+    const until = request.options.until
+    const common = { contractVersion: V, runId, requestId: request.requestId }
+    const noPictures: RunRecord = { contractVersion: V, runId, pictures: [], degradations: [] }
+    const ceilingCents = request.options.budgetCents
+    const planStarted: Step = { events: [{ type: 'stage.started', stage: 'plan' }] }
+    const planFinished: Step = { events: [{ type: 'stage.finished', stage: 'plan' }] }
+    const ending = (status: RunResult['status'], result: RunResult): Step => ({
+      events: [{ type: 'run.finished', status }],
+      finish: { result, record: noPictures },
+    })
+
+    if (scenario.kind === 'allPlansOverCap') {
+      // Every plan over the per-reel cap; one more try, then refused (D-063, D-064, D-083).
+      return [
+        planStarted,
+        ending('refused', {
+          ...common,
+          costCents: 0,
+          status: 'refused',
+          reason: 'budget',
+          limit: 'reel',
+          estimateCents: scenario.lowestEstimateCents,
+          ceilingCents,
+          capCents,
+        }),
+      ]
+    }
+    if (scenario.kind === 'stopRule') {
+      return [
+        planStarted,
+        ending('stopped', {
+          ...common,
+          costCents: 0,
+          status: 'stopped',
+          reason: 'rule',
+          rule: scenario.rule,
+          step: scenario.step,
+          detail: scenario.detail,
+        }),
+      ]
+    }
+    if (scenario.kind === 'fail') {
+      return [
+        planStarted,
+        ending('failed', { ...common, costCents: 0, status: 'failed', detail: scenario.detail }),
+      ]
+    }
+    if (scenario.kind === 'stopBudget') {
+      return [
+        planStarted,
+        planFinished,
+        { events: [{ type: 'stage.started', stage: 'stills' }] },
+        ending('stopped', {
+          ...common,
+          costCents: scenario.spentCents,
+          status: 'stopped',
+          reason: 'budget',
+          limit: scenario.limit,
+          estimateCents: scenario.estimateCents,
+          ceilingCents,
+          capCents,
+        }),
+      ]
+    }
+
+    const estimateCents = scenario.estimateCents ?? 200
+    if (estimateCents > capCents) {
+      return [
+        planStarted,
+        ending('refused', {
+          ...common,
+          costCents: 0,
+          status: 'refused',
+          reason: 'budget',
+          limit: 'reel',
+          estimateCents,
+          ceilingCents,
+          capCents,
+        }),
+      ]
+    }
+    if (until !== 'plan' && estimateCents > ceilingCents) {
+      // A full run whose chosen plan is over the caller's ceiling: refused before any picture.
+      return [
+        planStarted,
+        planFinished,
+        ending('refused', {
+          ...common,
+          costCents: 0,
+          status: 'refused',
+          reason: 'budget',
+          limit: 'ceiling',
+          estimateCents,
+          ceilingCents,
+          capCents,
+        }),
+      ]
+    }
+    return completionSteps(runId, request, estimateCents)
+  }
+
   /** A run that completes normally, shaped by its `until`. */
-  function completionSteps(runId: string, request: SubmitRequest): Step[] {
+  function completionSteps(runId: string, request: SubmitRequest, estimateCents: number): Step[] {
     const until = request.options.until
     const artifacts = join(options.storageDir, 'artifacts', runId)
     const shots = request.narration.slice(0, 6).map((_, i) => `s${i + 1}`)
-    const estimateCents = 200
     const steps: Step[] = [
       { events: [{ type: 'stage.started', stage: 'plan' }] },
       { events: [{ type: 'stage.finished', stage: 'plan' }] },
@@ -247,6 +379,22 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
   function advance(runId: string): void {
     const run = progress.get(runId) as { state: string; steps: string; cursor: number } | undefined
     if (run === undefined || run.state === 'finished') return
+    const { flag } = cancelRequested.get(runId) as { flag: number }
+    if (Number(flag) === 1) {
+      // The stop takes effect at the next step: no further stage starts (contract, "Cancel").
+      const { request_id: requestId } = runById.get(runId) as { request_id: string }
+      const result: RunResult = {
+        contractVersion: V,
+        runId,
+        requestId,
+        costCents: 0,
+        status: 'cancelled',
+      }
+      const record: RunRecord = { contractVersion: V, runId, pictures: [], degradations: [] }
+      append(runId, { type: 'run.finished', status: 'cancelled' })
+      finishRun.run(JSON.stringify(result), JSON.stringify(record), runId)
+      return
+    }
     const steps = JSON.parse(run.steps) as Step[]
     const step = steps[Number(run.cursor)]
     if (step === undefined) return
@@ -330,13 +478,15 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
     }
 
     const runId = randomUUID()
+    const scenario = scripts.get(request.requestId) ?? { kind: 'complete' }
+    scripts.delete(request.requestId)
     insertRun.run(
       runId,
       request.requestId,
       hash,
       request.options.until,
       'running',
-      JSON.stringify(completionSteps(runId, request)),
+      JSON.stringify(stepsFor(runId, request, scenario)),
     )
     append(runId, { type: 'run.accepted' })
     return [
@@ -355,7 +505,19 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
     const url = new URL(req.url ?? '/', 'http://stand-in')
     const byId = RUN_ROUTE.exec(url.pathname)
     const sub = RUN_SUB_ROUTE.exec(url.pathname)
+    const cancel = CANCEL_ROUTE.exec(url.pathname)
 
+    if (failNext) {
+      failNext = false
+      throw new Error('the stand-in was told to fail this request')
+    }
+    if (req.method === 'POST' && cancel !== null) {
+      const runId = decodeURIComponent(cancel[1] as string)
+      const found = status(runId)
+      if (found === undefined) return send(res, 404, notFound('no such run'))
+      if (found.state === 'running') requestCancel.run(runId)
+      return send(res, 200, found)
+    }
     if (req.method === 'POST' && url.pathname === '/v1/runs') {
       const [code, body] = submit(await readBody(req))
       return send(res, code, body)
@@ -417,7 +579,13 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
   return {
     baseUrl: `http://127.0.0.1:${port}`,
     storagePath,
+    script(requestId: string, scenario: Scenario) {
+      scripts.set(requestId, scenario)
+    },
     advance,
+    failNextRequest() {
+      failNext = true
+    },
     runToEnd(runId: string) {
       for (let guard = 0; guard < 1000; guard += 1) {
         const run = progress.get(runId) as { state: string } | undefined
