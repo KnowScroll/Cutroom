@@ -271,3 +271,30 @@ a future session to remember** — the thing every mechanism here exists to repl
 **Caught by.** The audit's own demonstration: with one `.ts` file dropped into
 `packages/pipeline/src/`, all four folder rules report DEAD and the run exits 1. Removing the file
 returns it to 0 dead.
+
+---
+
+## S-015 | 2026-09-14 | A feature file moved here from the steering repository lives in `docs/features/`
+
+**Chose.** A feature whose gates were approved in the steering repository, and which D-089 or D-105 then
+moves here, lives at **`docs/features/<slug>.md`**. It keeps its front matter, its gates, its review
+history and a short note saying when and why it moved. Its slices are ticked and its journey recorded here
+from then on. The first is `reel-contract`, moved on 2026-09-14.
+
+**Why.** D-089 and D-105 say _that_ a feature moves here and never say _where_; this repository had no
+place for one. `docs/` already holds the copied design documents under `docs/design/`, so a feature beside
+them is where a session reading this repository will look.
+
+**Unlike `docs/design/`, a file here is not a copy.** The steering repository deletes it on the move, so
+there is nothing to stay byte-identical with: it is formatted like any other markdown here, and
+`docs-check.mjs`, which guards the copies, does not apply to it. The move of `reel-contract` was checked for
+lost content through the formatter — all 15 headings, all 27 checks and every word kept.
+
+**Rejected.** **`steering/features/`** — a `steering/` folder beside `steering-ref/` would read as a second
+authority, the ambiguity D-088 exists to prevent. **A `features/` folder at the root** — one more top-level
+name for something that is documentation. **Under `docs/design/`** — that folder means "a copy that must not
+diverge", and a moved feature is the opposite.
+
+**Caught by.** Nothing mechanical yet. With one moved feature there is nothing to be inconsistent with; the
+second move is the moment to add a test that every `docs/features/*.md` carries front matter and a moved-from
+note.

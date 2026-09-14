@@ -90,3 +90,35 @@ decisions. Then the CI decision. **One offer standing for the owner**: a one-lin
 steering repository's `drift.mjs` so a missing dependency-cruiser is a loud failure instead of a
 silent skip. Not applied — it is that repository's script, another session is active in it, and it
 would turn its `pnpm drift` red until someone installs there.
+
+## 2026-09-14 — session 03, the resolver could not see package names, and the contract arrives
+
+**Intent.** Work from a session in the steering repository, at the owner's instruction to do three things:
+fix this repository's boundary resolver, receive the approved `reel-contract` under D-105, and bump the pin.
+
+**Changed.** Commit `efd2a4e`: `.dependency-cruiser.cjs` gains `enhancedResolveOptions.exportsFields`, and
+`scripts/drift.mjs --prove` gains a by-package-name probe. This commit: `docs/features/reel-contract.md`,
+**S-015**, and `steering-ref` moved from `a93a65a` to `e874bb6`.
+
+**Observed.**
+
+- **Every cross-package rule was silent on the import real code will write.** Packages here declare only
+  `exports`; the resolver was not reading it, so `import ... from '@cutroom/domain'` stayed unresolved and no
+  rule fired. `--prove` passed throughout because all fifteen of its cases import by relative path. **Proven,
+  and still dead** — the exact failure this repository was built to prevent, one layer deeper than `--audit`
+  looks.
+- **The new probe was run against the old config first.** All 8 by-name cases reported SILENT and `--prove`
+  exited 1. With the setting added: all 15 rules caught, 8 again by package name, and the legal shape clean
+  both ways. A check is only trusted after it has been seen to fail.
+- **The pin had fallen 34 commits behind** — 76 decisions visible of 106, and none of D-093–D-106, which define
+  the contract now in `docs/features/`. `decisions.mjs` reads the pin from `HEAD`, so staging the submodule is
+  not enough; it goes green only once committed.
+- **The contract arrived with a formatter in the way.** Markdown outside `docs/design/` is formatted here. The
+  moved file was checked against the original for headings, checks and words before committing.
+
+**Why.** The resolver gap would have stayed invisible until the first cross-package import landed and nothing
+flagged it — the one moment a boundary rule matters.
+
+**Next.** The contract's Slice 1 is now allowed: `@cutroom/reel-contract`, its schemas, and a new
+`reel-contract-is-a-leaf` rule with a by-name `--prove` case. `plan-no-epistemic` names a folder D-096 moved to
+KnowScroll; re-examine it against D-034's drift test when `reel-engine`'s gates are next revised, not before.
