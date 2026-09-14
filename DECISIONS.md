@@ -413,3 +413,60 @@ migration does not create fails them; check 16 reads `job` straight from the fil
 changed without a new migration — the tests then run against the old tables and pass if nothing reads the new
 column. **Not handled:** two processes opening a brand-new file at the same instant both try the first migration;
 the tests start the API before the worker. `reel-plan`'s Slice 5, which restarts both, is where that is met.
+
+---
+
+## S-020 | 2026-09-14 | The boundary rules as `reel-plan` changes them, and the two resolver settings without which its npm rules see nothing
+
+**Chose.** Seventeen rules. **As `reel-plan`'s Gate 2 lists:** `contracts-are-a-leaf` permits
+`packages/reel-contract/` (D-099); `plan-no-epistemic` is deleted (D-096; D-103 retired D-085);
+`split-no-cinematic` is replaced by `split-imports-only-itself` — nothing under `packages/pipeline/src/split/`
+imports anything outside that folder; `split-entered-through-its-index` no longer names a `cinematic` folder;
+`pipeline-npm-only-zod` and `model-client-only-in-providers` are added, with Gate 2's patterns character for
+character; `node_modules` comes out of `options.exclude`.
+
+**Two settings Gate 2 does not list**, each found by Slice 2's `--prove` cases and each required for those
+rules to fire on a real package:
+
+- **`enhancedResolveOptions.conditionNames: ['import', 'require', 'node', 'default']`.** zod and ai declare
+  `exports` with only `types`, `import` and `require` conditions. With `exportsFields` alone, such an import
+  stays **unresolved**: its path is the bare name, never a `node_modules` path, and `pipeline-npm-only-zod`
+  is silent on `ai` from the pipeline. drizzle-orm, which also declares `default`, resolved — which is why
+  nothing noticed.
+- **`dist` in `options.exclude` anchored** to this repository's own tsc output: `^dist/` and
+  `^(apps|packages)/[^/]+/dist/`. Unanchored, it matched `node_modules/.pnpm/ai@…/node_modules/ai/dist/index.mjs`
+  and removed the edge from the graph, so once `ai` resolved **both** npm rules were silent on it from the
+  pipeline, the worker and the API.
+
+**And `--prove` itself** now counts a case as caught only when its rule fires on that file's edge to that
+module, not when the rule's name appears anywhere; builds its npm packages in pnpm's layout with manifests
+shaped like the real ones' (`dist/` entries, conditions-only `exports`); fails when a **legal** import does not
+resolve, since a rule is trivially silent on an edge that never reached the graph; and works in a folder named
+for its process, because two test files now run it at once.
+
+**Supersedes** **S-013**'s list of four folder rules and its count, and the counts in S-006 and `CLAUDE.md`
+(fifteen, sixteen). Not their substance: rules are still matched on resolved paths, and each is still proven.
+
+**Why.** Gate 2's experiment ran the rules in a miniature workspace whose packages had plain manifests with
+root-level files. Every real shape that differs from that — an entry under `dist/`, an `exports` map with no
+`default` — made a rule read correctly and match nothing, which is S-014's failure arriving through the
+resolver instead of through a rename. Seen in this order on 2026-09-14: the gate's config as written,
+`pipeline-npm-only-zod` SILENT on `ai` and five legal npm imports UNRESOLVED; with `conditionNames`, four cases
+SILENT and `ai` "not in the graph"; with `dist` anchored, all 38 cases caught and every legal import resolved.
+
+**Rejected.** **Catching unresolved bare imports by dependency type** inside `pipeline-npm-only-zod` — a
+second pattern beside the approved one, and every other path rule stays blind to the same imports; resolving
+them fixes the graph for all seventeen. **Putting `types` among the conditions** — zod lists `types` first, so
+its edge would be a declaration file rather than the code Node loads. **Dropping `dist` from `exclude`** —
+tsc's declarations in `packages/*/dist` would enter the graph beside every source file. **Counting a rule as
+proven when its name appears once** — the npm rules have several cases each, and one firing would have covered
+all of them, including a silent one.
+
+**Caught by.** `node scripts/drift.mjs --prove`, whose cases reproduce both holes: undo `conditionNames` and
+`pipeline-npm-only-zod` goes SILENT on `ai` while zod and ai go UNRESOLVED; unanchor `dist` and
+`model-client-only-in-providers` goes SILENT on three cases. `reel-plan`'s checks 8 and 9
+(`tests/reel-plan-rules.test.ts`) assert each case's own line, and that `exclude` keeps a store path in the
+graph and tsc output out of it. **Not caught:** an npm package that is not installed, imported from the
+pipeline, has no `node_modules` path and passes `pipeline-npm-only-zod` (only `ai` and `@ai-sdk/*` are matched
+by name); the typecheck fails on such an import. A global `fetch` in the pipeline — `reel-plan`'s deferred
+item 8.

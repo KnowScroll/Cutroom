@@ -519,7 +519,7 @@ _How a run ends_
       Planning does not exist yet, so the worker finishes every run as `failed` with the detail _"planning is
       not built"_ — a contract-valid answer that no check asserts, and that Slice 3 replaces.
       **Proves: 10, 11, 12, 13, 14, 15, 16.**
-- [ ] **Slice 2 — the shapes and the rules.** `cinematic.ts`, `model.ts`, `settings.ts`; the boundary-rule
+- [x] **Slice 2 — the shapes and the rules.** `cinematic.ts`, `model.ts`, `settings.ts`; the boundary-rule
       changes with their `drift:prove` cases. **No pipeline source yet**, so no folder a rule names is dead.
       **Proves: 1, 2, 3, 4, 5, 8, 9.**
 - [ ] **Slice 3 — the splitter, two plans, Gate 0, the score, and a completed plan.** The splitter and

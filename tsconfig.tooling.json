@@ -8,6 +8,7 @@
   "include": ["tests/**/*.ts", "drizzle.config.ts"],
   "references": [
     { "path": "./packages/reel-contract" },
+    { "path": "./packages/contracts" },
     { "path": "./apps/api" },
     { "path": "./apps/worker" }
   ]

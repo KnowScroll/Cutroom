@@ -43,24 +43,29 @@ apps/worker          the runner. The only place that knows both a stage and a ta
 apps/api             submitting work, reading records. Never calls a provider.
 ```
 
-A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094) and the only one
-with source; the six above are **empty until their features' gates are approved**. **Sixteen**
-boundary rules are enforced on the real dependency
-graph, and `node scripts/drift.mjs --prove` builds a deliberate violation of each one and fails
-if any rule stays silent. The load-bearing ones: **pipeline imports no domain, no providers, no
-app, and no I/O at all** — no filesystem, no network, no process, no database driver. A stage is
-handed a port; it never reaches for one.
+A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094). `reel-plan` has
+given `contracts`, `domain`, `api` and `worker` source; `pipeline` and `providers` stay **empty until
+its Slice 3**. **Seventeen** boundary rules are enforced on the real dependency graph, and
+`node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
+package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
+or any legal import is reported or fails to resolve. The load-bearing ones: **pipeline imports no
+domain, no providers, no app, no I/O at all, and no npm package but `zod`**. A stage is handed a
+port; it never reaches for one. **Nothing outside `providers` imports a model client** (`ai`,
+`@ai-sdk/*`).
 
-**Four of the sixteen are between two folders of one package**, and they are the reason this is
+**Three of the seventeen are between two folders of one package**, and they are the reason this is
 dependency-cruiser rather than a script matching import text. It resolves every import to a file
-path, so `'../epistemic/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
+path, so `'../split/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
+`split-imports-only-itself`, `split-imported-only-by-plan`, `split-entered-through-its-index` —
+**D-073**, whose stated check was never buildable against import text, because inside one package
+every import is relative. (`plan-no-epistemic` and `split-no-cinematic` are gone — **S-020**.)
 
-- `plan-no-epistemic` — **D-085**'s backstop. The narrowed view type is the real enforcement.
-- `split-no-cinematic`, `split-imported-only-by-plan`, `split-entered-through-its-index` — **D-073**,
-  whose stated check was never buildable against import text, because inside one package every
-  import is relative.
+**The npm rules see an import only if it resolves to a `node_modules` path.** That is why
+`node_modules` is not in `options.exclude`, why `dist` there is anchored to this repository's own
+output, and why the resolver is given `conditionNames` — each of the three, undone, makes a rule
+silent on `ai` (S-020).
 
-**None of those four folders exists yet.** `node scripts/drift.mjs --audit` reports every rule
+**Neither folder, `split/` nor `plan/`, exists yet.** `node scripts/drift.mjs --audit` reports every rule
 whose folders are absent, and **fails** once a package has source files while a folder one of its
 rules names is still missing — which is what a rename looks like. A rule that reads correctly and
 matches nothing is the worst state to be in, because it reads as coverage.

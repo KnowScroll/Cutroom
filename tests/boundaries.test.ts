@@ -59,13 +59,15 @@ test('no rule has quietly stopped applying to anything', () => {
   assert.doesNotMatch(out, /DEAD/, out)
 })
 
-test('the four intra-package rules exist, because import text cannot express them', () => {
-  // D-085 and D-073 both name two folders inside ONE package, where every import between
-  // them is relative. Matching an import specifier prefix can never see those.
+test('the intra-package rules exist, because import text cannot express them', () => {
+  // D-073 names folders inside ONE package, where every import between them is relative.
+  // Matching an import specifier prefix can never see those. reel-plan's Gate 2 deleted
+  // plan-no-epistemic (D-096, D-103 retired D-085) and replaced split-no-cinematic, which
+  // could not fire, with split-imports-only-itself (S-020); tests/reel-plan-rules.test.ts
+  // asserts both are gone.
   const { out } = drift('--audit')
   for (const rule of [
-    'plan-no-epistemic',
-    'split-no-cinematic',
+    'split-imports-only-itself',
     'split-imported-only-by-plan',
     'split-entered-through-its-index',
   ]) {

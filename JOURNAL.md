@@ -400,3 +400,59 @@ broken on purpose once after it passed.
 
 **Next.** `reel-plan` Slice 2: `cinematic.ts`, `model.ts`, `settings.ts`, and the boundary-rule changes with their
 `drift:prove` cases — checks 1–5, 8, 9.
+
+## 2026-09-14 — session 08, reel-plan Slice 2: the shapes and the rules
+
+**Intent.** The owner asked for `reel-plan` Slice 2 only, tests first, each broken on purpose once. The request
+named it _"the service answers, and a run finishes"_, which is Slice 1's title, already ticked at `8be3583`; the
+next unticked slice, _"the shapes and the rules"_ — checks 1–5, 8, 9 — is what was built.
+
+**Changed.**
+
+- `packages/contracts` — its first source. `cinematic.ts`: `DEFAULT_PLAN_VARY_ON`, `Plan`, `PlanShot`,
+  `PlanSubject`, `PlanFork`, `Gate0Condition`, `Gate0Verdict`, `PlanScore`, reusing `PlanVaryOn` and `Criterion`
+  from the contract. `model.ts`: `LanguageModelPort` with one call, `structured`; `ModelRole`; `ModelReceipt`.
+  `settings.ts`: `PlanSettings`. Types only, plus the one constant. Dependencies `@cutroom/reel-contract` and `zod`
+  (type import); project references in the root and tooling `tsconfig`s; root dev dependency so tests import it.
+- `.dependency-cruiser.cjs` — Gate 2's changes, and two it does not list (**S-020**): `conditionNames` for the
+  resolver, and `dist` in `exclude` anchored to this repository's own output. Seventeen rules.
+- `scripts/drift.mjs --prove` — cases carry their specifier and count only when the rule fires on that edge; npm
+  packages built in pnpm's layout with real manifests' shapes; legal imports must resolve; one temporary folder
+  per process. 38 cases, 22 by name.
+- `tests/engine/source.ts` — declarations and field names read with TypeScript's parser.
+  `tests/reel-plan-shapes.test.ts` (1, 3, 4, 5), `tests/reel-plan-rules.test.ts` (2, 8, 9).
+- `tests/boundaries.test.ts` — its intra-package test names the three folder rules that exist now, instead of
+  `plan-no-epistemic` and `split-no-cinematic`. The gate deletes one and replaces the other; check 8 asserts both
+  are gone. `CLAUDE.md`, `README.md`, `AGENTS.md` — the rule count and the folder rules.
+- Slice 2 ticked.
+
+**Observed.**
+
+- **The finding: Gate 2's npm rules, as approved, were silent on `ai`.** The gate's experiment used miniature
+  packages; the `--prove` cases here copy real manifests. Two independent holes, seen one after the other:
+  zod and ai declare `exports` with only `types`/`import`/`require`, so without `conditionNames` they never
+  resolve and no `node_modules` path reaches `pipeline-npm-only-zod`; and once resolved, `ai`'s entry is under
+  `dist/`, which the unanchored `exclude` removed from the graph, silencing `model-client-only-in-providers` on
+  three cases. `drift` on the real repository reported 0 violations throughout — the shape S-014 warns about.
+  Gate 2's patterns themselves are unchanged. Recorded in S-020 rather than by editing the approved gate.
+- **Red first.** Before any code: 1, 2, 3, 8, 9 failed; 4 and 5 passed, since they assert absence — each was seen
+  red only by its break. With the contracts files written, 2, 8 and 9 failed on their rule assertions; the new
+  harness against the old config showed all 11 new cases SILENT (a twelfth, `pipeline-no-io`, was the harness
+  fault below) and `contracts -> reel-contract` EAGER. The real `drift`
+  also caught `contracts-are-a-leaf` on `cinematic.ts`'s import until the rule was amended.
+- **Seven breaks, seven caught.** 1: the default `'order'`. 2: `Criterion` redeclared in `cinematic.ts`. 3: a
+  `StructuredCall` type alias. 4: a `ScriptView` interface. 5: a `beats` field on `PlanShot`. Each of those failed
+  its own check and no other. 8: `node_modules` back in `exclude` — check 8 on its own `exclude` assertion. 9: the
+  zod allowance widened to all of `node_modules/.pnpm/` — three pipeline npm cases SILENT. Breaks 8 and 9 also
+  fail check 2, which reads the same `--prove` run's exit status.
+- **Two harness faults, found before they could hide anything:** the tool records `node:fs` as `fs`, so the new
+  per-edge accounting first called `pipeline-no-io` SILENT; and two test files running `--prove` at once raced on
+  one temporary folder.
+- **A shell trap met again:** a `sed` and an inline `node -e` both halved backslashes while scripting the breaks;
+  the config was checked by reading the file afterwards, and was intact.
+- **`PlanScore`'s shape is not given by Gate 3** — only its name and file. Written as `terms` keyed like the
+  settings' weights, and `total`; Slice 3, which computes it, may reshape it, since nothing reads it yet.
+- `node scripts/check.mjs`: everything green, 82 tests.
+
+**Next.** `reel-plan` Slice 3: the splitter and `plan/` together, the stand-in and the recording port, ranking,
+the estimate, Gate 0, the plan score and plan rows — checks 6, 7, 17–19, 21–27, 29–37.

@@ -58,13 +58,14 @@ a journey, and journeys for these features run here once their gates are approve
 `providers`. `providers` never imports `domain` or `pipeline`. `contracts` imports nothing
 internal. A package is entered only through its `src/index.ts`.
 
-Four more are **between two folders of one package** — the planner may not import the epistemic
-module (D-085), and the splitter may not import cinematic types, may be imported only by the
-planner, and may be entered only through its index (D-073).
+Three more are **between two folders of one package** — the splitter imports nothing outside its
+own folder, may be imported only by the planner, and may be entered only through its index
+(D-073). Two are about npm packages: the pipeline imports none but `zod`, and nothing outside
+`providers` imports a model client (reel-plan, S-020).
 
-These are not conventions. They are **fifteen** rules checked against the real dependency graph,
+These are not conventions. They are **seventeen** rules checked against the real dependency graph,
 and they are expressed on **resolved file paths**, never on the text of an import line — which is
-the only reason those four can exist at all, since inside one package every import is relative.
+the only reason those three can exist at all, since inside one package every import is relative.
 
 ```bash
 node scripts/drift.mjs --prove    # writes a file to break each rule; fails if one stays silent

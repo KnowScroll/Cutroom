@@ -10,6 +10,7 @@
   "files": [],
   "references": [
     { "path": "./packages/reel-contract" },
+    { "path": "./packages/contracts" },
     { "path": "./packages/domain" },
     { "path": "./apps/api" },
     { "path": "./apps/worker" },

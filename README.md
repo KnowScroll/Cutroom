@@ -55,9 +55,9 @@ apps/worker          the runner. The only place that knows both a stage and a ta
 apps/api             submitting work and reading records. Never calls a provider.
 ```
 
-Every one of those is **empty on purpose**. The boundaries between them are not a convention —
-fifteen rules over the real dependency graph, four of them between two folders of a single
-package:
+`pipeline` and `providers` are still **empty on purpose**, until `reel-plan`'s Slice 3. The
+boundaries between them are not a convention — seventeen rules over the real dependency graph,
+three of them between two folders of a single package, two of them about npm packages:
 
 ```bash
 node scripts/drift.mjs            # no forbidden edge exists
@@ -66,9 +66,9 @@ node scripts/drift.mjs --audit    # no rule has quietly stopped applying to anyt
 ```
 
 The rules are matched on **resolved file paths**, not on the text of an import line. That is what
-lets them express a boundary between `src/plan/` and `src/epistemic/` inside one package, where
-every import is relative — the check D-085 and D-073 call for, and the one a specifier-prefix
-match can never make.
+lets them express a boundary between `src/plan/` and `src/split/` inside one package, where
+every import is relative — the check D-073 calls for, and the one a specifier-prefix match can
+never make.
 
 ## Running the checks
 

@@ -99,9 +99,10 @@ module.exports = {
       comment:
         'packages/contracts is imported by everything, so it must import nothing internal. The ports ' +
         'live here as types precisely so that pipeline can name a port without depending on the code ' +
-        'that implements it.',
+        'that implements it. One exception, D-099: the caller-facing types PlanVaryOn and Criterion ' +
+        'are declared only in @cutroom/reel-contract, and contracts reuses them from there.',
       from: { path: '^packages/contracts' },
-      to: { path: '^(apps|packages)/(?!contracts)' },
+      to: { path: '^(apps|packages)/(?!contracts/|reel-contract/)' },
     },
     {
       name: 'reel-contract-is-a-leaf',
@@ -147,36 +148,27 @@ module.exports = {
     // dependency-cruiser resolves each import to a file path, so the spelling does not
     // matter. That is the whole reason these four exist here and could not exist there.
     //
-    // The folder names come from the decisions (D-067, D-073, D-085). None of these folders
-    // exists yet — the gates that create them are still in review. `drift --audit` reports
-    // every rule whose folders are absent, and FAILS once the package has source files and
-    // the folder a rule names is still missing, which is what a rename would look like.
+    // The folder names come from the decisions (D-073) and reel-plan's Gate 3, which creates
+    // split/ and plan/ together in its Slice 3. `drift --audit` reports every rule whose folders
+    // are absent, and FAILS once the package has source files and the folder a rule names is
+    // still missing, which is what a rename would look like.
+    //
+    // `plan-no-epistemic` (D-085's backstop) was deleted by reel-plan: D-096 keeps the epistemic
+    // layer in KnowScroll, and D-103 retired D-085. `split-no-cinematic` was replaced by the rule
+    // below it, because it could not fire — see that rule's comment (S-020).
     // ---------------------------------------------------------------------------------
     {
-      name: 'plan-no-epistemic',
+      name: 'split-imports-only-itself',
       severity: 'error',
       comment:
-        'D-085: the planning and cinematic code receives a NARROWED VIEW of the script, with the ' +
-        'epistemic (truth) fields absent, so reading or writing one is a compile error. The type is ' +
-        'the real enforcement and this rule is the backstop — it catches the case the type cannot: ' +
-        'a plan module importing the epistemic module directly and reaching the full script through ' +
-        'it. D-067 put both layers in one package, so this import is relative and the steering ' +
-        "repository's specifier matching could never see it. That is why D-085 had to replace the " +
-        'rule D-034 asked for rather than build it.',
-      from: { path: '^packages/pipeline/src/(plan|cinematic)/' },
-      to: { path: '^packages/pipeline/src/epistemic/' },
-    },
-    {
-      name: 'split-no-cinematic',
-      severity: 'error',
-      comment:
-        'D-073: the splitter cuts claim-referenced prose into narration units and knows nothing ' +
-        'about shots, cameras or styles. A cinematic type reaching it would let a cut be decided by ' +
-        'how it will be filmed, which is what makes two storyboards of ONE script comparable ' +
-        "(D-062's shotCount axis). Matched anywhere in the path, so it holds whether the cinematic " +
-        'types end up in contracts or in pipeline.',
+        'D-073: the splitter is told only how many sentences there are and how many units to make, ' +
+        'and knows nothing about shots, cameras, claims or text. So it imports nothing outside its ' +
+        'own folder — no contracts, no npm package, no core module. This replaces a rule matching ' +
+        '"cinematic" in the imported path, which could never fire: every import of ' +
+        '@cutroom/contracts resolves to its index.ts, whose path never contains the word. A ' +
+        'splitter that imports nothing outside its folder imports no cinematic type by any path.',
       from: { path: '^packages/pipeline/src/split/' },
-      to: { path: 'cinematic' },
+      to: { pathNot: '^packages/pipeline/src/split/' },
     },
     {
       name: 'split-imported-only-by-plan',
@@ -198,13 +190,49 @@ module.exports = {
         'D-073: the planner MAY CALL the splitter and MAY NOT REACH INSIDE it. The module-level ' +
         'rule above this one only guards package boundaries; inside a package a deep import is ' +
         'relative, and this is the folder-level equivalent. Enter through split/index.ts.',
-      from: { path: '^packages/pipeline/src/(plan|cinematic)/' },
+      from: { path: '^packages/pipeline/src/plan/' },
       to: { path: '^packages/pipeline/src/split/(?!index\\.ts$).+' },
+    },
+
+    // ---------------------------------------------------------------------------------
+    // Rules about npm packages (reel-plan, Gate 2). Each sees an npm import only because
+    // `node_modules` is NOT in `options.exclude` below. The patterns are flat alternations:
+    // the tool refuses a repeat inside a repeated group as an unsafe regular expression.
+    // ---------------------------------------------------------------------------------
+    {
+      name: 'pipeline-npm-only-zod',
+      severity: 'error',
+      comment:
+        'The pipeline is pure functions, and zod is the one npm package it may use — to describe the ' +
+        'shape a model call must answer in. A database driver, an ORM or a model client imported ' +
+        'here passes every rule about folders, because none of them lives in one.',
+      from: { path: '^packages/pipeline/' },
+      to: { path: 'node_modules/', pathNot: 'node_modules/zod/|node_modules/\\.pnpm/zod@' },
+    },
+    {
+      name: 'model-client-only-in-providers',
+      severity: 'error',
+      comment:
+        'D-084: no module outside packages/providers constructs a model client, and D-005 names the ' +
+        'layer the one client would come from. Matched by package name as well as by path, so an ' +
+        'import of a client that is not installed is caught too.',
+      from: { pathNot: '^packages/providers/' },
+      to: {
+        path: '^ai$|^@ai-sdk/|node_modules/ai/|node_modules/@ai-sdk/|node_modules/\\.pnpm/ai@|node_modules/\\.pnpm/@ai-sdk\\+',
+      },
     },
   ],
   options: {
+    // The tool does not walk inside an npm package, but it does record the edge to one: without
+    // that, a rule about npm imports can never fire. So `node_modules` is here and not in
+    // `exclude`, which would remove every such path from the graph (reel-plan, Gate 2).
+    //
+    // `dist` is anchored to this repository's own tsc output, at the root and in each package.
+    // Unanchored it also matched `node_modules/ai/dist/index.mjs` — where most npm packages keep
+    // their entry — and removed that edge from the graph, so both npm rules were silent on `ai`
+    // once it resolved. Found by reel-plan's Slice 2 (S-020).
     doNotFollow: { path: 'node_modules' },
-    exclude: { path: '(node_modules|dist|\\.tmp|\\.artifacts|steering-ref)' },
+    exclude: { path: '(^dist/|^(apps|packages)/[^/]+/dist/|\\.tmp|\\.artifacts|steering-ref)' },
 
     // Type-only imports count. A boundary crossed by `import type` is still a boundary
     // crossed: it means the module was designed against the wrong thing.
@@ -217,8 +245,15 @@ module.exports = {
     // repository on 2026-09-14; `drift --prove` now has by-name cases that go SILENT if this
     // line is ever removed. Tested alone, this setting is sufficient; `conditionNames` alone
     // and `extensions` alone are not.
+    //
+    // `conditionNames` is what resolves an npm package whose `exports` name only conditions —
+    // zod and ai declare `types`, `import` and `require`, and no `default`. Without it such an
+    // import stays unresolved, reaches no rule as a node_modules path, and
+    // `pipeline-npm-only-zod` is silent on `ai` from the pipeline. Found by reel-plan's Slice 2,
+    // whose --prove cases copy real manifests' shapes; its legal cases must resolve (S-020).
     enhancedResolveOptions: {
       exportsFields: ['exports'],
+      conditionNames: ['import', 'require', 'node', 'default'],
     },
   },
 }

@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@cutroom/api": "workspace:*",
+    "@cutroom/contracts": "workspace:*",
     "@cutroom/reel-contract": "workspace:*",
     "@cutroom/worker": "workspace:*",
     "@eslint/js": "^9.38.0",
