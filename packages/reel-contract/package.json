@@ -1,0 +1,16 @@
+{
+  "name": "@cutroom/reel-contract",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The caller-facing contract of the reel engine: what to send, what to call when, and every answer. Types, schemas and the version only (D-094). Imports nothing internal.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "zod": "^4.6.5"
+  }
+}

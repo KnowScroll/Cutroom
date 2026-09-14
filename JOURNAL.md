@@ -122,3 +122,41 @@ flagged it — the one moment a boundary rule matters.
 **Next.** The contract's Slice 1 is now allowed: `@cutroom/reel-contract`, its schemas, and a new
 `reel-contract-is-a-leaf` rule with a by-name `--prove` case. `plan-no-epistemic` names a folder D-096 moved to
 KnowScroll; re-examine it against D-034's drift test when `reel-engine`'s gates are next revised, not before.
+
+## 2026-09-14 — session 04, the first engine code: reel-contract Slice 1
+
+**Intent.** The owner chose to build the approved contract as real code before revising `reel-engine`'s plan.
+Slice 1 of `docs/features/reel-contract.md`: the package, its schemas, and the boundary rule that keeps it
+free of the engine.
+
+**Changed.** New `packages/reel-contract/` — `version.ts`, `request.ts`, `events.ts`, `responses.ts`,
+`record.ts`, `errors.ts`, `routes.ts` (types only), `index.ts`. One runtime dependency, `zod` 4.6.5. New
+`tests/reel-contract-shapes.test.ts` (checks 1–9). New rule `reel-contract-is-a-leaf`, with a relative and a
+by-package-name `--prove` case (check 10). Root and tooling `tsconfig` reference the package; the root
+`package.json` links it as a workspace dev dependency so tests import it by name, the way a caller will.
+Slice 1 ticked.
+
+**Observed.**
+
+- **Tests before code, and seen failing.** The shape tests ran against no package and failed. Then, with the
+  package written, four deliberate breaks were made and each was caught by the test meant to catch it:
+  removing the claim cross-reference checks (checks 6, 7, 8), making a sentence non-strict (checks 1, 5),
+  loosening an event's version and removing the page check (check 1's mismatch clause), and adding a
+  `sources` field to the request (checks 4, 5). Restored; 11 of 11 pass.
+- **The boundary rule was seen silent before it existed.** With only the `--prove` cases added, both reported
+  SILENT and the run exited 1; with the rule, both are caught — including the by-package-name case this
+  repository could not see until `efd2a4e`. `--prove` now proves 16 rules, 9 of them again by package name.
+- **Every schema is strict**, so a caller that sends a field the contract does not define — `sources`, a
+  truth state inside a sentence — is rejected, not quietly stripped. That is what makes D-096's "never handed
+  the evidence" enforceable at the boundary rather than a matter of the caller's care.
+- **One layout choice avoided a cycle the rules forbid.** `RunEvent`'s `run.finished` needs the result statuses,
+  and `responses.ts` needs `RunEvent`; the statuses live in `events.ts` so `responses.ts` depends on it and not
+  the reverse. `no-circular` would have caught the other way.
+- `node scripts/check.mjs`: everything green.
+
+**Why.** It is the first code in the engine repository, and it is the one piece the orchestrator can use
+directly — the exact messages, with their checks built in, instead of copying shapes from a document.
+
+**Next.** Slices 2–5: a stand-in service in `tests/` with durable storage, and the behaviour checks 11–27 —
+answered-at-once refusals and asking twice, following events, the answers that are not a reel, and surviving a
+restart.

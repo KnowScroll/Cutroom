@@ -100,6 +100,11 @@ const CASES = [
   ],
   ['contracts-are-a-leaf', 'packages/contracts/src/index.ts', "import '../../domain/src/index.ts'"],
   [
+    'reel-contract-is-a-leaf',
+    'packages/reel-contract/src/index.ts',
+    "import '../../contracts/src/index.ts'",
+  ],
+  [
     'no-reaching-into-internals',
     'apps/worker/src/index.ts',
     "import '../../../packages/domain/src/deep/thing.ts'",
@@ -151,6 +156,7 @@ const BY_NAME_CASES = [
   ['providers-no-pipeline', 'packages/providers', '@cutroom/pipeline'],
   ['domain-no-pipeline-or-providers', 'packages/domain', '@cutroom/pipeline'],
   ['contracts-are-a-leaf', 'packages/contracts', '@cutroom/domain'],
+  ['reel-contract-is-a-leaf', 'packages/reel-contract', '@cutroom/contracts'],
 ]
 
 /** The legal shape again, by package name. Nothing here may be reported. */
@@ -162,6 +168,7 @@ const BY_NAME_LEGAL = [
 
 const PACKAGE_FOLDERS = [
   'packages/contracts',
+  'packages/reel-contract',
   'packages/domain',
   'packages/pipeline',
   'packages/providers',

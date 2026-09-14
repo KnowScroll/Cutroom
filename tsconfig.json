@@ -8,5 +8,5 @@
   // adding its reference here — and tests/workspace.test.ts fails if you forget,
   // because an unreferenced package is a package nothing typechecks.
   "files": [],
-  "references": [{ "path": "./tsconfig.tooling.json" }]
+  "references": [{ "path": "./packages/reel-contract" }, { "path": "./tsconfig.tooling.json" }]
 }

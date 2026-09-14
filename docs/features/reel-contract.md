@@ -403,7 +403,7 @@ _Behaviour — against the stand-in_
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the package and its schemas.** `@cutroom/reel-contract`, strict schemas, route types,
+- [x] **Slice 1 — the package and its schemas.** `@cutroom/reel-contract`, strict schemas, route types,
       version, and **the new `reel-contract-is-a-leaf` rule in the engine repository's boundary config**, with a
       `drift:prove` case importing by package name. **Proves: 1–9, and 10 once the engine repository's resolver
       fix has landed.**

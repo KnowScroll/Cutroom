@@ -104,6 +104,16 @@ module.exports = {
       to: { path: '^(apps|packages)/(?!contracts)' },
     },
     {
+      name: 'reel-contract-is-a-leaf',
+      severity: 'error',
+      comment:
+        'D-094: @cutroom/reel-contract is what a caller such as the orchestrator depends on, and the ' +
+        'only engine package anything outside the engine may depend on (D-099). It imports no other ' +
+        'engine package, so installing it gives a caller the contract and nothing of the engine.',
+      from: { path: '^packages/reel-contract/' },
+      to: { path: '^(apps|packages)/(?!reel-contract/)' },
+    },
+    {
       name: 'no-reaching-into-internals',
       severity: 'error',
       comment:
