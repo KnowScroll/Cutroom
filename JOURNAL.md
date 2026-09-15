@@ -643,3 +643,63 @@ purpose, nothing from Slice 5. `decisions.mjs`: pin current, 0 commits unpushed.
 
 **Next.** `reel-plan` Slice 5 — checks 45 (cancel before the stage), 46 (API and worker restart mid-run), 47 (every
 other test in a child process with no secrets), then `node scripts/journey.mjs reel-plan`, which re-runs 1–44.
+
+## 2026-09-15 — session 12, reel-plan Slice 5: cancel, restart, no secrets, and the journey
+
+**Intent.** The owner asked for `reel-plan` Slice 5 only — checks 45, 46, 47 — tests first, each check broken on
+purpose, then the journey. Nothing from `reel-stills`, no real adapter, no key. `decisions.mjs`: pin current, 0 commits
+unpushed. Baseline `check.mjs` green, 112 tests.
+
+**Changed.**
+
+- `packages/domain` — `queue.ts`: `claimJob` also takes a `running` job whose `lease_until` has passed, and takes the
+  lease length (`DEFAULT_LEASE_MS`, 60 s). `runs.ts`: `startPlanStage`, one immediate transaction that answers
+  `cancelled` when the flag is set, and otherwise appends `stage.started` for `plan` unless the run already has one.
+  `appendEvent` is removed: its one caller now uses `startPlanStage`.
+- `apps/worker` — `plan-job.ts` calls `startPlanStage` first and finishes a cancelled run `cancelled`, cost 0, with no
+  stage; `worker.ts` takes `leaseMs`.
+- Tests: `tests/reel-plan-cancel.test.ts` (45, and a second test for S-027's cancel on a second attempt),
+  `tests/reel-plan-restart.test.ts` (46), `tests/reel-plan-secrets.test.ts` (47). The harness gains `restart()` (stop
+  worker and API, keep the folder, start the API on the same file with a new stand-in) and `spawnWorker()`; and
+  `startEngine` now stops the API when the worker fails to start (below).
+- **One file Gate 3 does not list: `tests/engine/worker-process.ts`**, the real `startWorker` in a child process whose
+  stand-in never answers one chosen call. An in-process worker cannot be interrupted — its `stop()` finishes the job in
+  hand — so a crash needs a process to kill. It sits beside `harness.ts` and `plans.ts`, which Gate 3 does not list
+  either.
+- **S-027** (reclaim by lease; the flag and `stage.started` in one transaction before every attempt; a cancel honoured on
+  a second attempt; mid-run as a killed process) and **S-028** (check 47's environment, and the eleven Windows
+  variables). Slice 5 ticked. The Outcome boxes are left as `reel-contract` left its own.
+
+**Observed.**
+
+- **Red first.** 45 failed on its result — `completed`, not `cancelled`. 46 and the S-027 test got past every
+  precondition (the child held call 2; events 1–2 were `run.accepted`, `stage.started`; one receipt; the job `running`
+  at attempt 1) and then **timed out**, which is not an assertion; both now assert the job was claimed a second time
+  when the wait fails. With only the reclaim written, 46 failed on `stage.started` appearing again and the S-027 test on
+  `completed`. 47 failed because 45 and 46 failed inside its child — **every one of checks 1–44 already passed with the
+  bare environment**, so 47's own teeth were seen only by breaks.
+- **Thirteen breaks, all caught**, each applied by a script that ran every test and restored the file from the bytes
+  it read; the hash of every `.ts` under `packages`, `apps` and `tests` was identical before and after each batch. 47
+  re-runs 45 and 46, so it fails with every break below them.
+  - 45: the flag ignored — 45, the S-027 test, 47. `stage.started` written before the flag is read — 45, 47. Cancel on
+    a finished run answered 404 — 45, 13, 47.
+  - S-027: the flag read only before a first start — the S-027 test, 47.
+  - 46: no reclaim — 46, the S-027 test, 47. The lease ignored — 46, 47 (the second `locked_at` before the first
+    `lease_until`). The worker's `leaseMs` ignored — 46, the S-027 test, 47. `stage.started` on every attempt — 46, 47.
+    The repeat looked for under stage `stills` — 46, 47.
+  - 47: the worker requiring `HOME`, which Git Bash's environment has — 47 alone. The child handed `process.env` — 47.
+    `reel-plan-run.test.ts` left out of the child — 47 (15, 16 missing). Its own file left in — 47, before spawning.
+- **A harness fault the `HOME` break found**: it took 302 s. `startEngine` left the API listening when the worker threw
+  on start, so the child's test files never exited and 47 failed only at its 300 s timeout. Now the API is stopped on
+  that path; the same break failed in 13 s.
+- **Windows**, Node 22.14: a child spawned with `env: { PATH }` — or `env: {}` — holds eleven variables libuv copies
+  from the parent. No environment handed to `spawn` there is "only PATH", so 47 reads the child's real environment
+  (S-028).
+- **S-019's race is not met.** Drizzle's migrator reads the last applied migration before its `BEGIN`, so two processes
+  opening a brand-new file at once would both migrate. A restart opens a migrated file, and the tests still open the
+  API first. Recorded as not handled in S-027.
+- The suite went from 8.8 s to about 13.5 s: 47 runs the journey's other files again in parallel with the rest. Three
+  full runs, no flake. `drift`: 48 modules, 0 violations. `drift --audit`: 14 live, 0 inert, 0 dead.
+- `node scripts/check.mjs`: everything green, 116 tests.
+
+**Next.** Commit, then `node scripts/journey.mjs reel-plan`, whose verdict is added below once it has run.

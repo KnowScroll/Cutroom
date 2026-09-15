@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { and, asc, eq, gt, max } from 'drizzle-orm'
+import { and, asc, eq, gt, max, sql } from 'drizzle-orm'
 import type { Gate0Verdict, ModelReceipt, Plan } from '@cutroom/contracts'
 import {
   CONTRACT_VERSION,
@@ -187,10 +187,6 @@ export function eventsAfter(db: Db, runId: string, since: number): RunEvent[] {
     .map((row) => JSON.parse(row.body) as RunEvent)
 }
 
-export function appendEvent(db: Db, runId: string, body: EventBody, now: Date = new Date()) {
-  return db.transaction((tx) => append(tx, runId, body, now), { behavior: 'immediate' })
-}
-
 /**
  * Finishes a run in one transaction: its plans, the events before the end, its `run.finished`
  * event, its result, and its job marked done — so a job interrupted before this leaves no
@@ -232,6 +228,45 @@ export function finishRun(
         .where(eq(run.runId, runId))
         .run()
       completeJob(tx, jobId, result.costCents)
+    },
+    { behavior: 'immediate' },
+  )
+}
+
+/**
+ * What a `reel.plan` job does before its plan stage, in one immediate transaction, so a cancel
+ * cannot land between the read and the start (docs/features/reel-plan.md, Gate 2 "Cancel" and "A
+ * restart"; S-027). A run whose cancel flag is set answers `cancelled` and nothing is written — also
+ * when an interrupted job is run again. Otherwise `stage.started` is appended, unless an earlier
+ * attempt at the job already wrote it: a job run again from the start does not write it twice.
+ */
+export function startPlanStage(
+  db: Db,
+  runId: string,
+  now: Date = new Date(),
+): 'cancelled' | 'started' {
+  return db.transaction(
+    (tx) => {
+      const row = tx
+        .select({ cancelRequested: run.cancelRequested })
+        .from(run)
+        .where(eq(run.runId, runId))
+        .get()
+      if (row === undefined) throw new Error(`no run '${runId}'`)
+      if (row.cancelRequested) return 'cancelled'
+      const started = tx
+        .select({ seq: runEvent.seq })
+        .from(runEvent)
+        .where(
+          and(
+            eq(runEvent.runId, runId),
+            sql`json_extract(${runEvent.body}, '$.type') = 'stage.started'`,
+            sql`json_extract(${runEvent.body}, '$.stage') = 'plan'`,
+          ),
+        )
+        .get()
+      if (started === undefined) append(tx, runId, { type: 'stage.started', stage: 'plan' }, now)
+      return 'started'
     },
     { behavior: 'immediate' },
   )

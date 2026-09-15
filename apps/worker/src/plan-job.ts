@@ -1,10 +1,10 @@
 import type { Gate0Verdict, LanguageModelPort, PlanSettings } from '@cutroom/contracts'
 import {
-  appendEvent,
   finishRun,
   readReelCapCents,
   readRequest,
   readRun,
+  startPlanStage,
   type ClaimedJob,
   type Db,
   type EventBody,
@@ -81,7 +81,12 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
     costCents: 0,
   }
 
-  appendEvent(db, runId, { type: 'stage.started', stage: 'plan' })
+  // The cancel flag is read before the plan stage starts, and before a job interrupted mid-stage is
+  // run again (S-027). A cancel that arrives after this does not stop the stage (Gate review 2).
+  if (startPlanStage(db, runId) === 'cancelled') {
+    finishRun(db, { runId, jobId: job.id, result: { ...finished, status: 'cancelled' } })
+    return
+  }
 
   let planned: Planned
   try {

@@ -530,7 +530,7 @@ _How a run ends_
 - [x] **Slice 4 — the answers that are not a plan.** Too few sentences; the repair ladder; the budget refusal,
       its figures and its question; the rule stop; a thrown model call.
       **Proves: 20, 28, 38, 39, 40, 41, 42, 43, 44.**
-- [ ] **Slice 5 — cancel, restart, no secrets, and the journey.** **Proves: 45, 46, 47, and re-runs 1–44.**
+- [x] **Slice 5 — cancel, restart, no secrets, and the journey.** **Proves: 45, 46, 47, and re-runs 1–44.**
 
 Every check appears in exactly one slice: 7 + 7 + 21 + 9 + 3 = 47.
 

@@ -644,3 +644,91 @@ is written to the engine's folder; the repository's own `QUESTIONS.md` is untouc
 Checks 42 and 43 assert no question for a rule stop or a plan-only run over its ceiling. Breaks watched: no append,
 an overwrite instead of an append, the default one folder too high (41); a question on a rule stop (41, 42); a
 question for a completed run over its ceiling (43).
+
+---
+
+## S-027 | 2026-09-15 | An abandoned job is claimed again when its lease runs out; the cancel flag and `stage.started` are settled in one transaction before every attempt
+
+**Chose.** Four parts, all about a `reel.plan` job that a worker took and did not finish.
+
+- **Reclaim by lease.** `claimJob` (`packages/domain/src/queue.ts`) takes the oldest job that is `queued` and due,
+  **or `running` with `lease_until` at or before now**. The claim sets `locked_at`, a new `lease_until` and
+  `attempts + 1`, and the job runs from the start. The lease is the worker's `leaseMs` setting, default 60 seconds
+  (`DEFAULT_LEASE_MS`). Nothing renews it.
+- **Before every attempt, one immediate transaction** — `startPlanStage` (`packages/domain/src/runs.ts`): if the run's
+  cancel flag is set it answers `cancelled` and writes nothing, and the worker finishes the run `cancelled`, cost 0;
+  otherwise it appends `stage.started` for `plan` **unless the run already has one**, found by reading the event
+  bodies. So a run cancelled before its stage has no `stage.started`, and a run whose job is run again keeps the one
+  its first attempt wrote.
+- **A cancel that arrives while a job is interrupted is honoured** when the job is claimed again: the run finishes
+  `cancelled`, with the `stage.started` of the attempt that died and the receipts of the calls that returned, and no
+  model is asked again.
+- **"Mid-run" in check 46 is a worker process killed.** `tests/engine/worker-process.ts` runs the real `startWorker` in
+  a child process whose stand-in never answers one chosen call; the test waits for it to say so, kills it (a
+  `SIGKILL`, which on Windows is `TerminateProcess`), stops and starts the API on the same file, and starts a new worker.
+
+**Why.** Gate 2 says a claimed, unfinished job _"is run again from the start"_ and that `stage.started` _"is not
+written twice"_, and names neither how the job is found nor how the repeat is avoided. D-002 already chose the
+mechanism: a `lease_until` column, _"lease-based claiming gives us … crash recovery for free"_, confirmed by _"worker
+restart mid-job re-leases rather than duplicating"_. Slice 1 wrote the lease and nothing read it. The cancel read shares
+the transaction so a cancel cannot land between the read and the start. Honouring a cancel on a second attempt costs
+nothing the contract promises — Gate review 2 notes a cancel during the stage need not stop it, not that it must not —
+and a run the caller asked to stop is not planned again, which will matter when a call costs money.
+
+**Rejected.** **Reclaim every `running` job when a worker starts** — no wait after a crash, and a second worker's start
+takes the first's live job, which D-002's lease exists to prevent. **Knowing `stage.started` was written from
+`attempts > 1`** — an attempt that died between its claim and the event would leave a run that never has one. **A column
+on `run` for the stage** — a migration, and a second record of what the event log already says. **Reading the cancel
+flag only when the stage has not started** (Gate 2's words, literally) — the second attempt would re-run every call of a
+run the caller cancelled. **A stand-in answer that waits, with an in-process worker** — its `stop()` finishes the job in
+hand, so it cannot be stopped mid-run, and a held promise left behind would write to a closed database. **Setting a
+job's row to `running` by hand** — it proves what the test wrote, not what a dying worker leaves.
+
+**Not handled.** A job that outlasts its lease while its worker is alive is claimed by a second worker — there is one
+worker today, and the stand-in answers at once. A job that kills its worker every time is claimed forever: no attempt
+limit. **S-019's race is not met here**: a restart opens a file whose migrations are applied, and Drizzle's migrator
+then runs an empty transaction. Two processes opening a **brand-new** file at once still both read "no migration
+applied" before their `BEGIN`, so the second fails on an existing table; the tests still start the API first, and the
+child worker opens the file after it.
+
+**Caught by.** `reel-plan`'s check 46 (`tests/reel-plan-restart.test.ts`): before the kill, events 1–2 are
+`run.accepted` and `stage.started`, one receipt, the job `running` at attempt 1; after the restart the run is found by
+`requestId` at the same `lastSeq`, a replay returns it, it completes, events 3–6 follow with no gap, `stage.started`
+appears once, the first receipt is kept beside four new ones, and the job is `done` at attempt 2 with its second
+`locked_at` no earlier than the first `lease_until`. Check 45 (`tests/reel-plan-cancel.test.ts`) asserts a cancelled run
+has no `stage.started` and its second test the cancel read on a second attempt. Breaks watched: no reclaim (45's second
+test, 46); the lease ignored (46); the worker's `leaseMs` ignored (45's second test, 46); `stage.started` on every attempt
+(46); the repeat looked for under another stage (46); the flag ignored (45, both tests); the flag read only before a
+first start (45's second test); `stage.started` written before the flag is read (45). Check 47 re-runs both files, so it
+fails with each.
+
+---
+
+## S-028 | 2026-09-15 | Check 47's child is given PATH alone, and on Windows the eleven variables libuv adds are what "the operating system needs"
+
+**Chose.** `tests/reel-plan-secrets.test.ts` starts every other `tests/reel-plan-*.test.ts` in one `node --test` child
+whose `env` is **`{ PATH }` and nothing else**. Before that it starts a probe with the same object and reads the
+environment the probe actually has. The variables allowed there are **`PATH`** and, on Windows only, the eleven that
+libuv — the layer Node spawns through — copies from the parent into any child environment that lacks them:
+`HOMEDRIVE`, `HOMEPATH`, `LOGONSERVER`, `SYSTEMDRIVE`, `SYSTEMROOT`, `TEMP`, `USERDOMAIN`, `USERNAME`, `USERPROFILE`,
+`WINDIR` and `PATH` itself. A canary shaped like a key is set in the test's own process and must not reach the probe.
+The suite must pass with no failure, cancellation, skip or todo, and every check 1–46 must appear among its passing
+tests — 47 must not.
+
+**Why.** Seen on this machine on 2026-09-15 (Node 22.14): a child spawned with `env: { PATH }` holds exactly those
+eleven, and one spawned with `env: {}` holds the same eleven and starts. So on Windows no environment given to
+`spawn` is really "only PATH", and a check that trusted its own argument would state something false. None of the
+eleven is a credential: they name the machine, the user and folders. The roll call of 1–46 is there because a child
+that ran fewer files, or matched none, would otherwise pass as green.
+
+**Rejected.** **Asserting the argument, not the child** — true of the object and false of the process on Windows.
+**Passing a hand-picked Windows set, such as `SYSTEMROOT` and `TEMP`** — libuv adds the rest regardless, so an
+assertion of "only these" fails, and not asserting it hides what the child holds. **Filtering the parent's environment
+by name** (dropping `*KEY*`, `*TOKEN*`, `*SECRET*`) — a secret under any other name passes. **Running `check.mjs` in
+the child** — Gate 1 is about the journey's tests, and the check would run 47 again, inside itself.
+
+**Caught by.** Check 47 itself. Breaks watched: the child handed `process.env` (the probe sees the canary and the extra
+variables); the worker requiring `HOME`, which the parent shell has and the bare environment does not (47 alone — every
+other test passed in the parent); a test file left out of the child (47, checks 15 and 16 missing); its own file left
+in (47, before anything is spawned). **Not caught:** a secret held under one of the eleven names, and anything read
+from a file rather than the environment.

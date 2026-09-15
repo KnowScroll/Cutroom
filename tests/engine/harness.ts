@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -7,7 +8,9 @@ import type { PlanSettings } from '@cutroom/contracts'
 import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
 import { fakeModel, type FakeModel, type FakeScript } from '@cutroom/providers'
 import { startWorker, type Worker } from '@cutroom/worker'
+import { REPO } from '../_repo.ts'
 import { client } from '../stand-in/client.ts'
+import type { WorkerProcessConfig } from './worker-process.ts'
 
 /**
  * The real engine — its API and its worker — started on a database file in a temporary folder
@@ -31,9 +34,27 @@ export interface Engine {
   /** The stand-in the worker was handed, with every call it received. */
   model: FakeModel
   startWorker(): Promise<Worker>
+  /**
+   * The worker in a child process, whose stand-in never answers call `holdAtCall`: a run in the
+   * middle of its plan stage, which the test ends by killing the process.
+   */
+  spawnWorker(options: { script: FakeScript; holdAtCall: number; leaseMs: number }): WorkerProcess
+  /**
+   * Stops the worker and the API and starts the API again on the same database file, with a new
+   * stand-in answering from `script`. The folder is kept. The worker is not started again until
+   * `startWorker()`.
+   */
+  restart(options: { script?: FakeScript }): Promise<void>
   /** Reads the database file directly, the way an operator would, and closes it again. */
   query<T>(sql: string, ...params: Array<string | number>): T[]
   stop(): Promise<void>
+}
+
+export interface WorkerProcess {
+  /** Resolves once the worker's stand-in is holding its call open; rejects if the process ends first. */
+  held: Promise<void>
+  /** Ends the process at once, as a crash would, and resolves when it has gone. */
+  kill(): Promise<void>
 }
 
 export interface EngineOptions {
@@ -54,9 +75,9 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
     writeFileSync(budgetPath, options.budgetMd)
   }
   const settings = options.settings ?? DEFAULT_PLAN_SETTINGS
-  const model = fakeModel(options.script ?? {}, { models: settings.models })
   const api = await startApi({ dbPath })
   let worker: Worker | undefined
+  const children: Array<ReturnType<typeof spawn>> = []
 
   const engine: Engine = {
     dir,
@@ -65,17 +86,70 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
     budgetPath,
     api,
     http: client(api.baseUrl),
-    model,
+    model: fakeModel(options.script ?? {}, { models: settings.models }),
     async startWorker() {
       worker ??= await startWorker({
         dbPath,
         pollMs: 10,
-        model,
+        model: engine.model,
         settings,
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
       })
       return worker
+    },
+    spawnWorker({ script, holdAtCall, leaseMs }) {
+      const config: WorkerProcessConfig = {
+        dbPath,
+        questionsPath,
+        ...(budgetPath === undefined ? {} : { budgetPath }),
+        settings,
+        script,
+        holdAtCall,
+        leaseMs,
+      }
+      const child = spawn(
+        process.execPath,
+        [
+          '--experimental-strip-types',
+          '--no-warnings',
+          join('tests', 'engine', 'worker-process.ts'),
+        ],
+        { cwd: REPO, stdio: ['pipe', 'pipe', 'pipe'] },
+      )
+      children.push(child)
+      let output = ''
+      const gone = new Promise<void>((resolve) => child.once('exit', () => resolve()))
+      const held = new Promise<void>((resolve, reject) => {
+        child.stdout.on('data', (chunk: Buffer) => {
+          output += chunk.toString('utf8')
+          if (/^held$/m.test(output)) resolve()
+        })
+        child.stderr.on('data', (chunk: Buffer) => {
+          output += chunk.toString('utf8')
+        })
+        child.once('exit', (code) => {
+          reject(new Error(`the worker process ended (${code}) before holding a call:\n${output}`))
+        })
+      })
+      // A process killed before it held a call is the test's own doing, not an unhandled failure.
+      held.catch(() => {})
+      child.stdin.end(JSON.stringify(config))
+      return {
+        held,
+        async kill() {
+          if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
+          await gone
+        },
+      }
+    },
+    async restart({ script }) {
+      await worker?.stop()
+      worker = undefined
+      await engine.api.stop()
+      engine.api = await startApi({ dbPath })
+      engine.http = client(engine.api.baseUrl)
+      engine.model = fakeModel(script ?? {}, { models: settings.models })
     },
     query<T>(sql: string, ...params: Array<string | number>): T[] {
       const db = new DatabaseSync(dbPath)
@@ -86,12 +160,31 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       }
     },
     async stop() {
+      for (const child of children) {
+        if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL')
+      }
+      await Promise.all(
+        children.map((child) =>
+          child.exitCode === null && child.signalCode === null
+            ? new Promise<void>((resolve) => child.once('exit', () => resolve()))
+            : undefined,
+        ),
+      )
       await worker?.stop()
-      await api.stop()
+      await engine.api.stop()
       rmSync(dir, { recursive: true, force: true })
     },
   }
-  if (options.worker) await engine.startWorker()
+  if (options.worker) {
+    // A worker that fails to start must not leave the API listening: the test file's process would
+    // never exit, and a run of the suite would hang rather than fail (seen by check 47's child).
+    try {
+      await engine.startWorker()
+    } catch (error) {
+      await engine.stop()
+      throw error
+    }
+  }
   return engine
 }
 

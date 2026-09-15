@@ -4,6 +4,7 @@ import {
   buryJob,
   claimJob,
   closeDatabase,
+  DEFAULT_LEASE_MS,
   openDatabase,
   PLAN_JOB,
 } from '@cutroom/domain'
@@ -18,6 +19,12 @@ export interface WorkerOptions {
   dbPath: string
   /** How long to wait between polls when no job is due. D-002 says 500 ms. */
   pollMs?: number
+  /**
+   * How long a job this worker claims is held from every other claim (D-002's lease). A job still
+   * running when its lease runs out is taken to be abandoned, claimed again and run from the start
+   * (S-027). Nothing renews a lease, so it must outlast the longest job. Defaults to 60 seconds.
+   */
+  leaseMs?: number
   /**
    * The only way the worker asks a model (S-021). The caller supplies it; the worker wraps it so
    * every receipt is recorded, and never constructs one itself.
@@ -39,6 +46,7 @@ export interface Worker {
 export async function startWorker(options: WorkerOptions): Promise<Worker> {
   const db = openDatabase(options.dbPath)
   const pollMs = options.pollMs ?? 500
+  const leaseMs = options.leaseMs ?? DEFAULT_LEASE_MS
   const context: PlanJobContext = {
     model: options.model,
     settings: options.settings ?? DEFAULT_PLAN_SETTINGS,
@@ -51,7 +59,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
 
   async function drain(): Promise<void> {
     while (!stopped) {
-      const job = claimJob(db, [PLAN_JOB])
+      const job = claimJob(db, [PLAN_JOB], new Date(), leaseMs)
       if (job === undefined) return
       try {
         await runPlanJob(db, job, context)

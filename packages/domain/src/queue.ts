@@ -1,9 +1,10 @@
-import { and, asc, eq, inArray, lte, sql } from 'drizzle-orm'
+import { and, asc, eq, inArray, lte, or, sql } from 'drizzle-orm'
 import type { Db } from './db.ts'
 import { job } from './schema.ts'
 
 // The job queue is a table (D-002). A job is claimed with one UPDATE … RETURNING, so two workers
-// can never claim the same row.
+// can never claim the same row. A claimed job whose lease has run out — its worker died with it in
+// hand — is claimed again and run from the start (S-027).
 
 /** A write inside a transaction or outside one. */
 export type Writer = Pick<Db, 'select' | 'insert' | 'update'>
@@ -17,7 +18,7 @@ export interface ClaimedJob {
 }
 
 /** How long a claimed job is held before another claim may take it (D-002's lease). */
-const LEASE_MS = 60_000
+export const DEFAULT_LEASE_MS = 60_000
 
 export function enqueue(
   tx: Writer,
@@ -39,17 +40,29 @@ export function enqueue(
   return row.id
 }
 
-/** Claims the oldest queued job of one of `kinds` that is due, or returns undefined. */
+/**
+ * Claims the oldest job of one of `kinds` that is queued and due, or running with its lease run
+ * out, or returns undefined. The claim holds the job for `leaseMs`.
+ */
 export function claimJob(
   db: Db,
   kinds: readonly string[],
   now: Date = new Date(),
+  leaseMs: number = DEFAULT_LEASE_MS,
 ): ClaimedJob | undefined {
   const at = now.toISOString()
   const next = db
     .select({ id: job.id })
     .from(job)
-    .where(and(eq(job.state, 'queued'), inArray(job.kind, [...kinds]), lte(job.runAt, at)))
+    .where(
+      and(
+        inArray(job.kind, [...kinds]),
+        or(
+          and(eq(job.state, 'queued'), lte(job.runAt, at)),
+          and(eq(job.state, 'running'), lte(job.leaseUntil, at)),
+        ),
+      ),
+    )
     .orderBy(asc(job.id))
     .limit(1)
   const row = db
@@ -58,7 +71,7 @@ export function claimJob(
       state: 'running',
       attempts: sql`${job.attempts} + 1`,
       lockedAt: at,
-      leaseUntil: new Date(now.getTime() + LEASE_MS).toISOString(),
+      leaseUntil: new Date(now.getTime() + leaseMs).toISOString(),
     })
     .where(inArray(job.id, next))
     .returning()
