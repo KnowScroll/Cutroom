@@ -11,7 +11,7 @@ authority: plan
 
 # reel-plan — the engine answers a request for a plan, for $0
 
-Status: gated
+Status: verified
 Decisions: D-001, D-002, D-005, D-006, D-014, D-019, D-020, D-027, D-029, D-031, D-034, D-035, D-047, D-057, D-061, D-062, D-063, D-064, D-065, D-070, D-073, D-078, D-081, D-083, D-084, D-088, D-089, D-092, D-096, D-097, D-098, D-099, D-100, D-102, D-103, D-105, D-106, D-107, D-108, D-110, D-111, D-112, D-113, D-114, I-3, I-7, I-14, I-16, I-20, S-010, S-012, S-014, S-016
 Named only in the deferral list: D-026, D-028, D-033, D-036, D-037, D-042, D-043, D-048, D-049, D-050, D-068, D-069, D-071, D-086, D-087, I-9, I-15
 Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED 2026-09-14 adversarial-reviewer · program-design APPROVED 2026-09-14 adversarial-reviewer · slices APPROVED 2026-09-14 adversarial-reviewer
@@ -543,6 +543,8 @@ Every check appears in exactly one slice: 7 + 7 + 21 + 9 + 3 = 47.
 - [ ] A request for pictures, video, or another axis is told "not built yet"
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-15 journey=PASS at 915312d — every check green; 50 tests in tests/reel-plan-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 

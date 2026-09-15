@@ -702,4 +702,13 @@ unpushed. Baseline `check.mjs` green, 112 tests.
   full runs, no flake. `drift`: 48 modules, 0 violations. `drift --audit`: 14 live, 0 inert, 0 dead.
 - `node scripts/check.mjs`: everything green, 116 tests.
 
-**Next.** Commit, then `node scripts/journey.mjs reel-plan`, whose verdict is added below once it has run.
+**The journey.** Slice 5 committed as `915312d`, then `node scripts/journey.mjs reel-plan`: **PASS at 915312d — every
+check green; 50 tests in tests/reel-plan-\*.test.ts pass** (46 checks' tests, the S-027 test, 45, 46, 47), 36 s. It
+wrote `Status: verified`, the evidence line and `none` under Divergence, and nothing else. **The owner's untracked
+`nextPrompt.txt` would have made it refuse a dirty tree**: it was listed in `.git/info/exclude` for the run only — not
+committed, not moved, read by no check — and the file was restored byte for byte afterwards.
+
+**Next.** `reel-plan` is verified; its four Outcome boxes are still unticked, as `reel-contract`'s are. Open, and not
+assigned: a lease that outlasts a live job, no attempt limit on a job that keeps killing its worker, and S-019's
+brand-new-file migration race (all in S-027). The next feature is the owner's to name — `reel-stills` is gated in the
+steering repository and has not moved here.
