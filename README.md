@@ -55,8 +55,8 @@ apps/worker          the runner. The only place that knows both a stage and a ta
 apps/api             submitting work and reading records. Never calls a provider.
 ```
 
-`pipeline` and `providers` are still **empty on purpose**, until `reel-plan`'s Slice 3. The
-boundaries between them are not a convention — seventeen rules over the real dependency graph,
+`providers` holds one adapter: the stand-in model, the only one there is. The
+boundaries between the packages are not a convention — seventeen rules over the real dependency graph,
 three of them between two folders of a single package, two of them about npm packages:
 
 ```bash

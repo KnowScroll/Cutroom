@@ -1,15 +1,16 @@
 import { randomUUID } from 'node:crypto'
 import { and, asc, eq, gt, max } from 'drizzle-orm'
+import type { Gate0Verdict, ModelReceipt, Plan } from '@cutroom/contracts'
 import {
   CONTRACT_VERSION,
+  SubmitRequest,
   type RunEvent,
   type RunResult,
   type RunStatus,
-  type SubmitRequest,
 } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
 import { completeJob, enqueue, type Writer } from './queue.ts'
-import { run, runEvent } from './schema.ts'
+import { modelReceipt, plan, run, runEvent } from './schema.ts'
 
 // Runs and their event record (docs/features/reel-plan.md, Gate 2 "How the contract's rules are
 // kept"). Every write that numbers an event happens inside one immediate transaction, so the
@@ -133,6 +134,48 @@ export function readRunByRequestId(db: Db, requestId: string): StoredRun | undef
   return row === undefined ? undefined : readRun(db, row.runId)
 }
 
+/** The request a run was submitted with, parsed under the contract it was accepted by. */
+export function readRequest(db: Db, runId: string): SubmitRequest {
+  const row = db.select({ request: run.request }).from(run).where(eq(run.runId, runId)).get()
+  if (row === undefined) throw new Error(`no run '${runId}'`)
+  return SubmitRequest.parse(JSON.parse(row.request))
+}
+
+/**
+ * One model call that returned, written as it returns (D-005, D-084) — outside the transaction
+ * that finishes the run, so it survives a later thrown call, a failed run and an interrupted job.
+ */
+export function recordReceipt(
+  db: Db,
+  runId: string,
+  receipt: ModelReceipt,
+  now: Date = new Date(),
+): void {
+  db.insert(modelReceipt)
+    .values({
+      runId,
+      role: receipt.role,
+      model: receipt.model,
+      temperature: receipt.temperature,
+      inputTokens: receipt.usage.inputTokens,
+      outputTokens: receipt.usage.outputTokens,
+      fake: receipt.fake,
+      at: now.toISOString(),
+    })
+    .run()
+}
+
+/** A plan as its row stores it: the plan, what Gate 0 said, its score if any, and the fork's axis. */
+export interface PlanRow {
+  role: Plan['role']
+  /** The axis of the fork the plan belongs to, read from the fork (D-078). */
+  axis: string
+  plan: Plan
+  verdict: Gate0Verdict
+  score: number | null
+  selected: boolean
+}
+
 /** The events numbered after `since`, in order. */
 export function eventsAfter(db: Db, runId: string, since: number): RunEvent[] {
   return db
@@ -149,17 +192,40 @@ export function appendEvent(db: Db, runId: string, body: EventBody, now: Date = 
 }
 
 /**
- * Finishes a run in one transaction: its `run.finished` event, its result, and its job marked
- * done — so a job interrupted before this leaves no half-finished run behind.
+ * Finishes a run in one transaction: its plans, the events before the end, its `run.finished`
+ * event, its result, and its job marked done — so a job interrupted before this leaves no
+ * half-finished run behind.
  */
 export function finishRun(
   db: Db,
-  finish: { runId: string; jobId: number; result: RunResult },
+  finish: {
+    runId: string
+    jobId: number
+    result: RunResult
+    plans?: readonly PlanRow[]
+    events?: readonly EventBody[]
+  },
   now: Date = new Date(),
 ): void {
   const { runId, jobId, result } = finish
   db.transaction(
     (tx) => {
+      for (const row of finish.plans ?? []) {
+        tx.insert(plan)
+          .values({
+            runId,
+            role: row.role,
+            unitCount: row.plan.units.length,
+            axis: row.axis,
+            plan: JSON.stringify(row.plan),
+            verdict: JSON.stringify(row.verdict),
+            score: row.score,
+            estimateCents: row.plan.estimateCents,
+            selected: row.selected,
+          })
+          .run()
+      }
+      for (const event of finish.events ?? []) append(tx, runId, event, now)
       append(tx, runId, { type: 'run.finished', status: result.status }, now)
       tx.update(run)
         .set({ state: 'finished', result: JSON.stringify(result) })

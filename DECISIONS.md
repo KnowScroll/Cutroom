@@ -470,3 +470,82 @@ graph and tsc output out of it. **Not caught:** an npm package that is not insta
 pipeline, has no `node_modules` path and passes `pipeline-npm-only-zod` (only `ai` and `@ai-sdk/*` are matched
 by name); the typecheck fails on such an import. A global `fetch` in the pipeline — `reel-plan`'s deferred
 item 8.
+
+---
+
+## S-021 | 2026-09-15 | The worker is handed its model port by whoever starts it, and never constructs one
+
+**Chose.** `startWorker` takes `model: LanguageModelPort` as a **required** option, beside optional `settings`
+(defaulting to the pipeline's `DEFAULT_PLAN_SETTINGS`) and `budgetPath` (defaulting to the pinned
+`steering-ref/steering/BUDGET.md`, D-100). The worker wraps the port it is given in `recording-port.ts`, so every
+receipt is written as its call returns, and passes that to `planReel`. `apps/worker` does not depend on
+`@cutroom/providers`; the tests' harness builds the stand-in and hands it over.
+
+**Why.** `reel-plan`'s Gate 2 says the worker hands `planReel` "the stand-in wrapped", and Gate 3 gives no signature
+for how the worker comes to hold it. Whoever holds the choice of model is choosing whether a run can spend. Kept out of
+the runner, the choice is made once, by the code that starts the engine, and the runner stays the same when a real
+adapter arrives with the paid-path feature.
+
+**Rejected.** **The worker constructs the stand-in itself** — one less argument, and it puts an adapter choice in the
+runner: the paid-path feature would then either edit the runner or select an adapter by a setting, which Gate 3's
+fourth least-confident decision rejects as _"a property asserted of a setting"_; and a worker started with no script
+would fail every run that reaches a call. **An environment variable naming the adapter** — the same setting, read
+from the surroundings Gate 1 requires to hold no secret.
+
+**Caught by.** The type: `model` is required, so `tsc -b` fails on a worker started without one. `reel-plan`'s checks
+6 and 37 run the real worker with the stand-in the harness built, and 37 asserts one receipt per call the stand-in
+received. **Not caught:** a later change adding `@cutroom/providers` to the worker and building a port inside it — no
+boundary rule forbids `apps/worker -> packages/providers`.
+
+---
+
+## S-022 | 2026-09-15 | The plan score is a plain weighted sum of six named terms, and a weight that is not a non-negative number counts as 0
+
+**Chose.** `PlanScore` keeps Slice 2's shape, `{ terms, total }`. `terms` has six keys, which are also the keys of
+`PlanSettings.score.weights`: `coverage` (share of the request's claims shown by some shot; 1 when there are no
+claims), `recurrence` (share of shots showing rank 1's subject; 0 when nothing is ranked or there are no shots), and
+one per closed question, in the order asked — `order`, `pacing`, `juxtaposition`, `distinct` — each 1 for `yes` and 0
+for anything else. `total` is the sum of weight × term. **A weight that is missing, negative, `NaN` or infinite
+counts as 0**, and the total is capped at the largest finite number. Every default weight is 1, provisional until
+M-1 (D-064). The fourth question is worded so that `yes` is good: _does every shot show something no other shot has
+already shown?_
+
+**Why.** Gate 2 fixes the score as _"a weighted sum with non-negative weights over terms between 0 and 1"_ with _"no
+path that rejects"_ (I-16) and leaves what the terms are called, how an answer becomes a number and what an invalid
+weight does. Weights are settings, so a mistyped one is an expected input, and the score must still return a number.
+
+**Rejected.** **Dividing by the sum of the weights** — keeps totals between 0 and 1, and returns `NaN` when every
+weight is 0, which is a total that compares false with everything and silently selects the 4-unit plan. **Refusing
+invalid weights** — a path that rejects, which I-16 forbids in a score. **Keying the question terms by the question's
+wording** — rewording a question, which Gate 2 makes a setting, would drop its weight to 0 unnoticed. **A `yes` that
+means bad on the repetition question** — one term scored the other way from the other three, and a reader of the
+weights cannot tell.
+
+**Caught by.** `reel-plan`'s check 35 (`tests/reel-plan-score.test.ts`) scores every combination of answers,
+malformed answers, zero, missing, negative, `NaN`, infinite and huge weights, a plan with no shots and a request with
+no claims, and asserts a finite, non-negative total and every term between 0 and 1 — and that `plan/score.ts` holds
+no `throw`. Dividing by the weight sum was the break it was watched catching.
+
+---
+
+## S-023 | 2026-09-15 | The planning answer is also refused for a subject named twice, a shot showing an unnamed subject, and a duration in part-seconds
+
+**Chose.** Beside D-070's guard — each unit exactly one shot, and no shot for a unit that does not exist — the
+planning call's schema refuses an answer that names one subject id twice, a shot whose `subjectIds` names a subject
+the answer does not, or a `durationSeconds` that is not a whole number. As Gate 3's second least-confident decision
+says of any schema refusal, such a run finishes `failed`.
+
+**Why.** Each is an answer that is not a plan in D-029's sense, and each would otherwise be absorbed silently by code
+downstream. D-029 part 1 has subjects _"named … and deduped there"_; a duplicated id would make ranking count one
+subject under two entries. A shot naming an unknown id would be dropped by the ranking without a trace, changing the
+image-call count and the estimate. D-019 records the video model's `duration` as 5–15, and the schema it was read
+from types it as an integer (`steering-ref/docs/research/minimax-h3.md`); a plan of 7.5 would be estimated for a clip
+that cannot be requested.
+
+**Rejected.** **Accepting and ignoring them** — the plan then differs from what the model said, with nothing
+recording it. **Refusing them at Gate 0** — a fifth condition D-063 does not have, and the repair path for an answer
+that was never a plan (the same reason Gate 3 gives for treating schema refusals as faults). **Rounding durations** —
+code changing a cinematic field the planning layer owns (D-034).
+
+**Caught by.** `reel-plan`'s check 7 (`tests/reel-plan-shapes.test.ts`) asserts each is refused. Each refusal was
+disabled on purpose once and check 7, alone, failed.

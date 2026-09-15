@@ -103,6 +103,50 @@ export const where = (n: Name) => `${n.file}:${n.line} (${n.kind} ${n.name})`
 /** The declarations that give a name a type or a value: everything but fields and export aliases. */
 export const isDeclaration = (n: Name) => n.kind !== 'field' && n.kind !== 'export-alias'
 
+/**
+ * Every module specifier a file names, however it names it: `import`, `import type`, a bare
+ * `import 'x'`, `export … from`, a dynamic `import('x')` and `require('x')`.
+ */
+export function importSpecifiers(file: string): string[] {
+  const out: string[] = []
+  const visit = (node: ts.Node) => {
+    if (
+      (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+      node.moduleSpecifier !== undefined &&
+      ts.isStringLiteral(node.moduleSpecifier)
+    ) {
+      out.push(node.moduleSpecifier.text)
+    } else if (ts.isCallExpression(node)) {
+      const [first] = node.arguments
+      const dynamic = node.expression.kind === ts.SyntaxKind.ImportKeyword
+      const required = ts.isIdentifier(node.expression) && node.expression.text === 'require'
+      if ((dynamic || required) && first !== undefined && ts.isStringLiteralLike(first)) {
+        out.push(first.text)
+      }
+    } else if (ts.isImportTypeNode(node)) {
+      const arg = node.argument
+      if (ts.isLiteralTypeNode(arg) && ts.isStringLiteral(arg.literal)) out.push(arg.literal.text)
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(parse(file))
+  return out
+}
+
+/** Whether a file contains a `throw` statement anywhere — a path by which it can reject. */
+export function throwStatements(file: string): number[] {
+  const source = parse(file)
+  const lines: number[] = []
+  const visit = (node: ts.Node) => {
+    if (ts.isThrowStatement(node)) {
+      lines.push(source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1)
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(source)
+  return lines
+}
+
 /** The specifiers a file imports each name from: `import { A, type B } from 'x'` gives A→x, B→x. */
 export function importedNames(file: string): Map<string, string> {
   const out = new Map<string, string>()

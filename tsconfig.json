@@ -12,6 +12,8 @@
     { "path": "./packages/reel-contract" },
     { "path": "./packages/contracts" },
     { "path": "./packages/domain" },
+    { "path": "./packages/pipeline" },
+    { "path": "./packages/providers" },
     { "path": "./apps/api" },
     { "path": "./apps/worker" },
     { "path": "./tsconfig.tooling.json" }

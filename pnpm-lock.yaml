@@ -14,6 +14,12 @@ importers:
       '@cutroom/contracts':
         specifier: workspace:*
         version: link:packages/contracts
+      '@cutroom/pipeline':
+        specifier: workspace:*
+        version: link:packages/pipeline
+      '@cutroom/providers':
+        specifier: workspace:*
+        version: link:packages/providers
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:packages/reel-contract
@@ -59,9 +65,15 @@ importers:
 
   apps/worker:
     dependencies:
+      '@cutroom/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@cutroom/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@cutroom/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:../../packages/reel-contract
@@ -77,6 +89,9 @@ importers:
 
   packages/domain:
     dependencies:
+      '@cutroom/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:../reel-contract
@@ -91,9 +106,23 @@ importers:
         specifier: ^9.6.0
         version: 9.6.0
 
-  packages/pipeline: {}
+  packages/pipeline:
+    dependencies:
+      '@cutroom/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@cutroom/reel-contract':
+        specifier: workspace:*
+        version: link:../reel-contract
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
 
-  packages/providers: {}
+  packages/providers:
+    dependencies:
+      '@cutroom/contracts':
+        specifier: workspace:*
+        version: link:../contracts
 
   packages/reel-contract:
     dependencies:

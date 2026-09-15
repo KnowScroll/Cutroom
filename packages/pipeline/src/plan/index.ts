@@ -1,0 +1,180 @@
+import { z } from 'zod'
+import {
+  DEFAULT_PLAN_VARY_ON,
+  type Gate0Verdict,
+  type LanguageModelPort,
+  type Plan,
+  type PlanFork,
+  type PlanScore,
+  type PlanSettings,
+} from '@cutroom/contracts'
+import { Criterion, PlanVaryOn, type SubmitRequest } from '@cutroom/reel-contract'
+import { estimate } from '../estimate.ts'
+import { gate0 } from '../gates/index.ts'
+import { plannedImageCalls, rankSubjects } from '../rank.ts'
+import { groupSentences } from '../split/index.ts'
+import {
+  SCORE_QUESTIONS,
+  planningAnswer,
+  planningPrompt,
+  scoreAnswer,
+  scorePrompt,
+  type PlanningAnswer,
+} from './prompts.ts'
+import { scorePlan } from './score.ts'
+
+// The planning stage (docs/features/reel-plan.md, Gates 2 and 3). The worker calls `planReel` and
+// nothing else; this stage is the one caller of the splitter (D-073). It is handed its model port
+// and never reaches for one.
+
+/** Every planning setting's default. Each is provisional where its decision says so. */
+export const DEFAULT_PLAN_SETTINGS: PlanSettings = {
+  shotCountUnits: [4, 6], // D-112
+  totalSecondsBounds: [35, 45], // D-111
+  imageRateCents: 15, // BUDGET.md: nano-banana-pro/edit, the dearest candidate (O-4)
+  videoRateCentsPerSecond: 4, // BUDGET.md: H3 Turbo 768P, until Q9 is read
+  models: { planner: 'MiniMax-M2.7', reconciler: 'MiniMax-M3' }, // D-006
+  score: {
+    questions: SCORE_QUESTIONS, // D-064, provisional until M-1
+    weights: { coverage: 1, recurrence: 1, order: 1, pacing: 1, juxtaposition: 1, distinct: 1 },
+  },
+}
+
+const planSchema = z.strictObject({
+  role: z.enum(['a', 'b', 'repair']),
+  units: z.array(z.array(z.number().int().min(0))),
+  shots: z.array(
+    z.strictObject({
+      unit: z.number().int().min(0),
+      durationSeconds: z.number().int().min(0),
+      subjectIds: z.array(z.string().min(1)),
+    }),
+  ),
+  subjects: z.array(z.strictObject({ id: z.string().min(1), name: z.string().min(1) })),
+  criteria: z.strictObject({ mustShow: z.array(Criterion), mustNotShow: z.array(Criterion) }),
+  plannedImageCalls: z.number().int().min(0).max(4),
+  estimateCents: z.number().int().min(0),
+})
+
+/**
+ * Two plans of the same words and the axis they differ on. The axis is required and must be in the
+ * contract's closed list: a fork without one fails here (D-062, D-078).
+ */
+export const planForkSchema: z.ZodType<PlanFork> = z.strictObject({
+  axis: PlanVaryOn,
+  a: planSchema,
+  b: planSchema,
+})
+
+export interface PlanRecord {
+  fork: PlanFork
+  repair: Plan | null // D-113
+  verdicts: { a: Gate0Verdict; b: Gate0Verdict; repair: Gate0Verdict | null }
+  scores: { a: PlanScore; b: PlanScore } | null // only when both survived, D-113
+}
+
+export type PlanOutcome =
+  | (PlanRecord & { kind: 'selected'; selected: 'a' | 'b' | 'repair'; estimateCents: number })
+  | (PlanRecord & { kind: 'refused-budget'; estimateCents: number }) // lowest of the three
+  | (PlanRecord & { kind: 'stopped-rule'; rule: 'gate-0'; detail: string })
+  | { kind: 'stopped-rule'; rule: 'split'; detail: string } // too few sentences: no fork, no call, D-112
+
+/** The plan code builds from one planning answer: the model's shots and subjects, and nothing else. */
+function build(
+  role: 'a' | 'b',
+  units: number[][],
+  answer: PlanningAnswer,
+  request: SubmitRequest,
+  settings: PlanSettings,
+): Plan {
+  const shots = [...answer.shots]
+    .sort((x, y) => x.unit - y.unit)
+    .map((shot) => ({ ...shot, subjectIds: [...shot.subjectIds] }))
+  const subjects = answer.subjects.map((subject) => ({ ...subject }))
+  const calls = plannedImageCalls(rankSubjects({ shots, subjects }))
+  return {
+    role,
+    units,
+    shots,
+    subjects,
+    // Copied by code, every supplied criterion with its id and text (D-034, D-096).
+    criteria: {
+      mustShow: request.criteria.mustShow.map((c) => ({ ...c })),
+      mustNotShow: request.criteria.mustNotShow.map((c) => ({ ...c })),
+    },
+    plannedImageCalls: calls,
+    estimateCents: estimate({ shots, plannedImageCalls: calls }, settings),
+  }
+}
+
+/** Not built in Slice 3: reel-plan's Slice 4 replaces each throw with the answer it names. */
+const notBuilt = (what: string) => new Error(`${what} is not built (reel-plan Slice 4)`)
+
+export async function planReel(
+  request: SubmitRequest,
+  model: LanguageModelPort,
+  capCents: number,
+  settings: PlanSettings,
+): Promise<PlanOutcome> {
+  // The pair's axis is declared, and checked against the closed list before any call (D-062).
+  const axis = PlanVaryOn.parse(request.options.planVaryOn ?? DEFAULT_PLAN_VARY_ON)
+  if (axis !== 'shotCount') throw new Error(`planVaryOn '${axis}' is not built (D-110)`)
+
+  const [countA, countB] = settings.shotCountUnits
+  const sentences = request.narration.length
+  const unitsA = groupSentences(sentences, countA)
+  const unitsB = groupSentences(sentences, countB)
+  if (unitsA === null || unitsB === null) {
+    throw notBuilt(
+      `stopping for too few sentences (${sentences} for ${countA} and ${countB} units)`,
+    )
+  }
+
+  // One structured call per grouping, planner role, temperature 0 (D-061, D-062, D-035).
+  const planned = async (role: 'a' | 'b', units: number[][]) => {
+    const { value } = await model.structured({
+      prompt: planningPrompt(request, units, settings),
+      schema: planningAnswer(units.length),
+      role: 'planner',
+      temperature: 0,
+    })
+    return build(role, units, value, request, settings)
+  }
+  const a = await planned('a', unitsA)
+  const b = await planned('b', unitsB)
+  const fork = planForkSchema.parse({ axis, a, b })
+
+  const verdicts = {
+    a: gate0(fork.a, request, capCents, settings),
+    b: gate0(fork.b, request, capCents, settings),
+    repair: null,
+  }
+  const survives = (v: Gate0Verdict) => v.outcome === 'accept'
+
+  if (survives(verdicts.a) && survives(verdicts.b)) {
+    // Each plan in its own call, reconciler role, temperature 0 — never two plans at once (D-064).
+    const scored = async (p: Plan) => {
+      const { value } = await model.structured({
+        prompt: scorePrompt(p, request, settings),
+        schema: scoreAnswer,
+        role: 'reconciler',
+        temperature: 0,
+      })
+      return scorePlan(p, request, value.answers, settings)
+    }
+    const scores = { a: await scored(fork.a), b: await scored(fork.b) }
+    // Higher wins; a tie goes to the 4-unit plan, planned first (D-031 rule 4's shape).
+    const selected = scores.b.total > scores.a.total ? 'b' : 'a'
+    const record = { fork, repair: null, verdicts, scores }
+    return { ...record, kind: 'selected', selected, estimateCents: fork[selected].estimateCents }
+  }
+
+  if (survives(verdicts.a) || survives(verdicts.b)) {
+    // A sole survivor is selected outright, and neither plan is scored (D-113).
+    const selected = survives(verdicts.a) ? 'a' : 'b'
+    const record = { fork, repair: null, verdicts, scores: null }
+    return { ...record, kind: 'selected', selected, estimateCents: fork[selected].estimateCents }
+  }
+
+  throw notBuilt('the repair after both plans fail Gate 0')
+}

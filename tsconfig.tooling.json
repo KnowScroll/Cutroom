@@ -9,6 +9,8 @@
   "references": [
     { "path": "./packages/reel-contract" },
     { "path": "./packages/contracts" },
+    { "path": "./packages/pipeline" },
+    { "path": "./packages/providers" },
     { "path": "./apps/api" },
     { "path": "./apps/worker" }
   ]

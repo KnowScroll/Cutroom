@@ -9,5 +9,10 @@
   },
   "files": [
     "src"
-  ]
+  ],
+  "dependencies": {
+    "@cutroom/contracts": "workspace:*",
+    "@cutroom/reel-contract": "workspace:*",
+    "zod": "^4.6.5"
+  }
 }

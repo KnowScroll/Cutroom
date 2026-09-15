@@ -1,5 +1,14 @@
-import { buryJob, claimJob, closeDatabase, openDatabase, PLAN_JOB } from '@cutroom/domain'
-import { runPlanJob } from './plan-job.ts'
+import type { LanguageModelPort, PlanSettings } from '@cutroom/contracts'
+import {
+  BUDGET_MD,
+  buryJob,
+  claimJob,
+  closeDatabase,
+  openDatabase,
+  PLAN_JOB,
+} from '@cutroom/domain'
+import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
+import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 
 // The runner's loop: claim a due job, run it, and poll again (D-002). Jobs are run one at a time.
 
@@ -8,6 +17,15 @@ export interface WorkerOptions {
   dbPath: string
   /** How long to wait between polls when no job is due. D-002 says 500 ms. */
   pollMs?: number
+  /**
+   * The only way the worker asks a model (S-021). The caller supplies it; the worker wraps it so
+   * every receipt is recorded, and never constructs one itself.
+   */
+  model: LanguageModelPort
+  /** Planning settings. Defaults to the pipeline's. */
+  settings?: PlanSettings
+  /** The BUDGET.md the per-reel cap is read from (D-100). Defaults to the pinned steering-ref's. */
+  budgetPath?: string
 }
 
 export interface Worker {
@@ -18,6 +36,11 @@ export interface Worker {
 export async function startWorker(options: WorkerOptions): Promise<Worker> {
   const db = openDatabase(options.dbPath)
   const pollMs = options.pollMs ?? 500
+  const context: PlanJobContext = {
+    model: options.model,
+    settings: options.settings ?? DEFAULT_PLAN_SETTINGS,
+    budgetPath: options.budgetPath ?? BUDGET_MD,
+  }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined
   let current: Promise<void> = Promise.resolve()
@@ -27,7 +50,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
       const job = claimJob(db, [PLAN_JOB])
       if (job === undefined) return
       try {
-        await runPlanJob(db, job)
+        await runPlanJob(db, job, context)
       } catch (error) {
         buryJob(db, job.id, error instanceof Error ? error.message : String(error))
       }

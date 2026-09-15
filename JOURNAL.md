@@ -456,3 +456,128 @@ next unticked slice, _"the shapes and the rules"_ — checks 1–5, 8, 9 — is 
 
 **Next.** `reel-plan` Slice 3: the splitter and `plan/` together, the stand-in and the recording port, ranking,
 the estimate, Gate 0, the plan score and plan rows — checks 6, 7, 17–19, 21–27, 29–37.
+
+## 2026-09-15 — session 09, questions only: when the provider keys are needed, and why the AI SDK
+
+**Intent.** The owner asked when the MiniMax M3 and H3 keys are first required, then why the Vercel AI SDK is.
+
+**Changed.** Nothing but this entry. No code, no decision, no feature file.
+
+**Observed.**
+
+- **No key is needed by anything planned in this repository today.** `reel-plan` is keyless by structure (Gate 1;
+  pending decision 4; check 47 in Slice 5). The first real key is the unplanned **paid-path feature** that
+  `reel-plan.md` defers the real `LanguageModelPort` adapter to — `MINIMAX_API_KEY`, which the token plan makes
+  cover M2.7 and M3 (D-019).
+- **H3 is not a MiniMax key.** D-007 routes video through `fal-ai/minimax-h3-turbo/*`, so it is `FAL_KEY`, first
+  read by a real `reel-render`, whose gates are unwritten and which must ship fakes first. Its narration (T2A) also
+  reads `MINIMAX_API_KEY`, with no fallback (D-019). Real video spend also waits on Q9.
+- **Cutroom has no way to receive a key.** The steering repository reads Keychain through `scripts/env.sh`; this
+  machine is Windows and nothing here reads any key. The paid-path feature will need an `S-` decision for it.
+- **The AI SDK is D-005's choice, not a technical requirement.** D-005 weighed agent frameworks, never a plain HTTP
+  client against MiniMax's OpenAI- or Anthropic-compatible endpoints. Its strongest reason, the bounded tool loop,
+  is the research episode — KnowScroll's side, not the engine's. The engine depends only on `LanguageModelPort`
+  (D-078), so the choice is reversible inside `packages/providers`, but `model-client-only-in-providers` only
+  recognises `ai` and `@ai-sdk/*`: a hand-written client would need that rule and its `--prove` case extended.
+
+**Why.** Answering from the decisions rather than from memory; nothing was built because nothing was asked for.
+
+- **No date exists for a first real reel.** Under the current order it needs `reel-plan`'s last three slices,
+  `reel-stills`, `reel-render` and the paid path, and KnowScroll also needs `reel-script` and a client
+  (`validation-gate`, Q16). Estimated from pace, not from any plan: roughly 25–40 sessions.
+- **One H3 clip was already made**, 2026-09-02, by the steering repository's `h3-video.mjs` — 5 s, 768×1344,
+  7 s wall. I first said no H3 output had been seen; that was wrong. Q9, the billed rate, is still unanswered.
+- **Proposed and declined for now:** a throwaway, hand-run test reel (M2.7 plan, fal stills, M3 check, H3
+  image-to-video, T2A, ffmpeg), about $1.20–3.00 with a $5 stop, to answer Q9 and test the keyframe design,
+  Gate 1's judge and the image default against real output before `reel-stills`' gates. **The owner chose the
+  current order and will return to it later.** No decision was written.
+
+**Next.** Unchanged: `reel-plan` Slice 3. If the owner wants the AI SDK dropped for the engine, that is an `S-`
+entry superseding D-005, written before the paid-path feature's gates. The test reel is open for a later talk.
+
+## 2026-09-15 — session 10, reel-plan Slice 3: the splitter, two plans, Gate 0, the score, and a completed plan
+
+**Intent.** The owner asked for `reel-plan` Slice 3 only — checks 6, 7, 17–19, 21–27, 29–37 — tests first, each
+check broken on purpose once, nothing from Slices 4 or 5. `decisions.mjs`: pin current, 0 commits unpushed. Baseline
+`check.mjs` green, 82 tests.
+
+**Changed.**
+
+- `packages/pipeline` — its first source, in Gate 3's locations: `split/index.ts` (`groupSentences`);
+  `plan/index.ts` (`planReel`, `DEFAULT_PLAN_SETTINGS`, `planForkSchema`, `PlanRecord`, `PlanOutcome`);
+  `plan/prompts.ts` (the planning prompt and its answer schema per unit count, the score prompt and its answer
+  schema, the four default questions); `plan/score.ts`; `gates/index.ts` (`GATE_ORDER`), `gates/gate0.ts`; `rank.ts`;
+  `estimate.ts`. Plus `src/index.ts`, which Gate 3 does not name and CLAUDE.md's one-entry rule and
+  `tests/workspace.test.ts` require; it does not export the splitter, whose tests reach it by path.
+- `packages/providers` — `fake/model.ts`, the stand-in, and `src/index.ts`.
+- `packages/domain` — `budget.ts` (`readReelCapCents`, default path the pinned `BUDGET.md`); `runs.ts` gains
+  `readRequest`, `recordReceipt`, and `finishRun` now writes plan rows and the events before `run.finished` in its one
+  transaction.
+- `apps/worker` — `recording-port.ts`; `plan-job.ts` runs `planReel`; `startWorker` takes `model` (required),
+  `settings`, `budgetPath`. `NOT_BUILT` is gone.
+- Tests: `tests/reel-plan-planning.test.ts` (17–19, 21–27), `tests/reel-plan-gate0.test.ts` (29–33),
+  `tests/reel-plan-score.test.ts` (34–37), and 6 and 7 in `tests/reel-plan-shapes.test.ts`. `tests/engine/plans.ts`
+  holds the eight-sentence request, the scripts and a passing plan; the harness hands the worker a scripted stand-in;
+  `tests/engine/source.ts` gains `importSpecifiers` and `throwStatements`.
+- **S-021** (the worker is handed its port), **S-022** (the score's six terms and arithmetic; `PlanScore` keeps its
+  Slice 2 shape), **S-023** (three more refusals in the planning schema). CLAUDE.md and README.md no longer say
+  `pipeline` and `providers` are empty. Workspace dependencies, tsconfig references and the lockfile (links only,
+  installed `--offline`). Slice 3 ticked. This commit also carries session 09's entry, which was never committed.
+
+**Not built, on purpose.**
+
+- **`plan/repair.ts` is not written**, though the request listed it with `plan/`. Gate 3 gives it D-114's choice,
+  which only check 39 (Slice 4) exercises; `drift --audit` needs the folder `plan/`, not that file, and writing it now
+  would be code with no failing test. The repair prompt is likewise absent.
+- **The answers that are not a plan throw "not built".** Observed through the real engine: four sentences finish
+  `failed`, _"stopping for too few sentences (4 for 4 and 6 units) is not built (reel-plan Slice 4)"_, 0 receipts;
+  both plans failing Gate 0 finish `failed`, _"the repair after both plans fail Gate 0 is not built"_, 2 receipts, no
+  plan rows. Contract-valid, asserted by no check — Slice 1's precedent — so Slice 4's checks start red.
+- **A thrown call already finishes `failed` with its receipts kept** (a scripted throw on the second call: `failed`,
+  _"stand-in down"_, 1 receipt). The catch exists because the placeholders throw; check 44 will probably pass when
+  Slice 4 writes it, so it has to be seen red by a break.
+- **One survivor is selected outright** — selection is Slice 3's, and check 34 needs that run to show no score call.
+
+**Observed.**
+
+- **Red first, twice.** With the tests written and no pipeline source, every new file failed on
+  `ERR_MODULE_NOT_FOUND`, which proves nothing. Stubs in Gate 3's files returning wrong answers then gave 19
+  assertion failures; check 23 first crashed on a `TypeError` (no call, so no schema) and got an assertion in front of
+  it. **22 and 30 passed against the stubs** — one asserts sameness, the other absence — and were seen red only by
+  their breaks. The three S-023 assertions in check 7 were added after the code, and seen red only by breaks.
+- **Twenty-seven breaks, all caught.** Each applied by a script that restored the file; source hashes before and
+  after all of them were identical.
+  - 6: the fork schema's axis made optional — 6 only. Plan rows written with axis `'order'` — 6 only.
+  - 7: two shots per unit allowed — 7. The stand-in not parsing its answer — 7. A subject named twice, an unnamed
+    subject, and part-second durations, each allowed — 7 each, alone.
+  - 17: positions reversed inside each unit — 17 and 19 (19 asserts the plans' positions in order).
+  - 18: every second call with the same arguments gives the extras to the last units — 18, 22 and 36 (two plannings
+    in one process get different groupings, so plans and score prompts differ).
+  - 21: planning temperature 0.2 — 21 and 37 (the receipt's temperature).
+  - 22: a random line in the planning prompt — 22 only.
+  - 23: an optional `estimateCents` in the answer schema — 23 only.
+  - 24: `rank.ts` importing `LanguageModelPort` — 24; the earliest-appearance tie-break dropped — 24.
+  - 25: image calls uncapped — 25. 27: the image rate ignored — 27. 29: `['0', '1']` — 29. 30: `gate0.ts` importing
+    `LanguageModelPort` — 30.
+  - 26: criteria copied without `claimId` — 26 and 23 (23 also asserts the copied criteria).
+  - 31: cost compared with `<` — 31. 32: the lower total bound made exclusive — 32. 33: return at the first failed
+    condition — 33.
+  - 34: scoring when either plan survives — 34. 35: the total divided by the weight sum — 35 (`NaN` at zero weights).
+  - 36: a random line in the score prompt — 36 and 22. 37: receipts written for the planner only — 37.
+  - Beyond the slice's checks: the cap read as dollars, not cents — 6 and 37 (both plans fail on cost and hit the
+    unbuilt repair). Check 28, Slice 4's, is what owns the cap.
+- **Two harness faults**: check 23's zod walker walked `undefined`; the deleted `.gitkeep` files were still tracked, so
+  `tests/line-endings.test.ts` hit `ENOENT` until the deletion was staged.
+- **The shell trap once more**: a heredoc turned `\n` into real newlines inside a string of the break script, which
+  then failed to parse before touching anything. Fixed with the editor, and the script's run checked.
+- `drift --audit`: 14 live, 0 inert, 0 dead — the three folder rules live for the first time. `drift`: 46 modules, 0
+  violations; `zod` from `plan/` resolves to `node_modules/.pnpm/zod@4.6.5/…` and `pipeline-npm-only-zod` stays
+  silent on it.
+- **Small choices, recorded here rather than as decisions:** the estimate rounds up (no effect at integer rates); a
+  plan row's `score` holds the total, not the terms; shots are stored in unit order; Gate 0's 4–6 shots and 5–15 s are
+  constants in `gate0.ts`, since `PlanSettings` has no field for them, and the planning prompt reads them from there.
+- `node scripts/check.mjs`: everything green, 103 tests.
+
+**Next.** `reel-plan` Slice 4 — checks 20, 28, 38–44: the split stop, the repair ladder (`plan/repair.ts` and the
+repair prompt), the budget refusal and its question (`apps/worker/src/questions.ts`), the gate-0 rule stop, the thrown
+call. Both "not built" throws get replaced.

@@ -5,8 +5,8 @@ import { validRequest } from './stand-in/fixtures.ts'
 
 // reel-plan, Slice 1 — a run finishes (docs/features/reel-plan.md, checks 15 and 16): the worker
 // claims the run's one reel.plan job and finishes it, and the event record a caller follows is
-// numbered without gaps. How the run ends is not asserted — in this slice planning does not exist,
-// and Slice 3 replaces that answer.
+// numbered without gaps. How the run ends is not asserted: its request has four sentences, too few
+// for two plans, and the answer that gets is reel-plan's Slice 4.
 
 let engine: Engine
 

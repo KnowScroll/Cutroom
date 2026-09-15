@@ -11,7 +11,9 @@
     "src"
   ],
   "dependencies": {
+    "@cutroom/contracts": "workspace:*",
     "@cutroom/domain": "workspace:*",
+    "@cutroom/pipeline": "workspace:*",
     "@cutroom/reel-contract": "workspace:*"
   }
 }

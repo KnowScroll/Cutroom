@@ -9,5 +9,8 @@
   },
   "files": [
     "src"
-  ]
+  ],
+  "dependencies": {
+    "@cutroom/contracts": "workspace:*"
+  }
 }

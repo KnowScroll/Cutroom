@@ -3,6 +3,9 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { startApi, type Api } from '@cutroom/api'
+import type { PlanSettings } from '@cutroom/contracts'
+import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
+import { fakeModel, type FakeModel, type FakeScript } from '@cutroom/providers'
 import { startWorker, type Worker } from '@cutroom/worker'
 import { client } from '../stand-in/client.ts'
 
@@ -12,22 +15,33 @@ import { client } from '../stand-in/client.ts'
  * body the contract does not describe for that route and status.
  *
  * The worker is optional and can be started later, which is how a test observes a run before
- * any job has been claimed.
+ * any job has been claimed. Its only model is the stand-in, answering from the script a test
+ * gives — none, by default, so a run that reaches a model call fails.
  */
 export interface Engine {
   dir: string
   dbPath: string
   api: Api
   http: ReturnType<typeof client>
+  /** The stand-in the worker was handed, with every call it received. */
+  model: FakeModel
   startWorker(): Promise<Worker>
   /** Reads the database file directly, the way an operator would, and closes it again. */
   query<T>(sql: string, ...params: Array<string | number>): T[]
   stop(): Promise<void>
 }
 
-export async function startEngine(options: { worker: boolean }): Promise<Engine> {
+export interface EngineOptions {
+  worker: boolean
+  script?: FakeScript
+  settings?: PlanSettings
+}
+
+export async function startEngine(options: EngineOptions): Promise<Engine> {
   const dir = mkdtempSync(join(tmpdir(), 'reel-plan-'))
   const dbPath = join(dir, 'engine.sqlite')
+  const settings = options.settings ?? DEFAULT_PLAN_SETTINGS
+  const model = fakeModel(options.script ?? {}, { models: settings.models })
   const api = await startApi({ dbPath })
   let worker: Worker | undefined
 
@@ -36,8 +50,9 @@ export async function startEngine(options: { worker: boolean }): Promise<Engine>
     dbPath,
     api,
     http: client(api.baseUrl),
+    model,
     async startWorker() {
-      worker ??= await startWorker({ dbPath, pollMs: 10 })
+      worker ??= await startWorker({ dbPath, pollMs: 10, model, settings })
       return worker
     },
     query<T>(sql: string, ...params: Array<string | number>): T[] {

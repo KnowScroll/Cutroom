@@ -44,8 +44,9 @@ apps/api             submitting work, reading records. Never calls a provider.
 ```
 
 A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094). `reel-plan` has
-given `contracts`, `domain`, `api` and `worker` source; `pipeline` and `providers` stay **empty until
-its Slice 3**. **Seventeen** boundary rules are enforced on the real dependency graph, and
+given every package source by its Slice 3; **the only `LanguageModelPort` is the stand-in** in
+`packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021).
+**Seventeen** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
 or any legal import is reported or fails to resolve. The load-bearing ones: **pipeline imports no
@@ -65,8 +66,8 @@ every import is relative. (`plan-no-epistemic` and `split-no-cinematic` are gone
 output, and why the resolver is given `conditionNames` — each of the three, undone, makes a rule
 silent on `ai` (S-020).
 
-**Neither folder, `split/` nor `plan/`, exists yet.** `node scripts/drift.mjs --audit` reports every rule
-whose folders are absent, and **fails** once a package has source files while a folder one of its
+**`split/` and `plan/` exist, and every folder rule is live.** `node scripts/drift.mjs --audit`
+reports every rule whose folders are absent, and **fails** once a package has source files while a folder one of its
 rules names is still missing — which is what a rename looks like. A rule that reads correctly and
 matches nothing is the worst state to be in, because it reads as coverage.
 

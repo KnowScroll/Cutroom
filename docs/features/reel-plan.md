@@ -522,7 +522,7 @@ _How a run ends_
 - [x] **Slice 2 — the shapes and the rules.** `cinematic.ts`, `model.ts`, `settings.ts`; the boundary-rule
       changes with their `drift:prove` cases. **No pipeline source yet**, so no folder a rule names is dead.
       **Proves: 1, 2, 3, 4, 5, 8, 9.**
-- [ ] **Slice 3 — the splitter, two plans, Gate 0, the score, and a completed plan.** The splitter and
+- [x] **Slice 3 — the splitter, two plans, Gate 0, the score, and a completed plan.** The splitter and
       `plan/` together, so `drift --audit` never sees one without the other; the stand-in and the recording
       port; the planning call and its schema; ranking; the estimate; the cap from `BUDGET.md`; Gate 0; the plan
       score; selection; plan rows. A run with two survivors completes with an estimate.
