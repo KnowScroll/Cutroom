@@ -755,3 +755,63 @@ five questions still open). Then Gate 1 of that feature, here.
 **Answered the same session:** **`reel-stills` first.** The owner chose it over the order `video-edits.md` recorded;
 that file now says so. Its gates start in a fresh session — one feature per session — beginning with Gate 1 and an
 adversarial review of it.
+
+## 2026-09-15/16 — session 14, reel-stills gates 1–4: written, reviewed five times, approved
+
+**Intent.** The owner asked for `reel-stills`' four planning gates only — no code, no test — rewritten by removing
+promises from `reel-engine`'s draft, reviewed adversarially until approved or a finding needs the owner.
+`decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green.
+
+**Changed.**
+
+- `docs/features/reel-stills.md` — Gates 1–4: 50 checks in 5 slices (3 + 4 + 28 + 12 + 3), the Deferred list, and Gate
+  reviews 1–5. **All four gates APPROVED 2026-09-16 — the `Gates:` line written by the reviewer itself**, as the one edit
+  it was allowed, so no approval was typed by the author. `Status: planned`.
+- `DECISIONS.md` — **S-034 to S-048**: contract v1 amended, not v2 (S-034); reserve not in the admitted figure, every
+  image call guarded (S-035, supersedes D-081's enqueue clause); stand-in costs 0 unless scripted (S-036); pictures enter
+  the model port only through `observe` and `compare`, receipts tied by key (S-037, supersedes D-045's check); a
+  `PictureSensorPort` and `worker-no-providers` (S-038); placement (S-039, supersedes D-029 part 3 step 5 and D-030's check
+  for an unplaceable rank); criteria by claim, five reconcile failures, the plural count rule (S-040, supersedes D-043's
+  table row and check in part); text step never fails (S-041, supersedes an S-031 check); malformed observation fails the
+  run (S-042, supersedes a D-041 check); derived repairs from any free slot, at most two per shot (S-043, supersedes
+  D-027's allocation and two-slot reserve, D-029 part 3 step 7 and D-050 step 1 in part); the keyframe score (S-044); Gate
+  1S (S-045, supersedes D-049 in part); endings, attempt-carrying ids, undecided verdicts, the recorder (S-046); verified
+  tests that change (S-047); a restart starts over and pays again (S-048, supersedes D-047, D-065 and D-030 checks and
+  D-047 step 1 for a restarted attempt).
+- No code, no test.
+
+**Observed.**
+
+- **Owner answers, six**, each because it changed what "approved" or "spent" means: the text step never fails (S-041,
+  not the recommended option); a derived picture failing Gate 1 gets one repair if a slot is free (S-043); criteria reach
+  a picture by claim (S-040); a malformed observation fails the run (S-042); **after asking what "simplest" meant and for
+  a recommendation**, any free slot for that repair (S-043) and start over after a crash (S-048). The `Confirmed-by` of
+  S-043 and S-048 is scoped to what was asked; the rest is marked the entry's reading.
+- **Findings by round: 27, 9, 7, 5, 0.** Bars (b) and (c) never fired; every finding was (a) or (d).
+  - **Review 1** (27): a restart broke _"one entry per picture made"_ (fixed ids); a Gate 1S repair could not be informed;
+    the six-call check could never reach six; S-entries changed D-045, D-049, D-050/D-027 and D-029 without naming them;
+    receipt ids nothing could fill (`reel-plan`'s N1 again); coverage, rate applied and I-4's labels with no field.
+  - **Review 2** (23 fixed, 4 partly, 9 new): an unfinished verdict read `accept` (D-041); a restart's reserve blind to
+    the guard's count (D-047, D-030); the held slot narrowing the owner's answer; Gate 1 and Gate 2 describing different
+    ladders; `placePictures` undeclared; record ids and order with no source; _"one when the name states none"_ failing
+    every plural subject; check 16 vacuous. Two needed the owner.
+  - **Review 3** (7): a restart with no reserve could still repair the canonical and reach a seventh call; the plural
+    check could not fail and its example contradicted it; **D-024's _"unconditional, not retries"_ quoted against its own
+    sense** to allow uncapped repairs; stale slice text; S-048 superseding too little; a restart that fits failing; `seq`
+    order unchecked.
+  - **Review 4** (5; Gates 1, 3, 4 approved): the cap and the placement reserve narrowed D-050, D-027 and D-029 without
+    naming them; D-047 step 1 skipped unnamed; S-048's owner confirmation covering the author's additions. Fixed by
+    supersession, as the reviewer conditioned, so the approved gates were not reopened.
+- **The recorded pattern held every round**: each fix added prose nobody re-read against the decisions it touched. What
+  broke it at the end was quoting every superseded clause and having the reviewer check the quotes character by
+  character.
+- **Eleven D-entries — D-027, D-029, D-030, D-041, D-043, D-045, D-047, D-049, D-050, D-065, D-081 — are now superseded in part by S-entries written in one session**, most as the author's reading rather
+  than an owner's answer (S-035, S-037, S-039, S-040, S-043, S-045, S-048). The reviewer accepted each; none is marked
+  in the steering repository (D-115's cost).
+- **A shell trap**: an apostrophe in text passed to `node -e` through single quotes ended the quoting twice; scripts went
+  to scratch files instead.
+- `node scripts/check.mjs`: everything green before the commit.
+
+**Next.** `reel-stills` Slice 1 — the criterion's type, the ports and `worker-no-providers` (checks 1–3) — in its own
+session. Owed outside this repository: `reel-script` emitting a criterion's type (S-029); deleting the steering stubs and
+bumping the pin (S-033). S-015's promised front-matter test is still unwritten.

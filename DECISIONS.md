@@ -856,3 +856,504 @@ session in the other repository and a pin bump for every change read here. **The
 moved-from note — is still not written, with four feature files here now.
 
 **Confirmed-by.** The owner, 2026-09-15.
+
+---
+
+## S-034 | 2026-09-15 | A criterion's `type` amends contract version 1; there is no version 2
+
+**Chose.** S-029's required `Criterion.type` — `presence` or `event`, `presence` only in `mustNotShow` — is added to
+`@cutroom/reel-contract` **in version 1**. `CONTRACT_VERSION` stays `1`. Every criterion in `reel-contract`'s and
+`reel-plan`'s test fixtures gains a type in the same slice. `docs/features/reel-contract.md` gains a note naming this
+entry and S-030; its approved gates are not edited.
+
+**Why.** S-029 left it to `reel-stills`' Gate 2 under D-106. The version exists so that _"a caller that sends version 1
+keeps working when version 2 adds fields"_ (D-095). **No caller exists**: nothing in the KnowScroll repository depends on
+the package, and `reel-script` is not built (S-029), so a bump protects no one. D-095 gives version 1 _"Phase 1's
+fields"_, and D-043's type is a Phase 1 field the contract was written without. And a version 2 would leave version 1
+unusable anyway: D-043 says an untyped criterion fails validation, so the engine would refuse every version-1 request
+that carries a criterion.
+
+**Rejected.** **Version 2** — `CONTRACT_VERSION` 2 and either two request schemas served side by side or version 1
+refused outright; the first is two copies of the request to keep in step for a caller that does not exist, the second
+is a version bump with nothing on the far side of it. **Leave the type out and infer it** — D-043's own rejection,
+restated by S-029.
+
+**Caught by.** `reel-stills`' check 1: a criterion without a type, and a `mustNotShow` criterion typed `event`, fail
+validation, and `CONTRACT_VERSION` is 1. `reel-contract`'s shape checks run unchanged over the amended schema.
+
+---
+
+## S-035 | 2026-09-15 | A `stills` run is admitted on its planned image calls only; every image call is guarded, and one that would pass a limit stops the run
+
+**Chose.** S-030's admitted figure is **the selected plan's planned image calls × the image rate**, and **does not
+count D-027's reserve**. Admission refuses a figure above `budgetCents`; exactly equal is admitted. **Before every
+image call** — planned or reserve — the worker's guard compares **the chain's spend plus the image rate**, first with
+**the per-reel cap** and then with **the ceiling**. (The six-call ceiling is kept by the reserve, S-043 and S-048, not by
+the guard.) Above either, the call is
+not made and the run finishes **`stopped`, `reason: 'budget'`**, with `limit: 'reel'` if the cap would be passed, else
+`'ceiling'`, and `estimateCents` the spend plus the rate. **A stop at the per-reel cap appends one entry to the questions
+file** after the run finishes, in S-026's form with its own heading; a stop at the ceiling writes none.
+
+**Supersedes:** **D-081**, on _"checked before each job in the chain is enqueued"_ and its `Confirmed-by` _"a chain whose
+accumulated cost would pass $3.00 refuses the next job rather than the first"_ — the cap is compared over the chain's
+`SUM(cost_cents)` **before each image call**, and a call that would pass it is refused. D-081's chain, its
+`correlation_id` and its sum stand.
+
+**Why.** S-030 left the reserve open. D-083's estimate is _"what the reel would cost to generate as planned"_; D-027
+plans four calls and holds two _"unspent at plan time"_; D-048 reports a plan's _"planned"_ and _"reserve"_ calls
+separately. The contract already answers the other half: _"Making it can need extra attempts; if that passes or would
+pass your limit, it stops and tells you."_ Before each call rather than each enqueue because the chain's only spend is
+image calls, all inside one job, and D-014 already enforces caps _"before every paid call"_; at the enqueue the chain has
+spent nothing and Gate 0 has compared the whole estimate with the cap, so a comparison there could never fire. Cap before
+ceiling because D-100 writes a question only when the engine's own cap fires, and a call that passes both has passed the
+cap.
+
+**Rejected.** **Counting the reserve** — six calls' worth refused for a run that usually makes four, and a figure that
+is no longer the estimate D-083 names. **A cap comparison at the enqueue as well** — a check that cannot fail. **Guarding
+only reserve calls** — a real call can cost more than its rate (Q9), and a planned call is the first to find out.
+**Ceiling before cap** — a run passing both would be told `ceiling`, and the owner would never be asked about the cap.
+
+**Caught by.** `reel-stills`' checks 10 (equal admitted, one cent less refused), 42 (the comparison, cap then ceiling),
+43 and 44 (a stop at the ceiling, and a reserve call not made), 45 (a stop at the cap, and its question).
+
+---
+
+## S-036 | 2026-09-15 | A stand-in picture costs 0 unless a test scripts a cost, and every image call's cost is added to its job row as it returns
+
+**Chose.** Every image call writes a `generation_receipt` with the `costCents` its port reports and the image rate
+applied (D-028), and **in the same transaction adds the cost to the running job row's `cost_cents`**. The spend the
+guard compares (S-035) is **`SUM(cost_cents)` over every job row sharing the run's `correlation_id`** (D-081). **The
+stand-in image port reports 0**, unless a test scripts a cost for a picture; every receipt it writes carries `fake:
+true`. A run's `costCents` is that sum.
+
+**Why.** Gate 1 says nothing may cost money, and the contract says `costCents` is generation spend: a stand-in charging
+its rate would report spend that never happened. But a spend that is always 0 makes every budget stop, and D-081's sum,
+a check that cannot fail — S-014's rule that reads correctly and matches nothing. A scripted cost exercises the same
+arithmetic a real invoice will. Adding the cost to the row as each call returns keeps the sum current through a crash:
+a job run again after its lease runs out (S-027) sees what its first attempt spent.
+
+**Rejected.** **Charging the configured rate on every stand-in call** — a `costCents` that describes no payment. **Cost
+always 0, not scriptable** — the stop paths unfailable. **Summing receipts instead of job rows** — D-081 names
+`cost_cents` over the group, and a second sum beside it is a second ledger.
+
+**Caught by.** `reel-stills`' checks 35 (a default run costs 0 everywhere), 42 (the sum over the chain and no other),
+43 (a scripted cost stops the run, `costCents` the spend), 48 (a restarted attempt stopped by its first attempt's cost).
+
+---
+
+## S-037 | 2026-09-15 | Pictures enter the model port through `observe` and `compare` only; `structured` carries none, and a receipt is tied to its picture by key
+
+**Chose.** `LanguageModelPort` has three calls. **`structured`** is `reel-plan`'s, restricted to roles `planner` and
+`reconciler`, and **has no picture field** — only optional `pictureIds`, strings for its receipt. **`observe`** takes **a
+picture and temperature 0, and nothing else**; its role is `witness`, its question and answer shape are fixed inside the
+adapter, and its value is typed `unknown` and parsed by the pipeline at the gate boundary (D-041). **`compare`** takes two
+pictures, the names of the subjects they share and temperature 0; its role is `judge` — D-006's keyframe judge — and it
+is Gate 1S's adjudication. **`ModelReceipt`** gains `call` and `pictureIds`; `ModelRole` is
+`planner | reconciler | witness | judge`. **An observation is tied to the one `observe` receipt whose `pictureIds` is its
+picture's, and a reconciliation to the one `reconciler` receipt whose `pictureIds` is its picture's** — by key, with no
+receipt id stored, since picture ids never repeat (S-046). The model stand-in keeps its `observe` and `compare` calls in
+lists of their own.
+
+**Supersedes:** **D-045**, on its `Confirmed-by` _"Exactly one vision call appears in the receipts per generated image"_ —
+now **exactly one `observe` receipt per picture**; a `compare` receipt is Gate 1S's and names two pictures. D-045's
+_Chose_ — the scorer and the composer read Gate 1's verdict and make no vision call — stands.
+
+**Why.** Review 4 of `reel-engine` found the witness _"sighted by another route"_: a `structured` call accepting images,
+a free prompt and any schema lets a Gate 1 step show the brief to a vision call; and `observe` receipts carried no role.
+A picture that can reach a model only through a call with no text field cannot be looked at by a model told the brief
+(I-8). The type alone is not enough — review 4 noted TypeScript rejects extra fields only on fresh literals — so the
+stand-in records every call as made, and a check reads what reached it. **D-049, written after D-045, adds a model call
+over pictures**; `compare` answers one closed question about a pair and records no observation, so the one record of what
+a picture shows is still its one `observe` — what I-15 protects against: _"a second record that can disagree with the
+first"_. A receipt id cannot be stored on an observation: the port's receipt has none, and `reel-plan`'s review 2 (N1)
+removed the same kind of column for the same reason.
+
+**Rejected.** **Images on `structured`** — review 4's finding. **A separate port for vision** — D-006 and D-084: one port
+for text and vision. **Gate 1S's question through `observe`** — the witness would be told two pictures belong together.
+**Parsing the observation inside the adapter** — the stand-in cannot import the pipeline's schema
+(`providers-no-pipeline`), and D-041 validates at the gate. **A receipt id returned through the recording port** — a
+field on a port type that only one implementation fills.
+
+**Caught by.** `reel-stills`' checks 2 (each misuse a type error), 4 (roles by call), 25 (one `observe` receipt per
+picture past technical, and one `reconciler` receipt per reconciliation, by picture id), 26 (every `observe` call holds
+only a picture of that run and a temperature), 33 (a `compare` receipt behind every Gate 1S fail).
+
+---
+
+## S-038 | 2026-09-15 | Pixel work sits behind a `PictureSensorPort`; the worker is handed its image and sensor ports and cannot import an adapter
+
+**Chose.** `packages/contracts` declares **`PictureSensorPort`** — `measure` (readable, width, height, sharpness,
+exposure), `readText`, `similarity` — and **`ImagePort`**, with `acceptsReferences`. The stand-in sensor port **reads
+the real file** for readable, width and height, and answers the rest from a test's script. **`startWorker` requires
+`image` and `sensors`** beside `model` (S-021), and refuses to start when `image.acceptsReferences` is false (D-026). A
+new boundary rule, **`worker-no-providers`**: nothing under `apps/worker` imports `packages/providers`. Seventeen rules
+become eighteen.
+
+**Why.** Review 4 found that Gate 1's technical and text steps and Gate 1S's embeddings must read pixels, which
+`pipeline-no-io` forbids in the pipeline, and no port was named. A port keeps every stage a pure function handed what it
+needs. `measure` reads the file because D-087 has the stand-in write real pictures so that path handling is exercised;
+a scripted width would test nothing about the file. S-021 recorded a worker importing `providers` as **not caught**;
+with an image port within reach, that import is how a run would come to spend.
+
+**Rejected.** **Reading files in the pipeline, with an exception to `pipeline-no-io`** — a rule with a hole is the
+_"reads as coverage"_ state S-014 exists against. **Scripting every measure** — D-087's real files never read. **Real
+sharpness, text and embedding sensors now** — native dependencies for numbers whose weights and threshold are
+unmeasured (D-031, D-049).
+
+**Caught by.** `reel-stills`' checks 3 (`worker-no-providers` fires by path and by package name), 21 (a worker refuses
+an image port without references), 23 (a wrong size and unreadable bytes each fail technical).
+
+---
+
+## S-039 | 2026-09-15 | A picture is frame 1 of one shot: the canonical on its subject's first shot, a derived picture on the earliest shot no higher rank holds
+
+**Chose.** From D-029's ranking of the selected plan: rank 1 on **the first shot that shows it**; ranks 2 and 3 each on
+**the earliest shot showing it that no higher rank holds**; **a rank whose every shot is held gets no picture and no
+call**, and is not a degradation. Every other shot has no picture. A plan with no subject in two shots places nothing,
+and its run completes with no picture. Shot ids are `shot-<unit>`.
+
+**Supersedes:** **D-029** part 3 step 5, _"The remaining planned image calls … buy derived keyframes for the next-ranked
+subjects, one each"_, and **D-030**'s `Confirmed-by` _"a derived keyframe issues exactly one call unless its gate
+fails"_ — **for a rank every one of whose shots already opens with a higher rank's picture**: that rank gets no call.
+Both stand for every rank that has a free shot.
+
+**Why.** Review 4 of `reel-engine` found _"one approved picture per shot"_ against D-027, whose Config A plans one
+canonical, two derived and **bare** shots. D-029 part 4 puts the canonical on _"its first shot"_ and says every image is
+_"frame 1 of a real shot"_, but not which shot a derived picture opens; D-030's blast radius — _"its own shot plus both
+derived frames and their shots"_ — counts one shot per picture, so no shot opens with two. A rank-2 subject shows in at
+least two shots, so it always has a free one; a rank-3 subject can find both its shots held. Then a picture of it would
+open no shot, which **D-029 part 2 forbids**: _"No image is generated purely as a reference that the viewer never sees"_.
+It is not a degradation because every shot that subject appears in still opens with a checked picture: no shot is made
+worse.
+
+**Rejected.** **Every shot showing a subject opens with that subject's picture** — D-029 part 1's _"shots showing the
+same thing share one"_, read literally, contradicts D-027's bare shots and D-030's count. **Passing an unplaced rank's
+call to rank 4** — changes D-029's ranking, which buys derived pictures for the next two ranks. **Making the picture
+anyway** — an image that opens no shot. **The planner choosing the shot** — D-034: the model names, code places.
+
+**Caught by.** `reel-stills`' checks 13 (placement, including a rank with every shot held), 14 (every picture's shot shows
+its subject in the selected plan), 15 (no subject in two shots).
+
+---
+
+## S-040 | 2026-09-15 | Gate 1 gives a picture the criteria of its shot, by claim; reconcile fails a picture on five conditions
+
+**Chose.** **Which criteria, chosen by the owner:** a **`mustShow` presence criterion** is checked on the pictures of
+shots whose sentences carry its `claimId`; **every `mustNotShow`** on every picture; a `mustShow` with no `claimId`, or
+whose shots have no picture, on no picture — **the clip's Gate 5 checks every criterion** (D-043). **An `event`
+criterion is never given to Gate 1.** **The failure conditions, this entry's reading of D-042, D-044 and D-046:**
+reconcile fails a picture when **a subject its shot shows is not shown**, **a shown subject's entity is clipped by the
+edge**, **a shown subject's count does not match**, **a `mustShow` is not shown**, or **a `mustNotShow` is shown**. A
+subject's count matches when the entity's `count` is **the number the subject's name states; or, when it states none,
+one for a singular name and two or more for a plural one** — _"the barons"_ matches any count above one; a collective
+name such as _"a flock"_ is the reconciler's to read; the reconciler judges it and its prompt says so, in those words. The reconcile answer must name every subject and criterion it
+was given; code applies the conditions.
+
+**Supersedes:** **D-043**, on its table's `presence` row, _"Checked at keyframe and clip"_, and its `Confirmed-by` clause
+_"every `presence` criterion appears in both a Gate 1 and a Gate 5 verdict"_ — **for a presence criterion with no
+`claimId`, or whose shots have no picture**: it is checked at the clip only. Every presence criterion this entry gives a
+picture appears in that picture's Gate 1 verdict, and every presence criterion appears in a Gate 5 verdict. D-043's type,
+its partition and `mustNotShow` being always `presence` stand.
+
+**Why.** The contract's criteria are per reel (D-096); a picture opens one shot. The claim id is the only structural
+link from a criterion to a shot, and D-043 rejects any link an author writes (_"a freely declared `checkAt` field"_).
+D-027's bare shots and a reel-wide `mustShow` can never be in a picture's verdict, so D-043's clause as written could
+hold for no reel; the still check stays pure addition because Gate 5 runs everything. Every subject the shot shows is
+required because D-042 reconciles a picture _"against its brief"_, and the brief is the shot. The plan names a subject
+and gives it no count, so its name is the only place a count can come from.
+
+**Rejected.** **Every presence criterion on every picture** — one shot cannot show the whole reel; most pictures fail.
+**The planner assigning criteria to shots** — D-043's rejected routing. **Only the picture's own subject required** — a
+shot's opening frame missing a subject the plan put in it is a frame of another shot. **A count field in the planning
+call** — a change to `reel-plan`'s one call (D-035) for one veto. **One when the name states no number** — fails every
+true picture of _"the barons"_; D-046 vetoes a miscount because it is _"a picture of the wrong thing"_, and that rule
+would veto the right thing, D-043's doom loop bounded only by the repair.
+
+**Caught by.** `reel-stills`' checks 27 (no `event` criterion reaches reconcile, and the count's rule is in the prompt in
+its words — the rejected rule's prompt fails), 28 (which pictures get which criteria), 29 (each failure condition built
+alone).
+
+**Confirmed-by.** The owner, 2026-09-15, on which criteria a picture gets, while `reel-stills`' gates were written.
+
+---
+
+## S-041 | 2026-09-15 | Gate 1's text step records the words it reads and never fails a picture
+
+**Chose.** The text step reads the picture's words through the sensor port and records them on the picture; its outcome
+is always `accept`. Nothing is refused for words until a text policy exists.
+
+**Supersedes:** **S-031**, on its `Caught by` clause _"a picture failing the text step still has both"_ — no picture
+fails that step. What the clause protected — that no step after technical stops the gate — is checked instead on a
+picture failing **reconcile**, which keeps its observation and reconciliation. S-031's _Chose_ stands.
+
+**Why.** D-042 names a text step, and no decision says what fails it. I-9 lists `textPolicy` among the criteria written
+at plan time; none was ever designed, and the contract carries none. **The owner chose it on 2026-09-15**, over failing
+any picture with readable text.
+
+**Rejected.** **Any readable text fails** — D-008 keeps on-screen words to the engine's own captions, but a picture of a
+sign or a page would then always fail and spend a repair.
+
+**Caught by.** `reel-stills`' checks 22 (the step, in order), 24 (words read, outcome accept), 29 (a reconcile failure
+keeps both records).
+
+**Confirmed-by.** The owner, 2026-09-15.
+
+---
+
+## S-042 | 2026-09-15 | A witness answer that is not a valid observation fails the run
+
+**Chose.** The pipeline parses each `observe` answer under the `WitnessObservation` schema at the gate boundary. **One
+that does not parse finishes the run `failed`**, with the parse error as its detail, like `reel-plan`'s refused planning
+answer. **The witness step is recorded only when its answer parses**, so that picture's record has its technical and
+text checks, **no Gate 1 verdict outcome** (S-046) and no observation id — the contract's ids are _"for a picture that
+reached those steps"_, and it did not complete one; and D-041's _"every Gate 1 verdict with outcome: 'accept' carries a
+non-empty evidence.observation"_ holds, because its verdict was never decided. Every answer that parses is recorded, and S-031 holds for its picture: an observation and a
+reconciliation.
+
+**Supersedes:** **D-041**, on its `Confirmed-by` clause _"a malformed observation fails the gate rather than reaching a
+consumer"_ — it fails the run, and still reaches no consumer.
+
+**Why.** S-031 says every picture past technical has an observation and a reconciliation; a malformed answer leaves
+nothing to reconcile, so failing only the gate would break S-031 for that picture. **The owner chose it on 2026-09-15.**
+
+**Rejected.** **The picture fails its witness step and skips reconcile** — an exception to S-031. **Recording a witness
+check with outcome `fail` and no observation** — a picture that reached a step with no id, against the contract's
+record rule.
+
+**Caught by.** `reel-stills`' check 46.
+
+**Confirmed-by.** The owner, 2026-09-15, on the run failing.
+
+---
+
+## S-043 | 2026-09-15 | A derived picture that fails gets a repair from any free reserve slot; no slot is held for Gate 1S
+
+**Chose.** A derived picture that **fails Gate 1** takes **one informed repair call if a reserve slot is free**,
+consuming its verdict; the repair goes through Gate 1. With no slot, or if the repair fails Gate 1, **its shot goes on
+without a picture**, recorded as degraded, and the run does not fail. **Any free slot will do: none is held for a Gate
+1S repair.** A derived picture that **fails Gate 1S** is repaired **as D-050 step 1 says** — if a slot is free — and its
+repair goes through Gate 1, then Gate 1S; a repair that fails Gate 1 degrades its shot, and one that fails Gate 1S is
+again a derived picture failing Gate 1S. **No shot takes more than two repairs** — D-014's _"retries ≤ 2 per shot"_ —
+so a failure after a shot's second repair degrades it even with a slot free. **The reserve is 6 − the placement's
+calls** — 2 for a placed canonical and 1 for each placed derived picture, a rank with no free shot left out (S-039) —
+less a restarted attempt's earlier calls (S-048); every repair takes a slot; the canonical's repair runs first (D-047,
+D-048).
+
+**Supersedes:** **D-027**, on _"one for a canonical that fails best-of-2, one for a set-consistency repair"_ and its
+`Confirmed-by` _"a 6th remains available to a consistency repair within the same reel"_ — the reserve is one pool, and a
+derived picture's Gate 1 repair may take the slot a consistency repair would have used. **D-027**, on _"Two of the six
+permitted image calls are left unspent at plan time and held as reserve"_, and **D-029** part 3 step 7, _"two held in
+reserve (D-027)"_ — **for a placement with a rank left out** (S-039): its reserve is 6 − the placement's calls, so a
+planned call never made becomes a slot. **D-050** step 1, _"Repair it, if a reserve slot is free"_ — **for a shot that
+has had two repairs**, by D-014's _"retries ≤ 2 per shot"_: its next failure degrades it. D-027's Config A, its four
+planned calls and its ceiling of six stand.
+
+**Why.** D-030 says a derived keyframe is _"regenerated only on gate failure"_ and no more; D-050 covers only a Gate 1S
+failure. **The owner chose on 2026-09-15** one repair from a free slot, and _"if the repair fails, the shot goes without
+a picture"_; and **on 2026-09-16, that the repair may take any free slot**, over holding one for Gate 1S. A Gate 1
+failure and a Gate 1S failure each cost one shot its picture, so neither earns a slot set aside from the other; every
+derived picture meets Gate 1, while Gate 1S asks the judge only in doubt, so a held slot would often go unused while a
+shot went without. D-027's allocation was written before any rule for a derived picture's Gate 1 failure existed.
+
+**Rejected.** **No repair for a Gate 1 failure** — against D-030's _"regenerated"_ and the owner's answer. **The reel
+fails** — D-025 step 3 read literally; its scope is the clip take cap, and a derived picture's blast radius is one shot
+(D-050); the owner rejected it. **Holding the last slot for Gate 1S** — keeps D-027's allocation, and can leave a shot
+without a picture while a slot sits empty; the owner rejected it. **At most one repair per derived shot** — narrows D-050
+step 1 further than D-014 does. **No cap per shot, the reserve alone** — past D-014's two on a plan of three, whose
+reserve is three; D-024's _"fixed by policy, unconditional, not retries"_ describes planned keyframe calls, not repairs.
+**The reserve from the planned calls** — a rank with no free shot would count against it, and fail a restart that fits.
+
+**Caught by.** `reel-stills`' checks 38 (a Gate 1 repair from any free slot, and the degraded shot), 39 (a Gate 1S repair,
+a second one while a slot is free, and the cap of two), 40 (the reserve spent on the canonical and a Gate 1 repair, a
+Gate 1S failure degraded, six calls), 49 (a placement with a rank left out).
+
+**Confirmed-by.** The owner, 2026-09-15, on a Gate 1 failure of a derived picture; and 2026-09-16, on any free slot.
+The two-repair cap, the reserve from the placement's calls, and the supersessions of D-050 step 1 and of D-027's two-slot
+reserve with D-029 part 3 step 7 are this entry's reading, written after reviews 3 and 4.
+
+---
+
+## S-044 | 2026-09-15 | The keyframe score is a weighted sum of five terms, each above 0, and the canonical's two prompts differ in framing
+
+**Chose.** The score of a canonical candidate that survived Gate 1 reads its verdict only (D-045): **reference terms**
+from the canonical subject's reconciled entity — `faceVisible` (`yes`, `noFace` 1; `partial` ⅔; `no` ⅓), `unoccluded`
+(1; occluded ½), `prominence` (foreground 1; midground ⅔; background ⅓) — and **technical terms** from the technical
+measure, `sharpness` and `exposure`, clamped to [0.01, 1]. `total` is Σ weight × term, **capped at the largest finite
+number**. **Weights are settings, defaulting to 2 for each reference term and 1 for each technical term**; a weight that
+is missing or not a positive finite number counts as its default. **Each score records its terms, the weights used and
+its total.** Higher wins; a tie goes to candidate `a`. **The canonical's entry declares its axis, `framing`**, and its two
+prompts render the entry with the setting's two values, default `medium` and `wide`; **a worker whose two values are
+equal refuses to start**.
+
+**Why.** D-031 fixes the score's shape — normalised terms, weights in config, deterministic sensors and the witness's
+closed answers both feeding it, reference quality above composition, every term's value recorded so a score replays —
+and leaves the parameter list and the weights open until M-1. D-046 requires **every recorded score above 0**, which a
+term of 0 or a weight of 0 would break; so every term has a floor, and a bad weight falls back to its default rather than
+to 0, unlike the plan score's S-022, which has no such clause. A replay that does not know the weights cannot tell a
+changed weight from a changed function. D-032 permits variation only where the manifest is silent; the planning call
+authors no framing, and D-032 names framing _"the expected default"_. Two equal values are D-032's rejected seed-only
+variation.
+
+**Rejected.** **Terms that can be 0** — a surviving candidate scoring 0, against D-046. **An invalid weight counting 0**
+— S-022's rule, which can zero a total. **Equal weights** — D-031's one fixed ordering is reference above composition.
+**A model-chosen axis** — D-034.
+
+**Caught by.** `reel-stills`' checks 7 (an entry without its axis fails), 19 (two prompts differing in framing and in
+nothing else), 21 (equal framing values refused), 30 (selection and tie), 31 (finite and above 0 for every input,
+including huge weights; no throw), 32 (replay with recorded weights, and a weight changing the winner).
+
+---
+
+## S-045 | 2026-09-15 | Gate 1S compares whole pictures, asks the judge only above its threshold, and accepts a pair with no shared subject
+
+**Chose.** Gate 1S runs after every derived picture has been through Gate 1, on each derived picture that passed it,
+against the chosen canonical, in rank order. The **subjects both shots show** come from the selected plan; **none** —
+the pair is accepted and recorded as not compared. Otherwise the sensor port's **similarity of the two whole pictures**
+gives **suspicion = 1 − similarity**; **at or below the threshold** (a setting, default 0.25, provisional until M-1) the
+pair is accepted with no call; **above it, one `compare` call** decides. Its answer must name every shared subject with
+`yes` or `no`, or it does not parse and the run fails; **any `no` fails the picture**, and the subjects answered `no` are
+the verdict's reasons, which a repair's prompt carries (D-050). **One call per pair, given two pictures.** A repaired
+picture goes through Gate 1, then Gate 1S.
+
+**Supersedes:** **D-049**, on _"DINO/CLIP cosine between each derived frame and the canonical, over the shared subject"_
+— a similarity of the whole pictures — and on _"One grid model call adjudicates. A contact sheet of the pool"_ — one
+`compare` call per suspicious pair, given its two pictures. D-049's two stages, its threshold that only routes, its
+place after Gate 1 and its rule that no similarity fails a picture alone stand.
+
+**Why.** D-049 compares a derived frame with the canonical _"for identity of the subject they share"_, and says nothing
+of a pair that shares none — there is then no identity to compare. Embeddings over the shared subject need the subject
+located, which is a detector, parked by D-044 (C-12). A pool holds at most two derived pictures, so a sheet buys nothing
+a pair does not, and composing one is pixel work behind another port method.
+
+**Rejected.** **A detector to crop the shared subject** — a second vision dependency for one input to a threshold that
+only routes. **The judge on every pair** — D-049's rejected _"model-only over every pair"_. **Failing a pair with no
+shared subject** — a failure nothing about identity justifies. **A contact sheet** — above.
+
+**Caught by.** `reel-stills`' checks 33 (when Gate 1S runs, when it calls, no fail without a call, and its reasons), 39
+(a repair's prompt carrying them, and the repair through both gates), 47 (an answer leaving out a subject).
+
+---
+
+## S-046 | 2026-09-15 | How a stills run ends: picture ids carry the attempt, pictures are written as they go, and the stage never throws
+
+**Chose.** **Picture ids are `a<attempt>-shot-<unit>-<label>`**, the attempt being the keyframes job's, so no attempt
+reuses an id or a file path. **A picture's row is written with its image receipt**, in one transaction, **and updated
+through a `StillsRecorder` port** each time one of its checks, its score or its Gate 1S verdict completes. Each row
+carries **`seq`**, the run's image-call number, taken from the run's receipts in that transaction. **A Gate 1 verdict has
+no outcome until it is decided** — `fail` when technical fails or reconcile completes with a step failed, `accept` only
+when all four steps completed and accepted — so a picture whose steps were cut off has its completed steps, no outcome
+and no `verdict` event. `makeStills` **returns** `completed`, `stopped-rule` (`rule: 'gate-1'`, `step: 'stills'`),
+`stopped-budget` or `failed`, and never throws. The keyframes job then writes the chosen flags, the degradations and
+their labels, the events, `run.finished` and the result in one transaction. **The record holds every picture made, every
+attempt's, in `seq` order**, each with the checks it completed; a restarted attempt's earlier pictures are none chosen.
+`observationId` is `obs-<pictureId>` and `reconciliationId` `rec-<pictureId>`, the ids of those rows. The worker calls
+`placePictures` so the row it writes with each receipt carries the shot, subject and role. **Events, in the order the
+checks ran:**
+
+- **refused at the ceiling** — `run.accepted`, `stage.started` `plan`, one `verdict` per plan, `stage.finished` `plan`,
+  `run.finished`;
+- **admitted** — the same, up to `stage.finished` `plan`; then, from the keyframes job:
+  - **completed** — `stage.started` `stills`; for each check as it completes, a `verdict` gate `'1'` for a picture's
+    Gate 1 and a `verdict` gate `'1S'` for its Gate 1S; a `degraded` when a shot is degraded; then `stage.finished`
+    `stills`, `run.finished`;
+  - **stopped for a rule, stopped for budget, or failed** — `stage.started` `stills`, the verdicts and `degraded` events
+    reached, `run.finished`;
+  - **cancelled** — `run.finished`.
+
+Only the finishing attempt's verdicts become events. The plan stage's other endings are `reel-plan`'s (S-025).
+
+**Why.** The contract's record holds _"one entry per picture made"_ with _"each check it reached"_. A stage that threw
+would lose the pictures made before a stop or a fault; rows written only at the end lose a killed attempt's; fixed ids
+would let a second attempt overwrite the first's files and reuse its receipts' ids. A verdict read as `accept` from the
+steps a cut-off picture completed would be an accepted verdict with no observation, the failure D-041 exists against,
+and would record fewer than D-042's four step outcomes. S-025's reading — `stage.finished` means the stage produced its
+output — holds for `stills` the same way. `step: 'stills'` names the stage, as `reel-plan`'s rule stop names `plan`.
+
+**Rejected.** **Throwing, and letting the worker finish the run** — `reel-plan`'s shape, and the partial record goes with
+the stack. **Writing pictures only when the stage ends** — a killed attempt's pictures would be in no record. **Fixed
+picture ids, the second attempt overwriting the first** — files and receipts of pictures the record no longer holds.
+**Grouping events by gate** — a Gate 1S repair's Gate 1 verdict comes after the first Gate 1S verdicts, and a grouped
+order describes no run. **`stage.finished` for `stills` on every ending** — a caller would read a stopped run as having
+pictures.
+
+**Caught by.** `reel-stills`' checks 9 and 41 (each ending's events), 16 (ids carry the attempt), 37, 43 and 47 (the
+pictures made before a stop or a fault are in the record with their checks, and no outcome where one was cut off), 46 (an
+unparsed witness answer leaves no outcome), 48 (a killed attempt's pictures in the record).
+
+---
+
+## S-047 | 2026-09-15 | What `reel-stills` changes in verified features
+
+**Chose.** Each change is made in the slice that forces it, and **none removes an assertion**:
+
+- every criterion in `reel-contract`'s and `reel-plan`'s fixtures gains a `type`; `reel-contract.md` gains a note naming
+  S-030 and S-034 (Slice 1);
+- `reel-plan`'s check 10, _"a submit with until 'stills' or 'video' is refused 422 'unsupported'"_, asserts `video` only;
+  `reel-plan-run.test.ts`'s refused submit sends `video`; `reel-plan.md` gains a note naming this entry, since its Gate 1
+  and Outcome say pictures are "not built yet" (Slice 2);
+- `reel-plan`'s check 29, _"GATE_ORDER equals ['0']"_, asserts `['0', '1', '1S']` (Slice 3);
+- **code and test support that must follow the ports**, none of it an assertion: `apps/worker/src/recording-port.ts`
+  records `observe` and `compare`; `DEFAULT_PLAN_SETTINGS.models` names `witness` and `judge`;
+  `tests/engine/worker-process.ts` builds a port with all three calls (Slice 1); `tests/engine/harness.ts` and
+  `worker-process.ts` pass an image and a sensor stand-in (Slice 3). The model stand-in keeps `observe` and `compare`
+  calls in their own lists, so `reel-plan`'s check 37, which reads the `structured` calls' roles, is untouched.
+
+`reel-plan`'s and `reel-contract`'s Evidence lines are not touched; both journeys are run again after Slice 5.
+
+**Why.** D-108's `Confirmed-by` scopes the stills refusal: _"a submit with `until: 'stills'` to a `reel-plan` build is
+refused"_. `reel-plan`'s Gate 2: _"`GATE_ORDER` is the literal `['0']`. `reel-stills` appends its gates."_ Both checks
+were written to change here. A fixture criterion without a type is a request the amended contract refuses. A port type
+that gains calls must be implemented by everything that implements it.
+
+**Rejected.** **Leaving `reel-plan`'s tests as written** — the repository goes red on a correct build. **Dropping check
+10's stills clause without a record** — CLAUDE.md rule 3. **Editing the verified files' gates** — they were approved as
+written; a note says what changed and where it is decided.
+
+**Caught by.** Nothing mechanical sees an assertion change. `reel-stills`' checks 5 and 8 assert the new values, and
+`node scripts/journey.mjs reel-plan` and `reel-contract` must still pass after Slice 5.
+
+---
+
+## S-048 | 2026-09-16 | A keyframes job run again starts over and pays again; its earlier image calls come out of the reserve
+
+**Chose.** A `reel.keyframes` job claimed again after its worker died (S-027) **makes every picture again from the
+start, and pays for them again**. Its earlier attempts' pictures, receipts, files and cost stay (S-046). **At the start
+of each attempt the worker counts the run's image calls so far** (`imageCallCount`), and the attempt's reserve is **6 −
+those calls − the placement's calls** (S-043). **Below 0** — the attempt cannot make its pictures within six calls —
+**the run finishes `failed` before any image call**, its detail naming the counts. **A canonical repair needs a free
+slot**: when both candidates fail and the reserve is 0, which only a restarted attempt can reach, the run finishes
+`failed` before the call. Otherwise a repair beyond the reserve degrades its shot, as in any attempt (S-043). The guard
+counts the earlier attempts' cost (S-035, S-036).
+
+**Supersedes:** **for a restarted attempt only**, which makes its canonical's two candidates and its derived pictures
+again: **D-047**'s `Confirmed-by` _"No run produces four image calls against one canonical entry"_ and _"A fixture manifest
+entry that cannot pass Gate 1 produces exactly three image receipts … with all three verdicts attached"_; **D-065**'s
+_"terminates with three image calls"_; and **D-030**'s _"a derived keyframe issues exactly one call unless its gate
+fails"_; and **D-047 step 1**, _"One informed repair call"_, for a restarted attempt whose reserve is 0 when both
+canonical candidates fail — the run fails instead. The run's receipts then count every attempt's calls. All stand within
+one attempt.
+
+**Why.** Review 2 of `reel-stills` found a restarted attempt's reserve blind to the calls its guard counted, so a restart
+could ask for a seventh call and fail a run the ladder said completes; and that making the canonical pair again breaks
+D-047's and D-030's checks, which no entry superseded. **The owner chose on 2026-09-16** to start over and pay again, over
+resuming from the pictures already made. D-002's lease runs a job from the start, as `reel-plan`'s does (S-027). Resuming
+would mean re-checking a picture whose checks were cut off — a second witness look at one picture, against D-045 and
+I-15 — or storing each half-finished step. Crashes are rare, a stand-in costs nothing, and the per-reel cap and the
+ceiling still bound what a real restart spends. Failing a restart that cannot fit its plan, or its canonical repair, is
+a fault — a crash — which the contract allows `failed` for, and it is decided before the call rather than after a
+seventh. Failing and stopping for rule `gate-1` both leave out D-047 step 1's repair; failing is chosen because the
+cause is the crash, not the picture.
+
+**Rejected.** **Resume from what was made** — no double payment, and a second look or half-step storage; the owner
+rejected it. **A reserve that ignores earlier calls, with a seventh-call refusal in the guard** — round 2's N2: a run
+failing midway that its own ladder says completes. **Making the planned pictures and trimming repairs only** — a
+restarted attempt after three calls would make a seventh.
+
+**Caught by.** `reel-stills`' checks 48 (a restart's pictures, receipts and cost kept, and a budget stop across
+attempts, and the record in `seq` order) and 49 (a restart's reserve reduced by earlier calls; a restart whose canonical
+repair finds no slot failing with four calls; a restart that cannot fit its plan failing before any call; one that fits
+because a rank is left out of the placement).
+
+**Confirmed-by.** The owner, 2026-09-16, on starting over and paying again, and on earlier calls coming out of the
+reserve. The placement's calls, failing a restart whose canonical repair finds no slot, and the supersessions of D-047,
+D-065 and D-030 are this entry's reading, written after review 3.
