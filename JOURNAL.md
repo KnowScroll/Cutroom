@@ -751,3 +751,7 @@ whether Gate 1's four steps stop at the first failure) that must be answered bef
 
 **Next.** The owner picks which gates come first: `reel-stills` (answers in hand) or `video-edits` (the recorded order,
 five questions still open). Then Gate 1 of that feature, here.
+
+**Answered the same session:** **`reel-stills` first.** The owner chose it over the order `video-edits.md` recorded;
+that file now says so. Its gates start in a fresh session — one feature per session — beginning with Gate 1 and an
+adversarial review of it.

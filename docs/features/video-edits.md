@@ -12,6 +12,9 @@ Gates: product pending · architecture pending · program-design pending · slic
 > the steering repository (S-017). **Order, chosen by the owner:** its gates are written **next after
 > `reel-plan`'s gates are approved**.
 >
+> **Order changed by the owner on 2026-09-15:** `reel-stills`' gates are written first, and this feature's after
+> them. `reel-plan` was built and verified before either.
+>
 > **Its gates are not written.** This file records what the feature is, what is already decided that it
 > builds on, and what must be settled before its gates can be written.
 
