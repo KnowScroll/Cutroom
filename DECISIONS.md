@@ -732,3 +732,127 @@ variables); the worker requiring `HOME`, which the parent shell has and the bare
 other test passed in the parent); a test file left out of the child (47, checks 15 and 16 missing); its own file left
 in (47, before anything is spawned). **Not caught:** a secret held under one of the eleven names, and anything read
 from a file rather than the environment.
+
+---
+
+## S-029 | 2026-09-15 | A criterion in the contract carries its type, `presence` or `event`, and D-043 stands
+
+**Chose.** `@cutroom/reel-contract`'s `Criterion` gains a **required** `type: 'presence' | 'event'`, supplied by the
+caller — KnowScroll's `reel-script`, which computes the criteria (D-096). **In `mustNotShow` only `presence` is
+accepted**, since D-043 says `mustNotShow` is always `presence`. D-043 binds as written: an untyped criterion fails
+validation, `presence` is checked on the still and the clip, `event` on the clip only. **Not decided here**, and left
+to `reel-stills`' Gate 2 under D-106: whether this is an amendment to contract version 1, while no caller is built, or
+version 2.
+
+**Why.** D-043's type is what stops Gate 1 checking a still for motion it can never show — without it every shot with
+a verb fails its picture. The approved contract was written without it, so a caller cannot say which a criterion is,
+and D-043 forbids the engine inferring it from the words (_"the hero turns to face the door"_ against _"the hero faces
+the door"_). **The owner chose it on 2026-09-15**, answering a questions session before `reel-stills`' gates. No caller
+of the contract exists yet (Q16), so the change will never be cheaper.
+
+**Rejected.** **Every caller criterion counts as `presence`** — the contract stays as it is, and D-043's doom loop
+returns bounded by D-047's one repair: a reel whose criterion has a verb fails at its picture instead of looping. **Caller
+criteria checked on clips only** — D-043's rejected _"keyframe checks nothing"_, which pays $0.32 for a clip to learn
+what a $0.15 picture showed (D-042). **The engine inferring the type from the text** — D-043's own rejection.
+
+**Caught by.** Nothing yet: no code. `reel-stills`' Gate 3 must carry checks that an untyped criterion and an `event` in
+`mustNotShow` are refused, and that no `event` criterion appears in a Gate 1 verdict (D-043's `Confirmed-by`). The
+reviewer of those gates holds them to it. **Also owed by KnowScroll:** `reel-script` must emit the type.
+
+**Confirmed-by.** The owner, 2026-09-15.
+
+---
+
+## S-030 | 2026-09-15 | A `stills` run is admitted against the caller's ceiling by the pictures' share of the estimate
+
+**Chose.** Before any picture is made, a run with `until: 'stills'` compares **the cost of the image calls its chosen
+plan plans** with the request's `budgetCents`. The video's share of the estimate is not compared: this run does not
+spend it. **The per-reel cap is unchanged** — Gate 0 already compares the whole reel's estimate with it (D-063, D-100),
+so a plan whose reel could not be made under the cap is never chosen. A refusal carries `limit: 'ceiling'` and that
+figure as `estimateCents`, as the contract says (_"the figure that was compared"_). **Left to `reel-stills`' Gate 2:**
+whether the reserve calls D-027 holds count in the admitted figure, or a repair that would pass the ceiling stops the
+run for budget, which the contract already answers when a limit is passed while being made.
+
+**Why.** D-100: the orchestrator _"gives **each run** a spending ceiling"_. A stills run's ceiling is what that run may
+spend. The contract's _Pending_, item 2, left the figure to the engine. **The owner chose it on 2026-09-15.**
+
+**Rejected.** **The whole reel's estimate** — never buys pictures for a reel this ceiling could not finish, but turns a
+run's ceiling into a reel's budget, and refuses a picture preview for video money it would not spend.
+
+**Caught by.** Nothing yet: no code. `reel-stills`' Gate 3 must carry a check with a plan whose pictures fit the ceiling
+and whose whole estimate does not — admitted — and one whose pictures do not — refused, `limit: 'ceiling'`, with the
+pictures' figure. The contract's _Pending_ item 2 is answered by this entry.
+
+**Confirmed-by.** The owner, 2026-09-15.
+
+---
+
+## S-031 | 2026-09-15 | Gate 1 stops a picture at a failed technical step; otherwise its other three steps all run
+
+**Chose.** Gate 1's four steps (D-042) — technical, text, blind witness, reconcile — run in order on each picture. **A
+picture that fails the technical step stops there**: there is nothing a witness can look at in a file that cannot be
+read or is the wrong size. **Any other failure does not stop the gate**: text, witness and reconcile each run, and the
+verdict records every step's outcome. So every picture that passed the technical step has an observation and a
+reconciliation, and D-047's informed repair is given every reason a picture failed.
+
+**Why.** The contract's _Pending_, item 3, left it open, and the record's observation and reconciliation ids are optional
+until it is settled. Gate 0 records every condition that fails (D-114) so the repair can see them; the same reason holds
+here, and D-047 says a retry that cannot see why is a re-roll. Gate model calls are covered by the token plan (D-042), so
+running the later steps costs time, not money. **The owner chose it on 2026-09-15.**
+
+**Rejected.** **Stop at the first failure** — fewest calls; a failed picture may have no observation, and the repair
+knows only the first reason. **Always run all four** — the witness and reconcile then run on a file the technical step
+found unreadable.
+
+**Caught by.** Nothing yet: no code. `reel-stills`' Gate 3 must carry checks that a picture failing the technical step
+has no witness or reconcile call and no observation id, and that a picture failing the text step still has both. The
+contract's _Pending_ item 3 is answered by this entry.
+
+**Confirmed-by.** The owner, 2026-09-15.
+
+---
+
+## S-032 | 2026-09-15 | `reel-stills` builds no declared state change; D-037 and D-048 wait for a later feature
+
+**Chose.** In `reel-stills` the planner declares **no within-shot state change**, so no reel plans D-037's end-frame pin
+and **no plan has more than four image calls**, with two held in reserve (D-027). The planning call gains no
+state-change field. D-037 and D-048 are not superseded; they are **not built**, and are listed in `reel-stills`'
+_Deferred_ with no feature assigned.
+
+**Why.** `reel-plan` deferred the state change and its fifth call to `reel-stills`. Building it brings D-048's remainder
+— a consistency repair when the one reserve slot is spent — which D-048 says needs its own decision, and C-6, the case
+it serves, is still open. `reel-stills` is to be written by removing promises, as `reel-plan` was. **The owner chose it
+on 2026-09-15.**
+
+**Rejected.** **Build it in `reel-stills`** — a larger first picture feature carrying an undecided repair path.
+
+**Caught by.** Nothing yet. `reel-plan`'s check 25 already asserts no plan exceeds four image calls; `reel-stills`'
+Gate 3 must keep a check of that. A plan of five is then a regression, until a feature that builds D-048 supersedes this
+entry.
+
+**Confirmed-by.** The owner, 2026-09-15.
+
+---
+
+## S-033 | 2026-09-15 | `reel-stills` and `reel-render` are planned here, not in the steering repository
+
+**Chose.** Both feature files move to **`docs/features/reel-stills.md`** and **`docs/features/reel-render.md`** now,
+before their gates are written, and their gates are written and reviewed here, as `video-edits`' will be. The steering
+repository's copies, last changed at `e05e9f0`, are the owner's to delete there. Until they are, the files here are the
+authority and those are stale.
+
+**Supersedes:** **S-017**, on its exception — _"The three engine feature files still in the steering repository —
+`reel-plan`, `reel-stills`, `reel-render` — stay there until their gates are approved, then move here"_. No engine
+feature is planned in the steering repository any more. `CLAUDE.md`'s rule 1 is changed to match.
+
+**Why.** D-115, in the owner's words: _"lets stop making decisions for cutroom here, and do work there"_. Both files
+are stubs with no gate written, and `reel-stills`' says to rewrite rather than copy. Writing gates there would need a
+session in the other repository and a pin bump for every change read here. **The owner chose it on 2026-09-15.**
+
+**Rejected.** **Keep S-017's exception** — the gates are written in a KnowScroll session and moved on approval, as
+`reel-plan`'s were.
+
+**Caught by.** Nothing mechanical. S-015's promised test — every `docs/features/*.md` carries front matter and a
+moved-from note — is still not written, with four feature files here now.
+
+**Confirmed-by.** The owner, 2026-09-15.

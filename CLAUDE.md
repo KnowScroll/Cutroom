@@ -16,9 +16,8 @@ whole mechanism exists to catch.
 
 1. **Gates before code.** No implementation file for a feature whose four planning gates —
    product, architecture, program design, slices — are not approved by an adversarial reviewer.
-   **New features are planned here**, in `docs/features/`. `reel-plan`, `reel-stills` and
-   `reel-render` are the exception: their gates are still in the steering repository and move here
-   once approved (S-015, S-017). Trivial fixes (one file, no new route, table, job or screen) skip
+   **Every feature is planned here**, in `docs/features/`, including `reel-stills` and
+   `reel-render`, moved before their gates were written (S-033, superseding S-017's exception). Trivial fixes (one file, no new route, table, job or screen) skip
    to a slice.
 2. **Any choice between real alternatives becomes a written decision** with what was rejected and
    how a violation will be caught. Not in chat, not in your head. Anything about the engine or

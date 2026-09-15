@@ -714,3 +714,40 @@ brand-new-file migration race (all in S-027). The next feature is the owner's to
 said `reel-stills` "is gated"; it is not — its file in the steering repository reads `Status: planned`, all four gates
 `pending`, and lists owner questions (criterion types against D-043; the figure a `stills` run is admitted against;
 whether Gate 1's four steps stop at the first failure) that must be answered before its Gate 2 is written.
+
+## 2026-09-15 — session 13, questions only: what `reel-stills` needs from the owner before its gates
+
+**Intent.** The owner asked what comes next after `reel-plan`, then to set up a questions session for `reel-stills`.
+
+**Changed.**
+
+- **S-029 to S-033**, the owner's five answers, each the recommended option: a required `type` on the contract's
+  `Criterion`, `presence` only in `mustNotShow` (S-029); a `stills` run admitted against the ceiling by the pictures'
+  share (S-030); Gate 1 stops a picture only at a failed technical step (S-031); no declared state change in
+  `reel-stills` (S-032); `reel-stills` and `reel-render` planned here (S-033, superseding S-017's exception).
+- `docs/features/reel-stills.md` and `docs/features/reel-render.md`, moved from the steering repository at `e05e9f0`
+  with moved-from notes. `reel-stills`' needs list now names the answering entry for each item; `reel-render`'s text is
+  unchanged but for the note, formatting and its Evidence heading.
+- `CLAUDE.md` rule 1: every feature is planned here.
+- No code, no test.
+
+**Observed.**
+
+- **Read before asking:** D-027, D-042, D-043, D-048, D-081, D-083, D-084, D-100, D-106, the contract's `Criterion` and
+  _Pending_, and Gate review 4 in `reel-engine-reviews.md`. Of the stub's four needs, only items 2 and 3 and the state
+  change were the owner's; **review 4's picture findings** (the witness sighted through `structured`, `observe` receipts
+  with no role, pixel sensors with no port, _"one approved picture per shot"_) are architecture, for Gate 2 and its
+  reviewer, and were not asked.
+- **Left open on purpose, for `reel-stills`' Gate 2:** whether S-029's field amends contract version 1 or is version 2
+  (D-106); whether the reserve calls count in S-030's admitted figure.
+- **Owed outside this repository:** deleting the two stubs in the steering repository and bumping the pin (S-033);
+  `reel-script` emitting a criterion's type (S-029). The contract's _Pending_ items 2 and 3 in `reel-contract.md` are
+  answered by S-030 and S-031; that verified file was not edited.
+- **An order I missed.** `docs/features/video-edits.md` records the owner's earlier choice: _"its gates are written next
+  after `reel-plan`'s gates are approved."_ They were approved on 2026-09-14 and `reel-plan` was built instead. I
+  recommended `reel-stills` without saying so. Not decided here.
+- **S-015's promised test** — every `docs/features/*.md` has front matter and a moved-from note, _"the second move is
+  the moment"_ — was not written at `reel-plan`'s move and still is not, with four files now. Recorded in S-033.
+
+**Next.** The owner picks which gates come first: `reel-stills` (answers in hand) or `video-edits` (the recorded order,
+five questions still open). Then Gate 1 of that feature, here.
