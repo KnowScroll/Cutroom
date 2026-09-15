@@ -17,10 +17,12 @@ import {
   SCORE_QUESTIONS,
   planningAnswer,
   planningPrompt,
+  repairPrompt,
   scoreAnswer,
   scorePrompt,
   type PlanningAnswer,
 } from './prompts.ts'
+import { repairBasis } from './repair.ts'
 import { scorePlan } from './score.ts'
 
 // The planning stage (docs/features/reel-plan.md, Gates 2 and 3). The worker calls `planReel` and
@@ -81,7 +83,7 @@ export type PlanOutcome =
 
 /** The plan code builds from one planning answer: the model's shots and subjects, and nothing else. */
 function build(
-  role: 'a' | 'b',
+  role: Plan['role'],
   units: number[][],
   answer: PlanningAnswer,
   request: SubmitRequest,
@@ -107,8 +109,12 @@ function build(
   }
 }
 
-/** Not built in Slice 3: reel-plan's Slice 4 replaces each throw with the answer it names. */
-const notBuilt = (what: string) => new Error(`${what} is not built (reel-plan Slice 4)`)
+/** Each plan's unit count and the Gate 0 conditions it failed, for a rule stop's detail. */
+function failures(plans: readonly Plan[], verdicts: readonly Gate0Verdict[]): string {
+  return plans
+    .map((p, i) => `${p.role} (${p.units.length} units) failed ${verdicts[i]?.failed.join(', ')}`)
+    .join('; ')
+}
 
 export async function planReel(
   request: SubmitRequest,
@@ -125,9 +131,13 @@ export async function planReel(
   const unitsA = groupSentences(sentences, countA)
   const unitsB = groupSentences(sentences, countB)
   if (unitsA === null || unitsB === null) {
-    throw notBuilt(
-      `stopping for too few sentences (${sentences} for ${countA} and ${countB} units)`,
-    )
+    // A sentence is never divided, so the narration cannot be cut into both groupings, and D-061
+    // needs two plans: stopped at the plan step, before any model call (D-112).
+    const missed = [unitsA === null ? countA : null, unitsB === null ? countB : null]
+      .filter((count) => count !== null)
+      .join(' and ')
+    const detail = `${sentences} sentences cannot be cut into ${missed} units: a unit never divides a sentence (D-073, D-112)`
+    return { kind: 'stopped-rule', rule: 'split', detail }
   }
 
   // One structured call per grouping, planner role, temperature 0 (D-061, D-062, D-035).
@@ -176,5 +186,31 @@ export async function planReel(
     return { ...record, kind: 'selected', selected, estimateCents: fork[selected].estimateCents }
   }
 
-  throw notBuilt('the repair after both plans fail Gate 0')
+  // No survivor: one informed repair call, on the grouping D-114 picks, given both verdicts (D-064).
+  const basis = repairBasis(fork, verdicts)
+  const units = fork[basis].units.map((unit) => [...unit])
+  const { value } = await model.structured({
+    prompt: repairPrompt(request, fork, verdicts, basis, settings),
+    schema: planningAnswer(units.length),
+    role: 'planner',
+    temperature: 0,
+  })
+  const repair = planSchema.parse(build('repair', units, value, request, settings))
+  const repaired = { ...verdicts, repair: gate0(repair, request, capCents, settings) }
+  const record = { fork, repair, verdicts: repaired, scores: null }
+
+  // Recorded as a third plan, and selected if it survives (D-113).
+  if (survives(repaired.repair)) {
+    return { ...record, kind: 'selected', selected: 'repair', estimateCents: repair.estimateCents }
+  }
+
+  const plans = [fork.a, fork.b, repair]
+  const all = [repaired.a, repaired.b, repaired.repair]
+  if (all.every((v) => v.failed.includes('cost'))) {
+    // Every plan over the per-reel cap: refused for budget, with the lowest of the three estimates.
+    const estimateCents = Math.min(...plans.map((p) => p.estimateCents))
+    return { ...record, kind: 'refused-budget', estimateCents }
+  }
+  const detail = `no plan passed Gate 0, and neither did the repair: ${failures(plans, all)}`
+  return { ...record, kind: 'stopped-rule', rule: 'gate-0', detail }
 }

@@ -581,3 +581,65 @@ check broken on purpose once, nothing from Slices 4 or 5. `decisions.mjs`: pin c
 **Next.** `reel-plan` Slice 4 — checks 20, 28, 38–44: the split stop, the repair ladder (`plan/repair.ts` and the
 repair prompt), the budget refusal and its question (`apps/worker/src/questions.ts`), the gate-0 rule stop, the thrown
 call. Both "not built" throws get replaced.
+
+## 2026-09-15 — session 11, reel-plan Slice 4: the answers that are not a plan
+
+**Intent.** The owner asked for `reel-plan` Slice 4 only — checks 20, 28, 38–44 — tests first, each check broken on
+purpose, nothing from Slice 5. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green, 103 tests.
+
+**Changed.**
+
+- `packages/pipeline` — `plan/repair.ts` (`repairBasis`, D-114's choice; imports no port type). `plan/index.ts`: the
+  split stop returns `{ kind: 'stopped-rule', rule: 'split' }` before any call; with no survivor, one repair call
+  (planner, temperature 0, the picked grouping's schema), the repair built and put through Gate 0, then selected,
+  refused for budget (every plan failed `cost`; lowest of three estimates) or stopped for rule `gate-0` (detail names
+  each plan's unit count and failed conditions). `plan/prompts.ts`: `repairPrompt`; the planning prompt's body is
+  shared, its text unchanged. `repairBasis` exported from the index. Both "not built" throws are gone.
+- `apps/worker` — `questions.ts` (`QUESTIONS_MD`, `appendBudgetQuestion`); `plan-job.ts` maps every outcome to its
+  contract result, writing plan rows (repair included) and one verdict event per plan in the finishing transaction,
+  and appends a question after it on a per-reel refusal only; `startWorker` takes `questionsPath`.
+- Tests: `tests/reel-plan-repair.test.ts` (38–40), `tests/reel-plan-endings.test.ts` (20, 28, 41–44). The harness
+  always points `questionsPath` into its folder, takes `budgetMd` (a BUDGET.md written there), and gains `run()`, which
+  submits, waits and reads result, events, plan rows and receipts. `plans.ts` gains `bare` and `shortRequest`.
+- **S-024** (the repair is also shown the plan it corrects; every tie goes to `a`), **S-025** (no `stage.finished`
+  when a run ends at the plan step without a plan — the contract's stand-in's shape), **S-026** (the question entry's
+  Markdown form, created with `wx`, appended after the finishing transaction). Slice 4 ticked.
+- **No file outside Gate 3's list was added.** Tests cannot import `@cutroom/domain` (not a root devDependency), so
+  check 28 reads the pinned `BUDGET.md` by path and proves the default through a run's `capCents`, rather than adding a
+  dependency.
+
+**Observed.**
+
+- **Red first.** With tests written and nothing else, both files failed on a missing export, which proves nothing.
+  Stubs in Gate 3's files (`repairBasis` always `'a'`, a wrong `QUESTIONS_MD`) gave seven assertion failures: 20, 28,
+  38, 39, 40, 41, 42. **43 and 44 passed before any Slice 4 code**: nothing compared the ceiling or wrote a question,
+  and Slice 3's catch already failed a thrown run with its receipts. Both were seen red only by breaks, below. The
+  S-024 shots assertion in 39 was added after the code, and seen red only by its breaks.
+- **Twenty-nine breaks, all caught**, each applied by a script that ran every test and restored the file from the bytes it
+  read; source hashes before and after were identical.
+  - 20: a model call inside the split stop — 20 only. The result's step set to the rule — 20. (A first version put the
+    call before the check; it consumed a scripted answer in every run and 19 checks failed. Replaced, not counted.)
+  - 28: the cap read from the pinned file instead of `budgetPath` — 28 only. `capCents` hard-coded 300 — 28 only.
+  - 38: the repair row always marked selected — 38. The unselected survivor's score dropped — 38.
+  - 39: no fewer-conditions rule — 39. No lower-estimate rule — 39, 41 and 28 (their repairs then work from the other
+    grouping). Tie to `b` — 39, 38, 40, 42. One verdict line only — 39. The kept plan's shots dropped — 39. The other
+    plan's shots shown — 39. The repair row not written — 38–42.
+  - 40: a surviving repair not selected — 40 only.
+  - 41: `some` instead of `every` — 42 (its mixed cost/shape case). Only-cost instead of includes-cost — 41 (its
+    shape-and-cost case). The repair's estimate instead of the lowest — 41. Ceiling set to the cap — 41. No append — 41.
+    Overwrite instead of append — 41. The default one folder too high — 41.
+  - 42: the detail without the repair — 42. A question on every non-selected ending — 41 and 42.
+  - 43: a completed run refused against its ceiling — 43 only. A question for a completed run over its ceiling — 43.
+  - 44: receipts buffered and written only when planning returns (Gate review 1's finding 4) — 44 only. A generic
+    failure detail — 44 only.
+  - S-025: `stage.finished` on every ending — 41, 42. No verdict events when nothing is selected — 41, 42.
+- **The stop-gate fired twice mid-break**, running `check.mjs --code` while a break was applied, and reported red.
+  That red was the break, not the tree: the break script restored every file and the next full check was green.
+- `drift`: 48 modules, 0 violations. `drift --audit`: 14 live, 0 inert, 0 dead. No `QUESTIONS.md` exists at the root.
+- **Small choices, here rather than as decisions:** the split detail names only the unit counts that could not be
+  met; the repair plan is parsed under the plan schema, as the fork is; an append that throws after the commit leaves
+  the job `dead` (S-026, not handled).
+- `node scripts/check.mjs`: everything green, 112 tests.
+
+**Next.** `reel-plan` Slice 5 — checks 45 (cancel before the stage), 46 (API and worker restart mid-run), 47 (every
+other test in a child process with no secrets), then `node scripts/journey.mjs reel-plan`, which re-runs 1–44.

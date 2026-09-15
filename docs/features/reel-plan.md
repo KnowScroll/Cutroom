@@ -527,7 +527,7 @@ _How a run ends_
       port; the planning call and its schema; ranking; the estimate; the cap from `BUDGET.md`; Gate 0; the plan
       score; selection; plan rows. A run with two survivors completes with an estimate.
       **Proves: 6, 7, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37.**
-- [ ] **Slice 4 — the answers that are not a plan.** Too few sentences; the repair ladder; the budget refusal,
+- [x] **Slice 4 — the answers that are not a plan.** Too few sentences; the repair ladder; the budget refusal,
       its figures and its question; the rule stop; a thrown model call.
       **Proves: 20, 28, 38, 39, 40, 41, 42, 43, 44.**
 - [ ] **Slice 5 — cancel, restart, no secrets, and the journey.** **Proves: 45, 46, 47, and re-runs 1–44.**

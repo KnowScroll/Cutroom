@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { Plan, PlanSettings } from '@cutroom/contracts'
+import type { Gate0Condition, Gate0Verdict, Plan, PlanFork, PlanSettings } from '@cutroom/contracts'
 import type { Criterion, SubmitRequest } from '@cutroom/reel-contract'
 import { SHOT_COUNT, SHOT_SECONDS } from '../gates/gate0.ts'
 
@@ -85,6 +85,43 @@ function criteriaLines(list: Criterion[]): string {
   return list.length === 0 ? '- (none)' : list.map((c) => `- ${c.id}: ${c.text}`).join('\n')
 }
 
+/** Each unit's claim ids with their roles, then its sentences. */
+function unitLines(request: SubmitRequest, units: readonly (readonly number[])[]): string[] {
+  const roles = new Map(request.claims.map((c) => [c.id, c.role]))
+  return units.map((positions, unit) => {
+    const claims = [...new Set(positions.flatMap((p) => request.narration[p]?.claimIds ?? []))].map(
+      (id) => `${id} (${roles.get(id) ?? 'unlisted'})`,
+    )
+    const sentences = positions.map((p) => `  ${quoted(request.narration[p]?.text ?? '')}`)
+    return [`Unit ${unit} — claims: ${claims.join(', ') || 'none'}`, ...sentences].join('\n')
+  })
+}
+
+/** How a shot is asked for, what the reel's shape must be, the units, and the criteria. */
+function planningBody(
+  request: SubmitRequest,
+  units: readonly (readonly number[])[],
+  settings: PlanSettings,
+): string[] {
+  const [low, high] = settings.totalSecondsBounds
+  return [
+    'For each unit, give one shot: the unit number, how many whole seconds the shot lasts, and the ids of the subjects it shows. Name every subject once, with an id and a name; a subject shown in several shots is named once and referred to by its id each time.',
+    '',
+    `Each shot lasts ${SHOT_SECONDS[0]} to ${SHOT_SECONDS[1]} seconds. All the shots together last ${low} to ${high} seconds. A reel has ${SHOT_COUNT[0]} to ${SHOT_COUNT[1]} shots.`,
+    '',
+    'Units:',
+    ...unitLines(request, units),
+    '',
+    'What the pictures must show:',
+    criteriaLines(request.criteria.mustShow),
+    '',
+    'What the pictures must never show:',
+    criteriaLines(request.criteria.mustNotShow),
+    '',
+    'Answer only with the JSON object the schema describes.',
+  ]
+}
+
 /**
  * The planning prompt for one grouping (D-061, D-062): the sentences of each unit, the claim ids on
  * each unit with their roles, and the criteria.
@@ -94,32 +131,57 @@ export function planningPrompt(
   units: readonly (readonly number[])[],
   settings: PlanSettings,
 ): string {
-  const roles = new Map(request.claims.map((c) => [c.id, c.role]))
-  const listed = units.map((positions, unit) => {
-    const claims = [...new Set(positions.flatMap((p) => request.narration[p]?.claimIds ?? []))].map(
-      (id) => `${id} (${roles.get(id) ?? 'unlisted'})`,
-    )
-    const sentences = positions.map((p) => `  ${quoted(request.narration[p]?.text ?? '')}`)
-    return [`Unit ${unit} — claims: ${claims.join(', ') || 'none'}`, ...sentences].join('\n')
-  })
-  const [low, high] = settings.totalSecondsBounds
   return [
     `Plan the shots of one short vertical reel. Its narration is already written, and cut into ${units.length} units below. Each unit becomes exactly one shot.`,
     '',
-    'For each unit, give one shot: the unit number, how many whole seconds the shot lasts, and the ids of the subjects it shows. Name every subject once, with an id and a name; a subject shown in several shots is named once and referred to by its id each time.',
+    ...planningBody(request, units, settings),
+  ].join('\n')
+}
+
+// ---------------------------------------------------------------- the repair
+
+/** What each of Gate 0's conditions asks, in the words a repair call is given. */
+const CONDITION_WORDS: Record<Gate0Condition, string> = {
+  coverage: 'every claim must be spoken in some shot',
+  criteria: 'the plan must carry every criterion',
+  shape:
+    'the number of shots, the seconds of each, or the seconds of all of them were out of bounds',
+  cost: 'what the reel would cost to make as planned was over the per-reel cap; fewer seconds, or fewer subjects shown in two or more shots, cost less',
+}
+
+/**
+ * The one repair prompt (D-064, D-114): the grouping code picked, both plans' Gate 0 verdicts —
+ * each named against its own plan — and the shots of the plan whose grouping the repair keeps.
+ */
+export function repairPrompt(
+  request: SubmitRequest,
+  fork: Pick<PlanFork, 'a' | 'b'>,
+  verdicts: { a: Gate0Verdict; b: Gate0Verdict },
+  basis: 'a' | 'b',
+  settings: PlanSettings,
+): string {
+  const kept = fork[basis]
+  const verdictLine = (role: 'a' | 'b') => {
+    const failed = verdicts[role].failed
+    return `- The plan in ${fork[role].units.length} units failed: ${failed.join(', ')}.`
+  }
+  const conditions = [...new Set([...verdicts.a.failed, ...verdicts.b.failed])]
+  const names = new Map(kept.subjects.map((s) => [s.id, s.name]))
+  const shots = kept.shots.map((shot) => {
+    const shown = shot.subjectIds.map((id) => names.get(id)).filter((n) => n !== undefined)
+    return `- Unit ${shot.unit}: ${shot.durationSeconds} seconds, showing ${shown.join(', ') || 'nothing named'}`
+  })
+  return [
+    `Two plans of this reel's shots were made, and neither passed the counting check.`,
+    ...(['a', 'b'] as const).map(verdictLine),
     '',
-    `Each shot lasts ${SHOT_SECONDS[0]} to ${SHOT_SECONDS[1]} seconds. All the shots together last ${low} to ${high} seconds. A reel has ${SHOT_COUNT[0]} to ${SHOT_COUNT[1]} shots.`,
+    'What those conditions ask:',
+    ...conditions.map((c) => `- ${c}: ${CONDITION_WORDS[c]}`),
     '',
-    'Units:',
-    ...listed,
+    `Repair the plan that came closer to passing. Its narration is cut into the same ${kept.units.length} units as before, and each unit becomes exactly one shot. Its shots were:`,
+    ...shots,
     '',
-    'What the pictures must show:',
-    criteriaLines(request.criteria.mustShow),
-    '',
-    'What the pictures must never show:',
-    criteriaLines(request.criteria.mustNotShow),
-    '',
-    'Answer only with the JSON object the schema describes.',
+    ...planningBody(request, kept.units, settings),
   ].join('\n')
 }
 

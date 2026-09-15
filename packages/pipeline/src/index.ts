@@ -12,5 +12,6 @@ export {
   type PlanRecord,
 } from './plan/index.ts'
 export { planningAnswer, scoreAnswer } from './plan/prompts.ts'
+export { repairBasis } from './plan/repair.ts'
 export { scorePlan } from './plan/score.ts'
 export { plannedImageCalls, rankSubjects } from './rank.ts'

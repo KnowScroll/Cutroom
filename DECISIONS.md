@@ -549,3 +549,98 @@ code changing a cinematic field the planning layer owns (D-034).
 
 **Caught by.** `reel-plan`'s check 7 (`tests/reel-plan-shapes.test.ts`) asserts each is refused. Each refusal was
 disabled on purpose once and check 7, alone, failed.
+
+---
+
+## S-024 | 2026-09-15 | The repair call is also shown the plan it corrects, and every tie between the two plans goes to plan `a`
+
+**Chose.** The one repair call (D-064) is given, in `repairPrompt` (`packages/pipeline/src/plan/prompts.ts`): both
+plans' Gate 0 verdicts, one line each, naming the plan by its unit count and listing every condition it failed; a
+sentence per failed condition saying what it asks; **the shots of the plan whose grouping D-114 picked** — each
+unit's seconds and the subjects it shows; and then the same body as a planning call on that grouping — the units,
+their claims, the shape bounds and the criteria. Its schema is the planning schema for that unit count, and code
+builds the repair plan exactly as it builds `a` and `b`. **When D-114's first two rules tie, the grouping is `a`'s**,
+the plan planned first — the 4-unit plan at the default `shotCountUnits` — as a tied plan score already goes to `a`
+(Slice 3).
+
+**Why.** D-114's title says the repair plan _"starts from the plan that came closest to passing"_; its body says the
+call is given _"that grouping and both plans' Gate 0 verdicts"_. Gate 3 names neither the prompt nor its contents.
+D-047's reason for an informed repair — _"a retry that cannot see why the previous take failed is a re-roll"_ — is
+half met by the verdicts alone: a call told _"shape"_ without the durations that failed it is a third planning call
+with a hint. D-114 also justifies the choice as _"correcting the plan with fewer problems asks the call to fix
+less"_, which assumes the call can see that plan. On the tie: Gate 2 calls the score's tie winner _"the 4-unit plan,
+the one planned first"_; the two descriptions part only when the setting puts the larger count first.
+
+**Rejected.** **The grouping and the verdicts only** — the literal minimum, and the call re-plans from nothing.
+**Both plans' shots** — two plans in one request, which D-064 keeps out of the score call, and a grouping the call
+may not use. **A tie to the plan with fewer units** — a second reading of _"the 4-unit plan"_ that disagrees with the
+score's tie whenever the setting is reversed, and has no answer for a pair of equal counts.
+
+**Caught by.** `reel-plan`'s check 39 (`tests/reel-plan-repair.test.ts`): the repair call's schema accepts only the
+picked grouping's unit count and its prompt lists exactly those units; each verdict line carries exactly its plan's
+failed conditions; the prompt carries every shot of the kept plan and none of the other's; each of D-114's rules and
+the full tie is built. Breaks watched: dropping one verdict line, dropping the kept plan's shots, showing the other
+plan's shots, and a tie going to `b` — each caught by 39.
+
+---
+
+## S-025 | 2026-09-15 | A run that ends at the plan step with no plan selected has no `stage.finished`
+
+**Chose.** The events of a `reel.plan` run, by how it ends:
+
+- **completed** — `run.accepted`, `stage.started`, one `verdict` per plan (two, or three with a repair),
+  `stage.finished`, `run.finished`;
+- **refused for budget**, or **stopped for rule `gate-0`** — `run.accepted`, `stage.started`, three `verdict`s,
+  `run.finished`;
+- **stopped for rule `split`**, or **failed** — `run.accepted`, `stage.started`, `run.finished`.
+
+Verdicts are written for `a`, `b` and `repair` in that order, with the plan rows and the result, in the one
+finishing transaction.
+
+**Why.** Gate 2 lists the events _"a plan run emits"_ once, for a run that completes, and does not say whether a
+stage that produced no plan finished. The contract's stand-in (`tests/stand-in/reel-engine-stand-in.ts`), held to
+the approved contract by its journey, sends `stage.finished` for `plan` only when a plan goes on — to completion or
+to the next stage — and never before a refusal at the per-reel cap, a rule stop or a failure. A caller built
+against it reads `stage.finished` as _"there is a plan"_.
+
+**Rejected.** **`stage.finished` whenever `planReel` returned an answer** — the stage did run to its end, and a
+caller would see an event the contract's stand-in never sends for those endings. **Verdict events for `a` and `b`
+only** — the repair has its own verdict (D-113), and the events would count fewer verdicts than the plan rows.
+
+**Caught by.** `reel-plan`'s checks 20, 38, 40, 41, 42 and 44 assert each ending's event types exactly. Breaks
+watched: `stage.finished` on every ending, and no verdict events when nothing is selected — each caught by 41 and 42.
+
+---
+
+## S-026 | 2026-09-15 | A per-reel cap refusal appends a Markdown entry to the questions file, after the run is finished
+
+**Chose.** `apps/worker/src/questions.ts`. The file is the worker's `questionsPath` setting, defaulting to
+`QUESTIONS.md` at this repository's root. On first write it is created with a short header (flag `wx`, so two
+writers cannot both write one). Each refusal for `limit: 'reel'` then appends **one entry**: a `## ` heading with the
+time, the run id and _"refused: every plan is over the per-reel cap"_; bullets for the request id, the lowest
+estimate, the per-reel cap, the caller's ceiling, each plan's role, unit count and estimate, and the two rates; and
+one question. Entries are not numbered. The worker appends it **after** the transaction that finishes the run.
+Nothing else is ever written to the file, and nothing reads it back.
+
+**Why.** D-014 and D-097 say a question is written to `QUESTIONS.md` and what a refusal must carry; neither says
+the entry's form. The reader is the owner, and the steering repository's questions file is Markdown with a heading
+per question. The figures are D-097's; the rates are there because an estimate is only as good as them (Q9). After
+the transaction because Gate 2's sequence puts it there, and because a job is run again from the start after an
+interruption: a question written before the finish would be written twice for one refusal.
+
+**Rejected.** **Numbering entries `Q-n`** by reading the file first — a read, parse and write that fails on a
+hand-edited file and races two workers; the steering file's numbers are the owner's to assign. **JSON lines** —
+machine-readable, and nothing but the owner reads it. **Appending before the finishing transaction** — above.
+**Inside the transaction** — a file is not rolled back.
+
+**Not handled.** A crash between the commit and the append loses the question; the refusal itself is kept. An
+append that throws leaves the run refused and its job marked `dead` with the error, by the worker's existing
+`buryJob`.
+
+**Caught by.** `reel-plan`'s check 41 (`tests/reel-plan-endings.test.ts`): the file is absent before the first
+refusal and created by it; one `## ` entry per refusal, naming the run and the request and carrying the lowest
+estimate, the ceiling and the cap; a second refusal appends and leaves the first entry byte for byte; nothing else
+is written to the engine's folder; the repository's own `QUESTIONS.md` is untouched; the default path is the root's.
+Checks 42 and 43 assert no question for a rule stop or a plan-only run over its ceiling. Breaks watched: no append,
+an overwrite instead of an append, the default one folder too high (41); a question on a rule stop (41, 42); a
+question for a completed run over its ceiling (43).

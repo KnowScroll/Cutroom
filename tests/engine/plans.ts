@@ -4,7 +4,7 @@ import { fakeModel, type FakeScript } from '@cutroom/providers'
 import type { SubmitRequest } from '@cutroom/reel-contract'
 
 // Requests, stand-in scripts and plans for reel-plan's planning checks (docs/features/reel-plan.md,
-// Slice 3). Every builder returns a fresh value, so no test can change another's fixture.
+// Slices 3 and 4). Every builder returns a fresh value, so no test can change another's fixture.
 
 /**
  * Eight sentences, so both groupings exist: 4 units of two sentences each, and 6 units whose first
@@ -118,6 +118,30 @@ export function oneSurvivor(): FakeScript {
   return {
     planner: [{ value: answerA() }, { value: answer([9, 9, 8, 8, 8, 8], [], []) }],
     reconciler: [],
+  }
+}
+
+/** A planning answer that names no subject: these durations, one shot per unit, nothing shown. */
+export const bare = (...durations: number[]) => answer(durations, [], [])
+
+/**
+ * `planRequest` cut to its first `n` sentences, keeping only the claims those sentences reference
+ * and the criteria whose claim is kept — so the contract still accepts it.
+ */
+export function shortRequest(requestId: string, n: number): SubmitRequest {
+  const request = planRequest(requestId)
+  const narration = request.narration.slice(0, n)
+  const referenced = new Set(narration.flatMap((s) => s.claimIds))
+  const kept = (c: { claimId?: string }) => c.claimId === undefined || referenced.has(c.claimId)
+  return {
+    ...request,
+    narration,
+    claims: request.claims.filter((c) => referenced.has(c.id)),
+    criteria: {
+      ...request.criteria,
+      mustShow: request.criteria.mustShow.filter(kept),
+      mustNotShow: request.criteria.mustNotShow.filter(kept),
+    },
   }
 }
 

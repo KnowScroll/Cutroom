@@ -9,6 +9,7 @@ import {
 } from '@cutroom/domain'
 import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
+import { QUESTIONS_MD } from './questions.ts'
 
 // The runner's loop: claim a due job, run it, and poll again (D-002). Jobs are run one at a time.
 
@@ -26,6 +27,8 @@ export interface WorkerOptions {
   settings?: PlanSettings
   /** The BUDGET.md the per-reel cap is read from (D-100). Defaults to the pinned steering-ref's. */
   budgetPath?: string
+  /** The questions file a per-reel cap refusal is appended to (D-097). Defaults to QUESTIONS.md at the root. */
+  questionsPath?: string
 }
 
 export interface Worker {
@@ -40,6 +43,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     model: options.model,
     settings: options.settings ?? DEFAULT_PLAN_SETTINGS,
     budgetPath: options.budgetPath ?? BUDGET_MD,
+    questionsPath: options.questionsPath ?? QUESTIONS_MD,
   }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined
