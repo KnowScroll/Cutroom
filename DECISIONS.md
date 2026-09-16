@@ -1916,3 +1916,40 @@ feature created here claiming a move; one saying nothing of where it came from; 
 file claiming to be created here under a slug the steering repository held (`reel-engine`); and, in the test, the
 steering history never consulted — caught by its own guard that some feature was moved. Not caught, as it cannot be: the
 test's commit comparison disabled, when every named commit is right.
+
+---
+
+## S-065 | 2026-09-16 | Each session's opening prompt is kept in `PROMPTS/`, one numbered file per session, committed
+
+**Chose.** A folder **`PROMPTS/`** at the repository root holds the prompt each session is started with, from session
+20 on.
+
+- **One file per prompt, `NNN-<feature>-<work>.md`**: `NNN` is the session's number in `JOURNAL.md`, three digits, so
+  the folder sorts in session order. The first is `PROMPTS/020-reel-render-gates.md`.
+- **Each file** has a title, a short label — the session it is for, the feature, the work, when it was written, and
+  `Run` — and **the prompt verbatim in one fenced `text` block**.
+- **`PROMPTS/README.md`** says this and lists every prompt with the same label.
+- **A prompt is committed when it is written.** Once its session has run, only its `Run` line changes, in the file and
+  in the index; a changed prompt is a new file.
+- `CLAUDE.md` names the folder, so a session asked for the next prompt writes it there.
+
+**Why.** The owner, 2026-09-16: _"create a new dir called PROMPTS, and put the prompt for the next session inside it,
+label it nicely we will also keep track of prompts from now on"_. Until now a prompt lived as `nextPrompt.txt`,
+untracked at the root: it made `journey.mjs` refuse a dirty tree at `reel-plan`'s journey and again at `reel-stills'`,
+and was deleted, so what those sessions were asked survives only in their transcripts. Kept beside `JOURNAL.md`, a
+prompt shows what a session was asked next to what it says it did. The session number is the key both files share,
+and the only one that orders sessions: five of them ran on 2026-09-16. The fence keeps the prompt byte for byte:
+Prettier checks every markdown file here and would rewrite a prompt's list indentation and emphasis, and it leaves a
+fenced block alone.
+
+**Rejected.** **Plain `.txt` files** — nothing to label them with, and an index could not link them. **Dated
+filenames** — a date does not order sessions or name one. **`docs/prompts/`** — `docs/` holds copied design documents
+and feature plans under D-079's front-matter rule, and a prompt is neither; the owner named the folder. **Leaving
+prompts untracked or ignored** — the journey refuses the first, and the second is not kept. **Backfilling earlier
+prompts** — the owner said _"from now on"_, and the earlier ones survive only in transcripts.
+
+**Caught by.** Nothing mechanical: no test reads `PROMPTS/`. `node scripts/journey.mjs` refuses to run while a prompt
+is left uncommitted.
+
+**Confirmed-by.** The owner, 2026-09-16, on the folder, its name and keeping every prompt. The file names, the label,
+the fence, the index and committing on writing are this entry's reading.

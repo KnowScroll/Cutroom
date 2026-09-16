@@ -1340,3 +1340,32 @@ current, 0 commits unpushed. `check.mjs` green at 179 tests (11b94bd).
 likely need the owner's answer on its item 4, L4 and Gate 6. ffmpeg 8.1.1 and ffprobe are on this machine, and nothing
 here installs them yet. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type (S-029);
 deleting the steering stubs and bumping the pin (S-033).
+
+## 2026-09-16 — session 19, continued: PROMPTS/, and the prompt for reel-render's gates
+
+**Intent.** The owner asked for the next session's prompt — `reel-render`'s four gates — and then for a folder,
+`PROMPTS/`, to keep it in, _"we will also keep track of prompts from now on"_.
+
+**Changed.**
+
+- **`PROMPTS/README.md`** — what the folder is, how a prompt is named, labelled and kept, and an index.
+- **`PROMPTS/020-reel-render-gates.md`** — session 20's prompt, verbatim in a fenced block, labelled `Run: not yet`. It
+  sends the session to write and review `reel-render`'s Gates 1–4 with no code: what to read (session 14's entry, both
+  feature files, the decisions, `contentions.md`, `reel-engine`'s last plan and reviews, the real code); what the gates
+  must settle (the file's five needs, the four deferrals from `reel-stills`, ffmpeg, the chain and its guard, the take
+  ladder, restart, media, the line with `video-edits`, the verified checks that assert `video` is refused, and the size
+  — ask the owner about a split rather than write an oversized plan); how the adversarial review runs; and the traps.
+- **`DECISIONS.md` — S-065**: the folder, `NNN-<feature>-<work>.md` by session number, the label, the fence, the index,
+  committed on writing, and only `Run` changing after.
+- **`CLAUDE.md`** — a `Prompts` section naming the folder.
+
+**Observed.**
+
+- S-065 took the number the prompt first gave as the next free one, so the prompt says **S-066** is next.
+- The prompt sits in a fenced block because Prettier checks every markdown file here and would rewrite a prompt's list
+  indentation; inside a fence it is byte for byte what was written.
+- Not backfilled: `reel-stills`' Slice 5 prompt was `nextPrompt.txt`, deleted at the owner's word, and the owner said
+  _"from now on"_.
+- `node scripts/check.mjs`: everything green, 182 tests. Nothing but markdown changed.
+
+**Next.** Session 20: run `PROMPTS/020-reel-render-gates.md`.

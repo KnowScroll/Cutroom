@@ -112,6 +112,13 @@ node scripts/journey.mjs <slug>
 It runs every check and `tests/<slug>-*.test.ts`, and writes the evidence, the status and the divergence. Never
 type any of the three by hand. A FAIL is the finding: stop and report.
 
+## Prompts
+
+Every session's opening prompt is kept in **`PROMPTS/`** (S-065): one file per session, `NNN-<feature>-<work>.md`
+with `NNN` the session's number in `JOURNAL.md`, a short label, and the prompt verbatim in a fenced `text` block, listed
+in `PROMPTS/README.md`. Asked for the next session's prompt, write it there and commit it — never leave a prompt
+untracked at the root, where it makes `journey.mjs` refuse. When you run a prompt, set its `Run` line.
+
 ## Copy voice, when anything becomes user-visible
 
 The design's words, not ours: "kept things" not Relics, "checked out" not documented, "a place"
