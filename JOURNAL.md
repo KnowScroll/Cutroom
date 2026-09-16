@@ -1299,3 +1299,44 @@ deleting the steering stubs and bumping the pin (S-033). S-015's promised front-
 **Next.** `reel-stills` is verified. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type
 (S-029); deleting the steering stubs and bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
 `reel-render` and `video-edits` both have every gate pending; which comes first is the owner's call.
+
+## 2026-09-16 — session 19, continued: S-015's front-matter test
+
+**Intent.** The owner asked for S-015's promised test before `reel-render`'s gates. One test file and a decision, no
+route, table, job or screen: a trivial fix under CLAUDE.md's rule 1, straight to a slice. `decisions.mjs`: pin
+current, 0 commits unpushed. `check.mjs` green at 179 tests (11b94bd).
+
+**Changed.**
+
+- **`tests/feature-files.test.ts`**, three tests: every feature file begins with front matter holding `status:` and
+  `authority:`; a feature `steering-ref`'s history ever held at `steering/features/<slug>.md` opens with a move note
+  naming that path, and any steering commit the note names holds it; a feature it never held says it was created here
+  and claims no move. **+3 tests, 179 → 182.**
+- **`DECISIONS.md` — S-064**, below. No feature file was edited.
+
+**Observed.**
+
+- **S-015's promise could not be kept as written.** It asked for _"front matter and a moved-from note"_ on every file,
+  and `video-edits` was never moved — the first feature planned here (S-017). S-064 splits the rule: moved features
+  carry the note, features created here say so. **Which is which is read from the steering repository's history at the
+  pin**, not from a list in the test: `reel-contract`, `reel-plan`, `reel-stills` and `reel-render` were held there;
+  `video-edits` never was.
+- **Green at once**: the five files already comply, so no red was possible from them; the breaks are what show the test
+  fails. Of the move notes, `reel-plan`'s names `7a40970` and `reel-stills`' and `reel-render`'s `e05e9f0`, and each
+  commit holds its file; `reel-contract`'s names none, and it was left as it is (S-064's _Rejected_).
+- **Fourteen breaks by the session's runner, and two new files by hand.** Caught, each by the test named for it: front
+  matter removed, `authority:` empty, `status:` missing, front matter not the first bytes; a moved feature's note gone,
+  naming another path, naming a steering commit that does not hold the file, moved after the title, its date not a
+  date; a created feature claiming a move, or saying nothing; a new `demo.md` with no note; a new `reel-engine.md`
+  claiming to be created here, a slug the steering repository held at `97deb2b`; and the test never consulting the
+  history — caught by its own guard that some feature was moved. **The control** (a heading's wording) **and the test's
+  commit comparison disabled** were caught by nothing: the first changes nothing, and the second removes an assertion
+  that no correct file can fail — the break naming a wrong commit shows it is live. The runner restored every file from
+  its saved bytes and the fingerprint matched after each; the two new files were removed, and the tree held only the
+  new test.
+- `node scripts/check.mjs`: **everything green, 182 tests.**
+
+**Next.** `reel-render`'s gates, in a fresh session, one gate at a time with an adversarial review — its Gate 1 will
+likely need the owner's answer on its item 4, L4 and Gate 6. ffmpeg 8.1.1 and ffprobe are on this machine, and nothing
+here installs them yet. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type (S-029);
+deleting the steering stubs and bumping the pin (S-033).

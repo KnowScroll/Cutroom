@@ -1875,3 +1875,44 @@ to the root's dependencies** — a lockfile change for one test.
 
 **Caught by.** The breaks: `upsertPicture` also writing `seq` (48); `markDegraded` marking every attempt's receipts of
 the shot (49's fifth case).
+
+---
+
+## S-064 | 2026-09-16 | A feature file begins with front matter, and says where it came from — judged against the steering repository's history, not against itself
+
+**Chose.** `tests/feature-files.test.ts` holds every `docs/features/*.md` to three things:
+
+- **Front matter as its first bytes**, with `status:` and `authority:` present and not empty. Their values are free.
+- **A feature the steering repository ever held** at `steering/features/<slug>.md` — read from `steering-ref`'s history
+  up to the pinned commit — **opens, before its title, with a note** beginning `> **Moved here on <date>** from`
+  the KnowScroll repository's, naming `` `steering/features/<slug>.md` ``. Where the note says _"the last steering
+  commit holding it is `<commit>`"_, that commit must hold that path.
+- **A feature the steering repository never held** carries no _"Moved here on"_ note, and has a `> **Created <date>`
+  note before its first `## ` heading.
+
+A shallow `steering-ref`, whose history could make every feature look new, fails the test rather than passing it.
+
+**Why.** S-015 promised _"a test that every `docs/features/*.md` carries front matter and a moved-from note"_, written
+when every feature here had been moved. `video-edits` never was — it is the first feature planned here (S-017), and
+S-033 makes that the rule for every feature from now on — so a moved-from note on it would be false, and the promise
+as written cannot hold. What was moved is a fact of the steering repository's history, which this repository already
+pins; a list kept in the test would agree with whatever the files say whenever both were edited together. D-079 holds
+`docs/` front matter to presence, because its values are descriptive prose.
+
+**Rejected.** **A list of moved slugs in the test** — a second record of the move, beside the history that is the
+first. **Every move note naming a commit** — `reel-contract.md`'s names none, and it is verified; editing a verified
+feature to suit a test is S-047's rejected _"editing the verified files"_. **A closed vocabulary for `status:` and
+`authority:`** — D-079's rejected tightening, for `docs/`. **A note anywhere in the file** — each moved file opens with
+it, and a note after the title reads as the feature's own prose. **A check in `docs-check.mjs`** — that script guards
+the copies in `docs/design/`, and S-015 says a feature file is not a copy.
+
+**Not handled.** A move note that names no commit is not checked against the history beyond its path. A well-formed
+but wrong date passes. A slug the steering repository held only on a branch the pin does not reach looks created here.
+
+**Caught by.** The test itself. Breaks watched, each caught: front matter removed; `authority:` empty; `status:`
+missing; front matter not the first bytes; a moved feature's note gone; the note naming another feature's path; the
+note naming a steering commit that does not hold the file; the note moved after the title; its date not a date; a
+feature created here claiming a move; one saying nothing of where it came from; a new feature file with no note; a new
+file claiming to be created here under a slug the steering repository held (`reel-engine`); and, in the test, the
+steering history never consulted — caught by its own guard that some feature was moved. Not caught, as it cannot be: the
+test's commit comparison disabled, when every named commit is right.
