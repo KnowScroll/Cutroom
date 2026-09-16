@@ -25,6 +25,12 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 >
 > **The owner's answers this depends on:** S-029 to S-033 (session 13), and S-040 to S-043 and S-048, asked while
 > these gates were written (session 14).
+>
+> **One word of the approved gates was changed after approval, on 2026-09-16, by the owner's answer in
+> `reel-stills`' Slice 1: the sensor measure and score term `exposure` are named `brightness` (S-050).**
+> D-096's `Confirmed-by` bans a field named `exposure` anywhere in this repository and `reel-plan`'s check 5
+> enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
+> Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 
 ## Gate 1 — Product (no technical language)
 
@@ -260,7 +266,7 @@ Both candidates go through Gate 1; **only survivors are scored** (D-042).
 **The keyframe score reads Gate 1's verdict and makes no call** (D-045). It is a weighted sum over five terms of the
 canonical subject's reconciled entity and the technical measure, every term in (0, 1] (S-044): **reference terms** —
 `faceVisible` (`yes` and `noFace` 1, `partial` ⅔, `no` ⅓), `unoccluded` (1, or ½ when occluded), `prominence`
-(foreground 1, midground ⅔, background ⅓) — and **technical terms** — `sharpness` and `exposure`, the sensor's values
+(foreground 1, midground ⅔, background ⅓) — and **technical terms** — `sharpness` and `brightness`, the sensor's values
 clamped to [0.01, 1]. **Weights are settings, provisional until M-1** (D-031 rule 3), defaulting to **2 for each
 reference term and 1 for each technical term** — reference quality above composition, D-031's one fixed ordering. A
 weight that is missing or not a positive finite number counts as its default, and **the total is capped at the largest
@@ -399,7 +405,8 @@ the worker's guard answers. It declares **`acceptsReferences`**; **a worker hand
 (D-026).
 
 **`PictureSensorPort`** (S-038) — the pixel work `pipeline-no-io` forbids inside the pipeline, behind a port:
-**`measure`** (readable, width, height, sharpness, exposure), **`readText`**, **`similarity`**. Review 4 found these
+**`measure`** (readable, width, height, sharpness, brightness — D-031's "exposure", renamed by
+**S-050**), **`readText`**, **`similarity`**. Review 4 found these
 had no port; this is it.
 
 **`StillsRecorder`** — `record(picture: PictureRecord)`: the stage's one way to make its progress durable, handed to it
@@ -411,7 +418,7 @@ state:
 - **image** — writes the PNG; scripted per picture label and shot to write a wrong size or unreadable bytes, to cost
   some cents, or to throw. `fake: true`. `acceptsReferences: true`, or `false` when told.
 - **sensors** — **`measure` reads the real file** — its PNG signature and header — for readable, width and height;
-  sharpness, exposure, words and similarity come from the script, with defaults 1, 1, none and 1; any method can be
+  sharpness, brightness, words and similarity come from the script, with defaults 1, 1, none and 1; any method can be
   scripted to throw.
 - **model** — `structured` as `reel-plan` built it, its received calls kept where `reel-plan`'s tests read them;
   `observe` and `compare` answered from the script and **kept in their own lists**, exactly as made; receipts
@@ -541,7 +548,7 @@ export interface PictureMeasure {
   width: number
   height: number
   sharpness: number // 0..1
-  exposure: number // 0..1
+  brightness: number // 0..1 — D-031's "exposure" (S-050)
 }
 export interface PictureSensorPort {
   measure(picture: PictureRef): Promise<PictureMeasure>
@@ -572,7 +579,7 @@ export interface Reconciliation {
   criteria: Array<{ id: string; shown: boolean; entity: number | null }>
   failed: string[] // computed by code (S-040)
 }
-export type KeyframeTerm = 'faceVisible' | 'unoccluded' | 'prominence' | 'sharpness' | 'exposure'
+export type KeyframeTerm = 'faceVisible' | 'unoccluded' | 'prominence' | 'sharpness' | 'brightness'
 export interface KeyframeScore {
   terms: Record<KeyframeTerm, number> // each in (0, 1]
   weights: Record<KeyframeTerm, number> // as used, after defaults (D-031 rule 5)
@@ -863,7 +870,7 @@ _Restart, and no secrets_
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the criterion's type, the ports, and one rule.** `Criterion.type` in the contract, a type on every
+- [x] **Slice 1 — the criterion's type, the ports, and one rule.** `Criterion.type` in the contract, a type on every
       fixture criterion in `reel-contract`'s and `reel-plan`'s tests, and the note in `reel-contract.md` (S-047);
       `picture.ts`, `model.ts` and `settings.ts` as Gate 3 writes them; the model stand-in's `observe` and `compare`
       answering from a script, kept in their own lists; `recording-port.ts` recording both; `DEFAULT_PLAN_SETTINGS.models`
@@ -938,7 +945,7 @@ D-006); **O-4**, **M-1**, **Q9**.
 
 4. **A declared within-shot state change** — D-037's end-frame pin, D-048's fifth planned call and its reserve
    remainder, and D-049's exclusion of an FLF2V pair (S-032).
-5. **Real picture sensors** — sharpness, exposure, words and similarity. Only `measure`'s readable, width and height
+5. **Real picture sensors** — sharpness, brightness, words and similarity. Only `measure`'s readable, width and height
    read the file; the rest are scripted.
 6. **The planning call's cinematic fields** — `camera` (D-033), framing, join mode (D-036), text and audio policies (I-9)
    — and the planner adding cinematic criteria (D-034). The call is unchanged from `reel-plan` (D-035).

@@ -34,12 +34,12 @@ export function planRequest(requestId: string): SubmitRequest {
     ],
     criteria: {
       mustShow: [
-        { id: 'm1', text: 'a wax seal on parchment', claimId: 'c1' },
-        { id: 'm2', text: 'a meadow beside a river' },
+        { id: 'm1', text: 'a wax seal on parchment', type: 'presence', claimId: 'c1' },
+        { id: 'm2', text: 'a meadow beside a river', type: 'presence' },
       ],
       mustNotShow: [
-        { id: 'n1', text: 'any real living person' },
-        { id: 'n2', text: 'a modern flag', claimId: 'c4' },
+        { id: 'n1', text: 'any real living person', type: 'presence' },
+        { id: 'n2', text: 'a modern flag', type: 'presence', claimId: 'c4' },
       ],
       depictionPolicyVersion: 'policy-3',
     },

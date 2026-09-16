@@ -25,6 +25,17 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > running as its own service (D-098). The engine receives criteria and claim labels, never evidence
 > (D-096), and returns the video without a sources card (D-101). This file is reviewed here and moves to
 > the engine repository once approved (D-105).
+>
+> **Amended by `reel-stills` on 2026-09-16, in version 1 — the gates below are not edited.** Two
+> things changed under decisions written for that feature, and are read there:
+>
+> - **`Criterion` now carries a required `type`**, `presence` or `event`, and **`mustNotShow` takes
+>   `presence` only** (S-029, D-043). It amends **version 1**: `CONTRACT_VERSION` stays `1`, because no
+>   caller exists for a bump to protect and an untyped criterion is refused either way (**S-034**,
+>   D-106). _Pending_ item 2 below is answered by **S-030** and item 3 by **S-031**.
+> - **_"`estimateCents` is the figure that was compared with the limit"_ still holds**, and for a
+>   `stills` run refused at the ceiling that figure is **the pictures' share of the estimate**, not the
+>   whole plan's (**S-030**).
 
 ## Gate 1 — Product (no technical language)
 

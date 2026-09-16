@@ -5,6 +5,8 @@ export {
   fakeModel,
   type FakeAnswer,
   type FakeCall,
+  type FakeCompareCall,
   type FakeModel,
+  type FakeObserveCall,
   type FakeScript,
 } from './fake/model.ts'

@@ -45,15 +45,16 @@ apps/api             submitting work, reading records. Never calls a provider.
 A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094). `reel-plan` has
 given every package source by its Slice 3; **the only `LanguageModelPort` is the stand-in** in
 `packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021).
-**Seventeen** boundary rules are enforced on the real dependency graph, and
+**Eighteen** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
 or any legal import is reported or fails to resolve. The load-bearing ones: **pipeline imports no
 domain, no providers, no app, no I/O at all, and no npm package but `zod`**. A stage is handed a
 port; it never reaches for one. **Nothing outside `providers` imports a model client** (`ai`,
-`@ai-sdk/*`).
+`@ai-sdk/*`), and **nothing under `apps/worker` imports `packages/providers`** — the worker is
+handed its ports, so it cannot construct an adapter that spends (`worker-no-providers`, S-038).
 
-**Three of the seventeen are between two folders of one package**, and they are the reason this is
+**Three of the eighteen are between two folders of one package**, and they are the reason this is
 dependency-cruiser rather than a script matching import text. It resolves every import to a file
 path, so `'../split/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
 `split-imports-only-itself`, `split-imported-only-by-plan`, `split-entered-through-its-index` —

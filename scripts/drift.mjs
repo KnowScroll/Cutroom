@@ -117,6 +117,7 @@ const CASES = [
   ['pipeline-no-apps', 'packages/pipeline/src/b.ts', '../../../apps/api/src/index.ts'],
   ['pipeline-no-io', 'packages/pipeline/src/c.ts', 'node:fs'],
   ['api-no-providers', 'apps/api/src/index.ts', '../../../packages/providers/src/index.ts'],
+  ['worker-no-providers', 'apps/worker/src/spends.ts', '../../../packages/providers/src/index.ts'],
   ['providers-no-domain', 'packages/providers/src/index.ts', '../../domain/src/index.ts'],
   ['providers-no-pipeline', 'packages/providers/src/a.ts', '../../pipeline/src/index.ts'],
   [
@@ -190,6 +191,7 @@ const BY_NAME_CASES = [
   ['pipeline-no-providers', 'packages/pipeline', '@cutroom/providers'],
   ['pipeline-no-apps', 'packages/pipeline', '@cutroom/api'],
   ['api-no-providers', 'apps/api', '@cutroom/providers'],
+  ['worker-no-providers', 'apps/worker', '@cutroom/providers'],
   ['providers-no-domain', 'packages/providers', '@cutroom/domain'],
   ['providers-no-pipeline', 'packages/providers', '@cutroom/pipeline'],
   ['domain-no-pipeline-or-providers', 'packages/domain', '@cutroom/pipeline'],

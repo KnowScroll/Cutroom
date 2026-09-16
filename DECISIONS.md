@@ -1357,3 +1357,69 @@ because a rank is left out of the placement).
 **Confirmed-by.** The owner, 2026-09-16, on starting over and paying again, and on earlier calls coming out of the
 reserve. The placement's calls, failing a restart whose canonical repair finds no slot, and the supersessions of D-047,
 D-065 and D-030 are this entry's reading, written after review 3.
+
+---
+
+## S-049 | 2026-09-16 | `LanguageModelPort` carrying three calls changes one assertion in verified `reel-plan`, and an `observe` or `compare` receipt keeps no `call` until Slice 3
+
+**Chose.** Two things S-047 did not list, found while building `reel-stills`' Slice 1:
+
+- **`reel-plan`'s check 3** — _"no type named `StructuredCall` is exported as a standalone port"_ — asserts
+  `LanguageModelPort`'s members as an exact list, `['structured']`. It becomes **`['structured', 'observe', 'compare']`**,
+  in Slice 1, the slice that adds them (S-037). **The list stays exact and nothing is removed**: a fourth call, a
+  `StructuredCall` port, or a second declaration of the port still fails it.
+- **`recordingPort` records all three calls** from Slice 1, and `model_receipt` has **no `call` or `picture_ids`
+  column until `reel-stills`' Slice 3 migration**, so until then such a row carries the receipt's role, model,
+  temperature, usage and `fake` and not those two fields. Nothing calls `observe` or `compare` before Slice 3.
+
+**Supersedes:** **S-047**, by addition only — its list of what `reel-stills` changes in verified features gains
+`reel-plan`'s check 3. Its rule that no assertion is removed is unchanged and holds here.
+
+**Why.** S-047 listed `reel-plan`'s checks 10 and 29 and called the rest _"code and test support … none of it an
+assertion"_. Check 3 is an assertion, and no slice could satisfy it: Gate 2, Gate 3 and S-037 all say the port carries
+three calls, so the check pinning one call is the stale thing, not the port. Leaving it as written would make a correct
+build red, which S-047 itself named as the reason such changes are listed. Recording the two picture calls without their
+two fields is what the slice boundary leaves: the alternative is a migration in Slice 1, which Gate 4 puts in Slice 3.
+The fields are lost for no caller, because nothing makes either call yet.
+
+**Rejected.** **Leaving check 3 as `['structured']`** — the repository goes red on the build the gates describe.
+**Relaxing it to "contains structured"** — that would stop catching a fourth call and a picture reaching the model by a
+new route, which is what S-037 needs it for; CLAUDE.md rule 3. **Not recording `observe` and `compare` until Slice 3**
+— an observation is tied to its receipt by key (S-037), so a call that leaves no row leaves a record nothing can join,
+and the wrapper would be written twice. **A migration in Slice 1** — Gate 4 owns the slice boundaries.
+
+**Caught by.** `reel-plan`'s check 3, which now asserts the three names and still fails on a fourth; `reel-stills`'
+check 2, which compiles each misuse; and `reel-stills`' check 4 (Slice 3), _"every `model_receipt` names its call and
+role"_, which fails until the migration and the column exist.
+
+---
+
+## S-050 | 2026-09-16 | The sensor's exposure measure is named `brightness`, because D-096 bans the word `exposure` anywhere in this repository
+
+**Chose.** The technical measure D-031 and `reel-stills`' Gate 3 call **exposure** is declared as
+**`PictureMeasure.brightness`**, and the keyframe score's fifth term as **`'brightness'`**. `reel-stills`' Gate 3
+signature and the three prose lines naming the measure are amended to say so, each marked with this entry; **the
+`Gates:` approval line is not touched**, and no other word of the gates changes.
+
+**Supersedes:** **S-038**, on `measure` answering _"readable, width, height, sharpness, exposure"_; **S-044**, on the
+technical terms being _"`sharpness` and `exposure`"_ — the term, not the meaning or the arithmetic, in both.
+
+**Why.** **D-096's `Confirmed-by` is that no field named `source`, `sources`, `truthState`, `claimText` or
+`exposure` exists ANYWHERE in the engine repository**, and `reel-plan`'s verified check 5 asserts it over live source,
+by folded name. The banned `exposure` is KnowScroll's epistemic one; Gate 3's is photographic — but a check that reads
+names cannot tell two meanings apart, and it is not weakened to let one through (CLAUDE.md rule 3). The steering
+repository's own D-031 and D-096 collide on this word and nothing noticed. **The owner chose the rename on 2026-09-16**
+over an exception to check 5. `brightness` is what the stand-in and any real sensor actually measure, and it folds to
+neither banned name.
+
+**Rejected.** **An allowlist in check 5** — one permitted `exposure` declaration pinned by file and type: a rule with a
+hole, which is the _"reads as coverage"_ state S-014 exists against, and it would have to supersede D-096's
+`Confirmed-by` on the word _"anywhere"_. **Leaving the gates and going red** — a correct build cannot be red.
+**Sending Gate 3 back for a sixth review** — the owner settled it; a name is not a mechanism, and no check, figure or
+step changes with it.
+
+**Caught by.** `reel-plan`'s check 5, unchanged, which fails on any field folding to `exposure` anywhere in
+`packages/` or `apps/`; `reel-stills`' checks 30, 31 and 32 (Slice 3), which score and replay the five terms by name.
+
+**Confirmed-by.** The owner, 2026-09-16, choosing the rename over an exception to the check, and with it the edit to
+Gate 3's signature.

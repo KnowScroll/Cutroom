@@ -74,7 +74,14 @@ test('3. no type named StructuredCall is exported as a standalone port', () => {
   )
   const port = (ports[0] as Name).node as ts.InterfaceDeclaration
   const members = port.members.map((m) => m.name && ts.isIdentifier(m.name) && m.name.text)
-  assert.deepEqual(members, ['structured'], 'LanguageModelPort carries one call here: structured')
+  // reel-stills' Slice 1 added `observe` and `compare` (S-037, S-049). The list stays exact: a
+  // fourth call, or a picture reaching the model by a route other than these two, still fails
+  // here. What D-084 forbids is a call becoming a PORT of its own, which the line above asserts.
+  assert.deepEqual(
+    members,
+    ['structured', 'observe', 'compare'],
+    'LanguageModelPort carries three calls: structured, observe and compare',
+  )
 })
 
 // ---------------------------------------------------------------- 4

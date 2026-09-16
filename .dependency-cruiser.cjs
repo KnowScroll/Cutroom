@@ -64,6 +64,17 @@ module.exports = {
       to: { path: '^packages/providers' },
     },
     {
+      name: 'worker-no-providers',
+      severity: 'error',
+      comment:
+        'S-038: the worker is HANDED its model, image and sensor ports and never constructs one ' +
+        '(S-021). S-021 recorded this import as not caught, and with an image port in reach it is ' +
+        'exactly how a run would come to spend: a worker that can import an adapter can import a ' +
+        'real one, and then "no connection to any paid service" is a habit rather than a structure.',
+      from: { path: '^apps/worker' },
+      to: { path: '^packages/providers' },
+    },
+    {
       name: 'providers-no-domain',
       severity: 'error',
       comment:

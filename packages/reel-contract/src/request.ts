@@ -25,18 +25,43 @@ export const NarrationSentence = z.strictObject({
   claimIds: z.array(ClaimId),
 })
 
+/**
+ * A criterion, with what kind of thing it names (S-029). `presence` is something a single frame
+ * can show; `event` is something only a clip can. Required: the engine's still gate holds a
+ * picture against presence criteria only, and a type it had to infer from the text would be a
+ * guess at the boundary (D-043). Added in VERSION 1, not version 2 (S-034, D-106): no caller
+ * exists to keep working, and an untyped criterion is refused either way.
+ */
 export const Criterion = z.strictObject({
   id: z.string().min(1),
   text: z.string().min(1),
+  type: z.enum(['presence', 'event']),
   claimId: ClaimId.optional(),
 })
 
-/** Already computed on the KnowScroll side, against a named depiction-policy version (D-096). */
-export const Criteria = z.strictObject({
-  mustShow: z.array(Criterion),
-  mustNotShow: z.array(Criterion),
-  depictionPolicyVersion: z.string().min(1),
-})
+/**
+ * Already computed on the KnowScroll side, against a named depiction-policy version (D-096).
+ *
+ * `mustNotShow` is `presence` only (D-043, S-029): "must never show" is checked on every picture
+ * and on the clip, and neither a still nor a frame can decide that an event did not happen.
+ */
+export const Criteria = z
+  .strictObject({
+    mustShow: z.array(Criterion),
+    mustNotShow: z.array(Criterion),
+    depictionPolicyVersion: z.string().min(1),
+  })
+  .superRefine((criteria, ctx) => {
+    criteria.mustNotShow.forEach((criterion, i) => {
+      if (criterion.type !== 'presence') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['mustNotShow', i, 'type'],
+          message: `criterion "${criterion.id}" is typed "${criterion.type}"; mustNotShow takes presence only (D-043)`,
+        })
+      }
+    })
+  })
 
 export const StyleContract = z.strictObject({
   id: z.string().min(1),

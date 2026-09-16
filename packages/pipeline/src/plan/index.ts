@@ -35,7 +35,14 @@ export const DEFAULT_PLAN_SETTINGS: PlanSettings = {
   totalSecondsBounds: [35, 45], // D-111
   imageRateCents: 15, // BUDGET.md: nano-banana-pro/edit, the dearest candidate (O-4)
   videoRateCentsPerSecond: 4, // BUDGET.md: H3 Turbo 768P, until Q9 is read
-  models: { planner: 'MiniMax-M2.7', reconciler: 'MiniMax-M3' }, // D-006
+  // D-006: M3 is the only model in the family that accepts images, so the three roles that read
+  // one — the reconciler, the witness and the keyframe judge — are all routed to it.
+  models: {
+    planner: 'MiniMax-M2.7',
+    reconciler: 'MiniMax-M3',
+    witness: 'MiniMax-M3',
+    judge: 'MiniMax-M3',
+  },
   score: {
     questions: SCORE_QUESTIONS, // D-064, provisional until M-1
     weights: { coverage: 1, recurrence: 1, order: 1, pacing: 1, juxtaposition: 1, distinct: 1 },

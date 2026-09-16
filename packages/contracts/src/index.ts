@@ -11,5 +11,21 @@ export {
   type PlanShot,
   type PlanSubject,
 } from './cinematic.ts'
-export type { LanguageModelPort, ModelReceipt, ModelRole } from './model.ts'
-export type { PlanSettings } from './settings.ts'
+export type { LanguageModelPort, ModelCall, ModelReceipt, ModelRole } from './model.ts'
+export type {
+  Framing,
+  ImageAnswer,
+  ImagePort,
+  ImageReceipt,
+  ImageRequest,
+  KeyframeScore,
+  KeyframeTerm,
+  PictureMeasure,
+  PictureRecord,
+  PictureRef,
+  PictureSensorPort,
+  Reconciliation,
+  StillsRecorder,
+  WitnessObservation,
+} from './picture.ts'
+export type { PlanSettings, StillsSettings } from './settings.ts'

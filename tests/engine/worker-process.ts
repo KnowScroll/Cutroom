@@ -8,9 +8,9 @@ import { startWorker } from '@cutroom/worker'
  * An in-process worker cannot be that: its `stop()` finishes the job in hand first.
  *
  * It reads its settings as JSON on standard input. Its model is the stand-in, answering from the
- * script it is given, except that call `holdAtCall` (counted across roles, from 1) is never
- * answered: the process prints `held` and waits there until it is killed. Every call before it
- * returns, so its receipt is written.
+ * script it is given, except that call `holdAtCall` (counted across the port's three calls and
+ * every role, from 1) is never answered: the process prints `held` and waits there until it is
+ * killed. Every call before it returns, so its receipt is written.
  */
 export interface WorkerProcessConfig {
   dbPath: string
@@ -28,14 +28,26 @@ const config = JSON.parse(Buffer.concat(chunks).toString('utf8')) as WorkerProce
 
 const standIn = fakeModel(config.script, { models: config.settings.models })
 let received = 0
+
+/** True for the one call this process must never answer: the crash a test needs mid-stage. */
+function holds(): boolean {
+  received += 1
+  if (received !== config.holdAtCall) return false
+  process.stdout.write('held\n')
+  return true
+}
+
+const held = <T>(): Promise<T> => new Promise<T>(() => {})
+
 const model: LanguageModelPort = {
   structured(call) {
-    received += 1
-    if (received === config.holdAtCall) {
-      process.stdout.write('held\n')
-      return new Promise<never>(() => {})
-    }
-    return standIn.structured(call)
+    return holds() ? held() : standIn.structured(call)
+  },
+  observe(call) {
+    return holds() ? held() : standIn.observe(call)
+  },
+  compare(call) {
+    return holds() ? held() : standIn.compare(call)
   },
 }
 

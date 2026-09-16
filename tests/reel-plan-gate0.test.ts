@@ -116,7 +116,10 @@ test("31. each of Gate 0's conditions rejects a plan built to fail exactly that 
     ...base,
     criteria: {
       ...base.criteria,
-      mustShow: [...base.criteria.mustShow, { id: 'k1', text: 'low sun' }],
+      mustShow: [
+        ...base.criteria.mustShow,
+        { id: 'k1', text: 'low sun', type: 'presence' as const },
+      ],
     },
   }
   assert.deepEqual(gate0(added, request, CAP, S), ACCEPT, 'an added criterion')

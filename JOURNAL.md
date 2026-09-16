@@ -815,3 +815,82 @@ promises from `reel-engine`'s draft, reviewed adversarially until approved or a 
 **Next.** `reel-stills` Slice 1 — the criterion's type, the ports and `worker-no-providers` (checks 1–3) — in its own
 session. Owed outside this repository: `reel-script` emitting a criterion's type (S-029); deleting the steering stubs and
 bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
+
+## 2026-09-16 — session 15, reel-stills Slice 1: the criterion's type, the ports, and worker-no-providers
+
+**Intent.** `reel-stills`' Slice 1 only — checks 1, 2 and 3, tests first, nothing from Slice 2 or later.
+`decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green at **116 tests**.
+
+**Changed.**
+
+- **The contract (S-029, S-034).** `Criterion` gains a required `type`, `presence` or `event`; `Criteria` refuses an
+  `event` in `mustNotShow`, so the rule fails at `Criteria` and at `SubmitRequest` alike (D-043). `CONTRACT_VERSION`
+  stays `1`. Every fixture criterion in `reel-contract`'s and `reel-plan`'s tests gained a type — **no assertion
+  removed**. `docs/features/reel-contract.md` gains a note naming S-030 and S-034; its gates are not edited.
+- **`packages/contracts`** — new `picture.ts` (`PictureRef`, the image and sensor ports, the observation,
+  reconciliation, score and record shapes, `StillsRecorder`); `model.ts` with four roles, `ModelCall`, `observe`,
+  `compare`, and `ModelReceipt.call` and `.pictureIds` (S-037); `settings.ts` with `StillsSettings`. Types only.
+- **The stand-in and the worker.** `fakeModel` answers `observe` from the `witness` script and `compare` from the
+  `judge` script, keeping each in **its own list** (`observeCalls`, `compareCalls`), so `calls` is still the
+  `structured` calls and `reel-plan`'s check 37 is untouched (S-047). `recording-port.ts` records all three.
+  `DEFAULT_PLAN_SETTINGS.models` names `witness` and `judge` (MiniMax-M3, D-006). `tests/engine/worker-process.ts`
+  builds a port with all three calls, its hold counted across them.
+- **`worker-no-providers`** in `.dependency-cruiser.cjs`, with `--prove` cases **by path and by package name**
+  (S-038); `CLAUDE.md`'s count seventeen → eighteen.
+- **`DECISIONS.md` — S-049 and S-050**, below.
+- **Three test files**, `tests/reel-stills-{contract,ports,rules}.test.ts`: **+10 tests, 116 → 126**. Slice 1 ticked in
+  `docs/features/reel-stills.md`. No journey: that is Slice 5's.
+
+**Observed.**
+
+- **Red first, every check.** 1: _"Criterion accepted a criterion with no type"_. 2: _"Module … has no exported member
+  'PictureRef' | Property 'observe' does not exist on type 'LanguageModelPort'"_. 3: _"worker-no-providers is not in
+  .dependency-cruiser.cjs"_.
+- **Two collisions with `reel-plan`, which is VERIFIED, that no gate and no S-entry had listed.** The build cannot be
+  green and both checks intact without a decision:
+  - **`reel-plan`'s check 3 asserts `LanguageModelPort`'s members are exactly `['structured']`.** S-047 listed checks
+    10 and 29 and called everything else _"not an assertion"_. This is one, and no slice could satisfy it. **S-049**:
+    the list becomes the three calls and stays exact — a fourth call, or a `StructuredCall` port, still fails it.
+  - **`PictureMeasure.exposure` (Gate 3) is a field name D-096's `Confirmed-by` bans ANYWHERE in this repository**, and
+    `reel-plan`'s check 5 enforces it by folded name over live source. D-096's `exposure` is KnowScroll's epistemic
+    one; Gate 3's is photographic — and a check that reads names cannot tell them apart. **The steering repository's own
+    D-031 and D-096 collide on this word and nothing had noticed.** Asked the owner rather than choose: **the rename,
+    over an exception to check 5** — **S-050**, `brightness`. Gate 2's three prose lines and Gate 3's signature are
+    amended and marked; the `Gates:` line was not touched. Check 5 is unchanged and has no hole.
+- **Nine deliberate breaks, each undone by a script that restored the file from the bytes it read; every one was
+  caught**, and `git status` afterwards showed only this session's own changes:
+  | break                                          | caught by                                                     |
+  | ---------------------------------------------- | ------------------------------------------------------------- |
+  | `Criterion` loses `type`                       | check 1 (all three tests), and 4 `reel-contract` shape checks |
+  | `mustNotShow` stops refusing `event`           | check 1, the D-043 test alone                                 |
+  | `structured` gains a `picture` field           | check 2                                                       |
+  | `structured` accepts role `witness`            | check 2                                                       |
+  | `observe` gains a `prompt`                     | check 2                                                       |
+  | `compare` gains a `schema`                     | check 2                                                       |
+  | `CONTRACT_VERSION` bumped to 2                 | check 1                                                       |
+  | `worker-no-providers` renamed away             | check 3 (all three tests) and `boundaries.test.ts`            |
+  | its by-name `--prove` case deleted             | check 3, the prove test alone                                 |
+  | its by-path `--prove` case deleted             | check 3, the prove test alone                                 |
+  | the rule pointed at `^apps/keyframes`          | check 3 (all three) and `boundaries.test.ts`                  |
+  | `exportsFields` emptied (the S-020 regression) | check 3 and `boundaries.test.ts`                              |
+- **What Slice 1 builds that no Slice 1 check asserts**, by Gate 4's design: the stand-in's separate call lists
+  (check 26, Slice 3), `recordingPort` recording `observe` and `compare` (check 4, Slice 3), and the four model ids
+  (check 4). They are typechecked and unreachable until then — nothing calls `observe` or `compare` yet.
+- **`model_receipt` has no `call` or `picture_ids` column** until Slice 3's migration, so a receipt recorded now
+  would lose those two fields. Said rather than widened (S-049); no migration was written.
+- **One unreproduced red.** `check.mjs` reported `FAIL tests` once, immediately after the `reel-stills.md` edit; the
+  suite alone was green at that moment and **six consecutive `check.mjs` runs and four bare suite runs since have been
+  green**. The failing run's per-test output was not captured — my filter kept only the summary lines — so the failing
+  test is unknown. The suspect is a 5-second `waitFor` in `tests/engine/harness.ts` under load, not anything this
+  slice changed; it is not proven and is left recorded rather than explained away.
+- **The backslash trap, twice, in one file.** `tests/reel-stills-rules.test.ts` reached disk through a heredoc with
+  every backslash halved: `/[.*+?^${}()|[\]\\]/` became `[\]\]` (an unterminated regexp Node refused), and
+  `\\s+` inside a template literal became `\s`, which is the letter `s` — a regex that then matched nothing and
+  made a passing rule read as silent. Neither was visible in the command I typed. Verified by printing the file's bytes,
+  as CLAUDE.md says; both fixed with the editing tool instead.
+- `node scripts/check.mjs`: **everything green, 126 tests**.
+
+**Next.** `reel-stills` Slice 2 — `until: 'stills'` accepted, `admitPictures`, the ceiling refusal, the
+`reel.keyframes` job row, and `reel-plan`'s check 10 and its note (S-047). Checks 8–11. Owed outside this repository,
+unchanged: `reel-script` emitting a criterion's type (S-029); deleting the steering stubs and bumping the pin (S-033).
+S-015's promised front-matter test is still unwritten.

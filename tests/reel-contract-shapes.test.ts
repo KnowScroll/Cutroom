@@ -52,8 +52,8 @@ function validRequest() {
       { id: 'c3', role: 'supporting' },
     ],
     criteria: {
-      mustShow: [{ id: 'm1', text: 'a wax seal on parchment', claimId: 'c1' }],
-      mustNotShow: [{ id: 'n1', text: 'any real living person' }],
+      mustShow: [{ id: 'm1', text: 'a wax seal on parchment', type: 'presence', claimId: 'c1' }],
+      mustNotShow: [{ id: 'n1', text: 'any real living person', type: 'presence' }],
       depictionPolicyVersion: 'policy-3',
     },
     style: { id: 'style-1', version: 2, text: 'quiet, precise, natural light' },
@@ -166,7 +166,7 @@ const MESSAGES = {
 const NESTED = {
   NarrationSentence: [NarrationSentence, sentences[0]],
   ClaimRef: [ClaimRef, { id: 'c1', role: 'main' }],
-  Criterion: [Criterion, { id: 'm1', text: 'a wax seal' }],
+  Criterion: [Criterion, { id: 'm1', text: 'a wax seal', type: 'presence' }],
   Criteria: [Criteria, { mustShow: [], mustNotShow: [], depictionPolicyVersion: 'p' }],
   StyleContract: [StyleContract, { id: 's', version: 1, text: 't' }],
   RunOptions: [RunOptions, { until: 'plan', budgetCents: 1 }],
