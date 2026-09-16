@@ -1291,10 +1291,11 @@ deleting the steering stubs and bumping the pin (S-033). S-015's promised front-
 - **Not widened, still owed to nobody:** a `NaN` suspicion going to the judge (S-056), and an unreadable `BUDGET.md`
   between the two jobs (S-059's _Not handled_).
 - `node scripts/check.mjs`: **everything green, 179 tests.** 48, 49 and 50 pass, and 1–47 with them.
-- **The journeys: not yet run.** `nextPrompt.txt`, untracked at the root, makes `journey.mjs` refuse; the owner is being
-  asked whether to commit it, delete it or move it.
+- **The journeys.** `nextPrompt.txt`, untracked at the root, made `journey.mjs` refuse; **the owner chose to delete it**,
+  and it was deleted. Then, each written by the script and committed on its own: **`reel-stills` PASS at e42bc3f, 63
+  tests — Status: verified**; **`reel-plan` PASS at d5060a2, 50 tests**; **`reel-contract` PASS at 2b68bb8, 41 tests**
+  (S-047). Divergence `none` in all three.
 
-**Next.** The owner's answer on `nextPrompt.txt`; then `node scripts/journey.mjs reel-stills`, `reel-plan` and
-`reel-contract`, each committed. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type
+**Next.** `reel-stills` is verified. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type
 (S-029); deleting the steering stubs and bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
-After that, `reel-render` and `video-edits` both have every gate pending; which comes first is the owner's call.
+`reel-render` and `video-edits` both have every gate pending; which comes first is the owner's call.
