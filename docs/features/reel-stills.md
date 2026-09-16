@@ -10,7 +10,7 @@ authority: plan
 
 # reel-stills — a chosen plan becomes approved still pictures, for $0
 
-Status: planned
+Status: verified
 Decisions: D-001, D-002, D-005, D-006, D-014, D-020, D-025, D-026, D-027, D-028, D-029, D-030, D-031, D-032, D-035, D-038, D-041, D-042, D-043, D-044, D-045, D-046, D-047, D-048, D-049, D-050, D-061, D-063, D-064, D-065, D-069, D-081, D-083, D-084, D-086, D-087, D-094, D-097, D-098, D-099, D-100, D-106, D-108, D-110, I-4, I-6, I-7, I-8, I-10, I-15, I-16, I-17, I-20, S-010, S-016, S-021, S-025, S-026, S-027, S-028, S-029, S-030, S-031, S-032, S-033, S-034, S-035, S-036, S-037, S-038, S-039, S-040, S-041, S-042, S-043, S-044, S-045, S-046, S-047, S-048
 Named only in the deferral list: D-008, D-024, D-033, D-034, D-036, D-037, D-040, D-071, I-9, I-19, S-019
 Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED 2026-09-16 adversarial-reviewer · program-design APPROVED 2026-09-16 adversarial-reviewer · slices APPROVED 2026-09-16 adversarial-reviewer
@@ -913,6 +913,8 @@ Every check appears in exactly one slice: 3 + 4 + 28 + 12 + 3 = 50.
 - [ ] The whole journey passes with no secrets in its environment, and no connection to a paid service exists
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-16 journey=PASS at e42bc3f — every check green; 63 tests in tests/reel-stills-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
