@@ -1446,3 +1446,23 @@ commits unpushed. Baseline `check.mjs` green at 182 tests (110f667).
 session. Its prompt is not written. Owed outside this repository: KnowScroll's epistemic check of a returned video
 (S-068) and how a viewer is served the file (S-073); `reel-script` emitting a criterion's type (S-029); deleting the
 steering stubs and bumping the pin (S-033). `reel-takes`' gates are written after `reel-render` is verified.
+
+## 2026-09-16 — session 20, continued: the prompt for reel-render's Slice 1
+
+**Intent.** The owner asked for the next session's prompt, and how many slices `reel-render` has.
+
+**Changed.**
+
+- **`PROMPTS/021-reel-render-slice-1.md`** — session 21's prompt, `Run: not yet`: Slice 1 only, checks 1–6, tests
+  first. It names what to read (session 20's and session 15's entries, Gates 2–4, S-066 to S-077 and the decisions they
+  touch, the code and the tests Slice 1 changes), what Slice 1 builds and what it does not, the six checks, the verified
+  checks that change (S-077), a break campaign in sessions 18 and 19's form, when to stop and ask the owner, and the
+  traps. Indexed in `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **`reel-render` has six slices** (6 + 4 + 18 + 13 + 6 + 3 = 50 checks); the prompt is for the first. Slice 3 is the
+  largest, at eighteen checks, as `reel-stills`' Slice 3 was at twenty-eight.
+- Nothing but markdown changed.
+
+**Next.** Session 21: run `PROMPTS/021-reel-render-slice-1.md`.
