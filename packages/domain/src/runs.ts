@@ -9,7 +9,7 @@ import {
   type RunStatus,
 } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
-import { markChosen } from './pictures.ts'
+import { markChosen, markDegraded, type DegradedShot } from './pictures.ts'
 import { completeJob, enqueue, type Writer } from './queue.ts'
 import { modelReceipt, plan, run, runEvent } from './schema.ts'
 
@@ -295,8 +295,9 @@ export function readSelectedPlan(db: Db, runId: string): Plan {
 
 /**
  * Ends a run at its stills stage, in one immediate transaction (S-046): the approved pictures marked
- * chosen, the events the stage's checks produced, `run.finished`, the result, and the keyframes job
- * done — its cost left as its image calls added it (S-036), never overwritten with the result's.
+ * chosen, every degraded shot's labels (S-058), the events the stage's checks produced, `run.finished`,
+ * the result, and the keyframes job done — its cost left as its image calls added it (S-036), never
+ * overwritten with the result's.
  */
 export function finishStills(
   db: Db,
@@ -305,6 +306,7 @@ export function finishStills(
     jobId: number
     result: RunResult
     chosen?: readonly string[]
+    degraded?: readonly DegradedShot[]
     events?: readonly EventBody[]
   },
   now: Date = new Date(),
@@ -313,6 +315,7 @@ export function finishStills(
   db.transaction(
     (tx) => {
       markChosen(tx, runId, finish.chosen ?? [])
+      for (const shot of finish.degraded ?? []) markDegraded(tx, runId, shot)
       for (const event of finish.events ?? []) append(tx, runId, event, now)
       append(tx, runId, { type: 'run.finished', status: result.status }, now)
       tx.update(run)

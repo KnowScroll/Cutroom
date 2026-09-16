@@ -892,7 +892,7 @@ _Restart, and no secrets_
       failure that needs a ladder finishes the run `failed` with the detail _"the ladder is not built"_, which no check
       asserts.
       **Proves: 4, 5, 6, 7, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35.**
-- [ ] **Slice 4 — the ladders, and every ending that is not a completed run.** The canonical repair and the rule stop;
+- [x] **Slice 4 — the ladders, and every ending that is not a completed run.** The canonical repair and the rule stop;
       the reserve from the placement's calls, and the two-repair cap; derived repairs and degraded shots with their four
       labels; the Gate 1S repair; the
       guard's refusals, the budget stop and its question; a thrown call and a malformed answer.

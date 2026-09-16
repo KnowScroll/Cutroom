@@ -1,11 +1,12 @@
+import assert from 'node:assert/strict'
 import type { WitnessObservation } from '@cutroom/contracts'
 import type { FakeScript } from '@cutroom/providers'
 import type { SubmitRequest } from '@cutroom/reel-contract'
 import { finished, type Engine } from './harness.ts'
 import { answer, bare, planRequest, type Subject } from './plans.ts'
 
-// Requests, plans, stand-in scripts and readers for reel-stills' Slice 3 checks
-// (docs/features/reel-stills.md, checks 4–7 and 12–35). Every builder returns a fresh value.
+// Requests, plans, stand-in scripts and readers for reel-stills' Slice 3 and Slice 4 checks
+// (docs/features/reel-stills.md, checks 4–7 and 12–47). Every builder returns a fresh value.
 //
 // EVERY EXPECTATION HERE IS WRITTEN BY HAND. Which subjects a picture's shot shows, which criteria
 // it is given and which shot it opens are typed out below, never computed with the pipeline's own
@@ -225,6 +226,35 @@ export const TWO_SHARED_PICS: Pic[] = [
   pic(2, 'single', [SEAL, KING], []),
 ]
 
+// ---------------------------------------------------------------- the ladders, by hand (Slice 4)
+
+/**
+ * Rank 1 `seal` in 0, 1, 2; rank 2 `barons` in 1 and 3, opening shot 1; rank 3 `hall` in 2 and 4,
+ * opening shot 2. BOTH derived shots also show the seal, so both pairs with the canonical share it
+ * and either can fail Gate 1S. Planned image calls 4, placed 4.
+ */
+export const BOTH_SHARE: Shape = {
+  subjects: [SEAL, BARONS, HALL],
+  shown: [['seal'], ['seal', 'barons'], ['seal', 'hall'], ['barons'], ['hall'], []],
+}
+
+export const BOTH_SHARE_PICS: Pic[] = [
+  pic(0, 'a', [SEAL], ['show-seal']),
+  pic(0, 'b', [SEAL], ['show-seal']),
+  pic(1, 'single', [SEAL, BARONS], ['show-crowd']),
+  pic(2, 'single', [SEAL, HALL], []),
+]
+
+/**
+ * The same shot's picture under another label. A repair renders its picture's entry again, so it
+ * shows the same subjects and is given the same criteria; only its label, and so its key, differs.
+ */
+export const again = (p: Pic, label: string): Pic => ({
+  ...p,
+  key: `shot-${p.unit}-${label}`,
+  label,
+})
+
 // ---------------------------------------------------------------- the witness and the reconciler
 
 export type Entity = WitnessObservation['entities'][number]
@@ -307,6 +337,18 @@ export function passes(p: Pic): ReconcileAnswer {
     ],
   }
 }
+
+/** A reconciler's answer that fails the picture on ONE thing: `never-person` is shown. */
+export function showsPerson(p: Pic): ReconcileAnswer {
+  const answer = passes(p)
+  answer.criteria = answer.criteria.map((c) =>
+    c.id === 'never-person' ? { ...c, shown: true, entity: 0 } : c,
+  )
+  return answer
+}
+
+/** What a witness says of a picture whose first subject is cut off by the edge of the frame. */
+export const clipped = (p: Pic) => seen(p, (i) => (i === 0 ? { clippedByEdge: true } : {}))
 
 /** A judge's answer: every subject named `same`, unless listed in `no`. */
 export function judged(subjects: readonly string[], no: readonly string[] = []) {
@@ -436,6 +478,8 @@ export interface Stilled {
   observations: Array<{ id: string; picture_id: string; observation: WitnessObservation }>
   reconciliations: Array<{ id: string; picture_id: string; answer: unknown; failed: string[] }>
   jobs: Array<{ id: number; kind: string; attempts: number; state: string; cost_cents: number }>
+  /** The `degradation` table's rows for the run, in the order written. */
+  degradations: Array<{ shot_id: string; gate: string; reason: string }>
   /** The selected plan, as its row stores it. */
   plan: {
     shots: Array<{ unit: number; subjectIds: string[] }>
@@ -510,6 +554,12 @@ export function readStills(engine: Engine, runId: string, result: Record<string,
           runId,
         )
         .map((r) => ({ ...r })),
+      degradations: engine
+        .query<{ shot_id: string; gate: string; reason: string }>(
+          'SELECT shot_id, gate, reason FROM degradation WHERE run_id = ? ORDER BY rowid',
+          runId,
+        )
+        .map((r) => ({ ...r })),
       plan: json(planRow[0]?.plan ?? null),
     }
   }
@@ -540,3 +590,70 @@ export function pictureOf(ran: Stilled, key: string): PictureRow {
 
 /** The picture id a key has in a run's first attempt. */
 export const first = (key: string) => `a1-${key}`
+
+/**
+ * A degraded shot is LABELLED IN FOUR PLACES, and the four agree (I-4, D-025): one `degradation` row
+ * naming the shot, the gate that failed last and why; its last failing picture's `degradation`,
+ * which carries the same reason, and no other picture's; every `generation_receipt` of the shot's
+ * pictures marked degraded, and no other receipt; and one `degraded` event. The result, when the run
+ * completed, and the record list it too. Everything expected is given by hand. Returns the reason.
+ */
+export function assertDegraded(
+  ran: Stilled,
+  expected: { shotId: string; gate: '1' | '1S'; last: string; pictures: readonly string[] },
+): string {
+  const { shotId, gate, last, pictures } = expected
+  const rows = ran.degradations.filter((d) => d.shot_id === shotId)
+  assert.equal(rows.length, 1, `${shotId} has ${rows.length} degradation rows, not one`)
+  const row = rows[0] as Stilled['degradations'][number]
+  assert.equal(row.gate, gate, `${shotId} is degraded at gate ${row.gate}, not ${gate}`)
+  const reason = row.reason
+  assert.ok(reason.length > 0, `${shotId}'s degradation gives no reason`)
+
+  const labelled = ran.pictures.filter((p) => p.degradation !== null)
+  assert.ok(
+    labelled.some((p) => p.picture_id === last && p.degradation === reason),
+    `${last}, the last failing picture of ${shotId}, does not carry the degradation's reason`,
+  )
+  for (const picture of ran.pictures.filter((p) => `shot-${p.shot_unit}` === shotId)) {
+    if (picture.picture_id !== last) {
+      assert.equal(picture.degradation, null, `${picture.picture_id} is labelled, and is not last`)
+    }
+    assert.equal(picture.chosen, false, `${picture.picture_id} of degraded ${shotId} is chosen`)
+  }
+
+  // The shot's receipts are exactly the pictures expected, and every one is marked; a receipt of a
+  // shot with no degradation row is not.
+  const ofShot = (id: string, shot: string) => id.startsWith(`a1-${shot}-`)
+  assert.deepEqual(
+    ran.generations.filter((g) => ofShot(g.picture_id, shotId)).map((g) => g.picture_id),
+    [...pictures],
+    `${shotId}'s generation receipts are not the pictures expected`,
+  )
+  for (const generation of ran.generations) {
+    if (ofShot(generation.picture_id, shotId)) {
+      assert.equal(generation.degraded, true, `${generation.picture_id} is not marked degraded`)
+    } else if (!ran.degradations.some((d) => ofShot(generation.picture_id, d.shot_id))) {
+      assert.equal(generation.degraded, false, `${generation.picture_id} is marked degraded`)
+    }
+  }
+
+  const events = ran.events.filter((e) => e.type === 'degraded' && e.shotId === shotId)
+  assert.equal(events.length, 1, `${shotId} has ${events.length} degraded events, not one`)
+  assert.equal(events[0]?.reason, reason, "the degraded event's reason is not the row's")
+
+  assert.deepEqual(
+    ran.record.degradations.filter((d) => d.shotId === shotId),
+    [{ shotId, reason }],
+    "the record's degradations do not list the shot with its reason",
+  )
+  if (ran.result.status === 'completed') {
+    const listed = (ran.result.degradations as Array<{ shotId: string; reason: string }>).filter(
+      (d) => d.shotId === shotId,
+    )
+    assert.deepEqual(listed, [{ shotId, reason }], "the result's degradations do not list the shot")
+    const stilled = ran.result.stills as Array<{ shotId: string }>
+    assert.ok(!stilled.some((s) => s.shotId === shotId), `degraded ${shotId} has a still`)
+  }
+  return reason
+}

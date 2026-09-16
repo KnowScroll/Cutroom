@@ -7,6 +7,7 @@ import type {
 } from '@cutroom/contracts'
 import {
   finishStills,
+  readReelCapCents,
   readRequest,
   readRun,
   readSelectedPlan,
@@ -14,18 +15,21 @@ import {
   startStage,
   type ClaimedJob,
   type Db,
+  type DegradedShot,
 } from '@cutroom/domain'
-import { makeStills, placePictures, shotIdOf } from '@cutroom/pipeline'
+import { makeStills, placePictures, shotIdOf, type StillsOutcome } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
 import { guardedImagePort } from './guarded-image-port.ts'
+import { appendBudgetStopQuestion } from './questions.ts'
 import { stillsRecorder } from './recorder.ts'
 import { recordingPort } from './recording-port.ts'
 
 // The `reel.keyframes` job (docs/features/reel-stills.md, Gate 2 "How a run goes" and "How a stills
 // run ends"): the chain's second row, created only for an admitted `stills` run (D-081, D-083). It
-// settles the cancel flag and the stage's start in one transaction (S-027), hands `makeStills` the
-// selected plan and the ports it built, and ends the run with whatever the stage answered — the
-// chosen flags, the events and the result in one transaction (S-046).
+// settles the cancel flag and the stage's start in one transaction (S-027), reads the per-reel cap,
+// hands `makeStills` the selected plan and the ports it built, and ends the run with whatever the
+// stage answered — the chosen flags, the degradations and their labels, the events and the result
+// in one transaction (S-046) — and, for a stop at the per-reel cap, a question after it (D-100).
 
 export interface KeyframesJobContext {
   /** The model, image and sensor ports the worker was handed; it never constructs one (S-038). */
@@ -34,6 +38,29 @@ export interface KeyframesJobContext {
   sensors: PictureSensorPort
   settings: PlanSettings
   stills: StillsSettings
+  /** The BUDGET.md whose `Per reel, all-in` row is the cap (D-100), read once per attempt. */
+  budgetPath: string
+  /** The questions file a stop at the per-reel cap is appended to (D-097, D-100). */
+  questionsPath: string
+}
+
+/**
+ * Every shot the stage degraded, in the order its ladders reached them, with the picture carrying
+ * the reason and every picture of it this attempt made — so all four labels can be written (I-4,
+ * S-058).
+ */
+function degradedShots(outcome: StillsOutcome): DegradedShot[] {
+  return outcome.degradations.map((d) => {
+    const pictures = outcome.pictures.filter((p) => shotIdOf(p.shotUnit) === d.shotId)
+    const labelled = pictures.find((p) => p.degradation === d.reason)
+    return {
+      shotId: d.shotId,
+      gate: d.gate,
+      reason: d.reason,
+      lastPictureId: labelled?.pictureId ?? '',
+      pictureIds: pictures.map((p) => p.pictureId),
+    }
+  })
 }
 
 export async function runKeyframesJob(
@@ -56,6 +83,23 @@ export async function runKeyframesJob(
 
   const request = readRequest(db, runId)
   const plan = readSelectedPlan(db, runId)
+  const ceilingCents = request.options.budgetCents
+  let capCents: number
+  try {
+    // One figure, read once per attempt: what every image call is compared with (D-100, S-035).
+    capCents = readReelCapCents(context.budgetPath)
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error)
+    const result: RunResult = {
+      ...finished,
+      costCents: spentCents(db, runId),
+      status: 'failed',
+      detail,
+    }
+    finishStills(db, { runId, jobId: job.id, result })
+    return
+  }
+
   const outcome = await makeStills(
     // The run's image calls before this attempt are Slice 5's to count (S-048): a first attempt has
     // made none, and the restart that could have is not built yet.
@@ -69,6 +113,8 @@ export async function runKeyframesJob(
         rateCents: context.settings.imageRateCents,
         style: { id: request.style.id, version: request.style.version },
         stills: context.stills,
+        capCents,
+        ceilingCents,
       }),
       model: recordingPort(context.model, db, runId),
       sensors: context.sensors,
@@ -77,6 +123,8 @@ export async function runKeyframesJob(
     { plan: context.settings, stills: context.stills },
   )
   const costCents = spentCents(db, runId)
+  // A degradation the checks reached is labelled whatever ends the run (I-4, S-058).
+  const degraded = degradedShots(outcome)
 
   if (outcome.kind === 'completed') {
     // The approved pictures, in shot order, at the paths their rows record (the contract's StillRef).
@@ -85,6 +133,7 @@ export async function runKeyframesJob(
       runId,
       jobId: job.id,
       chosen: chosen.map((p) => p.pictureId),
+      degraded,
       // The stage produced its pictures, so it finished (S-025, S-046).
       events: [...outcome.events, { type: 'stage.finished', stage: 'stills' }],
       result: {
@@ -98,22 +147,64 @@ export async function runKeyframesJob(
           shotId: shotIdOf(p.shotUnit),
           path: p.path,
         })),
-        degradations: [],
+        degradations: degraded.map((d) => ({ shotId: d.shotId, reason: d.reason })),
       },
     })
     return
   }
 
-  // A stage that did not complete has no `stage.finished` (S-025's rule, S-046). A rule stop and a
-  // budget stop are Slice 4's endings: until then either is a fault, said so.
-  const detail =
-    outcome.kind === 'failed'
-      ? outcome.detail
-      : `the stills stage ended '${outcome.kind}', and that ending is not built`
-  finishStills(db, {
-    runId,
-    jobId: job.id,
-    events: outcome.events,
-    result: { ...finished, costCents, status: 'failed', detail },
-  })
+  // A stage that did not complete has no `stage.finished`, and nothing is chosen (S-025's rule,
+  // S-046, S-055): its events are the verdicts and degradations reached.
+  const ended = (result: RunResult) =>
+    finishStills(db, { runId, jobId: job.id, degraded, events: outcome.events, result })
+
+  if (outcome.kind === 'stopped-rule') {
+    ended({
+      ...finished,
+      costCents,
+      status: 'stopped',
+      reason: 'rule',
+      rule: outcome.rule,
+      step: 'stills',
+      detail: outcome.detail,
+    })
+    return
+  }
+
+  if (outcome.kind === 'stopped-budget') {
+    ended({
+      ...finished,
+      costCents,
+      status: 'stopped',
+      reason: 'budget',
+      limit: outcome.limit,
+      estimateCents: outcome.estimateCents,
+      ceilingCents,
+      capCents,
+    })
+    // The engine's own cap fired, so the owner is asked — after the run is finished (D-100, S-026,
+    // S-035). A stop at the caller's ceiling is returned, not written.
+    if (outcome.limit === 'reel') {
+      appendBudgetStopQuestion(context.questionsPath, {
+        runId,
+        requestId: request.requestId,
+        estimateCents: outcome.estimateCents,
+        spentCents: costCents,
+        pictures: outcome.pictures.length,
+        ceilingCents,
+        capCents,
+        imageRateCents: context.settings.imageRateCents,
+        videoRateCentsPerSecond: context.settings.videoRateCentsPerSecond,
+        plan: {
+          role: plan.role,
+          units: plan.units.length,
+          estimateCents: plan.estimateCents,
+          plannedImageCalls: plan.plannedImageCalls,
+        },
+      })
+    }
+    return
+  }
+
+  ended({ ...finished, costCents, status: 'failed', detail: outcome.detail })
 }

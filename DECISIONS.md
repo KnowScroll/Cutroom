@@ -1616,3 +1616,160 @@ check 33 at and above the threshold. Breaks watched: an answer allowed to leave 
 entity nobody saw (27 each); the threshold setting ignored, and a suspicion at the threshold sent to the judge (33
 each). **Not caught:** the `NaN` suspicion — the stand-in's similarity is a number unless a test scripts otherwise,
 and none does.
+
+---
+
+## S-057 | 2026-09-16 | A shot's ladder at a step is finished before the next shot's begins
+
+**Chose.** `makeStills` (`packages/pipeline/src/stills/index.ts`) takes each step of Gate 2's ladders one shot at a
+time, in rank order, and finishes that shot's ladder before the next shot's turn:
+
+- **step 2** — a derived picture failing Gate 1 takes its repair, and the repair goes through Gate 1, **before the next
+  derived picture is made**;
+- **step 3** — a derived picture failing Gate 1S takes its repair, the repair goes through Gate 1 and then Gate 1S, and
+  a second repair follows while one is allowed, **before the next shot's pair is judged**.
+
+Gate 1S still starts only once every derived picture has been through Gate 1, repairs included. So a run whose rank 2
+is repaired calls the image port for shot 0 `a`, `b`, shot 1 `single`, shot 1 `repair`, then shot 2 `single`; and a
+shot's repair verdicts sit next to the verdict they answer, in the record and in the events.
+
+**Why.** Gate 2 says the stage runs "in this order", steps 1 to 3, "in rank order", and that Gate 1S "runs once every
+derived picture has been through Gate 1" — and check 40's six calls hold under either reading, which is why it had to be
+decided. The canonical's ladder already finishes before any derived picture, and Gate 1 runs on every picture "as soon
+as it is made"; treating a derived shot the same way keeps one shape for every ladder, keeps a repair next to the verdict
+it consumes, and gives the higher rank the first claim on a slot at every step — D-048's reason for ordering at all, a
+higher rank being in more shots. Deferring repairs would hold pending verdicts across shots, state the stage has nowhere
+else.
+
+**Rejected.** **Every derived picture made first, then the Gate 1 repairs in rank order** — every planned call spent
+before any reserve call, so a budget stop at a repair keeps more planned pictures; but it changes no slot's owner, since
+the repairs still go in rank order, and it puts another shot's picture and verdict between a verdict and its repair.
+**Every pair judged first, then the Gate 1S repairs** — the same trade at step 3, and a repair's own Gate 1S verdict
+would come after later shots' verdicts: the grouped order S-046 rejected.
+
+**Caught by.** `reel-stills`' check 41, whose event lists are typed by hand: a run with rank 2's Gate 1 repair before
+rank 3's picture, and a run with a Gate 1S repair on each of two shots. Every ladder check's script is ordered as well —
+the stand-in answers in call order, so another order misaligns the answers. Breaks watched: derived Gate 1 repairs
+deferred until every derived picture is made (38, 40, 41); Gate 1S repairs deferred until every pair is judged (41
+alone).
+
+---
+
+## S-058 | 2026-09-16 | A degraded shot's four labels are written with whatever ending the run reaches, in the order the ladders reached them
+
+**Chose.**
+
+- The stage records a degradation — shot, gate, reason — puts the reason on the shot's **last failing picture**, and
+  adds a `degraded` event, at the moment the shot's ladder gives up. The keyframes job writes the `degradation` row,
+  that picture's `degradation` and **every `generation_receipt` of the shot's pictures marked `degraded`** in the
+  transaction that ends the run, **on every ending** — completed, stopped for a rule or for budget, or failed — with the
+  events (S-046). Only `chosen` waits for a completed ending (S-055).
+- The receipts marked are the shot's pictures **this attempt made**.
+- **The reason** names the last failing picture and what failed — each failed Gate 1 step with its reasons, or the shared
+  subjects the judge did not see as the same — and why nothing follows: no reserve slot is free, it was the shot's
+  repair, or the shot has had two repairs (D-014). The gate is the one that failed last, so a Gate 1S repair failing
+  Gate 1 is gate `'1'`.
+- The result's `degradations` and the record's list them **in the order the ladders reached them**; the record reads the
+  table by `rowid`, the order they were written.
+
+**Why.** I-4: _"degradation is recorded or it does not happen"_; D-025's confirmation: _"if the degradation is not
+queryable it was silent"_. S-046 already puts the `degraded` events reached into a stopped or failed run's events, and an
+event with no row would tell a caller following events one thing and a query another. `chosen` waits because a stopped
+run approved nothing (S-055); a degradation is a fact about a shot, decided when its ladder ended, whatever happens next.
+The order reached is the events' order; a sort by shot id would be a third order, and wrong as text for `shot-10`.
+
+**Rejected.** **Labels only on a completed ending**, like `chosen` — an event naming a degradation no row records.
+**Marking only the last failing picture's receipt** — Gate 2 says every receipt of the shot's pictures. **Shot order** —
+above. **Every attempt's pictures of the shot** — an earlier attempt's pictures belong to a ladder that degraded nothing
+(S-048); Slice 5's restart is where this would show.
+
+**Caught by.** `reel-stills`' checks 38 and 39 through one hand-written assertion, `assertDegraded`: the four labels
+agree, and no other picture or receipt carries one — for a Gate 1 repair that fails, no slot free at Gate 1, the cap of
+two at Gate 1S and no slot free at Gate 1S; and for two shots degraded in one run whose rank order is not shot order,
+where the result and the record list them alike, in the order reached. Check 40, and check 41's stop for budget after a
+degradation, whose labels are asserted with its events. Breaks watched: no `degradation` row, no reason on the last
+failing picture, no receipt marked, no `degraded` event (38, 39, 40, 41 each); only the last picture's receipt marked
+(38, 39, 41); the reason on the first picture rather than the failing repair (38, 41); the result listing none (38, 39,
+40); **the labels written only on a completed ending (41 alone)**; the result's list sorted by shot id, and the record's
+(38 each).
+
+---
+
+## S-059 | 2026-09-16 | The guard reads the chain's spend before every call and rounds up; the cap is read once per attempt; a stop at the cap asks in S-026's form
+
+**Chose.**
+
+- The guard is `apps/worker/src/guarded-image-port.ts`. **Before every image call** it reads `spentCents` over the chain
+  again, adds the image rate, **rounds up** (S-053), and refuses with `limit: 'reel'` above the cap, else `'ceiling'`
+  above the ceiling; the refusal's `estimateCents` is that figure, and exactly equal is made.
+- **The cap is read once per attempt** of the keyframes job, from the worker's `budgetPath` — as the plan job reads it
+  (D-100) — and handed to the guard with the request's `budgetCents`. **A cap that cannot be read finishes the run
+  `failed`**, its reason the detail, before any image call.
+- A stop's result carries the guard's `limit` and `estimateCents`, the ceiling and the cap as read, and `costCents` the
+  chain's spend when the stage returned — the spend the guard read, since the refused call was not made.
+- **A stop at the per-reel cap appends one entry** after the finishing transaction (S-026's order): a `## ` heading with
+  the time, the run and _"stopped: the next picture would pass the per-reel cap"_; bullets for the request, the estimate,
+  the spend and the pictures made, the cap, the ceiling, the plan — role, units, estimate, planned image calls — and the
+  two rates; and one question. It shares the refusal entry's first write, which creates the file with its header.
+
+**Why.** Gate 2 puts the comparison "before each call" and names the figures, not where they are read. A spend read once
+at the start misses the call that just returned — the call a scripted cost is on. Reading the cap once per attempt is
+"the cap the job read" and what the plan job does; reading it before every call would let an edit to `BUDGET.md` change
+the rule halfway through a run. Rounding up follows S-053, and is as unfalsifiable while rates are whole cents. An
+unreadable cap fails the run as in the plan job, whose read sits inside its fault handling; without that the worker
+would bury the job and leave the run running for ever, which no answer in the contract describes.
+
+**Rejected.** **The guard in the pipeline** — the spend is the database's (`pipeline-no-io`), and a stage is handed
+ports, not figures. **A spend kept per attempt from the receipts the port writes** — a second ledger beside
+`SUM(cost_cents)`, which S-036 rejected. **No rounding** — an `estimateCents` the contract's integer schema refuses once a
+rate has a fraction. **A stop's entry under the refusal's heading** — S-035 gives it its own, and the owner would read a
+stop as a refusal before any picture.
+
+**Not handled.** **Nothing checks the unreadable cap's failure**: no check in 36–47 changes `BUDGET.md` between the two
+jobs. A crash between the finish and the append loses the question (S-026's limit).
+
+**Caught by.** `reel-stills`' checks 42 (a row of the chain other than the keyframes job counted and another run's row
+not; exactly at the ceiling made and one cent over refused, and the same at the cap; the rate the setting's; the cap the
+fixture `BUDGET.md`'s; the cap before the ceiling), 43 and 44 (the figures of a stop, a planned and a reserve call
+refused), and 45 (one entry with the figures, a second stop appending, and the run finished when the entry cannot be
+written). Breaks watched: the spend summed over receipts (42), or over every job (35, 42); the ceiling compared before
+the cap, a call exactly at the ceiling refused, one exactly at the cap refused, the rate a constant (42 each); the cap
+read from the pinned file, not the worker's (42, 45); the spend read once (41–45); no guard (41–45); a stop's
+`costCents` the estimate, its ceiling the cap, an estimate without the rate, a refusal's estimate the spend (43, with
+others); a stop at the ceiling writing a question (43 — **caught only once the check read the file before its engine was
+stopped**: the first campaign found the assertion vacuous, since stopping an engine removes its folder); a stopped run's
+pictures marked chosen (33, 37, 41, 43, 44, 46, 47); reserve calls unguarded, and a refused Gate 1S repair degrading its
+shot and going on (44 each); no question, the question before the finish, the entry's spend the estimate, the file
+emptied before the entry (45 each). **An unreadable cap burying the job instead of failing the run: not caught**, as
+said above.
+
+---
+
+## S-060 | 2026-09-16 | A repair's prompt is its entry's prompt with the consumed verdicts appended; a derived repair consumes the one verdict that asked for it
+
+**Chose.** `repairPrompt` (`packages/pipeline/src/stills/prompts.ts`) renders the picture's entry exactly as
+`imagePrompt` does — the canonical's with candidate `a`'s framing — then a blank line, a line saying the try before
+failed, and each consumed verdict's reasons as bullets, under `Try 1:` and `Try 2:` when there are two. A Gate 1 reason is
+written as recorded; a Gate 1S reason, a shared subject's name, as _"<name> does not look like the same one as in the
+reference picture"_. **The canonical's repair consumes both candidates' Gate 1 verdicts** (D-047). **A derived repair
+consumes the one verdict that asked for it** — its picture's Gate 1 verdict or its Gate 1S verdict — so `repair-2`
+carries its repair's verdict and not the first picture's. Every derived repair keeps the canonical as its only reference
+(D-026, D-038); the canonical's repair has none.
+
+**Why.** Gate 2: _"A repair renders its picture's entry again with the reasons of every verdict it consumes appended"_.
+"Appended" makes the entry's prompt a prefix a check can compare, and keeps D-032's one-line difference between
+candidates out of the repair. D-050 step 1 and S-043 each have a repair consuming _"its verdict"_; the verdict of a picture
+already replaced is not what the repair corrects, and carrying it would tell the image model that a subject the latest
+judge saw as the same was not.
+
+**Rejected.** **Every earlier verdict of the shot in `repair-2`** — above. **The reasons woven into the entry's lines** —
+the prompt would no longer be the entry's, and a repair's difference from its picture could not be read. **Picture ids
+in the prompt** — nothing an image model can use.
+
+**Caught by.** `reel-stills`' checks 36 (both candidates' reasons appended to candidate `a`'s prompt — the same reason
+twice for a clipped pair, two different reasons for a pair failing at different steps), 38 (a derived repair's prompt is
+its picture's with the verdict's reasons appended) and 39 (a Gate 1S repair carries the subject answered no and not the
+one answered yes; `repair-2` carries its repair's subject, not the first picture's). Breaks watched: the canonical's
+repair told only candidate `a`'s reasons, given `b`'s framing, or given a reference (36 each); a derived repair told
+nothing, or made with no reference (38 each); a Gate 1S repair told every shared subject, or made with no reference (39
+each).

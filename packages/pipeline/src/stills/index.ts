@@ -16,8 +16,9 @@ import { GATE_ORDER } from '../gates/index.ts'
 import { gate1, type Brief, type Gate1Progress } from '../gates/gate1.ts'
 import { gate1s } from '../gates/gate1s.ts'
 import { criteriaFor } from './criteria.ts'
+import { REPAIRS_PER_SHOT, repairLabel, reserveOf } from './ladder.ts'
 import { pictureIdOf, placePictures, shotIdOf, type Placement } from './place.ts'
-import { framingFor, imagePrompt, pictureEntry } from './prompts.ts'
+import { framingFor, imagePrompt, pictureEntry, repairPrompt, type Consumed } from './prompts.ts'
 import { DEFAULT_SCORE_WEIGHTS, keyframeScore } from './score.ts'
 
 // The stills stage (docs/features/reel-stills.md, Gates 2 and 3; S-039 to S-046). The worker calls
@@ -25,9 +26,11 @@ import { DEFAULT_SCORE_WEIGHTS, keyframeScore } from './score.ts'
 // ended and everything it made. It never rejects: a thrown call, a refused parse or a bug becomes a
 // failed outcome, with every picture made before it in the record (S-046).
 //
-// Slice 3 of reel-stills builds a stage whose pictures all pass. Anything that needs a ladder — a
-// canonical with no survivor, a derived picture failing Gate 1 or Gate 1S — ends the stage failed
-// with "the ladder is not built", which Slice 4 replaces with the ladders.
+// The stage runs in the ladders' order (Gate 2, "The ladders and the reserve"), so the canonical's
+// repair always has first claim on the reserve (D-048): the canonical, and its repair if neither
+// candidate survives; then each derived picture in rank order, through Gate 1 and its repair; then
+// Gate 1S on each, in rank order, with its repairs. At each step ONE SHOT'S LADDER IS FINISHED
+// BEFORE THE NEXT SHOT'S BEGINS (S-057).
 
 /** Every stills setting's default. The weights and the threshold are provisional until M-1. */
 export const DEFAULT_STILLS_SETTINGS: StillsSettings = {
@@ -83,9 +86,6 @@ export interface StillsStageSettings {
   stills: StillsSettings
 }
 
-/** Until Slice 4 builds the ladders, the detail of every ending that needs one. */
-const NO_LADDER = 'the ladder is not built'
-
 /** A made picture: its place in this attempt's list, and the file the port wrote. */
 interface Made {
   index: number
@@ -97,8 +97,8 @@ type Refused = Extract<ImageAnswer, { kind: 'refused' }>
 const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
 
 /**
- * A call the worker's guard refused (S-035): the stage stops with the guard's figures. The run's
- * budget ending is the worker's to write — Slice 4's.
+ * A call the worker's guard refused (S-035): the call was not made, and the stage stops with the
+ * guard's figures. The ceiling, the cap and the spend are the worker's to add.
  */
 const stopped = (refused: Refused): Ending => ({
   kind: 'stopped-budget',
@@ -127,6 +127,7 @@ export async function makeStills(
 
 type Ending =
   | { kind: 'completed' }
+  | { kind: 'stopped-rule'; rule: 'gate-1'; detail: string }
   | { kind: 'failed'; detail: string }
   | ({ kind: 'stopped-budget' } & Pick<Refused, 'limit' | 'estimateCents'>)
 
@@ -181,16 +182,22 @@ async function stage(
     await ports.recorder.record(record.pictures[index])
   }
 
-  /** One image call: the picture as made, in the list, or the guard's refusal. */
+  /**
+   * One image call: the picture as made, in the list, or the guard's refusal. A repair is handed the
+   * verdicts it consumes, and its prompt carries their reasons.
+   */
   const make = async (
     placement: Placement,
     label: string,
     framing: Framing | null,
     references: readonly PictureRef[],
     brief: Brief,
+    consumed: readonly Consumed[] = [],
   ): Promise<Made | Refused> => {
     const pictureId = pictureIdOf(input.attempt, placement.shotUnit, label)
-    const prompt = imagePrompt(entryOf(placement, brief), framing)
+    const entry = entryOf(placement, brief)
+    const prompt =
+      consumed.length === 0 ? imagePrompt(entry, framing) : repairPrompt(entry, framing, consumed)
     const answer = await ports.image.generate({
       runId: input.runId,
       pictureId,
@@ -241,18 +248,54 @@ async function stage(
     return outcome
   }
 
+  /** The failed steps of a picture's decided Gate 1 verdict, as a repair consumes them. */
+  const gate1Failure = (made: Made): Consumed => ({
+    gate: '1',
+    reasons: (record.pictures[made.index]?.gate1?.steps ?? [])
+      .filter((s) => s.outcome === 'fail')
+      .flatMap((s) => s.reasons),
+  })
+
+  /** Why a picture failed Gate 1, naming it, each failed step and that step's reasons. */
+  const gate1Why = (made: Made) => {
+    const failed = (record.pictures[made.index]?.gate1?.steps ?? []).filter(
+      (s) => s.outcome === 'fail',
+    )
+    return `${made.ref.pictureId} failed Gate 1 at ${failed
+      .map((s) => `${s.step}: ${s.reasons.join('; ')}`)
+      .join(', and at ')}`
+  }
+
+  /**
+   * A shot that goes on without an approved picture (S-043, D-050 step 3). The stage records the
+   * degradation, the reason on the shot's last failing picture and a `degraded` event where the
+   * checks reached it; the worker writes all four labels with the run's ending (I-4, S-058).
+   */
+  const degrade = (placement: Placement, gate: '1' | '1S', last: Made, reason: string) => {
+    const shotId = shotIdOf(placement.shotUnit)
+    record.degradations.push({ shotId, gate, reason })
+    const picture = record.pictures[last.index]
+    if (picture !== undefined) record.pictures[last.index] = { ...picture, degradation: reason }
+    record.events.push({ type: 'degraded', shotId, reason })
+  }
+
   const placements = placePictures(plan)
   const [canonical, ...derived] = placements
   // No subject in two shots: nothing to make, and the stage is done (S-039).
   if (canonical === undefined) return { kind: 'completed' }
 
+  // The reserve: six less the placement's calls. Every repair takes one slot, any free one (S-043).
+  let slots = reserveOf(placements)
+
   // The canonical, best of two: a then b, each through Gate 1 as soon as it is made (D-030, D-042).
   const canonicalBrief = briefOf(canonical)
+  const candidates: Made[] = []
   const survivors: Made[] = []
   for (const label of ['a', 'b'] as const) {
     const framing = framingFor('canonical', label, settings.stills)
     const made = await make(canonical, label, framing, [], canonicalBrief)
     if ('kind' in made) return stopped(made)
+    candidates.push(made)
     if ((await check(made, canonical, canonicalBrief)) === 'accept') survivors.push(made)
   }
 
@@ -273,7 +316,7 @@ async function stage(
     return keyframeScore(entity, measure, settings.stills.scoreWeights)
   }
 
-  // Only survivors are scored (D-042); two are ranked, one is chosen outright, none needs a ladder.
+  // Only survivors are scored (D-042); two are ranked, one is chosen outright.
   let chosen: Made
   if (survivors.length === 2) {
     const [a, b] = survivors as [Made, Made]
@@ -286,45 +329,123 @@ async function stage(
   } else if (survivors.length === 1) {
     chosen = survivors[0] as Made
   } else {
-    return { kind: 'failed', detail: NO_LADDER }
+    // No survivor: ONE repair, told both candidates' reasons, with candidate a's framing and no
+    // reference (D-047). It runs before anything else takes a slot, so it has first claim (D-048). A
+    // first attempt's reserve is at least two, so it always finds one; a restarted attempt that
+    // finds none fails before the call (S-048), which reel-stills' Slice 5 builds.
+    slots -= 1
+    const framing = framingFor('canonical', 'a', settings.stills)
+    const repair = await make(
+      canonical,
+      'repair',
+      framing,
+      [],
+      canonicalBrief,
+      candidates.map(gate1Failure),
+    )
+    if ('kind' in repair) return stopped(repair)
+    if ((await check(repair, canonical, canonicalBrief)) !== 'accept') {
+      // Three failures on one entry: the run stops for the rule, before any derived picture is
+      // attempted (I-10), and no plan is made again (D-065).
+      const why = [...candidates, repair].map(gate1Why).join('. ')
+      return {
+        kind: 'stopped-rule',
+        rule: 'gate-1',
+        detail: `the canonical picture of ${shotIdOf(canonical.shotUnit)} failed Gate 1 three times (D-047): ${why}`,
+      }
+    }
+    // A sole survivor: the canonical outright, with no score (D-047 step 2).
+    chosen = repair
   }
 
   // Derived pictures, in rank order, each made once from the chosen canonical alone (D-026, D-038).
-  const passed: Array<{ made: Made; placement: Placement }> = []
+  // One failing Gate 1 takes one repair, at once, if a slot is free (S-043, S-057).
+  interface Passed {
+    placement: Placement
+    brief: Brief
+    made: Made
+    repairs: number
+  }
+  const passed: Passed[] = []
   for (const placement of derived) {
     const brief = briefOf(placement)
     const made = await make(placement, 'single', null, [chosen.ref], brief)
     if ('kind' in made) return stopped(made)
-    if ((await check(made, placement, brief)) !== 'accept')
-      return { kind: 'failed', detail: NO_LADDER }
-    passed.push({ made, placement })
+    if ((await check(made, placement, brief)) === 'accept') {
+      passed.push({ placement, brief, made, repairs: 0 })
+      continue
+    }
+    if (slots <= 0) {
+      degrade(placement, '1', made, `${gate1Why(made)}; no reserve slot is free (S-043)`)
+      continue
+    }
+    slots -= 1
+    const repair = await make(placement, repairLabel(1), null, [chosen.ref], brief, [
+      gate1Failure(made),
+    ])
+    if ('kind' in repair) return stopped(repair)
+    if ((await check(repair, placement, brief)) !== 'accept') {
+      degrade(placement, '1', repair, `${gate1Why(repair)}; it was the shot's repair (S-043)`)
+      continue
+    }
+    passed.push({ placement, brief, made: repair, repairs: 1 })
   }
 
-  // Gate 1S, once every derived picture has been through Gate 1, in rank order (D-049, S-045).
+  // Gate 1S, once every derived picture has been through Gate 1, in rank order (D-049, S-045). One
+  // failing takes a repair if a slot is free and its shot has had fewer than two; the repair goes
+  // through Gate 1, then Gate 1S — all before the next shot's Gate 1S (D-050, S-043, S-057).
   const canonicalShot = shotOf(canonical.shotUnit).subjectIds
-  for (const { made, placement } of passed) {
+  const approved: Made[] = [chosen]
+  for (const shot of passed) {
+    const { placement, brief } = shot
     const shown = new Set(shotOf(placement.shotUnit).subjectIds)
     const shared = canonicalShot
       .filter((id) => shown.has(id))
       .map((id) => subjects.get(id)?.name ?? id)
-    const verdict = await gate1s(
-      { canonical: chosen.ref, derived: made.ref, shared },
-      ports,
-      settings.stills.suspicionThreshold,
-    )
-    await update(made.index, { gate1s: verdict })
-    record.events.push({
-      type: 'verdict',
-      gate: GATE_ORDER[2],
-      outcome: verdict.outcome,
-      shotId: shotIdOf(placement.shotUnit),
-    })
-    if (verdict.outcome === 'fail') return { kind: 'failed', detail: NO_LADDER }
+    let { made, repairs } = shot
+    for (;;) {
+      const verdict = await gate1s(
+        { canonical: chosen.ref, derived: made.ref, shared },
+        ports,
+        settings.stills.suspicionThreshold,
+      )
+      await update(made.index, { gate1s: verdict })
+      record.events.push({
+        type: 'verdict',
+        gate: GATE_ORDER[2],
+        outcome: verdict.outcome,
+        shotId: shotIdOf(placement.shotUnit),
+      })
+      if (verdict.outcome === 'accept') {
+        approved.push(made)
+        break
+      }
+      const why = `${made.ref.pictureId} failed Gate 1S: the judge did not see the same ${verdict.reasons.join(' or ')} as in the canonical`
+      if (repairs >= REPAIRS_PER_SHOT) {
+        degrade(placement, '1S', made, `${why}; the shot has had ${repairs} repairs (D-014)`)
+        break
+      }
+      if (slots <= 0) {
+        degrade(placement, '1S', made, `${why}; no reserve slot is free (D-050)`)
+        break
+      }
+      slots -= 1
+      repairs += 1
+      const repair = await make(placement, repairLabel(repairs), null, [chosen.ref], brief, [
+        { gate: '1S', reasons: verdict.reasons },
+      ])
+      if ('kind' in repair) return stopped(repair)
+      if ((await check(repair, placement, brief)) !== 'accept') {
+        degrade(placement, '1', repair, `${gate1Why(repair)}; it was the shot's repair (S-043)`)
+        break
+      }
+      made = repair
+    }
   }
 
   // Approved: the chosen canonical and every derived picture past both gates. The flags are the
   // worker's to write, with the run's ending, in one transaction (S-046).
-  for (const made of [chosen, ...passed.map((p) => p.made)]) {
+  for (const made of approved) {
     const picture = record.pictures[made.index]
     if (picture !== undefined) record.pictures[made.index] = { ...picture, chosen: true }
   }

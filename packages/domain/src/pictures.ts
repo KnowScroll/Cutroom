@@ -1,8 +1,8 @@
-import { and, asc, eq } from 'drizzle-orm'
+import { and, asc, eq, inArray, sql } from 'drizzle-orm'
 import type { PictureRecord } from '@cutroom/contracts'
 import type { RunRecord } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
-import { degradation, observation, picture, reconciliation } from './schema.ts'
+import { degradation, generationReceipt, observation, picture, reconciliation } from './schema.ts'
 
 // The pictures of a run and their record (docs/features/reel-stills.md, Gate 2 "Storage" and "How a
 // stills run ends"; S-046). A picture's row is written with its image receipt (ledger.ts) and
@@ -141,12 +141,56 @@ export function readRecord(db: Db, runId: string): Pick<RunRecord, 'pictures' | 
         checks,
       }
     })
+  // In the order the run's ending wrote them: the order the ladders reached them (S-058).
   const degradations = db
     .select({ shotId: degradation.shotId, reason: degradation.reason })
     .from(degradation)
     .where(eq(degradation.runId, runId))
+    .orderBy(sql`rowid`)
     .all()
   return { pictures, degradations }
+}
+
+/** A shot that goes on without an approved picture, as the stage recorded it (S-043, D-050). */
+export interface DegradedShot {
+  shotId: string
+  /** The gate that failed last. */
+  gate: '1' | '1S'
+  reason: string
+  /** The shot's last failing picture, which carries the reason. */
+  lastPictureId: string
+  /** Every picture of the shot this attempt made: each one's generation_receipt is marked. */
+  pictureIds: readonly string[]
+}
+
+/**
+ * Three of a degraded shot's four labels, inside the transaction that ends the run (I-4, D-025):
+ * its `degradation` row, the reason on its last failing picture, and every `generation_receipt` of
+ * its pictures marked degraded. The fourth, its `degraded` event, is written with the events.
+ */
+export function markDegraded(
+  tx: Pick<Db, 'insert' | 'update'>,
+  runId: string,
+  shot: DegradedShot,
+): void {
+  tx.insert(degradation)
+    .values({ runId, shotId: shot.shotId, gate: shot.gate, reason: shot.reason })
+    .run()
+  tx.update(picture)
+    .set({ degradation: shot.reason })
+    .where(and(eq(picture.runId, runId), eq(picture.pictureId, shot.lastPictureId)))
+    .run()
+  if (shot.pictureIds.length > 0) {
+    tx.update(generationReceipt)
+      .set({ degraded: true })
+      .where(
+        and(
+          eq(generationReceipt.runId, runId),
+          inArray(generationReceipt.pictureId, [...shot.pictureIds]),
+        ),
+      )
+      .run()
+  }
 }
 
 /** Marks a run's approved pictures chosen, inside the transaction that ends the run (S-046). */

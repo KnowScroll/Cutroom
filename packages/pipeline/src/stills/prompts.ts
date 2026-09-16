@@ -89,6 +89,48 @@ export function imagePrompt(entry: PictureEntry, framing: Framing | null): strin
   ].join('\n')
 }
 
+/** One verdict a repair consumes, and what it failed on. */
+export interface Consumed {
+  gate: '1' | '1S'
+  /** Gate 1: the reasons of its failed steps. Gate 1S: the shared subjects the judge answered no. */
+  reasons: readonly string[]
+}
+
+/**
+ * A repair's prompt: its picture's entry rendered again — the canonical's with candidate a's framing
+ * — with the reasons of every verdict it consumes APPENDED (Gate 2 "Making a picture"). Both
+ * candidates' Gate 1 reasons for the canonical (D-047); a derived picture's Gate 1 reasons (S-043),
+ * or the shared subjects its Gate 1S judge answered no (D-050). A repair told nothing would be a
+ * re-roll, not a repair (D-047's "informed").
+ */
+export function repairPrompt(
+  entry: PictureEntry,
+  framing: Framing | null,
+  consumed: readonly Consumed[],
+): string {
+  if (consumed.length === 0) {
+    throw new Error(`a repair of ${entry.shotId} was asked for with no verdict to consume`)
+  }
+  const lines = [
+    imagePrompt(entry, framing),
+    '',
+    consumed.length === 1
+      ? 'The try before this one failed its checks. Correct what failed:'
+      : `Each of the ${consumed.length} tries before this one failed its checks. Correct what failed:`,
+  ]
+  consumed.forEach((verdict, i) => {
+    if (consumed.length > 1) lines.push(`Try ${i + 1}:`)
+    for (const reason of verdict.reasons) {
+      lines.push(
+        verdict.gate === '1S'
+          ? `- ${reason} does not look like the same one as in the reference picture`
+          : `- ${reason}`,
+      )
+    }
+  })
+  return lines.join('\n')
+}
+
 // ---------------------------------------------------------------- reconcile
 
 /**

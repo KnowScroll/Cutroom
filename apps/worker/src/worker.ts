@@ -102,6 +102,8 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     sensors: options.sensors,
     settings,
     stills,
+    budgetPath: context.budgetPath,
+    questionsPath: context.questionsPath,
   }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined

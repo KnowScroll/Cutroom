@@ -1101,3 +1101,109 @@ shots with their four labels, the Gate 1S repair, the guard's refusals, the budg
 and a malformed answer. Then Slice 5 (48–50 and the journey). Owed outside this repository, unchanged: `reel-script`
 emitting a criterion's type (S-029); deleting the steering stubs and bumping the pin (S-033). S-015's promised
 front-matter test is still unwritten.
+
+## 2026-09-16 — session 18, reel-stills Slice 4: the ladders, and every ending that is not a completed run
+
+**Intent.** `reel-stills`' Slice 4 — checks 36–47, tests first, nothing from Slice 5. `decisions.mjs`: pin current,
+0 commits unpushed. Baseline `check.mjs` green at **159 tests** (af08577).
+
+**Changed.**
+
+- **`stills/ladder.ts`** (Gate 3's file for the reserve): `IMAGE_CALLS` 6, `REPAIRS_PER_SHOT` 2, `placementCalls` — 2
+  for a placed canonical, 1 per placed derived picture — `reserveOf` = 6 − the placement's calls, and `repairLabel`
+  (`repair`, `repair-2`). The earlier attempts' calls are **not** subtracted: that is S-048's, Slice 5's, check 49's.
+- **`stills/prompts.ts`** — `repairPrompt`: the entry's prompt with the consumed verdicts' reasons appended (S-060).
+- **`stills/index.ts`** — the three placeholders are gone. No canonical survivor: one repair from the reserve, candidate
+  `a`'s framing, no reference, both verdicts' reasons; passes → chosen with no score; fails → `stopped-rule`, `gate-1`,
+  the detail naming each of the three pictures' failed steps and reasons, no derived call. Derived pictures: a Gate 1
+  failure takes one repair if a slot is free, else, or when the repair fails, the shot is degraded. Gate 1S: a failure
+  takes a repair while a slot is free and the shot has had fewer than two; the repair goes through Gate 1 then Gate 1S.
+  Each shot's ladder finishes before the next shot's (S-057). A degradation is recorded with its reason on the last
+  failing picture and a `degraded` event. **The canonical's repair takes a slot without asking whether one is free**: a
+  first attempt's reserve is at least 2; the restart that finds none is S-048's failure, Slice 5's.
+- **Domain.** `markDegraded` (`pictures.ts`): the `degradation` row, the reason on the last failing picture, every
+  receipt of the shot's pictures marked; `finishStills` takes `degraded` and writes them in its one transaction;
+  `readRecord` lists degradations by `rowid`.
+- **Worker.** `guarded-image-port.ts` refuses: before every call, the chain's spend again plus the rate, rounded up,
+  against the cap then the ceiling (S-059). `keyframes-job.ts` reads the cap once per attempt from `budgetPath`, hands
+  the guard the cap and the ceiling, and ends every outcome: completed with `degradations`; stopped for rule `gate-1` at
+  step `stills`; stopped for budget with the limit, estimate, ceiling, cap and spend, and — at the cap only — one
+  question after the finish; failed with the detail. Every ending writes the degradations reached (S-058); none but
+  completed has `stage.finished` or a chosen picture. `questions.ts` gains `appendBudgetStopQuestion`. `worker.ts` hands
+  the keyframes context `budgetPath` and `questionsPath`.
+- **`DECISIONS.md` — S-057, S-058, S-059, S-060**, below.
+- **Six test files**, `tests/reel-stills-{canonical-repair,derived-repair,reserve,endings,spending,faults}`, and
+  hand-written fixtures in `tests/engine/stills.ts` (`BOTH_SHARE`, `again`, `showsPerson`, `clipped`, the `degradation`
+  rows in `readStills`, and `assertDegraded`): **+12 tests, 159 → 171**. Slice 4 ticked. No journey: Slice 5's.
+
+**Observed.**
+
+- **Red first, ten of twelve.** 36, 38, 39 and 40 failed on the placeholder — _"status failed … the ladder is not
+  built"_ where `completed` was due; 37 on a `failed` result where a `stopped` rule stop was due; 41 on its event lists
+  ending `verdict 1S shot-1 fail`, `run.finished failed`; 42, 43 and 45 on `completed` where a budget stop was due, the
+  guard refusing nothing; 44 on `failed` with no limit. **46 and 47 were green before any Slice 4 code**: Slice 3 had
+  already built the witness answer that does not parse and the thrown call's ending. No red was possible for them; the
+  breaks are what show they can fail (s4-65 to s4-70, each caught by 46 or 47). One test bug before the code: my event
+  describer printed `run.accepted undefined`.
+- **The first wired run was 12 of 12**, and the whole suite 171 of 171.
+- **Two assertions added before the campaign, not after a break.** Check 45 runs a second stop in the same engine: one
+  stop cannot tell an append from an overwrite. Check 38 runs two shots degraded in one run whose rank order is not shot
+  order (`RANK_NOT_SHOT`), so the order of the result's and the record's `degradations` is pinned (S-058). And check 39
+  gained a `RANK_ALL_HELD` case — a placement of 3 from a plan of 4, reserve 3 — without which a reserve counted from the
+  plan's calls, not the placement's, is caught by nothing in 36–47.
+- **The decision the prompt named, S-057**: a shot's ladder at each step finishes before the next shot's; check 41's hand
+  typed event lists tell the two orders apart, at Gate 1 and at Gate 1S. Three more the gates left open: **S-058** —
+  degradation labels on every ending, in the order reached; **S-059** — the guard's reads, rounding, the unreadable cap,
+  and the stop's question; **S-060** — the repair prompt, and `repair-2` consuming one verdict.
+- **Seventy-one deliberate breaks**, run by a rebuilt script in the scratchpad: each file's original bytes written to disk
+  and `fsync`ed before it was touched, restored from those bytes, the tree's fingerprint — every modified **and untracked**
+  file, hashed — compared after every restore, and a refusal to start while a saved record exists. Afterwards the tree
+  was byte-identical to a `tar` snapshot taken before the campaign, no saved record was left, and every break's find text
+  was present once. **Sixty-nine caught at once**:
+
+  | guarded | breaks                                                                                                                                                                                                                                                                   | caught by (all `reel-stills`)                                              |
+  | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+  | 36      | repair told only a's reasons; b's framing; given a reference; not chosen; scored                                                                                                                                                                                         | 36 each (not chosen also 38, 39, 40)                                       |
+  | 37      | failing repair goes on; reported as a fault; detail names only the repair; step `plan`; reasons left out of a failure                                                                                                                                                    | 37 (and 41, 38)                                                            |
+  | 38      | never repaired; may not take the last slot; not told why; no reference; failing repair goes to Gate 1S; no row; no reason on the picture; no receipt marked; only the last receipt; no event; result lists none; reason on the first picture; both orders sorted by shot | 38 each, most also 39, 40, 41; the sorts 38 alone                          |
+  | 39      | told every shared subject; no cap; cap of one; skips Gate 1; every repair `repair`; never repaired; `repair-again`; no reference; reserve from the plan's four calls                                                                                                     | 39 each (skips Gate 1 and never repaired also 41, 44)                      |
+  | 40      | canonical's repair takes no slot; a canonical counts one call; seven calls                                                                                                                                                                                               | 38, 39, 40, 41 each                                                        |
+  | 41      | Gate 1 repairs deferred (S-057); Gate 1S repairs deferred (S-057); `stage.finished` on every ending; degraded event first; a stop loses its events; labels only when completed                                                                                           | 38, 40, 41; 41; 10, 37, 41, 43, 46, 47; 41; 37, 41; 41                     |
+  | 42      | spend over receipts; over every job; ceiling before cap; equal refused at ceiling; at cap; rate a constant; pinned `BUDGET.md`; spend read once; no guard                                                                                                                | 42 each (every job also 35; pinned also 45; read once and no guard 41–45)  |
+  | 43      | `costCents` the estimate; ceiling the cap; estimate without the rate; refusal's estimate the spend; stopped run's pictures chosen                                                                                                                                        | 43 each, with others of 41, 42, 44, 45; chosen also 33, 37, 41, 44, 46, 47 |
+  | 44      | reserve calls unguarded; refused Gate 1S repair degrades and goes on                                                                                                                                                                                                     | 44 each                                                                    |
+  | 45      | no question; question before the finish; entry's spend the estimate; file emptied first                                                                                                                                                                                  | 45 each                                                                    |
+  | 46–47   | unparsed witness recorded as a failed step; failed stage ends cancelled; stage rethrows; no detail; verdict decided at technical; compare answer need not name every subject                                                                                             | 46; 41, 46, 47; 10, 33, 41, 46, 47; 46, 47; 47; 47                         |
+
+- **What the breaks found, and what was done about each:**
+  - **s4-54, a stop at the ceiling writing a question — not caught, and the finding was my test.** Check 43 asserted the
+    questions file absent **after** its helper had stopped the engine, and stopping an engine removes its folder: the
+    assertion could not fail. The helper now reads the file before it stops the engine; run again, s4-54 is caught (43).
+    Added to, not weakened.
+  - **s4-71, an unreadable cap burying the keyframes job instead of failing the run — not caught, and said rather than
+    widened.** No check in 36–47 changes `BUDGET.md` between the plan job and the keyframes job. Recorded in S-059's
+    _Not handled_.
+  - **s4-06, a sole survivor repaired too**, is caught by Slice 3's 23, 25, 29 and 30, not by 36: 36's words are about
+    no survivor. **s4-69, a verdict decided at technical**, is caught by 47 alone: later steps rewrite the outcome to
+    none, so 46's witness failure still records none, and 47's `readText` throw is where the early outcome survives.
+    **s4-34, the reserve from the plan's calls**, is caught by 39 alone — by the `RANK_ALL_HELD` case above.
+- **An incident, recorded because it is the collision the campaign rule exists against.** I ended a turn to wait for the
+  campaign; the stop-gate hook then ran `check.mjs --code` against the repository while break s4-07 was applied. The
+  hook's suite went red on the break, and ran at the same time as s4-07's own suite (50 s against the usual 24). Nothing
+  was lost — the campaign restored from its saved bytes as always — but three results could have been disturbed:
+  **s4-06, s4-07 and s4-08 were run again alone, with the same results.** A campaign is waited for inside a turn from
+  now on.
+- **Traps.** A heredoc holding the stage's new body — backticks and apostrophes — ended at end-of-file and nothing ran;
+  the body was written with the editing tool and spliced in by a script, and the break texts were written the same way.
+  `tar` reads `C:` as a remote host without `--force-local`. No file gained a backslash outside a JavaScript string. No
+  field is named from D-096's list; `reel-plan`'s check 5 stayed green.
+- **Nothing from Slice 5:** no `imageCallCount`; `earlierImageCalls` is still 0 and is **not** subtracted from the
+  reserve; the canonical's repair takes a slot without asking whether one is free; no restart failure; no check 50 child.
+- `node scripts/check.mjs`: **everything green, 171 tests.** All 12 Slice 4 checks pass, by number.
+
+**Next.** `reel-stills` Slice 5 — restart, no secrets and the journey (checks 48–50): a worker killed mid-stills,
+`imageCallCount` read at attempt start, the reserve reduced by earlier calls, a restart that cannot fit its plan and one
+whose canonical repair finds no slot (the canonical repair's unconditional `slots -= 1` becomes that check), the
+recorder rewriting `seq` and the attempt in the picture id (S-055, check 48); then 1–47 again, and the `reel-plan` and
+`reel-contract` journeys. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type (S-029);
+deleting the steering stubs and bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
