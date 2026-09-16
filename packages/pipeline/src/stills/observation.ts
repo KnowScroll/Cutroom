@@ -18,11 +18,11 @@ const observedEntity = z.strictObject({
 })
 
 /**
- * A still's observation. Every object is strict, so D-041's temporal block — `actions` and
- * `eventOrder`, a clip's only — is refused on a still whether it is full or empty: its absence is
- * the whole meaning of a still's observation.
+ * D-041's fields, which a still's observation and a clip's share: one witness, one contract, and
+ * only the input differs (D-053). The clip's schema is these and the temporal block
+ * (clips/observation.ts), so the two can never disagree about an entity.
  */
-export const witnessObservation: z.ZodType<WitnessObservation> = z.strictObject({
+export const observationFields = {
   entities: z.array(observedEntity),
   framing: z.enum(['closeUp', 'medium', 'wide', 'extremeWide']),
   setting: z.string(),
@@ -30,4 +30,11 @@ export const witnessObservation: z.ZodType<WitnessObservation> = z.strictObject(
   readableTextPresent: z.boolean(),
   ambiguities: z.array(z.string()),
   unsafeDepictions: z.array(z.string()),
-})
+}
+
+/**
+ * A still's observation. Every object is strict, so D-041's temporal block — `actions` and
+ * `eventOrder`, a clip's only — is refused on a still whether it is full or empty: its absence is
+ * the whole meaning of a still's observation.
+ */
+export const witnessObservation: z.ZodType<WitnessObservation> = z.strictObject(observationFields)

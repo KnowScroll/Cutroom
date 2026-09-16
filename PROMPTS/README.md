@@ -14,4 +14,4 @@ its `JOURNAL.md` entry says it did (S-065).
 | #   | Prompt                                                   | Feature       | Work      | Written    | Run        |
 | --- | -------------------------------------------------------- | ------------- | --------- | ---------- | ---------- |
 | 020 | [020-reel-render-gates.md](020-reel-render-gates.md)     | `reel-render` | gates 1–4 | 2026-09-16 | session 20 |
-| 021 | [021-reel-render-slice-1.md](021-reel-render-slice-1.md) | `reel-render` | Slice 1   | 2026-09-16 | not yet    |
+| 021 | [021-reel-render-slice-1.md](021-reel-render-slice-1.md) | `reel-render` | Slice 1   | 2026-09-16 | session 21 |

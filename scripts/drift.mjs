@@ -116,6 +116,14 @@ const CASES = [
   ['pipeline-no-providers', 'packages/pipeline/src/a.ts', '../../providers/src/index.ts'],
   ['pipeline-no-apps', 'packages/pipeline/src/b.ts', '../../../apps/api/src/index.ts'],
   ['pipeline-no-io', 'packages/pipeline/src/c.ts', 'node:fs'],
+  // A built-in module has no package for the by-name cases to place, so both of child_process's
+  // names are imported here, from each of the three places that must not start a process (S-075).
+  ['processes-only-in-providers', 'apps/worker/src/spawns.ts', 'child_process'],
+  ['processes-only-in-providers', 'apps/worker/src/spawns-node.ts', 'node:child_process'],
+  ['processes-only-in-providers', 'apps/api/src/spawns.ts', 'child_process'],
+  ['processes-only-in-providers', 'apps/api/src/spawns-node.ts', 'node:child_process'],
+  ['processes-only-in-providers', 'packages/domain/src/spawns.ts', 'child_process'],
+  ['processes-only-in-providers', 'packages/domain/src/spawns-node.ts', 'node:child_process'],
   ['api-no-providers', 'apps/api/src/index.ts', '../../../packages/providers/src/index.ts'],
   ['worker-no-providers', 'apps/worker/src/spends.ts', '../../../packages/providers/src/index.ts'],
   ['providers-no-domain', 'packages/providers/src/index.ts', '../../domain/src/index.ts'],

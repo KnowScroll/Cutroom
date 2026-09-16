@@ -163,6 +163,7 @@ export function recordReceipt(
       role: receipt.role,
       call: receipt.call,
       pictureIds: JSON.stringify(receipt.pictureIds),
+      takeIds: JSON.stringify(receipt.takeIds),
       model: receipt.model,
       temperature: receipt.temperature,
       inputTokens: receipt.usage.inputTokens,

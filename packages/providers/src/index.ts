@@ -15,8 +15,10 @@ export {
   type FakeAnswer,
   type FakeCall,
   type FakeCompareCall,
+  type FakeJudgeCutCall,
   type FakeModel,
   type FakeObserveCall,
+  type FakeObserveClipCall,
   type FakeScript,
 } from './fake/model.ts'
 export {

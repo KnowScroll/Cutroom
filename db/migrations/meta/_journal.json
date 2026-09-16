@@ -15,6 +15,13 @@
       "when": 1789547005029,
       "tag": "0001_reel_stills_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789581479119,
+      "tag": "0002_model_receipt_take_ids",
+      "breakpoints": true
     }
   ]
 }

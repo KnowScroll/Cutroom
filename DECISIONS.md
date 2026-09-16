@@ -2553,3 +2553,77 @@ for `stills`. A port that gains a call must be implemented by everything that im
 S-049's reason. **Editing the verified files' gates** — a note says what changed and where it is decided.
 
 **Caught by.** `reel-render`'s checks 1, 3 and 7, and the three journeys.
+
+---
+
+## S-078 | 2026-09-16 | `reel-stills`' check 3 counts nineteen rules, exactly
+
+**Chose.** `tests/reel-stills-rules.test.ts`' test _"3. drift, drift:prove and drift --audit pass"_ asserts that
+`drift --prove` prints **`19 rules proven to fire`**, where it asserted `18`, in `reel-render`'s Slice 1 — the slice that
+adds the nineteenth rule, `processes-only-in-providers` (S-075). **The count stays exact**, and nothing else in the test
+changes. `reel-render`'s check 2 asserts the same line.
+
+**Supersedes:** **S-077**, by addition only — its list of what `reel-render` changes in verified features gains
+`reel-stills`' check 3. Its rule that no assertion is removed is unchanged and holds here.
+
+**Why.** Found while building Slice 1, before any code: the assertion pins the number of rules `drift --prove` watches
+fire, which S-075 raises by one, and S-077 did not list it — the miss S-049 found in S-047, again. Left as written, the
+build the gates describe is red.
+
+**Rejected.** **Asserting the printed count equals `.dependency-cruiser.cjs`' rules** — it stops pinning the number the
+decisions name, and a rule added with its cases passes silently. **Stopping the slice until a gate review amends
+S-077** — the owner settled it; no gate text, figure or step changes.
+
+**Caught by.** `reel-stills`' check 3 and `reel-render`'s check 2, each failing when a rule loses every one of its prove
+cases — session 21's break 2d: nineteen rules became eighteen, caught by both.
+
+**Confirmed-by.** The owner, 2026-09-16, choosing _"18 → 19, exact"_.
+
+---
+
+## S-079 | 2026-09-16 | `NarrationRecord` is declared in `clip.ts`, beside `TakeRecord` and `ClipsRecorder`
+
+**Chose.** `packages/contracts/src/clip.ts` declares **`NarrationRecord`**, beside `TakeRecord` and the `ClipsRecorder`
+that takes both. `narration.ts` declares `WordTiming`, `NarrationRequest`, `NarrationReceipt`, `NarrationAnswer` and
+`NarrationPort`, and imports nothing from `clip.ts`; `clip.ts` imports `WordTiming` from it. The type's fields and
+`@cutroom/contracts`' exports are Gate 3's. **No gate text is edited.**
+
+**Supersedes:** `reel-render`'s Gate 3, on its file list's _"`packages/contracts/src/narration.ts` — `WordTiming`,
+`NarrationRequest`, `NarrationReceipt`, `NarrationAnswer`, `NarrationPort`, `NarrationRecord`"_ — the last of the six
+lives in `clip.ts`.
+
+**Why.** Gate 3 puts `MediaProbe` and `ClipsRecorder` in `clip.ts`, and `NarrationRecord`, whose `probe` is a
+`MediaProbe`, in `narration.ts`, so the two files would import each other's types. `no-circular` fires on a cycle of
+type-only imports, since `tsPreCompilationDeps` is on — built in the scratchpad against this repository's config before
+any file was written, and it fired. A record beside the recorder that takes it, and beside the other record, is the
+one move that breaks the cycle.
+
+**Rejected.** **A new `media.ts`** holding `ClipRef`, `MediaProbe`, `ClipScan`, `ClipSound` and `MediaPort`, imported by
+both — five types leave the file Gate 3 names instead of one. **An exception to `no-circular`** — a rule with a hole
+(S-014). **Stopping the slice until a gate review amends Gate 3** — the owner settled it.
+
+**Caught by.** `no-circular`, in `drift` and `tests/boundaries.test.ts`, on the real graph. `reel-render`'s check 1
+compiles `NarrationRecord` and `ClipsRecorder` from the package's index.
+
+**Confirmed-by.** The owner, 2026-09-16, choosing _"NarrationRecord into clip.ts"_.
+
+---
+
+## S-080 | 2026-09-16 | The validator holds every video request that is not `image-to-video` to 9:16
+
+**Chose.** `validateVideoRequest` refuses a request **whose mode is not `image-to-video`** and whose `aspectRatio` is not
+`'9:16'` — a `text-to-video` request without it, and one of a mode the type does not have. It refuses the negative
+audio block unless the prompt holds **both of its lines, together**. When both rules fail, both reasons are given.
+
+**Why.** The validator is for a request the type never saw — one built from a value typed `any` (Gate 2, _"What the
+rules do not catch"_). D-036's finding records that a provider call with no image **is** text-to-video, at the
+provider's default ratio: D-019's trap does not depend on what the request called its mode. A validator matching only
+the word `text-to-video` lets a request of any other spelling through with no ratio.
+
+**Rejected.** **Matching `mode === 'text-to-video'` alone** — D-071's words read literally, and silent on the request
+the validator exists for. **Also refusing an `image-to-video` request with no image** — a third rule D-071 does not
+name; the type refuses it, and the clips stage builds the request from a chosen picture (S-071).
+
+**Caught by.** `reel-render`'s check 6: a request of an unknown mode with no ratio, and a prompt holding only one of the
+block's two lines, are each refused with the wrapped port receiving no call — session 21's breaks 6d and 6c, each caught
+by it.

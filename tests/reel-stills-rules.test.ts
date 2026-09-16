@@ -69,7 +69,10 @@ test('3. drift, drift:prove and drift --audit pass', () => {
   assert.equal(prove.status, 0, prove.out)
   assert.doesNotMatch(prove.out, /SILENT/, prove.out)
   assert.doesNotMatch(prove.out, /EAGER/, prove.out)
-  assert.match(prove.out, /18 rules proven to fire/, prove.out)
+  // reel-render's Slice 1 added a nineteenth rule, processes-only-in-providers (S-075). The count
+  // stays exact, so a rule losing every one of its prove cases, or cases for a twentieth, still
+  // fails here (S-078).
+  assert.match(prove.out, /19 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)

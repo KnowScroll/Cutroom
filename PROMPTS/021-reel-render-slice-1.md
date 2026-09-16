@@ -4,7 +4,7 @@
 - **Feature:** `reel-render` — [`docs/features/reel-render.md`](../docs/features/reel-render.md)
 - **Work:** Slice 1 of 6 — the ports, the shapes and one rule; checks 1–6, tests first; no journey
 - **Written:** 2026-09-16, at the end of session 20, after `reel-render`'s gates were approved
-- **Run:** not yet
+- **Run:** session 21
 
 Paste everything inside the block below as the session's first message.
 

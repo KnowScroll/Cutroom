@@ -85,6 +85,9 @@ export const plan = sqliteTable(
  * `picture_ids` arrived with reel-stills (S-037, S-049): an observation or a reconciliation is tied
  * to its receipt by picture id, not by a stored receipt id. Their defaults are what every row
  * written before them was — a `structured` call about no picture — and every writer names both.
+ * `take_ids` arrived with reel-render's first slice, in S-055's form: a take's observation and
+ * reconciliation are tied to their receipts by take id, and every row before it named no take
+ * (S-072).
  */
 export const modelReceipt = sqliteTable('model_receipt', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -92,11 +95,13 @@ export const modelReceipt = sqliteTable('model_receipt', {
     .notNull()
     .references(() => run.runId),
   role: text('role').notNull(),
-  call: text('call', { enum: ['structured', 'observe', 'compare'] })
+  call: text('call', { enum: ['structured', 'observe', 'compare', 'judgeCut'] })
     .notNull()
     .default('structured'),
   /** A JSON array of picture ids. */
   pictureIds: text('picture_ids').notNull().default('[]'),
+  /** A JSON array of take ids. */
+  takeIds: text('take_ids').notNull().default('[]'),
   model: text('model').notNull(),
   temperature: real('temperature').notNull(),
   inputTokens: integer('input_tokens').notNull(),

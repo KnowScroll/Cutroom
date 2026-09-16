@@ -1466,3 +1466,117 @@ steering stubs and bumping the pin (S-033). `reel-takes`' gates are written afte
 - Nothing but markdown changed.
 
 **Next.** Session 21: run `PROMPTS/021-reel-render-slice-1.md`.
+
+## 2026-09-16/17 — session 21, reel-render Slice 1: the ports, the shapes and processes-only-in-providers
+
+**Intent.** Run `PROMPTS/021-reel-render-slice-1.md`: `reel-render`'s Slice 1 only — checks 1 to 6, tests first, nothing
+from Slice 2 or later, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green, 182
+tests (855e785).
+
+**Changed.**
+
+- **`packages/contracts`** — `clip.ts`, `narration.ts` and `render.ts` as Gate 3 writes them, but for `NarrationRecord`,
+  which is in `clip.ts` (S-079); `model.ts`: `observe` on a picture **or** a clip, `judgeCut`, `ModelCall` with
+  `'judgeCut'`, `ModelReceipt.takeIds`, `structured`'s optional `takeIds`; `settings.ts`: `RenderSettings`. Types only,
+  all exported from the index.
+- **`packages/pipeline`** — `GATE_ORDER = ['0', '1', '1S', '2', '3', '4', '5', '7']`; `render/index.ts`:
+  `DEFAULT_RENDER_SETTINGS`, gate profile `{ id: 'phase-1', gates: GATE_ORDER }`; `render/manifest.ts`:
+  `renderManifestSchema`; `clips/observation.ts`: `clipObservation`, built from the still's fields, now exported from
+  `stills/observation.ts` as `observationFields` (one witness contract, D-041, D-053 — not an S-entry, since no
+  alternative was open); `clips/prompts.ts`: `NEGATIVE_AUDIO`; `clips/validate.ts`: `validateVideoRequest` (S-080).
+- **`packages/providers`** — the model stand-in keeps `observe` on a clip in `observeClipCalls` and `judgeCut` in
+  `judgeCutCalls`, answering from the `witness` and `judge` scripts; every receipt carries `takeIds`, `judgeCut`'s
+  `pictureIds` the frames'. `calls`, `observeCalls` and `compareCalls` read exactly as before.
+- **`packages/domain`** — `model_receipt.take_ids`, default `'[]'`, and `call` widened with `'judgeCut'`;
+  `db/migrations/0002_model_receipt_take_ids.sql`, made by `drizzle-kit generate --name model_receipt_take_ids` after
+  `schema.ts` changed (S-019); `recordReceipt` writes `take_ids`.
+- **`apps/worker`** — `renderSettings` on `WorkerOptions`, defaulting to `DEFAULT_RENDER_SETTINGS`; a gate profile whose
+  gates are not `GATE_ORDER` is refused third among the startup refusals, before the database opens (S-067, S-077);
+  `recording-port.ts` records `judgeCut`; **`video-port.ts`: `validatingVideoPort`**, exported, which validates and
+  throws before calling the port it wraps. The worker is handed no video port.
+- **The rule.** `processes-only-in-providers` in `.dependency-cruiser.cjs`; six cases in `drift.mjs`' `CASES`, beside
+  `pipeline-no-io`'s `node:fs`. `drift --prove`: _"19 rules proven to fire across 46 cases"_. `drift --audit` reports
+  it `n/a`, as it does `model-client-only-in-providers`: its folder is a `pathNot`. `CLAUDE.md`: nineteen rules, in both
+  places, and a line naming the rule.
+- **Verified checks changed, no assertion removed**: `reel-plan`'s check 3 (four calls, still exact) and 29, and
+  `reel-stills`' check 5 — each as S-077 says, titles and comments naming it; **`reel-stills`' check 3, 18 → 19 rules
+  (S-078)**.
+- **Test support, no assertion**: `worker-process.ts`' port carries `judgeCut`, its held call counted over four calls;
+  the `hold` wrappers in `reel-stills-endings` and `reel-stills-placing` pass `judgeCut` through; **`tests/engine/compile.ts`**,
+  the snippet compiler `reel-stills-ports` has inline, which `reel-stills-ports` does not use — that verified file is
+  untouched.
+- **Six test files, `tests/reel-render-{ports,rules,profile,shapes,names,validator}.test.ts`: +14 tests, 182 → 196.**
+  Check 5's name clause is its own file, `reel-render-names`, importing no engine package, so it could be seen green
+  before any code.
+- **`DECISIONS.md` — S-078, S-079, S-080.** Slice 1 ticked. Prompt 021's `Run` line set to session 21, in the file and
+  the index (S-065).
+
+**Observed.**
+
+- **Two collisions, both found before any code, both asked of the owner, who chose the recommended option each time.**
+  - **`reel-stills`' check 3 asserts `/18 rules proven to fire/`** — a nineteenth rule makes a verified check red, and
+    S-077 did not list it, the miss S-049 found in S-047. **S-078**: 19, still exact.
+  - **Gate 3's file list is a type cycle.** `clip.ts` holds `MediaProbe` and `ClipsRecorder`; `narration.ts` holds
+    `NarrationRecord`, whose `probe` is a `MediaProbe`. A two-file type-only cycle was built in the scratchpad against
+    this repository's config, and `no-circular` fired. **S-079**: `NarrationRecord` in `clip.ts`. No gate text edited.
+- **Red first.** 1: _"Module '…contracts/src/index.ts' has no exported member 'AssemblerPort'"_, and twelve more names,
+  both tests. 2: _"processes-only-in-providers is not in .dependency-cruiser.cjs"_; _"drift --prove did not catch …
+  apps/worker/src/spawns.ts -> child_process"_; the count test on 18. 3: _"The requested module '@cutroom/pipeline' does
+  not provide an export named 'DEFAULT_RENDER_SETTINGS'"_ — a link error, so the file's three tests were red together
+  and the port-calls test was never red on its own. 4 and 5's schema test: _"… no export named 'clipObservation'"_. **5's
+  name clause: green before any code**, as the gate says. 6: _"… no export named 'NEGATIVE_AUDIO'"_. **The four verified
+  tests were edited before the code and not run red** — my omission; breaks 2d, 3a and 3i below show each fails.
+- **One red after the code, fixed by adding.** Check 1 refused an `image-to-video` request with an `aspectRatio`, but
+  TypeScript's message named only types (_"Type 'string' is not assignable to type '"9:16"'"_), pointing at the field.
+  `errorsIn` now appends the source text each error is reported at; every misuse was then read and is refused for its
+  own field.
+- **One S-entry for a choice the gates left open: S-080.** The validator holds every request that is not
+  `image-to-video` to 9:16 — D-036's finding that a call with no image is text-to-video — over matching the word, and
+  wants both lines of the audio block together. Not S-entries, since nothing was rejected that could be caught: the
+  wrapper's name; the compile helper's place; the migration's name; `voice: 'stand-in'` and the caption style's values
+  in `DEFAULT_RENDER_SETTINGS`, which Slices 3 and 4 read.
+- **What Slice 1 builds that no Slice 1 check asserts**: `ModelReceipt.takeIds` in the stand-in and `take_ids` written
+  (checks 23, 24 — Slice 3); `observeClipCalls` (23); `recording-port.ts` recording `judgeCut` and `judgeCutCalls`
+  (Slice 4); the child worker holding `judgeCut` (49 — Slice 6); every `DEFAULT_RENDER_SETTINGS` value but the gate
+  profile; the render manifest schema's structure beyond its four refusals; `validatingVideoPort` in any job (Slice 3).
+- **Fifty-eight deliberate breaks, one control**, by a runner rebuilt in the scratchpad: each file's bytes written and
+  `fsync`ed to a record before it was touched, restored from those bytes, a refusal to start while a record exists, and
+  after each restore a fingerprint of every modified and untracked file compared with the one taken before the chunk.
+  Each break ran typecheck, lint, `drift`, `drift --prove`, `drift --audit` and the whole suite; foreground chunks under
+  ten minutes, two in the background with nothing else touching the repository. Afterwards: no record, every find text
+  back in its file, no replacement text left, and `check.mjs` green. The child-process checks (`reel-plan` 47,
+  `reel-stills` 50) caught whatever their roll calls did and are left out below.
+
+  | check | breaks                                                                                                                                                                                                                                                                            | caught by                                                                                                                                                             |
+  | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | 1     | `text-to-video`'s ratio optional; either mode losing its `never` field; the image optional; a reference mode; 1080P; an end image; `observe`'s picture or clip branch losing its `never`; a prompt on a clip; a role or a schema on `judgeCut`; clips as `takeIds`                | 1 each — **but `image-to-video` losing `aspectRatio?: never` was first caught by nothing** (below); also typecheck for the picture branch and for `takeIds`           |
+  | 2     | the rule pointed at `packages/pipeline`; renamed away; one worker case deleted; one domain case deleted; every case deleted; the providers exception removed; `node:` dropped from the name                                                                                       | 2, `boundaries.test.ts`, `reel-stills` 3, `reel-plan` 2, 8, 9; the same; 2; 2; 2 and `reel-stills` 3 (18 rules); **2's config test alone**; **2's config test alone** |
+  | 3     | `GATE_ORDER` gains 6; default id `phase-2`; the refusal removed; moved after the database opens; by membership, not order; after the loop starts; the port loses `judgeCut`; gains a fifth call; `judgeCut` left out of check 3's list                                            | 3, `reel-plan` 29, `reel-stills` 5; 3; 3; 3, `reel-stills` 21; 3; 3, `reel-stills` 21; typecheck, 1, 3, `reel-plan` 3; 3, `reel-plan` 3; 3 (its own list)             |
+  | 4     | the still's schema accepting actions; a clip's actions optional; its event order optional; `clippedByEdge` optional; the clip's schema not strict; the clip's schema the still's                                                                                                  | 4, `reel-stills` 6; typecheck, 4; typecheck, 4; typecheck, 4, `reel-stills` 6; 4; 4                                                                                   |
+  | 5     | narration ids may repeat; join mode optional; a placed reason optional; an unplaced opening not strict; a placed reason empty; a field `manifest`; a type `EndCard`; a column `end_card`                                                                                          | 5 (the schema test; typecheck too for the two optionals); 5 (the name test) for the last three — the column also failing every run that writes a receipt              |
+  | 6     | the wrapper warning instead of throwing; calling the port before validating; the block's first line enough; only `text-to-video` held to 9:16; the ratio rule removed; the block reworded; refusing `image-to-video` without a ratio; the wrapper validating only `text-to-video` | 6 each — the ratio rule removed also typecheck and lint (an unused binding)                                                                                           |
+  | none  | `recordReceipt` dropping `take_ids`; the migration adding no column; clip calls kept with pictures; `judgeCut` not recorded; the child never holding `judgeCut`; `judgeCut`'s receipt naming no frames; **control**: a comment                                                    | nothing; every run writing a receipt; nothing; nothing; nothing; nothing; nothing                                                                                     |
+
+- **Caught by nothing that a check's words promise — one, fixed by adding.** With `aspectRatio?: never` removed from
+  `image-to-video`, check 1 stayed green: a **fresh** object literal gets excess-property checking against the member
+  its `mode` picks, so the misuse was refused whether or not the type refused it. A request built first and sent after
+  is not checked that way, and only the `never` refuses it. **Check 1 gained three misuses built before they are sent** —
+  an `image-to-video` request with a ratio, a `text-to-video` request with an image, and `observe` given both a picture
+  and a clip — and re-run, all four `never` breaks were caught by check 1.
+- **Two catches only the config test makes.** dependency-cruiser records `node:child_process` as `child_process`, so a
+  rule naming only the bare spelling still fires on every prove case; and no file in `packages/providers` imports
+  `child_process` until Slice 3, so a rule without its providers exception passes `drift`. `reel-render`'s check 2 reads
+  the rule's patterns, as `reel-stills`' check 3 does, and catches both.
+- **Not widened: `judgeCut`'s receipt naming its frames** (S-074's _"Its receipt names the frames' ids"_) is caught by
+  nothing, and no check of the fifty names it. Said for Slice 4, where the first `judgeCut` receipt is written.
+- **Traps.** A `node -e` holding backticks ended early and wrote nothing (checked: the stand-in's diff was empty); the
+  file was written with the editing tool. The column break made every receipt write throw, and tests waiting on a held
+  call hung with no timeout; the hung processes were killed, the runner restored and fingerprinted as designed, and later
+  chunks ran with `--test-timeout`. A waiter's pattern matched a test title and returned while a break was applied;
+  nothing was touched until the runner reported its restore.
+- `node scripts/check.mjs`: **everything green, 196 tests.** Checks 1–6 pass by number (14 tests).
+
+**Next.** `reel-render` Slice 2 — asking for a video, and the chain: `until: 'video'` accepted, `admitVideo` and the
+refusal at the ceiling, `advanceStills` and the `reel.clips` row, `reel-plan`'s check 10 and `reel-stills`' check 8 with
+their notes (S-077). Checks 7–10. Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068)
+and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).

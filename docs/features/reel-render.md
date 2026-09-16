@@ -1216,7 +1216,7 @@ _Restart, and no secrets_
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the ports, the shapes and one rule.** `clip.ts`, `narration.ts`, `render.ts`, `model.ts` and
+- [x] **Slice 1 — the ports, the shapes and one rule.** `clip.ts`, `narration.ts`, `render.ts`, `model.ts` and
       `settings.ts` as Gate 3 writes them; `GATE_ORDER` and the default gate profile, with the worker refusing another;
       the clip observation schema; the render manifest schema; the validator, and the worker's `video-port.ts`
       validating the requests it passes on (its guard and receipts are Slice 3's); the model stand-in's `observe` on a

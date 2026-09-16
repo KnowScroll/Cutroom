@@ -75,6 +75,18 @@ module.exports = {
       to: { path: '^packages/providers' },
     },
     {
+      name: 'processes-only-in-providers',
+      severity: 'error',
+      comment:
+        'S-075: ffmpeg and ffprobe are reached only through ports built in packages/providers, the ' +
+        'one place an adapter lives. A process started by the worker, the API or the domain is a ' +
+        'spawn behind no port — the shape S-021 recorded as uncaught for an import — and the worker ' +
+        'is the one place that knows both a stage and a table. pipeline-no-io already forbids it in ' +
+        'the pipeline; this forbids it everywhere else but providers, under either of its names.',
+      from: { path: '^(packages|apps)/', pathNot: '^packages/providers/' },
+      to: { dependencyTypes: ['core'], path: '^(node:)?child_process$' },
+    },
+    {
       name: 'providers-no-domain',
       severity: 'error',
       comment:

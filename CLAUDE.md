@@ -47,7 +47,7 @@ given every package source by its Slice 3; **the only `LanguageModelPort` is the
 `packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021). The
 same holds for **the only `ImagePort` and `PictureSensorPort`**, since `reel-stills`' Slice 3 (S-038):
 the image stand-in writes real PNGs under one artifact root, `.artifacts/` by default (D-086, D-087).
-**Eighteen** boundary rules are enforced on the real dependency graph, and
+**Nineteen** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
 or any legal import is reported or fails to resolve. The load-bearing ones: **pipeline imports no
@@ -55,8 +55,10 @@ domain, no providers, no app, no I/O at all, and no npm package but `zod`**. A s
 port; it never reaches for one. **Nothing outside `providers` imports a model client** (`ai`,
 `@ai-sdk/*`), and **nothing under `apps/worker` imports `packages/providers`** — the worker is
 handed its ports, so it cannot construct an adapter that spends (`worker-no-providers`, S-038).
+**Nothing outside `providers` imports `child_process`** — a process is started only behind a port
+(`processes-only-in-providers`, S-075).
 
-**Three of the eighteen are between two folders of one package**, and they are the reason this is
+**Three of the nineteen are between two folders of one package**, and they are the reason this is
 dependency-cruiser rather than a script matching import text. It resolves every import to a file
 path, so `'../split/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
 `split-imports-only-itself`, `split-imported-only-by-plan`, `split-entered-through-its-index` —

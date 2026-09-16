@@ -3,6 +3,7 @@ import type {
   LanguageModelPort,
   PictureSensorPort,
   PlanSettings,
+  RenderSettings,
   StillsSettings,
 } from '@cutroom/contracts'
 import {
@@ -15,7 +16,12 @@ import {
   openDatabase,
   PLAN_JOB,
 } from '@cutroom/domain'
-import { DEFAULT_PLAN_SETTINGS, DEFAULT_STILLS_SETTINGS } from '@cutroom/pipeline'
+import {
+  DEFAULT_PLAN_SETTINGS,
+  DEFAULT_RENDER_SETTINGS,
+  DEFAULT_STILLS_SETTINGS,
+  GATE_ORDER,
+} from '@cutroom/pipeline'
 import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
@@ -59,19 +65,35 @@ export interface WorkerOptions {
    * would render one prompt twice, so the worker refuses to start with them (D-032).
    */
   stillsSettings?: StillsSettings
+  /**
+   * The render's settings. Defaults to the pipeline's. Exactly one gate profile is defined, so a
+   * profile whose gates are not GATE_ORDER — a lighter set, or one with a gate the engine does not
+   * run — makes the worker refuse to start (D-052, S-067).
+   */
+  renderSettings?: RenderSettings
 }
 
 /**
  * Why a worker would break a promise before its first picture — or nothing. Checked before the
- * database is opened, so a refused worker claims no job (D-026's and D-032's startup assertions).
+ * database is opened, so a refused worker claims no job (D-026's, D-032's and D-052's startup
+ * assertions, in that order: S-077).
  */
-function refusal(options: WorkerOptions, stills: StillsSettings): string | undefined {
+function refusal(
+  options: WorkerOptions,
+  stills: StillsSettings,
+  render: RenderSettings,
+): string | undefined {
   if (!options.image.acceptsReferences) {
     return 'the image port does not accept reference pictures, so no derived picture could be made from the canonical (D-026)'
   }
   const [first, second] = stills.canonicalFraming
   if (first === second) {
     return `both canonical framing values are '${first}', so the canonical's two candidates would be one prompt made twice (D-032)`
+  }
+  const { id, gates } = render.gateProfile
+  const one = gates.length === GATE_ORDER.length && gates.every((gate, i) => gate === GATE_ORDER[i])
+  if (!one) {
+    return `the gate profile '${id}' runs gates [${gates.join(', ')}], and the one profile defined runs [${GATE_ORDER.join(', ')}]: no other set of gates exists (D-052, S-067)`
   }
   return undefined
 }
@@ -83,7 +105,8 @@ export interface Worker {
 
 export async function startWorker(options: WorkerOptions): Promise<Worker> {
   const stills = options.stillsSettings ?? DEFAULT_STILLS_SETTINGS
-  const refused = refusal(options, stills)
+  const render = options.renderSettings ?? DEFAULT_RENDER_SETTINGS
+  const refused = refusal(options, stills, render)
   if (refused !== undefined) throw new Error(`the worker refuses to start: ${refused}`)
 
   const db = openDatabase(options.dbPath)

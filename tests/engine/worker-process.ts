@@ -15,7 +15,7 @@ import { startWorker } from '@cutroom/worker'
  * An in-process worker cannot be that: its `stop()` finishes the job in hand first.
  *
  * It reads its settings as JSON on standard input. Its model is the stand-in, answering from the
- * script it is given, except that call `holdAtCall` (counted across the port's three calls and
+ * script it is given, except that call `holdAtCall` (counted across the port's four calls and
  * every role, from 1) is never answered: the process prints `held` and waits there until it is
  * killed. Every call before it returns, so its receipt is written. Its image and sensor ports are
  * the stand-ins, answering from the engine's scripts — a cost keyed by a whole picture id lands on
@@ -61,6 +61,9 @@ const model: LanguageModelPort = {
   },
   compare(call) {
     return holds() ? held() : standIn.compare(call)
+  },
+  judgeCut(call) {
+    return holds() ? held() : standIn.judgeCut(call)
   },
 }
 

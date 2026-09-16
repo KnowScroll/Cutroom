@@ -18,9 +18,11 @@ const issuesOf = (s: Schema, x: unknown) =>
 
 // ---------------------------------------------------------------- 5
 
-test("5. GATE_ORDER equals ['0', '1', '1S'], asserted as data", () => {
+// reel-render's Slice 1 appended Gates 2 to 5 and 7 (S-067, S-068), and this check asserts the list
+// with them (S-077). Nothing is removed: Gates 0, 1 and 1S are still the first three, in order.
+test("5. GATE_ORDER equals ['0', '1', '1S', '2', '3', '4', '5', '7'], asserted as data", () => {
   assert.ok(Array.isArray(GATE_ORDER), 'GATE_ORDER is not a list')
-  assert.deepEqual([...GATE_ORDER], ['0', '1', '1S'])
+  assert.deepEqual([...GATE_ORDER], ['0', '1', '1S', '2', '3', '4', '5', '7'])
 })
 
 // ---------------------------------------------------------------- 6

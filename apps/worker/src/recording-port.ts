@@ -7,13 +7,13 @@ import { recordReceipt, type Db } from '@cutroom/domain'
  * (D-005, D-084). A call that throws returned nothing and leaves no receipt; every call before it
  * keeps its own, whatever happens to the run afterwards.
  *
- * All three calls are recorded (S-037): the observation and the reconciliation of a picture are
- * tied to their receipts by key — the one `observe` receipt whose `pictureIds` is that picture's,
- * the one `reconciler` receipt whose `pictureIds` is that picture's — so a call that left no row
- * would leave a record nothing can join.
+ * All four calls are recorded (S-037, S-074): the observation and the reconciliation of a picture
+ * or a take are tied to their receipts by key — the one `observe` receipt whose `pictureIds` or
+ * `takeIds` is that picture's or take's, and the one `reconciler` receipt likewise — so a call that
+ * left no row would leave a record nothing can join.
  *
- * Each row names its call and its picture ids — the columns reel-stills' Slice 3 migration added,
- * which S-049 recorded as owed until then.
+ * Each row names its call, its picture ids and its take ids — the columns reel-stills' Slice 3
+ * migration and reel-render's Slice 1 migration added (S-049, S-072).
  */
 export function recordingPort(model: LanguageModelPort, db: Db, runId: string): LanguageModelPort {
   return {
@@ -29,6 +29,11 @@ export function recordingPort(model: LanguageModelPort, db: Db, runId: string): 
     },
     async compare(call) {
       const answer = await model.compare(call)
+      recordReceipt(db, runId, answer.receipt)
+      return answer
+    },
+    async judgeCut(call) {
+      const answer = await model.judgeCut(call)
       recordReceipt(db, runId, answer.receipt)
       return answer
     },

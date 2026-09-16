@@ -1,9 +1,10 @@
 import type { ModelRole } from './model.ts'
 import type { Framing, KeyframeTerm } from './picture.ts'
+import type { GateProfile, OutputProfile } from './render.ts'
 
-// What planning and the stills stage read from settings rather than from code
-// (docs/features/reel-plan.md, Gate 2; docs/features/reel-stills.md, Gate 3). The types only; the
-// defaults arrive with the code that reads them.
+// What planning, the stills stage and the render read from settings rather than from code
+// (docs/features/reel-plan.md, Gate 2; docs/features/reel-stills.md and reel-render.md, Gate 3).
+// The types only; the defaults arrive with the code that reads them.
 
 export interface PlanSettings {
   /** The two unit counts a `shotCount` fork cuts the narration into (D-112). Default [4, 6]. */
@@ -31,4 +32,23 @@ export interface StillsSettings {
   scoreWeights: Record<KeyframeTerm, number>
   /** Above this suspicion Gate 1S asks the judge — provisional until M-1 (D-049). Default 0.25. */
   suspicionThreshold: number
+}
+
+export interface RenderSettings {
+  /** Default 768 × 1366 at 24 fps, 48 kHz, two channels — provisional until M-7 (D-055). */
+  profile: OutputProfile
+  /** Default `{ id: 'phase-1', gates: GATE_ORDER }`; exactly one profile is defined (S-067). */
+  gateProfile: GateProfile
+  /** Default 0: T2A is covered by the token plan (D-019, S-070). */
+  narrationRateCentsPerCharacter: number
+  voice: string
+  /** Default `balanced`, the only value the research read (D-072, O-20). */
+  promptExpansionMode: string
+  /** Gate 2's thresholds: 0.01, 0.5 s and 1.0 s — provisional until M-1 (S-072). */
+  technical: { aspectTolerance: number; blackSeconds: number; frozenSeconds: number }
+  captionStyle: { id: string; fontName: string; fontSize: number; marginV: number }
+  /** How far a clip's sound sits under the narration. Default 18 (S-073). */
+  duckDb: number
+  /** Gate 7's five closed questions, each answered yes when the cut is right — provisional until M-1 (S-074). */
+  cutQuestions: readonly [string, string, string, string, string]
 }

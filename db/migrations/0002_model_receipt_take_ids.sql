@@ -1,0 +1,1 @@
+ALTER TABLE `model_receipt` ADD `take_ids` text DEFAULT '[]' NOT NULL;

@@ -11,7 +11,31 @@ export {
   type PlanShot,
   type PlanSubject,
 } from './cinematic.ts'
+export type {
+  ClipObservation,
+  ClipReconciliation,
+  ClipRef,
+  ClipScan,
+  ClipSound,
+  ClipsRecorder,
+  MediaPort,
+  MediaProbe,
+  NarrationRecord,
+  TakeRecord,
+  TakeVerdict,
+  VideoAnswer,
+  VideoPort,
+  VideoReceipt,
+  VideoRequest,
+} from './clip.ts'
 export type { LanguageModelPort, ModelCall, ModelReceipt, ModelRole } from './model.ts'
+export type {
+  NarrationAnswer,
+  NarrationPort,
+  NarrationReceipt,
+  NarrationRequest,
+  WordTiming,
+} from './narration.ts'
 export type {
   Framing,
   ImageAnswer,
@@ -28,4 +52,14 @@ export type {
   StillsRecorder,
   WitnessObservation,
 } from './picture.ts'
-export type { PlanSettings, StillsSettings } from './settings.ts'
+export type {
+  AssembledFile,
+  AssemblerPort,
+  Caption,
+  CutVerdict,
+  GateProfile,
+  OutputProfile,
+  RenderManifest,
+  RenderShot,
+} from './render.ts'
+export type { PlanSettings, RenderSettings, StillsSettings } from './settings.ts'
