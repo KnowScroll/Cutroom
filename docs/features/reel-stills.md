@@ -878,7 +878,7 @@ _Restart, and no secrets_
       `worker-no-providers` with its `--prove` cases, and `CLAUDE.md`'s rule count. `reel-plan`'s behaviour is unchanged.
       **No `stills/` folder yet.**
       **Proves: 1, 2, 3.**
-- [ ] **Slice 2 — asking for pictures, and the chain.** `until: 'stills'` accepted, `reel-plan`'s check 10 and
+- [x] **Slice 2 — asking for pictures, and the chain.** `until: 'stills'` accepted, `reel-plan`'s check 10 and
       `reel-plan-run.test.ts` sending `video`, and the note in `reel-plan.md` (S-047); `admitPictures`; the refusal at
       the ceiling; `admitStills` and the `reel.keyframes` job row; the worker claiming both kinds; `startStage` for
       `stills` with the cancel flag. Pictures do not exist yet, so a started keyframes job finishes the run `failed` with

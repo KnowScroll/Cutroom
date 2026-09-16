@@ -86,8 +86,10 @@ test('16. a run has one job row, of kind reel.plan, whose correlation_id is the 
   const replayed = await engine.http.submit(validRequest('r16'))
   assert.equal(replayed.json.replayed, true)
 
-  const refused = validRequest('r16-stills')
-  refused.options.until = 'stills'
+  // `stills` is accepted since reel-stills' Slice 2 and would leave job rows of its own (S-047);
+  // `video` is the refusal that still stores nothing.
+  const refused = validRequest('r16-video')
+  refused.options.until = 'video'
   assert.equal((await engine.http.submit(refused)).status, 422)
 
   await finished(engine, runId)

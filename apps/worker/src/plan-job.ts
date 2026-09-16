@@ -1,16 +1,23 @@
 import type { Gate0Verdict, LanguageModelPort, PlanSettings } from '@cutroom/contracts'
 import {
+  admitStills,
   finishRun,
   readReelCapCents,
   readRequest,
   readRun,
-  startPlanStage,
+  startStage,
   type ClaimedJob,
   type Db,
   type EventBody,
   type PlanRow,
 } from '@cutroom/domain'
-import { GATE_ORDER, planReel, type PlanOutcome, type PlanRecord } from '@cutroom/pipeline'
+import {
+  GATE_ORDER,
+  admitPictures,
+  planReel,
+  type PlanOutcome,
+  type PlanRecord,
+} from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type SubmitRequest } from '@cutroom/reel-contract'
 import { appendBudgetQuestion } from './questions.ts'
 import { recordingPort } from './recording-port.ts'
@@ -83,7 +90,7 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
 
   // The cancel flag is read before the plan stage starts, and before a job interrupted mid-stage is
   // run again (S-027). A cancel that arrives after this does not stop the stage (Gate review 2).
-  if (startPlanStage(db, runId) === 'cancelled') {
+  if (startStage(db, runId, 'plan') === 'cancelled') {
     finishRun(db, { runId, jobId: job.id, result: { ...finished, status: 'cancelled' } })
     return
   }
@@ -119,11 +126,48 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
 
   if (outcome.kind === 'selected') {
     const plans = rowsOf(outcome, outcome.selected)
+    // The stage produced a plan, so it finished, whichever way the run goes from here (S-025).
+    const events: EventBody[] = [...verdictEvents(plans), { type: 'stage.finished', stage: 'plan' }]
+
+    if (request.options.until === 'stills') {
+      const chosen = plans.find((row) => row.selected)
+      if (chosen === undefined)
+        throw new Error(`the selected plan '${outcome.selected}' has no row`)
+      const ceilingCents = request.options.budgetCents
+      const { admitted, picturesCents } = admitPictures(chosen.plan, ceilingCents, context.settings)
+
+      if (!admitted) {
+        // The caller's ceiling fired, not the engine's cap: the run is refused with the figure that
+        // was compared, no question is written (D-100), and the chain gets no second row (D-083).
+        finishRun(db, {
+          runId,
+          jobId: job.id,
+          plans,
+          events,
+          result: {
+            ...finished,
+            status: 'refused',
+            reason: 'budget',
+            limit: 'ceiling',
+            estimateCents: picturesCents,
+            ceilingCents,
+            capCents,
+          },
+        })
+        return
+      }
+
+      // Admitted (S-030, S-035): one transaction writes the plan rows, the events, this job done at
+      // cost 0, and the chain's `reel.keyframes` row. The run is not finished — the pictures are.
+      admitStills(db, { runId, jobId: job.id, plans, events })
+      return
+    }
+
     finishRun(db, {
       runId,
       jobId: job.id,
       plans,
-      events: [...verdictEvents(plans), { type: 'stage.finished', stage: 'plan' }],
+      events,
       result: {
         ...finished,
         status: 'completed',

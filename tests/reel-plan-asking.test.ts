@@ -30,8 +30,11 @@ function reversedKeys(value: unknown): unknown {
 
 // ---------------------------------------------------------------- 10
 
-test("10. a submit with until 'stills' or 'video' is refused 422 'unsupported' with no runId", async () => {
-  for (const until of ['stills', 'video'] as const) {
+// D-108 scoped the stills refusal to "a reel-plan build". reel-stills' Slice 2 built the chain, so
+// this check narrows to `video` and reel-stills' check 8 asserts the new pair (S-047). No
+// assertion is removed: every one below still runs, on the one `until` this engine still refuses.
+test("10. a submit with until 'video' is refused 422 'unsupported' with no runId", async () => {
+  for (const until of ['video'] as const) {
     const requestId = `r10-${until}`
     const request = validRequest(requestId)
     request.options.until = until

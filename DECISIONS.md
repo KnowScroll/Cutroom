@@ -1423,3 +1423,87 @@ step changes with it.
 
 **Confirmed-by.** The owner, 2026-09-16, choosing the rename over an exception to the check, and with it the edit to
 Gate 3's signature.
+
+---
+
+## S-051 | 2026-09-16 | One `startStage` over both stages, not one function per stage
+
+**Chose.** `packages/domain/src/runs.ts`' `startPlanStage(db, runId)` becomes
+**`startStage(db, runId, stage)`**, `stage` being `'plan' | 'stills' | 'video'` — the contract's own stage type,
+re-exported as `Stage`. The body is unchanged apart from the two places that said `'plan'`: the `json_extract`
+that looks for an earlier `stage.started` now matches **that stage's**, and the event it appends carries it. Both
+job runners call it: `reel.plan` with `'plan'`, `reel.keyframes` with `'stills'` (`apps/worker/src/keyframes-job.ts`).
+
+**Why.** `reel-stills`' Gate 3 names `startStage` in `runs.ts` and does not name `startPlanStage`, and Gate 2 puts
+the same two obligations on the stills stage as S-027 put on the plan stage: one immediate transaction, so a cancel
+cannot land between the read and the start; and `stage.started` written once however many attempts a job takes. The
+rule is identical; only the word `'plan'` differed. **A second copy of a rule is a second place for it to drift**, and
+S-014's finding is that a rule which reads correctly and matches nothing is worse than no rule.
+
+**Rejected.** **A `startStillsStage` beside `startPlanStage`** — two functions, one rule, and a fix to the cancel
+transaction that has to be made twice. **Keeping `startPlanStage` as a wrapper** — a name for one argument. **A
+`stage` column on `run`** — a migration, and a second record of what the event log already says (S-027 rejected it
+once already).
+
+**Not handled.** **No Slice 2 check catches the `stage` argument.** Breaking the `json_extract` filter so it matches
+any stage — making the keyframes job treat the plan stage's `stage.started` as its own, and write none — left every
+Slice 2 check green, because nothing in Slice 2 reads a stills event. It is caught by **check 41** (Slice 4, each
+ending's events) and **check 48** (Slice 5, _"`stage.started` for stills appears once"_). Said rather than widened:
+check 10's words are about job rows, and inventing an event assertion here would move Slice 4's work forward.
+
+**Caught by.** `reel-plan`'s checks 45 and 46 for `'plan'` — a cancelled run has no `stage.started`, and a job run
+again does not write a second one — both unchanged and still green through the rename. Breaks watched, each caught:
+none.
+
+---
+
+## S-052 | 2026-09-16 | An admitted `stills` run's plan stage is ended by `admitStills`, which writes everything `finishRun` writes except the ending
+
+**Chose.** `admitStills(db, { runId, jobId, plans, events })` in `packages/domain/src/runs.ts`, one immediate
+transaction that writes **the plan rows, the events, the plan job done at cost 0, and the `reel.keyframes` row**, and
+**returns that row's id**. It writes **no `run.finished` event and no result**, and does not touch `run.state`: an
+admitted run stays `running` until the keyframes job answers for its pictures. The plan-row write `finishRun` used to
+do inline is factored into one `writePlans`, called by both, so the two transactions cannot come to store a plan
+differently.
+
+**Why.** Gate 2's _Admission_ lists five things in **one** transaction, and D-083's whole point is that the second row
+exists **only** if the plan survived — a plan row written by one transaction and a job row by another can be separated
+by a crash, and D-083's test would then pass over a database that says nothing about why the row exists. The run must
+not be finished, because `finishRun` sets `run.state` and writes `run.finished`: a caller polling would read an
+admitted run as over, and the record route would answer 200 with no pictures.
+
+**Rejected.** **`finishRun` with an optional "next job" and an optional result** — one function that sometimes ends a
+run and sometimes does not, whose callers all pass the half they do not mean. **Enqueueing outside the transaction,
+after `finishRun`-without-a-result** — the crash window above. **Marking the plan job done in the keyframes job** —
+the plan job's own runner is the only thing that knows it succeeded, and a lease would reclaim it meanwhile.
+
+**Caught by.** `reel-stills`' check 10: the admitted run has exactly two job rows, the plan job `done` at
+`cost_cents` 0, the keyframes row carrying the run's `correlation_id` and the plan job's id as `parent_id`, the plan
+stage's `stage.finished`, **and both plan rows with the selected one flagged**; and it is not refused. Breaks watched,
+each caught by check 10: the plan rows left out of the transaction, the events left out, the plan job completed at a
+cost, `parent_id` dropped, `correlation_id` given a chain of its own, and the run finished at the plan job as a
+plan-only run is. Check 9 and check 11 watch the other side — a refusal or a stop that enqueues the row anyway.
+
+---
+
+## S-053 | 2026-09-16 | The pictures' figure is rounded up, the way the estimate it is a share of is
+
+**Chose.** `admitPictures` returns `Math.ceil(plannedImageCalls * imageRateCents)`. Every rate in
+`PlanSettings` is typed `number`, not an integer, and today's two are whole cents.
+
+**Why.** D-083's estimate is `Math.ceil(image calls x image rate + seconds x video rate)` — `estimate.ts`, unchanged
+since `reel-plan`. The pictures' figure is a **share of that same estimate** (S-030), so it must round the same way,
+or a fractional rate would make the two figures disagree about the same plan. Up rather than down is the direction
+that refuses at the boundary rather than admitting: the contract promises a run is stopped when spending _"would
+pass"_ the limit, and a figure rounded down under-reports what the calls will cost.
+
+**Rejected.** **No rounding** — `estimateCents` is an integer field in the contract and in the `plan` row; an
+unrounded figure reaches a caller as a fraction of a cent. **Rounding down** — admits a run whose calls cost more
+than its ceiling, by less than a cent per reel, in the one direction the contract forbids. **Requiring integer
+rates** — a constraint on `PlanSettings` that `reel-plan` does not make and that a real invoice (Q9) may not keep.
+
+**Caught by.** `reel-stills`' check 10's exact-ceiling pair: a ceiling of exactly `planned calls x rate` is admitted
+and one cent less is refused, which fails on any figure that is not that arithmetic. Breaks watched, each caught by
+checks 9 and 10: the reserve's two calls added to the figure, and the plan's whole `estimateCents` compared in its
+place. **Not caught by anything today:** the rounding itself, since both rates are whole cents — a fractional rate
+has no fixture until Q9 is read.

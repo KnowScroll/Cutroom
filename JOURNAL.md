@@ -894,3 +894,99 @@ bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
 `reel.keyframes` job row, and `reel-plan`'s check 10 and its note (S-047). Checks 8–11. Owed outside this repository,
 unchanged: `reel-script` emitting a criterion's type (S-029); deleting the steering stubs and bumping the pin (S-033).
 S-015's promised front-matter test is still unwritten.
+
+## 2026-09-16 — session 16, reel-stills Slice 2: asking for pictures, and the chain
+
+**Intent.** `reel-stills`' Slice 2 only — checks 8, 9, 10 and 11, tests first, nothing from Slice 3 or later.
+`decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green at **126 tests**.
+
+**Changed.**
+
+- **`until: 'stills'` is accepted** (`apps/api/src/server.ts`): the refusal narrows from _"not `plan`"_ to `video`
+  alone (D-108, S-047). **`reel-plan`'s check 10 narrows to `video`**, `reel-plan-run.test.ts`'s refused submit sends
+  `video`, and `docs/features/reel-plan.md` gains a note naming S-047 — **its gates are not edited and no assertion is
+  removed**; check 10's every assertion still runs, on the one `until` this engine still refuses.
+- **`admitPictures`** (`packages/pipeline/src/admit.ts`, exported from the index), Gate 3's signature exactly: the
+  selected plan's `plannedImageCalls × imageRateCents`, **and nothing else** — no reserve, no video (S-030, S-035).
+- **Admission at the end of the plan job** (`apps/worker/src/plan-job.ts`). Above the ceiling → refused for budget,
+  `limit: 'ceiling'`, the pictures' figure as `estimateCents`, with the ceiling and the cap the job read; **no
+  question** (D-100) and **no second job row** (D-083); the plan stage keeps its `stage.finished` (S-025, S-046). At or
+  below → `admitStills`.
+- **`admitStills`** (`packages/domain/src/runs.ts`): one immediate transaction — plan rows, the plan stage's events,
+  the plan job done at cost 0, and **one `reel.keyframes` row** with the run id as `correlation_id` and the plan job as
+  `parent_id` (D-081). **The run is not finished.** `finishRun`'s inline plan-row write is factored into one
+  `writePlans` that both transactions call.
+- **`startStage(db, runId, stage)`** replaces `startPlanStage`, one function over both stages (S-051).
+  `apps/worker/src/keyframes-job.ts` is the second job kind: cancel flag and `stage.started` for `stills` in one
+  transaction (S-027), then the run finishes `failed` with _"pictures are not built"_ — contract-valid, asserted by no
+  check, replaced in Slice 3. The worker claims **both** kinds, oldest row first, so a plan job always precedes the
+  keyframes job it creates.
+- **`DECISIONS.md` — S-051, S-052 and S-053**, below.
+- **Two test files**, `tests/reel-stills-{asking,admission}.test.ts`: **+4 tests, 126 → 130**. Slice 2 ticked in
+  `docs/features/reel-stills.md`. No journey: that is Slice 5's.
+
+**Observed.**
+
+- **Red first, every check.** 8: _"until 'stills' is not built yet … 422 !== 202"_. 9, 10 and 11: the same refusal,
+  through the harness — _"the request was not accepted"_. Then the two `reel-plan` failures S-047 predicted, and only
+  those: check 10 and check 16 (and check 47, which re-runs the suite in a child process).
+- **The fixture is what makes checks 9 and 10 sharp.** The two plans' **planned image calls differ** — the 4-unit plan
+  shows two eligible subjects (3 calls, 205 cents), the 6-unit plan one (2 calls, 190) — and the 6-unit plan is
+  selected. So the pictures' figure is **30**, and an implementation reading the other plan (45), the reserve (60) or
+  the whole reel (190) gives a different number on the same run.
+- **Twenty-two deliberate breaks**, each applied and then **restored from the bytes the script read** — never from
+  git; `git status` afterwards showed only this session's own changes, every time. Twenty were caught at once:
+
+  | break                                                           | caught by                         |
+  | --------------------------------------------------------------- | --------------------------------- |
+  | the figure counts D-027's two reserve calls                     | 9, 10                             |
+  | the figure is the plan's whole `estimateCents`                  | 9, 10                             |
+  | exactly equal is refused, not admitted                          | 10                                |
+  | admission reads the first plan row, not the selected one        | 9, 10                             |
+  | a ceiling refusal writes a question                             | 9                                 |
+  | a ceiling refusal enqueues the keyframes row anyway             | 9, 10                             |
+  | a ceiling refusal drops `stage.finished` for plan               | 9                                 |
+  | the keyframes row carries no `parent_id`                        | 10                                |
+  | it starts a `correlation_id` of its own                         | 10                                |
+  | the plan job is completed at a cost                             | 10                                |
+  | submit accepts `video` too                                      | 8, and `reel-plan` 10, 16, 13, 47 |
+  | submit still refuses `stills`                                   | 8, 9, 10, 11                      |
+  | the worker claims `reel.plan` only                              | 10                                |
+  | a stills run with no plan selected is enqueued anyway           | 11                                |
+  | …and one stopped at the split                                   | 11                                |
+  | a no-plan stills run gets the plan stage's `stage.finished`     | 11                                |
+  | a stills run refused at the per-reel **cap** writes no question | 11                                |
+  | a split stop reports `step: 'stills'`                           | 11                                |
+  | an admitted run's plan-stage events are not written             | 10                                |
+  | the admitted run is finished at the plan job                    | 10                                |
+
+- **Two breaks nothing caught, and what was done about each.**
+  - **An admitted run's plan rows left out of `admitStills`** — green everywhere. Gate 2 puts the plan rows in the
+    **same transaction** as the keyframes row, so this is inside check 10's _"is admitted"_, not beyond it.
+    **An assertion was added**, never subtracted: the admitted run keeps both plan rows with the selected one flagged.
+    The break is caught now.
+  - **`startStage`'s `stage` filter widened to match any stage** — so the keyframes job reads the plan stage's
+    `stage.started` as its own and writes none. Still green, because **nothing in Slice 2 reads a stills event**. It is
+    caught by check 41 (Slice 4) and check 48 (Slice 5). **Said rather than widened** (S-051's _Not handled_):
+    check 10's words are about job rows, and writing an event assertion here would move Slice 4's work forward.
+- **Three decisions the gates left open.** **S-051** — one `startStage` over both stages, since S-027's transaction and
+  its once-only rule are identical for `plan` and `stills`, and a second copy is a second place to drift; Gate 3 names
+  `startStage` and not `startPlanStage`. **S-052** — `admitStills` writes everything `finishRun` writes **except** the
+  ending, because D-083's second row must not be separable from the plan it rests on, and a finished run would read to
+  a caller as over. **S-053** — the pictures' figure rounds **up**, as the estimate it is a share of does
+  (`estimate.ts`); the rounding itself is unfalsifiable while both rates are whole cents, which is recorded rather than
+  dressed up.
+- **No collision with verified `reel-plan` beyond the two S-047 listed.** `startPlanStage` was named by no test, so
+  the rename cost nothing; `reel-plan`'s checks 45 and 46 still hold it to S-027 for `plan`.
+- **Nothing from Slice 3 or later**: no `stills/` folder, no migration, `GATE_ORDER` still `['0']`, no image or sensor
+  port reached, no picture table.
+- **Session 15's unreproduced `FAIL tests` did not recur** in any run this session. The backslash trap did not fire:
+  every file carrying one was written through the editing tool, and the break script's replacements were read from
+  JSON, not typed into a shell.
+- `node scripts/check.mjs`: **everything green, 130 tests**.
+
+**Next.** `reel-stills` Slice 3 — pictures, both gates and a completed stills run (checks 4–7, 12–35): the image and
+sensor stand-ins, the migration, placement, the image prompts, Gate 1's four steps, the keyframe score, derived
+pictures, Gate 1S, the guarded image port, the recorder, the record route, and `GATE_ORDER` with `reel-plan`'s check 29
+(S-047). Owed outside this repository, unchanged: `reel-script` emitting a criterion's type (S-029); deleting the
+steering stubs and bumping the pin (S-033). S-015's promised front-matter test is still unwritten.

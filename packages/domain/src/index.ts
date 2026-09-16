@@ -5,7 +5,9 @@ export { BUDGET_MD, readReelCapCents } from './budget.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
 export {
+  KEYFRAMES_JOB,
   PLAN_JOB,
+  admitStills,
   canonicalJson,
   eventsAfter,
   finishRun,
@@ -14,10 +16,11 @@ export {
   readRunByRequestId,
   recordReceipt,
   requestCancel,
-  startPlanStage,
+  startStage,
   submitRun,
   type EventBody,
   type PlanRow,
+  type Stage,
   type StoredRun,
   type Submitted,
 } from './runs.ts'

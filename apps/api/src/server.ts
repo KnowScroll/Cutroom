@@ -108,9 +108,9 @@ function submit(db: Db, text: string): [number, SubmitResponse] {
   }
   const request = parsed.data
 
-  // D-108: this engine plans; pictures and video are reel-stills' and reel-render's.
-  if (request.options.until !== 'plan') {
-    const detail = `until '${request.options.until}' is not built yet: this engine answers with a plan only`
+  // D-108: this engine plans and makes pictures; video is reel-render's (S-047).
+  if (request.options.until === 'video') {
+    const detail = `until 'video' is not built yet: this engine answers with a plan or with pictures`
     return [422, refuse('unsupported', detail, request.requestId)]
   }
   // D-110: two plans may differ on shotCount only. Absent means shotCount (D-092).

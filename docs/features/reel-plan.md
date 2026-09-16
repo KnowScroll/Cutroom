@@ -26,6 +26,20 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 >
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
+>
+> **Amended by `reel-stills` on 2026-09-16 — the gates below are not edited, and no assertion is removed**
+> (**S-047**). Where Gate 1 and _Outcome_ say pictures are "not built yet", that is now true of **video only**:
+>
+> - **`until: 'stills'` is accepted.** D-108's `Confirmed-by` scoped the stills refusal to _"a `reel-plan`
+>   build"_, and `reel-stills`' Slice 2 built the chain, so **check 10 narrows to `video`** and its stills half
+>   is asserted by `reel-stills`' check 8. Every test here that sent `until: 'stills'` to be refused sends
+>   `video`.
+> - **A `stills` run's plan stage is exactly the one below**, with one thing after it: a selected plan is
+>   compared with the caller's ceiling by **the pictures' figure** (**S-030**, **S-035**), and an admitted run
+>   gets the chain's second job row (D-081, D-083). A run that selects no plan ends exactly as this feature's
+>   does (S-025), with no second row.
+> - Its fixtures' criteria gained a `type` in Slice 1 (S-029, S-034), and `GATE_ORDER` changes in Slice 3, where
+>   **check 29** is amended. Both journeys are run again after `reel-stills`' Slice 5.
 
 ## Gate 1 — Product (no technical language)
 

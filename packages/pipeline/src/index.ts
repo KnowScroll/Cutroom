@@ -2,6 +2,7 @@
 // No database, no provider, no filesystem, no network. The splitter is not exported: the planning
 // stage is its one caller (D-073).
 
+export { admitPictures } from './admit.ts'
 export { estimate } from './estimate.ts'
 export { GATE_ORDER, gate0 } from './gates/index.ts'
 export {

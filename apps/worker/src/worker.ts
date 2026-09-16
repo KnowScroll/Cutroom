@@ -5,14 +5,18 @@ import {
   claimJob,
   closeDatabase,
   DEFAULT_LEASE_MS,
+  KEYFRAMES_JOB,
   openDatabase,
   PLAN_JOB,
 } from '@cutroom/domain'
 import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
+import { runKeyframesJob } from './keyframes-job.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
 
 // The runner's loop: claim a due job, run it, and poll again (D-002). Jobs are run one at a time.
+// Both of the chain's kinds are claimed by the one worker, oldest row first, so a reel's plan job
+// is always run before the keyframes job it creates (D-081, D-083).
 
 export interface WorkerOptions {
   /** The database file (D-086), shared with the API. */
@@ -59,10 +63,11 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
 
   async function drain(): Promise<void> {
     while (!stopped) {
-      const job = claimJob(db, [PLAN_JOB], new Date(), leaseMs)
+      const job = claimJob(db, [PLAN_JOB, KEYFRAMES_JOB], new Date(), leaseMs)
       if (job === undefined) return
       try {
-        await runPlanJob(db, job, context)
+        if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job)
+        else await runPlanJob(db, job, context)
       } catch (error) {
         buryJob(db, job.id, error instanceof Error ? error.message : String(error))
       }

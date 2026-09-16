@@ -22,6 +22,11 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K>
 export type EventBody = DistributiveOmit<RunEvent, 'contractVersion' | 'runId' | 'seq' | 'at'>
 
 export const PLAN_JOB = 'reel.plan'
+/** The chain's second job: the pictures of an admitted `stills` run (D-081, D-083, D-108). */
+export const KEYFRAMES_JOB = 'reel.keyframes'
+
+/** The stages a run has events for. The engine builds two of them; `video` is reel-render's. */
+export type Stage = Extract<RunEvent, { stage: string }>['stage']
 
 /** JSON with keys sorted at every depth, so two requests that differ only in key order are equal. */
 export function canonicalJson(value: unknown): string {
@@ -187,6 +192,61 @@ export function eventsAfter(db: Db, runId: string, since: number): RunEvent[] {
     .map((row) => JSON.parse(row.body) as RunEvent)
 }
 
+/** The plan rows a stage produced, written inside whichever transaction ends that stage. */
+function writePlans(tx: Writer, runId: string, plans: readonly PlanRow[]): void {
+  for (const row of plans) {
+    tx.insert(plan)
+      .values({
+        runId,
+        role: row.role,
+        unitCount: row.plan.units.length,
+        axis: row.axis,
+        plan: JSON.stringify(row.plan),
+        verdict: JSON.stringify(row.verdict),
+        score: row.score,
+        estimateCents: row.plan.estimateCents,
+        selected: row.selected,
+      })
+      .run()
+  }
+}
+
+/**
+ * A `stills` run whose pictures fit the caller's ceiling (S-030, S-035), in one transaction: the
+ * plan rows, the events the plan stage ended with, the plan job marked done at cost 0, and the
+ * chain's next row — one `reel.keyframes` job whose `correlation_id` is the run and whose
+ * `parent_id` is the plan job (D-081, D-083). Returns that row's id.
+ *
+ * The run is deliberately NOT finished: it has no result until the pictures are answered for, and
+ * a worker that died between this transaction and the next claim leaves a queued job, not a
+ * half-finished run.
+ */
+export function admitStills(
+  db: Db,
+  admit: {
+    runId: string
+    jobId: number
+    plans?: readonly PlanRow[]
+    events?: readonly EventBody[]
+  },
+  now: Date = new Date(),
+): number {
+  const { runId, jobId } = admit
+  return db.transaction(
+    (tx) => {
+      writePlans(tx, runId, admit.plans ?? [])
+      for (const event of admit.events ?? []) append(tx, runId, event, now)
+      completeJob(tx, jobId, 0)
+      return enqueue(
+        tx,
+        { kind: KEYFRAMES_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
+        now,
+      )
+    },
+    { behavior: 'immediate' },
+  )
+}
+
 /**
  * Finishes a run in one transaction: its plans, the events before the end, its `run.finished`
  * event, its result, and its job marked done — so a job interrupted before this leaves no
@@ -206,21 +266,7 @@ export function finishRun(
   const { runId, jobId, result } = finish
   db.transaction(
     (tx) => {
-      for (const row of finish.plans ?? []) {
-        tx.insert(plan)
-          .values({
-            runId,
-            role: row.role,
-            unitCount: row.plan.units.length,
-            axis: row.axis,
-            plan: JSON.stringify(row.plan),
-            verdict: JSON.stringify(row.verdict),
-            score: row.score,
-            estimateCents: row.plan.estimateCents,
-            selected: row.selected,
-          })
-          .run()
-      }
+      writePlans(tx, runId, finish.plans ?? [])
       for (const event of finish.events ?? []) append(tx, runId, event, now)
       append(tx, runId, { type: 'run.finished', status: result.status }, now)
       tx.update(run)
@@ -234,15 +280,21 @@ export function finishRun(
 }
 
 /**
- * What a `reel.plan` job does before its plan stage, in one immediate transaction, so a cancel
- * cannot land between the read and the start (docs/features/reel-plan.md, Gate 2 "Cancel" and "A
- * restart"; S-027). A run whose cancel flag is set answers `cancelled` and nothing is written — also
- * when an interrupted job is run again. Otherwise `stage.started` is appended, unless an earlier
- * attempt at the job already wrote it: a job run again from the start does not write it twice.
+ * What a job does before its stage, in one immediate transaction, so a cancel cannot land between
+ * the read and the start (docs/features/reel-plan.md, Gate 2 "Cancel" and "A restart";
+ * docs/features/reel-stills.md, Gate 2 "Cancel"; S-027). A run whose cancel flag is set answers
+ * `cancelled` and nothing is written — also when an interrupted job is run again. Otherwise
+ * `stage.started` is appended, unless an earlier attempt at the job already wrote it: a job run
+ * again from the start does not write it twice.
+ *
+ * One function over both stages, not one per stage: the transaction and the once-only rule are the
+ * same for `plan` and for `stills`, and a second copy is a second place for the rule to drift
+ * (S-051).
  */
-export function startPlanStage(
+export function startStage(
   db: Db,
   runId: string,
+  stage: Stage,
   now: Date = new Date(),
 ): 'cancelled' | 'started' {
   return db.transaction(
@@ -261,11 +313,11 @@ export function startPlanStage(
           and(
             eq(runEvent.runId, runId),
             sql`json_extract(${runEvent.body}, '$.type') = 'stage.started'`,
-            sql`json_extract(${runEvent.body}, '$.stage') = 'plan'`,
+            sql`json_extract(${runEvent.body}, '$.stage') = ${stage}`,
           ),
         )
         .get()
-      if (started === undefined) append(tx, runId, { type: 'stage.started', stage: 'plan' }, now)
+      if (started === undefined) append(tx, runId, { type: 'stage.started', stage }, now)
       return 'started'
     },
     { behavior: 'immediate' },
