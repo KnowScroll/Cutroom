@@ -1580,3 +1580,27 @@ tests (855e785).
 refusal at the ceiling, `advanceStills` and the `reel.clips` row, `reel-plan`'s check 10 and `reel-stills`' check 8 with
 their notes (S-077). Checks 7–10. Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068)
 and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).
+
+## 2026-09-17 — session 21, continued: the prompt for reel-render's Slice 2, and a push
+
+**Intent.** The owner asked for the next session's prompt, and for the branch to be pushed.
+
+**Changed.**
+
+- **`PROMPTS/022-reel-render-slice-2.md`** — session 22's prompt, `Run: not yet`: Slice 2 only, checks 7–10, tests
+  first. It names what to read (session 21's and session 16's entries, Gates 2–4's parts about the request, admission,
+  the chain and endings, S-069 and the entries it rests on, the code and the verified tests Slice 2 changes), what
+  Slice 2 builds and what it does not — the placeholder clips job ending _"clips are not built"_, check 11 staying Slice
+  3's — the four checks, the verified checks that change (S-077), a break campaign, when to stop and ask, and the traps.
+  Indexed in `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Session 21's lessons are in the prompt as instructions**, not only in this journal: run each changed verified test
+  red before the code; a link error is red for a whole file at once; a type check written only with fresh literals can
+  pass on a type that refuses nothing; the campaign runner needs `--test-timeout`; a waiter must end on the runner's own
+  restore line. And one Slice 2 hazard found while writing it: once the keyframes job creates the `reel.clips` row, the
+  placeholder clips job finishes the run, so check 9's _"no run.finished from it"_ must be observed per job.
+- Nothing but markdown changed. `main` pushed to `origin` with Slice 1 (603ea36) and this commit.
+
+**Next.** Session 22: run `PROMPTS/022-reel-render-slice-2.md`.
