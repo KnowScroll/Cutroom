@@ -1507,3 +1507,112 @@ and one cent less is refused, which fails on any figure that is not that arithme
 checks 9 and 10: the reserve's two calls added to the figure, and the plan's whole `estimateCents` compared in its
 place. **Not caught by anything today:** the rounding itself, since both rates are whole cents — a fractional rate
 has no fixture until Q9 is read.
+
+---
+
+## S-054 | 2026-09-16 | The keyframe score's edges: a sensor value that is not a number is the floor, and a total that rounds to nothing is held at the smallest positive number
+
+**Chose.** In `packages/pipeline/src/stills/score.ts`, three edges S-044 leaves unsaid:
+
+- **A technical measure that is not a number — `NaN` included — counts as the floor, 0.01.** `+Infinity` clamps to
+  1 and `-Infinity` to 0.01, as any number outside [0.01, 1] does.
+- **An entity answer outside its closed list** counts as that term's lowest value: ⅓ for `faceVisible` and
+  `prominence`, ½ for `unoccluded`. The lists are read through a `Map`, so an answer such as `constructor` finds
+  nothing rather than a function.
+- **The total is `max(min(Σ weight × term, largest finite number), smallest positive number)`.** A weight that is a
+  positive finite number counts as itself, however small; five products of such weights can round to exactly 0,
+  and the floor keeps the total above 0.
+
+**Why.** S-044 says the terms are _"clamped to [0.01, 1]"_ and that _"every score is finite and above 0"_ (D-046).
+`NaN` has no order, so `min(1, max(0.01, NaN))` is `NaN` — a clamp written the obvious way returns a total that
+compares false with everything, and the tie rule then silently keeps candidate `a`. And S-044's weight rule keeps
+`Number.MIN_VALUE` as a weight: `5e-324 × ⅓` is 0 in floating point, so the gate's promise was false for a weight
+the settings type allows. A broken sensor counted as the floor, not the ceiling, never lets a picture it could not
+measure outrank one it could.
+
+**Rejected.** **`NaN` as 1** — a sensor that failed would score its picture as perfectly sharp. **A weight below
+some small number counting as its default** — a second threshold nobody measured, deciding what "positive" means.
+**Leaving the underflow** — a recorded score of 0, which D-046 says never exists. **A `try`/`catch` around the
+arithmetic** — a file with a path that rejects, which check 31 reads for.
+
+**Caught by.** `reel-stills`' check 31: every combination of entity answers, ten measures including `NaN`, both
+infinities and `-0`, and eleven weightings including `Number.MIN_VALUE` and `Number.MAX_VALUE`, each finite and
+above 0; bad weights replaced by their defaults exactly; S-044's term values exactly; no `throw` in the file.
+Breaks watched, each caught by 31: an invalid weight counting 0; no cap; no floor; `NaN` passed through; a `throw`
+added; the term floor 0; `partial` counting ½ (also 32); the total not the weighted sum (also 32).
+
+---
+
+## S-055 | 2026-09-16 | A picture's row: what it is, written once with its receipt; what its checks found, rewritten as they complete; `chosen`, written with the ending
+
+**Chose.**
+
+- **`recordGeneration`** (`packages/domain/src/ledger.ts`) writes the `generation_receipt`, adds the cost to the job
+  row and inserts the picture's row in one immediate transaction, taking **`seq`** there as the run's receipt count
+  plus one. It is handed the picture **without** a `seq` — `Omit<PictureRecord, 'seq'>`, narrower than Gate 3's
+  `PictureRecord` — so no caller can pass one the transaction would ignore.
+- **`upsertPicture`** (`pictures.ts`), which the worker's `StillsRecorder` calls, **rewrites only what the checks
+  found** — the measure, the words, the Gate 1 verdict, the score and the Gate 1S verdict — and writes the
+  observation and the reconciliation **once** each. The picture's identity — shot, subject, role, label, path,
+  prompt, framing, references, attempt and `seq` — is never rewritten.
+- **`chosen`** is written only by **`finishStills`** (`runs.ts`), in the transaction that ends the run, for the
+  pictures of a completed stage; a failed run marks none. `finishStills` marks the keyframes job done **without
+  touching its `cost_cents`**, which its image calls built up (S-036), so `completeJob`'s cost became optional.
+- **`observation` and `reconciliation`** are keyed `(run_id, id)` — picture ids repeat across runs — with a foreign
+  key to the picture; `picture` has a unique index on `(run_id, seq)`.
+- **`model_receipt.call`** defaults to `'structured'` and **`picture_ids`** to `'[]'`: SQLite cannot add a
+  `NOT NULL` column without a default, and every row written before them was a structured call about no picture
+  (S-049). Every writer names both.
+
+**Why.** Gate 2 has `seq` _"taken from the run's receipts in the transaction that writes the row"_, the row written
+as each image call returns, and then updated _"through the recorder"_. A recorder that rewrote the whole row would
+rewrite `seq` with the pipeline's own count, which agrees with the receipts on a first attempt and on no restart.
+A `chosen` flag written as the stage picks would leave a killed attempt with a chosen picture, which check 48 says
+it never has, and would make a failed run's record say something was approved.
+
+**Rejected.** **The recorder upserting every column** — two writers of `seq`. **`chosen` through the recorder** —
+above. **Nullable `call` and `picture_ids`** — a receipt naming no call, which check 4 could not tell from an old
+row. **`observation` keyed by its id alone** — the second run's `obs-a1-shot-0-a` collides with the first's.
+
+**Caught by.** `reel-stills`' checks 4 (every receipt names its call), 16 (the row's path is the file's and the
+still's), 25 (one observation and one reconciliation per picture, by id), 34 (the stills are exactly the pictures
+marked chosen) and 35 (a scripted cost is the receipt's, the job row's and its own run's only). Breaks watched:
+the receipt row losing its call, or its picture ids (4, 25, 33); the row recording another path (16, 17, 19, 26,
+33); the observation not written (25, 29, 32); a failed picture's reconciliation not kept (25, 29); the chosen flags
+not written (34 and six others); a scripted cost not the receipt's, not added to the job row, a constant in the
+result, or overwritten by the finish (35 each); the spend summed over every job (35, once it ran two costly runs).
+**Not caught in Slice 3:** a recorder that rewrote `seq` — the pipeline's count equals the receipts' on every first
+attempt; check 48 (Slice 5) runs a second one.
+
+---
+
+## S-056 | 2026-09-16 | A reconcile answer naming an entity the witness never gave, or an id it was not asked about, does not parse; a suspicion that is not a number goes to the judge
+
+**Chose.**
+
+- **`reconcileAnswer`** (`packages/pipeline/src/stills/prompts.ts`) refuses an answer whose `entity` is neither
+  `null` nor an index of the observation's entities, and one naming a subject or criterion it was not given — as
+  well as one leaving any out or naming one twice (Gate 2). A `shown` criterion with a `null` entity parses: a
+  criterion such as a setting is shown by no single entity. A refused answer fails the run, as every refused answer
+  does.
+- **`compareAnswer`** is `{ subjects: [{ subject, same: 'yes' | 'no' }] }`, every shared subject by name exactly once.
+- **Gate 1S** accepts a pair with no call only when its suspicion is **at or below** the threshold. A suspicion that
+  is `NaN` is not, so the judge decides.
+
+**Why.** Gate 2 has the reconciler answer _"the index of the entity that is it or none"_ and code apply the vetoes
+to that entity. An index past the list names nothing: read as "not shown" it would fail a true picture for the
+reconciler's slip and spend a repair; read as shown it would skip D-044's clipping veto, which reads the entity. Both
+let a malformed answer pass as a judgement, and an id not asked about is the same slip. For Gate 1S, D-049 lets the
+similarity route and never decide; a sensor that returned no number has routed nothing, and asking the one thing
+that may fail a picture keeps I-16.
+
+**Rejected.** **An out-of-range entity read as not shown** — a doom loop bounded by the repair, as S-040 rejected
+for the count. **Ignoring ids not asked about** — a reconciler answering another picture's brief would pass. **A
+`NaN` suspicion accepted with no call** — a broken sensor would wave every pair through.
+
+**Caught by.** `reel-stills`' check 27: for every picture, an answer leaving out a subject, leaving out a criterion,
+naming the event criterion, or naming an entity the witness did not give is refused by the call's own schema; and
+check 33 at and above the threshold. Breaks watched: an answer allowed to leave a subject out, and one allowed an
+entity nobody saw (27 each); the threshold setting ignored, and a suspicion at the threshold sent to the judge (33
+each). **Not caught:** the `NaN` suspicion — the stand-in's similarity is a number unless a test scripts otherwise,
+and none does.

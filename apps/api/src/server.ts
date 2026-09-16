@@ -4,6 +4,7 @@ import {
   closeDatabase,
   eventsAfter,
   openDatabase,
+  readRecord,
   readRun,
   readRunByRequestId,
   requestCancel,
@@ -189,8 +190,8 @@ async function handle(db: Db, req: IncomingMessage, res: ServerResponse): Promis
 
     if (found.result === undefined) return send(res, 409, found.status)
     if (sub[2] === 'result') return send(res, 200, found.result)
-    // This engine makes no pictures and no degradations yet, so a finished run's record is empty.
-    const record: RunRecord = { contractVersion: V, runId, pictures: [], degradations: [] }
+    // Every picture made, every attempt's, in seq order, with each check it reached (S-046).
+    const record: RunRecord = { contractVersion: V, runId, ...readRecord(db, runId) }
     return send(res, 200, record)
   }
   if (req.method === 'GET' && byId !== null) {

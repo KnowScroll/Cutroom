@@ -1,4 +1,10 @@
-import type { LanguageModelPort, PlanSettings } from '@cutroom/contracts'
+import type {
+  ImagePort,
+  LanguageModelPort,
+  PictureSensorPort,
+  PlanSettings,
+  StillsSettings,
+} from '@cutroom/contracts'
 import {
   BUDGET_MD,
   buryJob,
@@ -9,8 +15,8 @@ import {
   openDatabase,
   PLAN_JOB,
 } from '@cutroom/domain'
-import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
-import { runKeyframesJob } from './keyframes-job.ts'
+import { DEFAULT_PLAN_SETTINGS, DEFAULT_STILLS_SETTINGS } from '@cutroom/pipeline'
+import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
 
@@ -40,6 +46,34 @@ export interface WorkerOptions {
   budgetPath?: string
   /** The questions file a per-reel cap refusal is appended to (D-097). Defaults to QUESTIONS.md at the root. */
   questionsPath?: string
+  /**
+   * The only way the worker makes a picture (S-038). Required, like `model`: whoever starts the
+   * worker chooses whether a picture can cost money, and the worker cannot import an adapter to
+   * choose for itself. It must accept reference pictures, or the worker refuses to start (D-026).
+   */
+  image: ImagePort
+  /** The only way the worker reads a picture's pixels (S-038). */
+  sensors: PictureSensorPort
+  /**
+   * The stills stage's settings. Defaults to the pipeline's. Two equal canonical framing values
+   * would render one prompt twice, so the worker refuses to start with them (D-032).
+   */
+  stillsSettings?: StillsSettings
+}
+
+/**
+ * Why a worker would break a promise before its first picture — or nothing. Checked before the
+ * database is opened, so a refused worker claims no job (D-026's and D-032's startup assertions).
+ */
+function refusal(options: WorkerOptions, stills: StillsSettings): string | undefined {
+  if (!options.image.acceptsReferences) {
+    return 'the image port does not accept reference pictures, so no derived picture could be made from the canonical (D-026)'
+  }
+  const [first, second] = stills.canonicalFraming
+  if (first === second) {
+    return `both canonical framing values are '${first}', so the canonical's two candidates would be one prompt made twice (D-032)`
+  }
+  return undefined
 }
 
 export interface Worker {
@@ -48,14 +82,26 @@ export interface Worker {
 }
 
 export async function startWorker(options: WorkerOptions): Promise<Worker> {
+  const stills = options.stillsSettings ?? DEFAULT_STILLS_SETTINGS
+  const refused = refusal(options, stills)
+  if (refused !== undefined) throw new Error(`the worker refuses to start: ${refused}`)
+
   const db = openDatabase(options.dbPath)
   const pollMs = options.pollMs ?? 500
   const leaseMs = options.leaseMs ?? DEFAULT_LEASE_MS
+  const settings = options.settings ?? DEFAULT_PLAN_SETTINGS
   const context: PlanJobContext = {
     model: options.model,
-    settings: options.settings ?? DEFAULT_PLAN_SETTINGS,
+    settings,
     budgetPath: options.budgetPath ?? BUDGET_MD,
     questionsPath: options.questionsPath ?? QUESTIONS_MD,
+  }
+  const keyframes: KeyframesJobContext = {
+    model: options.model,
+    image: options.image,
+    sensors: options.sensors,
+    settings,
+    stills,
   }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -66,7 +112,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
       const job = claimJob(db, [PLAN_JOB, KEYFRAMES_JOB], new Date(), leaseMs)
       if (job === undefined) return
       try {
-        if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job)
+        if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job, keyframes)
         else await runPlanJob(db, job, context)
       } catch (error) {
         buryJob(db, job.id, error instanceof Error ? error.message : String(error))

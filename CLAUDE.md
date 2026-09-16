@@ -44,7 +44,9 @@ apps/api             submitting work, reading records. Never calls a provider.
 
 A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094). `reel-plan` has
 given every package source by its Slice 3; **the only `LanguageModelPort` is the stand-in** in
-`packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021).
+`packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021). The
+same holds for **the only `ImagePort` and `PictureSensorPort`**, since `reel-stills`' Slice 3 (S-038):
+the image stand-in writes real PNGs under one artifact root, `.artifacts/` by default (D-086, D-087).
 **Eighteen** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent

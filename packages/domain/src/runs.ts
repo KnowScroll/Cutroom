@@ -9,6 +9,7 @@ import {
   type RunStatus,
 } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
+import { markChosen } from './pictures.ts'
 import { completeJob, enqueue, type Writer } from './queue.ts'
 import { modelReceipt, plan, run, runEvent } from './schema.ts'
 
@@ -160,6 +161,8 @@ export function recordReceipt(
     .values({
       runId,
       role: receipt.role,
+      call: receipt.call,
+      pictureIds: JSON.stringify(receipt.pictureIds),
       model: receipt.model,
       temperature: receipt.temperature,
       inputTokens: receipt.usage.inputTokens,
@@ -274,6 +277,49 @@ export function finishRun(
         .where(eq(run.runId, runId))
         .run()
       completeJob(tx, jobId, result.costCents)
+    },
+    { behavior: 'immediate' },
+  )
+}
+
+/** The plan an admitted run was admitted on: its selected plan row's plan. */
+export function readSelectedPlan(db: Db, runId: string): Plan {
+  const row = db
+    .select({ plan: plan.plan })
+    .from(plan)
+    .where(and(eq(plan.runId, runId), eq(plan.selected, true)))
+    .get()
+  if (row === undefined) throw new Error(`run '${runId}' has no selected plan`)
+  return JSON.parse(row.plan) as Plan
+}
+
+/**
+ * Ends a run at its stills stage, in one immediate transaction (S-046): the approved pictures marked
+ * chosen, the events the stage's checks produced, `run.finished`, the result, and the keyframes job
+ * done — its cost left as its image calls added it (S-036), never overwritten with the result's.
+ */
+export function finishStills(
+  db: Db,
+  finish: {
+    runId: string
+    jobId: number
+    result: RunResult
+    chosen?: readonly string[]
+    events?: readonly EventBody[]
+  },
+  now: Date = new Date(),
+): void {
+  const { runId, jobId, result } = finish
+  db.transaction(
+    (tx) => {
+      markChosen(tx, runId, finish.chosen ?? [])
+      for (const event of finish.events ?? []) append(tx, runId, event, now)
+      append(tx, runId, { type: 'run.finished', status: result.status }, now)
+      tx.update(run)
+        .set({ state: 'finished', result: JSON.stringify(result) })
+        .where(eq(run.runId, runId))
+        .run()
+      completeJob(tx, jobId)
     },
     { behavior: 'immediate' },
   )

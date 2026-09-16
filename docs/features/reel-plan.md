@@ -38,8 +38,12 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 >   compared with the caller's ceiling by **the pictures' figure** (**S-030**, **S-035**), and an admitted run
 >   gets the chain's second job row (D-081, D-083). A run that selects no plan ends exactly as this feature's
 >   does (S-025), with no second row.
-> - Its fixtures' criteria gained a `type` in Slice 1 (S-029, S-034), and `GATE_ORDER` changes in Slice 3, where
->   **check 29** is amended. Both journeys are run again after `reel-stills`' Slice 5.
+> - Its fixtures' criteria gained a `type` in Slice 1 (S-029, S-034).
+> - **`GATE_ORDER` is `['0', '1', '1S']`** since `reel-stills`' Slice 3, as Gate 2 below said it would be
+>   (_"`reel-stills` appends its gates"_). **Check 29 asserts that list**, and one assertion was added — Gate 0 is
+>   still the first gate, the part of the check that was this feature's; none was removed (S-047). Plan verdict
+>   events still carry gate `'0'`.
+> - Both journeys are run again after `reel-stills`' Slice 5.
 
 ## Gate 1 — Product (no technical language)
 

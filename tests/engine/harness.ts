@@ -4,9 +4,20 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { startApi, type Api } from '@cutroom/api'
-import type { PlanSettings } from '@cutroom/contracts'
+import type { LanguageModelPort, PlanSettings, StillsSettings } from '@cutroom/contracts'
 import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
-import { fakeModel, type FakeModel, type FakeScript } from '@cutroom/providers'
+import {
+  DEFAULT_ARTIFACT_ROOT,
+  fakeImage,
+  fakeModel,
+  fakeSensors,
+  type FakeImage,
+  type FakeImageScript,
+  type FakeModel,
+  type FakeScript,
+  type FakeSensors,
+  type FakeSensorScript,
+} from '@cutroom/providers'
 import { startWorker, type Worker } from '@cutroom/worker'
 import { REPO } from '../_repo.ts'
 import { client } from '../stand-in/client.ts'
@@ -21,6 +32,11 @@ import type { WorkerProcessConfig } from './worker-process.ts'
  * any job has been claimed. Its only model is the stand-in, answering from the script a test
  * gives — none, by default, so a run that reaches a model call fails. Its questions file is always
  * inside the harness's folder, so no test can write the repository's own.
+ *
+ * The worker is also handed an image stand-in and a sensor stand-in (reel-stills, S-047), each
+ * answering from a script a test gives — by default a readable 9:16 picture at no cost, and every
+ * sensor's default. The image stand-in's artifact root is inside the harness's folder unless a
+ * test asks for the stand-in's own default, which only reel-stills' check 17 does.
  */
 export interface Engine {
   dir: string
@@ -29,11 +45,19 @@ export interface Engine {
   questionsPath: string
   /** The BUDGET.md written into `dir` when a test supplied one; otherwise the worker's default. */
   budgetPath: string | undefined
+  /** Where the image stand-in writes its pictures: inside `dir`, or the stand-in's default. */
+  artifactRoot: string
   api: Api
   http: ReturnType<typeof client>
   /** The stand-in the worker was handed, with every call it received. */
   model: FakeModel
+  /** The image stand-in the worker was handed, with every call it received. */
+  image: FakeImage
+  /** The sensor stand-in the worker was handed, with every call it received. */
+  sensors: FakeSensors
   startWorker(): Promise<Worker>
+  /** Stops the worker — after the job in hand — so `startWorker()` starts a new one. */
+  stopWorker(): Promise<void>
   /**
    * The worker in a child process, whose stand-in never answers call `holdAtCall`: a run in the
    * middle of its plan stage, which the test ends by killing the process.
@@ -63,6 +87,19 @@ export interface EngineOptions {
   settings?: PlanSettings
   /** The text of a BUDGET.md, written into the engine's folder and read by the worker for the cap. */
   budgetMd?: string
+  /** What the image stand-in makes of each picture, keyed `shot-<unit>-<label>`. */
+  images?: FakeImageScript
+  /** What the sensor stand-in reads off each picture, keyed `shot-<unit>-<label>`. */
+  sensors?: FakeSensorScript
+  /** The stills stage's settings. Defaults to the pipeline's. */
+  stillsSettings?: StillsSettings
+  /**
+   * The image stand-in's artifact root. Absent: a folder inside the engine's own. `null`: left
+   * unset, so the stand-in writes under its default — the repository's `.artifacts/` (D-086).
+   */
+  artifactRoot?: string | null
+  /** Wraps the model the worker is handed — how a test holds a call open in-process. */
+  wrapModel?: (model: LanguageModelPort) => LanguageModelPort
 }
 
 export async function startEngine(options: EngineOptions): Promise<Engine> {
@@ -75,34 +112,52 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
     writeFileSync(budgetPath, options.budgetMd)
   }
   const settings = options.settings ?? DEFAULT_PLAN_SETTINGS
+  const artifactRoot =
+    options.artifactRoot === null
+      ? DEFAULT_ARTIFACT_ROOT
+      : (options.artifactRoot ?? join(dir, 'artifacts'))
+  const imageOptions = options.artifactRoot === null ? {} : { artifactRoot }
   const api = await startApi({ dbPath })
   let worker: Worker | undefined
   const children: Array<ReturnType<typeof spawn>> = []
+  const wrap = options.wrapModel ?? ((model: LanguageModelPort) => model)
 
   const engine: Engine = {
     dir,
     dbPath,
     questionsPath,
     budgetPath,
+    artifactRoot,
     api,
     http: client(api.baseUrl),
     model: fakeModel(options.script ?? {}, { models: settings.models }),
+    image: fakeImage(options.images ?? {}, imageOptions),
+    sensors: fakeSensors(options.sensors ?? {}),
     async startWorker() {
       worker ??= await startWorker({
         dbPath,
         pollMs: 10,
-        model: engine.model,
+        model: wrap(engine.model),
+        image: engine.image,
+        sensors: engine.sensors,
         settings,
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
+        ...(options.stillsSettings === undefined ? {} : { stillsSettings: options.stillsSettings }),
       })
       return worker
+    },
+    async stopWorker() {
+      const stopping = worker
+      worker = undefined
+      await stopping?.stop()
     },
     spawnWorker({ script, holdAtCall, leaseMs }) {
       const config: WorkerProcessConfig = {
         dbPath,
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
+        artifactRoot,
         settings,
         script,
         holdAtCall,
@@ -150,6 +205,8 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       engine.api = await startApi({ dbPath })
       engine.http = client(engine.api.baseUrl)
       engine.model = fakeModel(script ?? {}, { models: settings.models })
+      engine.image = fakeImage(options.images ?? {}, imageOptions)
+      engine.sensors = fakeSensors(options.sensors ?? {})
     },
     query<T>(sql: string, ...params: Array<string | number>): T[] {
       const db = new DatabaseSync(dbPath)

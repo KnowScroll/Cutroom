@@ -86,8 +86,15 @@ export function claimJob(
   }
 }
 
-export function completeJob(tx: Writer, jobId: number, costCents: number): void {
-  tx.update(job).set({ state: 'done', costCents, leaseUntil: null }).where(eq(job.id, jobId)).run()
+/**
+ * Marks a job done. With `costCents`, that is its cost; without, the cost its image calls added as
+ * they returned is kept (S-036).
+ */
+export function completeJob(tx: Writer, jobId: number, costCents?: number): void {
+  tx.update(job)
+    .set({ state: 'done', leaseUntil: null, ...(costCents === undefined ? {} : { costCents }) })
+    .where(eq(job.id, jobId))
+    .run()
 }
 
 /** A job whose runner threw outside the run's own answer: kept, with why, and never claimed again. */

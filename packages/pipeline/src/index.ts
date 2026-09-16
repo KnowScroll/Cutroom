@@ -16,3 +16,24 @@ export { planningAnswer, scoreAnswer } from './plan/prompts.ts'
 export { repairBasis } from './plan/repair.ts'
 export { scorePlan } from './plan/score.ts'
 export { plannedImageCalls, rankSubjects } from './rank.ts'
+export { criteriaFor } from './stills/criteria.ts'
+export {
+  DEFAULT_STILLS_SETTINGS,
+  makeStills,
+  type StillsEvent,
+  type StillsInput,
+  type StillsOutcome,
+  type StillsPorts,
+  type StillsRecord,
+  type StillsStageSettings,
+} from './stills/index.ts'
+export { witnessObservation } from './stills/observation.ts'
+export {
+  pictureIdOf,
+  placePictures,
+  readPictureId,
+  shotIdOf,
+  type Placement,
+} from './stills/place.ts'
+export { framingFor, pictureEntry, type PictureEntry } from './stills/prompts.ts'
+export { DEFAULT_SCORE_WEIGHTS, keyframeScore } from './stills/score.ts'

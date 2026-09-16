@@ -3,6 +3,8 @@
 
 export { BUDGET_MD, readReelCapCents } from './budget.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
+export { recordGeneration, spentCents } from './ledger.ts'
+export { readRecord, upsertPicture } from './pictures.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
 export {
   KEYFRAMES_JOB,
@@ -11,9 +13,11 @@ export {
   canonicalJson,
   eventsAfter,
   finishRun,
+  finishStills,
   readRequest,
   readRun,
   readRunByRequestId,
+  readSelectedPlan,
   recordReceipt,
   requestCancel,
   startStage,

@@ -12,9 +12,8 @@ import { recordReceipt, type Db } from '@cutroom/domain'
  * the one `reconciler` receipt whose `pictureIds` is that picture's — so a call that left no row
  * would leave a record nothing can join.
  *
- * `model_receipt` has no `call` or `picture_ids` column until reel-stills' Slice 3 migration, so
- * until then a receipt's row carries its role, model, temperature, usage and `fake` and not those
- * two fields (S-049). Nothing calls `observe` or `compare` before Slice 3.
+ * Each row names its call and its picture ids — the columns reel-stills' Slice 3 migration added,
+ * which S-049 recorded as owed until then.
  */
 export function recordingPort(model: LanguageModelPort, db: Db, runId: string): LanguageModelPort {
   return {

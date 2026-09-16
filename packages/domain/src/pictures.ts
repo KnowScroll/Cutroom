@@ -1,0 +1,164 @@
+import { and, asc, eq } from 'drizzle-orm'
+import type { PictureRecord } from '@cutroom/contracts'
+import type { RunRecord } from '@cutroom/reel-contract'
+import type { Db } from './db.ts'
+import { degradation, observation, picture, reconciliation } from './schema.ts'
+
+// The pictures of a run and their record (docs/features/reel-stills.md, Gate 2 "Storage" and "How a
+// stills run ends"; S-046). A picture's row is written with its image receipt (ledger.ts) and
+// updated here as each of its checks completes, so the record holds every picture made — every
+// attempt's — with each check it reached, whatever ends the run.
+
+/** A picture's whole row, from its record. */
+export function pictureValues(runId: string, p: PictureRecord): typeof picture.$inferInsert {
+  return {
+    runId,
+    pictureId: p.pictureId,
+    seq: p.seq,
+    attempt: p.attempt,
+    shotUnit: p.shotUnit,
+    subjectId: p.subjectId,
+    role: p.role,
+    label: p.label,
+    path: p.path,
+    prompt: p.prompt,
+    framing: p.framing,
+    referenceIds: JSON.stringify(p.references),
+    measure: p.measure === null ? null : JSON.stringify(p.measure),
+    words: p.text === null ? null : JSON.stringify(p.text),
+    gate1: p.gate1 === null ? null : JSON.stringify(p.gate1),
+    score: p.score === null ? null : JSON.stringify(p.score),
+    gate1s: p.gate1s === null ? null : JSON.stringify(p.gate1s),
+    degradation: p.degradation,
+    chosen: false,
+  }
+}
+
+const observationId = (pictureId: string) => `obs-${pictureId}`
+const reconciliationId = (pictureId: string) => `rec-${pictureId}`
+
+/**
+ * A picture's checks, made durable, in one transaction: its measure, words, Gate 1 verdict, score
+ * and Gate 1S verdict, and — once there is one — its observation and its reconciliation, each
+ * written once. What the picture IS — its shot, subject, path, prompt, references and `seq` — was
+ * written with its receipt and is never rewritten here, and `chosen` is the run's ending's to write
+ * (S-054).
+ */
+export function upsertPicture(db: Db, runId: string, p: PictureRecord): void {
+  const values = pictureValues(runId, p)
+  db.transaction(
+    (tx) => {
+      tx.insert(picture)
+        .values(values)
+        .onConflictDoUpdate({
+          target: [picture.runId, picture.pictureId],
+          set: {
+            measure: values.measure,
+            words: values.words,
+            gate1: values.gate1,
+            score: values.score,
+            gate1s: values.gate1s,
+          },
+        })
+        .run()
+      if (p.observation !== null) {
+        tx.insert(observation)
+          .values({
+            id: observationId(p.pictureId),
+            runId,
+            pictureId: p.pictureId,
+            observation: JSON.stringify(p.observation),
+          })
+          .onConflictDoNothing()
+          .run()
+      }
+      if (p.reconciliation !== null) {
+        const { subjects, criteria, failed } = p.reconciliation
+        tx.insert(reconciliation)
+          .values({
+            id: reconciliationId(p.pictureId),
+            runId,
+            pictureId: p.pictureId,
+            answer: JSON.stringify({ subjects, criteria }),
+            failed: JSON.stringify(failed),
+          })
+          .onConflictDoNothing()
+          .run()
+      }
+    },
+    { behavior: 'immediate' },
+  )
+}
+
+type Check = RunRecord['pictures'][number]['checks'][number]
+
+/**
+ * A run's record as the contract gives it: one entry per picture made, every attempt, in `seq`
+ * order; `observationId` and `reconciliationId` where those rows exist; a check for each completed
+ * Gate 1 step and for Gate 1S; and every degradation.
+ */
+export function readRecord(db: Db, runId: string): Pick<RunRecord, 'pictures' | 'degradations'> {
+  const observed = new Set(
+    db
+      .select({ pictureId: observation.pictureId })
+      .from(observation)
+      .where(eq(observation.runId, runId))
+      .all()
+      .map((r) => r.pictureId),
+  )
+  const reconciled = new Set(
+    db
+      .select({ pictureId: reconciliation.pictureId })
+      .from(reconciliation)
+      .where(eq(reconciliation.runId, runId))
+      .all()
+      .map((r) => r.pictureId),
+  )
+  const pictures = db
+    .select()
+    .from(picture)
+    .where(eq(picture.runId, runId))
+    .orderBy(asc(picture.seq))
+    .all()
+    .map((row) => {
+      const gate1 = row.gate1 === null ? null : (JSON.parse(row.gate1) as PictureRecord['gate1'])
+      const gate1s =
+        row.gate1s === null ? null : (JSON.parse(row.gate1s) as PictureRecord['gate1s'])
+      const checks: Check[] = (gate1?.steps ?? []).map((s) => ({
+        gate: '1',
+        step: s.step,
+        outcome: s.outcome,
+      }))
+      if (gate1s !== null) checks.push({ gate: '1S', outcome: gate1s.outcome })
+      return {
+        pictureId: row.pictureId,
+        shotId: `shot-${row.shotUnit}`,
+        chosen: row.chosen,
+        ...(observed.has(row.pictureId) ? { observationId: observationId(row.pictureId) } : {}),
+        ...(reconciled.has(row.pictureId)
+          ? { reconciliationId: reconciliationId(row.pictureId) }
+          : {}),
+        checks,
+      }
+    })
+  const degradations = db
+    .select({ shotId: degradation.shotId, reason: degradation.reason })
+    .from(degradation)
+    .where(eq(degradation.runId, runId))
+    .all()
+  return { pictures, degradations }
+}
+
+/** Marks a run's approved pictures chosen, inside the transaction that ends the run (S-046). */
+export function markChosen(
+  tx: Pick<Db, 'update'>,
+  runId: string,
+  pictureIds: readonly string[],
+): void {
+  for (const pictureId of pictureIds) {
+    tx.update(picture)
+      .set({ chosen: true })
+      .where(and(eq(picture.runId, runId), eq(picture.pictureId, pictureId)))
+      .run()
+  }
+}

@@ -26,9 +26,14 @@ function shaped(units: number[][], durations: number[]): Plan {
 
 // ---------------------------------------------------------------- 29
 
-test("29. GATE_ORDER equals ['0'], asserted as data", () => {
+// reel-plan's Gate 2: "GATE_ORDER is the literal ['0']. reel-stills appends its gates." reel-stills'
+// Slice 3 appended Gate 1 and Gate 1S, so this check asserts the list with them (S-047), and
+// reel-stills' check 5 asserts the same. No assertion is removed: both below still run, and one is
+// added — Gate 0 is still the first gate, which is the part of this check that was reel-plan's.
+test("29. GATE_ORDER equals ['0', '1', '1S'], asserted as data", () => {
   assert.ok(Array.isArray(GATE_ORDER), 'GATE_ORDER is not a list')
-  assert.deepEqual([...GATE_ORDER], ['0'])
+  assert.deepEqual([...GATE_ORDER], ['0', '1', '1S'])
+  assert.equal(GATE_ORDER[0], '0', 'Gate 0 is no longer the first gate')
 })
 
 // ---------------------------------------------------------------- 30

@@ -1,5 +1,5 @@
 import type { LanguageModelPort, PlanSettings } from '@cutroom/contracts'
-import { fakeModel, type FakeScript } from '@cutroom/providers'
+import { fakeImage, fakeModel, fakeSensors, type FakeScript } from '@cutroom/providers'
 import { startWorker } from '@cutroom/worker'
 
 /**
@@ -10,12 +10,14 @@ import { startWorker } from '@cutroom/worker'
  * It reads its settings as JSON on standard input. Its model is the stand-in, answering from the
  * script it is given, except that call `holdAtCall` (counted across the port's three calls and
  * every role, from 1) is never answered: the process prints `held` and waits there until it is
- * killed. Every call before it returns, so its receipt is written.
+ * killed. Every call before it returns, so its receipt is written. Its image and sensor ports are
+ * the stand-ins with their defaults, writing under the artifact root it is given (S-047).
  */
 export interface WorkerProcessConfig {
   dbPath: string
   questionsPath: string
   budgetPath?: string
+  artifactRoot: string
   settings: PlanSettings
   script: FakeScript
   holdAtCall: number
@@ -58,6 +60,8 @@ await startWorker({
   dbPath: config.dbPath,
   pollMs: 10,
   model,
+  image: fakeImage({}, { artifactRoot: config.artifactRoot }),
+  sensors: fakeSensors({}),
   settings: config.settings,
   questionsPath: config.questionsPath,
   leaseMs: config.leaseMs,

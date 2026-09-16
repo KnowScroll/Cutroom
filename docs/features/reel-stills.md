@@ -884,7 +884,7 @@ _Restart, and no secrets_
       `stills` with the cancel flag. Pictures do not exist yet, so a started keyframes job finishes the run `failed` with
       the detail _"pictures are not built"_ — a contract-valid answer no check asserts, which Slice 3 replaces.
       **Proves: 8, 9, 10, 11.**
-- [ ] **Slice 3 — pictures, both gates, and a completed stills run.** The image and sensor stand-ins, required on the
+- [x] **Slice 3 — pictures, both gates, and a completed stills run.** The image and sensor stand-ins, required on the
       worker, and the harness passing them; the migration; placing pictures; the image prompts; Gate 1's four steps;
       the keyframe score and choosing the canonical; derived pictures; Gate 1S with its judge call; the guarded image
       port with its receipts, costs and picture rows (its refusals are Slice 4's); the recorder; the record
