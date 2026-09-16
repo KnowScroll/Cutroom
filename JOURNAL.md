@@ -1369,3 +1369,80 @@ deleting the steering stubs and bumping the pin (S-033).
 - `node scripts/check.mjs`: everything green, 182 tests. Nothing but markdown changed.
 
 **Next.** Session 20: run `PROMPTS/020-reel-render-gates.md`.
+
+## 2026-09-16 — session 20, reel-render gates 1–4: cut in two, written, reviewed three times, approved
+
+**Intent.** Run `PROMPTS/020-reel-render-gates.md`: write `reel-render`'s four planning gates and have an adversarial
+reviewer review them until approved or a finding needs the owner. No code, no test. `decisions.mjs`: pin current, 0
+commits unpushed. Baseline `check.mjs` green at 182 tests (110f667).
+
+**Changed.**
+
+- **`docs/features/reel-render.md`** — Gates 1–4: **50 checks in 6 slices (6 + 4 + 18 + 13 + 6 + 3)**, the Deferred list
+  and known limits, and Gate reviews 1–3. **All four gates APPROVED 2026-09-16 — the `Gates:` line written by the
+  reviewer itself**, as its one allowed edit. `Status: planned`. The front matter and the move note are kept as they
+  were (S-064); the `Decisions:` and deferral lines are computed from what the gates and the Deferred list cite.
+- **`docs/features/reel-takes.md`** — a new feature file, created by S-066 with its gates unwritten: D-024's three
+  takes, I-11's transient counter, D-025's ladder at the cap, and the takes in the contract's record, with six things
+  its gates must settle.
+- **`DECISIONS.md` — S-066 to S-077**: the split, one take a shot (S-066, owner); L4 and Gate 6 not built while every
+  reel is a cut, and the gate profile as config (S-067, owner); Gate 8 is KnowScroll's (S-068, owner); a video run's
+  admission on its plan's estimate, four jobs under one stage, I-18 by structure (S-069); narration by a stand-in voice
+  before each clip, the clip's duration from the measured narration (S-070); a clip's request, prompt, receipts and the
+  validator scoped to video calls (S-071); Gates 2–5 on a take (S-072); the one pass — manifest, spans and holds,
+  conform, captions, mix, output measured (S-073); Gate 7 as one `judgeCut` call on a frame strip (S-074); ffmpeg from
+  PATH behind ports, and a nineteenth rule, `processes-only-in-providers` (S-075); restarts (S-076); what changes in
+  verified features (S-077).
+- **`PROMPTS/`** — prompt 020's `Run` line set to session 20, in the file and the index (S-065).
+- No code, no test.
+
+**Observed.**
+
+- **The owner was asked three questions before any gate was written**, each because it changed what "approved" or
+  "failed" means, and chose the recommended option each time:
+  - **the size** — written whole, `reel-render` was about 90–100 checks in 9–10 slices, twice `reel-stills`. The
+    contract's `until` has nothing between `stills` and `video`, so a first half verified through the API must end in a
+    real video. Chosen: **a gated video with one take a shot here, the takes and the still-hold in `reel-takes`**, D-058's
+    edits staying `video-edits`' (S-066). Rejected: one feature; retries in the first half; a split by stage, whose
+    first half could answer no caller;
+  - **L4 and Gate 6** (the stub's need 4) — the decisions settled L4 and not Gate 6, which D-052 names per join. Chosen:
+    not run while every reel is a cut (S-067);
+  - **Gate 8** — D-096 keeps everything it would read out of the engine, and contract v1 carries no plugin. Chosen:
+    KnowScroll's (S-068). Owed there.
+- **ffmpeg was run on this machine before the gates were fixed**, in the scratchpad only: an ASS file burns captions
+  through the `ass` filter, in a PATH-only environment too; `blackdetect` and `freezedetect` fire on built files — but
+  **only for stretches as long as their minimum duration, two seconds by default**, and `freezedetect` reports a freeze
+  about 0.2 s short, so the thresholds are handed to the scan and the checks keep margins; a tone's level is measurable
+  per band; `+faststart` puts `moov` first; `-count_frames` is exact. The facts went to the reviewer as given.
+- **Findings by round: 21, 6, 0.** Bars (b) and (c) never fired. Gate 1 was approved in round 1.
+  - **Round 1 (21):** every supersession quote was exact, and **every bar-(a) finding was a clause the quotes left
+    out** — D-080 and D-108 giving this feature the ladder and Gate 8; D-058's edit vocabulary; D-052's profile as
+    config; D-055's and D-059's _Chose_ halves; D-057's and D-036's checks; I-19 and model calls; D-024's counters and
+    I-11; a hold labelled in no verdict (I-4). The bar-(d) findings were checks that could not fail: thresholds ffmpeg
+    would never reach, boundaries with no measurement and a replay overwriting its own file, a schema clause with
+    nothing to discriminate on, fields named `manifest` that check 5 would catch, ports required before any slice built
+    them, and four checks in slices that could not produce them.
+  - **Round 2 (6):** all 21 verified fixed. New: three supersessions wider or narrower than their change; a remembered
+    readiness that could make a check order-dependent; a check clause green in its slice undeclared; the child worker's
+    port lagging the port by two slices; the file list lagging the revision; one stale number in the review record.
+  - **Round 3 (0):** all approved. Three notes outside the gates, fixed: a `Confirmed-by` scope, a verdict misrecorded,
+    a decision miscounted in the header.
+- **The pattern held, and quoting was not enough on its own.** Session 14's lesson — quote every superseded clause and
+  have the reviewer check each character — made every quote exact from the first round. What broke instead was
+  **coverage**: a quote of a `Confirmed-by` beside an unnamed _Chose_ saying the same thing, or a quote wider than the
+  change. Round 2 found both directions. The fix that converged was reading each decision whole, not the clause in view.
+- **A check that reads its own input back proves nothing** was round 1's other lesson, in three forms: boundaries read
+  from the manifest, a replay over its own output, thresholds below what the tool reports. Each became a measurement.
+- **Found after approval, from the reviewer's "could not check" list:** `reel-stills-endings` and `reel-stills-placing`
+  wrap the model port call by call, and `reel-stills-prompts` calls `startWorker` itself; `tests/` is type-checked, so
+  each changes with the port or the worker's options. Recorded in S-077 by addition, as S-049 added to S-047, with
+  `startWorker`'s existing refusals kept before `ready()`. No gate text and no assertion changed.
+- **Twelve S-entries in one session supersede, in part, D-024, D-025, D-033, D-036, D-050, D-051, D-052, D-055, D-056,
+  D-057, D-058, D-059, D-071, D-080, D-108, I-11, I-19 and S-037** — three by the owner's answers, the rest as the
+  entries' readings, each accepted by the reviewer. None is marked in the steering repository (D-115's cost).
+- `node scripts/check.mjs`: everything green, 182 tests. Nothing but markdown changed.
+
+**Next.** `reel-render` Slice 1 — the ports, the shapes and `processes-only-in-providers` (checks 1–6) — in its own
+session. Its prompt is not written. Owed outside this repository: KnowScroll's epistemic check of a returned video
+(S-068) and how a viewer is served the file (S-073); `reel-script` emitting a criterion's type (S-029); deleting the
+steering stubs and bumping the pin (S-033). `reel-takes`' gates are written after `reel-render` is verified.

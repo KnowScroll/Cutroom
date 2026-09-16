@@ -1953,3 +1953,603 @@ is left uncommitted.
 
 **Confirmed-by.** The owner, 2026-09-16, on the folder, its name and keeping every prompt. The file names, the label,
 the fence, the index and committing on writing are this entry's reading.
+
+---
+
+## S-066 | 2026-09-16 | `reel-render` is cut in two: a gated video with one take a shot, and D-024's takes and D-025's ladder in a new feature, `reel-takes`
+
+**Chose.** `reel-render` builds everything from the approved stills to a finished video: the narration of every shot;
+one clip a shot, made from its approved picture or from words alone; Gates 2 to 5 on every clip; the one assembly
+pass; and Gate 7 on the assembled file. **A shot gets one take in each attempt of the clips job.** A take that fails
+Gate 2, 3 or 5 stops the reel for that gate's rule, and a reel that fails Gate 7 stops for rule `gate-7`: nothing more
+is bought, and no video is returned. **A new feature, `reel-takes`** (`docs/features/reel-takes.md`, created with its
+gates unwritten), owns D-024's three takes and their informed retries, with D-033's rider that a retry consumes the
+failed take's verdict; I-11's counter for provider transient errors; and D-025 at the take cap — `accept_with_label`,
+holding the gated keyframe as a still, and failing the reel — with their labels. **D-058's edit repairs stay
+`video-edits`'.** Sizes, as asked: `reel-render` about fifty-five checks, `reel-takes` about thirty.
+
+**Supersedes**, for `reel-render`'s build, until `reel-takes` supersedes this entry in turn (quoted without the
+source's emphasis):
+
+- **D-024**, on _"A shot may consume 3 paid clip takes — one initial plus two retries — before it is marked `failed`"_
+  and its `Confirmed-by` _"A test that a shot with three failed takes is marked `failed` and that no fourth video job is
+  submitted for it"_ — a shot's first take in an attempt is its last, and its failure stops the reel;
+- **D-025**, on rung 1, _"soft failure (style adherence, camera not exactly as asked) → `accept_with_label`, with the
+  verdict recording why"_, and rung 2, _"picture right, motion broken (freeze, morph, artifact) → hold the gated
+  keyframe as a `still` for the shot's duration, with a slow push"_ — every take failure has rung 3's outcome, the reel
+  fails, reported as stopped for the gate's rule;
+- **D-033**, on its `Confirmed-by` _"A test that take 2's prompt differs from take 1's whenever take 1 failed a gate"_ —
+  no take 2 is made;
+- **D-024**, on _"and provider transient errors (`maxAttempts` with backoff)"_ and its `Confirmed-by` _"A
+  test that N consecutive provider transient errors leave the take counter unchanged"_, and **I-11**, on _"Transient
+  failures retry on `maxAttempts` with backoff, on their own counter"_ — no call is retried in this build: a call that
+  throws finishes the run `failed`, as a thrown call does in `reel-plan` and `reel-stills` (S-046), and counts as no
+  take;
+- **D-058**, on _"Their repair vocabulary is a closed enum of edit ops that spend no money: `reorder`, `retime`,
+  `recaption`, `reselect-take` (choosing a different already-accepted take of the same shot). Applying any of them
+  re-runs L5 and re-runs Gates 7 and 8."_ and its `Confirmed-by` _"The op vocabulary is a closed enum in the schema and
+  an op outside it fails validation."_ — no edit op exists until `video-edits` builds them, so every Gate 7 failure
+  reaches D-058's _"If no edit op fixes the failure, the reel fails and is labelled"_;
+- **D-080**, on _"the clips, Gates 2 to 5, the take ladder, the narration audio, the assembly pass, and Gates 7 and 8"_,
+  and **D-108**, on _"`reel-render` is unchanged: everything after the approved stills (D-080)"_ — the take ladder is
+  `reel-takes`', the edits `video-edits`', and Gate 8 KnowScroll's (S-068).
+
+D-024's rule that a take is counted in takes and never in retries, its keyframe counter — kept by the stills stage of a
+`video` run as of any `stills` run — D-025 rung 3 and its labels, and D-014's _"retries
+≤ 2 per shot"_ — zero is within it — stand.
+
+**Why.** Written whole, `reel-render` was about ninety to a hundred checks in nine or ten slices, twice `reel-stills`,
+which took five reviews at fifty. D-080 and D-108 each split a plan of that shape because it did not converge. The
+contract's `until` has no value between `stills` and `video`, so a first half verified through the API must end with a
+real video, and a gated video at one take is the smallest one that runs every gate the decisions require. Takes and
+holds deepen it without changing what the finished video is. With stand-ins nothing is paid, so no real reel is lost
+to the lower cap.
+
+**Rejected.** **One feature** — the shape D-080 and D-108 split. **Two, with D-024's retries in the first** and only
+D-025's label and still-hold waiting — a larger first half for a smaller second. **Split by stage, clips then
+assembly** — the first half could answer no caller: `video` would stay refused until the second landed, so its journey
+would verify runs ending on a placeholder. **Defining an `until` for clips** — exposes the engine's internal seam to
+callers, which D-093's contract exists to hide.
+
+**Caught by.** `reel-render`'s checks 26 (a failing take stops the reel, and nothing later is made) and 38 (a failing
+Gate 7 stops it). **Owed by `reel-takes`:** its gates name checks 21 to 26 and 38 as premises it changes, in S-047's
+form, since each asserts a stop that three takes turn into a retry.
+
+**Confirmed-by.** The owner, 2026-09-16, choosing _"Two: video first, takes second"_, whose option listed what each
+feature holds, one take a shot with a failing take stopping the reel, Gate 7's failure stopping it, and D-058's edits
+staying `video-edits`'. **This entry's reading:** that one take is per attempt of the clips job, D-033's rider moving
+with the retries, and the supersession quotes.
+
+---
+
+## S-067 | 2026-09-16 | L4 SELECT and Gate 6 are not built while every reel is a cut
+
+**Chose.** No plan carries a join mode — the planning call's cinematic fields are `reel-stills`' deferred item 6 — so
+**every reel is D-036's default, `cut`**, and every shot of a render manifest records `joinMode: 'cut'`. **L4 SELECT is
+not built:** its handover frames and anchors serve a chain (D-036; O-7 _"matters less if O-1 lands on cuts"_), one take
+a shot (S-066) leaves no accepted take to pick among, and a new version of a cut is `video-edits`' question 2. **Gate 6
+does not run on a cut join:** identity of a shared subject across shots is checked on the stills by Gate 1S (D-049,
+S-045), and D-036 records that distinct scenes lose nothing to a cut. `GATE_ORDER` holds no `'6'`. Both arrive with
+chains, which need a join mode in the planning call (D-035) and a feature that builds them.
+
+**The gate profile is config, as D-052 requires:** a setting, `RenderSettings.gateProfile`, defaulting to
+`{ id: 'phase-1', gates: GATE_ORDER }`. **Exactly one profile is defined**, so a worker handed one whose gates are not
+`GATE_ORDER` refuses to start — no lighter set exists (D-052) — and every render manifest records the profile that ran.
+
+**Supersedes:** **D-052**, on _"every gate in it runs: Gate 1, Gate 1S, Gates 2–5 per take, Gate 6 per join, Gates 7–8
+on the cut"_ — Gate 6 does not run on a cut join. **D-036**, on _"The manifest declares a join mode — `cut` or `chain` —
+per reel, and per adjacent pair where only part of a reel must flow."_ and its `Confirmed-by` _"The manifest carries a
+join mode and fails schema validation without one."_ — the planning call's plan declares none, and every plan is
+D-036's default, `cut`; **the render manifest is where the join mode is declared**, on every shot, and its schema
+refuses a shot without one. D-036's default, D-052's one profile as config, and its record of what ran, stand.
+
+**Why.** `reel-render.md`'s need 4 asked whether L4 and Gate 6 are built or D-036's default makes them unnecessary. The
+decisions settle L4 — every part of it is chain machinery or a choice among takes that do not exist — and do not settle
+Gate 6, which D-052 names for every join.
+
+**Rejected.** **Gate 6 on every cut join** — each shot's last frame against the next shot's first, as Gate 1S does:
+about five more checks for a comparison D-036 says a cut does not need. **Building chains now** — a join mode in
+`reel-plan`'s verified planning call, last-frame extraction, re-anchoring after three hops, L4 and Gate 6.
+
+**Caught by.** `reel-render`'s checks 3 (`GATE_ORDER` as data, the default profile, and a worker refusing another), 5
+(a shot with no join mode refused), 29 (every shot's join mode `cut`, and the profile recorded) and 39 (no verdict for
+gate 6).
+
+**Confirmed-by.** The owner, 2026-09-16, choosing _"Not run while every reel is a cut"_. The list of L4's parts, the
+`GATE_ORDER` value, the gate profile setting and the supersession of D-036's _Chose_ clause and check are this entry's
+reading.
+
+---
+
+## S-068 | 2026-09-16 | Gate 8 is KnowScroll's, not the engine's
+
+**Chose.** **The engine runs no Gate 8.** Under D-096 it never receives a claim's content, a source or a truth state,
+and contract version 1 carries no plugin (D-095), so an epistemic gate inside the engine would have nothing to judge.
+The engine's gates end at 7: a completed video has passed Gates 1 to 5 and 7, and 1S wherever a derived picture was
+made. **Whether and how KnowScroll checks a returned video is KnowScroll's side**, decided in the steering repository
+(D-115); it is owed there, beside Q19.
+
+**Supersedes**, for the engine: **D-052**, on _"Gates 7–8 on the cut"_ — Gate 7 alone runs on the cut — and on its
+_Rejected_ _"Dropping Gate 8 (`ks:epistemic`) in Phase 1 — it is the only gate that checks the thing KnowScroll exists
+to get right"_; **D-058**, on _"and Gate 8 (`ks:epistemic`) run on the assembled output file"_ and on its `Confirmed-by`
+_"A test that no reel reaches the library with a `pending` or absent Gate 7 or Gate 8 verdict, each carrying `coverage`
+(I-6)"_ — the engine's test holds for Gate 7; **D-080**, on _"and Gates 7 and 8"_ — `reel-render` takes Gate 7.
+
+**Why.** D-096, written after D-052 and D-058, keeps everything Gate 8 would read in KnowScroll. I-14 lets the
+`ks:epistemic` plugin reach a harness; version 1 of the verified contract builds no plugin route, and a stand-in gate
+with nothing behind it is the guard D-103 retired D-085 for being.
+
+**Rejected.** **A later contract version adds a hook** so KnowScroll's check runs before the engine answers `completed`
+— no different for `reel-render`, and it names the engine as the place the check is owed. **A stand-in Gate 8 in the
+engine** — a scripted pass with no data behind it, which reads as coverage.
+
+**Caught by.** `reel-render`'s checks 3 (`GATE_ORDER`) and 39 (no verdict for gate 8); `reel-plan`'s check 5 keeps the
+truth fields' names out of the engine.
+
+**Confirmed-by.** The owner, 2026-09-16, choosing _"KnowScroll's, not the engine's"_. The supersession quotes are this
+entry's reading.
+
+---
+
+## S-069 | 2026-09-16 | A video run: admitted on its plan's estimate, made by four jobs under one stage `video`, and nothing bought once its render begins
+
+**Chose.**
+
+- **Submit** accepts `until: 'video'`. `planVaryOn` other than `shotCount` is still refused `unsupported` (D-110).
+- **Admission.** When planning selects a plan and `until` is `video`, the plan job compares **the selected plan's
+  `estimateCents`** (D-083, unchanged) with `budgetCents`. **Above** → refused for budget, `limit: 'ceiling'`,
+  `estimateCents` the plan's estimate — the contract's own words, _"the chosen plan's estimate"_ — with the ceiling and
+  the cap; no question; one job row; `stage.finished` for `plan`. **At or below** → admitted exactly as a `stills` run is,
+  by `admitStills` (S-052). The reserve is not counted (S-035), and narration is not in the estimate (S-070).
+- **The chain** is `reel.plan` → `reel.keyframes` → `reel.clips` → `reel.assemble`, each row created, with the run as
+  `correlation_id` and the job before it as `parent_id`, in the transaction that ends its parent's stage successfully
+  (D-081, D-083):
+  - **the keyframes job of a `video` run whose stills stage completes** writes, in one transaction, the chosen flags,
+    the degradations' labels (S-058), its events and `stage.finished` for `stills`, itself done with its cost kept
+    (S-055), and the `reel.clips` row. The run is not finished. **Any other stills ending** ends the run exactly as a
+    `stills` run's (S-046) and creates no row;
+  - **the clips job** settles the cancel flag and `stage.started` for `video` before every attempt (S-027, S-051);
+    completed, it writes its events, itself done with its cost kept, and the `reel.assemble` row;
+  - **the assemble job** settles the cancel flag the same way — writing no second `stage.started` — and **is handed no
+    image, narration or video port**.
+- **I-18 by structure.** `reel.assemble` is the chain's last job and holds no paid port, so nothing can be bought once
+  its render row is written; a check compares every receipt's time with the first render row's.
+- **One stage, `video`** — the contract's — spans both jobs: `stage.started` from the clips job's first attempt,
+  `stage.finished` only when the assemble job completes (S-025's reading).
+- **Events of an admitted `video` run**, after the plan stage's (S-025): from the keyframes job, S-046's for `stills`,
+  and when the stills stage completes, `stage.finished` for `stills`; then from the clips job — cancelled: `run.finished`;
+  else `stage.started` for `video`, then for each shot in plan order a `verdict` for gates `'2'`, `'3'`, `'4'` and `'5'`
+  with its `shotId`, each once its gate completes; then — a take failing, a stop for budget or a failure: `run.finished`;
+  an unclaimed `mustShow` no take shows: a `verdict` gate `'5'`, outcome `fail`, no `shotId`, then `run.finished`;
+  completed: nothing more from this job. From the assemble job — cancelled: `run.finished`; else a `degraded` event per
+  hold in shot order (S-073), a `verdict` gate `'7'` once decided, and `stage.finished` for `video` and `run.finished`
+  when it accepts, or `run.finished` when it fails or the job fails. **Only the finishing attempt's verdicts become
+  events.**
+- **Endings.** Completed → `until: 'video'`, `estimateCents` the plan's, `costCents` the spend, `stills` the chosen
+  pictures in shot order, `video` the render's absolute path, `degradations` the stills' then the holds'. A rule stop
+  names step `video` and rule `gate-2`, `gate-3`, `gate-5` or `gate-7`. Each job reads the cap once per attempt (S-059).
+- **`reel-render.md`'s need 5 (D-076, D-100).** The engine's admission and guard are generation-only: the spend is
+  `SUM(cost_cents)` over the chain's job rows, and only image, narration and clip calls add to them. No port, table or
+  setting for research spend exists in the engine.
+
+**Why.** D-081 gives a stage its own row when it can fail on its own, take minutes or need to survive a restart: clips
+are all three, and an assembly that fails must not buy the clips again. A last job with no paid port makes I-18 a
+structure rather than a promise. S-030 compared a `stills` run's ceiling with what that run spends; a `video` run spends
+the whole estimate, which is the figure the contract already names.
+
+**Rejected.** **One `reel.render` job for clips and assembly** — a restart during assembly pays for every clip again, and
+I-18 rests on the stage's code. **Admitting on the pictures' share** — a video run's ceiling would never be compared with
+its clips. **Narration in the estimate** — changes `reel-plan`'s verified D-083 figure for a cost the token plan covers
+(D-019). **Stage names `clips` and `assembly`** — the contract's stage is `plan`, `stills` or `video`.
+
+**Caught by.** `reel-render`'s checks 7 to 11, 27, 39, 40 and 47.
+
+---
+
+## S-070 | 2026-09-16 | Narration is made shot by shot, just before each clip, by a stand-in voice writing real audio and word timings; the clip's duration is asked for from the measured narration
+
+**Chose.**
+
+- **`NarrationPort.speak({ runId, narrationId, text, voice })`.** `narrationId` is `a<attempt>-shot-<unit>-narration`;
+  `text` the unit's sentences in order, joined by one space; `voice` a setting. It answers `made` — the audio file, the
+  word timings typed `unknown`, and a receipt of model, characters, cost and `fake` — or `refused`, which only the
+  worker's guard answers.
+- **One call a shot, in plan order, immediately before that shot's clip.**
+- **The stand-in** writes a real WAV — 16-bit PCM, mono, 24 kHz, a steady 660 Hz tone — at
+  `<artifact root>/<runId>/<narrationId>.wav`, each word 300 ms of timing followed by a 200 ms gap, the file as long as
+  its timings; scriptable per shot for the word and gap lengths, the timings it reports, a cost, and a throw.
+- **Measured, then parsed.** The media port probes the file, and **the measured duration is the narration's** (I-17).
+  The timings are parsed at the stage's boundary: every word of the text, split on white space, exactly once, in order,
+  each ending after it starts, none overlapping the next, the last ending at or before the measured duration. An answer
+  that does not parse finishes the run `failed`, as S-042's witness answer does.
+- **The guard** (S-035, S-059): before the call, the chain's spend plus the text's characters × the narration rate,
+  rounded up, against the cap, then the ceiling. **The rate is a setting defaulting to 0 cents**: T2A is covered by the
+  owner's token plan (D-019), and D-057 says narration _"costs nothing"_. A test scripts a rate and a cost.
+- **After the call**, in one transaction: its `speech_receipt` with the rate applied, its cost added to the job row,
+  and the narration's row.
+- **The clip's requested duration** is the measured narration rounded up to a whole second (S-023), **at least 5 and at
+  most 15** (D-019). A narration longer than 15 seconds gets a 15-second clip whose last frame is held (S-073).
+
+**Supersedes:** **D-057**, on _"the planner requests a clip `duration` at or above the shot's measured narration
+duration, inside D-019's 5–15 s range"_, and on its `Confirmed-by` _"A test that every shot's requested clip `duration`
+is at or above its narration unit's measured duration."_ — **the clips stage requests it**, after measuring the
+narration, at or above that duration, **or 15 seconds when the narration is longer**, and the rest is held (S-073). The
+planning call runs before any narration exists (`reel-plan`'s known limit 10).
+
+**Why.** D-008 makes narration its own call with word timings; D-019 gives it no fallback, so without a stand-in that
+returns both, a run needs a credential — `reel-engine` review 1's _"The fake provider still cannot run the feature"_.
+Real audio is what lets the conform, the mix and the measure run on a file (`reel-render.md`'s need 2). Just before its
+clip, because D-057 asks for the clip from the measured narration.
+
+**Rejected.** **Narration in parallel with the clips**, as the flow diagram draws it — a clip's duration could not come
+from it. **Every narration first, then every clip** — a stop at the first clip leaves the rest of the reel's narration
+bought; either order passes the other checks, so it is decided here. **The clip's duration from the plan's
+`durationSeconds`** — shorter than its narration whenever the plan guessed short. **A rate at the $100 per million
+characters list price by default** — a charge the token plan does not make.
+
+**Caught by.** `reel-render`'s checks 13, 14, 16, 42 and 44.
+
+---
+
+## S-071 | 2026-09-16 | A clip is made from its approved picture or from words, composed from its shot and Gate 1's observation, and refused at the boundary without the audio block or the 9:16
+
+**Chose.**
+
+- **Take ids** are `a<attempt>-shot-<unit>-take-1`.
+- **Mode.** `image-to-video` from the shot's chosen picture (D-026), where the stills chose one; **`text-to-video` with
+  `aspectRatio: '9:16'` for every other shot** — one that was never given a picture (D-027; D-029 part 3 step 6) and one
+  whose picture was degraded (D-050 step 2). A degraded shot's take row and video receipt are marked `degraded`.
+- **The request** carries the prompt, the duration (S-070), `resolution: '768P'` (D-007, D-014), a seed — the CRC-32 of
+  the take id, made by the caller and recorded (D-018) — and the expansion mode, a setting defaulting to `balanced`, the
+  only value the research read; which value rewrites least is O-20, the paid-path feature's (D-072). Its type has no
+  `reference-to-video` mode and no end image (D-026, D-037).
+- **The prompt**, composed by code after the stills are approved (D-033, D-069, D-008): the style contract's text; the
+  shot's sentences; the names of the subjects it shows; each `mustShow` — presence or event — whose `claimId` a sentence
+  of its unit carries, every `mustNotShow`, and every `mustShow` with no `claimId`, under a line saying the reel must
+  show it in some shot; for an `image-to-video` shot, its picture's recorded observation — framing, setting, lighting,
+  and each entity's label and position — read from Gate 1's verdict, never looked at again (D-033, I-15); and last, the
+  negative audio block, `No dialogue, no speech, no music.` then `non_diegetic_music: N/A`. No camera, since none is
+  planned; no `[Shot` marker (D-071).
+- **The validator** (D-071, I-19) is a pure function in the pipeline, run by the worker's video port **before the guard
+  and before the port it wraps**: it refuses — by throwing, so the run fails as a fault — a request whose prompt lacks
+  the negative audio block, and a `text-to-video` request without `aspectRatio: '9:16'`. The clips stage is handed only
+  that port.
+- **The guard** (S-059's form): the chain's spend plus the requested seconds × the video rate, rounded up, against the
+  cap, then the ceiling.
+- **After each call**, in one transaction: its `video_receipt` — model, mode, resolution, duration, **the aspect ratio
+  a `text-to-video` call asked for** (none for `image-to-video`, whose ratio follows its picture), seed, the provider's
+  request id, prompt, expanded prompt, expansion mode, **the style contract's id and version** (D-069), rate applied,
+  cost, `fake`, degraded — its cost added to the job row, and the take's row.
+- **Only two files call a video port's `generate`**: the worker's `video-port.ts`, on the port it wraps after validating,
+  and the clips stage's `clips/index.ts`, on the port it is handed; and the clips job hands `makeClips` only the port
+  `video-port.ts` builds. A test reads the source for it.
+- **The stand-in** writes a real MP4 through ffmpeg (S-075): a moving test pattern with **a band whose colour is keyed
+  from the take id**, so a shot's frames can be told from the next shot's in an output, a dark band across its lower
+  third, where captions go, and a steady 220 Hz tone, as long as requested; scriptable per take for a black or frozen
+  stretch at a given time and length, or a whole black or frozen picture, another size, frame rate or sample rate, no
+  audio stream, no video stream, unreadable bytes, a shorter duration, a cost, an expanded prompt, and a throw.
+
+**Supersedes:**
+
+- **D-071**, on _"a validator every outgoing provider call passes, which refuses a call whose prompt omits D-008's
+  negative audio block, or a `text-to-video` call without an explicit `aspect_ratio: 9:16`"_, and **I-19**, on _"One
+  validator that every outgoing call passes is the only version of this that survives code nobody has written yet"_ —
+  **image, narration and model calls do not pass it.** D-008's block ends _"Every shot prompt"_; no image prompt carries
+  it (`reel-stills`, verified), so read literally the validator refuses every image call; and neither rule names a
+  narration call or a model call — `structured`, `observe`, `compare` or `judgeCut` — so passing them through would refuse
+  nothing. Every video call passes it.
+- **D-050**, on its `Confirmed-by` _"produces a shot with no image receipt"_ — a shot degraded by its ladder has the
+  image receipts of its failed pictures, marked degraded (S-043, S-058). What the clause guarded holds: no clip is made
+  from any of them, and the shot's clip is `text-to-video` with 9:16.
+
+**Why.** D-033 composes the prompt late so it describes the frame that exists; D-071 puts the two silent rules where no
+new call site can skip them; D-019's trap is a `text-to-video` call without the ratio. A seed made from the take id is
+recorded like any seed and lets two runs of one script be compared. An unclaimed `mustShow` was placed on no shot by the
+plan (S-040), so a clip is only asked for it if every prompt carries it.
+
+**Rejected.** **The validator on every port, with no rule for two of them** — a check that cannot fail (S-014). **The
+validator inside the clips stage only** — D-071's rejected template, _"bypassed by the next call site, silently"_. **A random seed** —
+two stand-in runs of one script could not be compared. **Looking at the picture again to compose** — D-033's second
+record of one frame. **The unclaimed `mustShow` in no prompt** — no clip would be asked for it, and the reel would stop
+for it every time (S-072).
+
+**Caught by.** `reel-render`'s checks 1, 6, 15, 17, 18 and 19.
+
+---
+
+## S-072 | 2026-09-16 | Gates 2 to 5 on a take: what fails one, which measures are real, the witness on a whole clip, and the criteria no shot holds
+
+**Chose.** On each take as soon as it is made, in order (I-7, D-042's ladder, D-052):
+
+- **Gate 2, technical.** The media port measures the file (I-17): ffprobe for its streams, codecs, duration, width,
+  height, frame rate, frame count, sample rate and channels; and one ffmpeg pass of `blackdetect`, `freezedetect`,
+  `silencedetect` and `ebur128`, **handed `blackSeconds` and `frozenSeconds` as the shortest stretch each reports** —
+  ffmpeg's own defaults are two seconds, so a shorter threshold would otherwise never be reached. **It fails when** the
+  file is not readable or has no video stream; when its width over its height differs from 9/16 by more than a
+  tolerance, default 0.01 — D-019's 16:9 trap; when a black stretch of at least `blackSeconds`, default 0.5, is
+  reported; or when a frozen stretch of at least `frozenSeconds`, default 1.0, is reported. `freezedetect` measures a
+  freeze a few frames short, so the checks keep a margin either side of each threshold. Duration,
+  frame rate, sample rate, channels, a missing audio stream, silence and loudness are recorded and never fail a take: a
+  short clip is held (S-073), and the rest are conformed. The thresholds are settings, provisional until M-1. **A take
+  failing Gate 2 has no later gate**: there is nothing to witness in a file that could not be measured as a clip
+  (S-031's reason).
+- **Gate 3, text and sound.** The media port reads the clip's words and classifies its sound as speech or music — from
+  a script in this feature, as `reel-stills`' sensors read words (real OCR and audio classifiers are deferred). **Words
+  are recorded and never fail** (S-041's reading). **Speech or music fails the take**: D-008 makes H3's sound ambience
+  only, and every prompt forbids both.
+- **Gate 4, the witness.** **One `observe` call, role `witness`, temperature 0, given the clip and nothing else** —
+  one witness, whose input is the clip (D-051, D-053, I-8). Its answer is parsed as a clip's `WitnessObservation`,
+  whose `actions` and `eventOrder` are required (D-041); an answer that does not parse finishes the run `failed`
+  (S-042). Its coverage is `full`, with the limitation that how the model samples a supplied clip is undocumented
+  (D-051, I-6). It accepts once parsed.
+- **Gate 5, the brief.** **One `structured` call, role `reconciler`, temperature 0**, naming the take for its receipt,
+  given the clip observation, the subjects the shot shows, **the take's criteria** — each `mustShow`, presence or event,
+  whose claim a sentence of the unit carries, and every `mustNotShow` — and **every unclaimed `mustShow`, marked as the
+  reel's**. It answers as S-040's reconciler does, naming every subject and criterion given once, with entities the
+  witness gave (S-056). **Code fails the take** when a subject the shot shows is not shown, a shown subject's count does
+  not match (S-040's rule), a claimed `mustShow` of either type is not shown, or a `mustNotShow` is shown. **A clipped
+  entity does not fail a clip**: D-044's veto is the keyframe's, and a subject leaving a moving frame is motion.
+- **An unclaimed `mustShow`** is recorded on every take and fails none; **once every shot's take is accepted, one shown
+  by no take stops the reel for rule `gate-5`** at step `video`, naming it — D-025's rung 3, _"`mustShow` unmet"_, and
+  D-043's _"Gate 5 still runs every criterion on the clip"_.
+- **A take's outcome** is decided when Gate 2 fails or Gate 5 completes; `accept` only when all four completed and
+  accepted. After Gate 3 fails, Gates 4 and 5 still run, so the record holds every reason. **A take that fails stops the
+  run** for the rule of its lowest failing gate, the detail naming each failed gate's reasons (S-066).
+- **Coverage** on every verdict (I-6): Gate 2 and Gate 3 `whole file`; Gate 4 as above; Gate 5 `observation`.
+- **Receipts and rows.** `ModelReceipt` and `model_receipt` gain **`takeIds`**; the witness receipt and the reconciler
+  receipt of a take name it, and its `take_observation` (`obs-<takeId>`) and `take_reconciliation` (`rec-<takeId>`) rows
+  are tied to them by key (S-037's form). The model stand-in keeps `observe` calls on clips in a list of their own.
+  `model_receipt.take_ids` arrives with `reel-render`'s first slice, defaulting to `'[]'` (S-055's form), so the port's
+  new field is never recorded without a column.
+
+**Supersedes:**
+
+- **S-037**, on _"`observe` takes a picture and temperature 0, and nothing else"_ — it takes a picture **or a clip**,
+  and temperature 0, and nothing else.
+- **D-051**, on _"Sampled frames remain implemented and are the recorded fallback"_ and its `Confirmed-by` _"A clip
+  exceeding the inline limit produces a verdict recording a frames strategy and a stated limitation, not a failed
+  gate"_ — the inline limit and a provider refusing a format belong to a real adapter, so the frames path is the
+  paid-path feature's; every Gate 4 verdict here records `full`.
+
+**Why.** No decision says what fails a clip at Gate 2 or 3; I-7 lists what is measured and D-025 names freezes as broken
+motion. The witness is one contract with two inputs (D-053), so `observe` takes both. D-043 promises every criterion a
+Gate 5 verdict, and S-040 already found that a reel-wide `mustShow` fails nearly every frame it is required of.
+
+**Rejected.** **Failing silence or a missing audio stream** — H3's sound is only ambience, and the conform supplies
+silence. **Letterboxing a 16:9 clip** — the trap D-019 names. **Recording speech and music only** — they would sit under
+the narration. **Every `mustShow` on every clip** — S-040's doom loop. **Ignoring an unclaimed `mustShow`** — D-043.
+
+**Caught by.** `reel-render`'s checks 4 and 20 to 26.
+
+---
+
+## S-073 | 2026-09-16 | The one pass: the render manifest, spans and holds, conform notes, captions and the mix, and the output measured
+
+**Chose.**
+
+- **The render manifest** (D-059) is built by code from the run's rows when the clips job has completed, validated by
+  its schema, and written with its hash on a render row **before the assembler is called**; with the files it names, it
+  is the assembler's only input. It holds the run, a render id `a<attempt>-render`, the output profile, the gate profile
+  that ran (S-067), the caption style, the duck level and a cost ledger — image, narration and video cents — and, **for
+  every shot of the selected plan in plan order, none removed** (I-12, D-025): its shot id, `joinMode: 'cut'` (S-067),
+  its take, the provider's request id, the expanded prompt and the clip's path; **its opening** — `keyframe` with the
+  picture's id; `text-to-video`, not placed, for a shot the plan gave no picture, with no reason; or `text-to-video`,
+  placed, for a shot whose picture was degraded, with its degradation reason — so the schema refuses a placed opening
+  without a reason and an unplaced one with one; its narration id, audio path and word timings; the clip's measured
+  facts; its span; its conform notes; its hold; and every verdict decided before assembly — 1 and 1S where its picture
+  had them, 2 to 5 — with coverage. Captions are listed in reel time. No end card (D-101); no type or field is named
+  `manifest` alone — the fields that hold one are `renderManifest`.
+- **A span** is the measured narration in frames, rounded up, starting where the shot before ends. **A clip with at
+  least that many frames is trimmed at the tail** — the ordinary case, no label (D-057, I-12). **One with fewer holds its
+  last frame for the rest: a hold**, labelled in four places (I-4, S-058's form) — a `hold` row with its seconds and
+  reason; **the take's row, whose degradation reason sits beside its verdicts**, as a degraded picture's does; the
+  take's video receipt, marked degraded; and a `degraded` event — and carried on the shot's manifest entry, and listed
+  after the stills' degradations in a completed result and in the record.
+- **Captions** (D-008): one event per narrated word, from its start to its end, offset by its shot's start; burned by
+  the `ass` filter from a subtitles file the assembler writes beside the output; the style is a setting with an id.
+- **The mix** (D-008): each clip's sound resampled to the profile and fitted to its span — silence where it has none —
+  lowered by the duck level, a setting defaulting to 18 dB, for the whole span, since the narration spans every shot;
+  each narration resampled and fitted to its span; the two mixed.
+- **The conform** (D-055) reads each clip's geometry, frame rate, sample rate and channels **only from its measured
+  facts in the manifest** — a video request carries none of them: scaled to fit the profile keeping its aspect, padded,
+  its frame rate converted, its sound resampled to the profile's rate and layout. **A conform note** is recorded for a
+  pad, a frame-rate conversion and added silence; a scale alone or a resample alone records none.
+- **One pass** (D-054): **one ffmpeg invocation** reads every clip and narration file and writes one MP4 — H.264, AAC,
+  the profile's geometry, frame rate, sample rate and channels, `-movflags +faststart` — at
+  `<artifact root>/<runId>/<renderId>.mp4`. **Shots are joined by the `concat` filter inside that one filtergraph**:
+  one decode, one encode. No concat demuxer or protocol is used, and nothing is stream-copied.
+- **The profile** (D-055) is a setting defaulting to 768 × 1366 at 24 frames a second, 48 kHz, two channels,
+  provisional until M-7. Every test but one sets a small profile, so the suite stays quick.
+- **The output is measured** (I-17) by the media port's probe: codecs, geometry, frame rate, sample rate, channels,
+  decoded frame count, and whether `moov` comes before `mdat`. A difference from the profile or from the manifest's
+  total frames, or `mdat` first, finishes the run `failed`, naming it: the assembler broke its own input.
+- **The adapters refuse paths outside the root**: the assembler and the frame strip, like the stand-ins, refuse a run or
+  render id whose path would leave the artifact root (D-086).
+- **The render row** is the assembly's receipt: render id, attempt, the manifest and its hash, the output path, the
+  profile, the invocations, the measure, when it started and finished, and Gate 7's verdict (S-074). **The reel's
+  record is the render row with its manifest.**
+- **Checked by measurement, not by reading the manifest back.** Each stand-in take's picture carries a band keyed from
+  its take id, so **a shot boundary is the frame at which that band changes** in the output. A replay renders a stored
+  manifest again **under another artifact root**, so it never overwrites the file it is compared with; and a manifest
+  whose captions' text alone is changed renders with the same boundaries — D-054's caption test, which needs no edit
+  op.
+
+**Supersedes:**
+
+- **D-057**, on _"A shot's span on the output timeline is `max(its narration duration, its picture duration)`"_ — **the
+  span is the narration's measured duration**: D-057's own next clauses trim a longer picture to its narration and hold
+  a shorter one to it, so no picture outlasts its span.
+- **D-055**, on _"and in every receipt"_ and its `Confirmed-by` _"Every `generation_receipt` and every render manifest
+  carries the profile"_ — the render manifest and the render row carry it; an image, narration or clip receipt records
+  what its call asked for. The profile being identical for every reel, and its record in the render manifest, stand.
+- **D-059**, on its `Confirmed-by` _"A test that a shot marked `still-hold` or `text-to-video` without a degradation
+  reason fails validation"_ — a `text-to-video` shot carries a reason exactly when its picture was degraded; a shot the
+  plan gave no picture (D-027) is `text-to-video` by design and carries none. `still-hold` is `reel-takes`' (S-066).
+- **D-059**, on _"every gate verdict from Gates 1 through 8, each with its `coverage` (I-6)"_ and _"It is also what L6
+  publishes as the reel's record"_ — the manifest holds every verdict decided before it is built, Gates 1, 1S and 2 to
+  5; **Gate 7's verdict and the output's measure**, decided on the file the manifest made, are on the render row beside
+  it, and the reel's record is the two together. Gate 8 is KnowScroll's (S-068).
+- **D-056**, on _"served over HTTP Range from the API's `/media` route"_ and its `Confirmed-by` _"A test that `/media`
+  answers a `Range` request with `206` and the correct byte window"_ — the engine returns the file's absolute path, as
+  `reel-contract`'s Gate 3 chose (least confident 4), and serving it to a viewer is the player's, KnowScroll's (D-115).
+  One progressive MP4 with `faststart` and no `.m3u8` stand.
+
+**Why.** D-054's concern is seams between separately encoded segments; a filter joining decoded streams inside one
+encode has none. A fixed duck over a span the narration fills is what a compressor would settle to, and it can be
+measured. One caption a word makes every offset checkable against its timing. D-059's manifest must hold everything the
+pass reads, so the measured facts travel in it.
+
+**Rejected.** **Segments, the concat demuxer or stream copy** — D-054. **Spans from the plan's durations** — picture and
+voice would drift apart. **A sidechain compressor** — an envelope with no gap to release into, and a level no check can
+predict. **A caption a sentence** — its word timings would go unused and no offset could be checked. **Normalising
+loudness** — no target is decided; it is measured only.
+
+**Caught by.** `reel-render`'s checks 5, 29 to 37, 39 and 41.
+
+---
+
+## S-074 | 2026-09-16 | Gate 7 is one `judgeCut` call on a frame strip of the assembled file, answering five closed questions, and its failure ends the reel
+
+**Chose.**
+
+- Once the output is measured, **the media port extracts a frame strip**: for each shot, the frames at the start, the
+  middle and the end of its span, as PNGs `<artifact root>/<runId>/<renderId>-frame-<n>.png` (D-051: Gate 7 keeps its
+  frame strip).
+- **One `judgeCut` call, role `judge`** (D-006's M3), temperature 0, given each shot in timeline order with its frames
+  and its sentences, and **five closed questions** — a setting, provisional until M-1: the order of the shots, their
+  pacing, what sits next to what, whether the burned captions follow the narration (D-058), and whether a shot repeats
+  what another shows (D-064's fourth question). Its receipt names the frames' ids.
+- **Its answer names every question once, `yes` or `no`**, or it does not parse and the run fails. **Any `no` fails Gate
+  7** (I-16). The verdict records its coverage — `frames`, with their number (I-6) — the answer, and the questions
+  answered `no` as its reasons.
+- **A failure stops the run for rule `gate-7` at step `video`**: the file and its render row are kept, the result
+  carries no video, and no question is written. No edit op exists to try first (S-066).
+- `LanguageModelPort` carries **four** calls.
+
+**Supersedes:** **S-037**, on _"`LanguageModelPort` has three calls"_ and its title's _"Pictures enter the model port
+through `observe` and `compare` only"_ — `judgeCut` also carries pictures, the assembled file's frames, with the shots'
+sentences and the questions. It is not the witness: I-8 protects `observe`, which is unchanged, and Gate 7 must see the
+narration to judge the cut against it (D-058).
+
+**Why.** D-058 puts Gate 7 on the assembled file because only there are the conform, the burned captions and the mix
+visible. D-064 took Gate 7's questions for the plan score, and D-058 adds the captions' alignment. D-045's _"one witness
+call per image"_ is about generated images; these frames are cut from a file already judged shot by shot.
+
+**Rejected.** **A text-only call on the render manifest** — it could not see what D-058 runs Gate 7 on the file to see.
+**`observe` or `compare`** — the blind witness and Gate 1S's fixed question. **The whole video instead of frames** —
+D-051 keeps a strip for Gate 7. **Returning a failed cut with a label** — the contract's _"never receive a reel that
+looks finished but is not"_.
+
+**Caught by.** `reel-render`'s checks 38 and 46; `reel-plan`'s check 3, the port's calls.
+
+---
+
+## S-075 | 2026-09-16 | ffmpeg and ffprobe come from PATH, are checked when a worker starts, and are reached only through ports built in `packages/providers`
+
+**Chose.**
+
+- **They are found on PATH by name**: the adapters' settings `ffmpeg` and `ffprobe` default to `'ffmpeg'` and
+  `'ffprobe'`. No path to them is written in the repository (D-086). Nothing here installs them; `CLAUDE.md`'s traps name
+  them, as 8.1.1 on this machine.
+- **The adapters live in `packages/providers/src/ffmpeg/`**: `ffmpegTools`, which runs the two and checks them;
+  `ffmpegMedia`, the `MediaPort` — its probe, scan and frames real, its words and sound from a script; and
+  `ffmpegAssembler`, the `AssemblerPort`. The stand-in video port writes its clips with the same tools. Each writes only
+  under the artifact root and refuses an id that would leave it.
+- **`ready()`** on the media port and on the assembler runs both tools' `-version`, reads `-encoders` and `-filters`,
+  and rejects naming the first thing missing: a tool that cannot be run, `libx264`, `aac`, or a filter the scan, the
+  pass or the strip uses. **`startWorker` awaits both before it opens its database, and refuses to start with that
+  reason** — D-026's startup refusal, so no job is claimed. **What is remembered, once per process for a pair of tool
+  names, is what the tools said** — each one's `-version`, `-encoders` and `-filters` output, or that it could not be run
+  — so the many workers a test suite starts do not each spawn the tools again; **every `ready()` compares its own
+  required encoders and filters against that**, so a port asking for a filter the tools lack is refused whatever passed
+  before it.
+- **The pipeline never touches them**: `pipeline-no-io` forbids `child_process` there. **A new rule,
+  `processes-only-in-providers`**: nothing under `packages/` or `apps/` outside `packages/providers` imports
+  `child_process`, so neither the worker, the API nor the domain can start a process. Eighteen rules become
+  **nineteen**. Its `drift:prove` cases import the module under both its spellings, `child_process` and
+  `node:child_process`, from `apps/worker`, `apps/api` and `packages/domain` — in `drift.mjs`' list of cases by file,
+  where `pipeline-no-io`'s `node:fs` case already sits, since a built-in module has no package for the by-name cases to
+  place. `CLAUDE.md`'s count follows.
+- **The worker requires the video, narration and media ports and the assembler from `reel-render`'s third slice**,
+  when their stand-ins and adapters exist, as `reel-stills` required its image and sensor ports from its third.
+
+**Why.** D-054 and D-055 need ffmpeg, and it costs nothing, reads no secret and reaches no network. A port keeps every
+stage pure (S-038). A missing tool found at start is found before any clip is bought. S-021 recorded a worker import as
+uncaught until a rule existed; a spawn in the runner is the same shape.
+
+**Rejected.** **An npm package bundling ffmpeg** — a native binary per platform in the lockfile. **A default absolute
+path** — D-086. **Spawning ffmpeg from the worker** — a process started by the one place that knows stages and tables.
+**Finding a missing tool at first use** — after the reel's clips are paid for.
+
+**Caught by.** `reel-render`'s checks 2 (the rule), 12 (the refusal) and 50 (a child whose environment is PATH alone runs
+them).
+
+---
+
+## S-076 | 2026-09-16 | A clips job run again starts over and pays again; an assemble job run again renders again and buys nothing
+
+**Chose.**
+
+- **A `reel.clips` job claimed again** after its lease runs out (S-027) runs from the start with the next attempt:
+  every narration and take is made again under ids carrying that attempt, and paid for again — S-048, applied to clips.
+  The earlier attempt's rows, receipts, files and cost stay, with the gates each take reached and no outcome where one
+  was cut off; the guard counts its cost; `stage.started` for `video` is not written twice; only the finishing attempt's
+  verdicts become events. One take a shot is per attempt (S-066).
+- **A `reel.assemble` job claimed again** builds its manifest again from the same rows, under a render id carrying the
+  next attempt, and writes a new render row and file. The earlier render row and file stay. No receipt of a paid call
+  can be added (S-069).
+- **A worker that dies between two jobs** leaves the next row queued, and the next worker claims it; the job before is
+  not run again (D-081).
+
+**Why.** S-048's reasons hold: resuming a take whose gates were cut off would mean a second look at one clip (I-15) or
+storing half-finished steps. Rendering again costs nothing.
+
+**Rejected.** **Resuming the accepted takes** — a take cut off inside its gates would be looked at twice. **Reusing an
+earlier render's file** — its Gate 7 verdict may have been cut off.
+
+**Caught by.** `reel-render`'s checks 48 and 49.
+
+---
+
+## S-077 | 2026-09-16 | What `reel-render` changes in verified features
+
+**Chose.** Each change is made in the slice that forces it, and **none removes an assertion**:
+
+- **`reel-plan`'s check 10 and `reel-stills`' check 8** assert that `until: 'video'` is refused; each asserts it is
+  **accepted** with a `runId`. **Every assertion check 10 made of its refusal** — `422`, `unsupported`, the `requestId`
+  echoed, a detail saying _"not built yet"_, no `runId`, and nothing stored — **is kept, made of the one request the
+  engine still refuses as `unsupported`, `planVaryOn: 'order'`**, in the same test; `reel-render`'s check 7 makes them
+  too. `reel-plan-run.test.ts` and `reel-plan-service.test.ts`, which send `video` to get a refusal, send `planVaryOn:
+'order'` (Slice 2). `reel-plan.md` and `reel-stills.md` gain notes naming this entry.
+- **`reel-plan`'s check 29 and `reel-stills`' check 5**: `GATE_ORDER` equals `['0', '1', '1S', '2', '3', '4', '5', '7']`
+  (Slice 1).
+- **`reel-plan`'s check 3**: `LanguageModelPort`'s calls are exactly `structured`, `observe`, `compare` and `judgeCut`
+  (Slice 1, S-049's form).
+- **`reel-contract`**: nothing in its package; its file gains a note, in the slice that completes a video (Slice 4),
+  that the real engine now answers `until: 'video'` and that its record still lists pictures only.
+- **Code and test support, none of it an assertion**: `model_receipt.take_ids`, `recordReceipt` writing it, and
+  `ModelReceipt.takeIds` in the model stand-in; `recording-port.ts` recording `judgeCut`; and `worker-process.ts`'
+  port carrying `judgeCut`, its held call counted across the four calls (Slice 1, as S-047 put the three-call port in the
+  slice that grew it); `WorkerOptions` requiring `video`, `narration`, `media` and `assembler` (S-021, S-038, S-075),
+  with `tests/engine/harness.ts` and `worker-process.ts` building them with a small test profile (Slice 3); `readRecord` listing
+  a render's holds after the degradations (Slice 4); the keyframes job advancing a `video` run, the plan job admitting
+  one, and the API accepting it (Slice 2); `CLAUDE.md`: nineteen rules (Slice 1), the only video and narration ports
+  stand-ins and ffmpeg on PATH (Slice 3).
+- **Found after the gates were approved, by Gate review 3's list of what it could not check**, and added here by
+  addition only, as S-049 added to S-047: `tests/reel-stills-endings.test.ts` and `tests/reel-stills-placing.test.ts`
+  each wrap the model port call by call in a `hold`, and gain `judgeCut` passed through (Slice 1, since `tests/` is
+  type-checked); `tests/reel-stills-prompts.test.ts` calls `startWorker` itself for `reel-stills`' check 21, and hands
+  it the four ports (Slice 3). **`startWorker` keeps its existing refusals first** — an image port without references,
+  equal framing values, and now another gate profile — **and only then awaits `ready()`**, so check 21's refusals are
+  reached before any tool is run. No assertion of either file changes.
+
+`reel-plan`'s, `reel-stills`' and `reel-contract`'s Evidence lines are not touched; their journeys run again in
+`reel-render`'s last slice.
+
+**Why.** D-108's `Confirmed-by` refuses `video` to _"a `reel-plan` build"_, and S-047 narrowed the refusal the same way
+for `stills`. A port that gains a call must be implemented by everything that implements it.
+
+**Rejected.** **Leaving the refusals as written** — a correct build goes red. **Relaxing check 3 to "contains"** —
+S-049's reason. **Editing the verified files' gates** — a note says what changed and where it is decided.
+
+**Caught by.** `reel-render`'s checks 1, 3 and 7, and the three journeys.

@@ -4,7 +4,7 @@
 - **Feature:** `reel-render` — [`docs/features/reel-render.md`](../docs/features/reel-render.md)
 - **Work:** write its four planning gates and have them reviewed adversarially until approved; no code, no test
 - **Written:** 2026-09-16, at the end of session 19, after `reel-stills` was verified
-- **Run:** not yet
+- **Run:** session 20
 
 Paste everything inside the block below as the session's first message.
 

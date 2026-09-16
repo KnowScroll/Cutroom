@@ -11,6 +11,6 @@ its `JOURNAL.md` entry says it did (S-065).
 - **A prompt is not edited once its session has run**, except its `Run` line. A changed prompt is a new file.
 - **Committed**, never left untracked at the repository root: `node scripts/journey.mjs` refuses a dirty tree.
 
-| #   | Prompt                                               | Feature       | Work      | Written    | Run     |
-| --- | ---------------------------------------------------- | ------------- | --------- | ---------- | ------- |
-| 020 | [020-reel-render-gates.md](020-reel-render-gates.md) | `reel-render` | gates 1–4 | 2026-09-16 | not yet |
+| #   | Prompt                                               | Feature       | Work      | Written    | Run        |
+| --- | ---------------------------------------------------- | ------------- | --------- | ---------- | ---------- |
+| 020 | [020-reel-render-gates.md](020-reel-render-gates.md) | `reel-render` | gates 1–4 | 2026-09-16 | session 20 |
