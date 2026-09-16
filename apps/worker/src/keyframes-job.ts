@@ -7,6 +7,7 @@ import type {
 } from '@cutroom/contracts'
 import {
   finishStills,
+  imageCallCount,
   readReelCapCents,
   readRequest,
   readRun,
@@ -100,10 +101,12 @@ export async function runKeyframesJob(
     return
   }
 
+  // The run's image calls before this attempt, counted from its receipts now, at the attempt's start:
+  // a job run again after its worker died makes every picture again, and what the attempts before
+  // it made comes out of its reserve (S-048). The stage decides what that leaves (S-061).
+  const earlierImageCalls = imageCallCount(db, runId)
   const outcome = await makeStills(
-    // The run's image calls before this attempt are Slice 5's to count (S-048): a first attempt has
-    // made none, and the restart that could have is not built yet.
-    { runId, attempt: job.attempts, earlierImageCalls: 0, request, plan },
+    { runId, attempt: job.attempts, earlierImageCalls, request, plan },
     {
       image: guardedImagePort(context.image, db, {
         jobId: job.id,

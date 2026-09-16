@@ -3,7 +3,7 @@
 
 export { BUDGET_MD, readReelCapCents } from './budget.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
-export { recordGeneration, spentCents } from './ledger.ts'
+export { imageCallCount, recordGeneration, spentCents } from './ledger.ts'
 export { readRecord, upsertPicture, type DegradedShot } from './pictures.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
 export {

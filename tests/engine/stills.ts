@@ -597,12 +597,22 @@ export const first = (key: string) => `a1-${key}`
  * which carries the same reason, and no other picture's; every `generation_receipt` of the shot's
  * pictures marked degraded, and no other receipt; and one `degraded` event. The result, when the run
  * completed, and the record list it too. Everything expected is given by hand. Returns the reason.
+ *
+ * The receipts marked are the shot's pictures of the attempt that degraded it — `attempt`, 1 unless
+ * given — and no earlier attempt's (S-058).
  */
 export function assertDegraded(
   ran: Stilled,
-  expected: { shotId: string; gate: '1' | '1S'; last: string; pictures: readonly string[] },
+  expected: {
+    shotId: string
+    gate: '1' | '1S'
+    last: string
+    pictures: readonly string[]
+    attempt?: number
+  },
 ): string {
   const { shotId, gate, last, pictures } = expected
+  const attempt = expected.attempt ?? 1
   const rows = ran.degradations.filter((d) => d.shot_id === shotId)
   assert.equal(rows.length, 1, `${shotId} has ${rows.length} degradation rows, not one`)
   const row = rows[0] as Stilled['degradations'][number]
@@ -624,7 +634,7 @@ export function assertDegraded(
 
   // The shot's receipts are exactly the pictures expected, and every one is marked; a receipt of a
   // shot with no degradation row is not.
-  const ofShot = (id: string, shot: string) => id.startsWith(`a1-${shot}-`)
+  const ofShot = (id: string, shot: string) => id.startsWith(`a${attempt}-${shot}-`)
   assert.deepEqual(
     ran.generations.filter((g) => ofShot(g.picture_id, shotId)).map((g) => g.picture_id),
     [...pictures],

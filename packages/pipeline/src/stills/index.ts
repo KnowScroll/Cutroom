@@ -16,7 +16,7 @@ import { GATE_ORDER } from '../gates/index.ts'
 import { gate1, type Brief, type Gate1Progress } from '../gates/gate1.ts'
 import { gate1s } from '../gates/gate1s.ts'
 import { criteriaFor } from './criteria.ts'
-import { REPAIRS_PER_SHOT, repairLabel, reserveOf } from './ladder.ts'
+import { IMAGE_CALLS, REPAIRS_PER_SHOT, placementCalls, repairLabel, reserveOf } from './ladder.ts'
 import { pictureIdOf, placePictures, shotIdOf, type Placement } from './place.ts'
 import { framingFor, imagePrompt, pictureEntry, repairPrompt, type Consumed } from './prompts.ts'
 import { DEFAULT_SCORE_WEIGHTS, keyframeScore } from './score.ts'
@@ -284,8 +284,18 @@ async function stage(
   // No subject in two shots: nothing to make, and the stage is done (S-039).
   if (canonical === undefined) return { kind: 'completed' }
 
-  // The reserve: six less the placement's calls. Every repair takes one slot, any free one (S-043).
-  let slots = reserveOf(placements)
+  // The reserve: six less the run's earlier image calls, less the placement's calls, fixed now
+  // (S-043, S-048). Every repair takes one slot, any free one. Below 0 — an attempt run again after
+  // its worker died, which cannot make its pictures within six calls — is a fault, decided here,
+  // before any call (S-061).
+  let slots = reserveOf(placements, input.earlierImageCalls)
+  if (slots < 0) {
+    const calls = placementCalls(placements)
+    return {
+      kind: 'failed',
+      detail: `attempt ${input.attempt} cannot make its pictures within ${IMAGE_CALLS} image calls: the run made ${input.earlierImageCalls} before it and its placement makes ${calls}, ${input.earlierImageCalls + calls} in all (S-048)`,
+    }
+  }
 
   // The canonical, best of two: a then b, each through Gate 1 as soon as it is made (D-030, D-042).
   const canonicalBrief = briefOf(canonical)
@@ -331,8 +341,16 @@ async function stage(
   } else {
     // No survivor: ONE repair, told both candidates' reasons, with candidate a's framing and no
     // reference (D-047). It runs before anything else takes a slot, so it has first claim (D-048). A
-    // first attempt's reserve is at least two, so it always finds one; a restarted attempt that
-    // finds none fails before the call (S-048), which reel-stills' Slice 5 builds.
+    // first attempt's reserve is at least two, so it always finds one; an attempt run again whose
+    // earlier calls left none fails before the call — a fault of the crash, not rule gate-1, which
+    // is for a repair that was made and failed (S-048, S-061).
+    if (slots <= 0) {
+      const why = candidates.map(gate1Why).join('. ')
+      return {
+        kind: 'failed',
+        detail: `attempt ${input.attempt} cannot repair the canonical picture of ${shotIdOf(canonical.shotUnit)}: no reserve slot is free, the run having made ${input.earlierImageCalls} image calls before it and its placement making ${placementCalls(placements)} of the ${IMAGE_CALLS} (S-048). ${why}`,
+      }
+    }
     slots -= 1
     const framing = framingFor('canonical', 'a', settings.stills)
     const repair = await make(

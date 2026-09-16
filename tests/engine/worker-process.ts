@@ -1,5 +1,12 @@
-import type { LanguageModelPort, PlanSettings } from '@cutroom/contracts'
-import { fakeImage, fakeModel, fakeSensors, type FakeScript } from '@cutroom/providers'
+import type { LanguageModelPort, PlanSettings, StillsSettings } from '@cutroom/contracts'
+import {
+  fakeImage,
+  fakeModel,
+  fakeSensors,
+  type FakeImageScript,
+  type FakeScript,
+  type FakeSensorScript,
+} from '@cutroom/providers'
 import { startWorker } from '@cutroom/worker'
 
 /**
@@ -11,7 +18,8 @@ import { startWorker } from '@cutroom/worker'
  * script it is given, except that call `holdAtCall` (counted across the port's three calls and
  * every role, from 1) is never answered: the process prints `held` and waits there until it is
  * killed. Every call before it returns, so its receipt is written. Its image and sensor ports are
- * the stand-ins with their defaults, writing under the artifact root it is given (S-047).
+ * the stand-ins, answering from the engine's scripts — a cost keyed by a whole picture id lands on
+ * that attempt's picture only — and writing under the artifact root it is given (S-047, S-062).
  */
 export interface WorkerProcessConfig {
   dbPath: string
@@ -19,7 +27,10 @@ export interface WorkerProcessConfig {
   budgetPath?: string
   artifactRoot: string
   settings: PlanSettings
+  stillsSettings?: StillsSettings
   script: FakeScript
+  images: FakeImageScript
+  sensors: FakeSensorScript
   holdAtCall: number
   leaseMs: number
 }
@@ -60,9 +71,10 @@ await startWorker({
   dbPath: config.dbPath,
   pollMs: 10,
   model,
-  image: fakeImage({}, { artifactRoot: config.artifactRoot }),
-  sensors: fakeSensors({}),
+  image: fakeImage(config.images, { artifactRoot: config.artifactRoot }),
+  sensors: fakeSensors(config.sensors),
   settings: config.settings,
+  ...(config.stillsSettings === undefined ? {} : { stillsSettings: config.stillsSettings }),
   questionsPath: config.questionsPath,
   leaseMs: config.leaseMs,
   ...(config.budgetPath === undefined ? {} : { budgetPath: config.budgetPath }),

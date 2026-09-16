@@ -1773,3 +1773,105 @@ one answered yes; `repair-2` carries its repair's subject, not the first picture
 repair told only candidate `a`'s reasons, given `b`'s framing, or given a reference (36 each); a derived repair told
 nothing, or made with no reference (38 each); a Gate 1S repair told every shared subject, or made with no reference (39
 each).
+
+---
+
+## S-061 | 2026-09-16 | A restarted attempt that cannot fit its pictures, or whose canonical repair finds no slot, is failed by the stills stage, from the earlier calls the worker counts
+
+**Chose.**
+
+- **`imageCallCount`** (`packages/domain/src/ledger.ts`) is the number of the run's `generation_receipt` rows, every
+  attempt's. The keyframes job reads it **once per attempt**, after the cancel read and the cap, just before the stage,
+  and hands it to `makeStills` as `earlierImageCalls`.
+- **`reserveOf(placements, earlierImageCalls)`** (`stills/ladder.ts`) is 6 − the earlier calls − the placement's calls.
+- **`makeStills` decides both of S-048's failures**, before the call each is about:
+  - **below 0** — before any image call: `failed`, detail _"attempt 2 cannot make its pictures within 6 image calls:
+    the run made 3 before it and its placement makes 4, 7 in all (S-048)"_;
+  - **no candidate survives and no slot is free** — before the repair's call: `failed`, detail _"attempt 2 cannot
+    repair the canonical picture of shot-0: no reserve slot is free, the run having made 2 image calls before it and
+    its placement making 4 of the 6 (S-048)."_, then each candidate's Gate 1 failure in the words of the rule stop's
+    detail (_"a2-shot-0-a failed Gate 1 at reconcile: …"_), joined by `. `.
+- A plan that places nothing makes no call, and completes before the reserve is looked at.
+
+**Why.** Gate 2 puts the reserve in the ladders, and the ladders are the stage's; Gate 3 hands the stage
+`earlierImageCalls` beside the plan it places, so it has every figure the decision needs, and `placePictures`,
+`placementCalls` and the reserve already live there. The worker holds the count only because counting is a read of the
+database, which the pipeline may not make (`pipeline-no-io`). Gate 2 asks for a detail _"naming the counts"_; the
+canonical's also names what failed, because the rule stop it replaces names the three pictures' failures, and an
+operator reading a failed run needs to know why a repair was due as much as why it could not be made.
+
+**Rejected.** **The worker deciding "below 0" before calling the stage** — it calls `placePictures` already, for its
+guard, but the reserve would be computed in two packages, and a stage handed a count it could not fit would still make
+calls. **A seventh call refused by the guard** — S-048's rejected round-2 N2: a run failing midway that its own ladder
+says completes. **A rule stop, `gate-1`, when the canonical repair has no slot** — S-048 chose `failed`: the cause is the
+crash, not the picture. **A detail naming only the counts** — the reasons would be in the record alone.
+
+**Caught by.** `reel-stills`' check 49 (`tests/reel-stills-restart-reserve.test.ts`): killed after 2 calls of a plan of
+4, reserve 0 — a derived picture failing Gate 1 degraded, 6 calls; killed after 2, both candidates failing — `failed`
+with the detail above, 4 calls, no repair; killed after 3, reserve −1 — `failed` with the detail above, no image, sensor
+or model call in the second attempt; a plan of 4 whose rank 3 has no free shot, killed after 3 — fits, completes. Breaks
+watched, each caught by 49 (and 50, which runs it): the count not taken (the Slice 4 stand-in); `reserveOf` without
+the earlier calls; the reserve from the plan's planned calls (also 39); −1 let through; no below-0 failure; a reserve of
+exactly 0 failed (also 48); either detail without its counts, the canonical's without its reasons; either failure
+reported as a rule stop; the canonical's decided after its call. **The count taken over every run's receipts** is caught
+by 13, 14, 29, 30 and 35, whose engines run several stills runs — not by 49, whose engines run one.
+
+---
+
+## S-062 | 2026-09-16 | The restart checks hold their first worker at the witness call of the picture after the image calls they need, and trust the receipts, not the count
+
+**Chose.** `tests/engine/worker-process.ts` keeps `reel-plan`'s one mechanism: `holdAtCall`, counted over every model
+call from 1, the planner's included. Checks 48 and 49 hold **the witness call of the picture after the N-th image
+call** — the fixture plans make two planner calls, then each picture past technical one witness and one reconcile call,
+so call 5 follows 2 image calls and call 7 follows 3 — say in the test which picture that is, and **assert the picture
+ids of the run's `generation_receipt` rows before the kill** (`killedMidStills`, `tests/engine/restart.ts`). The child
+is now handed the engine's `images`, `sensors` and `stillsSettings`, so a cost keyed by a whole picture id,
+`a1-shot-0-b`, lands on the first attempt alone. The child's lease is 1 s; the helper waits up to 60 s for the hold and
+for the finish, and kills the child in `finally`.
+
+**Why.** A hold at a witness call leaves a picture cut off inside Gate 1 — technical and text recorded, no observation, no
+outcome — which is what check 48 asserts of _"no verdict outcome where one was cut off"_. The count of calls depends on
+how many planner calls a fixture makes and how many calls a picture takes, both of which can change without the test
+changing; the receipts cannot disagree with what was made.
+
+**Rejected.** **A hold on the image port** — every picture made before it would have completed Gate 1, so no picture
+would be cut off, and it is a second hold mechanism beside the one `reel-plan`'s check 46 uses. **A hold at the
+reconcile call** — a picture cut off after its observation, so a cut-off picture with no observation id would go
+unasserted. **A cost scripted in the child's own options** — two scripts for one run, which could disagree.
+
+**Caught by.** `killedMidStills` fails when the receipts are not the pictures the test names. The break of the child
+ignoring the engine's image script is caught by both halves of check 48.
+
+---
+
+## S-063 | 2026-09-16 | Two things the restart checks assert beyond a restart's arithmetic: a recorder handed another `seq` keeps the row's, and a restart's degradation marks only its own attempt's receipts
+
+**Chose.**
+
+- Check 48's first case, once its run has completed, hands `upsertPicture` — the one write of the worker's recorder —
+  the second attempt's first picture **numbered 1**, as a stage told of no earlier call would number it, and asserts
+  every row's `seq` unchanged. The test imports the domain package's `src/index.ts` by relative path, as
+  `tests/reel-plan-planning.test.ts` imports the splitter's.
+- Check 49 has a fifth case: the restart of a plan whose rank 3 has no free shot, as in the fourth, with the second
+  attempt's derived picture failing Gate 1. Its reserve is 0, so the shot is degraded, and **the first attempt's picture
+  of that shot has its receipt unmarked and no degradation**.
+- `assertDegraded` (`tests/engine/stills.ts`) takes the attempt whose receipts it expects marked, 1 unless given.
+
+**Why.** S-055 left _"a recorder that rewrote `seq`"_ to check 48 because the stage's own count _"agrees with the
+receipts on a first attempt and on no restart"_ — true while `earlierImageCalls` was 0. Slice 5 counts the earlier
+calls, so the two counts agree on every restart too, and a recorder that rewrites `seq` writes the number already
+there. The break campaign showed it: that break alone was caught by nothing; with the stage's count also forgetting the
+earlier calls, check 48 caught it at once (`UNIQUE constraint failed: picture.run_id, picture.seq`). No run can tell the
+two recorders apart; a picture handed with its own number can. S-058 rejected marking every attempt's receipts of a
+degraded shot, and said _"Slice 5's restart is where this would show"_; no restart case had an earlier attempt's picture
+of a shot the later attempt degraded, and the break marking them was caught by nothing.
+
+**Rejected.** **Leaving the `seq` break uncaught, as equivalent** — S-055's rule is that `seq` has one writer, and a
+second writer matters as soon as the counts can disagree, which a job whose lease outlasts a live worker makes possible
+(`reel-plan`'s known limit, carried as `reel-stills`' limit 12). **A run with a live duplicate worker, to make the counts
+disagree** — builds a known limit into a check. **Changing the fourth case's script instead of adding a fifth** — its
+claim, that a restart fitting exactly completes with every still, would no longer be shown. **Adding `@cutroom/domain`
+to the root's dependencies** — a lockfile change for one test.
+
+**Caught by.** The breaks: `upsertPicture` also writing `seq` (48); `markDegraded` marking every attempt's receipts of
+the shot (49's fifth case).

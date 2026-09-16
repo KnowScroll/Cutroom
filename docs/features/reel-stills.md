@@ -897,7 +897,7 @@ _Restart, and no secrets_
       labels; the Gate 1S repair; the
       guard's refusals, the budget stop and its question; a thrown call and a malformed answer.
       **Proves: 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47.**
-- [ ] **Slice 5 — restart, no secrets, and the journey.** A worker killed mid-stills; `imageCallCount` read at attempt
+- [x] **Slice 5 — restart, no secrets, and the journey.** A worker killed mid-stills; `imageCallCount` read at attempt
       start, a restarted attempt's reserve reduced by the calls before it, a restart that cannot fit its plan, and a
       restart whose canonical repair finds no slot. **Proves: 48, 49, 50, and re-runs 1–47.**
 

@@ -60,7 +60,9 @@ export interface Engine {
   stopWorker(): Promise<void>
   /**
    * The worker in a child process, whose stand-in never answers call `holdAtCall`: a run in the
-   * middle of its plan stage, which the test ends by killing the process.
+   * middle of its plan stage, or of its stills stage, which the test ends by killing the process.
+   * Its image and sensor stand-ins answer from the engine's `images` and `sensors`, and it is
+   * handed the engine's `stillsSettings`.
    */
   spawnWorker(options: { script: FakeScript; holdAtCall: number; leaseMs: number }): WorkerProcess
   /**
@@ -159,7 +161,10 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
         ...(budgetPath === undefined ? {} : { budgetPath }),
         artifactRoot,
         settings,
+        ...(options.stillsSettings === undefined ? {} : { stillsSettings: options.stillsSettings }),
         script,
+        images: options.images ?? {},
+        sensors: options.sensors ?? {},
         holdAtCall,
         leaseMs,
       }

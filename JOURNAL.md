@@ -1207,3 +1207,94 @@ whose canonical repair finds no slot (the canonical repair's unconditional `slot
 recorder rewriting `seq` and the attempt in the picture id (S-055, check 48); then 1–47 again, and the `reel-plan` and
 `reel-contract` journeys. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type (S-029);
 deleting the steering stubs and bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
+
+## 2026-09-16 — session 19, reel-stills Slice 5: restart, no secrets, and the journey
+
+**Intent.** `reel-stills`' Slice 5 — checks 48, 49 and 50, tests first; then 1–47 again, and the `reel-stills`,
+`reel-plan` and `reel-contract` journeys (S-047). `decisions.mjs`: pin current, 0 commits unpushed. Baseline
+`check.mjs` green at **171 tests** (219c7b4).
+
+**Changed.**
+
+- **Domain.** `imageCallCount(db, runId)` (`ledger.ts`): the run's `generation_receipt` rows, every attempt's.
+- **Pipeline.** `reserveOf(placements, earlierImageCalls)` = 6 − earlier calls − the placement's calls. `makeStills`
+  fails a reserve **below 0** before any image call, and a **canonical repair with no free slot** before its call, each
+  `failed` with a detail naming the counts — the canonical's also naming both candidates' Gate 1 failures (S-061). The
+  canonical's unconditional `slots -= 1` now asks first.
+- **Worker.** `keyframes-job.ts` counts `imageCallCount` at the start of each attempt and hands it to the stage; the
+  Slice 4 stand-in `earlierImageCalls: 0` is gone.
+- **Test support, no assertion.** `worker-process.ts` takes the engine's `images`, `sensors` and `stillsSettings`, which
+  `harness.ts` passes, so a cost keyed `a1-shot-0-b` lands on the first attempt only (S-062). `assertDegraded` takes the
+  attempt whose receipts it expects marked. `tests/engine/restart.ts`: `killedMidStills` (spawn, hold, assert the
+  receipts' picture ids, kill in `finally`) and `takenUp` (restart, new worker, wait up to 60 s, the second claim no
+  earlier than the first lease ran out).
+- **Three test files.** `reel-stills-restart` (48: a completed restart, and a budget stop across attempts),
+  `reel-stills-restart-reserve` (49: reserve 0 degrading a shot; no slot for the canonical's repair; −1 before any
+  call; a placement of 3 fitting after 3 calls; and that last restart with its derived picture degraded),
+  `reel-stills-secrets` (50: S-028's child, roll call 1–49). **+8 tests, 171 → 179.**
+- **`DECISIONS.md` — S-061, S-062, S-063**, below. Slice 5 ticked.
+
+**Observed.**
+
+- **Red first, three of eight.** 49's first three cases failed for the reason they exist: the second attempt made
+  `a2-shot-1-repair` with no slot, `a2-shot-0-repair` with no slot, and four calls where none was allowed. **Both halves
+  of 48 and 49's fourth case were green before any Slice 5 code**: Slices 3 and 4 had already built the lease reclaim,
+  ids carrying the attempt, the record in `seq` order, the chain's spend and `stage.started` once; and a placement of 3
+  after 3 calls fits under the old reserve too. No red was possible for them; the breaks below are what show they fail.
+  **50 was not run before the code** — my omission; every break caught by 48 or 49 also failed 50, a worker needing `HOME` failed 50 alone, and
+  four breaks of 50's own file failed it. After the code: 48 and 49 six of six, 50 green alone in 16 s, and `check.mjs` red
+  only on my own test's unused variable and formatting, fixed.
+- **Three decisions the gates left open.** **S-061** — both of S-048's failures are the stage's, not the worker's, and
+  their details' words. **S-062** — the restart checks hold the witness call of the picture after the image calls they
+  need (call 5 after 2, call 7 after 3), and trust the receipts' picture ids, never the count. **S-063** — two
+  assertions added after the campaign, below.
+- **Thirty-one deliberate breaks, one composite and two controls**, by a runner rebuilt in the scratchpad: every file's
+  original bytes written and `fsync`ed before it was touched, restored from those bytes, a refusal to start while a saved
+  record exists, and after each restore a fingerprint of every modified and untracked file compared. The controls — a
+  comment, and the stage's own `seq` forgetting the earlier calls with nothing writing it — were caught by nothing, as
+  they should be. Afterwards no saved record was left, every break's find text was present once and no replacement text
+  anywhere, and every source file was byte-identical to a `tar` snapshot taken before the campaign; the two test files
+  that differ are the two extended below. **Twenty-nine caught at once**; 50 caught every one of them, so it is left
+  out of the table but where it was alone:
+
+  | guarded | breaks                                                                                                                                                                                                                           | caught by (all `reel-stills`)          |
+  | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+  | 49      | earlier calls not counted; `reserveOf` without them; the reserve from the plan's calls; −1 let through; no below-0 failure; reserve 0 failed; below-0 detail without counts; below 0 a rule stop                                 | 49; 49; 39, 49; 49; 49; 48, 49; 49; 49 |
+  | 49      | canonical repair with no slot made; reported as a rule stop; decided after its call; detail without reasons; without counts                                                                                                      | 49 each                                |
+  | 49      | `imageCallCount` over every run's receipts                                                                                                                                                                                       | 13, 14, 29, 30, 35 — not 49            |
+  | 48      | picture id without its attempt (session 17's 16b); `stage.started` every attempt; record of the latest attempt only; latest attempt first; a claim resetting the job's cost; the stage told attempt 1; the row written attempt 1 | 48, 49; 48, 49; 48; 48; 48; 48, 49; 48 |
+  | 48      | an earlier attempt's picture chosen; the second attempt's file written over the first's; the child ignoring the image script (test support)                                                                                      | 48; 16, 17, 48; 48                     |
+  | 50      | the worker needing `HOME`; the child handed `process.env`; its own file left in; a file left out; the roll call stopping at 48                                                                                                   | 50 alone; 50 each (run alone)          |
+
+- **What the breaks found, and what was done about each** — added to, never weakened:
+  - **s5-17, a recorder rewriting `seq` with the stage's count (owed to 48 by S-055) — not caught, and it could not
+    be by any run.** S-055 expected the stage's count to disagree with the receipts' on a restart. That was true while
+    `earlierImageCalls` was 0; counted, the two agree on every attempt, and the break writes the number already there.
+    The composite showed it: with the stage's count also forgetting the earlier calls, 48 caught the rewrite at once
+    (`UNIQUE constraint failed: picture.run_id, picture.seq`). **48 now hands `upsertPicture` the second attempt's first
+    picture numbered 1 and asserts every `seq` unchanged**: caught (48). The domain package is not a root dependency, so
+    the test imports its `src/index.ts` by relative path, as `reel-plan-planning.test.ts` imports the splitter (S-063).
+  - **s5-33, a restart's degradation marking every attempt's receipts of the shot — not caught.** S-058 rejected it and
+    said Slice 5's restart is where it would show, but no restart case had a first-attempt picture of a shot the second
+    attempt degraded. **49 gained a fifth case** — the fourth's restart, its derived picture failing Gate 1 with no slot —
+    rather than changing the fourth, whose claim is that an exact fit completes with every still: caught (49).
+  - **s5-02, the count over every run's receipts**, is caught by 13, 14, 29, 30 and 35 — engines running several stills
+    runs — and not by 49, whose engines run one. Said, not widened: 1–47 re-running is what caught it.
+- **Session 17's 16b is caught now** (48, 49), as its entry promised.
+- **Traps.** `sed` did not match a line in `packages/domain/src/index.ts`; the editing tool did. `@cutroom/domain` does
+  not resolve from `tests/` (above). A helper finding a picture by `shot-<unit>-<label>` returns the first attempt's row,
+  which would have made the result's paths vacuous; found reading the test before its first run, and lookups by whole id
+  used instead. The break campaign ran in foreground chunks under ten minutes, nothing else against the repository
+  meanwhile. Every break text with a backslash (`s5-26`, `s5-34`) was written by the editing tool or built from
+  `String.fromCharCode(92)` and checked as parsed. No field is named from D-096's list; `apps/worker` imports no
+  provider.
+- **Not widened, still owed to nobody:** a `NaN` suspicion going to the judge (S-056), and an unreadable `BUDGET.md`
+  between the two jobs (S-059's _Not handled_).
+- `node scripts/check.mjs`: **everything green, 179 tests.** 48, 49 and 50 pass, and 1–47 with them.
+- **The journeys: not yet run.** `nextPrompt.txt`, untracked at the root, makes `journey.mjs` refuse; the owner is being
+  asked whether to commit it, delete it or move it.
+
+**Next.** The owner's answer on `nextPrompt.txt`; then `node scripts/journey.mjs reel-stills`, `reel-plan` and
+`reel-contract`, each committed. Owed outside this repository, unchanged: `reel-script` emitting a criterion's type
+(S-029); deleting the steering stubs and bumping the pin (S-033). S-015's promised front-matter test is still unwritten.
+After that, `reel-render` and `video-edits` both have every gate pending; which comes first is the owner's call.

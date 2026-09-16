@@ -21,6 +21,21 @@ export function spentCents(db: Db, correlationId: string): number {
 }
 
 /**
+ * The image calls a run has made: its `generation_receipt` rows, every attempt's (D-027, S-048). The
+ * keyframes job reads it at the start of each attempt, and the attempt's reserve is six less these
+ * and less the placement's calls — so an attempt run again after its worker died pays for what the
+ * one before it made out of what is left, and no run makes more than six.
+ */
+export function imageCallCount(db: Db, runId: string): number {
+  const row = db
+    .select({ n: count() })
+    .from(generationReceipt)
+    .where(eq(generationReceipt.runId, runId))
+    .get()
+  return row?.n ?? 0
+}
+
+/**
  * One image call that returned, in one immediate transaction (S-036, S-046): its
  * `generation_receipt` with the rate applied (D-028); its cost added to the running job row's
  * `cost_cents`; and the picture's row, made and not yet checked, whose `seq` — the run's image-call

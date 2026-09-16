@@ -18,12 +18,13 @@ export function placementCalls(placements: readonly Placement[]): number {
 }
 
 /**
- * The slots every repair takes one of, any free one (S-043): six less the placement's calls. A
- * placement with a rank left out therefore holds more than D-027's two. Less a restarted attempt's
- * earlier image calls, too (S-048) — which reel-stills' Slice 5 counts, and its check 49 proves.
+ * The slots every repair takes one of, any free one (S-043): six less the image calls the run's
+ * earlier attempts made, less the placement's calls (S-048), fixed when the attempt starts. A
+ * placement with a rank left out therefore holds more than D-027's two. Below 0, the attempt cannot
+ * make its pictures within six calls, and the stage fails before any call (S-061).
  */
-export function reserveOf(placements: readonly Placement[]): number {
-  return IMAGE_CALLS - placementCalls(placements)
+export function reserveOf(placements: readonly Placement[], earlierImageCalls: number): number {
+  return IMAGE_CALLS - earlierImageCalls - placementCalls(placements)
 }
 
 /** A derived shot's repairs are labelled `repair`, then `repair-2` (S-046). */
