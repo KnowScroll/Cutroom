@@ -437,6 +437,7 @@ _Behaviour — against the stand-in_
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-16 journey=PASS at 2b68bb8 — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-14 journey=PASS at 0ae20f8 — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-14 journey=FAIL at f8e1584 — the check 'decisions pin' failed
 
