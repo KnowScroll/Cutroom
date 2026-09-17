@@ -1,4 +1,4 @@
-import type { Gate0Verdict, LanguageModelPort, PlanSettings } from '@cutroom/contracts'
+import type { Gate0Verdict, LanguageModelPort, Plan, PlanSettings } from '@cutroom/contracts'
 import {
   admitStills,
   finishRun,
@@ -14,6 +14,7 @@ import {
 import {
   GATE_ORDER,
   admitPictures,
+  admitVideo,
   planReel,
   type PlanOutcome,
   type PlanRecord,
@@ -70,6 +71,12 @@ function rowsOf(record: PlanRecord, selected: 'a' | 'b' | 'repair' | null): Plan
     ]
   }
   return [...row('a', verdicts.a), ...row('b', verdicts.b), ...row('repair', verdicts.repair)]
+}
+
+/** A stills run's admission, its figure named as a refusal carries it. */
+function picturesAdmission(plan: Plan, ceilingCents: number, settings: PlanSettings) {
+  const { admitted, picturesCents } = admitPictures(plan, ceilingCents, settings)
+  return { admitted, estimateCents: picturesCents }
 }
 
 /** One verdict event per plan, in the order the rows are written. */
@@ -129,12 +136,18 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
     // The stage produced a plan, so it finished, whichever way the run goes from here (S-025).
     const events: EventBody[] = [...verdictEvents(plans), { type: 'stage.finished', stage: 'plan' }]
 
-    if (request.options.until === 'stills') {
+    const until = request.options.until
+    if (until === 'stills' || until === 'video') {
       const chosen = plans.find((row) => row.selected)
       if (chosen === undefined)
         throw new Error(`the selected plan '${outcome.selected}' has no row`)
       const ceilingCents = request.options.budgetCents
-      const { admitted, picturesCents } = admitPictures(chosen.plan, ceilingCents, context.settings)
+      // What the run spends is what is compared with its ceiling: a stills run's pictures (S-030,
+      // S-035), a video run's whole estimate (S-069).
+      const { admitted, estimateCents } =
+        until === 'video'
+          ? admitVideo(chosen.plan, ceilingCents)
+          : picturesAdmission(chosen.plan, ceilingCents, context.settings)
 
       if (!admitted) {
         // The caller's ceiling fired, not the engine's cap: the run is refused with the figure that
@@ -149,7 +162,7 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
             status: 'refused',
             reason: 'budget',
             limit: 'ceiling',
-            estimateCents: picturesCents,
+            estimateCents,
             ceilingCents,
             capCents,
           },
@@ -157,8 +170,9 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
         return
       }
 
-      // Admitted (S-030, S-035): one transaction writes the plan rows, the events, this job done at
-      // cost 0, and the chain's `reel.keyframes` row. The run is not finished — the pictures are.
+      // Admitted (S-030, S-035, S-069): one transaction writes the plan rows, the events, this job
+      // done at cost 0, and the chain's `reel.keyframes` row. The run is not finished — the pictures
+      // are, and for a video run what follows them (S-052).
       admitStills(db, { runId, jobId: job.id, plans, events })
       return
     }

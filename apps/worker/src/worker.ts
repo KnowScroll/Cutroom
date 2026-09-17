@@ -10,6 +10,7 @@ import {
   BUDGET_MD,
   buryJob,
   claimJob,
+  CLIPS_JOB,
   closeDatabase,
   DEFAULT_LEASE_MS,
   KEYFRAMES_JOB,
@@ -22,13 +23,14 @@ import {
   DEFAULT_STILLS_SETTINGS,
   GATE_ORDER,
 } from '@cutroom/pipeline'
+import { runClipsJob } from './clips-job.ts'
 import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
 
 // The runner's loop: claim a due job, run it, and poll again (D-002). Jobs are run one at a time.
-// Both of the chain's kinds are claimed by the one worker, oldest row first, so a reel's plan job
-// is always run before the keyframes job it creates (D-081, D-083).
+// Every kind of the chain is claimed by the one worker, oldest row first, so a reel's job is always
+// run before the job it creates (D-081, D-083, S-069).
 
 export interface WorkerOptions {
   /** The database file (D-086), shared with the API. */
@@ -134,10 +136,11 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
 
   async function drain(): Promise<void> {
     while (!stopped) {
-      const job = claimJob(db, [PLAN_JOB, KEYFRAMES_JOB], new Date(), leaseMs)
+      const job = claimJob(db, [PLAN_JOB, KEYFRAMES_JOB, CLIPS_JOB], new Date(), leaseMs)
       if (job === undefined) return
       try {
-        if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job, keyframes)
+        if (job.kind === CLIPS_JOB) await runClipsJob(db, job)
+        else if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job, keyframes)
         else await runPlanJob(db, job, context)
       } catch (error) {
         buryJob(db, job.id, error instanceof Error ? error.message : String(error))

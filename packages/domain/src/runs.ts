@@ -23,10 +23,12 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K>
 export type EventBody = DistributiveOmit<RunEvent, 'contractVersion' | 'runId' | 'seq' | 'at'>
 
 export const PLAN_JOB = 'reel.plan'
-/** The chain's second job: the pictures of an admitted `stills` run (D-081, D-083, D-108). */
+/** The chain's second job: the pictures of an admitted `stills` or `video` run (D-081, D-083, D-108). */
 export const KEYFRAMES_JOB = 'reel.keyframes'
+/** The chain's third job: the clips of a `video` run whose stills stage completed (S-069). */
+export const CLIPS_JOB = 'reel.clips'
 
-/** The stages a run has events for. The engine builds two of them; `video` is reel-render's. */
+/** The stages a run has events for: `plan`, `stills` and `video`, the contract's. */
 export type Stage = Extract<RunEvent, { stage: string }>['stage']
 
 /** JSON with keys sorted at every depth, so two requests that differ only in key order are equal. */
@@ -251,6 +253,15 @@ export function admitStills(
   )
 }
 
+/** A run's ending, written inside whichever transaction ends it: `run.finished`, its state and result. */
+function endRun(tx: Writer, runId: string, result: RunResult, now: Date): void {
+  append(tx, runId, { type: 'run.finished', status: result.status }, now)
+  tx.update(run)
+    .set({ state: 'finished', result: JSON.stringify(result) })
+    .where(eq(run.runId, runId))
+    .run()
+}
+
 /**
  * Finishes a run in one transaction: its plans, the events before the end, its `run.finished`
  * event, its result, and its job marked done — so a job interrupted before this leaves no
@@ -272,11 +283,7 @@ export function finishRun(
     (tx) => {
       writePlans(tx, runId, finish.plans ?? [])
       for (const event of finish.events ?? []) append(tx, runId, event, now)
-      append(tx, runId, { type: 'run.finished', status: result.status }, now)
-      tx.update(run)
-        .set({ state: 'finished', result: JSON.stringify(result) })
-        .where(eq(run.runId, runId))
-        .run()
+      endRun(tx, runId, result, now)
       completeJob(tx, jobId, result.costCents)
     },
     { behavior: 'immediate' },
@@ -294,6 +301,25 @@ export function readSelectedPlan(db: Db, runId: string): Plan {
   return JSON.parse(row.plan) as Plan
 }
 
+/** What a stills stage leaves, however the run goes on from it (S-046, S-055, S-058). */
+interface StillsEnding {
+  chosen?: readonly string[]
+  degraded?: readonly DegradedShot[]
+  events?: readonly EventBody[]
+}
+
+/**
+ * The stills stage's ending, written inside whichever transaction ends the stage: the approved
+ * pictures marked chosen, every degraded shot's four labels (S-058), and the events the stage's checks
+ * produced. One writer for a stage that ends the run and one that advances it, so the two cannot come
+ * to label a shot differently (S-081).
+ */
+function endStills(tx: Writer, runId: string, ending: StillsEnding, now: Date): void {
+  markChosen(tx, runId, ending.chosen ?? [])
+  for (const shot of ending.degraded ?? []) markDegraded(tx, runId, shot)
+  for (const event of ending.events ?? []) append(tx, runId, event, now)
+}
+
 /**
  * Ends a run at its stills stage, in one immediate transaction (S-046): the approved pictures marked
  * chosen, every degraded shot's labels (S-058), the events the stage's checks produced, `run.finished`,
@@ -302,27 +328,73 @@ export function readSelectedPlan(db: Db, runId: string): Plan {
  */
 export function finishStills(
   db: Db,
-  finish: {
-    runId: string
-    jobId: number
-    result: RunResult
-    chosen?: readonly string[]
-    degraded?: readonly DegradedShot[]
-    events?: readonly EventBody[]
-  },
+  finish: StillsEnding & { runId: string; jobId: number; result: RunResult },
   now: Date = new Date(),
 ): void {
   const { runId, jobId, result } = finish
   db.transaction(
     (tx) => {
-      markChosen(tx, runId, finish.chosen ?? [])
-      for (const shot of finish.degraded ?? []) markDegraded(tx, runId, shot)
-      for (const event of finish.events ?? []) append(tx, runId, event, now)
-      append(tx, runId, { type: 'run.finished', status: result.status }, now)
-      tx.update(run)
-        .set({ state: 'finished', result: JSON.stringify(result) })
-        .where(eq(run.runId, runId))
-        .run()
+      endStills(tx, runId, finish, now)
+      endRun(tx, runId, result, now)
+      completeJob(tx, jobId)
+    },
+    { behavior: 'immediate' },
+  )
+}
+
+/**
+ * A `video` run whose stills stage completed, in one immediate transaction (S-069): everything
+ * `finishStills` writes of the stage — the chosen flags, the degradations' labels, the events and
+ * `stage.finished` for stills — and the keyframes job done with its cost kept (S-055), and the chain's
+ * next row: one `reel.clips` job whose `correlation_id` is the run and whose `parent_id` is the
+ * keyframes job (D-081, D-083). Returns that row's id.
+ *
+ * The run is NOT finished, as `admitStills` leaves it (S-052): it has no result until the clips are
+ * answered for, and a worker that died between this transaction and the next claim leaves a queued
+ * job, not a half-finished run.
+ */
+export function advanceStills(
+  db: Db,
+  a: {
+    runId: string
+    jobId: number
+    chosen: readonly string[]
+    degraded: readonly DegradedShot[]
+    events: readonly EventBody[]
+  },
+  now: Date = new Date(),
+): number {
+  const { runId, jobId } = a
+  return db.transaction(
+    (tx) => {
+      endStills(tx, runId, a, now)
+      completeJob(tx, jobId)
+      return enqueue(
+        tx,
+        { kind: CLIPS_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
+        now,
+      )
+    },
+    { behavior: 'immediate' },
+  )
+}
+
+/**
+ * Ends a `video` run at one of its video stage's jobs, in one immediate transaction: the events
+ * before the end, `run.finished`, the result, and the job done — its cost left as its calls added it
+ * (S-036), never overwritten with the result's, which is the whole chain's spend (D-081). Slice 4
+ * adds a render's holds and measures.
+ */
+export function finishVideo(
+  db: Db,
+  f: { runId: string; jobId: number; result: RunResult; events?: readonly EventBody[] },
+  now: Date = new Date(),
+): void {
+  const { runId, jobId, result } = f
+  db.transaction(
+    (tx) => {
+      for (const event of f.events ?? []) append(tx, runId, event, now)
+      endRun(tx, runId, result, now)
       completeJob(tx, jobId)
     },
     { behavior: 'immediate' },
@@ -337,9 +409,9 @@ export function finishStills(
  * `stage.started` is appended, unless an earlier attempt at the job already wrote it: a job run
  * again from the start does not write it twice.
  *
- * One function over both stages, not one per stage: the transaction and the once-only rule are the
- * same for `plan` and for `stills`, and a second copy is a second place for the rule to drift
- * (S-051).
+ * One function over every stage, not one per stage: the transaction and the once-only rule are the
+ * same for `plan`, `stills` and `video`, and a second copy is a second place for the rule to drift
+ * (S-051, S-069).
  */
 export function startStage(
   db: Db,

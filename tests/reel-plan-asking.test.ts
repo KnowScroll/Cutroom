@@ -31,16 +31,26 @@ function reversedKeys(value: unknown): unknown {
 // ---------------------------------------------------------------- 10
 
 // D-108 scoped the stills refusal to "a reel-plan build". reel-stills' Slice 2 built the chain, so
-// this check narrows to `video` and reel-stills' check 8 asserts the new pair (S-047). No
-// assertion is removed: every one below still runs, on the one `until` this engine still refuses.
-test("10. a submit with until 'video' is refused 422 'unsupported' with no runId", async () => {
-  for (const until of ['video'] as const) {
-    const requestId = `r10-${until}`
+// this check narrowed to `video` and reel-stills' check 8 asserted the new pair (S-047).
+// reel-render's Slice 2 builds video, so `video` is accepted with a runId, and every assertion this
+// check made of the video refusal is made of the one request the engine still refuses as
+// `unsupported`: planVaryOn 'order' (D-110, S-077). No assertion is removed.
+test("10. a submit with until 'video' is accepted with a runId; one with planVaryOn 'order' is refused 422 'unsupported' with no runId", async () => {
+  const video = validRequest('r10-video')
+  video.options.until = 'video'
+  const accepted = await engine.http.submit(video)
+  assert.equal(accepted.status, 202, JSON.stringify(accepted.json))
+  assert.equal(accepted.json.outcome, 'accepted')
+  assert.equal(typeof accepted.json.runId, 'string', 'an accepted video request carried no runId')
+  assert.equal((await engine.http.lookup('r10-video')).status, 200)
+
+  for (const axis of ['order'] as const) {
+    const requestId = `r10-${axis}`
     const request = validRequest(requestId)
-    request.options.until = until
+    request.options.planVaryOn = axis
 
     const { status, json } = await engine.http.submit(request)
-    assert.equal(status, 422, until)
+    assert.equal(status, 422, axis)
     assert.equal(json.outcome, 'refused')
     assert.equal(json.reason, 'unsupported')
     assert.equal(json.requestId, requestId)
@@ -48,7 +58,7 @@ test("10. a submit with until 'video' is refused 422 'unsupported' with no runId
     assert.ok(!('runId' in json), 'a refusal carried a runId')
 
     const lookup = await engine.http.lookup(requestId)
-    assert.equal(lookup.status, 404, `the refused ${until} request was stored as a run anyway`)
+    assert.equal(lookup.status, 404, `the refused ${axis} request was stored as a run anyway`)
   }
 
   const plan = await engine.http.submit(validRequest('r10-plan'))

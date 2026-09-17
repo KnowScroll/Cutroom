@@ -5,8 +5,10 @@ import { validRequest } from './stand-in/fixtures.ts'
 
 // reel-stills, Slice 2 — check 8 (docs/features/reel-stills.md): what this engine now answers.
 // D-108 scoped the stills refusal to "a reel-plan build"; with the chain built, `stills` is
-// accepted and `video` alone is still refused (S-047). No worker runs here: both answers are
-// given at submit, before any job is claimed.
+// accepted and `video` alone is still refused (S-047). reel-render's Slice 2 builds video, so the
+// video clause asserts acceptance, and every assertion it made of the refusal is made of the one
+// request still refused as `unsupported`, planVaryOn 'order' (D-110, S-077). No assertion is
+// removed. No worker runs here: every answer is given at submit, before any job is claimed.
 
 let engine: Engine
 
@@ -20,7 +22,7 @@ after(async () => {
 
 // ---------------------------------------------------------------- 8
 
-test("8. a submit with until 'stills' is accepted; one with until 'video' is refused 422 'unsupported' with no runId", async () => {
+test("8. a submit with until 'stills' is accepted, and one with until 'video'; one with planVaryOn 'order' is refused 422 'unsupported' with no runId", async () => {
   const stills = validRequest('r8-stills')
   stills.options.until = 'stills'
   const accepted = await engine.http.submit(stills)
@@ -44,20 +46,34 @@ test("8. a submit with until 'stills' is accepted; one with until 'video' is ref
     'an accepted stills request does not begin with exactly one reel.plan job',
   )
 
-  // Video is reel-render's, and is refused before anything is stored (D-108).
+  // Video is reel-render's, and is accepted as a run since its Slice 2 (S-077).
   const video = validRequest('r8-video')
   video.options.until = 'video'
-  const refused = await engine.http.submit(video)
+  const taken = await engine.http.submit(video)
+  assert.equal(taken.status, 202, JSON.stringify(taken.json))
+  assert.equal(taken.json.outcome, 'accepted')
+  assert.equal(taken.json.requestId, 'r8-video')
+  assert.equal(typeof taken.json.runId, 'string', 'an accepted video request carried no runId')
+  assert.equal(
+    (await engine.http.lookup('r8-video')).status,
+    200,
+    'the accepted video request was not stored as a run',
+  )
+
+  // The one request still refused as unsupported, before anything is stored (D-110).
+  const order = validRequest('r8-order')
+  order.options.planVaryOn = 'order'
+  const refused = await engine.http.submit(order)
   assert.equal(refused.status, 422, JSON.stringify(refused.json))
   assert.equal(refused.json.outcome, 'refused')
   assert.equal(refused.json.reason, 'unsupported')
-  assert.equal(refused.json.requestId, 'r8-video')
+  assert.equal(refused.json.requestId, 'r8-order')
   assert.match(String(refused.json.detail), /not built yet/, 'Gate 1: it says "not built yet"')
   assert.ok(!('runId' in refused.json), 'a refusal carried a runId')
   assert.equal(
-    (await engine.http.lookup('r8-video')).status,
+    (await engine.http.lookup('r8-order')).status,
     404,
-    'the refused video request was stored as a run anyway',
+    'the refused request was stored as a run anyway',
   )
 
   // And a plan-only request is still answered as reel-plan answers it.

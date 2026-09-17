@@ -44,6 +44,22 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 >   still the first gate, the part of the check that was this feature's; none was removed (S-047). Plan verdict
 >   events still carry gate `'0'`.
 > - Both journeys are run again after `reel-stills`' Slice 5.
+>
+> **Amended by `reel-render` on 2026-09-16 and 2026-09-17 — the gates below are not edited, and no assertion is
+> removed** (**S-077**). Where Gate 1 and _Outcome_ say a video is "not built yet", that is no longer true: every
+> `until` is built, and the one request still answered "not built yet" is a `planVaryOn` other than `shotCount`
+> (D-110):
+>
+> - **`until: 'video'` is accepted.** **Check 10 asserts it accepted with a `runId`, and keeps every assertion it
+>   made of the refusal** — `422`, `unsupported`, the `requestId` echoed, _"not built yet"_, no `runId`, nothing
+>   stored — made of `planVaryOn: 'order'`, in the same test. `reel-plan-run.test.ts` and `reel-plan-service.test.ts`
+>   send `planVaryOn: 'order'` for their refusal (`reel-render`'s Slice 2).
+> - **A `video` run's plan stage is exactly the one below**, with one thing after it: the selected plan's
+>   `estimateCents` is compared with the caller's ceiling (**S-069**), and an admitted run gets the chain's second job
+>   row. A run that selects no plan ends exactly as this feature's does.
+> - **Check 3** asserts `LanguageModelPort`'s four calls, `judgeCut` added, and **check 29** asserts `GATE_ORDER` with
+>   Gates 2 to 5 and 7 (`reel-render`'s Slice 1). Both lists stay exact.
+> - This journey is run again in `reel-render`'s last slice.
 
 ## Gate 1 — Product (no technical language)
 

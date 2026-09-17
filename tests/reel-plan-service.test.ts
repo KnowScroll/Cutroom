@@ -82,9 +82,11 @@ test('13. every body the service sends on every route parses under its @cutroom/
   hit('submit', await http.call('POST', '/v1/runs', undefined, '{ not json'), 422)
   hit('submit', await http.call('POST', '/v1/runs', undefined, '[1, 2]'), 422)
   hit('submit', await http.submit({ ...validRequest('r13-s'), sources: ['a book'] }), 422)
-  const video = validRequest('r13-video')
-  video.options.until = 'video'
-  hit('submit', await http.submit(video), 422)
+  // An axis this engine cannot plan on: the one request refused as unsupported since reel-render's
+  // Slice 2 accepts `video` (S-077).
+  const order = validRequest('r13-order')
+  order.options.planVaryOn = 'order'
+  hit('submit', await http.submit(order), 422)
 
   // lookup and status
   hit('lookup', await http.lookup('r13'), 200)

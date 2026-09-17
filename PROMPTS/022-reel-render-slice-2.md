@@ -4,7 +4,7 @@
 - **Feature:** `reel-render` — [`docs/features/reel-render.md`](../docs/features/reel-render.md)
 - **Work:** Slice 2 of 6 — asking for a video, and the chain; checks 7–10, tests first; no journey
 - **Written:** 2026-09-17, at the end of session 21, after `reel-render`'s Slice 1 was committed (603ea36)
-- **Run:** not yet
+- **Run:** session 22
 
 Paste everything inside the block below as the session's first message.
 

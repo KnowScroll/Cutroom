@@ -2627,3 +2627,78 @@ name; the type refuses it, and the clips stage builds the request from a chosen 
 **Caught by.** `reel-render`'s check 6: a request of an unknown mode with no ratio, and a prompt holding only one of the
 block's two lines, are each refused with the wrapped port receiving no call — session 21's breaks 6d and 6c, each caught
 by it.
+
+---
+
+## S-081 | 2026-09-17 | A stills stage that completes is written by one writer whether its run ends or advances; the clips job ends a run keeping its job's cost
+
+**Chose.**
+
+- **`packages/domain/src/runs.ts` writes a stills stage's ending once**, in a private `endStills` — the chosen flags
+  (S-055), each degraded shot's four labels (S-058) and the stage's events — called inside their own immediate
+  transactions by **`finishStills`**, which then ends the run, and by **`advanceStills`**, which then marks the
+  keyframes job done without touching its cost and enqueues the `reel.clips` row. `apps/worker/src/keyframes-job.ts`
+  builds one ending for a completed stage and hands it to `advanceStills` for a `video` run, or to `finishStills` with
+  the result otherwise. The run's own ending — `run.finished`, its state and its result — is likewise one private
+  `endRun`, called by `finishRun`, `finishStills` and `finishVideo`.
+- **`finishVideo(db, { runId, jobId, result, events? })`** is built in `reel-render`'s Slice 2, with Gate 3's signature
+  less `render`, which Slice 4 adds: the placeholder clips job and its cancel read need a finish that marks the job done
+  **without overwriting its cost**, and Gate 3 names that function for it.
+
+**Why.** Gate 2 and S-069 give `advanceStills` exactly what `finishStills` writes of the stage — _"the chosen flags, the
+degradations' four labels (S-058), its events"_ — and a `video` run's stills stage is exactly `reel-stills`' (Gate 2,
+_"What a request becomes"_). Two copies of the label-writing are two places for a shot to come to be labelled
+differently, S-051's reason for one `startStage`. `finishRun` marks its job done at the result's `costCents`, which is
+the whole chain's spend: from the clips job, D-081's `SUM(cost_cents)` would then count the keyframes job's image
+calls twice.
+
+**Rejected.** **A copy of the chosen flags and labels in `advanceStills`** — above. **`finishStills` with an optional
+next row**, ending the run or not by its arguments — S-052 rejected the same shape for `finishRun`. **`finishRun` from the
+clips job** — the doubled spend above. **`finishStills` from the clips job** — the body fits, and the name says the
+stills stage ended a run that its video stage ended.
+
+**Not handled.** **Nothing checks a clips-job ending's job cost.** Session 22's break 9o, `finishVideo` marking the job
+done at the result's cost, was caught by nothing, and no check of `reel-render`'s fifty reads a job row's cost after a
+clips-job ending: the stand-ins cost 0 by default, and each result's `costCents` is read before the finish. Said for
+Slice 3, whose clips calls are the first a clips job pays for.
+
+**Caught by.** `reel-render`'s check 9 holds a `video` run's chosen flags, degradation rows, picture labels and receipt
+marks, from a completed stage with two chosen pictures and a degraded shot, equal to the same fixture asked for stills —
+session 22's breaks 9l (`advanceStills` writing no chosen flags) and 9m (no labels) each caught by it alone. Check 10
+holds every other ending equal, with no `reel.clips` row — break 10a caught by it.
+
+---
+
+## S-082 | 2026-09-17 | `reel-render`'s check 9 reads the keyframes job's writes with no clips job run after them, or by which job wrote what
+
+**Chose.** `tests/reel-render-chain.test.ts`, two tests titled with check 9.
+
+- **A plan that places pictures**: the model port the worker is handed is wrapped so the stills stage's first witness
+  call waits; once it waits, the test calls `stopWorker()` and then lets the call go, so the worker finishes the
+  keyframes job and claims nothing after it (`reel-stills`' check 41 stops a worker between two jobs the same way). The
+  run is then read as it is: status `running`, its result route `409`, its events ending `stage.finished` for stills
+  with no `run.finished`, and three job rows, the `reel.clips` row `queued` at attempt 0 with its parent and
+  `correlation_id`. The same fixture, asked for stills on an engine of its own, is the standard the events up to
+  `stage.finished` for stills and the labels are held to (S-081).
+- **A plan that places no picture** makes no call in its stills stage, so nothing can hold the worker there. The test
+  waits for `stage.started` for video, stops the worker, and asserts that **the events before that one** are exactly the
+  plan stage's, `stage.started` and `stage.finished` for stills: the worker runs one job at a time, the clips job is
+  claimed only after the keyframes job's transaction commits, and its first write is that event — so every event before
+  it is the plan and keyframes jobs'. Nothing the clips job writes after it is asserted.
+
+**Why.** Once the keyframes job writes the `reel.clips` row, the placeholder clips job is claimed in the same loop and
+finishes the run failed: a run read after that is finished whichever job finished it, and a run read while it happens
+still to be running is a race with that claim.
+
+**Rejected.** **Reading the finished run and trusting which ending it has** — _"clips are not built"_ would be the
+evidence, and Gate 4 says no check asserts it. **A worker option to claim only some job kinds** — code in the worker that
+exists for a test. **Waiting for the keyframes job's row to be `done` and reading at once** — the clips job may already
+have run.
+
+**Not handled.** The second test depends on the clips job writing `stage.started` for video first. Session 22's breaks
+9j (the clips job unclaimed) and 9k (its `startStage` given `stills`) each make it time out — caught, but for a promise
+check 11 owns (Slice 3).
+
+**Caught by.** Session 22's breaks: 9d (`advanceStills` appending `run.finished`) and 9e (a `video` run's completed
+stage finished as a stills run's) — both tests; 9f (the run's state set finished with no event) — the first test alone;
+9h (a plan placing no picture not advancing) — the second alone.

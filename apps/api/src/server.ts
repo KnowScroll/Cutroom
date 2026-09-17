@@ -109,11 +109,7 @@ function submit(db: Db, text: string): [number, SubmitResponse] {
   }
   const request = parsed.data
 
-  // D-108: this engine plans and makes pictures; video is reel-render's (S-047).
-  if (request.options.until === 'video') {
-    const detail = `until 'video' is not built yet: this engine answers with a plan or with pictures`
-    return [422, refuse('unsupported', detail, request.requestId)]
-  }
+  // Every `until` is built: a plan, pictures (S-047) and a video (S-069, S-077).
   // D-110: two plans may differ on shotCount only. Absent means shotCount (D-092).
   const axis = request.options.planVaryOn
   if (axis !== undefined && axis !== 'shotCount') {

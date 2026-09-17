@@ -1604,3 +1604,125 @@ and serving the file (S-073); `reel-script` emitting a criterion's type (S-029);
 - Nothing but markdown changed. `main` pushed to `origin` with Slice 1 (603ea36) and this commit.
 
 **Next.** Session 22: run `PROMPTS/022-reel-render-slice-2.md`.
+
+## 2026-09-17 — session 22, reel-render Slice 2: asking for a video, and the chain
+
+**Intent.** Run `PROMPTS/022-reel-render-slice-2.md`: `reel-render`'s Slice 2 only — checks 7 to 10, tests first,
+nothing from Slice 3 or later, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs`
+green, 196 tests (e6d486a).
+
+**Changed.**
+
+- **`apps/api/src/server.ts`** — `until: 'video'` accepted; `planVaryOn` other than `shotCount` still refused, `422`
+  `unsupported`, the one refusal of what the engine cannot build that is left.
+- **`packages/pipeline/src/admit.ts`** — `admitVideo(plan, budgetCents)`, Gate 3's signature: the selected plan's
+  `estimateCents` against the ceiling, exactly equal admitted. Exported from the index.
+- **`apps/worker/src/plan-job.ts`** — a `video` run's selected plan is compared by `admitVideo`, a `stills` run's by
+  `admitPictures` as before; above the ceiling, refused for budget with `limit: 'ceiling'` and the figure compared, no
+  question, one job row, `stage.finished` for plan; at or below, `admitStills`, unchanged (S-052).
+- **`packages/domain/src/runs.ts`** — `CLIPS_JOB = 'reel.clips'`; **`advanceStills`**, Gate 3's signature: in one
+  immediate transaction the chosen flags, the labels and the events, the keyframes job done with its cost kept, and the
+  `reel.clips` row with the run's `correlation_id` and the keyframes job as parent, returning its id; the run is not
+  finished. It shares a private `endStills` with `finishStills`, and `finishRun`, `finishStills` and **`finishVideo`**
+  share a private `endRun` (**S-081**). `finishVideo` is Gate 3's signature less `render` (Slice 4's): the job done,
+  its cost kept. All exported.
+- **`apps/worker/src/keyframes-job.ts`** — a `video` run whose stills stage completes advances with `advanceStills`,
+  also for a plan that places no picture; every other ending, and every `stills` run's, is untouched.
+- **`apps/worker/src/clips-job.ts`**, new — `startStage(db, runId, 'video')` before every attempt (S-027, S-051);
+  cancelled → the run finishes `cancelled`, `costCents` the spend; otherwise `failed`, _"clips are not built"_, both
+  through `finishVideo`. **`worker.ts`** claims `reel.plan`, `reel.keyframes` and `reel.clips`, oldest row first.
+- **Verified checks changed, S-077's form, no assertion removed** — `reel-plan`'s check 10 asserts `video` accepted with
+  a `runId` and makes every assertion of its refusal — `422`, `unsupported`, the `requestId`, _"not built yet"_, no
+  `runId`, nothing stored — of `planVaryOn: 'order'`; `reel-stills`' check 8's `video` clause asserts acceptance and
+  keeps its refusal's assertions the same way; `reel-plan-run.test.ts`' check 16 and `reel-plan-service.test.ts`' check
+  13 send `planVaryOn: 'order'` for their refusal. Titles and comments name S-077. **`reel-plan.md` and
+  `reel-stills.md` each gain a note naming S-077**, before their gates, which are not edited; each also records Slice
+  1's changes to it, which had no note.
+- **Test support, no assertion**: `tests/engine/video.ts` — `videoRequest`, `described`, `jobRows`, `eventsOf`.
+- **Four test files, `tests/reel-render-{asking,admission,chain,stills-stops}.test.ts`: +6 tests, 196 → 202.**
+- **`DECISIONS.md` — S-081, S-082.** Slice 2 ticked. Prompt 022's `Run` line set to session 22, in the file and the
+  index (S-065).
+
+**Observed.**
+
+- **No collision needing the owner.** One point was read before any test: S-077 names the refusal assertions `reel-plan`'s
+  check 10 keeps, and says of `reel-stills`' check 8 only that its `video` clause asserts acceptance. Check 8 made the
+  same assertions of its refusal, so S-077's _"none removes an assertion"_ keeps them, made of `planVaryOn: 'order'` as
+  check 10's are. No gate text or figure changes.
+- **Red first, in three steps, each written down.**
+  - **Before any code**: 7, and `reel-plan` 10 and `reel-stills` 8 — _"until 'video' is not built yet … actual: 422,
+    expected: 202"_; 8 — _"the request was not accepted: … not built yet"_, both tests; 9 and 10 — the same `422` at
+    submit. **Two verified tests could not be red before the code**: `reel-plan` 13 and 16 now send a refusal that
+    already existed. Break 7b, `order` accepted, shows each fails.
+  - **With `video` accepted and nothing else**: 7 green; 8 — the result was `status: 'completed', until: 'plan'` where a
+    refusal was expected, and _"a ceiling of exactly 190 cents was not admitted"_; 9 — the file timed out at 30 s on a
+    held witness call a plan-only run never makes; 10 — _"rule: the results differ"_.
+  - **With admission**: 8 green; 9 — _"the run was finished"_ and _"timed out after 5000ms waiting for the clips job's
+    stage.started for video"_; 10 — _"rule: the records differ"_ on the two runs' `runId`s, **a fault of the test**, whose
+    record comparison did not blank the id its result comparison blanked. Fixed in the test, and 10 was then green before
+    the keyframes job changed, as it should be: every stills ending already ends a run alike, and 10's red was the
+    plan-only run before admission. 9 went green with the domain, the keyframes job, the clips job and the worker.
+- **How check 9 sees the keyframes job alone (S-082).** Held at the stills stage's first witness call and told to stop,
+  the worker finishes the keyframes job and claims nothing; the run is read `running`, result `409`, events ending
+  `stage.finished` for stills, the `reel.clips` row `queued` at attempt 0. A plan placing no picture makes no call to
+  hold, so its events are read up to the clips job's `stage.started` for video, its first write. The pictured test also
+  holds the labels and events to the same fixture asked for stills (S-081).
+- **What Slice 2 builds that no Slice 2 check asserts**: the placeholder's _"clips are not built"_ (Gate 4 says so); the
+  clips job's cancel read (check 11, Slice 3); `stage.started` for video written once over attempts (check 48); the
+  clips job keeping its job row's cost — asserted by no check of the fifty (below).
+- **Thirty-one deliberate breaks and one control**, by a runner rebuilt in the scratchpad: each file's bytes written and
+  `fsync`ed to a record before it was touched, restored from those bytes and read back, the record removed; after each
+  restore, every modified and untracked file's hash compared with the chunk's first; a refusal to start while a record
+  exists; the suite with `--test-timeout=120000`. Each break ran `tsc -b` and every test file but the two child-process
+  roll calls (`reel-plan` 47, `reel-stills` 50) — 200 tests; typecheck passed for all 31. Two chunks in the background,
+  each waited on by a foreground waiter ending only on the runner's `@@BREAKS-CHUNK-COMPLETE <chunk>@@` line. Afterwards:
+  no record, the fingerprint equal, `check.mjs` green.
+
+  | check | break                                                                                            | caught by                                                                              |
+  | ----- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+  | none  | **control**: a comment in `keyframes-job.ts`                                                     | nothing                                                                                |
+  | 7     | `video` refused again                                                                            | 7, 8 (both), 9 (both), 10; `reel-plan` 10; `reel-stills` 8                             |
+  | 7     | `planVaryOn: 'order'` accepted                                                                   | 7; `reel-plan` 10, 11, 13, 16; `reel-stills` 8                                         |
+  | 7     | the axis refusal no longer says _"not built yet"_                                                | 7; `reel-plan` 10, 11; `reel-stills` 8                                                 |
+  | 7     | the axis refusal drops the `requestId`                                                           | 7; `reel-plan` 10; `reel-stills` 8                                                     |
+  | 8     | a `video` run admitted on its pictures' share                                                    | 8 (both)                                                                               |
+  | 8     | `admitVideo`'s boundary `<`: exactly equal refused                                               | 8; 10 (its ceiling stop is admitted at exactly the estimate)                           |
+  | 8     | the boundary a cent loose: one cent less admitted                                                | 8                                                                                      |
+  | 8     | a question written for a refusal at the ceiling                                                  | 8                                                                                      |
+  | 8     | a second job row on a refusal                                                                    | 8 (both)                                                                               |
+  | 8     | no `stage.finished` for plan on a refusal                                                        | 8                                                                                      |
+  | 8     | admission reads the first plan row, not the selected                                             | 8 (both); `reel-stills` 9, 10                                                          |
+  | 9     | `advanceStills` makes no `reel.clips` row; one with no parent; one with its own `correlation_id` | 9 (both), each                                                                         |
+  | 9     | `advanceStills` appends `run.finished`; a completed `video` stage finished as a stills run's     | 9 (both), each                                                                         |
+  | 9     | `advanceStills` sets the run finished with no event                                              | 9 (the pictured test)                                                                  |
+  | 9     | the keyframes job's cost reset to 0 on advancing                                                 | 9 (the pictured test)                                                                  |
+  | 9     | no chosen flags; no labels                                                                       | 9 (the pictured test), each                                                            |
+  | 9     | no events, so no `stage.finished` for stills                                                     | 9 (both)                                                                               |
+  | 9     | a plan placing no picture does not advance                                                       | 9 (the no-picture test)                                                                |
+  | 9     | an `until: 'stills'` run advances to clips                                                       | 9 (the pictured test's stills run never finished); 30 `reel-stills` tests, checks 4–49 |
+  | 9     | the clips job unclaimed; its `startStage` given `stills`                                         | 9 (the no-picture test times out), each — **owed to check 11**                         |
+  | 9     | a clips-job ending marks its job at the result's cost                                            | **nothing**                                                                            |
+  | 9     | the clips job ignores the cancel flag                                                            | **nothing — check 11 (Slice 3), 47 (Slice 5)**                                         |
+  | 10    | a `reel.clips` row after a `video` run's stills stage stops                                      | 10; 8 (its admitted run's stills stage fails, then advances)                           |
+  | 10    | a `video` run stopped at the cap asks no question                                                | 10                                                                                     |
+  | 10    | a `video` run's stills rule stop names step `video`                                              | 10                                                                                     |
+
+- **Caught by nothing that a check's words promise: none.** Two were caught by nothing. The clips job ignoring cancel is
+  check 11's, Slice 3's. **A clips-job ending that overwrites its job's cost with the chain's spend** is promised by
+  Gate 3's _"the job done, its cost kept"_ and by no check's words: check 9's are about the keyframes job, check 27's
+  about a completed clips stage. Said in S-081's _Not handled_ rather than widened; Slice 3 makes the first clips job
+  with a cost.
+- **Traps.** The first run of chunk A caught nothing in four seconds a break: the reporter was passed as a Windows path,
+  and `node --test` refuses an ESM path that is not a `file://` URL, so no suite ran — every restore was verified, and
+  the fingerprint held. The runner now uses `pathToFileURL` and stops if a suite prints no counts; chunk A ran again.
+  The prompt's traps did not fire: every file carrying a backtick was written with the editing tool, and each break's
+  find text was checked to match once before the runner started.
+- `node scripts/check.mjs`: **everything green, 202 tests.** Checks 7–10 pass by number (6 tests).
+
+**Next.** `reel-render` Slice 3 — narration, clips and Gates 2 to 5: migration 0003, `ffmpegTools` and readiness, the
+narration and video stand-ins, the media port, the worker requiring its four ports, the guarded ports and their
+receipts, the clips recorder, Gates 2 to 5, the unclaimed criteria, `advanceClips` and the `reel.assemble` row, the
+assemble job's cancel read. Checks 11–28. Worth carrying into its prompt: a job row's cost after a clips-job ending
+(S-081), and check 11 as the owner of breaks 9j, 9k and 9p. Owed outside this repository, unchanged: KnowScroll's check
+of a returned video (S-068) and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the
+steering stubs and the pin (S-033).

@@ -6,6 +6,7 @@ import type {
   StillsSettings,
 } from '@cutroom/contracts'
 import {
+  advanceStills,
   finishStills,
   imageCallCount,
   readReelCapCents,
@@ -26,11 +27,13 @@ import { stillsRecorder } from './recorder.ts'
 import { recordingPort } from './recording-port.ts'
 
 // The `reel.keyframes` job (docs/features/reel-stills.md, Gate 2 "How a run goes" and "How a stills
-// run ends"): the chain's second row, created only for an admitted `stills` run (D-081, D-083). It
-// settles the cancel flag and the stage's start in one transaction (S-027), reads the per-reel cap,
-// hands `makeStills` the selected plan and the ports it built, and ends the run with whatever the
-// stage answered — the chosen flags, the degradations and their labels, the events and the result
-// in one transaction (S-046) — and, for a stop at the per-reel cap, a question after it (D-100).
+// run ends"): the chain's second row, created only for an admitted `stills` or `video` run (D-081,
+// D-083). It settles the cancel flag and the stage's start in one transaction (S-027), reads the
+// per-reel cap, hands `makeStills` the selected plan and the ports it built, and ends the run with
+// whatever the stage answered — the chosen flags, the degradations and their labels, the events and
+// the result in one transaction (S-046) — and, for a stop at the per-reel cap, a question after it
+// (D-100). A `video` run whose stills stage completes is not ended here: it advances to the chain's
+// `reel.clips` row (docs/features/reel-render.md, Gate 2 "The chain"; S-069).
 
 export interface KeyframesJobContext {
   /** The model, image and sensor ports the worker was handed; it never constructs one (S-038). */
@@ -132,13 +135,25 @@ export async function runKeyframesJob(
   if (outcome.kind === 'completed') {
     // The approved pictures, in shot order, at the paths their rows record (the contract's StillRef).
     const chosen = outcome.pictures.filter((p) => p.chosen).sort((x, y) => x.shotUnit - y.shotUnit)
-    finishStills(db, {
+    const stage = {
       runId,
       jobId: job.id,
       chosen: chosen.map((p) => p.pictureId),
       degraded,
       // The stage produced its pictures, so it finished (S-025, S-046).
-      events: [...outcome.events, { type: 'stage.finished', stage: 'stills' }],
+      events: [...outcome.events, { type: 'stage.finished', stage: 'stills' } as const],
+    }
+
+    if (request.options.until === 'video') {
+      // The run goes on: in one transaction, the stage's ending as a stills run's, this job done with
+      // its cost kept, and the chain's `reel.clips` row — also for a plan that placed no picture. The
+      // run is not finished; its clips are (S-069).
+      advanceStills(db, stage)
+      return
+    }
+
+    finishStills(db, {
+      ...stage,
       result: {
         ...finished,
         costCents,

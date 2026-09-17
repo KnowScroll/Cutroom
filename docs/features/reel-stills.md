@@ -31,6 +31,20 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > D-096's `Confirmed-by` bans a field named `exposure` anywhere in this repository and `reel-plan`'s check 5
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
+>
+> **Amended by `reel-render` on 2026-09-16 and 2026-09-17 — the gates below are not edited, and no assertion is
+> removed** (**S-077**, **S-078**). Where Gate 1 says a video is "not built yet", that is no longer true:
+>
+> - **`until: 'video'` is accepted.** **Check 8's `video` clause asserts acceptance with a `runId`**, and every
+>   assertion it made of the refusal is made of `planVaryOn: 'order'`, the one request still refused as `unsupported`
+>   (D-110), in the same test (`reel-render`'s Slice 2).
+> - **A `video` run's stills stage is exactly the one below**, but for what follows a stage that completes: the
+>   keyframes job writes the same chosen flags, labels and events, is done with its cost kept, and makes the chain's
+>   `reel.clips` row instead of finishing the run (**S-069**). Every other ending ends a `video` run exactly as a
+>   `stills` run's, with no further row.
+> - **Check 5** asserts `GATE_ORDER` with Gates 2 to 5 and 7, and **check 3** counts nineteen rules
+>   (`reel-render`'s Slice 1). Both stay exact.
+> - This journey is run again in `reel-render`'s last slice.
 
 ## Gate 1 — Product (no technical language)
 

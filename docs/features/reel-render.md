@@ -1227,7 +1227,7 @@ _Restart, and no secrets_
       (S-077); `processes-only-in-providers` with its `--prove` cases, and `CLAUDE.md`'s count. The worker is handed no
       new port yet. **Check 5's name clause is green before any code** (it says so).
       **Proves: 1, 2, 3, 4, 5, 6.**
-- [ ] **Slice 2 — asking for a video, and the chain.** `until: 'video'` accepted; `reel-plan`'s check 10 keeping its
+- [x] **Slice 2 — asking for a video, and the chain.** `until: 'video'` accepted; `reel-plan`'s check 10 keeping its
       refusal's assertions on `planVaryOn: 'order'`, `reel-stills`' check 8, and the two tests that sent `video` to be
       refused (S-077), with the notes in `reel-plan.md` and `reel-stills.md`; `admitVideo` and the refusal at the
       ceiling; `advanceStills` and the `reel.clips` row; the worker claiming it; `startStage` for `video` with the cancel

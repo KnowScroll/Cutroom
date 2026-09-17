@@ -2,7 +2,7 @@
 // No database, no provider, no filesystem, no network. The splitter is not exported: the planning
 // stage is its one caller (D-073).
 
-export { admitPictures } from './admit.ts'
+export { admitPictures, admitVideo } from './admit.ts'
 export { clipObservation } from './clips/observation.ts'
 export { NEGATIVE_AUDIO } from './clips/prompts.ts'
 export { validateVideoRequest } from './clips/validate.ts'
