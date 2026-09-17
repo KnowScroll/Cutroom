@@ -4,7 +4,7 @@
 - **Feature:** `reel-render` — [`docs/features/reel-render.md`](../docs/features/reel-render.md)
 - **Work:** Slice 3 of 6 — narration, clips and Gates 2 to 5; checks 11–28, tests first; no journey
 - **Written:** 2026-09-17, at the end of session 22, after `reel-render`'s Slice 2 was committed (243483a)
-- **Run:** not yet
+- **Run:** session 23
 
 Paste everything inside the block below as the session's first message.
 

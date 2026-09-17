@@ -27,6 +27,8 @@ export const PLAN_JOB = 'reel.plan'
 export const KEYFRAMES_JOB = 'reel.keyframes'
 /** The chain's third job: the clips of a `video` run whose stills stage completed (S-069). */
 export const CLIPS_JOB = 'reel.clips'
+/** The chain's fourth and last job: assembling a `video` run whose clips stage completed (S-069). */
+export const ASSEMBLE_JOB = 'reel.assemble'
 
 /** The stages a run has events for: `plan`, `stills` and `video`, the contract's. */
 export type Stage = Extract<RunEvent, { stage: string }>['stage']
@@ -372,6 +374,35 @@ export function advanceStills(
       return enqueue(
         tx,
         { kind: CLIPS_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
+        now,
+      )
+    },
+    { behavior: 'immediate' },
+  )
+}
+
+/**
+ * A `video` run whose clips stage completed, in one immediate transaction (S-069): the events its
+ * gates produced, the clips job done with its cost kept — what its narration and clip calls added
+ * (S-036) — and the chain's last row: one `reel.assemble` job whose `correlation_id` is the run and
+ * whose `parent_id` is the clips job (D-081, D-083). Returns that row's id.
+ *
+ * The run is NOT finished, and the video stage has no `stage.finished`: the stage produced its output
+ * only once its assembly does (S-025's reading, S-069).
+ */
+export function advanceClips(
+  db: Db,
+  a: { runId: string; jobId: number; events: readonly EventBody[] },
+  now: Date = new Date(),
+): number {
+  const { runId, jobId } = a
+  return db.transaction(
+    (tx) => {
+      for (const event of a.events) append(tx, runId, event, now)
+      completeJob(tx, jobId)
+      return enqueue(
+        tx,
+        { kind: ASSEMBLE_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
         now,
       )
     },

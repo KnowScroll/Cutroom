@@ -5,7 +5,17 @@ import { join } from 'node:path'
 import { test } from 'node:test'
 import type { Framing } from '@cutroom/contracts'
 import { DEFAULT_PLAN_SETTINGS, DEFAULT_STILLS_SETTINGS } from '@cutroom/pipeline'
-import { FAKE_IMAGE_MODEL, fakeImage, fakeModel, fakeSensors } from '@cutroom/providers'
+import {
+  FAKE_IMAGE_MODEL,
+  fakeImage,
+  fakeModel,
+  fakeNarration,
+  fakeSensors,
+  fakeVideo,
+  ffmpegAssembler,
+  ffmpegMedia,
+  ffmpegTools,
+} from '@cutroom/providers'
 import { startWorker } from '@cutroom/worker'
 import { startEngine, waitFor } from './engine/harness.ts'
 import {
@@ -177,11 +187,18 @@ test('21. a worker refuses to start when handed an image port that does not acce
     // A run is waiting, so a worker that started its loop before refusing would claim it.
     const submitted = await engine.http.submit(stillsRequest('r21'))
     assert.equal(submitted.status, 202)
+    // The video, narration and media ports and the assembler a worker requires from reel-render's
+    // Slice 3 (S-077): support for starting one, and no assertion of this check.
+    const tools = ffmpegTools()
     const base = {
       dbPath: engine.dbPath,
       pollMs: 10,
       model: fakeModel({}, { models: DEFAULT_PLAN_SETTINGS.models }),
       sensors: fakeSensors({}),
+      video: fakeVideo(tools, {}, { artifactRoot: dir }),
+      narration: fakeNarration({}, { artifactRoot: dir }),
+      media: ffmpegMedia(tools, { artifactRoot: dir }),
+      assembler: ffmpegAssembler(tools, { artifactRoot: dir }),
       questionsPath: join(dir, 'QUESTIONS.md'),
     }
 

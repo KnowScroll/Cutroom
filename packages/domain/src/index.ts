@@ -2,15 +2,25 @@
 // Imports no stage and no provider.
 
 export { BUDGET_MD, readReelCapCents } from './budget.ts'
+export {
+  readClipsInputs,
+  recordClip,
+  recordNarration,
+  upsertNarration,
+  upsertTake,
+  type ClipsInputs,
+} from './clips.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
 export { imageCallCount, recordGeneration, spentCents } from './ledger.ts'
 export { readRecord, upsertPicture, type DegradedShot } from './pictures.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
 export {
+  ASSEMBLE_JOB,
   CLIPS_JOB,
   KEYFRAMES_JOB,
   PLAN_JOB,
   admitStills,
+  advanceClips,
   advanceStills,
   canonicalJson,
   eventsAfter,

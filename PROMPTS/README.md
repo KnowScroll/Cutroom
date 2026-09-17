@@ -16,4 +16,4 @@ its `JOURNAL.md` entry says it did (S-065).
 | 020 | [020-reel-render-gates.md](020-reel-render-gates.md)     | `reel-render` | gates 1–4 | 2026-09-16 | session 20 |
 | 021 | [021-reel-render-slice-1.md](021-reel-render-slice-1.md) | `reel-render` | Slice 1   | 2026-09-16 | session 21 |
 | 022 | [022-reel-render-slice-2.md](022-reel-render-slice-2.md) | `reel-render` | Slice 2   | 2026-09-17 | session 22 |
-| 023 | [023-reel-render-slice-3.md](023-reel-render-slice-3.md) | `reel-render` | Slice 3   | 2026-09-17 | not yet    |
+| 023 | [023-reel-render-slice-3.md](023-reel-render-slice-3.md) | `reel-render` | Slice 3   | 2026-09-17 | session 23 |

@@ -4,24 +4,58 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { startApi, type Api } from '@cutroom/api'
-import type { LanguageModelPort, PlanSettings, StillsSettings } from '@cutroom/contracts'
-import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
+import type {
+  LanguageModelPort,
+  NarrationPort,
+  PlanSettings,
+  RenderSettings,
+  StillsSettings,
+  VideoPort,
+} from '@cutroom/contracts'
+import { DEFAULT_PLAN_SETTINGS, DEFAULT_RENDER_SETTINGS } from '@cutroom/pipeline'
 import {
   DEFAULT_ARTIFACT_ROOT,
   fakeImage,
   fakeModel,
+  fakeNarration,
   fakeSensors,
+  fakeVideo,
+  ffmpegAssembler,
+  ffmpegMedia,
+  ffmpegTools,
   type FakeImage,
   type FakeImageScript,
+  type FakeMediaScript,
   type FakeModel,
+  type FakeNarration,
+  type FakeNarrationScript,
   type FakeScript,
   type FakeSensors,
   type FakeSensorScript,
+  type FakeVideo,
+  type FakeVideoScript,
+  type FfmpegAssembler,
+  type FfmpegMedia,
 } from '@cutroom/providers'
 import { startWorker, type Worker } from '@cutroom/worker'
 import { REPO } from '../_repo.ts'
 import { client } from '../stand-in/client.ts'
 import type { WorkerProcessConfig } from './worker-process.ts'
+
+/** The small output profile every engine a test starts is handed (reel-render, Gate 3). */
+export const TEST_RENDER_SETTINGS: RenderSettings = {
+  ...DEFAULT_RENDER_SETTINGS,
+  profile: {
+    container: 'mp4',
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    width: 108,
+    height: 192,
+    fps: 24,
+    sampleRate: 48000,
+    channels: 2,
+  },
+}
 
 /**
  * The real engine — its API and its worker — started on a database file in a temporary folder
@@ -37,6 +71,10 @@ import type { WorkerProcessConfig } from './worker-process.ts'
  * answering from a script a test gives — by default a readable 9:16 picture at no cost, and every
  * sensor's default. The image stand-in's artifact root is inside the harness's folder unless a
  * test asks for the stand-in's own default, which only reel-stills' check 17 does.
+ *
+ * And the worker is handed the video and narration stand-ins, the ffmpeg media port and the
+ * assembler (reel-render's Slice 3, S-077), each answering from a script a test gives and writing
+ * under the same artifact root; and a small output profile, so no test renders at 768 × 1366.
  */
 export interface Engine {
   dir: string
@@ -55,6 +93,14 @@ export interface Engine {
   image: FakeImage
   /** The sensor stand-in the worker was handed, with every call it received. */
   sensors: FakeSensors
+  /** The video stand-in the worker was handed, with every request it received. */
+  video: FakeVideo
+  /** The narration stand-in the worker was handed, with every request it received. */
+  narration: FakeNarration
+  /** The ffmpeg media port the worker was handed, with every call it received. */
+  media: FfmpegMedia
+  /** The assembler the worker was handed. */
+  assembler: FfmpegAssembler
   startWorker(): Promise<Worker>
   /** Stops the worker — after the job in hand — so `startWorker()` starts a new one. */
   stopWorker(): Promise<void>
@@ -102,6 +148,18 @@ export interface EngineOptions {
   artifactRoot?: string | null
   /** Wraps the model the worker is handed — how a test holds a call open in-process. */
   wrapModel?: (model: LanguageModelPort) => LanguageModelPort
+  /** What the video stand-in makes of each take, keyed `shot-<unit>-take-<n>`. */
+  video?: FakeVideoScript
+  /** What the narration stand-in speaks for each shot, keyed `shot-<unit>-narration`. */
+  narration?: FakeNarrationScript
+  /** What the media port reads and hears in each take, keyed `shot-<unit>-take-<n>`. */
+  media?: FakeMediaScript
+  /** The render settings. Defaults to TEST_RENDER_SETTINGS. */
+  renderSettings?: RenderSettings
+  /** Wraps the video port the worker is handed — how a test sees the calls' order and answers. */
+  wrapVideo?: (video: VideoPort) => VideoPort
+  /** Wraps the narration port the worker is handed. */
+  wrapNarration?: (narration: NarrationPort) => NarrationPort
 }
 
 export async function startEngine(options: EngineOptions): Promise<Engine> {
@@ -119,10 +177,14 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       ? DEFAULT_ARTIFACT_ROOT
       : (options.artifactRoot ?? join(dir, 'artifacts'))
   const imageOptions = options.artifactRoot === null ? {} : { artifactRoot }
+  const renderSettings = options.renderSettings ?? TEST_RENDER_SETTINGS
+  const tools = ffmpegTools()
   const api = await startApi({ dbPath })
   let worker: Worker | undefined
   const children: Array<ReturnType<typeof spawn>> = []
   const wrap = options.wrapModel ?? ((model: LanguageModelPort) => model)
+  const wrapVideo = options.wrapVideo ?? ((video: VideoPort) => video)
+  const wrapNarration = options.wrapNarration ?? ((narration: NarrationPort) => narration)
 
   const engine: Engine = {
     dir,
@@ -135,6 +197,10 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
     model: fakeModel(options.script ?? {}, { models: settings.models }),
     image: fakeImage(options.images ?? {}, imageOptions),
     sensors: fakeSensors(options.sensors ?? {}),
+    video: fakeVideo(tools, options.video ?? {}, imageOptions),
+    narration: fakeNarration(options.narration ?? {}, imageOptions),
+    media: ffmpegMedia(tools, { ...imageOptions, script: options.media ?? {} }),
+    assembler: ffmpegAssembler(tools, imageOptions),
     async startWorker() {
       worker ??= await startWorker({
         dbPath,
@@ -142,7 +208,12 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
         model: wrap(engine.model),
         image: engine.image,
         sensors: engine.sensors,
+        video: wrapVideo(engine.video),
+        narration: wrapNarration(engine.narration),
+        media: engine.media,
+        assembler: engine.assembler,
         settings,
+        renderSettings,
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
         ...(options.stillsSettings === undefined ? {} : { stillsSettings: options.stillsSettings }),
@@ -165,6 +236,10 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
         script,
         images: options.images ?? {},
         sensors: options.sensors ?? {},
+        video: options.video ?? {},
+        narration: options.narration ?? {},
+        media: options.media ?? {},
+        renderSettings,
         holdAtCall,
         leaseMs,
       }
@@ -212,6 +287,10 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       engine.model = fakeModel(script ?? {}, { models: settings.models })
       engine.image = fakeImage(options.images ?? {}, imageOptions)
       engine.sensors = fakeSensors(options.sensors ?? {})
+      engine.video = fakeVideo(tools, options.video ?? {}, imageOptions)
+      engine.narration = fakeNarration(options.narration ?? {}, imageOptions)
+      engine.media = ffmpegMedia(tools, { ...imageOptions, script: options.media ?? {} })
+      engine.assembler = ffmpegAssembler(tools, imageOptions)
     },
     query<T>(sql: string, ...params: Array<string | number>): T[] {
       const db = new DatabaseSync(dbPath)

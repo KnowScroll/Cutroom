@@ -1,24 +1,53 @@
+import type {
+  LanguageModelPort,
+  MediaPort,
+  NarrationPort,
+  PlanSettings,
+  RenderSettings,
+  VideoPort,
+} from '@cutroom/contracts'
 import {
+  advanceClips,
   finishVideo,
+  readClipsInputs,
+  readRequest,
   readRun,
+  readSelectedPlan,
   spentCents,
   startStage,
   type ClaimedJob,
   type Db,
 } from '@cutroom/domain'
+import { makeClips } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
+import { clipsRecorder } from './clips-recorder.ts'
+import { guardedNarrationPort } from './narration-port.ts'
+import { recordingPort } from './recording-port.ts'
+import { guardedVideoPort, validatingVideoPort } from './video-port.ts'
 
-// The `reel.clips` job (docs/features/reel-render.md, Gate 2 "The chain" and "Cancel, and a
-// restart"): the chain's third row, created only for a `video` run whose stills stage completed
-// (S-069). Before every attempt it settles the cancel flag and `stage.started` for video in one
-// transaction (S-027, S-051), so a cancel cannot land between the read and the start and a job run
-// again writes no second `stage.started`.
-//
-// Clips are not built yet (reel-render's Slice 2): a started job that is not cancelled finishes the
-// run failed, saying so — an answer the contract describes, which Slice 3 replaces with the clips
-// stage.
+// The `reel.clips` job (docs/features/reel-render.md, Gate 2 "The chain", "How a video run ends" and
+// "Cancel, and a restart"): the chain's third row, created only for a `video` run whose stills stage
+// completed (S-069). Before every attempt it settles the cancel flag and `stage.started` for video in
+// one transaction (S-027, S-051), so a cancel cannot land between the read and the start and a job run
+// again writes no second `stage.started`. It hands `makeClips` the selected plan, the chosen pictures
+// and the ports it built, and then either advances — its events, itself done with its cost kept, and
+// the `reel.assemble` row — or ends the run with whatever the stage answered.
 
-export async function runClipsJob(db: Db, job: ClaimedJob): Promise<void> {
+export interface ClipsJobContext {
+  /** The ports the worker was handed; it never constructs one (S-021, S-075). */
+  model: LanguageModelPort
+  video: VideoPort
+  narration: NarrationPort
+  media: MediaPort
+  settings: PlanSettings
+  render: RenderSettings
+}
+
+export async function runClipsJob(
+  db: Db,
+  job: ClaimedJob,
+  context: ClipsJobContext,
+): Promise<void> {
   const runId = job.correlationId
   const found = readRun(db, runId)
   if (found === undefined) throw new Error(`reel.clips job ${job.id} names no run '${runId}'`)
@@ -31,11 +60,82 @@ export async function runClipsJob(db: Db, job: ClaimedJob): Promise<void> {
     return
   }
 
-  const result: RunResult = {
-    ...finished,
-    costCents: spentCents(db, runId),
-    status: 'failed',
-    detail: 'clips are not built',
+  const request = readRequest(db, runId)
+  const plan = readSelectedPlan(db, runId)
+  let inputs: ReturnType<typeof readClipsInputs>
+  try {
+    inputs = readClipsInputs(db, runId)
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error)
+    finishVideo(db, {
+      runId,
+      jobId: job.id,
+      result: { ...finished, costCents: spentCents(db, runId), status: 'failed', detail },
+    })
+    return
   }
-  finishVideo(db, { runId, jobId: job.id, result })
+
+  const outcome = await makeClips(
+    { runId, attempt: job.attempts, request, plan, ...inputs },
+    {
+      // The validator outermost, then the guard, then the port the worker was given (S-071).
+      video: validatingVideoPort(
+        guardedVideoPort(context.video, db, {
+          jobId: job.id,
+          runId,
+          attempt: job.attempts,
+          degradedShots: inputs.degradedShots,
+          rateCents: context.settings.videoRateCentsPerSecond,
+          style: { id: request.style.id, version: request.style.version },
+        }),
+      ),
+      narration: guardedNarrationPort(context.narration, db, {
+        jobId: job.id,
+        runId,
+        attempt: job.attempts,
+        rateCentsPerCharacter: context.render.narrationRateCentsPerCharacter,
+      }),
+      media: context.media,
+      model: recordingPort(context.model, db, runId),
+      recorder: clipsRecorder(db, runId),
+    },
+    { plan: context.settings, render: context.render },
+  )
+
+  if (outcome.kind === 'completed') {
+    // The run goes on: in one transaction, the stage's events, this job done with its cost kept, and
+    // the chain's `reel.assemble` row. The run is not finished, and the video stage has no
+    // stage.finished until its assembly completes (S-069).
+    advanceClips(db, { runId, jobId: job.id, events: outcome.events })
+    return
+  }
+
+  // Any other ending finishes the run, keeping this job's cost as its calls added it (S-081).
+  const costCents = spentCents(db, runId)
+  const ended = (result: RunResult) =>
+    finishVideo(db, { runId, jobId: job.id, events: outcome.events, result })
+
+  if (outcome.kind === 'stopped-rule') {
+    ended({
+      ...finished,
+      costCents,
+      status: 'stopped',
+      reason: 'rule',
+      rule: outcome.rule,
+      step: 'video',
+      detail: outcome.detail,
+    })
+    return
+  }
+  if (outcome.kind === 'stopped-budget') {
+    // No guard refuses a narration or a clip until reel-render's Slice 5, which builds this ending.
+    ended({
+      ...finished,
+      costCents,
+      status: 'failed',
+      detail: 'a stop for budget in the clips stage is not built',
+    })
+    return
+  }
+  ended({ ...finished, costCents, status: 'failed', detail: outcome.detail })
 }

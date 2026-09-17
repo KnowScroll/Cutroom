@@ -47,6 +47,11 @@ given every package source by its Slice 3; **the only `LanguageModelPort` is the
 `packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021). The
 same holds for **the only `ImagePort` and `PictureSensorPort`**, since `reel-stills`' Slice 3 (S-038):
 the image stand-in writes real PNGs under one artifact root, `.artifacts/` by default (D-086, D-087).
+And for **the only `VideoPort` and `NarrationPort`**, since `reel-render`'s Slice 3: stand-ins writing
+real MP4s (through ffmpeg) and WAVs under the same root. **The one real adapter is ffmpeg on this
+machine** — the `MediaPort` and the `AssemblerPort` in `packages/providers/src/ffmpeg/` — which costs
+nothing, reads no secret and reaches no network; a worker awaits both ports' `ready()` before it opens
+its database, and refuses to start without the tools (S-075).
 **Nineteen** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
@@ -83,6 +88,12 @@ forget, because an unreferenced package is one nothing typechecks.
 
 - **`pnpm` is not on PATH** and is not installed globally. Use `corepack pnpm <script>`, or skip
   it: `node scripts/check.mjs`.
+- **ffmpeg and ffprobe must be on PATH** — 8.1.1 here, through WinGet's Links folder. Nothing in this
+  repository installs them and no path to them is written (S-075, D-086): a worker without them
+  refuses to start, and the suite needs them, including the checks that run it with PATH alone.
+  Start either with an argument array, never a shell string; a Windows path inside a filtergraph needs
+  its `:` and `\` escaped, one given as an input or output argument does not. The detectors a scan
+  parses report on stderr at info level, so no quieter log level.
 - **Node is 22.14**, so TypeScript tests need `--experimental-strip-types`. A bare directory
   (`node --test tests`) is read as a module path and fails; pass a quoted glob and let **Node**
   expand it.

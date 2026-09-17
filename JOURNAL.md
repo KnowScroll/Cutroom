@@ -1754,3 +1754,148 @@ steering stubs and the pin (S-033).
 - Nothing but markdown changed.
 
 **Next.** Session 23: run `PROMPTS/023-reel-render-slice-3.md`.
+
+## 2026-09-17 — session 23, reel-render Slice 3: narration, clips and Gates 2 to 5
+
+**Intent.** Run `PROMPTS/023-reel-render-slice-3.md`: `reel-render`'s Slice 3 only — checks 11 to 28, tests first,
+nothing from Slice 4 or later, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green,
+202 tests (fb8f4da). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`db/migrations/0003_reel_render_tables.sql`**, made by `drizzle-kit generate --name reel_render_tables` after
+  `schema.ts` gained `narration`, `speech_receipt`, `take`, `video_receipt`, `take_observation`, `take_reconciliation`,
+  `render` (its manifest column `render_manifest`) and `hold` (S-019). Nothing writes `render` or `hold` yet.
+- **`packages/providers`** — `artifacts.ts`: `DEFAULT_ARTIFACT_ROOT` and one `artifactPath` refusal for every adapter,
+  the image stand-in's moved there unchanged in behaviour; **`ffmpeg/tools.ts`** — `ffmpegTools`, running each tool
+  from an argument array, remembering per process, for a pair of tool names, what `-version`, `-encoders` and `-filters`
+  said, and comparing each `ready()`'s own `libx264`, `aac` and filters (the scan's four) against that;
+  **`ffmpeg/media.ts`** — `ffmpegMedia`: `probe` by `ffprobe -count_frames` with `moov` before `mdat` read from the
+  file's top-level boxes, `scan` as one pass of `blackdetect`, `freezedetect`, `silencedetect` and
+  `ebur128=framelog=quiet` handed the two thresholds as they are, `readText` and `listen` from a script, `frames`
+  throwing _"not built"_; **`ffmpeg/assemble.ts`** — `ffmpegAssembler`, `ready()` and an `assemble` that throws
+  _"not built"_; **`fake/video.ts`** — `fakeVideo`: `testsrc2` at 108 × 192, 24 fps, a top band coloured from the take
+  id's CRC-32, the lower third shaded, a 220 Hz tone at 48 kHz, and a script for a black stretch (a full-frame box for
+  exactly its frames), a frozen stretch (`freezeframes`), size, rate, sample rate, a missing stream, unreadable bytes,
+  length, cost, expansion and a throw; **`fake/narration.ts`** — `fakeNarration`: a 24 kHz mono WAV of 660 Hz written
+  byte by byte, 300 ms a word and 200 ms after it, word and gap lengths, timings, cost and throw by script. All exported.
+- **`packages/pipeline`** — `clips/narration.ts` (`narrationText`, `wordTimings`, `requestedSeconds`),
+  `clips/criteria.ts` (`takeCriteria`), `clips/prompts.ts` (`clipPrompt`, `takeReconcilePrompt`,
+  `takeReconcileAnswer` — S-040's and S-056's schema), `clips/ids.ts`, `gates/gate2.ts` to `gate5.ts`, and
+  **`clips/index.ts` — `makeClips`**, which never rejects: shot by shot, the narration measured and its timings parsed,
+  one take, Gates 2 to 5, a stop for the lowest failing gate, and the unclaimed `mustShow` after every take. The seed's
+  CRC-32 is written in the pipeline, which imports no Node module.
+- **`packages/domain`** — `clips.ts`: `recordNarration`, `recordClip`, `upsertNarration`, `upsertTake`,
+  `readClipsInputs`; `runs.ts`: `ASSEMBLE_JOB`, **`advanceClips`**.
+- **`apps/worker`** — `WorkerOptions` requires `video`, `narration`, `media` and `assembler`; `startWorker` keeps its
+  refusals first, then awaits both `ready()`s, then opens the database. **`video-port.ts`**: `guardedVideoPort` beside
+  `validatingVideoPort` (S-083); **`narration-port.ts`**: `guardedNarrationPort`; **`clips-recorder.ts`**;
+  **`clips-job.ts`**: `makeClips`, then `advanceClips` or `finishVideo`; **`assemble-job.ts`**: its cancel read and
+  _"assembly is not built"_; the worker claims four kinds and hands the assemble job no port.
+- **Test support, no assertion**: `tests/engine/harness.ts` and `worker-process.ts` build the four ports under the
+  engine's artifact root with `TEST_RENDER_SETTINGS` (108 × 192, 24 fps, 48 kHz, two channels), and take `video`,
+  `narration`, `media`, `renderSettings`, `wrapVideo` and `wrapNarration`; the `startWorker` calls in `reel-stills`'
+  check 21 and `reel-render`'s check 3 are handed the four ports; `tests/engine/video.ts` gains the takes written by
+  hand, `videoScript`, `readVideo`, `holding`, `whenHeld` and `videoFinished`.
+- **Nine test files, `tests/reel-render-{readiness,files,narration,clips,gate2,gates,stops,advance,cancel}.test.ts`:
+  +28 tests, 202 → 230.**
+- **`CLAUDE.md`**: the only `VideoPort` and `NarrationPort` are stand-ins, ffmpeg is the one real adapter, and ffmpeg
+  on PATH as a trap. **`DECISIONS.md` — S-083.** Slice 3 ticked. Prompt 023's `Run` line set to session 23, in the file
+  and the index (S-065).
+
+**Observed.**
+
+- **No collision needing the owner.** Read before any test: the harness's five-second waits are a plan run's —
+  `videoFinished` in `tests/engine/video.ts` waits 90 s for a video run and the harness's own waits are unchanged, since
+  every take spawns ffmpeg and the suite runs files side by side; check 9's second test now runs a real clips stage to
+  its first witness call before `stopWorker` returns, and stays green; D-096's and S-073's names are not used
+  (`render_manifest`, no `source`); `.gitignore` already names `*.mp4` and `*.wav`, and no subtitles file is written;
+  the two PATH-alone roll calls find ffmpeg; S-077 missed nothing beyond `reel-render`'s own check 3, which session 22
+  had already named.
+- **Red first.** Checks 12 and 19: a link error, _"does not provide an export named 'fakeNarration'"_, for both files
+  at once. With the providers built: 12 green, 19's refusal and git clauses green, its two engine clauses _"no such
+  table: take"_. With the migration, before any stage code, against Slice 2's placeholder clips job: 13, 14, 15, 16,
+  17, 18, 19, 20 to 26 — _"the clips stage did not complete: … clips are not built"_, or a held call never reached; 16
+  first as a link error on `requestedSeconds`, so **its pure clause was never red on its own** (breaks 16a to 16c show
+  it fails); 27 _"finished before the held call"_; 28's first half _"the run made no narration to cost"_;
+  11's second test _"finished before the held call"_. **Green before this slice's code, as the gate says**: 28's second
+  half and 11's render-row clause — both once the migration existed; before it the query itself fails. **Also green
+  before this slice's code: 11's first test**, whose cancel read Slice 2 built; breaks 11a to 11c show it fails.
+- **Four faults of my own tests, fixed in the tests.** The cancel route answers `200`, not `202`. A held call that
+  never arrives hung its file for the 300-second timeout, so `whenHeld` fails once the run finishes first. Check 20
+  read the placeholder assemble job's `run.finished` as a clips event; it now reads the verdicts. Check 19's root-unset
+  case left its run folder in `.artifacts/` when its assertions failed before recording the folder; its helper now
+  removes its own runs' folders there.
+- **One green run, 27 of 28 at first** (check 20, above), in 24 s for the nine files; `check.mjs` 70 s.
+- **Measured, not assumed.** `freezedetect` reads a two-second freeze made by `freezeframes` as 1.83 s and three
+  quarters of a second as 0.58 s at 24 fps (four frames short: libx264 settles on a still picture over its first frames);
+  a black box of exactly one second reads 1.0 s black and 1.0 s frozen. A freeze the file ends inside is reported with a
+  start and no end, and is counted to the file's end. `-af` on a clip with no audio stream is ignored, not an error.
+- **Choices the gates left open, not S-entries (nothing rejected could be caught):** the stand-in recipe; the scan's
+  parsing; the thresholds handed to ffmpeg exactly, the margins being the fixtures' as Gate 2 says; the test profile.
+  **The guards' comparison is not written in Slice 3**: the guarded ports write receipts, costs and rows and refuse
+  nothing, and a `stopped-budget` outcome — which nothing can produce yet — ends the run failed saying it is not built.
+  Writing the comparison now would be code whose breaks no Slice 3 check can catch; checks 42–45 are its tests first.
+- **What Slice 3 builds that no Slice 3 check asserts**: _"assembly is not built"_ (Gate 4 says so); the frame strip's
+  and the assembler's throws; `ready()` comparing encoders (break 12f); a freeze the file ends inside (21l); no scan of a
+  file with no video stream (21k); silence and loudness recorded; `readClipsInputs`' failure for a chosen picture with
+  no observation; the take's `degradation` column; `render` and `hold`; the stand-in's default expansion wording.
+- **S-081's _Not handled_, again: nothing checks a clips-job ending's job cost.** No Slice 3 check's words promise a job
+  row's cost after a clips-job ending — check 27's are about a completed stage, and check 27 now scripts narration and
+  clip costs so its _"cost kept"_ can fail (breaks 27c, 27d). Break 28e, `finishVideo` marking the job at the result's
+  cost, was caught by nothing.
+- **A hundred and eleven deliberate breaks and one control, and one break run again**, by a runner rebuilt in the
+  scratchpad: each break's files saved as bytes and `fsync`ed to a record first, restored from them and read back, the
+  record removed; every modified and untracked file hashed after each restore against the chunk's first; a refusal to
+  start while a record exists; every find checked to occur once before a chunk started; the built-in TAP reporter, the
+  counts required. Each break ran `tsc -b` and all 66 test files but the two PATH-alone roll calls (`reel-plan` 47,
+  `reel-stills` 50) — 228 tests — with `--test-timeout=180000`. **The system stopped the background chunks for low memory
+  after 77 breaks, with break 23a applied**: it was restored from its record and read back, no break's replacement text
+  was found anywhere, and the owner chose to resume the remaining 34 with `--test-concurrency=6`. Afterwards: no record,
+  `.artifacts/` empty, `check.mjs` green.
+
+  | check | breaks                                                                                                                                                                                                                                                                                            | caught by                                                                                                  |
+  | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+  | none  | **control**: a comment in `clips-job.ts`                                                                                                                                                                                                                                                          | nothing                                                                                                    |
+  | 11    | the clips job unclaimed (Slice 2's 9j); its `startStage` given `stills` (9k); its cancel flag ignored (9p); the assemble job's cancel ignored                                                                                                                                                     | 11 each (the first also 9, 13, 15, 19–21, 25, 27; the second also 9, 20, 25)                               |
+  | 12    | `ready()` after the database opens; not awaited; a ready pass remembered per tool names; an ffprobe that cannot run not refused; no filter compared                                                                                                                                               | 12 each                                                                                                    |
+  | 12    | no encoder compared                                                                                                                                                                                                                                                                               | **nothing** — check 12's words name tools and filters                                                      |
+  | 13    | text joined by two spaces; shots in reverse; a clip made before its narration; the row's duration not the file's; the row's path not the file's                                                                                                                                                   | 13 each; reversed also 11, 14–28; clip first also 14–17; duration also 16; path also 19                    |
+  | 14    | a word left out, repeated, reordered, overlapping, or ending after the file — each accepted                                                                                                                                                                                                       | 14 each                                                                                                    |
+  | 15    | a clip from a picture not chosen; a degraded shot from its failed picture; degraded not marked; a ratio on an image-to-video receipt; none on a text-to-video one                                                                                                                                 | 15 each (the first also 17)                                                                                |
+  | 16    | rounded down; unclamped; a whole second rounded up again                                                                                                                                                                                                                                          | 16 each (unclamped also 21)                                                                                |
+  | 17    | each of style, sentences, subject names, claimed `mustShow`, `mustNotShow`, unclaimed and the picture's observation dropped; the block not last; a `[Shot` marker; `mustShow` not by claim; a picture looked at again; a third file calling `generate`; no validator around the handed port       | 17 each; by claim also 11, 13–28 and typecheck; the second look also 11, 15, 18, 20, 22–28                 |
+  | 18    | the seed not the CRC-32; style id; style version; the expansion mode a constant; the rate a constant; the expansion recorded as the prompt; the cost not the call's; another resolution                                                                                                           | 18 each (the cost also 27)                                                                                 |
+  | 19    | writing outside the root; the take row's path not the file's; a default clip with no sound; the default root outside the repository; a video file under `tests/`                                                                                                                                  | 19 each; outside the root and the default root also `reel-stills` 17; path also 23; no sound also 21       |
+  | 19    | a take id not carrying the attempt                                                                                                                                                                                                                                                                | **nothing — owed to check 48 (Slice 6)**                                                                   |
+  | 20    | an outcome set when Gate 3 fails; Gate 4 without its limitation; Gate 5's coverage `whole file`; verdicts newest first                                                                                                                                                                            | 20 each; newest first also 21–24, 26                                                                       |
+  | 21    | ffmpeg's default for black; for frozen; the tolerance 0; the tolerance 2 (21d2 — **21d's tolerance of 1 still failed 16:9 and was a weak break, run again**); failing on frame rate, sample rate, missing sound, shortness; Gates 3–5 after Gate 2 fails; black held to three times its threshold | 21 each                                                                                                    |
+  | 21    | a file with no video stream scanned; a freeze the file ends inside dropped                                                                                                                                                                                                                        | **nothing** — no check's words build either                                                                |
+  | 22    | failing on words; speech not failing; music not failing; Gates 4 and 5 skipped after Gate 3 fails; words not recorded                                                                                                                                                                             | 22 each; speech and the skip also 20, 26; music also 26; words also typecheck                              |
+  | 23    | observe handed a prompt; an unparsed answer accepted; no observation row; no receipt for an observe on a clip                                                                                                                                                                                     | 23 each; no observation row also 24                                                                        |
+  | 24    | a clipped entity failing; each of subject not shown, count, both mustShow types, event mustShow, `mustNotShow` not failing; the unclaimed not marked; the expansion given to Gate 5; no `takeIds`; a failed take's reconciliation not kept                                                        | 24 each; `mustNotShow` also 23, 26; no `takeIds` also 11, 20, 22, 27 and typecheck; reconciliation also 26 |
+  | 25    | the unclaimed never checked; its verdict with a `shotId`; the stop not naming it; the unclaimed failing a take                                                                                                                                                                                    | 25 each                                                                                                    |
+  | 26    | a failed take not stopping; the highest failing gate's rule; the detail without the take; with the first gate's reasons only; a later narration after a failure; a `reel.assemble` row after a stop                                                                                               | 26 each; not stopping also 22–24; the row after a stop also 21–25                                          |
+  | 27    | the wrong parent; another `correlation_id`; the cost reset; a clip's cost not added to the job                                                                                                                                                                                                    | 27 each; another `correlation_id` also 11, 13, 15, 19–21, 25, 28; reset and not added also 11              |
+  | 28    | a video receipt costing 1 by default; a speech receipt; a narration rate of 1; a stopped stills stage advancing to clips                                                                                                                                                                          | 28 each; the two receipts also 11, 27 (the video one 18); advancing also 10 and `reel-stills` 37, 41       |
+  | 28    | S-081: a clips-job ending marks its job at the result's cost                                                                                                                                                                                                                                      | **nothing** (above)                                                                                        |
+  | 13–28 | the migration naming `take_observation` otherwise                                                                                                                                                                                                                                                 | 11, 13–28                                                                                                  |
+
+- **One flake:** under break 13e, `reel-contract` 27 — a restart test against the contract stand-in, which no Slice 3
+  code reaches — failed once; it failed under no other break and in no full run.
+- **Caught by nothing that a check's words promise: none.** 19e is check 48's; 12f, 21k and 21l are named by no check's
+  words and said here rather than widened; 28e is S-081's.
+- **Traps.** A heredoc holding backticks ended early and wrote nothing (checked: `schema.ts` unchanged); it was written
+  with the editing tool. Under break 27b a run never finishes, the file passes its 180-second timeout and node cancels
+  check 19's root-unset case mid-wait, so no cleanup can run: its run folder was left in `.artifacts/` and removed by
+  hand — only a break that hangs a run reaches it. The first suite run with the four ports took 146 s against HEAD's
+  108 s on the same machine at that hour; two `reel-stills` restart tests timed out under that load and passed alone,
+  and did not recur in any later full run.
+- `node scripts/check.mjs`: **everything green, 230 tests.** Checks 11–28 pass by number (28 tests).
+
+**Next.** `reel-render` Slice 4 — assembly, Gate 7 and a video: `renderManifest`, `startRender`, the one pass in
+`ffmpegAssembler`, the output measured, the frame strip, `judgeCut`, `finishVideo` with holds, `readRecord` listing
+holds, and `reel-contract.md`'s note (S-077). Checks 29–41. Worth carrying: `REQUIRED_FILTERS` gains the pass's and the
+strip's filters; S-081's clips-job ending cost is still unchecked; the suite's memory under many ffmpeg processes.
+Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and serving the file (S-073);
+`reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).

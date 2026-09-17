@@ -227,3 +227,200 @@ export const degradation = sqliteTable(
   },
   (t) => [primaryKey({ columns: [t.runId, t.shotId] })],
 )
+
+// ---------------------------------------------------------------- reel-render
+//
+// docs/features/reel-render.md, Gate 2 "Storage". Every narration and take made — every attempt's —
+// is a row, written with its receipt and updated as each measure and gate completes (S-070, S-071,
+// S-072). The render and hold tables arrive in the same migration (Slice 3); nothing writes them
+// until the assembly exists (Slice 4).
+
+/** One row per narration made, written with its speech receipt (S-070). */
+export const narration = sqliteTable(
+  'narration',
+  {
+    runId: text('run_id')
+      .notNull()
+      .references(() => run.runId),
+    /** `a<attempt>-shot-<unit>-narration`. */
+    narrationId: text('narration_id').notNull(),
+    attempt: integer('attempt').notNull(),
+    shotUnit: integer('shot_unit').notNull(),
+    /** The unit's sentences, in order, joined by one space. */
+    text: text('text').notNull(),
+    path: text('path').notNull(),
+    /** JSON: the word timings, once parsed. */
+    words: text('words'),
+    /** JSON: the file's measure, once taken (I-17). */
+    probe: text('probe'),
+  },
+  (t) => [primaryKey({ columns: [t.runId, t.narrationId] })],
+)
+
+/** One row per narration call that returned: what was spoken, at what rate, and what it cost. */
+export const speechReceipt = sqliteTable('speech_receipt', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  runId: text('run_id')
+    .notNull()
+    .references(() => run.runId),
+  narrationId: text('narration_id').notNull(),
+  model: text('model').notNull(),
+  characters: integer('characters').notNull(),
+  /** The narration rate, per character, applied to this call (S-070). */
+  rateCents: real('rate_cents').notNull(),
+  costCents: integer('cost_cents').notNull(),
+  fake: integer('fake', { mode: 'boolean' }).notNull(),
+  at: text('at').notNull(),
+})
+
+/**
+ * One row per take made, every attempt's (S-071, S-072). Written with its video receipt — what it is
+ * and what was asked for — and updated as each measure and gate completes. Its degradation is a
+ * hold's reason, written with the assemble job's ending (S-073).
+ */
+export const take = sqliteTable(
+  'take',
+  {
+    runId: text('run_id')
+      .notNull()
+      .references(() => run.runId),
+    /** `a<attempt>-shot-<unit>-take-<n>`. */
+    takeId: text('take_id').notNull(),
+    attempt: integer('attempt').notNull(),
+    shotUnit: integer('shot_unit').notNull(),
+    number: integer('number').notNull(),
+    mode: text('mode', { enum: ['image-to-video', 'text-to-video'] }).notNull(),
+    pictureId: text('picture_id'),
+    degraded: integer('degraded', { mode: 'boolean' }).notNull().default(false),
+    prompt: text('prompt').notNull(),
+    requestedSeconds: integer('requested_seconds').notNull(),
+    seed: integer('seed').notNull(),
+    requestId: text('request_id').notNull(),
+    expandedPrompt: text('expanded_prompt').notNull(),
+    path: text('path').notNull(),
+    /** JSON: what ffprobe measured (I-17). */
+    probe: text('probe'),
+    /** JSON: the black, frozen and silent stretches and the loudness (S-072). */
+    scan: text('scan'),
+    /** JSON: the words read, recorded and never failing (S-041's reading). */
+    words: text('words'),
+    /** JSON: whether its sound is speech or music. */
+    sound: text('sound'),
+    /** JSON: each gate's verdict with its coverage, in gate order, each once completed (I-6). */
+    verdicts: text('verdicts').notNull().default('[]'),
+    /** Null until Gate 2 fails or Gate 5 completes. */
+    outcome: text('outcome', { enum: ['accept', 'fail'] }),
+    /** A hold's reason (S-073). */
+    degradation: text('degradation'),
+  },
+  (t) => [primaryKey({ columns: [t.runId, t.takeId] })],
+)
+
+/** One row per video call that returned (D-028, D-072, S-071). */
+export const videoReceipt = sqliteTable('video_receipt', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  runId: text('run_id')
+    .notNull()
+    .references(() => run.runId),
+  takeId: text('take_id').notNull(),
+  model: text('model').notNull(),
+  mode: text('mode', { enum: ['image-to-video', 'text-to-video'] }).notNull(),
+  resolution: text('resolution').notNull(),
+  requestedSeconds: integer('requested_seconds').notNull(),
+  /** What a text-to-video call asked for; none for image-to-video, whose ratio is its picture's. */
+  aspectRatio: text('aspect_ratio'),
+  seed: integer('seed').notNull(),
+  requestId: text('request_id').notNull(),
+  prompt: text('prompt').notNull(),
+  expandedPrompt: text('expanded_prompt').notNull(),
+  expansionMode: text('expansion_mode').notNull(),
+  styleId: text('style_id').notNull(),
+  styleVersion: integer('style_version').notNull(),
+  /** The video rate, per second, applied to this call (D-083). */
+  rateCents: real('rate_cents').notNull(),
+  costCents: integer('cost_cents').notNull(),
+  fake: integer('fake', { mode: 'boolean' }).notNull(),
+  /** A degraded shot's text-to-video take (D-050), or a hold's (S-073). */
+  degraded: integer('degraded', { mode: 'boolean' }).notNull().default(false),
+  at: text('at').notNull(),
+})
+
+/** What the witness said of a take, once, for a take whose Gate 4 completed (I-15, S-072). */
+export const takeObservation = sqliteTable(
+  'take_observation',
+  {
+    /** `obs-<takeId>`. */
+    id: text('id').notNull(),
+    runId: text('run_id').notNull(),
+    takeId: text('take_id').notNull(),
+    observation: text('observation').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.runId, t.id] }),
+    foreignKey({ columns: [t.runId, t.takeId], foreignColumns: [take.runId, take.takeId] }),
+  ],
+)
+
+/** What the reconciler answered for a take, and what code made of it (S-072). */
+export const takeReconciliation = sqliteTable(
+  'take_reconciliation',
+  {
+    /** `rec-<takeId>`. */
+    id: text('id').notNull(),
+    runId: text('run_id').notNull(),
+    takeId: text('take_id').notNull(),
+    answer: text('answer').notNull(),
+    failed: text('failed').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.runId, t.id] }),
+    foreignKey({ columns: [t.runId, t.takeId], foreignColumns: [take.runId, take.takeId] }),
+  ],
+)
+
+/**
+ * One row per render: the assembly's receipt (S-073). Its render manifest and that manifest's hash
+ * are written before the assembler is called; the output, its measure and Gate 7's verdict after.
+ */
+export const render = sqliteTable(
+  'render',
+  {
+    runId: text('run_id')
+      .notNull()
+      .references(() => run.runId),
+    /** `a<attempt>-render`. */
+    renderId: text('render_id').notNull(),
+    attempt: integer('attempt').notNull(),
+    /** JSON: the one document the render is made from (D-059). */
+    renderManifest: text('render_manifest').notNull(),
+    hash: text('hash').notNull(),
+    path: text('path'),
+    /** JSON: the output profile. */
+    profile: text('profile').notNull(),
+    /** JSON: the ffmpeg invocations the assembler ran. */
+    invocations: text('invocations'),
+    /** JSON: the output, measured (I-17). */
+    measure: text('measure'),
+    startedAt: text('started_at').notNull(),
+    finishedAt: text('finished_at'),
+    /** JSON: Gate 7's verdict (S-074). */
+    gate7: text('gate7'),
+  },
+  (t) => [primaryKey({ columns: [t.runId, t.renderId] })],
+)
+
+/** A shot whose clip is shorter than its narration: its own table, so it is a query (I-4, S-073). */
+export const hold = sqliteTable(
+  'hold',
+  {
+    runId: text('run_id').notNull(),
+    renderId: text('render_id').notNull(),
+    shotId: text('shot_id').notNull(),
+    seconds: real('seconds').notNull(),
+    reason: text('reason').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.runId, t.renderId, t.shotId] }),
+    foreignKey({ columns: [t.runId, t.renderId], foreignColumns: [render.runId, render.renderId] }),
+  ],
+)

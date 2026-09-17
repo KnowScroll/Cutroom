@@ -1,24 +1,16 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { dirname } from 'node:path'
 import { crc32, deflateSync } from 'node:zlib'
 import type { ImagePort, ImageRequest } from '@cutroom/contracts'
+import { DEFAULT_ARTIFACT_ROOT, artifactPath } from '../artifacts.ts'
 import { entryFor } from './key.ts'
 
 // The stand-in ImagePort (docs/features/reel-stills.md, Gate 2 "Making a picture" and "The
 // stand-ins"). It is the only image port the engine has: it runs on this machine, reads no secret,
 // reaches no network and costs nothing unless a test says so (S-036). It writes A REAL PNG for every
 // picture (D-087), generated on the spot, so the path a picture is handed on with has a file at the
-// end of it — and it holds no durable state of its own.
-
-/**
- * Where pictures are written when no root is given: `.artifacts/` at this repository's root, which
- * `.gitignore` names (D-086). Found from this file, never from the working directory, so it is the
- * same folder whoever starts the engine from wherever.
- */
-export const DEFAULT_ARTIFACT_ROOT = fileURLToPath(
-  new URL('../../../../.artifacts', import.meta.url),
-)
+// end of it — and it holds no durable state of its own. Its path, and the refusal of one that would
+// leave the root, are every adapter's (artifacts.ts).
 
 /** The model every stand-in receipt names. Nothing real answers to it. */
 export const FAKE_IMAGE_MODEL = 'stand-in-image'
@@ -78,28 +70,6 @@ function png(size: { width: number; height: number }, pictureId: string): Buffer
   ])
 }
 
-/** One path segment, or a refusal: nothing a caller passes may walk out of its folder. */
-function segment(value: string, what: string): void {
-  if (value === '' || value === '.' || value === '..' || /[\\/:]/.test(value)) {
-    throw new Error(
-      `the stand-in image port refuses ${what} '${value}': a picture's path must stay under the artifact root (D-086)`,
-    )
-  }
-}
-
-/** `<root>/<runId>/<pictureId>.png`, refused if it would be anywhere but under the root (D-086). */
-function pathFor(root: string, request: ImageRequest): string {
-  segment(request.runId, 'runId')
-  segment(request.pictureId, 'pictureId')
-  const base = resolve(root)
-  const path = resolve(base, request.runId, `${request.pictureId}.png`)
-  const inside = relative(base, path)
-  if (inside === '' || inside.startsWith('..') || isAbsolute(inside)) {
-    throw new Error(`the stand-in image port refuses '${path}': it is not under ${base} (D-086)`)
-  }
-  return path
-}
-
 export function fakeImage(
   script: FakeImageScript,
   options: { artifactRoot?: string; acceptsReferences?: boolean } = {},
@@ -113,7 +83,12 @@ export function fakeImage(
       calls.push(request)
       const entry = entryFor(script, request.pictureId) ?? {}
       if (entry.throws !== undefined) throw new Error(entry.throws)
-      const path = pathFor(root, request)
+      const path = artifactPath(
+        root,
+        { runId: request.runId, id: request.pictureId, what: 'pictureId' },
+        '.png',
+        'the stand-in image port',
+      )
       const bytes =
         entry.shape === 'unreadable'
           ? Buffer.from('these bytes are not a picture\n', 'utf8')

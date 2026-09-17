@@ -1234,7 +1234,7 @@ _Restart, and no secrets_
       flag. Clips do not exist yet, so a started clips job finishes the run `failed` with the detail _"clips are not
       built"_ — a contract-valid answer no check asserts, which Slice 3 replaces.
       **Proves: 7, 8, 9, 10.**
-- [ ] **Slice 3 — narration, clips and Gates 2 to 5.** The migration of the narration, take, render and hold tables and
+- [x] **Slice 3 — narration, clips and Gates 2 to 5.** The migration of the narration, take, render and hold tables and
       their receipts; `ffmpegTools` and its readiness; `fakeNarration` and `fakeVideo`; the media port's `probe`,
       `scan`, `readText` and `listen`, and the assembler with `ready` alone — its `assemble` throws _"not built"_, which
       nothing reaches; **the worker requiring the four ports** and refusing to start without ffmpeg, with the harness

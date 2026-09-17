@@ -2702,3 +2702,28 @@ check 11 owns (Slice 3).
 **Caught by.** Session 22's breaks: 9d (`advanceStills` appending `run.finished`) and 9e (a `video` run's completed
 stage finished as a stills run's) — both tests; 9f (the run's state set finished with no event) — the first test alone;
 9h (a plan placing no picture not advancing) — the second alone.
+
+---
+
+## S-083 | 2026-09-17 | The clips job composes the video port it hands the stage — the validator outermost — from two builders in `video-port.ts`
+
+**Chose.** `apps/worker/src/video-port.ts` exports **`validatingVideoPort(video)`**, unchanged from `reel-render`'s Slice
+1, and **`guardedVideoPort(video, db, job)`**, which writes each call's `video_receipt`, its cost on the job row and the
+take's row as the call returns (S-036's form; its comparison with the cap and the ceiling is Slice 5's). **`clips-job.ts`
+hands `makeClips` `validatingVideoPort(guardedVideoPort(context.video, db, …))`**, so a request is validated before the
+guard and before the port the worker was given (Gate 2, _"Clips"_). `reel-render`'s check 17 reads its clause _"clips-job.ts
+hands makeClips only the port video-port.ts builds"_ as: the `video` property of the one `makeClips` call is a call of
+`validatingVideoPort`, imported from `./video-port.ts`, whose argument is a call of a builder imported from the same file.
+
+**Why.** Check 6 tests `validatingVideoPort` itself, and every request the clips stage builds passes the validator, so
+no engine run can see the validator missing from the port the stage is handed. Only the composition's place in the
+source can: kept in `clips-job.ts`, it is one expression a check can read.
+
+**Rejected.** **Growing `validatingVideoPort`'s signature with the guard's database and job** — the change S-077 and
+session 23's prompt anticipated; check 6 would need a database, a run and a job row to call the port it tests, for no
+assertion. **One `videoPort(video, db, job)` builder in `video-port.ts` composing both** — a builder that dropped the
+validator would be caught by nothing, for the reason above.
+
+**Caught by.** `reel-render`'s check 17: session 23's break 17m, `clips-job.ts` handing the guarded port with no
+validator around it, caught by 17 alone; break 17l, a third file calling a video port's `generate`, caught by 17 alone.
+Check 6 catches the validator itself.

@@ -1,12 +1,17 @@
 import type {
+  AssemblerPort,
   ImagePort,
   LanguageModelPort,
+  MediaPort,
+  NarrationPort,
   PictureSensorPort,
   PlanSettings,
   RenderSettings,
   StillsSettings,
+  VideoPort,
 } from '@cutroom/contracts'
 import {
+  ASSEMBLE_JOB,
   BUDGET_MD,
   buryJob,
   claimJob,
@@ -23,7 +28,8 @@ import {
   DEFAULT_STILLS_SETTINGS,
   GATE_ORDER,
 } from '@cutroom/pipeline'
-import { runClipsJob } from './clips-job.ts'
+import { runAssembleJob } from './assemble-job.ts'
+import { runClipsJob, type ClipsJobContext } from './clips-job.ts'
 import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
@@ -73,6 +79,22 @@ export interface WorkerOptions {
    * run — makes the worker refuse to start (D-052, S-067).
    */
   renderSettings?: RenderSettings
+  /**
+   * The only way the worker makes a clip (S-071, S-075). Required, like `image`: whoever starts the
+   * worker chooses whether a clip can cost money. The worker wraps it so every request is validated,
+   * then recorded with its receipt (video-port.ts).
+   */
+  video: VideoPort
+  /** The only way the worker makes a narration (S-070). Wrapped so every call is recorded. */
+  narration: NarrationPort
+  /**
+   * The only way the worker measures a file (S-075): ffmpeg and ffprobe behind a port. Its `ready()`
+   * is awaited before the database is opened, and a worker whose tools cannot be run, or lack an
+   * encoder or a filter, refuses to start.
+   */
+  media: MediaPort
+  /** The only way the worker assembles a video (S-073), made ready the same way. */
+  assembler: AssemblerPort
 }
 
 /**
@@ -111,6 +133,20 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
   const refused = refusal(options, stills, render)
   if (refused !== undefined) throw new Error(`the worker refuses to start: ${refused}`)
 
+  // Only then the tools, and still before the database is opened, so a worker that could not measure
+  // or assemble a clip claims no job and buys nothing (S-075, S-077's order).
+  for (const [name, port] of [
+    ['media port', options.media],
+    ['assembler', options.assembler],
+  ] as const) {
+    try {
+      await port.ready()
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error)
+      throw new Error(`the worker refuses to start: its ${name} is not ready: ${reason} (S-075)`)
+    }
+  }
+
   const db = openDatabase(options.dbPath)
   const pollMs = options.pollMs ?? 500
   const leaseMs = options.leaseMs ?? DEFAULT_LEASE_MS
@@ -130,16 +166,27 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     budgetPath: context.budgetPath,
     questionsPath: context.questionsPath,
   }
+  const clips: ClipsJobContext = {
+    model: options.model,
+    video: options.video,
+    narration: options.narration,
+    media: options.media,
+    settings,
+    render,
+  }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined
   let current: Promise<void> = Promise.resolve()
 
   async function drain(): Promise<void> {
     while (!stopped) {
-      const job = claimJob(db, [PLAN_JOB, KEYFRAMES_JOB, CLIPS_JOB], new Date(), leaseMs)
+      const kinds = [PLAN_JOB, KEYFRAMES_JOB, CLIPS_JOB, ASSEMBLE_JOB]
+      const job = claimJob(db, kinds, new Date(), leaseMs)
       if (job === undefined) return
       try {
-        if (job.kind === CLIPS_JOB) await runClipsJob(db, job)
+        // The assemble job is handed no image, narration or video port (I-18, S-069).
+        if (job.kind === ASSEMBLE_JOB) await runAssembleJob(db, job)
+        else if (job.kind === CLIPS_JOB) await runClipsJob(db, job, clips)
         else if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job, keyframes)
         else await runPlanJob(db, job, context)
       } catch (error) {

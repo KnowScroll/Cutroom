@@ -3,8 +3,26 @@
 // stage is its one caller (D-073).
 
 export { admitPictures, admitVideo } from './admit.ts'
+export { takeCriteria } from './clips/criteria.ts'
+export {
+  makeClips,
+  type ClipsEvent,
+  type ClipsInput,
+  type ClipsOutcome,
+  type ClipsPorts,
+  type ClipsRecord,
+  type ClipsStageSettings,
+} from './clips/index.ts'
+export { narrationIdOf, readNarrationId, readTakeId, takeIdOf } from './clips/ids.ts'
+export { narrationText, requestedSeconds, wordTimings } from './clips/narration.ts'
 export { clipObservation } from './clips/observation.ts'
-export { NEGATIVE_AUDIO } from './clips/prompts.ts'
+export {
+  NEGATIVE_AUDIO,
+  clipPrompt,
+  takeReconcileAnswer,
+  takeReconcilePrompt,
+  type ClipBrief,
+} from './clips/prompts.ts'
 export { validateVideoRequest } from './clips/validate.ts'
 export { estimate } from './estimate.ts'
 export { GATE_ORDER, gate0 } from './gates/index.ts'
