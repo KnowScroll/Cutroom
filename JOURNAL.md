@@ -1726,3 +1726,31 @@ assemble job's cancel read. Checks 11–28. Worth carrying into its prompt: a jo
 (S-081), and check 11 as the owner of breaks 9j, 9k and 9p. Owed outside this repository, unchanged: KnowScroll's check
 of a returned video (S-068) and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the
 steering stubs and the pin (S-033).
+
+## 2026-09-17 — session 22, continued: the prompt for reel-render's Slice 3
+
+**Intent.** The owner asked for the next session's prompt.
+
+**Changed.**
+
+- **`PROMPTS/023-reel-render-slice-3.md`** — session 23's prompt, `Run: not yet`: Slice 3 only, checks 11–28, tests
+  first. It names what to read (sessions 22, 21 and 17, Gate 2's sections on narration, clips, Gates 2 to 5, spending,
+  endings, ports, ffmpeg, media and storage, the Slice 3 signatures and checks, S-066 and S-069 to S-082 with the
+  entries they rest on, the code and the tests Slice 3 changes or copies), what Slice 3 builds and what it does not —
+  the placeholder assemble job ending _"assembly is not built"_, the guards' refusals left to Slice 5 — a working order,
+  collision candidates to look at before any test, the break campaign, when to stop and ask, and the traps. Indexed in
+  `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Checked while writing, so the prompt does not guess.** `ffmpeg` and `ffprobe` 8.1.1 run from PATH on this machine,
+  through WinGet's Links folder. `tests/engine/source.ts`' `names` collects variables at any depth, object-literal keys
+  and Drizzle columns, so D-096's and S-073's banned names reach an ffmpeg input named `source` or a column named
+  `manifest` — said in the prompt. `.gitignore` names `*.mp4` and `*.wav` and no subtitles extension; Slice 3 writes no
+  subtitles, and check 19 asserts none is tracked. `startWorker` is called directly by `harness.ts`, `worker-process.ts`,
+  `reel-stills-prompts` and `reel-render-profile` — the last not in S-077's list, since it was written in Slice 1.
+- **The prompt asks the session to stop and ask the owner** if eighteen checks will not fit, rather than cutting the
+  slice itself.
+- Nothing but markdown changed.
+
+**Next.** Session 23: run `PROMPTS/023-reel-render-slice-3.md`.
