@@ -4,7 +4,7 @@
 - **Feature:** `reel-render` — [`docs/features/reel-render.md`](../docs/features/reel-render.md)
 - **Work:** Slice 4 of 6 — assembly, Gate 7 and a video; checks 29–41, tests first; no journey
 - **Written:** 2026-09-18, in session 24, after `reel-render`'s Slice 3 was committed (34380f2) and pushed
-- **Run:** not yet
+- **Run:** session 25
 
 Paste everything inside the block below as the session's first message.
 

@@ -4,11 +4,13 @@
 export { BUDGET_MD, readReelCapCents } from './budget.ts'
 export {
   readClipsInputs,
+  readRenderInputs,
   recordClip,
   recordNarration,
   upsertNarration,
   upsertTake,
   type ClipsInputs,
+  type RenderInputs,
 } from './clips.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
 export { imageCallCount, recordGeneration, spentCents } from './ledger.ts'
@@ -33,10 +35,13 @@ export {
   readSelectedPlan,
   recordReceipt,
   requestCancel,
+  startRender,
   startStage,
   submitRun,
   type EventBody,
+  type HeldShot,
   type PlanRow,
+  type RenderEnding,
   type Stage,
   type StoredRun,
   type Submitted,

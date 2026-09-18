@@ -31,6 +31,8 @@ data/
 *.jpg
 *.jpeg
 *.webp
+# The subtitles file the assembler writes beside its output (S-073)
+*.ass
 !docs/**/*.png
 
 # Node

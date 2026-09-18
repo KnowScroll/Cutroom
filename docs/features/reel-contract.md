@@ -36,6 +36,14 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > - **_"`estimateCents` is the figure that was compared with the limit"_ still holds**, and for a
 >   `stills` run refused at the ceiling that figure is **the pictures' share of the estimate**, not the
 >   whole plan's (**S-030**).
+>
+> **Noted by `reel-render` on 2026-09-18 — nothing in this package changed, and the gates below are not
+> edited (S-077).** Since `reel-render`'s Slice 4 **the real engine answers `until: 'video'`**: a
+> completed run's result carries `video`, the assembled file's absolute path under the engine's artifact
+> root, beside its `stills` and its `degradations` — the stills stage's in the order reached, then each
+> shot whose clip was held to its narration, in shot order (S-073). **The record still lists pictures
+> only**; its `degradations` list the same holds. Takes in the record are _Pending_ item 1, and go to
+> `reel-takes`.
 
 ## Gate 1 — Product (no technical language)
 

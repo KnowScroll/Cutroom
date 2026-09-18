@@ -1,7 +1,12 @@
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, max, sql } from 'drizzle-orm'
 import type {
+  ClipObservation,
+  ClipReconciliation,
   NarrationReceipt,
   NarrationRecord,
+  PictureRecord,
+  RenderManifest,
+  RenderShot,
   TakeRecord,
   VideoReceipt,
   VideoRequest,
@@ -10,6 +15,7 @@ import type {
 import type { Db } from './db.ts'
 import {
   degradation,
+  generationReceipt,
   job,
   narration,
   observation,
@@ -291,4 +297,150 @@ export function readClipsInputs(db: Db, runId: string): ClipsInputs {
     .map((row) => Number(/^shot-(\d+)$/.exec(row.shotId)?.[1] ?? Number.NaN))
     .filter((unit) => Number.isInteger(unit))
   return { stills, degradedShots }
+}
+
+/** What a render manifest is built from, read from the run's rows (S-073). */
+export interface RenderInputs {
+  /** The chosen pictures, in shot order, each with the verdicts that approved it. */
+  stills: Array<{ pictureId: string; shotUnit: number; verdicts: RenderShot['verdicts'] }>
+  /** The stills stage's degradations, in the order it reached them (S-058). */
+  degradations: Array<{ shotId: string; reason: string }>
+  /** The finishing clips attempt's takes, in the order made. */
+  takes: TakeRecord[]
+  /** The same attempt's narrations. */
+  narrations: NarrationRecord[]
+  /** What the run's image, narration and video calls cost, every attempt's (D-081). */
+  ledger: RenderManifest['ledger']
+}
+
+const parsed = <T>(text: string | null): T | null =>
+  text === null ? null : (JSON.parse(text) as T)
+
+/**
+ * The rows a render manifest is built from, once the clips job has completed (S-073): the chosen
+ * pictures with Gate 1's verdict and Gate 1S's where it ran, the stills stage's degradations, THE
+ * FINISHING CLIPS ATTEMPT'S takes and narrations — the latest attempt's, since an attempt run again
+ * starts over and only the one that finished advanced the run (S-076) — and the cost ledger, summed
+ * from the three receipt tables.
+ */
+export function readRenderInputs(db: Db, runId: string): RenderInputs {
+  const stills = db
+    .select({
+      pictureId: picture.pictureId,
+      shotUnit: picture.shotUnit,
+      gate1: picture.gate1,
+      gate1s: picture.gate1s,
+    })
+    .from(picture)
+    .where(and(eq(picture.runId, runId), eq(picture.chosen, true)))
+    .orderBy(picture.shotUnit)
+    .all()
+    .map((row) => {
+      const verdicts: RenderShot['verdicts'] = []
+      const gate1 = parsed<NonNullable<PictureRecord['gate1']>>(row.gate1)
+      if (gate1 !== null && gate1.outcome !== null) {
+        verdicts.push({ gate: '1', outcome: gate1.outcome, coverage: gate1.coverage })
+      }
+      const gate1s = parsed<NonNullable<PictureRecord['gate1s']>>(row.gate1s)
+      if (gate1s !== null) {
+        verdicts.push({ gate: '1S', outcome: gate1s.outcome, coverage: gate1s.coverage })
+      }
+      return { pictureId: row.pictureId, shotUnit: row.shotUnit, verdicts }
+    })
+
+  const degradations = db
+    .select({ shotId: degradation.shotId, reason: degradation.reason })
+    .from(degradation)
+    .where(eq(degradation.runId, runId))
+    .orderBy(sql`rowid`)
+    .all()
+
+  const finishing =
+    db
+      .select({ attempt: max(take.attempt) })
+      .from(take)
+      .where(eq(take.runId, runId))
+      .get()?.attempt ?? 0
+  const observed = new Map(
+    db
+      .select({ takeId: takeObservation.takeId, observation: takeObservation.observation })
+      .from(takeObservation)
+      .where(eq(takeObservation.runId, runId))
+      .all()
+      .map((row) => [row.takeId, JSON.parse(row.observation) as ClipObservation]),
+  )
+  const reconciled = new Map(
+    db
+      .select()
+      .from(takeReconciliation)
+      .where(eq(takeReconciliation.runId, runId))
+      .all()
+      .map((row) => {
+        const answer = JSON.parse(row.answer) as Pick<ClipReconciliation, 'subjects' | 'criteria'>
+        return [row.takeId, { ...answer, failed: JSON.parse(row.failed) as string[] }] as const
+      }),
+  )
+  const takes = db
+    .select()
+    .from(take)
+    .where(and(eq(take.runId, runId), eq(take.attempt, finishing)))
+    .orderBy(sql`rowid`)
+    .all()
+    .map((row): TakeRecord => ({
+      takeId: row.takeId,
+      attempt: row.attempt,
+      shotUnit: row.shotUnit,
+      number: 1,
+      mode: row.mode,
+      pictureId: row.pictureId,
+      degraded: row.degraded,
+      prompt: row.prompt,
+      durationSeconds: row.requestedSeconds,
+      seed: row.seed,
+      requestId: row.requestId,
+      expandedPrompt: row.expandedPrompt,
+      path: row.path,
+      probe: parsed(row.probe),
+      scan: parsed(row.scan),
+      words: parsed(row.words),
+      sound: parsed(row.sound),
+      observation: observed.get(row.takeId) ?? null,
+      reconciliation: reconciled.get(row.takeId) ?? null,
+      verdicts: JSON.parse(row.verdicts) as TakeRecord['verdicts'],
+      outcome: row.outcome,
+      degradation: row.degradation,
+    }))
+  const narrations = db
+    .select()
+    .from(narration)
+    .where(and(eq(narration.runId, runId), eq(narration.attempt, finishing)))
+    .orderBy(sql`rowid`)
+    .all()
+    .map((row): NarrationRecord => ({
+      narrationId: row.narrationId,
+      attempt: row.attempt,
+      shotUnit: row.shotUnit,
+      text: row.text,
+      path: row.path,
+      words: parsed(row.words),
+      probe: parsed(row.probe),
+    }))
+
+  const spent = (table: typeof generationReceipt | typeof speechReceipt | typeof videoReceipt) =>
+    db
+      .select({ cents: sql<number>`COALESCE(SUM(${table.costCents}), 0)` })
+      .from(table)
+      .where(eq(table.runId, runId))
+      .get()?.cents ?? 0
+  return {
+    stills,
+    degradations,
+    takes,
+    narrations,
+    ledger: {
+      imageCents: spent(generationReceipt),
+      narrationCents: spent(speechReceipt),
+      videoCents: spent(videoReceipt),
+    },
+  }
 }

@@ -11,15 +11,42 @@ import { spawn } from 'node:child_process'
 /** Every encoder the stand-in's clips and the one pass write with (D-055, D-056). */
 export const REQUIRED_ENCODERS: readonly string[] = ['libx264', 'aac']
 
+/** Every filter the scan uses (S-072). */
+export const SCAN_FILTERS = ['blackdetect', 'freezedetect', 'silencedetect', 'ebur128'] as const
+
 /**
- * Every filter the scan uses (S-072). The pass and the frame strip add theirs when they are built
- * (reel-render's Slice 4).
+ * Every filter the one pass uses (S-073). The assembler writes a filter only by a name from this
+ * list, so the pass cannot come to need one `ready()` never asked the tools for.
  */
+export const PASS_FILTERS = [
+  'scale',
+  'pad',
+  'setsar',
+  'fps',
+  'format',
+  'trim',
+  'tpad',
+  'concat',
+  'ass',
+  'aresample',
+  'aformat',
+  'atrim',
+  'apad',
+  'volume',
+  'amix',
+  'anullsrc',
+] as const
+export type PassFilter = (typeof PASS_FILTERS)[number]
+
+/** Every filter the frame strip uses (S-074). */
+export const STRIP_FILTERS = ['select'] as const
+export type StripFilter = (typeof STRIP_FILTERS)[number]
+
+/** Every filter the scan, the pass and the strip use: what `ready()` requires by default (S-075). */
 export const REQUIRED_FILTERS: readonly string[] = [
-  'blackdetect',
-  'freezedetect',
-  'silencedetect',
-  'ebur128',
+  ...SCAN_FILTERS,
+  ...PASS_FILTERS,
+  ...STRIP_FILTERS,
 ]
 
 /** What one run of a tool printed, and how it ended. */

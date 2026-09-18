@@ -2727,3 +2727,77 @@ validator would be caught by nothing, for the reason above.
 **Caught by.** `reel-render`'s check 17: session 23's break 17m, `clips-job.ts` handing the guarded port with no
 validator around it, caught by 17 alone; break 17l, a third file calling a video port's `generate`, caught by 17 alone.
 Check 6 catches the validator itself.
+
+---
+
+## S-084 | 2026-09-18 | A caption style is in the output's own pixels: the subtitles file's geometry is the profile's
+
+**Chose.** The subtitles file the assembler writes (S-073) declares **the render manifest's profile as its geometry** —
+`PlayResX` and `PlayResY` are the profile's width and height — so a caption style's `fontSize` and `marginV` are pixels
+of the output, and everything that places a caption is in the manifest. **A profile of another size is handed a caption
+style of its own**: the default style, 48-pixel words 200 above the foot, is sized for the default 768 × 1366, and the
+small profile every test but one renders at (`TEST_RENDER_SETTINGS`, 108 × 192) carries `word-captions-test`, 12-pixel
+words 20 above the foot — test support, no assertion.
+
+**Why.** D-059 and S-073: the manifest, with the files it names, is the assembler's only input, and _"D-059's manifest
+must hold everything the pass reads"_. A reference geometry the style is sized against would be a number the pass
+reads that no manifest holds. The style's type is Gate 3's — an id, a font, a size, a margin — and has no field for one.
+
+**Rejected.** **A fixed reference geometry in the assembler** — 768 × 1366, say — with every style scaled from it to the
+profile: one style would serve every profile, but the constant is an input outside the manifest, a replay under another
+build could burn another size from the same stored manifest, and a profile of another shape would stretch the margin
+and not the font. **A reference geometry added to the caption style** — Gate 3's signature, which this slice does not
+edit.
+
+**Caught by.** `reel-render`'s check 33, which measures the caption band of the output at the small profile: with the
+subtitles file's geometry anything but the profile's, 12-pixel words are burned at another size or outside the band, and
+a frame inside a word is no brighter than the gap before it. Session 25's break 33e, the geometry a fixed 768 × 1366,
+caught by 33 and by 36's caption-text clause.
+
+---
+
+## S-085 | 2026-09-18 | The render row's hash is SHA-256 over the text the row stores, computed by the worker
+
+**Chose.** `startRender` stores **`canonicalJson(renderManifest)`** — the domain's one serialiser, keys sorted at every
+depth — as the row's `render_manifest`, and **the worker hands it the SHA-256, in hex, of exactly that text**
+(`assemble-job.ts`, `node:crypto`). So the hash can be computed again from the row alone, by anyone, and a replay reads
+the stored text and nothing else.
+
+**Why.** Gate 3 hands `startRender` the manifest and its hash, so the hash is made before the domain is called; the
+pipeline imports no Node module, so it cannot be made there without a hand-written digest; and a hash over any other
+serialising of the same manifest — `JSON.stringify`, whose key order is the builder's — could not be checked against
+what the row holds.
+
+**Rejected.** **A SHA-256 written by hand in the pipeline**, as the seed's CRC-32 was (S-071) — forty lines nothing
+else needs, where a CRC is four. **Hashing inside `startRender`** — Gate 3's signature hands the hash in, and the
+function that writes a receipt should not also be the only witness to what it wrote. **Hashing `JSON.stringify` of
+the manifest** — above.
+
+**Caught by.** `reel-render`'s check 29 computes SHA-256 over the row's stored text and holds the row's hash to it, and
+check 36 does so again after a replay. Session 25's breaks 29m, the hash of another serialising, and 29n, another
+text stored, each caught by 29 and 36.
+
+---
+
+## S-086 | 2026-09-18 | Gate 7 is shown a shot's sentences as the render manifest holds them: its narration's words, joined
+
+**Chose.** `cutReel` is handed the render manifest and nothing else about the run (Gate 3), and the manifest holds a
+shot's narration as its word timings. **The `sentences` a `judgeCut` call carries for a shot are one string: the shot's
+words in order, joined by one space** — which is the narration's text, since that text is its unit's sentences joined by
+one space and its timings are every word of it, in order (S-070).
+
+**Why.** S-074 gives the judge _"each shot in timeline order with its frames and its sentences"_ so that it can hold
+the burned captions against the narration; the words joined are those sentences, to the letter. Gate 7 then judges a
+render from the one document the render was made from, so a stored manifest is enough to judge its file again (S-076).
+
+**Rejected.** **Handing `cutReel` the plan and the request** to read each unit's sentences one by one — a second input
+to the cut, against Gate 3's signature, for the same words in more strings. **A `sentences` field on the manifest's
+shot** — Gate 3's `RenderShot`, which this slice does not edit. **Splitting the text at full stops** — a guess, wrong for
+an abbreviation.
+
+**Not handled.** A caller's sentence holding two spaces together reaches the judge with one, as it reaches the
+narration's timings (S-070 splits on white space).
+
+**Caught by.** `reel-render`'s check 38 holds each shot's `sentences`, joined by one space, to its unit's sentences typed
+by hand and joined the same way. Session 25's breaks 38f, no sentences, and 38g, the words joined by two spaces, each
+caught by 38 alone.

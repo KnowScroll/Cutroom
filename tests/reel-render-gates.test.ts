@@ -111,11 +111,12 @@ test("20. every take's verdicts are gates 2, 3, 4 and 5 in order, each with an o
     }
 
     // Each verdict is an event once its gate completes, shot by shot, in plan order (S-069). What the
-    // assemble job writes after them is Slice 4's, and not read here.
+    // assemble job writes after them — Gate 7's verdict, since reel-render's Slice 4 — is its own
+    // checks', and not read here: the clips job's events are the twenty-four after the stage's start.
     const events = described(ran.events)
     const stage = events.slice(events.indexOf('stage.started video') + 1)
     assert.deepEqual(
-      stage.filter((e) => e.startsWith('verdict')),
+      stage.slice(0, 24),
       [0, 1, 2, 3, 4, 5].flatMap((u) =>
         ['2', '3', '4', '5'].map((g) => `verdict ${g} shot-${u} accept`),
       ),

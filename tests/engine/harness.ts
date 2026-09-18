@@ -5,7 +5,9 @@ import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { startApi, type Api } from '@cutroom/api'
 import type {
+  AssemblerPort,
   LanguageModelPort,
+  MediaPort,
   NarrationPort,
   PlanSettings,
   RenderSettings,
@@ -55,6 +57,9 @@ export const TEST_RENDER_SETTINGS: RenderSettings = {
     sampleRate: 48000,
     channels: 2,
   },
+  // A caption style is in the output's own pixels (S-084): the default's 48-pixel words 200 above
+  // the foot are sized for 768 × 1366 and would stand outside a frame 192 high.
+  captionStyle: { id: 'word-captions-test', fontName: 'Arial', fontSize: 12, marginV: 20 },
 }
 
 /**
@@ -160,6 +165,10 @@ export interface EngineOptions {
   wrapVideo?: (video: VideoPort) => VideoPort
   /** Wraps the narration port the worker is handed. */
   wrapNarration?: (narration: NarrationPort) => NarrationPort
+  /** Wraps the media port the worker is handed — how a test sees or changes what is measured. */
+  wrapMedia?: (media: MediaPort) => MediaPort
+  /** Wraps the assembler the worker is handed — how a test changes the file an assembly leaves. */
+  wrapAssembler?: (assembler: AssemblerPort) => AssemblerPort
 }
 
 export async function startEngine(options: EngineOptions): Promise<Engine> {
@@ -185,6 +194,8 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
   const wrap = options.wrapModel ?? ((model: LanguageModelPort) => model)
   const wrapVideo = options.wrapVideo ?? ((video: VideoPort) => video)
   const wrapNarration = options.wrapNarration ?? ((narration: NarrationPort) => narration)
+  const wrapMedia = options.wrapMedia ?? ((media: MediaPort) => media)
+  const wrapAssembler = options.wrapAssembler ?? ((assembler: AssemblerPort) => assembler)
 
   const engine: Engine = {
     dir,
@@ -210,8 +221,8 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
         sensors: engine.sensors,
         video: wrapVideo(engine.video),
         narration: wrapNarration(engine.narration),
-        media: engine.media,
-        assembler: engine.assembler,
+        media: wrapMedia(engine.media),
+        assembler: wrapAssembler(engine.assembler),
         settings,
         renderSettings,
         questionsPath,

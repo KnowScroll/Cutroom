@@ -37,8 +37,13 @@ export { planningAnswer, scoreAnswer } from './plan/prompts.ts'
 export { repairBasis } from './plan/repair.ts'
 export { scorePlan } from './plan/score.ts'
 export { plannedImageCalls, rankSubjects } from './rank.ts'
-export { DEFAULT_RENDER_SETTINGS } from './render/index.ts'
-export { renderManifestSchema } from './render/manifest.ts'
+export { DEFAULT_RENDER_SETTINGS, cutReel, type CutOutcome } from './render/index.ts'
+export {
+  renderIdOf,
+  renderManifest,
+  renderManifestSchema,
+  type RenderInput,
+} from './render/manifest.ts'
 export { criteriaFor } from './stills/criteria.ts'
 export {
   DEFAULT_STILLS_SETTINGS,

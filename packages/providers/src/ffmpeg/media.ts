@@ -1,14 +1,17 @@
+import { existsSync, mkdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import type { ClipRef, ClipScan, ClipSound, MediaPort, MediaProbe } from '@cutroom/contracts'
+import { DEFAULT_ARTIFACT_ROOT, artifactPath } from '../artifacts.ts'
 import { entryFor } from '../fake/key.ts'
-import type { FfmpegTools } from './tools.ts'
+import type { FfmpegTools, StripFilter } from './tools.ts'
 
-// The MediaPort on ffmpeg and ffprobe (docs/features/reel-render.md, Gate 2 "The ports" and "Gates 2
-// to 5 on each take"; S-072, S-075). Its probe and its scan are REAL: they measure the file on disk
-// (I-17), so a stand-in clip's black second is found by blackdetect and not by reading a script. Its
-// words and its sound answer from a script, defaulting to no words and neither speech nor music —
-// real text-reading and sound-classifying are the paid path's — and any method can be scripted to
-// throw. Its frame strip is reel-render's Slice 4.
+// The MediaPort on ffmpeg and ffprobe (docs/features/reel-render.md, Gate 2 "The ports", "Gates 2
+// to 5 on each take" and "Gate 7"; S-072, S-074, S-075). Its probe, its scan and its frame strip are
+// REAL: they measure and read the file on disk (I-17), so a stand-in clip's black second is found by
+// blackdetect and not by reading a script. Its words and its sound answer from a script, defaulting
+// to no words and neither speech nor music — real text-reading and sound-classifying are the paid
+// path's — and any method can be scripted to throw.
 
 export type MediaMethod = 'probe' | 'scan' | 'readText' | 'listen' | 'frames'
 
@@ -133,6 +136,7 @@ export function ffmpegMedia(
   options: { artifactRoot?: string; script?: FakeMediaScript } = {},
 ): FfmpegMedia {
   const script = options.script ?? {}
+  const root = options.artifactRoot ?? DEFAULT_ARTIFACT_ROOT
   const calls: MediaCall[] = []
 
   /** The script's entry for an id, or the throw it asks this method for. */
@@ -256,10 +260,75 @@ export function ffmpegMedia(
       return { speech: entry.speech ?? false, music: entry.music ?? false }
     },
 
-    async frames(file) {
+    async frames(file, atSeconds) {
       calls.push({ method: 'frames', id: file.renderId, path: file.path })
       scripted('frames', file.renderId)
-      throw new Error('the frame strip is not built (reel-render Slice 4)')
+      // `<root>/<runId>/<renderId>-frame-<n>.png`, refused before anything is read or written when
+      // either id would leave the root (D-086).
+      const pathOf = (n: number) =>
+        artifactPath(
+          root,
+          { runId: file.runId, id: `${file.renderId}-frame-${n}`, what: 'renderId' },
+          '.png',
+          'the frame strip',
+        )
+      pathOf(0)
+      if (atSeconds.length === 0) return []
+
+      // A time is a frame of THIS file: the one its frame rate puts there.
+      const asked = await tools.run('ffprobe', [
+        '-v',
+        'error',
+        '-select_streams',
+        'v:0',
+        '-show_entries',
+        'stream=r_frame_rate',
+        '-of',
+        'json',
+        file.path,
+      ])
+      let fps = 0
+      try {
+        fps = rate((JSON.parse(asked.stdout) as Probed).streams?.[0]?.r_frame_rate)
+      } catch {
+        fps = 0
+      }
+      if (asked.code !== 0 || !(fps > 0)) {
+        throw new Error(`the frame strip of ${file.renderId} found no frame rate in ${file.path}`)
+      }
+      const numbers = atSeconds.map((seconds) => Math.max(0, Math.round(seconds * fps)))
+      // One pass writes each frame once, in the file's order; a frame asked for twice is one file.
+      const written = [...new Set(numbers)].sort((x, y) => x - y)
+      const picked: StripFilter = 'select'
+      mkdirSync(dirname(pathOf(0)), { recursive: true })
+      const ran = await tools.run('ffmpeg', [
+        '-hide_banner',
+        '-nostdin',
+        '-y',
+        '-i',
+        file.path,
+        '-vf',
+        `${picked}='${written.map((n) => `eq(n,${n})`).join('+')}'`,
+        '-fps_mode',
+        'passthrough',
+        '-start_number',
+        '0',
+        // The numbered name the image writer fills in; a `%` of the folder's own is kept literal.
+        join(dirname(pathOf(0)).replace(/%/g, '%%'), `${file.renderId}-frame-%d.png`),
+      ])
+      if (ran.code !== 0) {
+        throw new Error(
+          `the frame strip of ${file.renderId} ended with code ${ran.code}: ${ran.stderr.trim().split(/\r?\n/).slice(-3).join(' | ')}`,
+        )
+      }
+      return numbers.map((number) => {
+        const n = written.indexOf(number)
+        const path = pathOf(n)
+        if (!existsSync(path)) {
+          throw new Error(`the frame strip of ${file.renderId} has no frame ${number} at ${path}`)
+        }
+        return { pictureId: `${file.renderId}-frame-${n}`, path }
+      })
     },
   }
 }

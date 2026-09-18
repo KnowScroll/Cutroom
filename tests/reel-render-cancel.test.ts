@@ -19,8 +19,10 @@ import {
 // nothing more is made. A cancel during a stage does not stop that stage: here the cancel lands while
 // the stage before is held at one of its model calls, so the job it cancels has not started.
 //
-// The render-row clause is green before any code: nothing writes a render row until reel-render's
-// Slice 4. Its table arrives with Slice 3's migration, which is what lets the clause be asked at all.
+// The render-row clause was green before any code: nothing wrote a render row until reel-render's
+// Slice 4. Its table arrived with Slice 3's migration, which is what let the clause be asked at all.
+// Since Slice 4 the assemble job writes one before it calls the assembler, and the clause can fail: a
+// render row written before the cancel is read is caught here.
 
 const [, b] = THREE_RANKS_PICS as [Pic, Pic, Pic, Pic]
 

@@ -1246,7 +1246,7 @@ _Restart, and no secrets_
       `failed` with the detail _"assembly is not built"_, which no check asserts. `CLAUDE.md`'s ports and ffmpeg trap.
       **Check 11's render-row clause and check 28's second half are green before this slice's code** (each says why).
       **Proves: 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28.**
-- [ ] **Slice 4 — assembly, Gate 7 and a video.** `renderManifest` with spans, holds, conform notes and captions;
+- [x] **Slice 4 — assembly, Gate 7 and a video.** `renderManifest` with spans, holds, conform notes and captions;
       `startRender`; `ffmpegAssembler` — the one pass, the conform, the mix, the captions, the root refusal; the output
       measured, and the output check naming its difference; the media port's `frames`; Gate 7 and `judgeCut`;
       `finishVideo` with the holds' labels, the events and the result; `readRecord` listing holds; the note in

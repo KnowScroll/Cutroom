@@ -1,6 +1,14 @@
 import { randomUUID } from 'node:crypto'
 import { and, asc, eq, gt, max, sql } from 'drizzle-orm'
-import type { Gate0Verdict, ModelReceipt, Plan } from '@cutroom/contracts'
+import type {
+  AssembledFile,
+  CutVerdict,
+  Gate0Verdict,
+  MediaProbe,
+  ModelReceipt,
+  Plan,
+  RenderManifest,
+} from '@cutroom/contracts'
 import {
   CONTRACT_VERSION,
   SubmitRequest,
@@ -11,7 +19,7 @@ import {
 import type { Db } from './db.ts'
 import { markChosen, markDegraded, type DegradedShot } from './pictures.ts'
 import { completeJob, enqueue, type Writer } from './queue.ts'
-import { modelReceipt, plan, run, runEvent } from './schema.ts'
+import { hold, modelReceipt, plan, render, run, runEvent, take, videoReceipt } from './schema.ts'
 
 // Runs and their event record (docs/features/reel-plan.md, Gate 2 "How the contract's rules are
 // kept"). Every write that numbers an event happens inside one immediate transaction, so the
@@ -411,19 +419,108 @@ export function advanceClips(
 }
 
 /**
+ * ASSEMBLY BEGINS (I-18, S-073): the render row, written with its render manifest, that manifest's
+ * hash, the profile and its start time BEFORE the assembler is called. The text stored is the
+ * manifest's canonical JSON, and the hash handed in is of exactly that text, so the row's hash can be
+ * computed again from the row (S-085). Its start is the time a check compares every receipt with.
+ */
+export function startRender(
+  db: Db,
+  r: {
+    runId: string
+    jobId: number
+    attempt: number
+    renderManifest: RenderManifest
+    hash: string
+  },
+  now: Date = new Date(),
+): void {
+  db.insert(render)
+    .values({
+      runId: r.runId,
+      renderId: r.renderManifest.renderId,
+      attempt: r.attempt,
+      renderManifest: canonicalJson(r.renderManifest),
+      hash: r.hash,
+      profile: canonicalJson(r.renderManifest.profile),
+      startedAt: now.toISOString(),
+    })
+    .run()
+}
+
+/** A shot whose clip is shorter than its narration, as the render manifest carries it (S-073). */
+export interface HeldShot {
+  shotId: string
+  takeId: string
+  seconds: number
+  reason: string
+}
+
+/** What a render left, written with the ending of the job that made it. */
+export interface RenderEnding {
+  renderId: string
+  holds: readonly HeldShot[]
+  assembled: AssembledFile | null
+  measured: MediaProbe | null
+  gate7: CutVerdict | null
+}
+
+/**
  * Ends a `video` run at one of its video stage's jobs, in one immediate transaction: the events
  * before the end, `run.finished`, the result, and the job done — its cost left as its calls added it
- * (S-036), never overwritten with the result's, which is the whole chain's spend (D-081). Slice 4
- * adds a render's holds and measures.
+ * (S-036), never overwritten with the result's, which is the whole chain's spend (D-081).
+ *
+ * From the assemble job it also writes what the render left, WHATEVER THE ENDING (S-058's form, S-073):
+ * the render row's output, invocations, measure, Gate 7 verdict and finish time, and three of each
+ * hold's four labels — its `hold` row, the reason on its take's row beside that take's verdicts, and
+ * its take's video receipt marked degraded. The fourth, its `degraded` event, is among the events.
  */
 export function finishVideo(
   db: Db,
-  f: { runId: string; jobId: number; result: RunResult; events?: readonly EventBody[] },
+  f: {
+    runId: string
+    jobId: number
+    result: RunResult
+    events?: readonly EventBody[]
+    render?: RenderEnding
+  },
   now: Date = new Date(),
 ): void {
   const { runId, jobId, result } = f
   db.transaction(
     (tx) => {
+      if (f.render !== undefined) {
+        const { renderId, holds, assembled, measured, gate7 } = f.render
+        for (const held of holds) {
+          tx.insert(hold)
+            .values({
+              runId,
+              renderId,
+              shotId: held.shotId,
+              seconds: held.seconds,
+              reason: held.reason,
+            })
+            .run()
+          tx.update(take)
+            .set({ degradation: held.reason })
+            .where(and(eq(take.runId, runId), eq(take.takeId, held.takeId)))
+            .run()
+          tx.update(videoReceipt)
+            .set({ degraded: true })
+            .where(and(eq(videoReceipt.runId, runId), eq(videoReceipt.takeId, held.takeId)))
+            .run()
+        }
+        tx.update(render)
+          .set({
+            path: assembled?.path ?? null,
+            invocations: assembled === null ? null : JSON.stringify(assembled.invocations),
+            measure: measured === null ? null : JSON.stringify(measured),
+            gate7: gate7 === null ? null : JSON.stringify(gate7),
+            finishedAt: now.toISOString(),
+          })
+          .where(and(eq(render.runId, runId), eq(render.renderId, renderId)))
+          .run()
+      }
       for (const event of f.events ?? []) append(tx, runId, event, now)
       endRun(tx, runId, result, now)
       completeJob(tx, jobId)

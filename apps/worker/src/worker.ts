@@ -28,7 +28,7 @@ import {
   DEFAULT_STILLS_SETTINGS,
   GATE_ORDER,
 } from '@cutroom/pipeline'
-import { runAssembleJob } from './assemble-job.ts'
+import { runAssembleJob, type AssembleJobContext } from './assemble-job.ts'
 import { runClipsJob, type ClipsJobContext } from './clips-job.ts'
 import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
@@ -174,6 +174,13 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     settings,
     render,
   }
+  // No image, narration or video port: nothing can be bought once assembly begins (I-18, S-069).
+  const assemble: AssembleJobContext = {
+    model: options.model,
+    media: options.media,
+    assembler: options.assembler,
+    render,
+  }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined
   let current: Promise<void> = Promise.resolve()
@@ -184,8 +191,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
       const job = claimJob(db, kinds, new Date(), leaseMs)
       if (job === undefined) return
       try {
-        // The assemble job is handed no image, narration or video port (I-18, S-069).
-        if (job.kind === ASSEMBLE_JOB) await runAssembleJob(db, job)
+        if (job.kind === ASSEMBLE_JOB) await runAssembleJob(db, job, assemble)
         else if (job.kind === CLIPS_JOB) await runClipsJob(db, job, clips)
         else if (job.kind === KEYFRAMES_JOB) await runKeyframesJob(db, job, keyframes)
         else await runPlanJob(db, job, context)

@@ -1970,3 +1970,161 @@ said to push it and write Slice 4's prompt.
 does not read as a lost file.
 
 **Next.** Session 25: run `PROMPTS/025-reel-render-slice-4.md`.
+
+## 2026-09-18/19 — session 25, reel-render Slice 4: assembly, Gate 7 and a video
+
+**Intent.** Run `PROMPTS/025-reel-render-slice-4.md`: `reel-render`'s Slice 4 only — checks 29 to 41, tests first,
+nothing from Slice 5 or later, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green,
+230 tests (ea59e0e). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`packages/pipeline`** — `render/manifest.ts`: **`renderManifest`**, `renderIdOf` and `RenderInput`, below the schema
+  Slice 1 wrote: every shot of the selected plan in plan order, its opening in one of three forms, its take, narration,
+  timings and the clip's measured facts, its span `ceil(seconds × fps)` starting where the last ends, the picture frames
+  used and its hold, its conform notes (`pad:`, `frame rate:`, `silence:` — none for a scale or a resample alone), every
+  verdict decided before assembly with coverage, the captions in reel time, the profile, the gate profile that ran, the
+  caption style, the duck level, the ledger and `totalFrames`; it throws on rows that cannot make one and on a manifest
+  its own schema refuses. **`gates/gate7.ts`** — `cutAnswer` and `gate7`. **`render/index.ts` — `cutReel`**, which never
+  rejects: the pass, the probe, the output check naming each difference, the strip at each span's first, middle and last
+  frame, one `judgeCut`, the verdict.
+- **`packages/providers`** — **`ffmpeg/assemble.ts`**: one ffmpeg invocation — each clip conformed from the manifest's
+  measured facts (`scale`, `pad` to an even offset, `setsar`, `fps`, `format`), `trim` to its picture frames, `tpad`
+  cloning its last frame for a hold; its sound `aresample`d, `atrim`med and `apad`ded to exactly the span's samples and
+  lowered by `volume`, silence from `anullsrc` where it has none; its narration fitted the same way; the two summed by
+  `amix` with `normalize=0`; the shots joined by the `concat` filter; captions burned by `ass` from
+  `<root>/<runId>/<renderId>.ass`; libx264 `veryfast`, AAC, `-movflags +faststart`; both paths refused outside the
+  root. **`ffmpeg/media.ts`** — `frames`, real: the file's frame rate by ffprobe, then one `select` pass writing
+  `<renderId>-frame-<n>.png`, refused outside the root before anything is read. **`ffmpeg/tools.ts`** —
+  `SCAN_FILTERS`, `PASS_FILTERS`, `STRIP_FILTERS`, and `REQUIRED_FILTERS` their union, 21; the assembler can write a
+  filter only by a name of `PassFilter`, so the pass cannot come to need one `ready()` never asked for.
+- **`packages/domain`** — `clips.ts`: **`readRenderInputs`** (the chosen pictures with Gate 1's and 1S's verdicts, the
+  degradations in the order written, the latest clips attempt's takes and narrations, the ledger summed from the three
+  receipt tables); `runs.ts`: **`startRender`** and **`finishVideo`'s `render`** — the row's output, invocations,
+  measure, Gate 7 verdict and finish time, and three of each hold's labels, with any ending; `pictures.ts`:
+  **`readRecord`** listing the latest render's holds, by shot number, after the degradation rows.
+- **`apps/worker`** — **`assemble-job.ts`**: `AssembleJobContext` — the model, the media port, the assembler and the
+  render settings, and no port that buys — then the cancel read, the rows, the manifest, its hash, `startRender`,
+  `cutReel`, the events and one of three endings; `worker.ts` hands it that context.
+- **`DECISIONS.md` — S-084** (a caption style is in the output's own pixels: the subtitles file's geometry is the
+  profile's), **S-085** (the row's hash is SHA-256 over the canonical text the row stores, made by the worker), **S-086**
+  (Gate 7's `sentences` are the manifest's words, joined).
+- **Test support, no assertion**: `tests/engine/harness.ts` — `wrapMedia` and `wrapAssembler`, and
+  `TEST_RENDER_SETTINGS`' own caption style, 12-pixel words 20 above the foot (S-084); `tests/engine/video.ts` —
+  `CUT_QUESTIONS` typed by hand, `cutAnswer`, and **`videoScript` ending its `judge` answers with Gate 7's, all yes**;
+  new `tests/engine/render.ts` — the render and hold rows, and the measures: which take's band each frame carries, shot
+  starts, thumbnails, a row's level, the caption band's bright pixels, a tone's level through two band-passes, ffprobe's
+  counts, a file replaced by another encoding of itself, and rows written by hand for `renderManifest`.
+  **`worker-process.ts` is unchanged**: no Slice 4 check starts a child worker, and a function cannot cross its JSON —
+  wrapping there is Slice 6's to need.
+- **Four test files, `tests/reel-render-{manifest,pass,cut,completed}.test.ts`: +24 tests, 230 → 254.**
+- **Changed in `reel-render`'s own Slice 3 tests, no assertion removed**: check 20's event clause read every verdict
+  after `stage.started video` and said in its comment that what the assemble job writes is not read there; it now holds
+  the twenty-four events after the stage's start to the takes' twenty-four verdicts, since Gate 7's follows them. Check
+  11's comment says its render-row clause is live.
+- `docs/features/reel-contract.md` gains its note naming S-077; `.gitignore` names `*.ass`; `schema.ts`' comment on
+  the render and hold tables; Slice 4 ticked; prompt 025's `Run` line set to session 25, in the file and the index.
+  **`CLAUDE.md` is unchanged**: no sentence in it stopped being true.
+
+**Observed.**
+
+- **Collisions, read before any test.** **`videoScript`'s default cut answer changes every Slice 3 run whose clips
+  stage completes**: it ended `failed` at `judgeCut` for want of an answer and now ends `completed` — checks 13, 15 to
+  20, 21's passing cases, 22 to 24, 27 and 28. None asserted that ending; one read past it (check 20, above). Check 16's
+  16.1-second narration under a 15-second clip is now a real hold of 1.1 s in its run, which it does not read. No
+  verified feature's test changed, and nothing S-077 missed was found: `AssemblerPort` and `MediaPort` are implemented
+  only in `packages/providers` and wrapped only in the new tests, and `runAssembleJob` is called only by the worker.
+- **Red first.** `reel-render-manifest`: a link error, _"does not provide an export named 'renderManifest'"_, for
+  checks 29, 30 and 35 at once. Then, with the pure function and the adapters written and the placeholder job still in
+  place, every engine test of 29 to 34, 36, 38, 39, 40's first and 41: _"assembly is not built"_; 40's second:
+  _"has no exported member 'AssembleJobContext'"_. **Not red on their own, said plainly**: I wrote the assembler and the
+  strip before check 29's refusal test and check 37's source test ran, so both were first seen green — breaks 29p, 29q
+  and 37a to 37f show each fails; check 37's grep clause is green before any code, as review 2 expected. Check 11's
+  render-row clause: break 11d.
+- **Five faults of my own tests, fixed in the tests.** Check 39's by-hand stills events had Gate 1S after each derived
+  picture; the verified stage runs every derived Gate 1, then Gate 1S rank by rank (`reel-stills`' endings list the
+  same). Check 40's wrapper read an engine not yet assigned. The frame finder compared grey thumbnails, and every
+  stand-in clip begins the same pattern again, so shot 5's first frame answered for shot 0's: it compares colour. The
+  hold's stillness was first held to a ratio the encoder misses by a hair (a held frame moves at most 0.45 of a level
+  when x264 sharpens a still; a moving one at least 0.88): it now asks that every moving frame moves, four in five held
+  frames do not at all, none moves as much as the least moving one, and on average a tenth. A one-row crop of a 4:2:0
+  picture is no picture: the row reader converts to grey first.
+- **Measured, not assumed.** A run of six shots, 29 s, at 108 × 192 takes 3.5 s, its render 0.85 s; the default-profile
+  case is the slowest test of the suite. `trim=end_frame` then `tpad=stop_mode=clone:stop=N` gives the frame count
+  exactly, also after `fps=24` on a 30-fps clip (210 frames give 168); 696 frames for the fixtures' 9, 7, 3, 3, 2 and 5
+  seconds, every band beginning at 0, 216, 384, 456, 528 and 576. **ffmpeg moves a pad's odd offset down to the even
+  one** for a 4:2:0 picture — 108 × 190 inside 108 × 192 has both black rows at the foot — so the assembler asks for the
+  even offset itself. The `ass` filter's Windows path works quoted, `\` as `/`, `:` escaped — verified by the burn: 47,
+  88 and 91 bright pixels in the caption band inside a word, 0 in the gap before it. The duck: 220 Hz at −42.1 dB
+  against −24.1 dB, 18.0 lower; 660 Hz at −18.1 dB in both. 108 × 192 into 768 × 1366 is a scale to 768 × 1365 and a pad
+  of one row, noted on every shot of the default-profile run.
+- **Choices the gates left open, not S-entries (nothing rejected could be caught):** the filtergraph's recipe and
+  `veryfast`; a hold made by `tpad` cloning; spans settled to nine places before `ceil`, and a clip's frames at another
+  rate rounded down; the strip's middle frame `start + floor(frames / 2)`; tones measured through two 20-Hz band-passes
+  and `volumedetect`; a boundary found by the nearest take colour within 40; **"live source" in check 37 is every source
+  file under `apps/` and `packages/`, comments included**, `hls` matched as a whole word, the demuxer told from the
+  filter by the `-f` before it.
+- **What Slice 4 builds that no Slice 4 check asserts**: `renderManifest`'s other throws — a take never measured, a take
+  not made from its chosen picture, a narration of no length, a clip with no frame — and that **`request` is carried, as
+  Gate 3 signs it, and not read**; a hold computed for a clip at another frame rate; the output check's other
+  differences — unreadable, a missing stream, a codec, the frame rate, the sample rate, the channels; `cutReel`'s throw
+  for a strip of the wrong length; the strip's one file for a frame asked twice, its `%` escape and its two throws; the
+  subtitles text's escaping and the font's fallback; layouts other than stereo; the failure _"the render manifest could
+  not be built"_ and _"the cut completed with no file"_; `readRenderInputs` choosing the latest clips attempt (check
+  48's); `REQUIRED_FILTERS`' new members (check 12 hands its own list); `startRender`'s unused `jobId`.
+- **S-081's _Not handled_, narrowed.** Check 39 reads all four job rows' costs — 0, 6, 6, 0 — so an assemble job marked
+  at the run's spend is caught (break 39h). **A clips-job ending's job cost is still checked by nothing**: no Slice 4
+  check's words promise it.
+- **A hundred and one deliberate breaks and one control, two run again**, by a runner rebuilt in `.tmp/campaign/`
+  (ignored; the session's scratchpad was withdrawn mid-session): each break's files saved as bytes and `fsync`ed to a
+  record first, restored from them and read back, the record removed; every modified and untracked file hashed after each
+  restore against the chunk's first; a refusal to start while a record exists; every find checked to occur once before
+  the chunk started; the built-in TAP reporter, the counts required. **Narrowed, said plainly**: each break ran `tsc -b`
+  and 123 tests — every `tests/reel-render-*.test.ts`, the four `reel-stills` files that read the record or a completed
+  result (`derived-repair`, `endings`, `contract`, `completed`) and every `reel-contract` file — with
+  `--test-concurrency=6 --test-timeout=240000`, about 65 s a break, one chunk, in the background with a foreground
+  waiter on the runner's own completion line. Memory held. Afterwards: no record, `.artifacts/` empty, the tree's
+  fingerprints unchanged, `check.mjs` green.
+
+  | check | breaks                                                                                                                                                                                                                                                                                                                                                                                                                                                     | caught by                                                                                                                                                   |
+  | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | none  | **control**: a comment in `assemble-job.ts`                                                                                                                                                                                                                                                                                                                                                                                                                | nothing                                                                                                                                                     |
+  | 11    | 11d a render row written before the cancel is read                                                                                                                                                                                                                                                                                                                                                                                                         | 11, and every check that reads one render row                                                                                                               |
+  | 29    | 29a a shot dropped; 29b shots reversed; 29c no join mode; 29d a keyframe opening written unplaced; 29e a degraded shot's reason lost; 29f a placed opening with an empty reason; 29h a verdict's coverage dropped; 29i the picture's verdicts dropped; 29j the gate profile a constant; 29k a ledger of zeros; 29k2 video cents as narration cents; 29l a relative clip path; 29s a failed take rendered                                                   | 29 each; 29a to 29c, 29f and 29l also most of 30 to 41 (the run fails or its spans move); 29e also typecheck                                                |
+  | 29    | 29g conform notes dropped                                                                                                                                                                                                                                                                                                                                                                                                                                  | 31, 32 and typecheck — not 29, whose run needs none                                                                                                         |
+  | 29    | 29m the hash of another serialising; 29n another text stored (S-085)                                                                                                                                                                                                                                                                                                                                                                                       | 29, 36 each                                                                                                                                                 |
+  | 29/40 | 29o the render row written after the assembler is called                                                                                                                                                                                                                                                                                                                                                                                                   | 40 alone                                                                                                                                                    |
+  | 29    | 29p the assembler's refusal removed; 29q the strip's                                                                                                                                                                                                                                                                                                                                                                                                       | 29 each                                                                                                                                                     |
+  | 29    | **29r the manifest not validated by its schema**                                                                                                                                                                                                                                                                                                                                                                                                           | **nothing at first** — fixed by adding: rows giving two shots one narration id must throw. Run again: 29                                                    |
+  | 30    | 30a a span rounded down; 30b every span starting at 0; 30c a trim labelled; 30d no hold row; 30e the take's row without the reason; 30f the receipt not marked; 30g no degraded event; 30h the hold off its manifest shot; 30i holds before the stills' in the result; 30j in the record; 30k an earlier render's holds listed; 30l the record's holds reversed; 30n the hold black, not a clone; 30o the result's reversed                                | 30 each; 30a also 29, 35; 30b also 29, 31 to 36, 38 to 41; 30c also 15, 38, 39; 30d to 30h also 38; 30k also typecheck                                      |
+  | 30/38 | 30m a hold's labels only on a completed ending                                                                                                                                                                                                                                                                                                                                                                                                             | 38 alone — its stopped run holds a shot                                                                                                                     |
+  | 31    | 31a a second invocation; 31b every shot a frame short; 31c a boundary a frame off with the total kept; 31d no `+faststart`; 31e a segment file written; 31f the row's profile a constant; 31g a clip read twice                                                                                                                                                                                                                                            | 31 each; 31b and 31d also every completing run; 31c also 15, 30, 32, 33, 35, 36, 38, 39; 31f also 29                                                        |
+  | 32    | 32a the pad note dropped; 32b the frame-rate note; 32c the silence note; 32d a note for a scale alone; 32e for a resample alone; 32f the rate not converted; 32g no silence added                                                                                                                                                                                                                                                                          | 32 each; 32a and 32d also 31's default profile; 32f and 32g also 37                                                                                         |
+  | 32    | **32h a clip of another shape stretched to the profile, not padded**                                                                                                                                                                                                                                                                                                                                                                                       | **nothing at first** — fixed by adding: two of the padded shot's outermost rows are black, none of an unpadded shot's. Run again: 32                        |
+  | 33    | 33a one caption a shot; 33b no shot offset; 33c offset twice; 33d not burned; 33e the subtitles file's geometry a fixed 768 × 1366 (S-084); 33f a caption held through the gap; 33g burned a second late                                                                                                                                                                                                                                                   | 33 each; 33a to 33c also 35; 33b to 33e also 36                                                                                                             |
+  | 34    | 34a the duck ignored; 34b applied to the narration; 34c only while a word is spoken                                                                                                                                                                                                                                                                                                                                                                        | 34 each; 34b also 32                                                                                                                                        |
+  | 34    | 34d `amix` normalising                                                                                                                                                                                                                                                                                                                                                                                                                                     | **nothing** — a constant 6 dB off both tones; check 34's words are differences, and no check names a level (deferred item 15). I expected it to move: wrong |
+  | 36    | 36a a replay writing over the first file                                                                                                                                                                                                                                                                                                                                                                                                                   | 36, 34, 37                                                                                                                                                  |
+  | 37    | 37a a settings type imported; 37b a database module; 37c the assembler probing the clip; 37d the conform ignoring the measured geometry; 37e a forbidden flag in a comment; 37f a `fetch`                                                                                                                                                                                                                                                                  | 37 each; 37d also 31, 32                                                                                                                                    |
+  | 38    | 38a two `judgeCut` calls; 38b temperature 1; 38c the receipt under role witness; 38d shots reversed; 38e the middle frame wrong; 38e2 the last frame the next shot's; 38f no sentences; 38g words joined by two spaces (S-086); 38h four questions; 38i coverage's number 0; 38j a no accepted; 38k the stop dropping the file from its row; 38l the stop carrying a video; 38m the verdict off the row; 38n the strip a frame late; 38o a reason left out | 38 each; 38a, 38e2, 38h and 38n also every completing run                                                                                                   |
+  | 39    | 39a stills reversed; 39b the video's path relative; 39c `estimateCents` the spend; 39d `costCents` 0; 39e a verdict for gate 8; 39f Gate 7's verdict with a `shotId`; 39g no `stage.finished` for video; 39h the assemble job marked at the run's spend                                                                                                                                                                                                    | 39 each; 39e and 39f also 30, 38; 39g also 30                                                                                                               |
+  | 40    | 40a the context holding a video port; 40b the row's start written when it finishes                                                                                                                                                                                                                                                                                                                                                                         | 40 each                                                                                                                                                     |
+  | 41    | 41a a frame count accepted; 41b a geometry accepted; 41c `mdat` first accepted; 41d failed without naming it; 41e the differing file judged all the same                                                                                                                                                                                                                                                                                                   | 41 each                                                                                                                                                     |
+
+- **Caught by nothing that a check's words promise: two, both fixed by adding** — 29r and 32h, above, each run again and
+  caught. 34d is named by no check's words. **Not built as breaks, said plainly**: a Gate 7 stop writing a question (no
+  code path writes one from the assemble job, and check 38 asserts the file is absent); a stop removing the render row.
+- **No flake in the campaign**: every break's failures were its own. Owed to later slices, unchanged: 19e (check 48),
+  and a thrown port at each step and a short judge answer (check 46) — `cutReel` already turns each into `failed`.
+- **Traps.** A quoted heredoc holding an apostrophe still ended early under the tool's shell and wrote nothing (checked:
+  the file's line count); written with the editing tool. `sed` halved the backslash of the `ass` path in the first
+  experiment, as `CLAUDE.md` warns: the experiment was rewritten as a Node script with an argument array. The
+  scratchpad folder was withdrawn mid-session; logs and the runner went to the ignored `.tmp/`.
+- `node scripts/check.mjs`: **everything green, 254 tests.** Checks 29–41 pass by number (24 tests).
+
+**Next.** `reel-render` Slice 5 — spending and faults: the guards' comparison and refusals, the budget stops and their
+question entries, thrown calls at every port, a short judge answer, every ending's events. Checks 42–47. Worth carrying:
+S-081's clips-job ending cost is still unchecked; a hold's labels with a failed ending are asserted only for a Gate 7
+stop; `renderManifest`'s `request` is unread. Owed outside this repository, unchanged: KnowScroll's check of a returned
+video (S-068) and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and
+the pin (S-033).

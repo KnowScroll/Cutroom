@@ -1,8 +1,16 @@
-import { and, asc, eq, inArray, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
 import type { PictureRecord } from '@cutroom/contracts'
 import type { RunRecord } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
-import { degradation, generationReceipt, observation, picture, reconciliation } from './schema.ts'
+import {
+  degradation,
+  generationReceipt,
+  hold,
+  observation,
+  picture,
+  reconciliation,
+  render,
+} from './schema.ts'
 
 // The pictures of a run and their record (docs/features/reel-stills.md, Gate 2 "Storage" and "How a
 // stills run ends"; S-046). A picture's row is written with its image receipt (ledger.ts) and
@@ -148,7 +156,26 @@ export function readRecord(db: Db, runId: string): Pick<RunRecord, 'pictures' | 
     .where(eq(degradation.runId, runId))
     .orderBy(sql`rowid`)
     .all()
-  return { pictures, degradations }
+  // Then the holds of the run's LATEST render, in shot order (S-073): a render made again holds its
+  // own, and an earlier attempt's rows stay in their table without being listed twice (S-076). Shot
+  // order is the shot's number, not its id as text, which would put `shot-10` before `shot-2`.
+  const latest = db
+    .select({ renderId: render.renderId })
+    .from(render)
+    .where(eq(render.runId, runId))
+    .orderBy(desc(render.attempt))
+    .limit(1)
+    .get()
+  const holds =
+    latest === undefined
+      ? []
+      : db
+          .select({ shotId: hold.shotId, reason: hold.reason })
+          .from(hold)
+          .where(and(eq(hold.runId, runId), eq(hold.renderId, latest.renderId)))
+          .orderBy(sql`CAST(substr(${hold.shotId}, 6) AS INTEGER)`)
+          .all()
+  return { pictures, degradations: [...degradations, ...holds] }
 }
 
 /** A shot that goes on without an approved picture, as the stage recorded it (S-043, D-050). */

@@ -213,9 +213,34 @@ export function turned(take: Take, id: string): TakeAnswer {
 }
 
 /**
+ * Gate 7's five closed questions, typed out BY HAND as the default render settings word them
+ * (S-074): each is answered yes when the cut is right.
+ */
+export const CUT_QUESTIONS = [
+  'Are the shots in a sensible order?',
+  'Does the pacing work?',
+  'Does every shot sit well beside the shot that follows it?',
+  'Do the burned captions follow the narration?',
+  'Does every shot show something no other shot repeats?',
+] as const
+
+/** A judge's answer to the five questions: every one yes, but those whose position is in `no`. */
+export function cutAnswer(no: readonly number[] = []) {
+  return {
+    answers: CUT_QUESTIONS.map((question, i) => ({
+      question,
+      answer: no.includes(i) ? 'no' : 'yes',
+    })),
+  }
+}
+
+/**
  * The script of one video run: the planner's answers and the stills stage's (reel-stills' fixtures),
  * then, for each take in plan order, its witness and reconciler answers — each passing unless
- * replaced. A take left out of `takes` gets no answer, so a run that reaches it fails.
+ * replaced — and, after the stills stage's judge answers, Gate 7's: every question yes unless `cut`
+ * replaces it, so a run of passing takes completes (the `judge` script answers `compare` and
+ * `judgeCut` in call order). A take left out of `takes` gets no answer, so a run that reaches it
+ * fails.
  */
 export function videoScript(
   shape: Shape,
@@ -225,6 +250,7 @@ export function videoScript(
     takes?: readonly Take[]
     witness?: Record<string, unknown>
     reconciler?: Record<string, unknown>
+    cut?: unknown
   } = {},
 ): FakeScript {
   const stills = stillsScript(shape, pics, over.stills)
@@ -239,7 +265,7 @@ export function videoScript(
       ...(stills.reconciler ?? []),
       ...takes.map((t) => ({ value: over.reconciler?.[t.key] ?? passesTake(t) })),
     ],
-    judge: stills.judge ?? [],
+    judge: [...(stills.judge ?? []), { value: over.cut ?? cutAnswer() }],
   }
 }
 

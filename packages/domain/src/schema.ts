@@ -232,8 +232,8 @@ export const degradation = sqliteTable(
 //
 // docs/features/reel-render.md, Gate 2 "Storage". Every narration and take made — every attempt's —
 // is a row, written with its receipt and updated as each measure and gate completes (S-070, S-071,
-// S-072). The render and hold tables arrive in the same migration (Slice 3); nothing writes them
-// until the assembly exists (Slice 4).
+// S-072). The render and hold tables arrived in the same migration (Slice 3); the assemble job writes
+// them (Slice 4): a render row before the assembler is called, and its holds with the job's ending.
 
 /** One row per narration made, written with its speech receipt (S-070). */
 export const narration = sqliteTable(
