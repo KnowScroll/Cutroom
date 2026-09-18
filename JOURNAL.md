@@ -1899,3 +1899,74 @@ holds, and `reel-contract.md`'s note (S-077). Checks 29–41. Worth carrying: `R
 strip's filters; S-081's clips-job ending cost is still unchecked; the suite's memory under many ffmpeg processes.
 Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and serving the file (S-073);
 `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).
+
+## 2026-09-18 — session 24, a question only: what is next
+
+**Intent.** The owner asked what is next.
+
+**Changed.** Nothing but this entry. No code, no test, no decision, no feature file, no prompt.
+
+**Observed.**
+
+- **Answered from session 23's _Next_, read rather than remembered:** `reel-render` Slice 4 — assembly, Gate 7 and a
+  video, checks 29–41 — with what that entry said to carry: `REQUIRED_FILTERS` gaining the pass's and the strip's
+  filters, S-081's unchecked clips-job ending cost, and the suite's memory under many ffmpeg processes.
+- **Slice 4's prompt is not written.** `PROMPTS/` ends at `023-reel-render-slice-3.md`. I told the owner its file would
+  be `024-…`; by S-065 the number is the running session's in this journal, and this entry takes 24 as session 09's
+  questions took 09, so **a Slice 4 session after this one is 25 and its prompt `025-reel-render-slice-4.md`** — unless
+  the owner has Slice 4 run as this session's continuation.
+- **`main` is one commit ahead of `origin/main`**: 34380f2, Slice 3, not pushed. Working tree clean at the start.
+- The start hook's roll call: pin current at `e05e9f0`, 115 decisions, 0 commits unpushed there, compared against a
+  local ref and not fetched; 99 modules, 0 boundary violations. `check.mjs` was not run — nothing changed but markdown.
+
+**Why.** A question was asked and nothing else; the journal is where the answer's source and the one correction live.
+
+**Next.** Unchanged: `reel-render` Slice 4, checks 29–41. First, the owner's two calls: whether Slice 3 is pushed, and
+whether its prompt is written now. Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
+
+## 2026-09-18 — session 24, continued: Slice 3 pushed, and the prompt for reel-render's Slice 4
+
+**Intent.** The owner asked whether Slice 3 was done — `docs/features/reel-render.md` reads `Status: planned` — then
+said to push it and write Slice 4's prompt.
+
+**Changed.**
+
+- **Pushed** `main` to `origin`: `fb8f4da..34380f2`, Slice 3's one commit.
+- **`PROMPTS/025-reel-render-slice-4.md`** — session 25's prompt, `Run: not yet`: Slice 4 only, checks 29–41, tests
+  first. It names what to read (sessions 23, 22 and 18, Gate 2's sections on the manifest, spans and holds, the one
+  pass, Gate 7, endings, ports, ffmpeg, media and storage, the Slice 4 signatures and checks, S-073 and S-074 above all,
+  the code and the tests Slice 4 changes or copies), what Slice 4 builds and what it does not — the guards' refusals and
+  checks 46 and 47 left to Slice 5, the restarts to Slice 6 — a working order, collision candidates, the break campaign
+  with its memory bounded from the start, when to stop and ask, and the traps. Indexed in `PROMPTS/README.md`, with a
+  line saying why there is no 024 (S-065).
+
+**Observed.**
+
+- **Slice 3 is done, and `Status: planned` is not a slice's to change.** Slices 1 to 3 are ticked in Gate 4; the status
+  line is the journey's, written after Slice 6 (S-016). Said to the owner.
+- **Checked while writing, so the prompt does not guess.**
+  - `fake/model.ts` answers `judgeCut` from the `judge` script in call order, the script `compare` reads, and
+    `videoScript` passes only the stills' judge answers: every Slice 3 test whose clips stage completes will run a real
+    assemble job that fails at `judgeCut`. None asserts that ending; each will spawn the pass, a probe and the strip.
+  - The fixtures' narrations are 9, 7, 3, 3, 2 and 5 seconds and their clips ask for 9, 7, 5, 5, 5 and 5, so no shot
+    holds by default; a hold needs `fakeVideo`'s scripted length.
+  - `TEST_RENDER_SETTINGS` spreads the defaults, so at 108 × 192 the caption style is still `fontSize` 48 and `marginV`
+    200, taller than the frame — a choice Slice 4 has to make before check 33 can measure a caption band.
+  - The contract is strict: a `degraded` event and a `Degradation` are `{ shotId, reason }`, `VideoRef` is `{ path }`.
+  - `reel-render`'s check 5 exempts variables and functions from `manifest` and `endCard`; `reel-plan`'s check 5 refuses
+    `source` and the rest for every kind of name.
+  - None of `-f concat`, `-c copy`, `-c:v copy`, `hls`, `m3u8` or `-hls_segment_type` occurs in `apps/` or `packages/`
+    today, comments included. `.gitignore` names `*.png`, `*.mp4` and `*.wav` and no subtitles extension.
+  - This machine's ffmpeg 8.1.1 has every filter a pass of that shape could want — `ass`, `subtitles`, `concat`, `tpad`,
+    `trim`, `amix`, `volume`, `anullsrc`, `select` and the measuring ones — so `REQUIRED_FILTERS` is a list of what the
+    code uses, not of what exists.
+  - The harness offers no way to wrap or script the assembler; check 41 needs one. `runAssembleJob` is handed only the
+    database and the job.
+- **The prompt asks the session to stop and ask the owner** if thirteen checks will not fit, rather than cutting the
+  slice itself.
+- Nothing but markdown changed. `prettier --check` on the three files passes.
+
+**Why.** The prompt is numbered 025 because this session took 24 in this journal (S-065); the index says so, so the gap
+does not read as a lost file.
+
+**Next.** Session 25: run `PROMPTS/025-reel-render-slice-4.md`.
