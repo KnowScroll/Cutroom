@@ -4,7 +4,7 @@
 - **Feature:** `reel-takes` — [`docs/features/reel-takes.md`](../docs/features/reel-takes.md)
 - **Work:** Slice 3 of 6 — the hold at the cap; checks 13–15, tests first; no journey
 - **Written:** 2026-09-19, at the end of session 31, after `reel-takes`' Slice 2 was committed (7d5f264) and pushed
-- **Run:** not yet
+- **Run:** session 32
 
 Paste everything inside the block below as the session's first message.
 

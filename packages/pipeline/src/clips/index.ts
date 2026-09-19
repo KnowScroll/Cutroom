@@ -3,11 +3,13 @@ import type {
   ClipsRecorder,
   LanguageModelPort,
   MediaPort,
+  MediaProbe,
   NarrationPort,
   NarrationRecord,
   Plan,
   PlanSettings,
   RenderSettings,
+  StillHold,
   TakeNumber,
   TakeRecord,
   TakeVerdict,
@@ -39,19 +41,27 @@ import { clipPrompt, retryPrompt } from './prompts.ts'
 // each as soon as it is made. A take is counted once decided: Gate 2 failed, or Gate 5 completed
 // (D-024, S-094). A take that fails is followed by the shot's next, told every earlier failed take's
 // reasons (D-033); the first accepted is the shot's, and none follows it (D-030). After the third
-// decided failure no video call names the shot, and the ladder decides: a hold, or a stop for the rule
-// of the third take's lowest failing gate (S-090). Once every shot is done, a `mustShow` no sentence
-// claims that no accepted take showed stops the reel for gate-5 (S-072).
+// decided failure no video call names the shot, and the ladder decides: a stop for the rule of the
+// third take's lowest failing gate, or a HOLD on the shot's chosen picture — probed by the media port
+// then (D-055, S-097), recorded with its `degraded` event, and the stage goes on to the next shot
+// (S-090, S-098). Once every shot is done, accepted or held, a `mustShow` no sentence claims that no
+// ACCEPTED take showed stops the reel for gate-5: a held shot's failed takes show nothing (S-072, S-090).
 
 type Verdict = Extract<RunEvent, { type: 'verdict' }>
+type Degraded = Extract<RunEvent, { type: 'degraded' }>
 type Refused = Extract<VideoAnswer, { kind: 'refused' }>
 
-export type ClipsEvent = Pick<Verdict, 'type' | 'gate' | 'outcome' | 'shotId'>
+/** A take's verdict, or a held shot's `degraded` event after its third take's verdicts (S-098). */
+export type ClipsEvent =
+  | Pick<Verdict, 'type' | 'gate' | 'outcome' | 'shotId'>
+  | Pick<Degraded, 'type' | 'shotId' | 'reason'>
 
 export interface ClipsRecord {
   /** This attempt's narrations, in the order made. */
   narrations: NarrationRecord[]
   takes: TakeRecord[]
+  /** The shots held on their chosen pictures, in the order the ladders reached them (S-098). */
+  stillHolds: StillHold[]
   /** In the order the gates ran. */
   events: ClipsEvent[]
 }
@@ -109,6 +119,19 @@ function crc32(text: string): number {
   return (crc ^ 0xffffffff) >>> 0
 }
 
+/**
+ * Why a held picture's probe is not a readable picture, or null when it is: ffprobe read the file and
+ * found a video stream with a width and a height (S-103). `readable` alone is not enough — ffprobe
+ * answers bytes that are no picture, named .png, with a stream of 0 × 0.
+ */
+function notAPicture(probe: MediaProbe): string | null {
+  if (!probe.readable) return 'ffprobe could not read the file'
+  if (probe.video === null) return 'it has no video stream'
+  const { width, height } = probe.video
+  if (!(width > 0 && height > 0)) return `its video stream is ${width} × ${height}`
+  return null
+}
+
 /** A call the worker's guard refused (S-035): not made, and the stage stops with the guard's figures. */
 const stopped = (refused: Refused): Ending => ({
   kind: 'stopped-budget',
@@ -132,10 +155,11 @@ export async function makeClips(
   ports: ClipsPorts,
   settings: ClipsStageSettings,
 ): Promise<ClipsOutcome> {
-  const record: ClipsRecord = { narrations: [], takes: [], events: [] }
+  const record: ClipsRecord = { narrations: [], takes: [], stillHolds: [], events: [] }
   const snapshot = (): ClipsRecord => ({
     narrations: record.narrations.map((n) => ({ ...n })),
     takes: record.takes.map((t) => ({ ...t })),
+    stillHolds: record.stillHolds.map((h) => ({ ...h })),
     events: [...record.events],
   })
   try {
@@ -353,12 +377,38 @@ async function stage(
         failed,
       )
       if (capped.kind === 'fail') return stop(failed, capped.why)
-      // reel-takes' Slice 3 builds the hold; until then a shot the ladder would hold fails the run.
-      return { kind: 'failed', detail: `${capped.reason}; but a held shot is not built` }
+
+      // A hold: the ladder holds only a shot with a chosen picture (S-090). Its picture is probed by
+      // the media port now, when the ladder holds the shot — the conform's only source for its
+      // geometry (D-055, I-17, S-097). A probe that throws fails the run, as any thrown call does
+      // (S-046); a picture that does not probe as a readable picture is a fault, and fails it too — it
+      // passed Gate 1, so its file is not the one that was checked (S-103). Either way nothing is
+      // recorded for the hold, so no label is written.
+      if (still === undefined) throw new Error(`${shotIdOf(unit)} was held with no chosen picture`)
+      const probe = await ports.media.probe({ id: still.pictureId, path: still.path })
+      const unreadable = notAPicture(probe)
+      if (unreadable !== null) {
+        return {
+          kind: 'failed',
+          detail: `${shotIdOf(unit)} is to be held on its approved picture ${still.pictureId}, which did not probe as a readable picture: ${unreadable} (D-055, S-097, S-103)`,
+        }
+      }
+      // Recorded, with its degraded event after its third take's verdicts; its labels are written with
+      // whatever ending the clips job reaches (S-098). The stage goes on to the next shot.
+      record.stillHolds.push({
+        shotUnit: unit,
+        pictureId: still.pictureId,
+        path: still.path,
+        probe,
+        takeIds: failed.map((t) => t.takeId),
+        reason: capped.reason,
+      })
+      record.events.push({ type: 'degraded', shotId: shotIdOf(unit), reason: capped.reason })
     }
   }
 
-  // Every shot done: a mustShow no sentence claims must be shown by an accepted take (S-072, S-090).
+  // Every shot done, accepted or held: a mustShow no sentence claims must be shown by an ACCEPTED take
+  // — a held shot's takes all failed, and show nothing for it (S-072, S-090).
   const unmet = request.criteria.mustShow.filter(
     (c) =>
       c.claimId === undefined &&

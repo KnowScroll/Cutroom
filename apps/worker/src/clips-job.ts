@@ -33,7 +33,8 @@ import { guardedVideoPort, validatingVideoPort, type ClipsLimits } from './video
 // one transaction (S-027, S-051), so a cancel cannot land between the read and the start and a job run
 // again writes no second `stage.started`. It hands `makeClips` the selected plan, the chosen pictures
 // and the ports it built, and then either advances — its events, itself done with its cost kept, and
-// the `reel.assemble` row — or ends the run with whatever the stage answered.
+// the `reel.assemble` row — or ends the run with whatever the stage answered. Either way, in the same
+// transaction, it writes the labels of every shot the stage held on its picture (reel-takes, S-098).
 
 export interface ClipsJobContext {
   /** The ports the worker was handed; it never constructs one (S-021, S-075). */
@@ -120,18 +121,21 @@ export async function runClipsJob(
     { plan: context.settings, render: context.render },
   )
 
+  // The held shots' labels are written with WHATEVER ENDING the job reaches, in the transaction that
+  // ends its stage or its run (S-098).
+  const { stillHolds } = outcome
   if (outcome.kind === 'completed') {
-    // The run goes on: in one transaction, the stage's events, this job done with its cost kept, and
-    // the chain's `reel.assemble` row. The run is not finished, and the video stage has no
-    // stage.finished until its assembly completes (S-069).
-    advanceClips(db, { runId, jobId: job.id, events: outcome.events })
+    // The run goes on: in one transaction, the held shots' labels, the stage's events, this job done
+    // with its cost kept, and the chain's `reel.assemble` row. The run is not finished, and the video
+    // stage has no stage.finished until its assembly completes (S-069).
+    advanceClips(db, { runId, jobId: job.id, events: outcome.events, stillHolds })
     return
   }
 
   // Any other ending finishes the run, keeping this job's cost as its calls added it (S-081).
   const costCents = spentCents(db, runId)
   const ended = (result: RunResult) =>
-    finishVideo(db, { runId, jobId: job.id, events: outcome.events, result })
+    finishVideo(db, { runId, jobId: job.id, events: outcome.events, stillHolds, result })
 
   if (outcome.kind === 'stopped-rule') {
     ended({

@@ -201,8 +201,8 @@ const reconciliationId = (takeId: string) => `rec-${takeId}`
  * A take's measures and gates, made durable, in one transaction: its probe, scan, words, sound,
  * verdicts and outcome, and — once there is one — its observation and its reconciliation, each written
  * once. What the take IS — its shot, mode, picture, prompt, seed, request, path and attempt — was
- * written with its receipt and is never rewritten here, and a hold's degradation is the assemble job's
- * ending's to write (S-073).
+ * written with its receipt and is never rewritten here, and its degradation is the ending's to write:
+ * a hold's the assemble job's (S-073), a still-hold's the clips job's (S-098).
  */
 export function upsertTake(db: Db, runId: string, t: TakeRecord): void {
   const values = takeValues(runId, t)

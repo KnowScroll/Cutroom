@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { and, asc, eq, gt, max, sql } from 'drizzle-orm'
+import { and, asc, eq, gt, inArray, max, sql } from 'drizzle-orm'
 import type {
   AssembledFile,
   CutVerdict,
@@ -8,6 +8,7 @@ import type {
   ModelReceipt,
   Plan,
   RenderManifest,
+  StillHold,
 } from '@cutroom/contracts'
 import {
   CONTRACT_VERSION,
@@ -19,7 +20,18 @@ import {
 import type { Db } from './db.ts'
 import { markChosen, markDegraded, type DegradedShot } from './pictures.ts'
 import { completeJob, enqueue, type Writer } from './queue.ts'
-import { hold, modelReceipt, plan, render, run, runEvent, take, videoReceipt } from './schema.ts'
+import {
+  hold,
+  job,
+  modelReceipt,
+  plan,
+  render,
+  run,
+  runEvent,
+  stillHold,
+  take,
+  videoReceipt,
+} from './schema.ts'
 
 // Runs and their event record (docs/features/reel-plan.md, Gate 2 "How the contract's rules are
 // kept"). Every write that numbers an event happens inside one immediate transaction, so the
@@ -390,22 +402,67 @@ export function advanceStills(
 }
 
 /**
- * A `video` run whose clips stage completed, in one immediate transaction (S-069): the events its
- * gates produced, the clips job done with its cost kept — what its narration and clip calls added
- * (S-036) — and the chain's last row: one `reel.assemble` job whose `correlation_id` is the run and
- * whose `parent_id` is the clips job (D-081, D-083). Returns that row's id.
+ * Three of a held shot's four labels, inside the transaction that ends the clips job's stage or its
+ * run, WHATEVER THE ENDING (I-4, S-058's form, S-098): its `still_hold` row — the attempt that decided
+ * it is the clips job's, read off its row — the reason on its third take's row, beside that take's
+ * verdicts, and the video receipt of each of its three takes marked degraded, whichever attempt made
+ * it. The fourth, its `degraded` event, is among the events.
+ */
+function markStillHeld(tx: Writer, runId: string, jobId: number, held: StillHold): void {
+  const claimed = tx.select({ attempts: job.attempts }).from(job).where(eq(job.id, jobId)).get()
+  if (claimed === undefined) throw new Error(`no job ${jobId} to hold shot-${held.shotUnit} with`)
+  const third = held.takeIds.at(-1)
+  if (held.takeIds.length !== 3 || third === undefined) {
+    throw new Error(
+      `shot-${held.shotUnit} is held with ${held.takeIds.length} takes, not three (S-090)`,
+    )
+  }
+  tx.insert(stillHold)
+    .values({
+      runId,
+      shotId: `shot-${held.shotUnit}`,
+      attempt: claimed.attempts,
+      pictureId: held.pictureId,
+      probe: JSON.stringify(held.probe),
+      takeIds: JSON.stringify(held.takeIds),
+      reason: held.reason,
+    })
+    .run()
+  tx.update(take)
+    .set({ degradation: held.reason })
+    .where(and(eq(take.runId, runId), eq(take.takeId, third)))
+    .run()
+  tx.update(videoReceipt)
+    .set({ degraded: true })
+    .where(and(eq(videoReceipt.runId, runId), inArray(videoReceipt.takeId, [...held.takeIds])))
+    .run()
+}
+
+/**
+ * A `video` run whose clips stage completed, in one immediate transaction (S-069): each held shot's
+ * labels (S-098), the events its gates produced, the clips job done with its cost kept — what its
+ * narration and clip calls added (S-036) — and the chain's last row: one `reel.assemble` job whose
+ * `correlation_id` is the run and whose `parent_id` is the clips job (D-081, D-083). Returns that
+ * row's id.
  *
  * The run is NOT finished, and the video stage has no `stage.finished`: the stage produced its output
  * only once its assembly does (S-025's reading, S-069).
  */
 export function advanceClips(
   db: Db,
-  a: { runId: string; jobId: number; events: readonly EventBody[] },
+  a: {
+    runId: string
+    jobId: number
+    events: readonly EventBody[]
+    /** In the order the ladders reached them (S-098). */
+    stillHolds: readonly StillHold[]
+  },
   now: Date = new Date(),
 ): number {
   const { runId, jobId } = a
   return db.transaction(
     (tx) => {
+      for (const held of a.stillHolds) markStillHeld(tx, runId, jobId, held)
       for (const event of a.events) append(tx, runId, event, now)
       completeJob(tx, jobId)
       return enqueue(
@@ -474,6 +531,9 @@ export interface RenderEnding {
  * the render row's output, invocations, measure, Gate 7 verdict and finish time, and three of each
  * hold's four labels — its `hold` row, the reason on its take's row beside that take's verdicts, and
  * its take's video receipt marked degraded. The fourth, its `degraded` event, is among the events.
+ *
+ * From the clips job it also writes each held shot's labels, WHATEVER THE ENDING (S-098): a still-hold
+ * decided before the run stopped or failed is a fact about its shot, as a degradation is (S-058).
  */
 export function finishVideo(
   db: Db,
@@ -483,12 +543,15 @@ export function finishVideo(
     result: RunResult
     events?: readonly EventBody[]
     render?: RenderEnding
+    /** The clips job's held shots, in the order the ladders reached them (S-098). */
+    stillHolds?: readonly StillHold[]
   },
   now: Date = new Date(),
 ): void {
   const { runId, jobId, result } = f
   db.transaction(
     (tx) => {
+      for (const held of f.stillHolds ?? []) markStillHeld(tx, runId, jobId, held)
       if (f.render !== undefined) {
         const { renderId, holds, assembled, measured, gate7 } = f.render
         for (const held of holds) {

@@ -2924,3 +2924,120 @@ Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
 
 **Next.** Session 32: run `PROMPTS/032-reel-takes-slice-3.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-20 — session 32, reel-takes Slice 3: the hold at the cap
+
+**Intent.** Run `PROMPTS/032-reel-takes-slice-3.md`: `reel-takes`' Slice 3 only — checks 13 to 15, tests first; nothing
+from Slice 4 or later, no journey. `decisions.mjs`: pin current, 0 commits unpushed. The machine quiet (3–10 % CPU, no
+process of note). Baseline `check.mjs` green at 86d6e2c, tests 227 s (322 by session 31's TAP count). `ffmpeg` and
+`ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`packages/contracts`** — `StillHold` (`clip.ts`), exported: the shot's unit, its chosen picture's id and path, that
+  file's probe, the three take ids and the reason. `TakeRecord.degradation`'s comment names the still-hold's.
+- **`packages/pipeline`** — **`clips/index.ts`**: `ClipsEvent` gains the `degraded` member (Gate 3's form);
+  `ClipsRecord.stillHolds`. At the cap, a `hold` now **probes the chosen picture with the media port** — id the
+  picture's, so a script keys it `shot-<unit>-<label>` — then, if `notAPicture` finds it no readable picture
+  (`readable`, a video stream, a width and a height above 0 — **S-103**), finishes the run failed with a detail naming
+  the shot and the picture, _"… did not probe as a readable picture: its video stream is 0 × 0 …"_; a probe that throws
+  fails it with the throw's message (the stage's own catch, S-046). Otherwise it records the `StillHold` and a
+  `degraded` event with the shot and the ladder's reason, right after the third take's verdicts, and **goes on to the
+  next shot**. Slice 2's stand-in is gone. The unclaimed `mustShow` is unchanged in code — accepted takes alone — and is
+  now reached with a shot held.
+- **`packages/domain`** — **`runs.ts`**: a private `markStillHeld` — the `still_hold` row (the attempt read off the
+  clips job's own row, in the transaction), the reason on the third take's row, and the video receipts of the three
+  takes marked — refusing other than three takes. `advanceClips` takes `stillHolds` (required) and `finishVideo`
+  `stillHolds?`, both writing them before the events, in the transaction that ends the stage or the run.
+  **`pictures.ts`**: `readRecord`'s degradations are the stills' (by rowid), then the still-holds' (by rowid), then the
+  latest render's holds. `schema.ts` and `clips.ts`: comments only.
+- **`apps/worker`** — `clips-job.ts` hands `outcome.stillHolds` to `advanceClips` and to every `finishVideo` of a
+  stage that ran: labels with whatever ending the job reaches (S-098).
+- **Test support, no assertion:** `tests/engine/video.ts` — `readVideo` returns the run's `still_hold` rows
+  (`StillHoldRow`).
+- **Three test files, +10 tests, 322 → 332**: `tests/reel-takes-{hold,labels,unclaimed}.test.ts` — checks 13 (5 tests),
+  14 (4) and 15 (1), each titled with Gate 3's words.
+- **`DECISIONS.md` — S-103.** Slice 3 ticked. Prompt 032's `Run` line set to session 32, in the file and the index
+  (S-065).
+
+**Observed.**
+
+- **No collision with a verified feature, and nothing for the owner.** Checks 1 to 12 and every moved `reel-render`
+  check stayed green with nothing changed: check 12's runs still stop (`atTheCap`'s `fail` path is untouched), check 4's
+  clips-stage stop is on shot 3, made from words, and check 20's held Gate 3 case is accepted on its retake.
+- **Red first, each for its reason.** Before code, 10 of 10 red:
+  - 13, the three hold runs (Gate 2 on shot 1, Gate 3 on shot 2, Gate 5 on shot 1): at the video calls — the run
+    stopped after the held shot's third take, Slice 2's stand-in failing it. The probe that throws: _"the detail is not
+    the throw's message"_, the stand-in's _"… but a held shot is not built"_. The picture replaced: at
+    `/did not probe as a readable picture/`. **Its "names the picture" half was green before code**, said plainly: the
+    stand-in's detail is the ladder's reason, which names the picture.
+  - 14: **my first form was red for the wrong reason.** It ran its four runs on one engine with one model script in
+    turn, and the first run, stopped early by the stand-in, left answers unconsumed: the next three failed on
+    _"the witness's answer for a1-shot-0-a is not an observation"_. Rewritten so the worker and API are started again
+    with each run's own script (`engine.restart`) on the same database; then each red for its own reason — completed,
+    _"no reel.assemble row"_; budget, `failed` where `stopped` was asserted; failed, its take rows ending at shot 1; the
+    query, `[]`.
+  - 15: _"shot 1 was not held"_ (0 !== 1).
+  - After code, 10 of 10 green at the first run; 68 of 68 over every `reel-takes` file and the four moved `reel-render`
+    files.
+- **Check 9's still-hold clause, live, green for the right reason.** A refused retry returns the stage's budget stop
+  before any ladder (S-095), and a hold now writes rows (check 14), so its _"no still-hold row"_ can fail: break 9a, a
+  refused retry holding its shot on its picture, is caught by check 9 alone.
+- **Measured before the detail was written (S-103).** ffprobe 8.1.1 answers bytes that are no picture, in a file named
+  `.png`, with **exit 0**, `image2`, one `png` stream of **0 × 0** and no frame read — the media port says
+  `readable: true`. The stand-in's picture probes `png_pipe`, 90 × 160, 25 a second, one frame, no duration: typed by
+  hand in check 14. A PNG cut after its header also probes 0 × 0, so a frame-count clause, first written, could fail nothing the size
+  clause passes; it was taken out of the code and of S-103 before the campaign.
+- **Thirty-three breaks and a control**, by session 31's runner in `.tmp/campaign/` (its breaks, chunk logs and results
+  moved aside to `s31/` first; ignored), taught this slice's files: each break's files saved as bytes and `fsync`ed to a
+  record, restored and read back, the record removed; every modified and untracked file hashed after each restore
+  against the chunk's first; a refusal to start while a record exists; every find checked once first; `tsc -b`, then
+  NEW (the three new files, checks 9, 12 and 4's — 24 tests) or FULL (with Slice 2's other three and the four moved
+  `reel-render` files — 60). One background chunk, 15–58 s a break, with a foreground waiter. Afterwards: no record,
+  `.artifacts/` empty, the fingerprints unchanged, no runner fault.
+
+  | check | breaks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | caught by                                        |
+  | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+  | none  | **control** c0: a comment in the hold                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | nothing                                          |
+  | 13    | 13a a hold that does not go on (the stage completing at it); 13b a held shot's later take made (its third take's request sent again); 13c Slice 2's stand-in back (typecheck too); 13d a hold on picture faults only, S-090's rejected option                                                                                                                                                                                                                                                                                                                     | 13, 14, 15                                       |
+  | 13    | 13e the probe skipped, the geometry assumed; 13g the probe's answer ignored; 13h only `readable` asked, S-103's rejected option; 13i a thrown probe turned into another detail; 13j the unreadable detail not naming the picture; 13k the hold recorded before the probe                                                                                                                                                                                                                                                                                          | 13 each                                          |
+  | 13    | 13f the probe of the third take's clip, not the picture                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 13, 14                                           |
+  | 14    | 14a no `still_hold` row                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | 14, 15                                           |
+  | 14    | 14f the labels written only when the stage completes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 14, 15                                           |
+  | 14    | 14b the third take's row without the reason; 14c no receipt marked (typecheck too); 14d no `degraded` event; 14e only the third take's receipt marked; 14g the labels written only when the run ends; 14h the event before the third take's verdicts; 14i the reason on the first take; 14j on each of the three; 14k every receipt of the run marked (typecheck too); 14l the still-hold's reason worded as a hold's; 14m the row's attempt one past the job's; 14n its probe not stored; 14o another picture's id; 14p `readRecord` not listing the still-holds | 14 each                                          |
+  | 14    | 14q the row's attempt read off the third take's id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | nothing: attempt 1 in every run this slice makes |
+  | 15    | 15a the unclaimed `mustShow` counted from a held shot's take; 15b over every take                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 15 each                                          |
+  | 9     | 9a a refused retry holding its shot                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | 9                                                |
+  | none  | x1 `readRecord` listing the still-holds before the stills' degradations; x2 the assemble job's hold reason worded as a still-hold's                                                                                                                                                                                                                                                                                                                                                                                                                               | nothing — check 19, Slice 4                      |
+
+- **Caught by nothing that a check's words promise: none.** Caught by nothing and promised by no check of this slice,
+  said plainly: **14q** — the job's attempt and the third take's are 1 in every run until a restart decides takes, so
+  the difference waits for Slice 5, whose check 22 holds a shot again after a kill: it should read the row's attempt;
+  **x1** and **x2** — no run of this slice has a stills degradation or a render beside a hold; check 19 (Slice 4)
+  promises both.
+- **Choices.** **S-103** recorded — rejected: `readable` alone, the probe compared with Gate 1's sensor measure, the
+  picture probed before its takes. **Not recorded**, nothing rejected could be caught or the gates fix it: the attempt
+  read off the job's row (Gate 3's signatures give `StillHold` and `advanceClips` no other field; the third take's
+  attempt is 14q); labels before events inside one transaction; the hold and its event recorded only after the probe
+  (S-058's rejected _"an event no row records"_, and check 13's failed runs now assert no label anywhere);
+  `markStillHeld` refusing other than three takes, a fault no stage path reaches.
+- **One red `check.mjs`, then a native crash caught, said plainly.** The first `check.mjs` after the slice was red in
+  its tests; it prints only the first 40 lines of a failure, so which test was not shown. The TAP runs before and after
+  it were 332 of 332. Two more runs to catch it: the second counted 331 — **`tests/reel-render-shapes.test.ts`' own
+  process died at 1.4 s with exit code 3221225477, 0xC0000005, an access violation**, before any test reported. Run
+  alone six times, it passed six. Nothing in this slice changes what that file does but the types it compiles; it is a
+  crash of Node 22.14's process under the suite's load, not an assertion, and no check was changed for it. Whether the
+  first red was the same crash is not known. Then `check.mjs` green. Worth watching: a native crash in any file reads
+  as a red check.
+- **The suite: 332 tests, 207–209 s by four TAP runs; `reel-render`'s check 50 child 169–170 s inside it** (session 28:
+  116–132 s), under its 300-second bound.
+- `node scripts/check.mjs`: **everything green, 332 tests** by the TAP count; checks 13–15 pass by number (10 tests),
+  1–12 (34) and every moved `reel-render` check.
+
+**Next.** `reel-takes` Slice 4 — the still-hold, rendered: checks 16–20. `RenderShot` as `ClipShot | StillHoldShot` and
+the manifest's schema, `renderManifest`'s _"has no accepted take to render"_ replaced, the pass's picture input with
+`zoompan` and silence, the stand-in picture's 2-pixel border, the completed result's order of degradations (x1 and x2
+caught by nothing until check 19), `reel-render`'s check 37 widened. Carried: Slice 5's check 22 reading the
+`still_hold` row's attempt (14q); check 4's second restart (S-100); the narration guard's every-send rule (S-101);
+check 50's child margin; the access violation, if it comes again. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.

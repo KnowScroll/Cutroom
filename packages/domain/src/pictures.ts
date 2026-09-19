@@ -11,6 +11,7 @@ import {
   reconciliation,
   render,
   run,
+  stillHold,
   take,
   takeObservation,
   takeReconciliation,
@@ -109,7 +110,8 @@ type Check = RunRecord['pictures'][number]['checks'][number]
  * A run's record as the contract gives it: one entry per picture made, every attempt, in `seq`
  * order; `observationId` and `reconciliationId` where those rows exist; a check for each completed
  * Gate 1 step and for Gate 1S; one entry per take made, every attempt's, in the order made, with a
- * check for each gate it completed (S-093); and every degradation.
+ * check for each gate it completed (S-093); and every degradation — the stills stage's, then the shots
+ * held on their pictures, then the latest render's holds (S-098).
  */
 export function readRecord(
   db: Db,
@@ -163,6 +165,14 @@ export function readRecord(
     .select({ shotId: degradation.shotId, reason: degradation.reason })
     .from(degradation)
     .where(eq(degradation.runId, runId))
+    .orderBy(sql`rowid`)
+    .all()
+  // Then the shots held on their pictures at their take caps, in the order the clips job's ending
+  // wrote them: the order the ladders reached them (S-098). A still-hold is not a hold (S-073).
+  const stillHolds = db
+    .select({ shotId: stillHold.shotId, reason: stillHold.reason })
+    .from(stillHold)
+    .where(eq(stillHold.runId, runId))
     .orderBy(sql`rowid`)
     .all()
   // Then the holds of the run's LATEST render, in shot order (S-073): a render made again holds its
@@ -239,7 +249,7 @@ export function readRecord(
         outcome: v.outcome,
       })),
     }))
-  return { pictures, takes, degradations: [...degradations, ...holds] }
+  return { pictures, takes, degradations: [...degradations, ...stillHolds, ...holds] }
 }
 
 /** A shot that goes on without an approved picture, as the stage recorded it (S-043, D-050). */

@@ -172,8 +172,29 @@ export interface TakeRecord {
   verdicts: TakeVerdict[]
   /** Null until Gate 2 fails or Gate 5 completes. */
   outcome: Outcome | null
-  /** A hold's reason, written with the assemble job's ending (S-073). */
+  /**
+   * A hold's reason, written with the assemble job's ending (S-073) — or, on a held shot's third take,
+   * its still-hold's, written with the clips job's (S-098). Never set by the stage itself.
+   */
   degradation: string | null
+}
+
+/**
+ * A shot held on its chosen picture at its take cap (D-025 rung 2, S-090): recorded by the clips stage
+ * when its ladder holds the shot, and written by the worker with whatever ending the clips job reaches
+ * (S-098). Not a hold, which is a clip shorter than its narration (S-073).
+ */
+export interface StillHold {
+  shotUnit: number
+  pictureId: string
+  /** The chosen picture's file, under the artifact root (D-086). */
+  path: string
+  /** That file, probed by the media port when the ladder held the shot (D-055, I-17, S-097). */
+  probe: MediaProbe
+  /** The three takes its ladder consumed, in order. */
+  takeIds: readonly string[]
+  /** Begins that the shot "is held on its approved picture", and cites D-025 (S-098). */
+  reason: string
 }
 
 /**

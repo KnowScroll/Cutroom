@@ -423,6 +423,16 @@ export interface ModelReceiptRow {
   take_ids: string[]
 }
 
+/** A shot held on its chosen picture at its take cap (reel-takes, S-090, S-098). */
+export interface StillHoldRow {
+  shot_id: string
+  attempt: number
+  picture_id: string
+  probe: Probe
+  take_ids: string[]
+  reason: string
+}
+
 export interface Videoed {
   runId: string
   result: Record<string, unknown>
@@ -434,6 +444,8 @@ export interface Videoed {
   receipts: ModelReceiptRow[]
   takeObservations: Array<{ id: string; take_id: string; observation: ClipObservation }>
   takeReconciliations: Array<{ id: string; take_id: string; answer: unknown; failed: string[] }>
+  /** In the order written. */
+  stillHolds: StillHoldRow[]
   jobs: Array<Omit<JobRow, 'correlation_id'>>
 }
 
@@ -507,6 +519,16 @@ export async function readVideo(engine: Engine, runId: string): Promise<Videoed>
         runId,
       )
       .map((r) => ({ ...r, answer: json(r.answer), failed: json(r.failed) })),
+    stillHolds: engine
+      .query<Record<string, unknown>>(
+        'SELECT shot_id, attempt, picture_id, probe, take_ids, reason FROM still_hold WHERE run_id = ? ORDER BY rowid',
+        runId,
+      )
+      .map((r) => ({
+        ...(r as unknown as StillHoldRow),
+        probe: json(r.probe as string),
+        take_ids: json(r.take_ids as string),
+      })),
     jobs: engine
       .query<Omit<JobRow, 'correlation_id'>>(
         'SELECT id, kind, parent_id, state, attempts, cost_cents FROM job WHERE correlation_id = ? ORDER BY id',

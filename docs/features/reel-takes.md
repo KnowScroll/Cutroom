@@ -835,7 +835,7 @@ _Endings, and no secrets_
       handed only a take's own clip and brief by construction (S-072) — the breaks recorded with the slice show it can
       fail. **Checks 9 and 11 say which of their clauses are green before code.**
       **Proves: 5, 6, 7, 8, 9, 10, 11, 12.**
-- [ ] **Slice 3 — the hold at the cap.** A `hold` goes on to the next shot; the held shot's `StillHold`, its picture
+- [x] **Slice 3 — the hold at the cap.** A `hold` goes on to the next shot; the held shot's `StillHold`, its picture
       probed by the media port, and its `degraded` event; its four labels with every clips-job ending, through
       `advanceClips` and `finishVideo`; `readRecord` listing still-holds after the stills' degradations. A render is not
       yet made of a held shot: `renderManifest` fails such a run _"has no accepted take to render"_ — `reel-render`'s own

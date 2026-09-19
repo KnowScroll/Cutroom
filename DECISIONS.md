@@ -3604,3 +3604,32 @@ the one time the campaign ran it, and failed one run in three beside it.
 
 **Caught by.** Check 10's measured waits, and session 31's breaks 10b (no wait) and 10c (a constant one), each caught by
 check 10 once the deadline was in.
+
+---
+
+## S-103 | 2026-09-20 | A held picture probes as a readable picture only when ffprobe finds a video stream with a width and a height
+
+**Chose.** When the ladder holds a shot (S-090), the clips stage probes its chosen picture with the media port (D-055,
+S-097) and holds it **only if the probe is `readable`, has a video stream, and that stream's width and height are
+above 0** (`notAPicture`, `packages/pipeline/src/clips/index.ts`). Anything else
+finishes the run `failed` with a detail naming the shot and the picture, saying it _"did not probe as a readable
+picture"_ and what the probe found; nothing is recorded for the hold, so no label is written. A probe that **throws**
+is not this: it fails the run with the throw's message, as any thrown call does (S-046).
+
+**Why.** S-097 says a picture that does not probe as a readable picture fails the run, and `reel-takes`' check 13
+builds one by replacing the picture's file with other bytes before its third take is decided. Measured on this
+machine, with ffprobe 8.1.1: bytes that are no picture, in a file named `.png`, make ffprobe **exit 0** and report an
+`image2` input with one `png` stream of **0 × 0** and no frame read — so the media port answers `readable: true`, with a
+video stream. The stand-in's real picture probes as `png_pipe`, 90 × 160, one frame. `readable` says ffprobe could
+read the file, not that the file is a picture. **No frame count is asked for**: a PNG cut short after its header
+probes as 0 × 0 too, so a rule on frames would fail no picture the size rule passes — a rule nothing can fail (S-014).
+
+**Rejected.** **`readable` alone** — the replaced picture passes, the shot is held on bytes no gate saw, and the render
+would conform a 0 × 0 stream (I-17's silent kind of failure). **Comparing the probe with Gate 1's measure** — that is
+the sensor's reading of the PNG header, not ffprobe (D-055), and a check of one against the other adds a second source
+for the geometry. **Probing the picture before the shot's takes** — S-097 says when the ladder holds the shot, and a
+file changed during the takes would be probed before it changed.
+
+**Caught by.** `reel-takes`' check 13, its run whose picture is replaced with other bytes during its third take's
+measure: with `readable` alone the shot is held and the run goes on, and the check's failed ending and its detail go
+red.

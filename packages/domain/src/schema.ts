@@ -278,7 +278,8 @@ export const speechReceipt = sqliteTable('speech_receipt', {
 /**
  * One row per take made, every attempt's (S-071, S-072). Written with its video receipt — what it is
  * and what was asked for — and updated as each measure and gate completes. Its degradation is a
- * hold's reason, written with the assemble job's ending (S-073).
+ * hold's reason, written with the assemble job's ending (S-073), or — on a held shot's third take — a
+ * still-hold's, written with the clips job's (S-098).
  */
 export const take = sqliteTable(
   'take',
@@ -312,7 +313,7 @@ export const take = sqliteTable(
     verdicts: text('verdicts').notNull().default('[]'),
     /** Null until Gate 2 fails or Gate 5 completes. */
     outcome: text('outcome', { enum: ['accept', 'fail'] }),
-    /** A hold's reason (S-073). */
+    /** A hold's reason (S-073), or a still-hold's on a held shot's third take (S-098). */
     degradation: text('degradation'),
   },
   (t) => [primaryKey({ columns: [t.runId, t.takeId] })],
@@ -342,7 +343,7 @@ export const videoReceipt = sqliteTable('video_receipt', {
   rateCents: real('rate_cents').notNull(),
   costCents: integer('cost_cents').notNull(),
   fake: integer('fake', { mode: 'boolean' }).notNull(),
-  /** A degraded shot's text-to-video take (D-050), or a hold's (S-073). */
+  /** A degraded shot's text-to-video take (D-050), a hold's (S-073), or a held shot's three (S-098). */
   degraded: integer('degraded', { mode: 'boolean' }).notNull().default(false),
   /** The `unavailable` answers before the call was made (S-096): 0 for a row made at its first send. */
   transientErrors: integer('transient_errors').notNull().default(0),
