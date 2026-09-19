@@ -2299,3 +2299,36 @@ clips-job cost at every clips ending but a budget stop is still unchecked; the l
 run over its limit (S-087); `renderManifest`'s `request` is unread; break 34d is named by no check (deferred item 15).
 Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and serving the file (S-073);
 `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).
+
+## 2026-09-19 — session 27, continued: the prompt for reel-render's Slice 6
+
+**Intent.** The owner asked for the next slice's prompt, and how many slices are left.
+
+**Changed.**
+
+- **`PROMPTS/028-reel-render-slice-6.md`** — session 28's prompt, `Run: not yet`: Slice 6 only, checks 48–50, tests
+  first, then 1–47 again and the `reel-render`, `reel-stills`, `reel-plan` and `reel-contract` journeys (S-077). It
+  names what to read (sessions 27, 25, 23 and 19; Gate 2's restart, chain, endings, spending and media sections; checks
+  48–50 and the clauses a restart touches; S-076 above all), what Slice 6 builds, a working order, collision
+  candidates, the break campaign narrowed around check 50's child, the journeys committed one at a time, and the traps.
+  Indexed in `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **One slice is left**: `reel-render` has six and five are ticked. Slice 6 ends with its journey, which is what marks it
+  verified (S-016); `reel-takes` and `video-edits` have every gate pending.
+- **Checked while writing, so the prompt does not guess.**
+  - `tests/engine/worker-process.ts` holds call `holdAtCall`, counted over every model call. For `THREE_RANKS` with
+    default sensors: two planner calls, eight in the stills stage, then two a take — take k's witness is call 11 + 2k,
+    Gate 7's `judgeCut` call 23. The prompt says so as a count to check against receipts, not to trust (S-062).
+  - The child is handed the engine's video, narration and media scripts as JSON, and `entryFor` looks a whole id up
+    first, so a cost keyed `a1-shot-1-take-1` lands on the first attempt alone.
+  - `tests/engine/restart.ts`' helpers are stills-shaped — the keyframes job's row, a 60-second wait, `readStills`.
+  - `readRenderInputs` takes `max(take.attempt)`'s takes and narrations. `startRender` writes the render row before the
+    assembler; only `finishVideo` sets its path — so a first worker killed at `judgeCut` leaves `a1-render.mp4` on disk
+    beside a row with no path: flagged for check 49's _"the first kept"_, not decided.
+  - `reel-stills`' check 50 gives its child `spawnSync`'s 300 s; reel-render's child will run about thirty heavier files.
+- Nothing but markdown changed. `prettier --check` on the three files passes.
+
+**Next.** Session 28: run `PROMPTS/028-reel-render-slice-6.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
