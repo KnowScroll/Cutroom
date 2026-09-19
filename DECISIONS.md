@@ -2927,3 +2927,586 @@ has no finish time, and nothing marks it abandoned: `readRecord` lists the holds
 render's ending written over the first row; 49d, the first row removed when a render starts again — each by 49; 48o2,
 the manifest read from both attempts' rows, by 48 once it reads `readRenderInputs`; 48k and 48l, each guard alone
 reading only its own attempt's spend, by 48 and 42.
+
+---
+
+## S-090 | 2026-09-19 | At the take cap a shot is held on its chosen picture when a hold would pass, and the reel stops otherwise; nothing is soft in this build
+
+**Chose.** When a shot's third decided take fails (D-024, S-094), a pure function of the shot and its three takes,
+**`atTheCap`**, applies D-025's ladder:
+
+- **Rung 2, hold** — **the shot has a chosen picture and claims no `event` mustShow**. Its picture passed Gate 1 against
+  every subject its shot shows, every presence `mustShow` its sentences claim and every `mustNotShow` (S-040), and Gate
+  1S where it ran; every failure Gates 2, 3 and 5 can find in one of its takes is either in the clip alone — black,
+  frozen, the wrong shape, unreadable, speech or music — or one that picture was checked against. So the class is **a
+  property of the shot, not of which gate failed**. The shot is held on its picture for its span, with a slow push, and
+  the stage goes on to the next shot.
+- **Rung 3, fail the reel** — **a shot with no chosen picture**, made from words because the plan gave it none (D-027)
+  or because its picture was degraded (D-050): D-025's _"keyframe never passed"_, since there is no gated picture to
+  hold; and **a shot that claims an `event` mustShow**: a still cannot show an event (D-043), so a hold would leave it
+  unmet — D-025's _"`mustShow` unmet"_. The run stops **for the rule of the third take's lowest failing gate** —
+  `gate-2`, `gate-3` or `gate-5` — at step `video`, the detail naming the three takes, each one's failed gates and
+  reasons, and why the shot cannot be held.
+- **Rung 1, `accept_with_label`** — **no failure of Gates 2 to 5 is in its class.** D-025's soft failures are _"style
+  adherence, camera not exactly as asked"_: no gate here checks style, and no plan asks for a camera (`reel-stills`'
+  deferred item 6). So **no take is accepted with a label**, and `atTheCap`'s answer has no member for one.
+
+A held shot's takes stay, all failed, and none is used; its labels are S-098's; its render is S-097's. **The reel's
+unclaimed `mustShow` is checked once every shot is done — accepted or held — over accepted takes alone**, so a held
+shot's failed takes show nothing for it.
+
+**Supersedes:**
+
+- **D-025**, on _"applies fixed policy in this order, by failure class"_, on rung 2's _"picture right, motion broken
+  (freeze, morph, artifact)"_ and on rung 3's _"`mustShow` unmet"_ — the class is a property of the shot, as above: a
+  shot with a chosen picture that claims no event is held whatever its three takes failed on, including a presence
+  `mustShow` its clips missed and its picture shows, which the hold shows. D-025's order of rungs, rung 2's _"hold the
+  gated keyframe as a `still` for the shot's duration, with a slow push"_ and rung 3's _"keyframe never passed"_ and
+  _"fail the reel; publish nothing"_ stand.
+- **S-066**, on its Chose's _"`accept_with_label`, holding the gated keyframe as a still, and failing the reel"_, as
+  this feature's — on its first part: no label is built here.
+- **S-066**, on its supersession of **D-025**, on rung 1, _"soft failure (style adherence, camera not exactly as asked)
+  → `accept_with_label`, with the verdict recording why"_, and rung 2, _"picture right, motion broken (freeze, morph,
+  artifact) → hold the gated keyframe as a `still` for the shot's duration, with a slow push"_ — ended, as S-066's own
+  _"until `reel-takes` supersedes this entry in turn"_ provides: rung 2 is built, and rung 1 stands, with no failure in
+  its class in this build.
+- **D-025**, on its `Confirmed-by` _"A test that `accept_with_label` over a failed `mustShow` is refused."_ — **for this
+  build**: nothing is accepted with a label, so there is nothing for a refusal to refuse, and a check of one could not
+  fail. `atTheCap`'s answer having no label member is checked by the type (`reel-takes`' check 12). The refusal is built
+  with rung 1's first class. I-5 stands, and holds vacuously.
+- **S-072**, on _"once every shot's take is accepted, one shown by no take stops the reel for rule `gate-5`"_, and
+  **S-069**, on _"an unclaimed `mustShow` no take shows"_ — once every shot is done, accepted or held, one shown by no
+  accepted take stops the reel for `gate-5`.
+
+D-025's _"Every one of these is labelled on the shot, in the verdict and in the receipt, and is queryable afterwards"_
+and its other two checks stand, and are `reel-takes`' checks 14 and 17.
+
+**Why.** No decision maps a failed gate to D-025's classes (`reel-takes.md`'s item 2). D-025's own reason for rung 2 is
+_"The keyframe has already passed its gate, so composition, identity and `mustShow` are witness-confirmed; what failed is
+motion"_ — which holds for every Gate 5 failure but an event's, since Gate 1 is given the shot's subjects, its claimed
+presence criteria and every `mustNotShow` (S-040), and never an event (D-043). A shot with no gated picture has nothing
+to hold (item 3): D-047 already refused to hold a picture that did not pass — _"that one holds a keyframe that passed
+Gate 1, and here nothing has"_.
+
+**Rejected.** **Hold on picture faults only** — only takes failing Gate 2, D-025's literal _"freeze, morph, artifact"_;
+it stops reels a hold would cure, for failures the picture was already checked against (the owner rejected it).
+**Sound failures as soft**, accepted with a label and the last take used — D-008 forbids speech and music in every clip,
+and a label fixes framing, not substance (I-5); the owner rejected it. **A hold for a shot made from words on a frame of
+a failed take** — a picture no gate passed. **A plain background in place of a shot with nothing to hold** — new content
+no gate saw, and D-025 rung 3 already names the case.
+
+**Caught by.** `reel-takes`' checks 12 (each case that stops the reel, its detail, and no label in the ladder's
+answer), 13 (a hold on each gate's failure) and 15 (a held shot's takes show no unclaimed `mustShow`).
+
+**Confirmed-by.** The owner, 2026-09-19, choosing _"Hold if a hold would pass (Recommended)"_, whose option said that a
+shot whose approved picture passed its checks is held on it with a slow push whatever the clips failed on, since the
+picture was already checked for it; that a shot that must show an event, and a shot with no approved picture, fail the
+reel; and that nothing is soft in this build, `accept_with_label` waiting for the first check of style or camera. The
+substance of the supersessions of D-025 and of S-066's allocation is that answer. **This entry's reading:** the rule a
+stopped reel names, its detail, the unclaimed `mustShow` over accepted takes alone, and every supersession quote.
+
+---
+
+## S-091 | 2026-09-19 | A shot's takes are all made its own way; a retry changes its prompt and its seed, never its mode
+
+**Chose.** **Every take of a shot is made in the shot's mode**: `image-to-video` from its chosen picture, or
+`text-to-video` at 9:16 — as `reel-render` makes its first take (S-071). A retry differs from the take before it in its
+prompt, which carries that take's reasons (S-094), and in its seed, the CRC-32 of its own take id (D-018). **No take
+changes strategy.** D-024's _"Takes may span strategies: two failures on one strategy trigger at most one alternative."_
+allows none — _"at most one"_ — and is read, not superseded.
+
+**Why.** The one alternative that exists for a pictured shot is `text-to-video`, which gives up the identity its
+picture was bought for (D-030: selection is spent on the canonical because it is the reference); D-050 allows words only
+where the picture failed, because it _"trades down from nothing"_. For such a shot the hold at the cap is free and keeps
+the checked picture (S-090). A shot already made from words has no alternative that exists: an image call in the clips
+stage would be a picture made outside the stills stage's six (D-027) and after its gate (I-10). D-037's FLF2V pair is
+not built (S-032).
+
+**Rejected.** **Words as the third take's alternative for a pictured shot**, labelled if accepted — the owner rejected
+it. **A new seed alone** — D-033's rejected _"re-roll dressed as a retry"_. **FLF2V** — S-032.
+
+**Caught by.** `reel-takes`' check 5: every take of a shot in its first take's mode, on a pictured shot and on one made
+from words.
+
+**Confirmed-by.** The owner, 2026-09-19, choosing _"One strategy: the shot's own (Recommended)"_.
+
+---
+
+## S-092 | 2026-09-19 | A clips job run again keeps every finished narration and decided take, and picks up at the first shot not finished; a take a crash cut off is made again and counts against nothing
+
+**Chose.** A `reel.clips` job claimed again after its lease runs out (S-027) **runs its code from the start, and its
+stage skips what earlier attempts finished**:
+
+- **Kept**: every narration an earlier attempt **finished** — made, measured, its timings parsed — and every take an
+  earlier attempt **decided** — its outcome `accept` or `fail`, with the verdicts it reached. The worker reads them once
+  per attempt, after the stage's start and the cap, every earlier attempt's in the order made (`readClipsInputs`), and
+  hands them to `makeClips` as `kept`.
+- **Not made again, and not looked at again**: a kept narration is not spoken, probed or parsed; a kept take is not made,
+  measured, heard, witnessed or reconciled; no receipt is added for either. The stage takes each shot in plan order: a
+  shot with a kept accepted take is finished; a kept narration is the shot's; **the shot's next take is numbered its kept
+  decided takes plus one**, and a retry after kept failed takes is told every one's reasons (S-094).
+- **Made again**: a take **cut off inside its gates** — no outcome — is not resumed: its row, receipt, file and cost stay
+  with the gates it reached, and the shot's take of that number is made again under the next attempt's id. **It is not
+  a decided take and counts against no cap**, though it is a further paid clip — one each crash, bounded by the per-reel
+  cap and the ceiling, which every send is compared with (S-095). A narration made and not finished is made again.
+- **The cap holds across attempts**: a shot's decided takes are at most three, every attempt's. A shot with three kept
+  failed takes goes to `atTheCap` with no call.
+- **Events**: the finishing attempt emits each kept take's verdicts when it reaches the shot, so every decided take's
+  verdicts are events once, in shot and take order, and a cut-off take's never.
+- **The render** is read from each shot's finished narration and accepted take, whichever attempt made them, the
+  still-holds and each held shot's three takes (S-097, S-098); never a cut-off take or an unfinished narration. With
+  checkpoints a shot has at most one finished narration and at most one accepted take, so **`renderManifest` refuses
+  rows holding two of either for one shot**, naming it, and the assemble job fails the run rather than choosing — what
+  S-089 guarded, a render quietly made from rows the stage did not use, kept by a fault instead of an attempt filter.
+- **A held shot** whose attempt did not end is held again from its kept takes, and its labels mark the receipts of its
+  three takes, whichever attempt made them (S-098).
+
+**Supersedes:**
+
+- **S-076**, on _"A `reel.clips` job claimed again after its lease runs out (S-027) runs from the start with the next
+  attempt: every narration and take is made again under ids carrying that attempt, and paid for again — S-048, applied
+  to clips."_, on _"only the finishing attempt's verdicts become events"_ and on _"One take a shot is per attempt
+  (S-066)."_ — as above. Its _"The earlier attempt's rows, receipts, files and cost stay, with the gates each take reached
+  and no outcome where one was cut off; the guard counts its cost; `stage.started` for `video` is not written twice"_
+  stands, and so do its bullets on an assemble job run again and a worker dying between jobs. And on its `Rejected`
+  _"Resuming the accepted takes — a take cut off inside its gates would be looked at twice."_ — accepted takes are kept;
+  the take the reason is about, the cut-off one, is never resumed but made again.
+- **S-069**, on _"Only the finishing attempt's verdicts become events."_ — for the clips job, the finishing attempt's
+  events hold the verdicts of every take it kept or made, each once.
+- **S-089**, on _"the second attempt's six takes and six narrations alone"_ — `reel-render`'s check 48 reads, from
+  `readRenderInputs`, each shot's finished narration and accepted take, whichever attempt made them (S-099); and on its
+  `Rejected` reason _"a late row from a worker whose lease outlasted it (`reel-plan`'s known limit) would make the render
+  a mix of attempts"_ — a render is made of rows from more than one attempt by design, and a late row that would give a
+  shot a second accepted take or finished narration fails the run instead (above).
+- **D-024**, on _"A shot may consume 3 paid clip takes — one initial plus two retries"_ and on its `Confirmed-by` _"and
+  that no fourth video job is submitted for it"_, and **D-014**, on _"retries ≤ 2 per shot"_ — **for a take a crash cut
+  off**: it is made again, a further paid clip and video job for the shot that is neither a further take nor a retry.
+  No video job follows a shot's third decided take, in any attempt, and every other take is within both.
+
+**S-048 stands for the stills stage**: a keyframes job run again still starts over and pays again. D-002's lease and
+S-027 stand: the job runs from the start, and its stage reads what is finished.
+
+**Why.** S-048 rejected resuming, and S-076 followed it: _"Resuming would mean re-checking a picture whose checks were
+cut off — a second witness look at one picture, against D-045 and I-15 — or storing each half-finished step."_ Keeping
+only what finished needs neither:
+a finished narration and a decided take have every step recorded, and a take cut off is made again rather than
+re-checked, so no clip is looked at twice (I-15). A crash is not a bad clip, as a provider's 500 is not (I-11's reason),
+so the take it cut off costs its shot no try.
+
+**Rejected.** **Starting over**, three takes a shot per attempt (S-076's form, the owner's first option) — the owner
+asked for checkpoints. **Keeping finished shots only**, the shot in progress starting over with three new takes — pays
+again for its failed takes and forgets their reasons; the owner rejected it. **Resuming a cut-off take's gates** — a
+second look at a clip whose witness call may have been made (I-15), or half-finished steps stored. **Counting a cut-off
+take** — a crash would cost a shot a try.
+
+**Caught by.** `reel-takes`' checks 21 (the kept work not made or looked at again, the cut-off take made again, the
+events once), 22 (the cap and the retry prompt across attempts, a held shot held again with no call), 23 (the render's
+rows, read directly and measured, and two accepted takes or finished narrations of one shot refused) and 24 (a budget
+stop across attempts, for each guard); `reel-render`'s check 48 as S-099 changes it.
+
+**Confirmed-by.** The owner, 2026-09-19. Asked whether a restarted attempt's earlier takes count against a shot's
+three, the owner answered _"Option 1, but can we not save the results as checkpoints so if a crash happens then we pick
+from there"_; asked which checkpoint rule, the owner chose _"Keep every finished result (Recommended)"_, whose option
+said that a narration measured and timed and every clip whose checks all finished are kept and not bought again, that
+the restart picks up at the first shot not finished, that a clip cut off mid-check is made again and counts against no
+cap, so a shot gets three judged clips across attempts, and that a retry after the crash is told why the last judged
+clip failed; the question said pictures keep S-048's start-over. The substance of the supersessions of S-076's
+start-over and its rejection of resuming, and of D-024's and D-014's clauses for a take a crash cut off, is that
+answer. **This entry's reading:** the events, the render's rows and the fault that guards them, a held shot held again,
+and every supersession quote.
+
+---
+
+## S-093 | 2026-09-19 | The record lists every take made, in contract version 1
+
+**Chose.** `@cutroom/reel-contract`'s `RunRecord` gains **`takes`**, required: **one entry per take made, every
+attempt's, in the order made** — a cut-off take too — each with its **`takeId`**, its **`shotId`**, its **`number`** (a
+whole number above 0), **`used`**, **`checks`** — each gate it reached, `'2'` to `'5'`, with its outcome — and, where it
+reached them, **`observationId`** and **`reconciliationId`** (`obs-<takeId>`, `rec-<takeId>`, S-072). **`used` is true
+exactly for the take each shot of a completed video run's video shows** — the take its latest render manifest's clip
+shot names — as `chosen` is true only for a completed stills stage's pictures (S-055). A plan or stills run's record has
+`takes: []`. The entry is strict, as every contract shape is. **`CONTRACT_VERSION` stays 1.** `readRecord` returns the
+takes; `reel-contract.md` gains a note naming this entry, and its gates are not edited; the contract's example record
+and the stand-in service's records carry `takes` (test support, S-034's form).
+
+**Why.** S-034's reasoning holds: the version exists so a caller that sends version 1 keeps working when version 2 adds
+fields (D-095), and **no caller exists**. `reel-contract`'s _Pending_ item 1 says _"Adding clip entries is compatible
+with version 1"_. D-015 traces seed-library assets and clips are assets; D-058 keeps rejected takes because _"they cost
+money, they carry evidence"_, and the record is where a caller reads evidence (I-4).
+
+**Rejected.** **Version 2** — two record shapes kept in step for a caller that does not exist (S-034's reason); the owner
+rejected it. **Leaving clips out** — the owner rejected it. **`takes` optional** — a record that leaves them out could
+not be told from one with none. **Narrations and renders in the record** — not asked; they stay in the tables.
+
+**Caught by.** `reel-takes`' checks 3 (the schema, and the version) and 4 (the entries a run's record lists, `used`, and
+none for a plan or stills run); `reel-contract`'s shape checks, run over the amended schema.
+
+**Confirmed-by.** The owner, 2026-09-19, choosing _"Add clips, in version 1 (Recommended)"_, whose option named the
+entry's shot, checks and outcomes, and observation and reconciliation ids, every attempt's, and `CONTRACT_VERSION`
+staying 1 as S-034 did. **This entry's reading:** `number`, `used`, the order, and the entry being required and strict.
+
+---
+
+## S-094 | 2026-09-19 | Three takes a shot, counted when decided; a retry is told the failed takes' reasons and nothing else
+
+**Chose.**
+
+- **A shot gets up to three takes, each counted once its outcome is decided** — Gate 2 failed, or Gate 5 completed
+  (D-024). A take that fails is followed by the shot's next take; the first accepted is the shot's, and none follows it
+  (D-030); **after the third decided failure no video call names the shot**, and `atTheCap` decides (S-090). A take is
+  not counted when its call was refused (S-095), answered `unavailable` to the last send (S-096), or cut off by a crash
+  (S-092).
+- **Take ids are `a<attempt>-shot-<unit>-take-<n>`**, `n` 1 to 3, the take's number among the shot's decided takes;
+  `TakeRecord.number` is typed `1 | 2 | 3`. The seed is the CRC-32 of the id (D-018). Every take of a shot is in its
+  first take's mode (S-091), with its criteria and its requested seconds.
+- **A retry's prompt is `retryPrompt(first, failed)`**: the shot's first take's prompt with, **inserted before the
+  negative audio block**, a blank line, a line saying the takes before this one failed their checks, and **every earlier
+  failed take's reasons, each under `Take 1:` or `Take 2:`, then under `Gate 2:`, `Gate 3:` and `Gate 5:`**, as bullets.
+  **The negative audio block stays last** (S-071). It consumes **every earlier failed take of the shot**, as the
+  canonical's repair consumes both candidates' verdicts (D-047, S-060): take 3 is told take 1's and take 2's reasons, so
+  its prompt differs from take 2's even when take 2 failed for take 1's reasons.
+- **A retry is never shown** the failed take's clip, path, observation or expanded prompt (D-072), and no model looks at
+  anything to write it (D-033: _"No second vision call is made"_, I-15).
+- **Gates 4 and 5 of every take are told nothing of an earlier take**: the witness is given the take's clip and a
+  temperature (I-8, S-072), and the reconcile prompt is made of the take's own observation and its shot's brief.
+- **Events**: each take's verdicts, with the shot's id, take after take in the order the gates ran.
+
+**Supersedes:**
+
+- **S-066**, on _"A shot gets one take in each attempt of the clips job."_ and on _"A take that fails Gate 2, 3 or 5
+  stops the reel for that gate's rule"_ — as above. Its supersession of **D-024**, on _"A shot may consume 3 paid clip
+  takes — one initial plus two retries — before it is marked `failed`"_ and its `Confirmed-by` _"A test that a shot with
+  three failed takes is marked `failed` and that no fourth video job is submitted for it"_, and of **D-033**, on its
+  `Confirmed-by` _"A test that take 2's prompt differs from take 1's whenever take 1 failed a gate"_, ends, as S-066's
+  own _"until `reel-takes` supersedes this entry in turn"_ provides: both apply as written, but where S-092 supersedes
+  D-024 for a take a crash cut off. _"marked `failed`"_ is read as the shot reaching its cap, where D-025's ladder, as
+  S-090 reads it, applies. S-066's _"a reel that fails Gate 7 stops for rule `gate-7`"_ stands.
+- **S-071**, on _"Take ids are `a<attempt>-shot-<unit>-take-1`."_ — the number is 1 to 3; and, by addition, on _"The
+  prompt, composed by code after the stills are approved (D-033, D-069, D-008)"_ — a retry's prompt adds the failed
+  takes' reasons before the negative audio block, which stays last.
+- **D-033**, by addition, on its rider _"A retry prompt additionally consumes the failed take's verdict."_ — take 3's
+  prompt consumes take 1's verdict as well as take 2's, as D-047's repair consumes both failed verdicts of one entry.
+  The rider's reason, _"a retry that cannot see why the previous take failed is a re-roll, not a retry"_, and D-033's
+  two inputs stand: a failed take's verdict is recorded, and citing it is never a second look.
+- **S-072**, on _"A take that fails stops the run for the rule of its lowest failing gate, the detail naming each failed
+  gate's reasons (S-066)."_ — a take that fails is followed by the shot's next; a shot that fails at its cap and cannot
+  be held stops the run for the rule of its third take's lowest failing gate (S-090).
+- **S-069**, on _"then for each shot in plan order a `verdict` for gates `'2'`, `'3'`, `'4'` and `'5'` with its `shotId`,
+  each once its gate completes"_ — for each take of each shot, take after take; and on _"a take failing"_ among the clips
+  job's endings — a shot failing at its cap.
+
+**Why.** D-024's three takes and D-033's rider are what S-066 withheld. The reasons go before the block because S-071
+puts the block last and the validator holds every video request to it; they are the verdict D-033 names. D-033 rejects
+_"Retrying with an unchanged prompt and a new seed — a re-roll dressed as a retry"_, and says of its check _"an
+identical prompt proves the verdict was never consumed"_: a take 3 told only take 2's reasons would be take 2's prompt
+again whenever the two failed alike, the likeliest case. D-047 already consumes both failed verdicts of one entry.
+
+**Rejected.** **The reasons after the negative audio block**, _"appended"_ as S-060 appends — the block would no longer
+be last. **Only the one failed take before it**, S-060's form for a derived repair — take 3 would repeat take 2's prompt
+when both failed alike. **The failed take's observation in the prompt** — what a witness saw of a clip that failed
+describes what was made, not what was wrong; the reasons are the verdict. **Counting a take when made** — a crash or a
+refusal would cost a shot a try.
+
+**Caught by.** `reel-takes`' checks 5 (the next take, its id, number, seed and mode, and no fourth), 6 (the retry
+prompt, and take 3's differing from take 2's), 7 (Gates 4 and 5 told nothing of an earlier take), 8 (the events) and 12
+(the stop at the cap); `reel-render`'s checks as S-099 changes them.
+
+**Confirmed-by.** Nothing here was asked of the owner: this entry is its own reading of D-024, D-033 and S-066, and of
+the owner's S-091 answer, whose option said _"each retry told why the last take failed"_ — which this entry widens, as
+its reading, to every earlier failed take, for the reason above.
+
+---
+
+## S-095 | 2026-09-19 | A video run is still admitted on its plan's estimate; every take is guarded, and a refused retry stops the run
+
+**Chose.**
+
+- **Admission is unchanged** (S-069, D-083): the selected plan's estimate, which counts one clip a shot at the plan's
+  durations, against the request's ceiling. **A retry is not in the estimate**, as the stills reserve is not (S-035).
+- **Every take is sent through the guard, and every send of it** (S-096): the chain's spend read again, plus the
+  requested seconds × the video rate, rounded up, against the cap the job read and then the ceiling (S-059, S-087).
+  Exactly equal is made.
+- **A retry the guard refuses is not made, and its shot is not held**: the stage stops for budget and the run finishes
+  `stopped`, `reason: 'budget'`, with the limit, the figure, the ceiling, the cap and the spend (S-087). A stop at the
+  cap appends S-087's question, naming the take by its id.
+- **D-014's _"retries ≤ 2 per shot"_ stands for decided takes**: three decided takes is two retries. A take a crash cut
+  off is made again beyond them (S-092). The per-reel cap and the ceiling bound what every take spends.
+
+**Why.** D-083's plan job _"estimates what the reel would cost to generate"_ from the winning storyboard, and a retry is
+in no storyboard; D-024's note: _"The pre-flight check is the control that matters; this is a backstop"_; I-2: the
+per-reel cap binds before the take cap does. D-014: a cap _"never silently degrades quality or silently overspends"_ —
+holding a shot because its retry was refused would degrade it to save money.
+
+**Rejected.** **Admitting on three clips a shot** — refuses nearly every reel for a spend most never make. **Holding a
+shot whose retry is refused** — D-014. **Guarding only a call's first send** — the guard would stop reading the spend
+between sends of one call.
+
+**Caught by.** `reel-takes`' check 9, its refused retry on a shot a hold would cure; `reel-render`'s checks 8 and 42 to
+45, unchanged.
+
+---
+
+## S-096 | 2026-09-19 | A provider that fails for a moment answers `unavailable`; the worker's guarded ports send the call again, with backoff, on their own counter
+
+**Chose.**
+
+- **`VideoAnswer` and `NarrationAnswer` gain `{ kind: 'unavailable'; detail: string }`** — the provider made nothing and
+  may if asked again. Only a provider answers it; the stand-ins answer it only when a test scripts `transient: n` on a
+  take or a narration — the first `n` sends of that id.
+- **The worker's guarded video and narration ports send the same request again** on `unavailable`, **up to
+  `maxAttempts` sends in all**, waiting `backoffMs` before the second, then twice that before each next —
+  `RenderSettings.transient`, **default 3 and 1000 ms**. Every send is guarded (S-095). Nothing is written for an
+  `unavailable` answer; in this build it costs nothing.
+- **A call made after N `unavailable` answers** records **`transient_errors` N** on its video or speech receipt — a
+  column defaulting to 0 — and is otherwise what it would have been: **the take counter is unchanged**.
+- **A call still `unavailable` at the last send** makes the port throw, naming the call, the sends and I-11; the stage
+  fails the run as for any thrown call (S-046) — no row, no receipt, **no take counted**.
+- **A throw is a fault**, sent once, failing the run, as in `reel-render`. The pipeline treats an `unavailable` answer
+  that reaches it — which the guarded port never passes on — as a fault too.
+- **Which calls: video and narration.** Image and model calls are not covered.
+- A worker handed **`maxAttempts` not a whole number of at least 1, or `backoffMs` not a finite number of at least 0,
+  refuses to start**, before its database is opened.
+
+**Supersedes:**
+
+- **S-066**, on its supersession of **D-024**, on _"and provider transient errors (`maxAttempts` with backoff)"_ and its
+  `Confirmed-by` _"A test that N consecutive provider transient errors leave the take counter unchanged"_, and of
+  **I-11**, on _"Transient failures retry on `maxAttempts` with backoff, on their own counter"_ — **ended for video and
+  narration calls**, as S-066's _"until `reel-takes` supersedes this entry in turn"_ provides. S-066's _"a call that
+  throws finishes the run `failed`, as a thrown call does in `reel-plan` and `reel-stills` (S-046), and counts as no
+  take"_ stands, for a call that throws.
+- **I-11**, on _"Transient failures retry on `maxAttempts` with backoff, on their own counter"_, and **D-024**, on
+  _"and provider transient errors (`maxAttempts` with backoff)"_ — **for image and model calls**, until the paid-path
+  feature builds the adapters that fail transiently: a thrown image or model call fails the run, as `reel-plan` and
+  `reel-stills` were verified. No image or model call touches a take counter.
+- **S-066**, on its Chose's allocation to this feature of _"I-11's counter for provider transient errors"_ — **for image
+  and model calls**, which the paid-path feature takes, as above; this feature builds the counter for video and
+  narration calls.
+
+**Why.** D-024 puts transient errors on a counter of their own, which must not share with takes; I-11: _"A 500 is not a
+bad picture and is often unbilled."_ A typed answer, rather than an error the worker recognises by its shape, makes
+the difference structural: a bug that throws is never sent again, and the guard, which holds the spend and the ceiling,
+is the one place that sends. Backoff waits, and waiting is the runner's, not a pure stage's (`pipeline-no-io`). The
+stand-ins reach no network, so nothing is transient unless a test says so.
+
+**Rejected.** **A thrown error carrying a marker** — the worker would retry by an error's shape, which no type names,
+and a thrown bug of the same shape would be sent again. **The retry in the stage** — the take counter and the transient
+counter in one loop, which D-024 says must not share, and a timer in the pipeline. **Every port now** — changes verified
+`reel-plan` and `reel-stills` for adapters that do not exist. **No backoff** — D-024 and I-11 name it.
+
+**Caught by.** `reel-takes`' checks 1 (the answer's type), 2 (the settings and the refusals), 10 (N below `maxAttempts`,
+for a video and a narration call; the waits; a take 2 staying take 2) and 11 (the last send, a throw sent once, and the
+stage, read directly, failing on an `unavailable` that reaches it); `reel-render`'s check 46, unchanged.
+
+**Confirmed-by.** The owner, 2026-09-19, after the first review of `reel-takes`' gates found the narrowing of S-066's
+allocation needed the owner: asked which calls the counter covers, the owner chose _"Clip and voice calls now
+(Recommended)"_, whose option said picture and model calls get the same counter with the paid-path feature that builds
+their real adapters, since changing verified `reel-plan` and `reel-stills` now would guard against failures no stand-in
+can produce. **This entry's reading:** the `unavailable` answer, the sends, the backoff and its defaults, the receipt
+column, the refusals, and the supersession quotes.
+
+---
+
+## S-097 | 2026-09-19 | A held shot is rendered in the one pass from its picture's file, pushed in by `zoompan`, with silence under its narration
+
+**Chose.**
+
+- **`RenderShot` is `ClipShot | StillHoldShot`.** `ClipShot` is `reel-render`'s shot, unchanged, with `stillHold?:
+never`. `StillHoldShot` has the shot's id, `joinMode: 'cut'`, narration, words, span and conform notes, and a
+  **`stillHold`** block — the chosen picture's **id and path**, **its probe** — ffprobe of the file, taken by the media
+  port when the ladder held the shot and kept on the `still_hold` row (S-098) — **the three takes** its ladder consumed,
+  **the reason**, and **`endZoom`** — and every clip field typed `never`. A picture that does not probe as a readable
+  picture is a fault, and fails the run. Its **verdicts** are its picture's, Gate 1 and 1S where it ran, then its three takes', Gates 2 to 5 in order,
+  with coverage. A clip shot's verdicts stay its picture's and its accepted take's.
+- **The schema refuses** a still-hold shot with no reason, with other than three takes, or with any clip field, and a
+  clip shot with a `stillHold`.
+- **The one pass** reads the picture's file in place of a clip: scaled to fit the profile keeping its aspect and padded
+  from its probe (D-055), then **`zoompan`**, making **exactly the span's frames** from the one picture, zooming **from
+  1 at the span's first frame to `endZoom` at its last, centred**, at the profile's frame rate; **silence** for its
+  sound, with the narration mixed over it; joined by the `concat` filter in the one filtergraph (D-054).
+- **`RenderSettings.stillPush`**, `{ endZoom }`, **default 1.1**, provisional until M-1; a worker handed an `endZoom`
+  that is not a finite number above 1 refuses to start. **`zoompan` joins `PASS_FILTERS`**, so `ready()` requires it.
+- **A still-hold is measured, never read back** (S-073): every frame of its span carries its picture's colour and none
+  the band of its takes; a bordered stand-in picture's border — **2 pixels** of its 90, since a push to 1.1 takes about
+  4.1 from each side — is at the span's first frame and pushed out by its last; the span's frames are counted; its clip
+  tone is absent under the narration's.
+- **The assembler, the assemble job and `cutReel` take both kinds of shot**, a clip shot's geometry read from its
+  clip's probe and a still-hold shot's from its picture's — the two measured sources `reel-render`'s check 37 allows
+  (S-099).
+
+**Supersedes:**
+
+- **D-059**, on _"the selected take id with its provider `request_id` and `expanded_prompt`"_ — **for a still-hold
+  shot**, which has no selected take: its picture's id, path and probe, and the takes its ladder consumed.
+- **S-073**, on _"its take, the provider's request id, the expanded prompt and the clip's path"_, _"its opening"_, _"the
+  clip's measured facts"_ and _"its hold"_ — for a still-hold shot, which has none of them: its `stillHold` block, as
+  above; and on _"`still-hold` is `reel-takes`' (S-066)."_ — built here: D-059's check _"A test that a shot
+  marked `still-hold` or `text-to-video` without a degradation reason fails validation"_ applies to a still-hold shot,
+  and S-073's reading of it for a `text-to-video` shot stands.
+
+D-059's other clauses stand: the manifest is the assembler's only input, its paths local and under the root, every
+shot in timeline order with its join mode and conform notes. S-073's spans, holds, captions, mix and measure stand.
+
+**Why.** D-025 rung 2: _"hold the gated keyframe as a `still` for the shot's duration, with a slow push"_, whose
+reason names the primitive _"implemented with ffmpeg `zoompan`"_. D-059 lists _"`still-hold`"_ among a shot's openings,
+with its reason. D-055: _"Every input is measured with ffprobe and conformed to that profile"_ — Gate 1's sensor read
+the picture's size from its header, which is not ffprobe — so the stage probes the file once, when it holds the shot,
+and the manifest carries the probe: the assembler reads nothing the manifest does not hold (D-059), and no geometry is
+taken on trust (I-17). Run on this machine before the gates were fixed: a 90 × 160 PNG through `scale`, `setsar` and
+`zoompan` with `d` 50 gave exactly 50 frames; the first review ran it again and found a 4-pixel border still at the last
+frame's edge and a 2-pixel one gone.
+
+**Rejected.** **A still-hold shot as a clip shot with null fields** — a type in which a keyframe shot may have no take.
+**A kind field on every shot** — every manifest's text, hash and fixture would change for shots that did not. **The
+picture looped as an input and trimmed** — `zoompan` makes the frames itself, from one picture. **Gate 1's sensor
+measure** — D-055 measures every input with ffprobe. **The assembler probing the picture** — the manifest is its only
+input (D-059). **The three takes' verdicts left out** — the hold's evidence would be
+in rows alone, and a replayed manifest could not show why its shot is held.
+
+**Caught by.** `reel-takes`' checks 2 (the setting and `zoompan`), 13 (a picture that cannot be probed fails the run),
+16 (the types and the schema), 17 (the manifest), 18 (the output, measured) and 20 (a replay, and Gate 7's frames);
+`reel-render`'s check 37, widened as S-099 says.
+
+---
+
+## S-098 | 2026-09-19 | A held shot is labelled in four places with whatever ending the clips job reaches, in a table of its own, and listed after the stills' degradations
+
+**Chose.**
+
+- **Four places** (I-4): **a `still_hold` row** — run, shot, the clips attempt that decided it, picture, the picture's
+  probe (S-097), the three take ids, reason — its key the run and the shot; **the third take's row**, whose
+  `degradation` carries the reason; **the video receipt of each of the three takes**, marked `degraded`, **whichever
+  attempt made it**; and **a `degraded` event** after the third take's verdicts. S-058's form, but for the receipts:
+  S-058's _"The receipts marked are the shot's pictures this attempt made"_ is about pictures, and its reason — an
+  earlier attempt's pictures belong to a ladder that degraded nothing — does not hold under checkpoints, where an
+  earlier attempt's decided takes are this ladder's (S-092).
+- **Written with whatever ending the clips job reaches**: `advanceClips` for a completed stage, `finishVideo` for a
+  stop or a failure, in the transaction that ends it. The stage records each `StillHold` and its event when its ladder
+  holds.
+- **Listed** in a completed result's `degradations` and in the record's: the stills stage's in the order reached, then
+  **the still-holds in the order reached**, then the latest render's holds in shot order.
+- **Kept apart from a hold** (S-073): a still-hold's reason begins with the shot _"is held on its approved picture"_ and
+  cites D-025; a hold's says a take's _"last frame is held"_ and cites S-073. They are written by different jobs to
+  different tables, and no shot has both, since a held shot shows no clip.
+
+**Supersedes:** **S-069**, on _"`degradations` the stills' then the holds'"_ — the stills', then the still-holds', then
+the holds'; and on its list of the clips job's events, ending _"completed: nothing more from this job"_ — the clips job
+also writes a `degraded` event for each held shot, after its third take's verdicts, whatever its ending. S-069's
+_"From the assemble job — cancelled: `run.finished`; else a `degraded` event per hold in shot order (S-073)"_ stands for
+the holds.
+
+**Why.** I-4: _"A still-hold, an `accept_with_label`, a dropped shot — each is labelled on the shot, in the verdict, in
+the receipt, and queryable afterwards."_ D-025's check wants a query for the reels containing a held shot, which a
+table of its own answers, as S-073's `hold` table does for a clip held to its narration. S-058 writes a degraded
+picture's labels with every ending, because a degradation is a fact decided when its ladder ended.
+
+**Rejected.** **The `degradation` table** — the stills stage's, which `readClipsInputs` reads as the shots to make from
+words: a restart would make a held shot `text-to-video`. **The `hold` table with a kind** — one name for two things, and
+the record lists the latest render's holds only. **Labels on a completed ending only** — an event no row records
+(S-058's reason). **Only the third take's receipt marked** — S-058 marks every receipt of the shot's pictures.
+
+**Caught by.** `reel-takes`' checks 14 (the four places, with three endings, and the query), 19 (the order, and the
+two kept apart) and 25 (the events of a held shot's endings).
+
+---
+
+## S-099 | 2026-09-19 | What `reel-takes` changes in verified features
+
+**Chose.** Each change is made in the slice that forces it, and **none removes an assertion**. **A premise three takes
+turn into a retry is kept on the path that still stops**: the failure built on each of a shot's three takes, on a shot
+S-090 cannot hold — shot 0 of `NO_RECURRENCE`, shot 3 of `THREE_RANKS` (each made from words) or shot 0 of `THREE_RANKS`
+(it claims the event `show-pressing`).
+
+**`reel-render`** (Slice 2, but check 37 in Slice 4 and check 48 in Slice 5):
+
+- **Check 20** (`tests/reel-render-gates.test.ts`), its held test: its Gate 3 failure is on shot 1, which a hold can
+  cure, so once released the run makes shot 1's take 2 and goes on to shots 2 to 5; its script, which answered
+  `[t0, t1]`, answers shot 1's take 2 and every take after it, so the run ends as a completed clips stage rather than on
+  a missing answer. Every assertion is kept as written — it reads take 1 alone.
+- **Check 21** (`tests/reel-render-gate2.test.ts`): `firstTake` scripts its entry on `shot-0-take-1`, `-2` and `-3` of
+  `NO_RECURRENCE`. In `failedGate2`, _"a later take was made"_ — one take row — becomes three, the shot's, and none of a
+  later shot; the one take's verdicts `[['2', 'fail']]`, its outcome and its Gate 2 reason are asserted of each of the
+  three; stopped, rule `gate-2`, step `video`, no observe or reconcile call and no observation or reconciliation are kept
+  as written. Its passing tests are unchanged.
+- **Check 22** (`tests/reel-render-gates.test.ts`): the speech and the music runs script the sound on each of shot 3's
+  three takes, where they scripted shot 2's one; stopped and rule `gate-3` are kept; the take's verdicts, reasons,
+  outcome and sound, and Gates 4 and 5 having run, are asserted of each of the three. The words run is unchanged.
+- **Check 23**, its first test: the Gate 5 failure on each of shot 3's three takes; rule `gate-5` kept; the outcomes
+  `['accept', 'accept', 'fail']` become three `accept` then three `fail`; `observeClipCalls.length` 3 becomes 6; the
+  rest is asserted over every take, as written. Its second test is unchanged: an unparsed witness answer fails the run.
+- **Check 24**, its second test: each Gate 5 fault on each of shot 0's three takes; rule `gate-5` kept; the one take's
+  Gate 5 verdict, reason and outcome asserted of each of the three; the observations and reconciliations — one each —
+  become the three takes', with one reconciler receipt each. Its first test is unchanged.
+- **Check 26** (`tests/reel-render-stops.test.ts`): each case's fault on each of shot 3's three takes, where it was on
+  shot 2's one. Status, reason, rule and step are kept. _"The detail names the take and every reason of every gate it
+  failed"_ is asserted of the three takes. `/one take/i` becomes `/three takes/i` and `/no approved picture/i`. The
+  narration calls become shots 0 to 3, and so do the narration rows, `[0, 1, 2]` becoming `[0, 1, 2, 3]`; the clip calls
+  take 1 of shots 0 to 2, then takes 1, 2 and 3 of shot 3; the take rows shots 0 to 2 accepted, then shot 3's three
+  failed; the gates each failing take reached, per case, of each of the three; the reconciliations 3 or 6 where they were
+  2 or 3; the Gate 3 case's criteria, shot 3's.
+- **Check 37** (`tests/reel-render-cut.test.ts`, Slice 4): its reading of the assembler's source — that every width,
+  height, frame rate, sample rate and channels read is off the profile or off `shot.clip.video` — gains a second
+  measured source, `shot.stillHold.probe.video`, a still-hold shot's picture probed by ffprobe (S-097, D-055); every
+  other read it refuses, it still refuses, and its grep for the concat demuxer, stream copy and segments is unchanged.
+- **Check 47**, _"a take failing"_ (`tests/reel-render-endings.test.ts`): the music on each of shot 3's three takes; the
+  events `TAKES(2)` and shot 2's four become `TAKES(3)` and shot 3's three takes' four each — `2 accept`, `3 fail`,
+  `4 accept`, `5 accept` — then `run.finished stopped`; rule `gate-3` kept.
+- **Check 48** (`tests/reel-render-restart.test.ts`, Slice 5, S-092). The completed restart, held at call 15: the new
+  worker's narration calls, every shot's, become shots 3 to 5's; its clip calls, every shot's, become shot 2's —
+  `a2-shot-2-take-1`, the take the kill cut off, made again — and shots 3 to 5's; the narration rows become the first
+  attempt's three and the second's three; the take rows the first attempt's three and the second's four; the
+  observations and reconciliations `T(1,0)`, `T(1,1)` and the second's four; the second attempt's receipts its three
+  narrations and four clips; the manifest's shots, and the takes `framesOf` measures, the first attempt's takes and
+  narrations for shots 0 and 1, the first attempt's narration and the second's take for shot 2, the second's for 3 to
+  5; `readRenderInputs` those same rows, where it was _"the second attempt's six takes and six narrations alone"_ (S-089)
+  — each shot's finished narration and accepted take, never `T(1,2)`. The new worker's model script, `clipsScript`,
+  answers from shot 2's take on, the second attempt's first model call. The result, the jobs, `stage.started` once, the
+  events, the kept receipts, the files and the ledger are kept as written. The budget stop, held at call 11: the clip
+  guard's run keeps its figure, 246, and its made calls become none — shot 0's narration is kept, so the refused call is
+  its take made again; the narration guard's run holds its first worker where the second attempt's first narration call
+  comes after the cut-off take is made again — the next shot's — with a ceiling and a narration rate chosen in the slice
+  so that clip is made and that narration refused, and asserts the same things of it.
+- **Stand as written**: checks **13** and **18**, whose fixtures are one attempt with no failing take — though their
+  words, _"one narration call in each attempt"_ and _"N video receipts"_, no longer hold of every run: a restarted
+  attempt makes no narration it kept, and an attempt with a retry makes a receipt a take; **25**; **38** — a Gate 7
+  failure is terminal, D-058's edits being `video-edits'`; **46** — a throw is a fault, only `unavailable` is sent again;
+  **49**; and every check not named here.
+- `reel-render.md` gains a note naming this entry and checks 13 and 18 — its Gate 2 and 3 passages resting on S-066's
+  one take, S-072's stop, S-076's start-over and S-069's events and order of `degradations` are superseded with those
+  entries, not edited — and its Evidence line is not touched.
+
+**`reel-contract`** (Slice 1, S-093): `RunRecord` requires `takes`, so the shape check's example record and the
+stand-in service's records (`tests/stand-in/`) carry `takes: []`; `reel-contract.md` gains a note. No assertion changes.
+
+**`reel-stills`** and **`reel-plan`**: nothing asserted changes. The stand-in picture's `border` is an option no stills
+test sets; the model port keeps its four calls.
+
+**Code and test support, none of it an assertion**: `TakeRecord.number` widened, and the guarded video port and
+`readRenderInputs` writing and reading the take's number; the pipeline handling `unavailable` (Slice 1); the assembler,
+the assemble job and `cutReel` taking both kinds of render shot, and two verified test files typed for the union —
+`tests/reel-render-shapes.test.ts`' shot builder taking a `ClipShot['opening']`, and
+`tests/reel-render-manifest.test.ts`' `rows()` carrying `stillHolds: []` (Slice 4); `tests/engine/video.ts`'
+`videoScript` and `clipsScript` answering the model stand-in for each take made, retakes included, in call order;
+`TEST_RENDER_SETTINGS` and the child worker carrying `transient` — with a short backoff — and `stillPush`.
+
+**S-066's other supersessions continue**, by name: of **D-058**, on _"Their repair vocabulary is a closed enum of edit
+ops that spend no money: `reorder`, `retime`, `recaption`, `reselect-take` (choosing a different already-accepted take
+of the same shot). Applying any of them re-runs L5 and re-runs Gates 7 and 8."_ and its `Confirmed-by` _"The op
+vocabulary is a closed enum in the schema and an op outside it fails validation."_ — the edits are `video-edits'`, and
+a Gate 7 failure stays terminal; and of **D-080**, on _"the clips, Gates 2 to 5, the take ladder, the narration audio,
+the assembly pass, and Gates 7 and 8"_, and **D-108**, on _"`reel-render` is unchanged: everything after the approved
+stills (D-080)"_ — the take ladder is this feature's and is built here, the edits `video-edits'`, and Gate 8
+KnowScroll's (S-068).
+
+`reel-render's`, `reel-stills'`, `reel-plan's` and `reel-contract's` journeys run again in Slice 6.
+
+**Why.** S-066: _"Owed by `reel-takes`: its gates name checks 21 to 26 and 38 as premises it changes, in S-047's form,
+since each asserts a stop that three takes turn into a retry."_ Checks 46 and 48 meet I-11's counter and the restart.
+
+**Rejected.** **Leaving the checks as written** — red on a correct build. **Moving each to a shot that is held** — its
+stop assertions would go. **Scripting the failure on take 1 alone** — the run completes on take 2, and the stop
+assertions go dead (S-055's lesson). **Editing `reel-render`'s gates** — a note says what changed and where it is
+decided (S-047).
+
+**Caught by.** The four journeys, run again in `reel-takes`' Slice 6, and `reel-render`'s check 50, whose child runs
+every changed test.

@@ -2501,3 +2501,75 @@ adversarial review. Owed outside this repository, unchanged: S-068, S-073, S-029
 
 **Next.** Session 29: run `PROMPTS/029-reel-takes-gates.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-19 — session 29, reel-takes gates 1–4: six owner answers, written, reviewed three times, approved
+
+**Intent.** Run `PROMPTS/029-reel-takes-gates.md`: write `reel-takes`' four planning gates and have an adversarial
+reviewer review them until approved or a finding needs the owner. No code, no test. `decisions.mjs`: pin current, 0
+commits unpushed. Baseline `check.mjs` green (288 tests at 8819d13, by session 28's TAP count).
+
+**Changed.**
+
+- **`docs/features/reel-takes.md`** — Gates 1–4: **26 checks in 6 slices (4 + 8 + 3 + 5 + 4 + 2)**, the Deferred list
+  and known limits, and Gate reviews 1–3. **All four gates APPROVED 2026-09-19 — the `Gates:` line written by the
+  reviewer itself**, as its one allowed edit (product and slices in round 2, architecture and program design in round
+  3). `Status: planned`. The front matter and the "Created 2026-09-16 by S-066" note are kept; the title now says what
+  the owner chose; the `Decisions:` and deferral lines are computed from what the gates and the Deferred list cite.
+- **`DECISIONS.md` — S-090 to S-099**: the ladder at the cap — hold on the chosen picture when a hold would pass, stop
+  the reel otherwise, nothing soft (S-090, owner); one strategy a shot (S-091, owner); checkpoints on a restarted clips
+  job (S-092, owner); takes in the record, contract version 1 (S-093, owner); three takes and the retry prompt (S-094);
+  spending (S-095); `unavailable` and the transient counter for video and narration calls (S-096, owner); the still-hold
+  in the one pass (S-097); a held shot's labels (S-098); what `reel-takes` changes in verified features (S-099).
+- **`PROMPTS/`** — prompt 029's `Run` line set to session 29, in the file and the index (S-065).
+- No code, no test.
+
+**Observed.**
+
+- **Six owner answers**, each asked because it changed what "approved", "spent" or "failed" means; the recommended
+  option chosen each time but one:
+  - **the failure classes at the cap** (items 2 and 3): hold if a hold would pass — a shot with a chosen picture that
+    claims no event is held whatever its three takes failed on, since its picture was checked for all of it; a shot made
+    from words, or one that must show an event, stops the reel; nothing is soft, so `accept_with_label` is not built;
+  - **what a strategy is** (item 4): the shot's own — a retry changes its prompt and seed, never its mode;
+  - **a restart's takes** (item 5): the owner answered in free text, _"Option 1, but can we not save the results as
+    checkpoints so if a crash happens then we pick from there"_ — so a fifth question put a checkpoint rule, and the
+    owner chose to keep every finished narration and decided take, remaking only a take a crash cut off, which counts
+    against no cap. This reverses S-076's start-over for clips (S-048 stands for stills), and is buildable without a
+    second look at any clip (I-15) because nothing cut off is resumed;
+  - **the takes in the record** (item 6): version 1, amended, as S-034 did;
+  - **a sixth, raised by review 1**: which calls the transient counter covers — S-066 had given `reel-takes` _"I-11's
+    counter"_ by the owner's own answer, so narrowing it needed the owner. Chosen: clip and voice calls now, picture and
+    model calls with the paid-path feature.
+- **Settled before any gate by running ffmpeg** in the scratchpad: `zoompan` makes exactly `d` frames from one PNG, and
+  pushes a border out at a zoom of 1.1 — which review 1 refined: four pixels survive at the last frame, two do not.
+- **Found while writing, before review**: D-055 measures every input with ffprobe, and Gate 1's sensor reads a PNG's
+  header — so a held picture is probed by the media port when the ladder holds it, and the manifest carries the probe.
+- **Findings by round: 17, 5, 0.** Bars (b) and (c) never fired.
+  - **Round 1 (17):** every quote was exact again — and, as in session 20, the bar-(a) findings were clauses the quotes
+    left out: D-025's _"by failure class"_ and rung 2's words, widened by the hold rule; D-024's Chose and D-014, which a
+    crash's remade take passes; S-076's and S-089's rejections, which checkpoints adopt; S-069's clips-job events and
+    unclaimed clause; S-066's allocation of I-11's counter. The bar-(d) findings: a union type that would break code and
+    verified tests in a slice that did not touch them (the reviewer compiled it); `reel-render`'s check 37, which would go
+    red on a still's geometry; a type check in the wrong slice; S-091 caught by nothing; clauses green before code,
+    undeclared; take 3's prompt able to repeat take 2's — a re-roll D-033 rejects; a border width no fixture fixed.
+  - **Round 2 (5):** all 17 fixed; product and slices approved. New: a probe clause that could not fail, one stale check
+    number, D-033's rider widened unnamed by the round-1 fix, wording lagging the fixes, one false sentence about a test.
+  - **Round 3 (0):** all approved; 175 quotes exact.
+- **The pattern held, and changed shape.** Session 20's lesson — read each decision whole — kept quotes exact from the
+  first round, and still round 1 found every bar-(a) in a clause outside the quote. What was new here: **a fix to one
+  finding widened another decision** — consuming every failed take in the retry prompt (finding 12) widened D-033's rider,
+  caught in round 2. And **an owner's free-text answer changed the design mid-session**: checkpoints reversed a verified
+  rule, and every supersession it forced (S-076, S-089, D-024, D-014, S-069) surfaced only in review.
+- **Six S-entries in one session supersede, in part, D-014, D-024, D-025, D-033, D-059, I-11, S-066, S-069, S-071,
+  S-072, S-073, S-076 and S-089** — three (S-090, S-092, S-096) with the owner's answers as their substance, the rest as
+  the entries' readings, each accepted by the reviewer; S-099 continues S-066's supersessions of D-058, D-080 and D-108. None is marked in the steering repository (D-115's cost).
+- **Carried to the slices, from the reviewer's "could not check":** `reel-render`'s check 37 keys the assembler's
+  declarations by name, so a second measured source must not collide on `video` (Slice 4); three-take runs against the
+  60-second lease (Slices 2 and 5, known limit 14); `zoompan` at the full 768 × 1366 profile (Slice 4).
+- **A shell trap, again**: a `node -e` edit holding backticks was cut by the shell and ran nothing — caught by its own
+  once-only find throwing before any write. The edits went through the editing tool.
+- `node scripts/check.mjs`: **everything green, 288 tests** by the TAP count. Nothing but markdown changed.
+
+**Next.** `reel-takes` Slice 1 — the ports' answers, the settings and the record (checks 1–4) — in its own session. Its
+prompt is not written. Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and
+serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).

@@ -4,7 +4,7 @@
 - **Feature:** `reel-takes` — [`docs/features/reel-takes.md`](../docs/features/reel-takes.md)
 - **Work:** write its four planning gates and have them reviewed adversarially until approved; no code, no test
 - **Written:** 2026-09-19, at the end of session 28, after `reel-render` was verified (8819d13) and pushed
-- **Run:** not yet
+- **Run:** session 29
 
 Paste everything inside the block below as the session's first message.
 
