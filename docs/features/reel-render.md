@@ -12,7 +12,7 @@ authority: plan
 
 # reel-render — approved stills become a finished video, for $0
 
-Status: planned
+Status: verified
 Decisions: D-001, D-005, D-007, D-008, D-014, D-015, D-018, D-019, D-020, D-023, D-025, D-026, D-027, D-028, D-029, D-033, D-036, D-037, D-041, D-042, D-043, D-044, D-047, D-049, D-050, D-051, D-052, D-053, D-054, D-055, D-056, D-057, D-058, D-059, D-063, D-064, D-069, D-071, D-072, D-076, D-080, D-081, D-083, D-086, D-087, D-094, D-098, D-099, D-100, D-101, D-108, D-110, I-4, I-6, I-7, I-8, I-10, I-12, I-15, I-16, I-17, I-18, I-19, S-010, S-016, S-021, S-023, S-025, S-026, S-027, S-028, S-029, S-031, S-033, S-035, S-036, S-037, S-038, S-040, S-041, S-042, S-046, S-048, S-051, S-052, S-053, S-055, S-056, S-058, S-059, S-066, S-067, S-068, S-069, S-070, S-071, S-072, S-073, S-074, S-075, S-076, S-077
 Named only in the deferral list: D-022, D-024, D-035, D-040, D-048, I-5, I-9, I-11, S-019, S-032
 Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED 2026-09-16 adversarial-reviewer · program-design APPROVED 2026-09-16 adversarial-reviewer · slices APPROVED 2026-09-16 adversarial-reviewer
@@ -1273,6 +1273,8 @@ Every check appears in exactly one slice: 6 + 4 + 18 + 13 + 6 + 3 = 50.
 - [ ] The whole journey passes with no secrets in its environment, and no connection to a paid service exists
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-19 journey=PASS at 8819d13 — every check green; 106 tests in tests/reel-render-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
