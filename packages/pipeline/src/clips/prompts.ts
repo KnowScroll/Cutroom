@@ -1,4 +1,9 @@
-import type { ClipObservation, PlanSubject, WitnessObservation } from '@cutroom/contracts'
+import type {
+  ClipObservation,
+  PlanSubject,
+  TakeRecord,
+  WitnessObservation,
+} from '@cutroom/contracts'
 import type { Criterion, StyleContract } from '@cutroom/reel-contract'
 import { COUNT_RULE, reconcileAnswer } from '../stills/prompts.ts'
 
@@ -73,6 +78,39 @@ export function clipPrompt(brief: ClipBrief): string {
   }
   lines.push(NEGATIVE_AUDIO)
   return lines.join('\n')
+}
+
+/**
+ * A retry's prompt (reel-takes, S-094; D-033's rider): the shot's first take's prompt with, inserted
+ * before the negative audio block, a blank line, a line saying the takes before this one failed their
+ * checks, and every earlier failed take's reasons — under `Take <n>:`, then under `Gate <g>:` for each
+ * gate it failed, as bullets. The block stays last, so every retry passes the validator (S-071).
+ *
+ * EVERY earlier failed take, not only the last: take 3 told only take 2's reasons would ask for take
+ * 2 again whenever the two failed alike — a re-roll with a new seed, which D-033 rejects — as the
+ * canonical's repair consumes both candidates' verdicts (D-047, S-060). And only their RECORDED
+ * reasons: never a failed take's clip, path, observation or expanded prompt (D-072), and nothing is
+ * looked at to write it (D-033: "No second vision call is made"; I-15).
+ */
+export function retryPrompt(
+  first: string,
+  failed: ReadonlyArray<Pick<TakeRecord, 'number' | 'verdicts'>>,
+): string {
+  if (!first.endsWith(NEGATIVE_AUDIO)) {
+    throw new Error(
+      "a retry is made from its first take's prompt, which ends with the block (S-071)",
+    )
+  }
+  if (failed.length === 0) throw new Error('a retry follows a take that failed (S-094)')
+  const lines = ['', 'The takes before this one failed their checks. What failed, take by take:']
+  for (const take of failed) {
+    lines.push(`Take ${take.number}:`)
+    for (const verdict of take.verdicts) {
+      if (verdict.outcome !== 'fail') continue
+      lines.push(`Gate ${verdict.gate}:`, ...verdict.reasons.map((reason) => `- ${reason}`))
+    }
+  }
+  return `${first.slice(0, first.length - NEGATIVE_AUDIO.length)}${lines.join('\n')}\n${NEGATIVE_AUDIO}`
 }
 
 const idLines = (list: readonly Criterion[]) =>

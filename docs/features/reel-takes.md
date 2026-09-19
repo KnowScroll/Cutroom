@@ -825,7 +825,7 @@ _Endings, and no secrets_
       on rows `reel-render` already writes** — one take a shot, and its restart's two attempts — and every number is 1
       until Slice 2, whose check 5 reads the others.
       **Proves: 1, 2, 3, 4.**
-- [ ] **Slice 2 — three takes, informed retries, transient errors, and the cap's stop.** The take number on ids, rows and
+- [x] **Slice 2 — three takes, informed retries, transient errors, and the cap's stop.** The take number on ids, rows and
       seeds; the loop to three decided takes; `retryPrompt`; every send guarded and a refused retry stopping the run;
       `unavailable` sent again with backoff in both guarded ports, `transient_errors` recorded, the last send throwing;
       the stand-ins' `transient`; **`atTheCap`**, whose `fail` stops the run for its rule with its detail — **a `hold`,

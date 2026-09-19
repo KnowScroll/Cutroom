@@ -126,7 +126,7 @@ export interface ClipsStopQuestion {
   /** The call that was not made: a narration and its characters, or a clip and its seconds. */
   refused:
     | { call: 'narration'; narrationId: string; characters: number }
-    | { call: 'clip'; takeId: string; seconds: number }
+    | { call: 'clip'; takeId: string; number: number | null; seconds: number }
   /** The spend plus the refused call's figure: what was compared with the cap. */
   estimateCents: number
   spentCents: number
@@ -159,7 +159,7 @@ export function appendClipsStopQuestion(
       : `the next narration, ${refused.narrationId},`
   const figure =
     refused.call === 'clip'
-      ? `the clip \`${refused.takeId}\`, ${refused.seconds} seconds at ${question.videoRateCentsPerSecond} cents a second`
+      ? `the clip \`${refused.takeId}\`${refused.number === null ? '' : `, take ${refused.number} of its shot`}, ${refused.seconds} seconds at ${question.videoRateCentsPerSecond} cents a second`
       : `the narration \`${refused.narrationId}\`, ${refused.characters} characters at ${question.narrationRateCentsPerCharacter} cents a character`
   const entry = [
     '',

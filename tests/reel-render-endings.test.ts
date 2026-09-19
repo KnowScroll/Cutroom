@@ -13,6 +13,7 @@ import {
   holding,
   readVideo,
   reconcilesTake,
+  retake,
   takesOf,
   turned,
   video,
@@ -180,21 +181,32 @@ test(title('cancelled before the assemble job'), async () => {
 })
 
 test(title('a take failing'), async () => {
-  // Shot 2's clip carries music: it fails Gate 3, and Gates 4 and 5 still run (S-072).
+  // Each of shot 3's three clips carries music: each fails Gate 3, and Gates 4 and 5 still run
+  // (S-072). Shot 3 is made from words, so a hold cannot cure it, and the shot's three failed takes
+  // stop the reel (reel-takes, S-090, S-099: it was shot 2's one take).
+  const t3 = takes[3] as Take
+  const shot3 = [t3, retake(t3, 2), retake(t3, 3)]
   const ran = await ended('r47-take', {
-    media: { 'shot-2-take-1': { music: true } },
-    script: videoScript(THREE_RANKS, THREE_RANKS_PICS, { takes: takes.slice(0, 3) }),
+    media: Object.fromEntries(shot3.map((t) => [t.key, { music: true }])),
+    script: videoScript(THREE_RANKS, THREE_RANKS_PICS, {
+      takes: [...takes.slice(0, 3), ...shot3],
+    }),
   })
   assert.equal(ran.result.rule, 'gate-3', JSON.stringify(ran.result))
+  const failing = [
+    'verdict 2 shot-3 accept',
+    'verdict 3 shot-3 fail',
+    'verdict 4 shot-3 accept',
+    'verdict 5 shot-3 accept',
+  ]
   assertEnded(ran, 'stopped', [
     ...PLANNED,
     ...STILLS,
     'stage.started video',
-    ...TAKES(2),
-    'verdict 2 shot-2 accept',
-    'verdict 3 shot-2 fail',
-    'verdict 4 shot-2 accept',
-    'verdict 5 shot-2 accept',
+    ...TAKES(3),
+    ...failing,
+    ...failing,
+    ...failing,
     'run.finished stopped',
   ])
 })

@@ -8,6 +8,7 @@ import type {
   Plan,
   PlanSettings,
   RenderSettings,
+  TakeNumber,
   TakeRecord,
   TakeVerdict,
   VideoAnswer,
@@ -23,18 +24,24 @@ import { gate5, type TakeBrief } from '../gates/gate5.ts'
 import { shotIdOf } from '../stills/place.ts'
 import { takeCriteria } from './criteria.ts'
 import { narrationIdOf, takeIdOf } from './ids.ts'
+import { TAKES_A_SHOT, atTheCap } from './ladder.ts'
 import { narrationText, requestedSeconds, wordTimings } from './narration.ts'
-import { clipPrompt } from './prompts.ts'
+import { clipPrompt, retryPrompt } from './prompts.ts'
 
-// The clips stage (docs/features/reel-render.md, Gates 2 and 3; S-066, S-070 to S-072). The worker
-// calls `makeClips` with the selected plan, the chosen pictures and the ports it built, and it answers
-// with how the stage ended and everything it made. It never rejects: a thrown call, a refused parse or
-// a bug becomes a failed outcome, with every narration and take made before it in the record.
+// The clips stage (docs/features/reel-render.md, Gates 2 and 3; S-070 to S-072; and reel-takes' S-090,
+// S-091, S-094). The worker calls `makeClips` with the selected plan, the chosen pictures and the ports
+// it built, and it answers with how the stage ended and everything it made. It never rejects: a thrown
+// call, a refused parse or a bug becomes a failed outcome, with every narration and take made before it
+// in the record.
 //
-// SHOT BY SHOT, IN PLAN ORDER: the shot's narration, measured and its timings parsed; then its one take
-// (S-066), made from its chosen picture or from words, and Gates 2 to 5 on it as soon as it is made. A
-// take that fails stops the stage, and nothing later is made. Once every take is accepted, a `mustShow`
-// no sentence claims that no take showed stops the reel for gate-5 (S-072).
+// SHOT BY SHOT, IN PLAN ORDER: the shot's narration, measured and its timings parsed; then its takes,
+// each made the shot's own way — from its chosen picture, or from words (S-091) — and Gates 2 to 5 on
+// each as soon as it is made. A take is counted once decided: Gate 2 failed, or Gate 5 completed
+// (D-024, S-094). A take that fails is followed by the shot's next, told every earlier failed take's
+// reasons (D-033); the first accepted is the shot's, and none follows it (D-030). After the third
+// decided failure no video call names the shot, and the ladder decides: a hold, or a stop for the rule
+// of the third take's lowest failing gate (S-090). Once every shot is done, a `mustShow` no sentence
+// claims that no accepted take showed stops the reel for gate-5 (S-072).
 
 type Verdict = Extract<RunEvent, { type: 'verdict' }>
 type Refused = Extract<VideoAnswer, { kind: 'refused' }>
@@ -173,17 +180,24 @@ async function stage(
       shotId: shotIdOf(record.takes[index]?.shotUnit ?? -1),
     })
   }
-  /** A take that failed stops the reel, for the rule of its lowest failing gate (S-066). */
-  const stop = (index: number): Ending => {
-    const take = record.takes[index]
-    const failing = (take?.verdicts ?? []).filter((v) => v.outcome === 'fail')
-    const lowest = failing[0]?.gate ?? '5'
+  /** Each failed gate of a take, with its reasons. */
+  const failures = (take: TakeRecord) =>
+    take.verdicts
+      .filter((v) => v.outcome === 'fail')
+      .map((v) => `Gate ${v.gate}: ${v.reasons.join('; ')}`)
+      .join(', and ')
+  /**
+   * A shot whose three takes failed and cannot be held stops the reel, for the rule of its THIRD
+   * take's lowest failing gate (S-090, S-094), the detail naming each take, its reasons and why.
+   */
+  const stop = (failed: readonly TakeRecord[], why: string): Ending => {
+    const lowest = failed.at(-1)?.verdicts.find((v) => v.outcome === 'fail')?.gate ?? '5'
     return {
       kind: 'stopped-rule',
       rule: lowest === '2' ? 'gate-2' : lowest === '3' ? 'gate-3' : 'gate-5',
-      detail: `${take?.takeId} failed ${failing
-        .map((v) => `Gate ${v.gate}: ${v.reasons.join('; ')}`)
-        .join(', and ')}. A shot gets one take in this build, so the reel stops (S-066).`,
+      detail: `${shotIdOf(failed[0]?.shotUnit ?? -1)}'s three takes failed their checks — ${failed
+        .map((t) => `${t.takeId} failed ${failures(t)}`)
+        .join('; ')} — so the reel stops: ${why}`,
     }
   }
 
@@ -225,8 +239,8 @@ async function stage(
     }
     await narrated(n, { words: timings.data })
 
-    // The shot's one take: from its chosen picture, or from words at 9:16 (S-071).
-    const takeId = takeIdOf(attempt, unit)
+    // What every take of the shot is made from and held to: its first take's prompt, criteria and
+    // requested seconds, and its mode — from its chosen picture, or from words at 9:16 (S-071, S-091).
     const still = input.stills.find((s) => s.shotUnit === unit)
     const criteria = takeCriteria(unit, plan, request)
     const shown = shot.subjectIds.flatMap((id) => {
@@ -234,84 +248,117 @@ async function stage(
       return subject === undefined ? [] : [subject]
     })
     const brief: TakeBrief = { subjects: shown, ...criteria }
-    const prompt = clipPrompt({
+    const first = clipPrompt({
       style: request.style,
       sentences: (plan.units[unit] ?? []).map((p) => request.narration[p]?.text ?? ''),
       ...brief,
       picture: still?.observation ?? null,
     })
-    const fields = {
-      runId,
-      takeId,
-      prompt,
-      durationSeconds: requestedSeconds(measured.durationSeconds),
-      resolution: '768P' as const,
-      seed: crc32(takeId),
-      promptExpansionMode: settings.render.promptExpansionMode,
+    const durationSeconds = requestedSeconds(measured.durationSeconds)
+
+    // Up to three decided takes, until one is accepted (D-024, D-030, S-094).
+    const failed: TakeRecord[] = []
+    for (let count = 1; count <= TAKES_A_SHOT; count += 1) {
+      const number = count as TakeNumber
+      const takeId = takeIdOf(attempt, unit, number)
+      // A retry is told every earlier failed take's reasons, and nothing else of them (D-033).
+      const prompt = failed.length === 0 ? first : retryPrompt(first, failed)
+      const fields = {
+        runId,
+        takeId,
+        prompt,
+        durationSeconds,
+        resolution: '768P' as const,
+        seed: crc32(takeId),
+        promptExpansionMode: settings.render.promptExpansionMode,
+      }
+      const asked: VideoRequest =
+        still === undefined
+          ? { ...fields, mode: 'text-to-video', aspectRatio: '9:16' }
+          : {
+              ...fields,
+              mode: 'image-to-video',
+              image: { pictureId: still.pictureId, path: still.path },
+            }
+      // A take the guard refuses is not made, and its shot is not held: the stage stops for budget
+      // (S-095). Not made, it is not counted.
+      const made = await ports.video.generate(asked)
+      if (made.kind === 'refused') return stopped(made)
+      if (made.kind === 'unavailable') throw unavailable('video', takeId, made.detail)
+      record.takes.push({
+        takeId,
+        attempt,
+        shotUnit: unit,
+        number,
+        mode: asked.mode,
+        pictureId: still?.pictureId ?? null,
+        degraded: still === undefined && input.degradedShots.includes(unit),
+        prompt,
+        durationSeconds,
+        seed: fields.seed,
+        requestId: made.receipt.requestId,
+        expandedPrompt: made.receipt.expandedPrompt,
+        path: made.clip.path,
+        probe: null,
+        scan: null,
+        words: null,
+        sound: null,
+        observation: null,
+        reconciliation: null,
+        verdicts: [],
+        outcome: null,
+        degradation: null,
+      })
+      const t = record.takes.length - 1
+      const clip: ClipRef = { takeId, path: made.clip.path }
+
+      // Gate 2. A take failing it has no later gate (S-031's reason), and is decided.
+      const technical = await gate2(clip, ports.media, settings.render.technical, (f) =>
+        taken(t, f),
+      )
+      if (technical.outcome === 'fail') {
+        await decided(t, technical, { outcome: 'fail' })
+        failed.push(record.takes[t] as TakeRecord)
+        continue
+      }
+      await decided(t, technical)
+
+      // Gate 3; after it fails, Gates 4 and 5 still run, so the record holds every reason.
+      const heard = await gate3(clip, ports.media, (f) => taken(t, f))
+      await decided(t, heard)
+
+      // Gate 4, the witness, given this take's clip alone (I-8): a cut-off take keeps the gates it
+      // completed and no outcome.
+      const witnessed = await gate4(clip, ports.model)
+      await decided(t, witnessed.verdict, { observation: witnessed.observation })
+
+      // Gate 5, given this take's own observation and its shot's brief; the outcome is decided now:
+      // accept only if all four accepted.
+      const reconciled = await gate5({ takeId }, witnessed.observation, brief, ports.model)
+      const all = [...(record.takes[t]?.verdicts ?? []), reconciled.verdict]
+      const outcome = all.every((v) => v.outcome === 'accept') ? 'accept' : 'fail'
+      await decided(t, reconciled.verdict, { reconciliation: reconciled.reconciliation, outcome })
+      if (outcome === 'accept') break
+      failed.push(record.takes[t] as TakeRecord)
     }
-    const asked: VideoRequest =
-      still === undefined
-        ? { ...fields, mode: 'text-to-video', aspectRatio: '9:16' }
-        : {
-            ...fields,
-            mode: 'image-to-video',
-            image: { pictureId: still.pictureId, path: still.path },
-          }
-    const made = await ports.video.generate(asked)
-    if (made.kind === 'refused') return stopped(made)
-    if (made.kind === 'unavailable') throw unavailable('video', takeId, made.detail)
-    record.takes.push({
-      takeId,
-      attempt,
-      shotUnit: unit,
-      number: 1,
-      mode: asked.mode,
-      pictureId: still?.pictureId ?? null,
-      degraded: still === undefined && input.degradedShots.includes(unit),
-      prompt,
-      durationSeconds: fields.durationSeconds,
-      seed: fields.seed,
-      requestId: made.receipt.requestId,
-      expandedPrompt: made.receipt.expandedPrompt,
-      path: made.clip.path,
-      probe: null,
-      scan: null,
-      words: null,
-      sound: null,
-      observation: null,
-      reconciliation: null,
-      verdicts: [],
-      outcome: null,
-      degradation: null,
-    })
-    const t = record.takes.length - 1
-    const clip: ClipRef = { takeId, path: made.clip.path }
 
-    // Gate 2. A take failing it has no later gate (S-031's reason).
-    const technical = await gate2(clip, ports.media, settings.render.technical, (f) => taken(t, f))
-    if (technical.outcome === 'fail') {
-      await decided(t, technical, { outcome: 'fail' })
-      return stop(t)
+    // At the cap: every one of its three decided takes failed, and the ladder decides (S-090).
+    if (failed.length === TAKES_A_SHOT) {
+      const capped = atTheCap(
+        {
+          shotUnit: unit,
+          picture: still === undefined ? null : { pictureId: still.pictureId },
+          events: criteria.mustShow.filter((c) => c.type === 'event'),
+        },
+        failed,
+      )
+      if (capped.kind === 'fail') return stop(failed, capped.why)
+      // reel-takes' Slice 3 builds the hold; until then a shot the ladder would hold fails the run.
+      return { kind: 'failed', detail: `${capped.reason}; but a held shot is not built` }
     }
-    await decided(t, technical)
-
-    // Gate 3; after it fails, Gates 4 and 5 still run, so the record holds every reason.
-    const heard = await gate3(clip, ports.media, (f) => taken(t, f))
-    await decided(t, heard)
-
-    // Gate 4, the witness: a cut-off take keeps the gates it completed and no outcome.
-    const witnessed = await gate4(clip, ports.model)
-    await decided(t, witnessed.verdict, { observation: witnessed.observation })
-
-    // Gate 5; the outcome is decided now: accept only if all four accepted.
-    const reconciled = await gate5({ takeId }, witnessed.observation, brief, ports.model)
-    const all = [...(record.takes[t]?.verdicts ?? []), reconciled.verdict]
-    const outcome = all.every((v) => v.outcome === 'accept') ? 'accept' : 'fail'
-    await decided(t, reconciled.verdict, { reconciliation: reconciled.reconciliation, outcome })
-    if (outcome === 'fail') return stop(t)
   }
 
-  // Every take accepted: a mustShow no sentence claims must be shown by one of them (S-072, D-025).
+  // Every shot done: a mustShow no sentence claims must be shown by an accepted take (S-072, S-090).
   const unmet = request.criteria.mustShow.filter(
     (c) =>
       c.claimId === undefined &&

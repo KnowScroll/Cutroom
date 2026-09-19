@@ -19,7 +19,7 @@ import {
   type ClaimedJob,
   type Db,
 } from '@cutroom/domain'
-import { makeClips } from '@cutroom/pipeline'
+import { makeClips, readTakeId } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
 import { clipsRecorder } from './clips-recorder.ts'
 import { guardedNarrationPort } from './narration-port.ts'
@@ -102,6 +102,7 @@ export async function runClipsJob(
           rateCents: context.settings.videoRateCentsPerSecond,
           style: { id: request.style.id, version: request.style.version },
           limits,
+          transient: context.render.transient,
         }),
       ),
       narration: guardedNarrationPort(context.narration, db, {
@@ -110,6 +111,7 @@ export async function runClipsJob(
         attempt: job.attempts,
         rateCentsPerCharacter: context.render.narrationRateCentsPerCharacter,
         limits,
+        transient: context.render.transient,
       }),
       media: context.media,
       model: recordingPort(context.model, db, runId),
@@ -169,6 +171,8 @@ export async function runClipsJob(
             ? {
                 call: 'clip',
                 takeId: refused.request.takeId,
+                // Its number among its shot's takes, which its id carries (reel-takes, S-095).
+                number: readTakeId(refused.request.takeId)?.number ?? null,
                 seconds: refused.request.durationSeconds,
               }
             : {

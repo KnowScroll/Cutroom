@@ -6,6 +6,7 @@ import {
   UNCLAIMED,
   described,
   passesTake,
+  retake,
   takesOf,
   turned,
   video,
@@ -20,9 +21,17 @@ import {
 // stops the run for the rule of its lowest failing gate, and nothing later is made. Every criterion of
 // the request is put to some take's Gate 5 (D-043), and a mustShow no shot claims, shown by no take
 // once every take is accepted, stops the reel for gate-5 — D-025 rung 3's "mustShow unmet".
+//
+// Since reel-takes (S-099), a take that fails is followed by its shot's next, up to three, and a shot
+// whose three takes fail stops the reel only where a hold cannot cure it (S-090). Check 26 builds each
+// fault on each of shot 3's three takes — made from words, so it has no approved picture to hold —
+// where it was on shot 2's one, and asserts of the three what it asserted of the one.
 
 const takes = takesOf(THREE_RANKS)
-const [, , t2] = takes as [Take, Take, Take, Take, Take, Take]
+const [t0, t1, t2, t3] = takes as [Take, Take, Take, Take, Take, Take]
+/** Shot 3's three takes. */
+const shot3 = [t3, retake(t3, 2), retake(t3, 3)]
+const each = (entry: object) => Object.fromEntries(shot3.map((t) => [t.key, entry]))
 
 // ---------------------------------------------------------------- 25
 
@@ -90,26 +99,26 @@ test('25. an unclaimed mustShow shown by no accepted take stops the run for rule
 // ---------------------------------------------------------------- 26
 
 test("26. a take failing Gate 2, 3 or 5 stops the run for rule gate-2, gate-3 or gate-5 at step video, the detail naming the take and each failed gate's reasons; no later shot's narration or clip is made; there is no stage.finished for video and no reel.assemble row; and every narration and take made is in the tables with the gates it reached", async () => {
-  const both: TakeAnswer = turned(t2, 'never-person')
+  const both: TakeAnswer = turned(t3, 'never-person')
   const cases = [
     {
       what: 'Gate 2',
       rule: 'gate-2',
       failed: ['2'],
-      over: { video: { [t2.key]: { black: { atSeconds: 1, seconds: 1 } } } },
+      over: { video: each({ black: { atSeconds: 1, seconds: 1 } }) },
     },
     {
       what: 'Gate 3',
       rule: 'gate-3',
       failed: ['3'],
-      over: { media: { [t2.key]: { music: true } } },
+      over: { media: each({ music: true }) },
     },
-    { what: 'Gate 5', rule: 'gate-5', failed: ['5'], over: { reconciler: { [t2.key]: both } } },
+    { what: 'Gate 5', rule: 'gate-5', failed: ['5'], over: { reconciler: each(both) } },
     {
       what: 'Gates 3 and 5 together',
       rule: 'gate-3',
       failed: ['3', '5'],
-      over: { media: { [t2.key]: { speech: true } }, reconciler: { [t2.key]: both } },
+      over: { media: each({ speech: true }), reconciler: each(both) },
     },
   ] as const
   for (const { what, rule, failed, over } of cases) {
@@ -122,7 +131,7 @@ test("26. a take failing Gate 2, 3 or 5 stops the run for rule gate-2, gate-3 or
       worker: true,
       ...options,
       script: videoScript(THREE_RANKS, THREE_RANKS_PICS, {
-        takes: takes.slice(0, 3),
+        takes: [t0, t1, t2, ...shot3],
         ...(reconciler === undefined ? {} : { reconciler }),
       }),
     })
@@ -133,34 +142,60 @@ test("26. a take failing Gate 2, 3 or 5 stops the run for rule gate-2, gate-3 or
       assert.equal(ran.result.rule, rule, what)
       assert.equal(ran.result.step, 'video', what)
 
-      // The detail names the take and every reason of every gate it failed.
-      const take = ran.takes[2]
-      assert.ok(take !== undefined, `${what}: shot 2 has no take`)
+      // The detail names each of the three takes and every reason of every gate it failed.
       const detail = String(ran.result.detail)
-      assert.ok(detail.includes(take.take_id), `${what}: the detail does not name ${take.take_id}`)
-      const failing = take.verdicts.filter((v) => v.outcome === 'fail')
-      assert.deepEqual(
-        failing.map((v) => v.gate),
-        [...failed],
-        `${what}: the failed gates`,
-      )
-      for (const verdict of failing) {
-        assert.ok(verdict.reasons.length > 0)
-        for (const reason of verdict.reasons) {
-          assert.ok(detail.includes(reason), `${what}: the detail leaves out "${reason}"`)
+      const three = ran.takes.slice(3)
+      assert.equal(three.length, 3, `${what}: shot 3 has not three takes`)
+      for (const take of three) {
+        assert.ok(
+          detail.includes(take.take_id),
+          `${what}: the detail does not name ${take.take_id}`,
+        )
+        const failing = take.verdicts.filter((v) => v.outcome === 'fail')
+        assert.deepEqual(
+          failing.map((v) => v.gate),
+          [...failed],
+          `${what}: ${take.take_id}'s failed gates`,
+        )
+        for (const verdict of failing) {
+          assert.ok(verdict.reasons.length > 0)
+          for (const reason of verdict.reasons) {
+            assert.ok(detail.includes(reason), `${what}: the detail leaves out "${reason}"`)
+          }
         }
       }
-      assert.match(detail, /one take/i, `${what}: the detail does not say a shot gets one take`)
+      assert.match(
+        detail,
+        /three takes/i,
+        `${what}: the detail does not say the shot's three takes failed`,
+      )
+      assert.match(
+        detail,
+        /no approved picture/i,
+        `${what}: the detail does not say why the shot cannot be held`,
+      )
 
-      // Nothing after the failing take was made.
+      // Nothing after the third failing take was made.
       assert.deepEqual(
         engine.narration.calls.map((c) => c.narrationId),
-        ['a1-shot-0-narration', 'a1-shot-1-narration', 'a1-shot-2-narration'],
+        [
+          'a1-shot-0-narration',
+          'a1-shot-1-narration',
+          'a1-shot-2-narration',
+          'a1-shot-3-narration',
+        ],
         `${what}: a later shot's narration was made`,
       )
       assert.deepEqual(
         engine.video.calls.map((c) => c.takeId),
-        ['a1-shot-0-take-1', 'a1-shot-1-take-1', 'a1-shot-2-take-1'],
+        [
+          'a1-shot-0-take-1',
+          'a1-shot-1-take-1',
+          'a1-shot-2-take-1',
+          'a1-shot-3-take-1',
+          'a1-shot-3-take-2',
+          'a1-shot-3-take-3',
+        ],
         `${what}: a later shot's clip was made`,
       )
       const events = described(ran.events)
@@ -171,27 +206,31 @@ test("26. a take failing Gate 2, 3 or 5 stops the run for rule gate-2, gate-3 or
       // Every narration and take made is in the tables, with the gates it reached.
       assert.deepEqual(
         ran.narrations.map((n) => [n.narration_id, n.words !== null]),
-        [0, 1, 2].map((u) => [`a1-shot-${u}-narration`, true]),
+        [0, 1, 2, 3].map((u) => [`a1-shot-${u}-narration`, true]),
       )
       assert.deepEqual(
         ran.takes.map((t) => [t.take_id, t.outcome]),
         [
           ['a1-shot-0-take-1', 'accept'],
           ['a1-shot-1-take-1', 'accept'],
-          ['a1-shot-2-take-1', 'fail'],
+          ['a1-shot-2-take-1', 'accept'],
+          ['a1-shot-3-take-1', 'fail'],
+          ['a1-shot-3-take-2', 'fail'],
+          ['a1-shot-3-take-3', 'fail'],
         ],
       )
-      assert.deepEqual(
-        take.verdicts.map((v) => v.gate),
-        rule === 'gate-2' ? ['2'] : ['2', '3', '4', '5'],
-        `${what}: the gates the failing take reached`,
-      )
-      assert.equal(ran.takeReconciliations.length, rule === 'gate-2' ? 2 : 3, what)
-      if (rule === 'gate-3' && failed.length === 1) {
+      for (const take of three) {
         assert.deepEqual(
-          (ran.takeReconciliations.at(-1)?.answer as TakeAnswer).criteria,
-          passesTake(t2).criteria,
+          take.verdicts.map((v) => v.gate),
+          rule === 'gate-2' ? ['2'] : ['2', '3', '4', '5'],
+          `${what}: the gates ${take.take_id} reached`,
         )
+      }
+      assert.equal(ran.takeReconciliations.length, rule === 'gate-2' ? 3 : 6, what)
+      if (rule === 'gate-3' && failed.length === 1) {
+        for (const reconciled of ran.takeReconciliations.slice(3)) {
+          assert.deepEqual((reconciled.answer as TakeAnswer).criteria, passesTake(t3).criteria)
+        }
       }
     } finally {
       await engine.stop()

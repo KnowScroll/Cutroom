@@ -1,6 +1,13 @@
-import type { NarrationRequest, VideoPort, VideoRequest } from '@cutroom/contracts'
+import type {
+  NarrationRequest,
+  RenderSettings,
+  VideoAnswer,
+  VideoPort,
+  VideoRequest,
+} from '@cutroom/contracts'
 import { recordClip, spentCents, type Db } from '@cutroom/domain'
 import { readTakeId, validateVideoRequest } from '@cutroom/pipeline'
+import { sentUntilAvailable } from './transient.ts'
 
 /**
  * A call one of a clips attempt's two guards refused, as it was asked for. The clips job hands both
@@ -49,14 +56,16 @@ export function validatingVideoPort(video: VideoPort): VideoPort {
  * The port the worker was given, guarded (docs/features/reel-render.md, Gate 2 "Spending"; S-021,
  * S-035, S-036, S-071):
  *
- * - BEFORE EACH CALL, the chain's spend plus the call's figure — the requested seconds at the video
+ * - BEFORE EACH SEND, the chain's spend plus the call's figure — the requested seconds at the video
  *   rate — is compared with the per-reel cap, then with the caller's ceiling. A call that would pass
  *   either is not made: the answer is `refused`, with the limit and that figure, the request goes on
  *   the attempt's list of refused calls, and the stage stops (S-035). Exactly equal is made. The cap
  *   is compared first, so a call passing both is told `reel` and the owner is asked (D-100).
- * - AS EACH CALL RETURNS, its `video_receipt` — with the expansion mode, the style contract's id and
- *   version and the video rate applied — its cost added to the job row, and the take's row are written
- *   in one transaction.
+ * - A PROVIDER ANSWERING `unavailable` is sent the same request again, with backoff, every send
+ *   guarded, and nothing written for it (reel-takes, S-096): see `sentUntilAvailable`.
+ * - AS EACH CALL RETURNS MADE, its `video_receipt` — with the expansion mode, the style contract's id
+ *   and version, the video rate applied and the `unavailable` answers before it — its cost added to
+ *   the job row, and the take's row, numbered as its id numbers it, are written in one transaction.
  *
  * The validator wraps this port, so a request it refuses throws before the guard is asked (S-083).
  * Built per job attempt, knowing the attempt, the shots the stills stage degraded, the cap the job
@@ -74,31 +83,38 @@ export function guardedVideoPort(
     rateCents: number
     style: { id: string; version: number }
     limits: ClipsLimits
+    transient: RenderSettings['transient']
   },
 ): VideoPort {
   return {
     async generate(request) {
       const named = readTakeId(request.takeId)
       if (named === null) {
-        throw new Error(`'${request.takeId}' is not a<attempt>-shot-<unit>-take-<n> (S-071)`)
+        throw new Error(`'${request.takeId}' is not a<attempt>-shot-<unit>-take-<1 to 3> (S-094)`)
       }
 
-      // SUM(cost_cents) over the chain, read again before every call (D-081, S-036), plus this clip's
-      // requested seconds at the rate — rounded up, as every guard's figure is (S-053, S-059).
-      const estimateCents = Math.ceil(
-        spentCents(db, job.runId) + request.durationSeconds * job.rateCents,
+      const { answer, unavailable } = await sentUntilAvailable(
+        `the video call for ${request.takeId}`,
+        job.transient,
+        async (): Promise<VideoAnswer> => {
+          // SUM(cost_cents) over the chain, read again before every send (D-081, S-036, S-095), plus
+          // this clip's requested seconds at the rate — rounded up, as every guard's figure is (S-053,
+          // S-059).
+          const estimateCents = Math.ceil(
+            spentCents(db, job.runId) + request.durationSeconds * job.rateCents,
+          )
+          const { capCents, ceilingCents, refused } = job.limits
+          if (estimateCents > capCents || estimateCents > ceilingCents) {
+            refused.push({ call: 'clip', request })
+            return {
+              kind: 'refused',
+              limit: estimateCents > capCents ? 'reel' : 'ceiling',
+              estimateCents,
+            }
+          }
+          return video.generate(request)
+        },
       )
-      const { capCents, ceilingCents, refused } = job.limits
-      if (estimateCents > capCents || estimateCents > ceilingCents) {
-        refused.push({ call: 'clip', request })
-        return {
-          kind: 'refused',
-          limit: estimateCents > capCents ? 'reel' : 'ceiling',
-          estimateCents,
-        }
-      }
-
-      const answer = await video.generate(request)
       if (answer.kind !== 'made') return answer
       recordClip(db, {
         jobId: job.jobId,
@@ -107,7 +123,7 @@ export function guardedVideoPort(
           takeId: request.takeId,
           attempt: job.attempt,
           shotUnit: named.shotUnit,
-          number: 1,
+          number: named.number,
           mode: request.mode,
           pictureId: request.mode === 'image-to-video' ? request.image.pictureId : null,
           degraded: request.mode === 'text-to-video' && job.degradedShots.includes(named.shotUnit),
@@ -131,8 +147,8 @@ export function guardedVideoPort(
         style: job.style,
         rateCents: job.rateCents,
         receipt: answer.receipt,
-        // Made at its first send: nothing sends a call again until reel-takes' Slice 2 (S-096).
-        transientErrors: 0,
+        // The `unavailable` answers before it: the transient counter, never the take's (I-11).
+        transientErrors: unavailable,
       })
       return answer
     },

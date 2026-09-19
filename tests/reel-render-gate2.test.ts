@@ -15,8 +15,15 @@ import { video, videoRequest, videoScript, type TakeRow, type Videoed } from './
 // freezedetect measures a freeze a few frames short (a two-second freeze reads about 1.83 s, three
 // quarters of a second about 0.58 s, at 24 frames a second), so every stretch here keeps a margin
 // from the threshold it is held to.
+//
+// Since reel-takes (S-099), a take that fails is followed by its shot's next, up to three. Shot 0 of
+// NO_RECURRENCE is made from words, so a hold cannot cure it (S-090): each fault below is built on
+// each of its three takes, and what was asserted of the one take is asserted of the three.
 
-/** A run of the plan that places no picture, its first take built as the script says. */
+/** Shot 0's three takes. */
+const SHOT_0 = ['a1-shot-0-take-1', 'a1-shot-0-take-2', 'a1-shot-0-take-3']
+
+/** A run of the plan that places no picture, each of its first shot's takes built as the script says. */
 async function firstTake(
   entry: FakeVideoEntry,
   over: { technical?: typeof TEST_RENDER_SETTINGS.technical } = {},
@@ -24,7 +31,7 @@ async function firstTake(
   const engine = await startEngine({
     worker: true,
     script: videoScript(NO_RECURRENCE, []),
-    video: { 'shot-0-take-1': entry },
+    video: { 'shot-0-take-1': entry, 'shot-0-take-2': entry, 'shot-0-take-3': entry },
     ...(over.technical === undefined
       ? {}
       : { renderSettings: { ...TEST_RENDER_SETTINGS, technical: over.technical } }),
@@ -37,7 +44,10 @@ async function firstTake(
   }
 }
 
-/** The take failed Gate 2 alone: one verdict, no witness or reconciler looked at it, and the run stopped. */
+/**
+ * Each of the shot's three takes failed Gate 2 alone: one verdict, no witness or reconciler looked at
+ * it, and the run stopped.
+ */
 function failedGate2(
   ran: Videoed,
   engine: Awaited<ReturnType<typeof firstTake>>['engine'],
@@ -48,18 +58,23 @@ function failedGate2(
   assert.equal(ran.result.reason, 'rule', what)
   assert.equal(ran.result.rule, 'gate-2', what)
   assert.equal(ran.result.step, 'video', what)
-  assert.equal(ran.takes.length, 1, `${what}: a later take was made`)
-  const take = ran.takes[0] as TakeRow
   assert.deepEqual(
-    take.verdicts.map((v) => [v.gate, v.outcome]),
-    [['2', 'fail']],
-    `${what}: the take reached a gate after Gate 2`,
+    ran.takes.map((t) => t.take_id),
+    SHOT_0,
+    `${what}: a take of a later shot was made`,
   )
-  assert.equal(take.outcome, 'fail', `${what}: the take's outcome`)
-  assert.ok(
-    take.verdicts[0]?.reasons.some((r) => why.test(r)),
-    `${what}: Gate 2 failed for another reason: ${take.verdicts[0]?.reasons.join(' | ')}`,
-  )
+  for (const take of ran.takes as TakeRow[]) {
+    assert.deepEqual(
+      take.verdicts.map((v) => [v.gate, v.outcome]),
+      [['2', 'fail']],
+      `${what}: ${take.take_id} reached a gate after Gate 2`,
+    )
+    assert.equal(take.outcome, 'fail', `${what}: ${take.take_id}'s outcome`)
+    assert.ok(
+      take.verdicts[0]?.reasons.some((r) => why.test(r)),
+      `${what}: ${take.take_id} failed Gate 2 for another reason: ${take.verdicts[0]?.reasons.join(' | ')}`,
+    )
+  }
   assert.equal(engine.model.observeClipCalls.length, 0, `${what}: the witness looked at the clip`)
   assert.equal(
     engine.model.calls.filter((c) => c.role === 'reconciler').length,
@@ -133,9 +148,11 @@ test('21. Gate 2 passes a quarter second of black and three quarters of a second
     try {
       failedGate2(run.ran, run.engine, why, what)
       // The scan was handed the thresholds it was held to, and reported the stretch it failed for.
-      const scan = run.ran.takes[0]?.scan
-      const found = why.source.includes('black') ? scan?.black : scan?.frozen
-      assert.ok((found ?? []).length > 0, `${what}: the scan reports no stretch`)
+      for (const take of run.ran.takes) {
+        const scan = take.scan
+        const found = why.source.includes('black') ? scan?.black : scan?.frozen
+        assert.ok((found ?? []).length > 0, `${what}: ${take.take_id}'s scan reports no stretch`)
+      }
     } finally {
       await run.engine.stop()
     }

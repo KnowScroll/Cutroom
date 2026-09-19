@@ -47,6 +47,11 @@ export interface FakeVideoEntry {
   expandedPrompt?: string
   /** The call throws this message instead of making anything. */
   throws?: string
+  /**
+   * The first this-many sends of the take id are answered `unavailable` — a provider failing for a
+   * moment — and the next is answered as the rest of the entry says (reel-takes, S-096).
+   */
+  transient?: number
 }
 
 /** Entries by `shot-<unit>-take-<n>` — or by a whole take id, which wins. */
@@ -93,11 +98,21 @@ export function fakeVideo(
 ): FakeVideo {
   const root = options.artifactRoot ?? DEFAULT_ARTIFACT_ROOT
   const calls: VideoRequest[] = []
+  /** How many times each take id has been sent. */
+  const sends = new Map<string, number>()
   return {
     calls,
     async generate(request) {
       calls.push(request)
       const entry = entryFor(script, request.takeId) ?? {}
+      const send = (sends.get(request.takeId) ?? 0) + 1
+      sends.set(request.takeId, send)
+      if (entry.transient !== undefined && send <= entry.transient) {
+        return {
+          kind: 'unavailable',
+          detail: `the stand-in video port is unavailable for ${request.takeId}, send ${send} of the ${entry.transient} it was scripted to answer so`,
+        }
+      }
       if (entry.throws !== undefined) throw new Error(entry.throws)
       const path = artifactPath(
         root,

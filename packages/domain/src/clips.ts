@@ -7,6 +7,7 @@ import type {
   PictureRecord,
   RenderManifest,
   RenderShot,
+  TakeNumber,
   TakeRecord,
   VideoReceipt,
   VideoRequest,
@@ -322,6 +323,12 @@ export interface RenderInputs {
 const parsed = <T>(text: string | null): T | null =>
   text === null ? null : (JSON.parse(text) as T)
 
+/** A take row's number, which is its number among its shot's decided takes: 1 to 3 (D-024, S-094). */
+function takeNumber(number: number, takeId: string): TakeNumber {
+  if (number === 1 || number === 2 || number === 3) return number
+  throw new Error(`the take ${takeId} is numbered ${number}, and a take is numbered 1 to 3 (S-094)`)
+}
+
 /**
  * The rows a render manifest is built from, once the clips job has completed (S-073): the chosen
  * pictures with Gate 1's verdict and Gate 1S's where it ran, the stills stage's degradations, THE
@@ -396,7 +403,7 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
       takeId: row.takeId,
       attempt: row.attempt,
       shotUnit: row.shotUnit,
-      number: 1,
+      number: takeNumber(row.number, row.takeId),
       mode: row.mode,
       pictureId: row.pictureId,
       degraded: row.degraded,

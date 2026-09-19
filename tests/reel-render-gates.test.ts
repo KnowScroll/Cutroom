@@ -11,6 +11,7 @@ import {
   passesTake,
   readVideo,
   reconcilesTake,
+  retake,
   seenClip,
   takeOf,
   takesOf,
@@ -31,9 +32,17 @@ import {
 // the record holds every reason. Gate 4 is the witness — the clip and a temperature, nothing else
 // (I-8) — whose answer is parsed as a clip observation. Gate 5 holds that observation against the
 // shot's subjects and the take's criteria, and code decides; a clipped entity is motion, not a fault.
+//
+// Since reel-takes (S-099), a take that fails is followed by its shot's next, up to three: each stop
+// below is built on each of a shot's three takes, on a shot a hold cannot cure — shot 3, made from
+// words, or shot 0, which claims an event — and what was asserted of the one take is asserted of the
+// three. Check 20's held case is on shot 1, which a retry now follows: its script answers the retake.
 
 const takes = takesOf(THREE_RANKS)
-const [t0, t1, t2] = takes as [Take, Take, Take, Take, Take, Take]
+const [t0, t1, t2, t3, t4, t5] = takes as [Take, Take, Take, Take, Take, Take]
+/** Shot 3's three takes, and shot 0's: each shot a hold cannot cure (S-090, S-099). */
+const shot3 = [t3, retake(t3, 2), retake(t3, 3)]
+const shot0 = [t0, retake(t0, 2), retake(t0, 3)]
 
 const clipsCompleted = (ran: Videoed) =>
   assert.ok(
@@ -127,12 +136,15 @@ test("20. every take's verdicts are gates 2, 3, 4 and 5 in order, each with an o
   }
 
   // A take whose Gate 3 fails has NO outcome until Gate 5 completes: held at its reconciler's call,
-  // its row holds three verdicts and none; the take before it, decided, holds its outcome.
+  // its row holds three verdicts and none; the take before it, decided, holds its outcome. Once let
+  // go, shot 1's second take follows it, and the run goes on to shots 2 to 5 (S-099).
   const hold = holding({ call: 'structured', matches: reconcilesTake(t1.key) })
   const held = await startEngine({
     worker: true,
     media: { [t1.key]: { speech: true } },
-    script: videoScript(THREE_RANKS, THREE_RANKS_PICS, { takes: [t0, t1] }),
+    script: videoScript(THREE_RANKS, THREE_RANKS_PICS, {
+      takes: [t0, t1, retake(t1, 2), t2, t3, t4, t5],
+    }),
     wrapModel: hold.wrap,
   })
   try {
@@ -185,42 +197,45 @@ test('22. Gate 3 records every word read and never fails on words, and fails a t
   }
 
   for (const heard of ['speech', 'music'] as const) {
+    // The sound on each of shot 3's three takes, where it was on shot 2's one (S-099).
     const run = await threeRanks(`r22-${heard}`, {
-      media: { [t2.key]: { [heard]: true } },
-      takes: [t0, t1, t2],
+      media: Object.fromEntries(shot3.map((t) => [t.key, { [heard]: true }])),
+      takes: [t0, t1, t2, ...shot3],
     })
     try {
       const { ran: stopped, engine: e } = run
       assert.equal(stopped.result.status, 'stopped', `${heard}: ${JSON.stringify(stopped.result)}`)
       assert.equal(stopped.result.rule, 'gate-3', heard)
-      const take = takeOf(stopped, t2.key)
-      assert.deepEqual(
-        take.verdicts.map((v) => [v.gate, v.outcome]),
-        [
-          ['2', 'accept'],
-          ['3', 'fail'],
-          ['4', 'accept'],
-          ['5', 'accept'],
-        ],
-        `${heard}: the take's verdicts`,
-      )
-      assert.ok(
-        take.verdicts[1]?.reasons.some((r) => r.includes(heard)),
-        `${heard}: Gate 3's reasons`,
-      )
-      assert.equal(take.outcome, 'fail')
-      assert.deepEqual(take.sound, { speech: heard === 'speech', music: heard === 'music' })
-      // Gates 4 and 5 ran on it: the witness saw the clip, and the reconciler was asked.
-      assert.ok(
-        e.model.observeClipCalls.some((c) => c.clip.takeId === firstTake(t2.key)),
-        heard,
-      )
-      assert.ok(
-        e.model.calls.some(
-          (c) => c.role === 'reconciler' && c.takeIds?.includes(firstTake(t2.key)),
-        ),
-        heard,
-      )
+      for (const failing of shot3) {
+        const take = takeOf(stopped, failing.key)
+        assert.deepEqual(
+          take.verdicts.map((v) => [v.gate, v.outcome]),
+          [
+            ['2', 'accept'],
+            ['3', 'fail'],
+            ['4', 'accept'],
+            ['5', 'accept'],
+          ],
+          `${heard}: ${failing.key}'s verdicts`,
+        )
+        assert.ok(
+          take.verdicts[1]?.reasons.some((r) => r.includes(heard)),
+          `${heard}: ${failing.key}'s Gate 3 reasons`,
+        )
+        assert.equal(take.outcome, 'fail')
+        assert.deepEqual(take.sound, { speech: heard === 'speech', music: heard === 'music' })
+        // Gates 4 and 5 ran on it: the witness saw the clip, and the reconciler was asked.
+        assert.ok(
+          e.model.observeClipCalls.some((c) => c.clip.takeId === firstTake(failing.key)),
+          `${heard}: ${failing.key}`,
+        )
+        assert.ok(
+          e.model.calls.some(
+            (c) => c.role === 'reconciler' && c.takeIds?.includes(firstTake(failing.key)),
+          ),
+          `${heard}: ${failing.key}`,
+        )
+      }
     } finally {
       await run.engine.stop()
     }
@@ -230,17 +245,19 @@ test('22. Gate 3 records every word read and never fails on words, and fails a t
 // ---------------------------------------------------------------- 23
 
 test('23. every take past Gate 2 has exactly one observe receipt, role witness, temperature 0, whose takeIds are its own, and a clip observation, whether it is accepted or fails; every observe call on a clip holds only a clip of that run and a temperature', async () => {
-  // Shot 2's take fails Gate 5, so the run holds accepted takes and one that failed.
-  const failing = turned(t2, 'never-person')
+  // Each of shot 3's three takes fails Gate 5, so the run holds accepted takes and three that failed
+  // (S-099: it was shot 2's one).
+  const failing = turned(t3, 'never-person')
+  const scripted = [t0, t1, t2, ...shot3]
   const { engine, ran } = await threeRanks('r23', {
-    reconciler: { [t2.key]: failing },
-    takes: [t0, t1, t2],
+    reconciler: Object.fromEntries(shot3.map((t) => [t.key, failing])),
+    takes: scripted,
   })
   try {
     assert.equal(ran.result.rule, 'gate-5', JSON.stringify(ran.result))
     assert.deepEqual(
       ran.takes.map((t) => t.outcome),
-      ['accept', 'accept', 'fail'],
+      ['accept', 'accept', 'accept', 'fail', 'fail', 'fail'],
     )
     for (const take of ran.takes) {
       const witnessed = ran.receipts.filter(
@@ -255,11 +272,14 @@ test('23. every take past Gate 2 has exactly one observe receipt, role witness, 
       assert.equal(observed.length, 1, `${take.take_id} has ${observed.length} observations`)
       assert.equal(observed[0]?.id, `obs-${take.take_id}`)
       const key = take.take_id.replace(/^a\d+-/, '')
-      assert.deepEqual(observed[0]?.observation, seenClip(takes.find((t) => t.key === key) as Take))
+      assert.deepEqual(
+        observed[0]?.observation,
+        seenClip(scripted.find((t) => t.key === key) as Take),
+      )
     }
 
     // Every observe call on a clip holds a clip of this run, and a temperature — and nothing else.
-    assert.equal(engine.model.observeClipCalls.length, 3)
+    assert.equal(engine.model.observeClipCalls.length, 6)
     for (const call of engine.model.observeClipCalls) {
       assert.deepEqual(Object.keys(call).sort(), ['clip', 'temperature'], JSON.stringify(call))
       assert.deepEqual(Object.keys(call.clip).sort(), ['path', 'takeId'], JSON.stringify(call))
@@ -428,36 +448,44 @@ test('24. Gate 5 fails a take, each built alone, for a subject not shown, a coun
     ['a mustNotShow shown', turned(t0, 'never-flag'), /never-flag/],
   ]
   for (const [what, answer, why] of faults) {
+    // Each fault on each of shot 0's three takes, where it was on its one (S-099).
     const { engine, ran } = await threeRanks(`r24-${what}`, {
-      reconciler: { [t0.key]: answer },
-      takes: [t0],
+      reconciler: Object.fromEntries(shot0.map((t) => [t.key, answer])),
+      takes: shot0,
     })
     try {
       assert.equal(ran.result.status, 'stopped', `${what}: ${JSON.stringify(ran.result)}`)
       assert.equal(ran.result.rule, 'gate-5', what)
-      const take = takeOf(ran, t0.key) as TakeRow
-      const gate5 = take.verdicts[3]
-      assert.equal(gate5?.gate, '5', what)
-      assert.equal(gate5?.outcome, 'fail', what)
-      assert.equal(gate5?.reasons.length, 1, `${what}: ${gate5?.reasons.join(' | ')}`)
-      assert.match(gate5?.reasons[0] ?? '', why, what)
-      assert.equal(take.outcome, 'fail', what)
-      // Kept though it failed: one observation and one reconciliation, tied to their receipts.
-      const id = take.take_id
+      const ids = shot0.map((t) => firstTake(t.key))
+      for (const failing of shot0) {
+        const take = takeOf(ran, failing.key) as TakeRow
+        const gate5 = take.verdicts[3]
+        assert.equal(gate5?.gate, '5', `${what}: ${failing.key}`)
+        assert.equal(gate5?.outcome, 'fail', `${what}: ${failing.key}`)
+        assert.equal(gate5?.reasons.length, 1, `${what}: ${gate5?.reasons.join(' | ')}`)
+        assert.match(gate5?.reasons[0] ?? '', why, `${what}: ${failing.key}`)
+        assert.equal(take.outcome, 'fail', `${what}: ${failing.key}`)
+        // Kept though it failed: its observation and its reconciliation, tied to their receipts.
+        const id = take.take_id
+        assert.deepEqual(
+          ran.takeReconciliations.find((o) => o.take_id === id)?.failed,
+          gate5?.reasons,
+          `${what}: ${failing.key}`,
+        )
+        assert.equal(
+          ran.receipts.filter((r) => r.role === 'reconciler' && r.take_ids.includes(id)).length,
+          1,
+          `${what}: ${failing.key}`,
+        )
+      }
       assert.deepEqual(
         ran.takeObservations.map((o) => o.id),
-        [`obs-${id}`],
+        ids.map((id) => `obs-${id}`),
         what,
       )
       assert.deepEqual(
         ran.takeReconciliations.map((o) => o.id),
-        [`rec-${id}`],
-        what,
-      )
-      assert.deepEqual(ran.takeReconciliations[0]?.failed, gate5?.reasons, what)
-      assert.equal(
-        ran.receipts.filter((r) => r.role === 'reconciler' && r.take_ids.includes(id)).length,
-        1,
+        ids.map((id) => `rec-${id}`),
         what,
       )
     } finally {

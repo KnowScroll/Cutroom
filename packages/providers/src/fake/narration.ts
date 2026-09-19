@@ -29,6 +29,11 @@ export interface FakeNarrationEntry {
   costCents?: number
   /** The call throws this message instead of making anything. */
   throws?: string
+  /**
+   * The first this-many sends of the narration id are answered `unavailable` — a provider failing
+   * for a moment — and the next is answered as the rest of the entry says (reel-takes, S-096).
+   */
+  transient?: number
 }
 
 /** Entries by `shot-<unit>-narration` — or by a whole narration id, which wins. */
@@ -70,11 +75,21 @@ export function fakeNarration(
 ): FakeNarration {
   const root = options.artifactRoot ?? DEFAULT_ARTIFACT_ROOT
   const calls: NarrationRequest[] = []
+  /** How many times each narration id has been sent. */
+  const sends = new Map<string, number>()
   return {
     calls,
     async speak(request) {
       calls.push(request)
       const entry = entryFor(script, request.narrationId) ?? {}
+      const send = (sends.get(request.narrationId) ?? 0) + 1
+      sends.set(request.narrationId, send)
+      if (entry.transient !== undefined && send <= entry.transient) {
+        return {
+          kind: 'unavailable',
+          detail: `the stand-in narration port is unavailable for ${request.narrationId}, send ${send} of the ${entry.transient} it was scripted to answer so`,
+        }
+      }
       if (entry.throws !== undefined) throw new Error(entry.throws)
       const path = artifactPath(
         root,

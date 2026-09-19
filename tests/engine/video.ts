@@ -118,7 +118,7 @@ export const CRITERION_TEXT: Readonly<Record<string, string>> = {
 
 /** One take the clips stage makes, and what its shot asks of it. */
 export interface Take {
-  /** `shot-<unit>-take-1`: the take id without its attempt. */
+  /** `shot-<unit>-take-<n>`: the take id without its attempt. */
   key: string
   unit: number
   subjects: Subject[]
@@ -145,6 +145,17 @@ export function takesOf(shape: Shape): Take[] {
     unclaimed: UNCLAIMED,
   }))
 }
+
+/**
+ * A shot's take `n`: the same shot, made again after its earlier takes failed (reel-takes, S-094). It
+ * asks the same of the model stand-in as the shot's first take, under its own key, so a script lists
+ * each take the run will make in the order made — retakes included. A take that fails Gate 2 makes no
+ * model call, so a script leaves it out: the stand-in answers in call order.
+ */
+export const retake = (take: Take, n: 2 | 3): Take => ({
+  ...take,
+  key: `shot-${take.unit}-take-${n}`,
+})
 
 /** The id a take has in the clips job's first attempt. */
 export const firstTake = (key: string) => `a1-${key}`
@@ -236,11 +247,11 @@ export function cutAnswer(no: readonly number[] = []) {
 
 /**
  * The script of one video run: the planner's answers and the stills stage's (reel-stills' fixtures),
- * then, for each take in plan order, its witness and reconciler answers — each passing unless
+ * then, for each take in the order made, its witness and reconciler answers — each passing unless
  * replaced — and, after the stills stage's judge answers, Gate 7's: every question yes unless `cut`
  * replaces it, so a run of passing takes completes (the `judge` script answers `compare` and
  * `judgeCut` in call order). A take left out of `takes` gets no answer, so a run that reaches it
- * fails.
+ * fails. A shot's retakes are listed where the run makes them, each by `retake` (reel-takes, S-099).
  */
 export function videoScript(
   shape: Shape,
@@ -272,7 +283,8 @@ export function videoScript(
 /**
  * The script of a clips stage and its cut alone, with no planner or stills stage before them: what a
  * worker that takes up a video run after its stills stage is asked — each take's witness and
- * reconciler answers in plan order, each passing, then Gate 7's, every question yes.
+ * reconciler answers in the order made, retakes included, each passing, then Gate 7's, every question
+ * yes.
  */
 export function clipsScript(takes: readonly Take[]): FakeScript {
   return {
@@ -384,6 +396,8 @@ export interface VideoReceiptRow {
   cost_cents: number
   fake: boolean
   degraded: boolean
+  /** The `unavailable` answers before the call was made (reel-takes, S-096). */
+  transient_errors: number
   at: string
 }
 
@@ -395,6 +409,8 @@ export interface SpeechReceiptRow {
   rate_cents: number
   cost_cents: number
   fake: boolean
+  /** The `unavailable` answers before the call was made (reel-takes, S-096). */
+  transient_errors: number
   at: string
 }
 

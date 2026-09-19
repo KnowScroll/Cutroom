@@ -5,7 +5,7 @@
 - **Work:** Slice 2 of 6 — three takes, informed retries, transient errors, and the cap's stop; checks 5–12, tests first;
   `reel-render`'s checks 20–24, 26 and 47 moved as S-099 says; no journey
 - **Written:** 2026-09-19, at the end of session 30, after `reel-takes`' Slice 1 was committed (d6ae1f1) and pushed
-- **Run:** not yet
+- **Run:** session 31
 
 Paste everything inside the block below as the session's first message.
 

@@ -3547,3 +3547,60 @@ slices, so the case moves anyway. **Leaving 4c and 4f uncaught** — the check's
 
 **Caught by.** Breaks 4c2 and 4f2 — 4c and 4f run again after the case was added — each caught by check 4. Slice 5's
 suite, in which this case goes red once checkpoints land, until it is moved.
+
+---
+
+## S-101 | 2026-09-19 | `reel-takes`' check 9 shows every send of a take guarded, by a spend a test writes between two sends
+
+**Chose.** Check 9 (`tests/reel-takes-guard.test.ts`) holds S-095's _"Every take is sent through the guard, and every
+send of it"_ with a fourth run beside its three: shot 1's retry is scripted `transient: 1`, and the port the worker is
+handed is wrapped so that, when that send is answered `unavailable`, the test adds 213 cents to the clips job's row — as
+a provider that billed an unavailable answer would make the spend grow. The guard reads the chain's spend again before
+the second send and refuses it, 213 + 28 = 241 against a ceiling of 240, so the run stops for budget with that figure:
+the retry's first send reached the port, and its second did not. The test is titled with check 9's words and _"every
+send of a take, not only its first"_.
+
+**Why.** In this build nothing changes the chain's spend between two sends of one call: an `unavailable` answer writes
+nothing and costs nothing (S-096), and the worker runs one job at a time (D-002). So a guard that compared only a call's
+first send — S-095's rejected _"Guarding only a call's first send"_ — gives every run the answer one that compares each
+gives, and S-095 names check 9 as what catches its rules. A rule nothing can fail reads as coverage (S-014).
+
+**Rejected.** **Leaving it to the paid path**, which settles whether a provider bills an `unavailable` answer
+(`reel-takes`' deferred item 2) — the guard's rule is this feature's, built now, and would go unchecked until then.
+**A cost scripted on the stand-in's `unavailable` answer** — S-096 says one costs nothing here, and a cost on an answer
+that writes no receipt is spend no ledger holds. **`guardedVideoPort` exported and called on a database built by
+hand** — a worker export that exists for a test (S-082's reason), and the port read apart from the clips job that builds
+it.
+
+**Not handled.** **The narration guard's every-send rule is checked by nothing.** Check 9's words are about takes, and no
+check of the 26 reads a narration's second send against a spend that grew: session 31's break 9c, the narration guard
+comparing only a call's first send, was caught by nothing. Said here rather than widened.
+
+**Caught by.** Session 31's break 9b, the video guard comparing only a call's first send — caught by check 9 alone.
+
+---
+
+## S-102 | 2026-09-19 | A wait between two sends of one call is held to a monotonic deadline, not to one timer
+
+**Chose.** `apps/worker/src/transient.ts`, through which both guarded ports send (S-096), waits between two sends until
+`performance.now()` has passed the deadline the wait began with — `backoffMs`, then twice the last wait — and sleeps
+again for what is left whenever a timer ends first.
+
+**Why.** Gate 2 and S-096 say the port waits `backoffMs` and then twice that, and check 10 measures each wait as _"at
+least backoffMs"_. libuv counts a timer from the event loop's cached time, in whole milliseconds, so one `setTimeout(ms)`
+can end a fraction of a millisecond — more after a long turn of the loop — before `ms` have passed on the monotonic
+clock. Session 31 saw it: in its break campaign check 10 failed under six breaks that cannot reach it, and with the bare
+timer put back one of three runs of the campaign's test set failed with _"a1-shot-1-narration's first wait was 150
+ms"_ — 149 and a fraction, rounded. A probe of 27 waits under load found a least margin of 0.18 ms with the bare timer
+and 1.24 ms with the deadline, and three runs with the deadline passed.
+
+**Rejected.** **One `setTimeout` a wait** — a wait the gate says is at least `backoffMs` that now and then is not.
+**Check 10 allowing a millisecond short** — a check loosened to fit the code, where the code can keep the gate's word
+(CLAUDE.md's rule 3). **Asking the timer for a millisecond more** — how far short a timer ends grows with the turn of the
+loop it was set in, which nothing bounds.
+
+**Not handled.** The bare timer is caught only now and then: session 31's break w1, which restores it, passed check 10
+the one time the campaign ran it, and failed one run in three beside it.
+
+**Caught by.** Check 10's measured waits, and session 31's breaks 10b (no wait) and 10c (a constant one), each caught by
+check 10 once the deadline was in.

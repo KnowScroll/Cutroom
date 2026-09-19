@@ -14,11 +14,13 @@ export {
   type ClipsStageSettings,
 } from './clips/index.ts'
 export { narrationIdOf, readNarrationId, readTakeId, takeIdOf } from './clips/ids.ts'
+export { TAKES_A_SHOT, atTheCap, type AtTheCap } from './clips/ladder.ts'
 export { narrationText, requestedSeconds, wordTimings } from './clips/narration.ts'
 export { clipObservation } from './clips/observation.ts'
 export {
   NEGATIVE_AUDIO,
   clipPrompt,
+  retryPrompt,
   takeReconcileAnswer,
   takeReconcilePrompt,
   type ClipBrief,

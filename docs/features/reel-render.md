@@ -35,6 +35,22 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > audio and word timings (S-070). 3 — stand-in clips carrying a tone, mixed and conformed by a real pass (S-071, S-073).
 > 4 — S-067. 5 — D-100: admission and every guard are generation-only, and no research spend exists in the engine
 > (S-069).
+>
+> **Amended by `reel-takes` on 2026-09-19 — the gates below are not edited (S-099).** Since `reel-takes`' Slice 2 a
+> take that fails Gate 2, 3 or 5 is followed by its shot's next, up to three decided takes, each told every earlier
+> failed take's reasons (S-094); a shot whose three takes fail stops the reel for its third take's lowest failing gate
+> where a hold cannot cure it, and is held on its approved picture where one can (S-090, the hold built in
+> `reel-takes`' Slice 3); and a clip or voice call answered `unavailable` is sent again, on its own counter (S-096). The
+> passages below resting on S-066's one take a shot, S-072's stop, S-076's start-over and S-069's clips-job events and
+> order of `degradations` are superseded with those entries, not edited. **Checks 21, 22, 23, 24 and 26, and check
+> 47's _"a take failing"_,** build their failing take on each of a shot's three takes, on a shot a hold cannot cure —
+> shot 0 of `NO_RECURRENCE`, shot 3 of `THREE_RANKS` or shot 0 of `THREE_RANKS` — and assert of the three what they
+> asserted of the one; check 26's _"one take"_ is _"three takes"_ and _"no approved picture"_; **check 20**'s held case
+> answers its shot's retake. No assertion was removed. **Checks 13 and 18 stand on their fixtures** — one attempt with no
+> failing take — though their words, _"one narration call in each attempt"_ and _"N video receipts"_, no longer hold of
+> every run: a restarted attempt makes no narration it kept (from `reel-takes`' Slice 5), and an attempt with a retry
+> makes a receipt a take. Check 37 moves with `reel-takes`' Slice 4 and check 48 with its Slice 5. The Evidence line is
+> not touched.
 
 ## Gate 1 — Product (no technical language)
 

@@ -2737,3 +2737,164 @@ repository, unchanged: S-068, S-073, S-029, S-033.
 
 **Next.** Session 31: run `PROMPTS/031-reel-takes-slice-2.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-19 — session 31, reel-takes Slice 2: three takes, informed retries, transient errors, and the cap's stop
+
+**Intent.** Run `PROMPTS/031-reel-takes-slice-2.md`: `reel-takes`' Slice 2 only — checks 5 to 12, tests first, and
+`reel-render`'s checks 20 to 24, 26 and 47 moved as S-099 says; nothing from Slice 3 or later, no journey.
+`decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green at 52a62dd, tests 183 s (302 by session
+30's TAP count). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`packages/pipeline`** — **`clips/ladder.ts`**: `TAKES_A_SHOT = 3`, `AtTheCap` (`hold` or `fail`, no label member)
+  and `atTheCap(shot, takes)`, which holds a shot with a chosen picture that claims no event and fails every other —
+  its `why` naming no approved picture (made from words: the plan gave it none, or its picture was degraded, read off
+  the takes' `degraded`) or the event it must show, which a still picture cannot. **`clips/prompts.ts`**:
+  `retryPrompt(first, failed)` — the first take's prompt, then before the block a blank line, a line saying the takes
+  before this one failed their checks, and every failed take's reasons under `Take <n>:` and `Gate <g>:` as bullets.
+  **`clips/ids.ts`**: `takeIdOf` takes a `TakeNumber`; `readTakeId` returns one, and reads no take numbered beyond 3.
+  **`clips/index.ts` — `makeClips`**: per shot, the first take's prompt, criteria, requested seconds and mode, then up
+  to three decided takes — the next told every earlier failed take's reasons, its id and seed its own — stopping at the
+  first accepted; after the third failure `atTheCap`: a `fail` stops the run for the third take's lowest failing gate,
+  the detail naming the shot's three takes, each one's reasons and why; a `hold` finishes the run failed, _"… but a held
+  shot is not built"_ (Gate 4's Slice 2 stand-in). The unclaimed `mustShow` is over accepted takes, as it was. All
+  exported.
+- **`packages/providers`** — `transient?: number` on `FakeVideoEntry` and `FakeNarrationEntry`: `unavailable` for the
+  first n sends of that id, counted per id, then as the rest of the entry says.
+- **`apps/worker`** — **`transient.ts`**, new: `sentUntilAvailable(call, transient, send)`, one send the guard's
+  comparison and the port's call, sent again on `unavailable` up to `maxAttempts` sends, waiting `backoffMs` and then
+  twice the last wait **to a monotonic deadline (S-102)**, throwing at the last send naming the call, the sends and
+  I-11; a throw passes through, sent once. **`video-port.ts`** and **`narration-port.ts`**: every send guarded through
+  it, `job.transient` handed in, the row's number from the id and `transientErrors` the `unavailable` answers before
+  it. **`clips-job.ts`** hands both ports `render.transient`; the clips stop question names a refused clip's number
+  (_"take 2 of its shot"_, Gate 2's _"with its number"_).
+- **`packages/domain`** — `readRenderInputs` reads each take row's number (1 to 3, or a fault).
+- **`reel-render`'s checks moved (S-099), no assertion removed**: **21** (`tests/reel-render-gate2.test.ts`) — each fault
+  on each of `NO_RECURRENCE` shot 0's three takes; _"a later take was made"_ now three rows, exactly the shot's; the
+  verdicts, outcome, Gate 2 reason and — in its second test — the scan, of each. **22, 23, 24**
+  (`tests/reel-render-gates.test.ts`) — the sound, then the Gate 5 failure, on each of shot 3's three takes; the Gate 5
+  faults on each of shot 0's; outcomes three `accept` then three `fail`, `observeClipCalls` 6, observations and
+  reconciliations the three takes' each with one receipt; check 23's per-take observation looked up in the scripted
+  list, retakes included, so its assertion still runs over every take. **26** (`tests/reel-render-stops.test.ts`) —
+  every case on shot 3's three takes; the detail names each take and every reason; `/one take/i` became `/three
+takes/i` and `/no approved picture/i`; narration calls and rows shots 0 to 3, clip calls and take rows as S-099
+  lists, reconciliations 3 or 6, the Gate 3 case's criteria shot 3's. **47**'s _"a take failing"_
+  (`tests/reel-render-endings.test.ts`) — `TAKES(3)` and shot 3's three takes' four verdicts each. **20** — its held
+  case's script answers shot 1's retake and every take after it; no assertion changed.
+  **`docs/features/reel-render.md`** gains a note naming S-099 and checks 13 and 18; its gates and Evidence are not
+  edited.
+- **Test support, no assertion:** `tests/engine/video.ts` — `retake(take, n)`, a shot's take `n` under its own key, so
+  `videoScript` and `clipsScript` answer each take made in call order, retakes included (a take failing Gate 2 makes
+  no model call and is left out); `transient_errors` on the receipt row types.
+- **Five test files, +20 tests, 302 → 322**: `tests/reel-takes-{takes,retry,guard,transient,cap}.test.ts` — checks 5
+  (3 tests) and 8 (1); 6 (2) and 7 (1); 9 (4); 10 (1) and 11 (4); 12 (4). Each titled with Gate 3's words.
+- **`DECISIONS.md` — S-101, S-102.** Slice 2 ticked. Prompt 031's `Run` line set to session 31, in the file and the
+  index (S-065).
+
+**Observed.**
+
+- **No collision with a verified feature, and nothing for the owner.** S-099's premises held, file by file: every moved
+  check was red before this slice's code for the reason S-099 names — one take a shot — and green after it with no
+  assertion removed; check 20 was green before code, as S-099 says it changes no assertion. Check 4 stayed green: its
+  clips-stage stop now stops for budget, the record unchanged (S-100).
+- **Red first, each for its reason.** Before code, 18 of the 20 new tests red:
+  - typecheck alone: _"'transient' does not exist in type 'FakeVideoEntry'"_ (and `FakeNarrationEntry`), six places in
+    checks 9 to 11;
+  - 5, 6, 7, 8, 9 and 10: each run stopped at its first failing take, _"… failed Gate 3: its sound is classified as
+    speech. A shot gets one take in this build, so the reel stops (S-066)"_, or at the result or call-list assertion
+    after it; 10's stand-ins ignored `transient`;
+  - 11's two last-send tests: _"the detail does not name the call: the stand-in's script has no answer for witness call
+    6"_ — the call was made at its first send;
+  - 12: _"words: not the third take's lowest failing gate"_ (gate-2, the first take's); the degraded and event runs at
+    the detail's _"three takes"_; the compile test _"a hold or a fail from the ladder did not compile"_, no `atTheCap`.
+  - **Green before code, as the checks say:** 11's throw sent once and `makeClips` read directly (reel-render's check 46
+    and Slice 1's fault). Check 9's still-hold clause is green before Slice 3 by construction. Check 7 was red before
+    code only because the run stopped; it holds by construction once retries exist — breaks 7a to 7c show it can fail.
+  - Moved checks before code: 21 _"a take of a later shot was made"_; 22 _"no take shot-3-take-2"_; 23 the outcomes; 24
+    _"no take shot-0-take-2"_; 26 _"Gate 2: shot 3 has not three takes"_; 47 the events.
+- **After code, 57 of 58 at first**: check 8's count of shot 1's verdict events was 10, a fault of my test — it counted
+  the stills stage's Gate 1 and 1S verdicts for the shot's picture; it now counts Gates 2 to 5.
+- **The lease (known limit 14), measured.** A clips job's seconds, from its claim to its advance or `run.finished`, at
+  the test profile: the slowest check run, check 10's (three calls each waiting 150 + 300 ms), **4.2 s alone and 6.2 s
+  with eight runs side by side**; check 6's eight takes 3.1 s and 5.5 s; a probe beyond any check, three shots taking
+  three takes each (twelve), 4.5 s and 7.5 s. Against a 60-second lease, nothing here comes near: the limit stays a
+  real adapter's, whose clips take minutes. The suite ran 212 s against 183 s.
+- **A flake, found by the campaign and fixed in the code (S-102).** Check 10 failed under six breaks that cannot reach
+  it. With the bare `setTimeout` put back, one of three runs of the campaign's test set failed with _"a1-shot-1-
+  narration's first wait was 150 ms"_ — 149 and a fraction, rounded: libuv counts a timer from the loop's cached time in
+  whole milliseconds, so a wait can end short of `backoffMs`. A probe of 27 waits under load: least margin 0.18 ms with
+  the bare timer, 1.24 ms with the deadline; three runs with the deadline, all green. The check was not loosened.
+- **Sixty-four break runs — fifty-two breaks, a control, ten run again, and one more** — by session 30's runner in
+  `.tmp/campaign/` (its files moved aside to `s30/` first; ignored), taught this slice's files: the break list now
+  exports its default `TESTS` and each file's `COUNTS`; each break's files saved as bytes and `fsync`ed to a record,
+  restored and read back, the record removed; every modified and untracked file hashed after each restore against the
+  chunk's first; a refusal to start while a record exists; every find checked once first; `tsc -b`, then NEW (the five
+  files and check 4's, 26 tests) or FULL (with the four moved `reel-render` files, 50). Two background chunks with a
+  foreground waiter, 13–111 s a break. Afterwards: no record, `.artifacts/` empty, the fingerprints unchanged.
+
+  | check | breaks                                                                                                                                                                                                                                                     | caught by                                                           |
+  | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+  | none  | **control** c0, and again as c0-2: a comment in `makeClips`                                                                                                                                                                                                | nothing                                                             |
+  | 5     | 5a a retry in the other mode (words for a pictured shot)                                                                                                                                                                                                   | 5, 6, 7, 8, 9                                                       |
+  | 5     | 5b1 the take row's number left at 1                                                                                                                                                                                                                        | 5, 10                                                               |
+  | 5     | 5b2 the stage's own record numbered 1                                                                                                                                                                                                                      | 6 (the retry prompt's _"Take 2:"_; the row's number is the guard's) |
+  | 5     | 5c every take's id numbered 1                                                                                                                                                                                                                              | 5–10, 12; `reel-render` 21–24, 26, 47                               |
+  | 5     | 5d each unavailable send counted as a take                                                                                                                                                                                                                 | 10                                                                  |
+  | 5     | 5e a fourth take (`TAKES_A_SHOT` 4)                                                                                                                                                                                                                        | 5, 12; `reel-render` 21–24, 26, 47                                  |
+  | 5     | 5f a take after an accepted one                                                                                                                                                                                                                            | 4–12; `reel-render` 20–26, 47                                       |
+  | 5     | 5g take 1's seed reused; 5h a retry asking more seconds                                                                                                                                                                                                    | 5; 5 and 9                                                          |
+  | 6     | 6a only the last failed take; 6b none (typecheck too); 6c the reasons after the block; 6d, 6e, 6f a failed take's path, observation, expanded prompt; 6g no blank line                                                                                     | 6 each                                                              |
+  | 7     | 7a Gate 5 told an earlier take's reasons; 7b the witness handed an earlier take's clip; 7c Gate 5 named for take 1                                                                                                                                         | 7 each (7a also 5; 7b also 22, 23; 7c also 5, 22, 24)               |
+  | 8     | 8a a shot's verdict events grouped by gate                                                                                                                                                                                                                 | 8, 47                                                               |
+  | 9     | 9a a refused retry holding its shot; 9b only a video call's first send guarded; 9d exactly equal refused; 9e the question naming take 1                                                                                                                    | 9 each                                                              |
+  | none  | **9c only a narration call's first send guarded**                                                                                                                                                                                                          | **nothing** — S-101's _Not handled_                                 |
+  | 10    | 10a an unavailable narration written as a row; 10b no backoff; 10c a constant one; 10d, 10e a receipt's transient errors written 0 (typecheck too); 10f sent again with another request; 10g, 10h never sent again; 10i the stand-in one unavailable short | 10 each (10a, 10g also 11; 10h, 10i also 9, 11)                     |
+  | 11    | **11a the last send passing `unavailable` on**                                                                                                                                                                                                             | **nothing at first** — fixed by adding (below). Run again: 11       |
+  | 11    | 11b a throw sent again; 11c one send more than `maxAttempts`; 11d, 11e the stage's `unavailable` lines removed (typecheck too)                                                                                                                             | 11 each                                                             |
+  | 12    | 12a a shot made from words held; 12b one claiming an event held                                                                                                                                                                                            | 12 (12a also 5, 22, 23, 26, 47; 12b also 24)                        |
+  | 12    | 12c the first take's gate; 12d the third take's highest; 12e no why (typecheck too); 12f only the third take named; 12k no _"three takes"_; 12i a later shot after the stop (typecheck too)                                                                | 12 each (all but 12c also 26; 12i also 5, 21–24, 47)                |
+  | 12    | 12g a label member in `AtTheCap`; 12h a degraded shot said to have no picture from the plan                                                                                                                                                                | 12 each                                                             |
+  | none  | x1 `readRenderInputs` reading every number as 1 (typecheck too); x2 `readTakeId` reading a take beyond 3; x3 the question without the number                                                                                                               | nothing — no check promises any                                     |
+  | 10    | **w1 the bare timer, S-102's rejected option**                                                                                                                                                                                                             | **nothing, the one time run** — it fails now and then               |
+
+  The first chunk listed check 10 also under 5e, 6a, 9d, 9e, 11b and x1 — the flake above. Each was run again once the
+  wait was a deadline, with 10b and 10c, whose code moved: check 10 no longer among their catchers; 10b and 10c caught
+  by 10.
+
+- **Caught by nothing that a check's words promise: none left; one was fixed by adding.** 11a — the guarded port
+  passing `unavailable` on at its last send — ends the run failed through the stage's own Slice 1 fault, whose detail
+  also names the call and I-11, so check 11's words held of it. S-096 says the port throws _"naming the call, the sends
+  and I-11"_: check 11's two last-send tests now also assert _"each of its 3 sends"_, and 11a-2 was caught by 11.
+  **Caught by nothing and promised by no check's words**, said plainly: 9c (S-101's _Not handled_), x1 (S-099: support,
+  _"none of it an assertion"_), x2 (the stage never asks for a fourth), x3 (check 9 names the take by its id), and w1
+  (S-102's _Not handled_).
+- **Choices recorded.** **S-101**: check 9's fourth run writes 213 cents to the clips job's row when the retry's first
+  send is answered `unavailable`, so a guard that compared only a call's first send fails it — rejected: leaving it to
+  the paid path, a cost on the stand-in's `unavailable`, exporting `guardedVideoPort` for a test. **S-102**: the wait is
+  a monotonic deadline — rejected: one `setTimeout`, check 10 allowing a millisecond short, a millisecond more asked.
+  **Not recorded, nothing rejected could be caught:** the retry prompt's wording; the failed takes kept in a list per
+  shot; `sentUntilAvailable` shared by the two ports; `readTakeId` refusing a take beyond 3.
+- **What Slice 2 builds that no Slice 2 check asserts**: the `hold` stand-in's detail (Gate 4 says so); the question's
+  take number; `readRenderInputs` reading the number; the guard refusing a take id beyond 3.
+- **Traps.** The one `sed -i` run this session changed nothing and left the file LF (checked by counting `\r`). Every
+  file holding backticks was written with the editing tool, and the break list with it, its finds checked once by the
+  runner before any chunk.
+- **Two red runs of the whole suite, both load, said plainly.** Once the slice was done, `check.mjs` failed twice in a
+  row, its tests taking 369 s and 376 s against 212 s an hour before, with a process outside this repository
+  (`ACBlackFlag`, 8 470 CPU-seconds) holding the CPU at half with nothing of ours running. In the TAP run between them
+  **check 50's child hit its 300-second spawn bound** (300 400 ms) and **`reel-render`'s check 41 failed once on
+  `fetch failed`** — the test's poll of its own engine dropping, no assertion. Nothing in either is this slice's code:
+  check 50's child alone took 102 s, 105 of 105 green, and with the load gone `check.mjs` was green in 222 s. But the
+  child now carries this slice's heavier moved checks — three takes on every failing shot — so **its margin under the
+  300-second bound is smaller than session 28 measured** (116–132 s inside the suite then). Worth watching in Slice 6,
+  which runs four journeys; not widened here.
+- `node scripts/check.mjs`: **everything green, 322 tests** by the TAP count; checks 1–12 pass by number (34 tests),
+  and every moved `reel-render` check.
+
+**Next.** `reel-takes` Slice 3 — the hold at the cap: checks 13–15. A `hold` goes on to the next shot; the held shot's
+`StillHold`, its picture probed by the media port, its `degraded` event and four labels with every clips-job ending;
+`readRecord` listing still-holds after the stills' degradations. Carried: check 9's still-hold clause goes live there;
+the narration guard's every-send rule is checked by nothing (S-101); `reel-render`'s check 50 child's margin under its
+300-second bound, which the child overran twice this session on a loaded machine. For Slice 5: check 4's second restart (S-100).
+Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
