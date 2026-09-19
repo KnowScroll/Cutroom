@@ -2437,7 +2437,15 @@ S-029, S-033.
   Node script whose finds were checked once.
 - `node scripts/check.mjs`: **everything green, 288 tests** by the TAP count; checks 48, 49 and 50 pass by number, and
   1–47 with them and inside 50's child.
+- **The journeys**, each on a clean tree, written by the script and committed on its own, in this order:
+  **`reel-render` PASS at 8819d13, 106 tests — Status: verified**; **`reel-stills` PASS at e39734b, 63 tests**;
+  **`reel-plan` PASS at 97f139c, 50 tests**; **`reel-contract` PASS at 7d6cbd0, 41 tests** (S-077). Divergence `none`
+  in all four. Nothing was left untracked at the root, so none refused.
 
-**Next.** The journeys, each committed on its own: `reel-render`, then `reel-stills`, `reel-plan` and `reel-contract`
-again (S-077). Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and serving the
-file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).
+**Next.** `reel-render` is verified. Which of `reel-takes` and `video-edits` comes first — both with every gate pending
+— is the owner's call. Worth carrying: S-081's clips-job ending cost is still unchecked but at a budget stop and a
+completed stage; the last shot's overspent clip completes a run over its limit (S-087); `renderManifest`'s `request` is
+unread; break 34d is named by no check (deferred item 15); a render row whose worker died is marked by nothing (S-089).
+The suite now runs about 170 s here, most of it check 50's child. Owed outside this repository, unchanged: KnowScroll's
+check of a returned video (S-068) and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the
+steering stubs and the pin (S-033).
