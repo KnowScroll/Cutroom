@@ -2712,3 +2712,28 @@ reel_takes_tables` after `schema.ts` changed: the `still_hold` table (run, shot,
 reading the take's number (S-099); check 11 reading the stage's `unavailable` fault directly; `transient_errors`
 checked first by check 10. For Slice 5: check 4's second restart moves onto checkpoints (S-100). Owed outside this
 repository, unchanged: S-068, S-073, S-029, S-033.
+
+## 2026-09-19 — session 30, continued: a push, and the prompt for reel-takes' Slice 2
+
+**Intent.** The owner asked for the commit and the push, then the next session's prompt.
+
+**Changed.**
+
+- **Pushed** `main` to `origin`: 238df85..d6ae1f1 — Slice 1, S-100 and the journal. It was already committed.
+- **`PROMPTS/031-reel-takes-slice-2.md`** — session 31's prompt, `Run: not yet`: Slice 2 only, checks 5–12, tests
+  first, and `reel-render`'s checks 20–24, 26 and 47 moved as S-099 says. It names what to read (sessions 30, 29, 22 and
+  23; Gate 2's takes, retry prompt, cap, transient and spending sections; S-090, S-091, S-094 to S-096, S-099, S-100
+  and what they lean on), what Slice 2 builds and what it does not — no hold, no still-hold, no checkpoint — the eight
+  checks with the clauses Gate 3 says are green before code, the lease to measure (known limit 14), a break campaign
+  in session 30's form with the breaks to run, when to stop and ask the owner, and the traps. Indexed in
+  `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Every path the prompt names was checked to exist**, and the next free S-number it gives is S-101. It carries two
+  things Slice 1 learned: check 4's clips-stage stop becomes a budget stop from Slice 2 by design and must stay green
+  (S-100), and SQLite's silence on a `NOT NULL` column added to an empty table.
+- Nothing but markdown changed; `prettier --check` passes.
+
+**Next.** Session 31: run `PROMPTS/031-reel-takes-slice-2.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
