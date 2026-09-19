@@ -2898,3 +2898,29 @@ takes/i` and `/no approved picture/i`; narration calls and rows shots 0 to 3, cl
 the narration guard's every-send rule is checked by nothing (S-101); `reel-render`'s check 50 child's margin under its
 300-second bound, which the child overran twice this session on a loaded machine. For Slice 5: check 4's second restart (S-100).
 Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
+
+## 2026-09-19 — session 31, continued: a push, and the prompt for reel-takes' Slice 3
+
+**Intent.** The owner asked for the push and the next session's prompt, and how many slices the feature has.
+
+**Changed.**
+
+- **Pushed** `main` to `origin`: 52a62dd..7d5f264 — session 31's prompt and Slice 2.
+- **`PROMPTS/032-reel-takes-slice-3.md`** — session 32's prompt, `Run: not yet`: Slice 3 only, checks 13–15, tests
+  first. It names what to read (sessions 31, 30 and 29; Gate 2's cap, labels, events and storage sections; S-090,
+  S-097, S-098 and what they lean on), what Slice 3 builds and what it does not — no still-hold shot in the render, no
+  checkpoint — the holdable shots, check 9's still-hold clause going live, a break campaign in session 31's form with the
+  breaks to run, when to stop and ask the owner, and the traps, the timer's among them (S-102). Indexed in
+  `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **`reel-takes` has six slices** (Gate 4): 4 + 8 + 3 + 5 + 4 + 2 = 26 checks. Slices 1 and 2 are done; Slice 3 is next,
+  and Slice 6 runs this feature's journey and `reel-render`'s, `reel-stills'`, `reel-plan's` and `reel-contract's`
+  again.
+- **Every path the prompt names was checked to exist**; `StillHold` is not yet in `packages/contracts`, as the prompt
+  says. The next free S-number it gives is S-103.
+- Nothing but markdown changed.
+
+**Next.** Session 32: run `PROMPTS/032-reel-takes-slice-3.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
