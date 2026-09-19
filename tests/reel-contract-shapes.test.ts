@@ -154,6 +154,8 @@ const MESSAGES = {
             checks: [{ gate: '1', outcome: 'fail' }],
           },
         ],
+        // Required since reel-takes' Slice 1 (S-093, S-099): test support, no assertion.
+        takes: [],
         degradations: [],
       },
     ],

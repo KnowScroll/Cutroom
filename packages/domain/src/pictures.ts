@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
-import type { PictureRecord } from '@cutroom/contracts'
-import type { RunRecord } from '@cutroom/reel-contract'
+import type { PictureRecord, RenderManifest, TakeVerdict } from '@cutroom/contracts'
+import type { RunRecord, RunResult } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
 import {
   degradation,
@@ -10,6 +10,10 @@ import {
   picture,
   reconciliation,
   render,
+  run,
+  take,
+  takeObservation,
+  takeReconciliation,
 } from './schema.ts'
 
 // The pictures of a run and their record (docs/features/reel-stills.md, Gate 2 "Storage" and "How a
@@ -42,8 +46,9 @@ export function pictureValues(runId: string, p: PictureRecord): typeof picture.$
   }
 }
 
-const observationId = (pictureId: string) => `obs-${pictureId}`
-const reconciliationId = (pictureId: string) => `rec-${pictureId}`
+/** A picture's observation and reconciliation ids — and a take's, formed the same way (S-072). */
+const observationId = (id: string) => `obs-${id}`
+const reconciliationId = (id: string) => `rec-${id}`
 
 /**
  * A picture's checks, made durable, in one transaction: its measure, words, Gate 1 verdict, score
@@ -103,9 +108,13 @@ type Check = RunRecord['pictures'][number]['checks'][number]
 /**
  * A run's record as the contract gives it: one entry per picture made, every attempt, in `seq`
  * order; `observationId` and `reconciliationId` where those rows exist; a check for each completed
- * Gate 1 step and for Gate 1S; and every degradation.
+ * Gate 1 step and for Gate 1S; one entry per take made, every attempt's, in the order made, with a
+ * check for each gate it completed (S-093); and every degradation.
  */
-export function readRecord(db: Db, runId: string): Pick<RunRecord, 'pictures' | 'degradations'> {
+export function readRecord(
+  db: Db,
+  runId: string,
+): Pick<RunRecord, 'pictures' | 'takes' | 'degradations'> {
   const observed = new Set(
     db
       .select({ pictureId: observation.pictureId })
@@ -160,7 +169,7 @@ export function readRecord(db: Db, runId: string): Pick<RunRecord, 'pictures' | 
   // own, and an earlier attempt's rows stay in their table without being listed twice (S-076). Shot
   // order is the shot's number, not its id as text, which would put `shot-10` before `shot-2`.
   const latest = db
-    .select({ renderId: render.renderId })
+    .select({ renderId: render.renderId, renderManifest: render.renderManifest })
     .from(render)
     .where(eq(render.runId, runId))
     .orderBy(desc(render.attempt))
@@ -175,7 +184,62 @@ export function readRecord(db: Db, runId: string): Pick<RunRecord, 'pictures' | 
           .where(and(eq(hold.runId, runId), eq(hold.renderId, latest.renderId)))
           .orderBy(sql`CAST(substr(${hold.shotId}, 6) AS INTEGER)`)
           .all()
-  return { pictures, degradations: [...degradations, ...holds] }
+
+  // The takes (S-093): every take made, every attempt's — a take cut off inside its gates too — in
+  // the order their rows were written, which is the order made. `used` is true exactly for the takes
+  // a COMPLETED run's video shows: those its latest render manifest names, as `chosen` is written
+  // only for a completed stills stage (S-055). A run that stopped or failed after a render was made —
+  // at Gate 7, say — shows a caller no video, so it used no take.
+  const finished = db.select({ result: run.result }).from(run).where(eq(run.runId, runId)).get()
+  const result =
+    finished?.result === null || finished?.result === undefined
+      ? null
+      : (JSON.parse(finished.result) as RunResult)
+  const used = new Set(
+    result?.status === 'completed' && latest !== undefined
+      ? (JSON.parse(latest.renderManifest) as RenderManifest).shots.map((shot) => shot.takeId)
+      : [],
+  )
+  const takeSeen = new Set(
+    db
+      .select({ takeId: takeObservation.takeId })
+      .from(takeObservation)
+      .where(eq(takeObservation.runId, runId))
+      .all()
+      .map((r) => r.takeId),
+  )
+  const takeReconciled = new Set(
+    db
+      .select({ takeId: takeReconciliation.takeId })
+      .from(takeReconciliation)
+      .where(eq(takeReconciliation.runId, runId))
+      .all()
+      .map((r) => r.takeId),
+  )
+  const takes = db
+    .select({
+      takeId: take.takeId,
+      shotUnit: take.shotUnit,
+      number: take.number,
+      verdicts: take.verdicts,
+    })
+    .from(take)
+    .where(eq(take.runId, runId))
+    .orderBy(sql`rowid`)
+    .all()
+    .map((row) => ({
+      takeId: row.takeId,
+      shotId: `shot-${row.shotUnit}`,
+      number: row.number,
+      used: used.has(row.takeId),
+      ...(takeSeen.has(row.takeId) ? { observationId: observationId(row.takeId) } : {}),
+      ...(takeReconciled.has(row.takeId) ? { reconciliationId: reconciliationId(row.takeId) } : {}),
+      checks: (JSON.parse(row.verdicts) as TakeVerdict[]).map((v) => ({
+        gate: v.gate,
+        outcome: v.outcome,
+      })),
+    }))
+  return { pictures, takes, degradations: [...degradations, ...holds] }
 }
 
 /** A shot that goes on without an approved picture, as the stage recorded it (S-043, D-050). */

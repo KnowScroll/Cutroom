@@ -4,7 +4,7 @@
 - **Feature:** `reel-takes` — [`docs/features/reel-takes.md`](../docs/features/reel-takes.md)
 - **Work:** Slice 1 of 6 — the ports' answers, the settings and the record; checks 1–4, tests first; no journey
 - **Written:** 2026-09-19, at the end of session 29, after `reel-takes`' gates were approved (b74951b) and pushed
-- **Run:** not yet
+- **Run:** session 30
 
 Paste everything inside the block below as the session's first message.
 

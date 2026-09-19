@@ -16,7 +16,8 @@ export const SCAN_FILTERS = ['blackdetect', 'freezedetect', 'silencedetect', 'eb
 
 /**
  * Every filter the one pass uses (S-073). The assembler writes a filter only by a name from this
- * list, so the pass cannot come to need one `ready()` never asked the tools for.
+ * list, so the pass cannot come to need one `ready()` never asked the tools for. `zoompan` pushes a
+ * held shot's picture in (S-097), and is required before any filtergraph writes it.
  */
 export const PASS_FILTERS = [
   'scale',
@@ -35,6 +36,7 @@ export const PASS_FILTERS = [
   'volume',
   'amix',
   'anullsrc',
+  'zoompan',
 ] as const
 export type PassFilter = (typeof PASS_FILTERS)[number]
 

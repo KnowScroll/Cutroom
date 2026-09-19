@@ -200,7 +200,13 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
   function stepsFor(runId: string, request: SubmitRequest, scenario: Scenario): Step[] {
     const until = request.options.until
     const common = { contractVersion: V, runId, requestId: request.requestId }
-    const noPictures: RunRecord = { contractVersion: V, runId, pictures: [], degradations: [] }
+    const noPictures: RunRecord = {
+      contractVersion: V,
+      runId,
+      pictures: [],
+      takes: [],
+      degradations: [],
+    }
     const ceilingCents = request.options.budgetCents
     const planStarted: Step = { events: [{ type: 'stage.started', stage: 'plan' }] }
     const planFinished: Step = { events: [{ type: 'stage.finished', stage: 'plan' }] }
@@ -368,7 +374,8 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
         degradations,
       }
     }
-    const record: RunRecord = { contractVersion: V, runId, pictures, degradations }
+    // The stand-in makes no clip, so it lists none (S-093, S-099).
+    const record: RunRecord = { contractVersion: V, runId, pictures, takes: [], degradations }
     steps.push({
       events: [{ type: 'run.finished', status: 'completed' }],
       finish: { result, record },
@@ -390,7 +397,13 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
         costCents: 0,
         status: 'cancelled',
       }
-      const record: RunRecord = { contractVersion: V, runId, pictures: [], degradations: [] }
+      const record: RunRecord = {
+        contractVersion: V,
+        runId,
+        pictures: [],
+        takes: [],
+        degradations: [],
+      }
       append(runId, { type: 'run.finished', status: 'cancelled' })
       finishRun.run(JSON.stringify(result), JSON.stringify(record), runId)
       return

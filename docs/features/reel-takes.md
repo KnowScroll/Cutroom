@@ -817,7 +817,7 @@ _Endings, and no secrets_
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the ports' answers, the settings and the record.** `TakeNumber`; `unavailable` on both answers, with
+- [x] **Slice 1 — the ports' answers, the settings and the record.** `TakeNumber`; `unavailable` on both answers, with
       the stage treating one that reaches it as a fault; `RenderSettings.transient` and `stillPush`, with their defaults
       and the worker's refusals; `zoompan` in `PASS_FILTERS`; **the migration** — `still_hold`, `transient_errors` — and
       `recordClip` and `recordNarration` writing 0; `RunRecord.takes`, `readRecord` returning them, the contract's

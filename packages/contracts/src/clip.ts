@@ -57,6 +57,12 @@ export type VideoAnswer =
       limit: Extract<RunResult, { reason: 'budget' }>['limit']
       estimateCents: number
     }
+  /**
+   * The provider made nothing and may if asked again (S-096). Only a provider answers it; the
+   * worker's guarded port sends the call again, and it is never a take (I-11). It carries a detail
+   * and nothing else.
+   */
+  | { kind: 'unavailable'; detail: string }
 
 export interface VideoPort {
   generate(request: VideoRequest): Promise<VideoAnswer>
@@ -135,14 +141,16 @@ export interface TakeVerdict {
     | { strategy: 'observation' }
 }
 
+/** A take's number among its shot's decided takes: three a shot, counted when decided (D-024, S-094). */
+export type TakeNumber = 1 | 2 | 3
+
 /** One entry per take made, with each gate it reached, whatever ended the run (S-072). */
 export interface TakeRecord {
   takeId: string
   /** The clips job's attempt. */
   attempt: number
   shotUnit: number
-  /** One take a shot in this feature (S-066). */
-  number: 1
+  number: TakeNumber
   mode: VideoRequest['mode']
   /** The chosen picture of an image-to-video take. */
   pictureId: string | null

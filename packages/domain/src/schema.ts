@@ -270,6 +270,8 @@ export const speechReceipt = sqliteTable('speech_receipt', {
   rateCents: real('rate_cents').notNull(),
   costCents: integer('cost_cents').notNull(),
   fake: integer('fake', { mode: 'boolean' }).notNull(),
+  /** The `unavailable` answers before the call was made (S-096): 0 for a row made at its first send. */
+  transientErrors: integer('transient_errors').notNull().default(0),
   at: text('at').notNull(),
 })
 
@@ -342,6 +344,8 @@ export const videoReceipt = sqliteTable('video_receipt', {
   fake: integer('fake', { mode: 'boolean' }).notNull(),
   /** A degraded shot's text-to-video take (D-050), or a hold's (S-073). */
   degraded: integer('degraded', { mode: 'boolean' }).notNull().default(false),
+  /** The `unavailable` answers before the call was made (S-096): 0 for a row made at its first send. */
+  transientErrors: integer('transient_errors').notNull().default(0),
   at: text('at').notNull(),
 })
 
@@ -422,5 +426,41 @@ export const hold = sqliteTable(
   (t) => [
     primaryKey({ columns: [t.runId, t.renderId, t.shotId] }),
     foreignKey({ columns: [t.runId, t.renderId], foreignColumns: [render.runId, render.renderId] }),
+  ],
+)
+
+// ---------------------------------------------------------------- reel-takes
+//
+// docs/features/reel-takes.md, Gate 2 "Storage". The migration that made these arrived in Slice 1;
+// the clips job writes a still_hold row with whatever ending it reaches from Slice 3 (S-098).
+
+/**
+ * A shot held on its chosen picture at its take cap (D-025 rung 2, S-090): its own table, so "every
+ * run with a held shot" is a query (I-4, S-098). Not a `hold`, which is a clip shorter than its
+ * narration (S-073).
+ */
+export const stillHold = sqliteTable(
+  'still_hold',
+  {
+    runId: text('run_id')
+      .notNull()
+      .references(() => run.runId),
+    shotId: text('shot_id').notNull(),
+    /** The clips job's attempt whose ladder decided it. */
+    attempt: integer('attempt').notNull(),
+    /** The chosen picture it is held on. */
+    pictureId: text('picture_id').notNull(),
+    /** JSON: that picture's file, probed by the media port when the shot was held (D-055, S-097). */
+    probe: text('probe').notNull(),
+    /** JSON: the three takes its ladder consumed, in order. */
+    takeIds: text('take_ids').notNull(),
+    reason: text('reason').notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.runId, t.shotId] }),
+    foreignKey({
+      columns: [t.runId, t.pictureId],
+      foreignColumns: [picture.runId, picture.pictureId],
+    }),
   ],
 )

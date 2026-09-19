@@ -56,6 +56,11 @@ export const DEFAULT_RENDER_SETTINGS: RenderSettings = {
     'Do the burned captions follow the narration?',
     'Does every shot show something no other shot repeats?',
   ],
+  // D-024, I-11, S-096: a call answered unavailable is sent again, three sends in all, a second apart
+  // and then two.
+  transient: { maxAttempts: 3, backoffMs: 1000 },
+  // D-025, S-097: a held shot's slow push — provisional until M-1.
+  stillPush: { endZoom: 1.1 },
 }
 
 /** What the cut made, whatever ended it: each field is there once its step returned. */

@@ -131,6 +131,8 @@ export function guardedVideoPort(
         style: job.style,
         rateCents: job.rateCents,
         receipt: answer.receipt,
+        // Made at its first send: nothing sends a call again until reel-takes' Slice 2 (S-096).
+        transientErrors: 0,
       })
       return answer
     },

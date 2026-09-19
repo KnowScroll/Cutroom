@@ -60,6 +60,12 @@ export const TEST_RENDER_SETTINGS: RenderSettings = {
   // A caption style is in the output's own pixels (S-084): the default's 48-pixel words 200 above
   // the foot are sized for 768 × 1366 and would stand outside a frame 192 high.
   captionStyle: { id: 'word-captions-test', fontName: 'Arial', fontSize: 12, marginV: 20 },
+  // The default's three sends, with a short backoff, so no test waits a second between them
+  // (reel-takes' Gate 3; S-096, S-099). Written out here rather than spread from the default, so a
+  // test reading a wait knows it.
+  transient: { maxAttempts: 3, backoffMs: 20 },
+  // The default push (S-097, S-099).
+  stillPush: { endZoom: 1.1 },
 }
 
 /**

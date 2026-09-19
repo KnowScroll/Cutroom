@@ -3510,3 +3510,40 @@ decided (S-047).
 
 **Caught by.** The four journeys, run again in `reel-takes`' Slice 6, and `reel-render`'s check 50, whose child runs
 every changed test.
+
+---
+
+## S-100 | 2026-09-19 | `reel-takes`' check 4 is built on runs later slices leave alone, but one restart, typed for S-076's start-over, which Slice 5 moves
+
+**Chose.** Check 4 (`tests/reel-takes-record.test.ts`) reads each run's record from the record route, every expectation
+typed by hand, on runs chosen so the ladders Slices 2 to 5 build leave the record as Slice 1 finds it:
+
+- **The run stopped in its clips stage** stops on shot 3's first take — `THREE_RANKS`' shot made from words — which
+  fails Gate 2, black from its first frame, at a scripted cost of 230 under a ceiling of 240. Slice 1 stops it for
+  `gate-2`; from Slice 2 the retry, at least 230 + 20, is refused by the guard and the run stops for budget (S-095). The
+  record is the same four entries either way, and the check asserts the run stopped, not why.
+- **The first restart** holds its first worker at call 12, shot 0's reconcile call: the first attempt decides no take,
+  so the second makes all six whether it starts over (S-076) or picks up where the first stopped (S-092).
+- **The plan and stills runs** share an engine with a video run, so their records are read while the database holds
+  another run's takes.
+- **A second restart**, added after this slice's break campaign, holds its first worker at call 16, shot 2's reconcile
+  call: shots 0 and 1 decided and accepted, shot 2's take cut off. **It is typed for S-076's start-over** — the first
+  attempt's three entries, none used, then the second attempt's six, used. **Slice 5 moves it onto S-092's
+  checkpoints**, as S-099 moves `reel-render`'s check 48: the new worker's model script from shot 2's take on, the
+  second attempt's four takes, and shots 0 and 1's first-attempt takes used; every clause kept.
+
+**Why.** Two wrong records passed every run the first four cases make: **the takes in shot order** rather than the order
+made, and **every accepted take of a completed run marked used** — breaks 4f and 4c, caught by nothing. Check 4 promises
+both, _"in the order made"_ and _"used true for every take its video shows"_ as S-093 reads it, _"exactly"_. Neither
+differs from the right record while a restart's first attempt decided no take, or on any run of one attempt: only a
+restart that starts over after deciding takes lists an attempt's takes out of shot order and shows none of its accepted
+ones. Under checkpoints no run can — a finishing attempt makes nothing before the take it cut off, and every accepted
+take of a completed run is its shot's one — so the moved case needs to catch neither there.
+
+**Rejected.** **Rows written straight into a database and `readRecord` read directly** — a record of rows no run made,
+where check 4 reads runs. **Expectations read from the tables** — the order from the take rows, `used` from the render
+row — to spare Slice 5 the move: not typed by hand, and the new worker's script still differs between the two
+slices, so the case moves anyway. **Leaving 4c and 4f uncaught** — the check's words promise both.
+
+**Caught by.** Breaks 4c2 and 4f2 — 4c and 4f run again after the case was added — each caught by check 4. Slice 5's
+suite, in which this case goes red once checkpoints land, until it is moved.

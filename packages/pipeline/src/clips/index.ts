@@ -109,6 +109,17 @@ const stopped = (refused: Refused): Ending => ({
   estimateCents: refused.estimateCents,
 })
 
+/**
+ * An `unavailable` answer that reached the stage: a fault, as a thrown call is (S-046, S-096). Only a
+ * provider answers it, and the worker's guarded port — the only video and narration port the stage is
+ * handed — sends the call again rather than pass it on; one that arrives here came through a port
+ * built wrong. Nothing is recorded for it, so no take is counted (I-11).
+ */
+const unavailable = (port: 'video' | 'narration', id: string, detail: string) =>
+  new Error(
+    `the ${port} port answered unavailable for ${id} (${detail}): only the worker's guarded port may be answered that, and it sends the call again (S-096, I-11)`,
+  )
+
 export async function makeClips(
   input: ClipsInput,
   ports: ClipsPorts,
@@ -189,6 +200,7 @@ async function stage(
       voice: settings.render.voice,
     })
     if (spoken.kind === 'refused') return stopped(spoken)
+    if (spoken.kind === 'unavailable') throw unavailable('narration', narrationId, spoken.detail)
     record.narrations.push({
       narrationId,
       attempt,
@@ -247,6 +259,7 @@ async function stage(
           }
     const made = await ports.video.generate(asked)
     if (made.kind === 'refused') return stopped(made)
+    if (made.kind === 'unavailable') throw unavailable('video', takeId, made.detail)
     record.takes.push({
       takeId,
       attempt,

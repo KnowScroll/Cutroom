@@ -69,6 +69,8 @@ export function guardedNarrationPort(
         },
         rateCentsPerCharacter: job.rateCentsPerCharacter,
         receipt: answer.receipt,
+        // Made at its first send: nothing sends a call again until reel-takes' Slice 2 (S-096).
+        transientErrors: 0,
       })
       return answer
     },

@@ -76,7 +76,8 @@ export interface WorkerOptions {
   /**
    * The render's settings. Defaults to the pipeline's. Exactly one gate profile is defined, so a
    * profile whose gates are not GATE_ORDER — a lighter set, or one with a gate the engine does not
-   * run — makes the worker refuse to start (D-052, S-067).
+   * run — makes the worker refuse to start (D-052, S-067); so does a transient setting that could not
+   * send a call or wait between sends (S-096), or a still push that would not push in (S-097).
    */
   renderSettings?: RenderSettings
   /**
@@ -100,7 +101,9 @@ export interface WorkerOptions {
 /**
  * Why a worker would break a promise before its first picture — or nothing. Checked before the
  * database is opened, so a refused worker claims no job (D-026's, D-032's and D-052's startup
- * assertions, in that order: S-077).
+ * assertions, in that order: S-077), and then the render settings a retry and a still-hold read: a
+ * transient setting that could not send a call or wait between sends (S-096), and a push that would
+ * not push in (S-097).
  */
 function refusal(
   options: WorkerOptions,
@@ -118,6 +121,17 @@ function refusal(
   const one = gates.length === GATE_ORDER.length && gates.every((gate, i) => gate === GATE_ORDER[i])
   if (!one) {
     return `the gate profile '${id}' runs gates [${gates.join(', ')}], and the one profile defined runs [${GATE_ORDER.join(', ')}]: no other set of gates exists (D-052, S-067)`
+  }
+  const { maxAttempts, backoffMs } = render.transient
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1) {
+    return `the transient setting's maxAttempts is ${maxAttempts}, and a call answered unavailable is sent a whole number of times, at least once (S-096, I-11)`
+  }
+  if (!Number.isFinite(backoffMs) || backoffMs < 0) {
+    return `the transient setting's backoffMs is ${backoffMs}, and the wait before a call is sent again is a finite number of milliseconds, at least 0 (S-096, I-11)`
+  }
+  const { endZoom } = render.stillPush
+  if (!Number.isFinite(endZoom) || endZoom <= 1) {
+    return `the still push's endZoom is ${endZoom}, and a held shot is pushed in from a zoom of 1 to a finite zoom above it (S-097, D-025)`
   }
   return undefined
 }

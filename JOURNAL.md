@@ -2595,3 +2595,120 @@ serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the
 
 **Next.** Session 30: run `PROMPTS/030-reel-takes-slice-1.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-19 — session 30, reel-takes Slice 1: the ports' answers, the settings and the record
+
+**Intent.** Run `PROMPTS/030-reel-takes-slice-1.md`: `reel-takes`' Slice 1 only — checks 1 to 4, tests first, nothing
+from Slice 2 or later, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline 288 tests (b74951b, by
+session 29's TAP count). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`packages/reel-contract`** — `RunRecord.takes`, required and strict: `takeId`, `shotId`, `number` (a whole number
+  above 0), `used`, `checks` (gate and outcome), `observationId` and `reconciliationId` optional (S-093).
+  `CONTRACT_VERSION` stays 1.
+- **`packages/contracts`** — `TakeNumber = 1 | 2 | 3`, exported, and `TakeRecord.number: TakeNumber`; `{ kind:
+'unavailable'; detail: string }` on `VideoAnswer` and `NarrationAnswer`; `RenderSettings.transient` and
+  `stillPush`. Types only. No `StillHold`, no render shot union.
+- **`packages/pipeline`** — `DEFAULT_RENDER_SETTINGS`' `transient: { maxAttempts: 3, backoffMs: 1000 }` and `stillPush:
+{ endZoom: 1.1 }`; `makeClips` throws on an `unavailable` answer from either port, before any row is recorded, so the
+  stage fails with a detail naming the port, the id, the provider's detail, S-096 and I-11, and nothing is counted.
+- **`packages/providers`** — `'zoompan'` in `PASS_FILTERS`, so `REQUIRED_FILTERS` and every `ready()` require it. No
+  filtergraph writes it.
+- **`packages/domain`** — **`db/migrations/0004_reel_takes_tables.sql`**, made by `drizzle-kit generate --name
+reel_takes_tables` after `schema.ts` changed: the `still_hold` table (run, shot, attempt, picture, probe, take ids,
+  reason; key the run and the shot; a foreign key to the picture) and `transient_errors` on `video_receipt` and
+  `speech_receipt`, `DEFAULT 0 NOT NULL`. `recordClip` and `recordNarration` take and write `transientErrors`.
+  **`readRecord` returns `takes`**: every take row in `rowid` order, its checks from its verdicts, its ids where the
+  observation and reconciliation rows exist, and `used` exactly for the takes the latest render row's manifest names
+  when the run's result is `completed` — S-093's own words, so not a new choice.
+- **`apps/worker`** — the three refusals, after the gate profile's and before `ready()` (S-077's order), each naming its
+  setting; the guarded ports pass `transientErrors: 0`. **`apps/api`** — unchanged: the record route spreads
+  `readRecord`, so it returns `takes` and the type made it.
+- **Test support, no assertion (S-099):** the contract shape check's example record and the stand-in service's three
+  records carry `takes: []`; `TEST_RENDER_SETTINGS` carries `transient: { maxAttempts: 3, backoffMs: 20 }` and
+  `stillPush: { endZoom: 1.1 }`, written out. **`worker-process.ts` is unchanged**: the child is handed the harness's
+  render settings as JSON. `reel-render-profile`'s settings spread the default, so nothing else changed.
+- **Four test files, +14 tests, 288 → 302**: `tests/reel-takes-{ports,settings,shapes,record}.test.ts` — checks 1 (2
+  tests), 2 (3), 3 (3), 4 (6), each titled with Gate 3's words.
+- **`DECISIONS.md` — S-100.** `reel-contract.md` gains a note naming S-093 and S-099 in S-034's form; its gates are not
+  edited. Slice 1 ticked. Prompt 030's `Run` line set to session 30, in the file and the index.
+
+**Observed.**
+
+- **No collision with a verified feature, and nothing for the owner.** Every change S-099 lists for Slice 1 was what the
+  build needed, no more: the contract example and the stand-in records failed to type without `takes`, and nothing
+  else in `tests/` builds a `RunRecord` or a `RenderSettings` literal that does not spread a default.
+- **Red first, each for its reason.**
+  - 1, what compiles: _"Module '…contracts/src/index.ts' has no exported member 'TakeNumber'"_, _"Type '2' is not
+    assignable to type '1'"_, _"Type '"unavailable"' is not assignable to type '"made" | "refused"'"_ on both ports, and
+    each exact-keys comparison _"Type 'true' is not assignable to type 'false'"_. 1, what is refused: red at _"a take
+    number of 4"_, for the missing export. **A take record numbered 0 or 4 was a type error before any code**, since
+    `number` was typed `1` — said plainly; breaks 1a and 1b show the new type's clauses can fail.
+  - 2: _"the default transient setting is not 3 sends and 1000 ms"_; _"no send at all: the worker started"_;
+    _"REQUIRED_FILTERS does not hold zoompan: blackdetect, … select"_.
+  - 3: _"a record with a take entry was refused"_. **The any-other-field test was first green for the wrong reason** —
+    the whole record was refused, `takes` being an unknown key — so it now first asserts the plain entry parses, and was
+    red: _"the take entry was refused with no other field"_. **The version clause green before code**, as the check
+    says.
+  - 4: all five tests red at the `takes` assertion itself (`+ undefined`), each after its run's premises held.
+- **What Slice 1 builds that no Slice 1 check asserts**, each shown by a break caught by nothing or by typecheck alone:
+  the stage's `unavailable` fault (5a, 5b — typecheck alone; check 11 reads it directly in Slice 2); the `still_hold`
+  table (6e — Slice 3); `transient_errors` written 0 (6c, 6d — check 10, Slice 2); **the column's default** (6a, 6b):
+  no check migrates a database holding earlier rows, and SQLite adds a `NOT NULL` column with no default to an empty
+  table without complaint, so even the `NOT NULL` break is silent on every fresh test database. No check of the 26
+  promises it. And `readRenderInputs` still writes `number: 1`: S-099 gives reading the number to Slice 2.
+- **Check 4's runs chosen to outlast later slices (S-100).** Its clips-stage stop is shot 3's first take failing Gate 2
+  at a cost of 230 under a ceiling of 240, so from Slice 2 the refused retry stops it for budget with the same record;
+  its first restart is held at call 12, before any take is decided, so starting over and checkpoints make the same
+  record; its plan and stills runs share an engine with a video run.
+- **Fifty-five deliberate breaks, one control, and two run again**, by session 28's runner in `.tmp/campaign/` (its
+  files moved aside to `s28/` first; ignored), its defaults pointed at this slice's four files and its counts taught
+  them: each break's files saved as bytes and `fsync`ed to a record first, restored and read back, the record removed;
+  every modified and untracked file hashed after each restore against the chunk's first; a refusal to start while a
+  record exists; every find checked once before the chunk; `tsc -b`, then the four files (13 tests, then 14), and the
+  contract's shape checks where named. One background chunk, 21–27 s a break, with a foreground waiter. Afterwards: no
+  record, `.artifacts/` empty, the fingerprints unchanged.
+
+  | check | breaks                                                                                                                                                                                                                                                                                                                                          | caught by                                                                         |
+  | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+  | none  | **control**: a comment in `readRecord`                                                                                                                                                                                                                                                                                                          | nothing                                                                           |
+  | 1     | 1a `TakeNumber` allowing 4; 1b allowing 0; 1c `TakeRecord.number` any number; 1e the video answer carrying an optional `estimateCents`; 1g `TakeNumber` not exported                                                                                                                                                                            | 1 each                                                                            |
+  | 1     | 1d the video answer's `detail` optional; 1f the narration port with no `unavailable`; 1h the narration answer carrying a `reason`, not a `detail`                                                                                                                                                                                               | 1 each, and typecheck                                                             |
+  | 2     | 2a–2c each default changed (2 sends, 500 ms, 1.2); 2d, 2g, 2i each refusal removed; 2e 0 sends allowed; 2f a part of a send; 2h a wait not finite; 2j a zoom of 1; 2k a zoom not finite; 2l the three refusals moved after the database opens; 2m after `ready()`, before the database; 2n `zoompan` left out of `PASS_FILTERS`                 | 2 each                                                                            |
+  | 3     | 3a `takes` optional; 3b a take entry allowed an extra field; 3c a take's check allowed one; 3d a number not whole; 3e a number of 0; 3f `used` optional; 3i a check's outcome not `accept_with_label`; 3k an empty `takeId`                                                                                                                     | 3 each                                                                            |
+  | 3     | 3g `observationId` required; 3h `reconciliationId` required                                                                                                                                                                                                                                                                                     | 3, 4, and typecheck                                                               |
+  | 3     | 3j `CONTRACT_VERSION` 2                                                                                                                                                                                                                                                                                                                         | 8 of 24 tests, over this feature's files and the contract's shapes                |
+  | 4     | 4a `used` for a stopped run; 4b `used` for every take of a shot its video shows; 4d only the latest attempt's takes; 4e the last made first; 4g a cut-off take given a reconciliation id; 4h an observation id only beside a reconciliation; 4i failed checks left out; 4j every outcome `accept`; 4l every shot `shot-0`; 4m every run's takes | 4 each (4a, 4g, 4h also typecheck, an unused binding)                             |
+  | 4     | **4f the takes in shot order**                                                                                                                                                                                                                                                                                                                  | **nothing at first** — fixed by adding (below). Run again: 4                      |
+  | 4     | **4c every accepted take of a completed run `used`**                                                                                                                                                                                                                                                                                            | **no test at first** — typecheck, on the break's own unused binding. Run again: 4 |
+  | 4     | 4k every take numbered 1                                                                                                                                                                                                                                                                                                                        | nothing: every number is 1 in this slice, and check 5 reads others                |
+  | none  | 5a, 5b the stage's `unavailable` line removed, for video and for narration                                                                                                                                                                                                                                                                      | typecheck alone                                                                   |
+  | none  | 6a `video_receipt.transient_errors` `NOT NULL` with no default; 6b `speech_receipt`'s nullable with none; 6c `recordClip` not writing it; 6d the guarded video port passing 2; 6e no `still_hold` table                                                                                                                                         | nothing                                                                           |
+  | S-099 | 7a the contract shape check's example record without `takes`                                                                                                                                                                                                                                                                                    | `reel-contract`'s shape checks 1 and 2                                            |
+
+- **Caught by nothing that a check's words promise: two, fixed by adding.** 4f — the takes in shot order — and 4c —
+  every accepted take of a completed run marked `used` — pass every run of one attempt and every restart whose first
+  attempt decided no take. Check 4 promises _"in the order made"_ and `used` for what the video shows, which S-093 says
+  is _"exactly"_. **Check 4 gained a restart held at call 16**, shot 2's reconcile call: shots 0 and 1 accepted, shot
+  2 cut off, and the second attempt starting over, so its record is out of shot order and two accepted takes are shown
+  by nothing. Run again as 4c2 and 4f2: each caught by 4. **It is typed for S-076's start-over, and Slice 5 must move
+  it** onto S-092's checkpoints, as S-099 moves `reel-render`'s check 48 — the new worker's script from shot 2's take,
+  four second-attempt takes, shots 0 and 1's first takes used. Under checkpoints neither break is a wrong record for any
+  run the engine can make. **S-100** records the choice, and what was rejected: rows written straight into a database,
+  expectations read from the tables.
+- **Not built as breaks, said plainly**: the refusals' order among themselves (a worker handed two bad settings names
+  the first) — nothing could catch it and no check promises it; the `still_hold` foreign key to its picture, which
+  nothing writes before Slice 3.
+- **Traps, twice.** A `node -e` holding backticks, to edit `recordClip`, ran nothing — its own once-only find threw
+  before any write; the edits went through the editing tool. And a `node -e` appending the rerun entries to the break
+  list arrived with a template cut out and a function that did not exist; `--check` would have refused it, and it was
+  written again with the editing tool as a plain loop after the array, session 28's trap and fix.
+- `node scripts/check.mjs`: **everything green, 302 tests** by the TAP count; checks 1–4 pass by number (14 tests). The
+  suite ran 185 s.
+
+**Next.** `reel-takes` Slice 2 — three takes, informed retries, transient errors, and the cap's stop: checks 5–12, with
+`reel-render`'s checks 20 to 24, 26 and 47 moved as S-099 says, and `reel-render.md`'s note. Carried: `readRenderInputs`
+reading the take's number (S-099); check 11 reading the stage's `unavailable` fault directly; `transient_errors`
+checked first by check 10. For Slice 5: check 4's second restart moves onto checkpoints (S-100). Owed outside this
+repository, unchanged: S-068, S-073, S-029, S-033.

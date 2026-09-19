@@ -21,6 +21,7 @@ export type {
   MediaPort,
   MediaProbe,
   NarrationRecord,
+  TakeNumber,
   TakeRecord,
   TakeVerdict,
   VideoAnswer,

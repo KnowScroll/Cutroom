@@ -88,6 +88,8 @@ export function recordNarration(
     narration: NarrationRecord
     rateCentsPerCharacter: number
     receipt: NarrationReceipt
+    /** The `unavailable` answers before the call was made (S-096). */
+    transientErrors: number
   },
   now: Date = new Date(),
 ): void {
@@ -103,6 +105,7 @@ export function recordNarration(
           rateCents: e.rateCentsPerCharacter,
           costCents: receipt.costCents,
           fake: receipt.fake,
+          transientErrors: e.transientErrors,
           at: now.toISOString(),
         })
         .run()
@@ -133,6 +136,8 @@ export function recordClip(
     style: { id: string; version: number }
     rateCents: number
     receipt: VideoReceipt
+    /** The `unavailable` answers before the call was made (S-096). */
+    transientErrors: number
   },
   now: Date = new Date(),
 ): void {
@@ -159,6 +164,7 @@ export function recordClip(
           costCents: receipt.costCents,
           fake: receipt.fake,
           degraded: e.take.degraded,
+          transientErrors: e.transientErrors,
           at: now.toISOString(),
         })
         .run()

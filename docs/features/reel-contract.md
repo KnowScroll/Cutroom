@@ -44,6 +44,17 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > shot whose clip was held to its narration, in shot order (S-073). **The record still lists pictures
 > only**; its `degradations` list the same holds. Takes in the record are _Pending_ item 1, and go to
 > `reel-takes`.
+>
+> **Amended by `reel-takes` on 2026-09-19, in version 1 — the gates below are not edited (S-093,
+> S-099).** Since `reel-takes`' Slice 1 **`RunRecord` requires `takes`**: one entry per clip made, every
+> attempt's, in the order made — a take cut off inside its checks too — each with its `takeId`, its
+> `shotId`, its `number` (a whole number above 0), `used`, its `checks` (each gate it reached, `'2'` to
+> `'5'`, with its outcome), and its `observationId` and `reconciliationId` where it reached them; the
+> entry is strict. **`used` is true exactly for the takes a completed video run's video shows**, as
+> `chosen` is for a picture; a plan or stills run's record has `takes: []`. `CONTRACT_VERSION` stays `1`,
+> as S-034 kept it: no caller exists for a bump to protect. _Pending_ item 1 is answered by **S-093**.
+> The shape check's example record and the stand-in service's records carry `takes: []` — test support;
+> no assertion of this feature changed.
 
 ## Gate 1 — Product (no technical language)
 

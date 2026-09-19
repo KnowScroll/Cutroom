@@ -43,6 +43,8 @@ export type NarrationAnswer =
       limit: Extract<RunResult, { reason: 'budget' }>['limit']
       estimateCents: number
     }
+  /** The provider made nothing and may if asked again: sent again by the worker's guarded port (S-096). */
+  | { kind: 'unavailable'; detail: string }
 
 /** One call a shot, in plan order, just before that shot's clip (S-070). */
 export interface NarrationPort {

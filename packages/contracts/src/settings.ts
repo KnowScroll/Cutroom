@@ -51,4 +51,17 @@ export interface RenderSettings {
   duckDb: number
   /** Gate 7's five closed questions, each answered yes when the cut is right — provisional until M-1 (S-074). */
   cutQuestions: readonly [string, string, string, string, string]
+  /**
+   * A video or narration call answered `unavailable` is sent again, up to `maxAttempts` sends in all,
+   * waiting `backoffMs` before the second and twice the last wait before each next (D-024, I-11,
+   * S-096). Default 3 and 1000; a worker handed a `maxAttempts` that is not a whole number of at least
+   * 1, or a `backoffMs` that is not a finite number of at least 0, refuses to start.
+   */
+  transient: { maxAttempts: number; backoffMs: number }
+  /**
+   * A shot held on its picture is pushed in from a zoom of 1 at its span's first frame to `endZoom` at
+   * its last (D-025, S-097). Default 1.1 — provisional until M-1; a worker handed an `endZoom` that is
+   * not a finite number above 1 refuses to start.
+   */
+  stillPush: { endZoom: number }
 }
