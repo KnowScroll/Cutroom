@@ -2879,3 +2879,51 @@ check.
 **Caught by.** `reel-render`'s check 42: shot 2's narration holds one letter outside the BMP — 34 code points, 35 UTF-16
 units — and at 0.75 cents a character its figure is 216 + 25.5, rounded up to 242, made at a ceiling of exactly 242;
 counted by `length` it would be 216 + 26.25, rounded up to 243, and refused.
+
+---
+
+## S-089 | 2026-09-19 | The video restart checks hold a take's witness call or Gate 7's; "the first kept" is the first render row as its worker left it and its file byte for byte; check 48 reads the rows a render is made from
+
+**Chose.**
+
+- **Check 48 holds its first worker at a take's witness call** — S-062's form, applied to clips. For `THREE_RANKS` the
+  planner makes two calls and the stills stage eight, so take k's witness is call 11 + 2k: call 15 in the completed
+  restart, where shots 0 and 1 have been through every gate and shot 2's clip has been made, measured and heard and
+  never seen; call 11 in the budget stop. What the first attempt made is asserted from its receipts before the kill
+  (`killedMidVideo`, `tests/engine/restart.ts`). A cost keyed by a whole id — `a1-shot-0-take-1` — lands on the first
+  attempt alone. **The budget clause is shown for each guard**: at a narration rate of 0.5 the second attempt's first
+  call, its narration, would be 210 + 41 = 251 and is refused; at 0 its narration is made and its clip, 210 + 36 = 246,
+  is refused — each over a ceiling of 240.
+- **Check 49 holds its first worker at Gate 7's `judgeCut`**, call 23. The render row is written before the assembler
+  (`startRender`), and only the assemble job's ending writes its path, measure, verdict and finish (`finishVideo`); a
+  killed job reaches no ending. So **"the first kept" is read as the first render row exactly as it was when its worker
+  died** — its manifest text, hash and start, and no path, finish or verdict — **and its file where the assembler wrote
+  it, `<root>/<runId>/a1-render.mp4`, byte for byte**, measured with every frame and every shot where its narration puts
+  it. The test types that path by hand, as check 39 types `a1-render.mp4`.
+- **Check 48 reads `readRenderInputs` itself** once its run has completed: the second attempt's six takes and six
+  narrations alone, and a ledger summing every attempt's receipts. The test imports the domain package's
+  `src/index.ts` by relative path (S-063's form).
+
+**Why.** S-062's reasons hold for a take: a hold at its witness leaves it cut off inside its gates, with no observation
+and no outcome, and the count of calls moves with the fixtures where the receipts cannot. Gate 7's is the only model
+call after assembly begins. The gates give the render row two writes — its start before the pass and its ending after
+(Gate 2, _"The chain"_; S-073) — so a row kept from a killed job has no output, and the file is what says the first
+render happened. **A render made from both attempts' rows is the same render on every run one worker can make**:
+`renderManifest` takes each shot's last accepted take and narration, and the finishing attempt's rows are always
+written last. Session 28's break 48o, `readRenderInputs` dropping its attempt filter, was caught by nothing; session 25
+owed _"`readRenderInputs` choosing the latest clips attempt"_ to check 48.
+
+**Rejected.** **A write naming the file on the render row once the assembler returns** — a third write Gate 3 does not
+give the row, and a row naming a file whose Gate 7 was cut off reads like a judged render. **Two render rows as all
+"kept" means** — a second render written over the first's file would pass. **Holding the assembler** — a second hold
+mechanism beside the model's (S-062's reason). **Leaving 48o uncaught as equivalent** — the filter is one line nothing
+else reads, and a late row from a worker whose lease outlasted it (`reel-plan`'s known limit) would make the render a
+mix of attempts. **A run with two live workers to show it** — builds a known limit into a check (S-063's reason).
+
+**Not handled.** The first render's frame strip stays beside its file, read by no check. A render row whose worker died
+has no finish time, and nothing marks it abandoned: `readRecord` lists the holds of the latest render only (S-076).
+
+**Caught by.** Session 28's breaks: 49b, the assembler naming every output for the first render; 49c, the second
+render's ending written over the first row; 49d, the first row removed when a render starts again — each by 49; 48o2,
+the manifest read from both attempts' rows, by 48 once it reads `readRenderInputs`; 48k and 48l, each guard alone
+reading only its own attempt's spend, by 48 and 42.

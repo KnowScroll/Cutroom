@@ -1257,7 +1257,7 @@ _Restart, and no secrets_
       slice's code** — Slices 3 and 4 already turn a throw into `failed` and write each ending's events; the breaks
       recorded when the slice is built are what show they can fail.
       **Proves: 42, 43, 44, 45, 46, 47.**
-- [ ] **Slice 6 — restart, no secrets, and the journeys.** A worker killed mid-clips and one killed at Gate 7; the child
+- [x] **Slice 6 — restart, no secrets, and the journeys.** A worker killed mid-clips and one killed at Gate 7; the child
       process with PATH alone. **Proves: 48, 49, 50, and re-runs 1–47**; then the `reel-render` journey, and the
       `reel-stills`, `reel-plan` and `reel-contract` journeys again (S-077).
 

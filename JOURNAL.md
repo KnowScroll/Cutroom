@@ -2332,3 +2332,112 @@ Owed outside this repository, unchanged: KnowScroll's check of a returned video 
 
 **Next.** Session 28: run `PROMPTS/028-reel-render-slice-6.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-19 — session 28, reel-render Slice 6: restart, no secrets, and the journeys
+
+**Intent.** Run `PROMPTS/028-reel-render-slice-6.md`: `reel-render`'s last slice — checks 48, 49 and 50, tests first;
+1–47 again; then the `reel-render` journey and the `reel-stills`, `reel-plan` and `reel-contract` journeys again
+(S-077). `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green, **284 tests** by the TAP count
+(21f7f37). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **No code under `apps/` or `packages/`.** Every clause of 48 to 50 was green against Slice 5's code (below).
+- **Three test files: +4 tests, 284 → 288.** `tests/reel-render-restart.test.ts` — check 48: a completed restart, and a
+  budget stop across attempts, run once for each guard. `tests/reel-render-restart-cut.test.ts` — check 49.
+  `tests/reel-render-secrets.test.ts` — check 50, S-028's child over every other `tests/reel-render-*.test.ts`, the
+  roll call 1–49, four files at a time.
+- **Test support, no assertion**: `tests/engine/restart.ts` — `killedMidVideo` (spawn, hold, kill in `finally`, then the
+  speech and video receipts held to the narration and take ids the test names, and the chain's job rows up to the one
+  killed) and `takenUpVideo` (restart, a new worker, a video run's 90-second wait, the killed job claimed a second time
+  no earlier than its lease ran out, `readVideo`), beside the stills helpers, which are unchanged; `tests/engine/video.ts`
+  — `clipsScript`, a clips stage and its cut with no planner or stills answers. **`worker-process.ts` is unchanged**: it
+  already carried the engine's video, narration and media scripts as JSON and counted `judgeCut` among its held calls.
+- **`DECISIONS.md` — S-089**: the calls the video restart checks hold; _"the first kept"_ read as the first render row as
+  its worker left it and its file byte for byte; check 48 reading `readRenderInputs` itself.
+- Slice 6 ticked. Prompt 028's `Run` line set to session 28, in the file and the index. `CLAUDE.md` unchanged: no
+  sentence in it stopped being true.
+
+**Observed.**
+
+- **Collisions, read before any test; none needed the owner.**
+  - **The held calls, checked against receipts, not trusted.** Held at call 15, the first attempt's model receipts for
+    takes are exactly the witness and reconciler of takes 0 and 1, and its speech and video receipts are shots 0 to 2:
+    take 2 is cut off at its witness, with Gates 2 and 3 and no outcome. Held at 23, the last receipt is take 5's
+    reconciler, none is a `judgeCut`, and the render row stands with no path. So the prompt's count holds for
+    `THREE_RANKS`, and the tests assert the receipts.
+  - **A cost keyed by a whole id crosses the child's JSON**: `a1-shot-0-take-1` at 7 and `a1-shot-1-narration` at 3 land
+    on the first attempt alone (`entryFor`), as S-062's picture ids did.
+  - **Check 49's _"the first kept"_**: `startRender` writes the row before the pass and only the ending writes its path,
+    so a worker killed at `judgeCut` leaves `a1-render.mp4` on disk beside a row with no path, no finish and no verdict.
+    Read as the row unchanged and the file unchanged, byte for byte and measured (S-089). Rejected there: a new write
+    naming the file when the assembler returns, and two rows as all "kept" means.
+  - **Check 40 after the restart**: 49 holds every paid receipt at or before the first render row's start again; the
+    second attempt's only receipt is Gate 7's, `judgeCut judge`.
+  - **The second attempt's bands are too alike for check 31's reader**: `a2-shot-3-take-1` and `a2-shot-4-take-1` are 72
+    apart, under `takeOfFrames`' 80, so it refuses to find a boundary between them; and `a1-shot-4` is 23 from
+    `a2-shot-4`. Check 48 measures its output with a reader of its own in the test file — each frame's band nearest one
+    of the six second-attempt takes within 40, every frame in the span its narration gives — and leaves the verified
+    helper alone. A first-attempt clip in shot 0 or 1 is 81 and 92 from every second-attempt colour, so it fails.
+  - **S-081, again**: check 48 reads the clips job's cost after a completed stage (10) and after a budget stop (210),
+    the endings checks 27 and 42 already read. **At every other clips-job ending it is still checked by nothing**; no
+    Slice 6 check's words promise more.
+- **Red first: none was possible, said plainly.** Each file was written before any Slice 6 code and ran green at once:
+  48's completed restart (after one fault of my own test, below), 48's budget stop in both its runs, 49, and 50 alone in
+  61 s. Everything they read was built by Slices 2 to 5 — the lease reclaim (S-027), ids carrying the attempt,
+  `stage.started` once, the guards reading the chain's spend, a render id per attempt, `readRenderInputs`' latest
+  attempt. The breaks below are what show each clause can fail.
+- **One fault of my own test**: `killedMidVideo` returned `node:sqlite`'s rows, whose prototype is null, and 48 held
+  later plain rows equal to them — _"Expected values to be strictly deep-equal"_ over identical fields. The helper now
+  hands back plain objects.
+- **Added before the campaign**: 48's budget clause as first written stopped at the second attempt's narration only,
+  so the clip guard reading an earlier attempt's spend would have been shown by nothing in 48. A second run at a
+  narration rate of 0 makes that narration and refuses the clip, 210 + 36 = 246 over 240 (break 48l).
+- **Measured, not assumed.** 48's two tests take 11 s, 49 6.5 s. Check 50's child: 61 s alone; **inside the suite 116 s
+  at Node's default concurrency, with as little as 531 MB of 16 GB free** in one of three runs (1.39 GB and 1.37 GB in the
+  others; 5.9 GB free at rest). **Bounded to four files at a time: 132 s and 2.57 GB free at the lowest**, the suite
+  168 s against 154 s. The bound is test support — every file still runs and no assertion changed — and the 300-second
+  spawn limit, reel-stills' check 50's, leaves the child more than twice its time. Not an S-entry: nothing could catch
+  a concurrency.
+- **Thirty-two deliberate breaks, one control, and six run again**, by session 27's runner in `.tmp/campaign/` (its files
+  moved aside to `s27/` first; ignored), taught to run each break's own tests and to count them: each break's files
+  saved as bytes and `fsync`ed to a record first, restored from them and read back, the record removed; every modified
+  and untracked file hashed after each restore against the chunk's first; a refusal to start while a record exists;
+  every find checked to occur once before the chunk; the built-in TAP reporter, the counts required, a run counting
+  fewer tests than its files hold a runner fault; `--test-concurrency=6 --test-timeout=240000`; the machine held awake
+  by `SetThreadExecutionState` while it ran. **Narrowed, said plainly**: `tsc -b`, then 48's and 49's files (3 tests) for
+  every break of theirs; 50's file alone for its own; 48, 49 and 50 for the worker needing `HOME`; and 48, 49 and check
+  42–45's file for the three guard breaks. One chunk in the background, about 13 s a break, with a foreground waiter
+  on the runner's own completion line. Afterwards: no record, `.artifacts/` empty, the fingerprints unchanged.
+
+  | check | breaks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | caught by                                                                 |
+  | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+  | none  | **control**: a comment in `clips-job.ts`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | nothing                                                                   |
+  | 48    | 48a a take id not carrying the attempt (session 23's 19e — every attempt `a1-`); 48b a narration id; 48d the first attempt's narration rows removed by a later attempt's narration of the shot; 48e its take rows; 48f its video receipts; 48g its speech receipts; 48h an outcome written once a take passes Gate 2, so a cut-off take has one; 48i a claim resetting the job's cost; 48n the manifest read from the first attempt's rows; 48p the stage told attempt 1; 48q the second attempt's clip files written over the first's; 48r the child ignoring the engine's video script (test support) | 48 each                                                                   |
+  | 48    | 48c `stage.started` for video written on every attempt; 48m the keyframes job run again (`advanceStills` leaving it running)                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 48, 49 each                                                               |
+  | 48    | 48j both guards reading only this attempt's spend; 48k the narration guard alone; 48l the clip guard alone                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 48 each; 48j and 48l also 42, 45; 48k also 42                             |
+  | 48    | **48o the manifest read from both attempts' rows**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | **nothing at first** — fixed by adding (below). Run again as 48o2: 48     |
+  | 49    | 49a a render id not carrying the attempt (the second row meets the first's key and the run never finishes: caught when the 90-second wait ran out, at 98 s); 49b the assembler naming every output for the first render; 49c the second render's ending written over the first's row; 49d the first row removed when a render starts again; 49f the result's video at the first render's path                                                                                                                                                                                                           | 49 each                                                                   |
+  | 49    | 49e a receipt added by the assemble job — a speech receipt at the render's start; 49g the clips job run again after its stage completed (`advanceClips` leaving it running)                                                                                                                                                                                                                                                                                                                                                                                                                             | 49, 48 each                                                               |
+  | 50    | 50a the child handed this process's environment; 50b its own file left in; 50c one file left out — 49's; 50d the roll call stopping at 48                                                                                                                                                                                                                                                                                                                                                                                                                                                               | 50 each (50a and 50b before anything is spawned) — and again once bounded |
+  | 50    | 50e the worker needing `HOME`, which the parent has and a bare environment does not                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | 50 alone of 48, 49, 50 — and again once bounded                           |
+
+- **Caught by nothing that a check's words promise: one, fixed by adding.** 48o — `readRenderInputs` dropping its
+  attempt filter — changes no render any one-worker run can make: `renderManifest` takes each shot's last accepted take
+  and narration, and the finishing attempt's rows are always written last. Session 25 owed _"`readRenderInputs` choosing
+  the latest clips attempt"_ to check 48, so 48 now reads `readRenderInputs` itself once its run has completed — the
+  second attempt's six takes and narrations alone, and a ledger of every attempt's receipts, 0, 3 and 7 — importing the
+  domain's `src/index.ts` by relative path, as S-063 did (S-089). Run again as 48o2: caught by 48.
+- **Not built as breaks, said plainly**: only the finishing attempt's verdicts becoming events — no code path writes an
+  earlier attempt's, and a break would have to invent one; 48's event list holds exactly the second attempt's 24. S-081's
+  clips-job ending cost beyond the two endings above.
+- **Check 50's breaks were run again after the child was bounded**, since its file changed: each caught as before.
+- **Traps.** A generated rerun list first referred to itself inside its own initialiser — written again as a plain
+  loop and checked by the runner's `--check` before it ran. Every repository file was edited with the editing tool or a
+  Node script whose finds were checked once.
+- `node scripts/check.mjs`: **everything green, 288 tests** by the TAP count; checks 48, 49 and 50 pass by number, and
+  1–47 with them and inside 50's child.
+
+**Next.** The journeys, each committed on its own: `reel-render`, then `reel-stills`, `reel-plan` and `reel-contract`
+again (S-077). Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and serving the
+file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).

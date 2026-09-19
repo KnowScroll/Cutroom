@@ -5,7 +5,7 @@
 - **Work:** Slice 6 of 6 — restart, no secrets, and the journeys; checks 48–50, tests first; then 1–47 again and four
   journeys
 - **Written:** 2026-09-19, in session 27, after `reel-render`'s Slice 5 was committed (8ffcee6)
-- **Run:** not yet
+- **Run:** session 28
 
 Paste everything inside the block below as the session's first message.
 

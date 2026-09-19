@@ -269,6 +269,19 @@ export function videoScript(
   }
 }
 
+/**
+ * The script of a clips stage and its cut alone, with no planner or stills stage before them: what a
+ * worker that takes up a video run after its stills stage is asked — each take's witness and
+ * reconciler answers in plan order, each passing, then Gate 7's, every question yes.
+ */
+export function clipsScript(takes: readonly Take[]): FakeScript {
+  return {
+    witness: takes.map((t) => ({ value: seenClip(t) })),
+    reconciler: takes.map((t) => ({ value: passesTake(t) })),
+    judge: [{ value: cutAnswer() }],
+  }
+}
+
 const [pa, pb, barons, hall] = THREE_RANKS_PICS as [Pic, Pic, Pic, Pic]
 
 /**
