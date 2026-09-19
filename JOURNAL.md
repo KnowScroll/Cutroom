@@ -2573,3 +2573,25 @@ commits unpushed. Baseline `check.mjs` green (288 tests at 8819d13, by session 2
 **Next.** `reel-takes` Slice 1 — the ports' answers, the settings and the record (checks 1–4) — in its own session. Its
 prompt is not written. Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and
 serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).
+
+## 2026-09-19 — session 29, continued: a push, and the prompt for reel-takes' Slice 1
+
+**Intent.** The owner asked for the push and the next session's prompt.
+
+**Changed.**
+
+- **Pushed** `main` to `origin`: 619fc8a..b74951b — `reel-takes`' gates and S-090 to S-099.
+- **`PROMPTS/030-reel-takes-slice-1.md`** — session 30's prompt, `Run: not yet`: Slice 1 only, checks 1–4, tests first.
+  It names what to read (session 29's and session 21's entries, Gates 2–4 and the three reviews, S-090 to S-099 and the
+  decisions they touch, the code and tests Slice 1 changes), what Slice 1 builds and what it does not, the four checks,
+  the test support S-099 lists, a break campaign in session 28's form, when to stop and ask the owner, and the traps.
+  Indexed in `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Every path the prompt names was checked to exist** before it was committed, and the S-entries it cites to say what
+  it says of them. The next free S-number it gives is S-100.
+- Nothing but markdown changed; `prettier --check` on the files passes.
+
+**Next.** Session 30: run `PROMPTS/030-reel-takes-slice-1.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
