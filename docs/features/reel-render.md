@@ -1252,7 +1252,7 @@ _Restart, and no secrets_
       `finishVideo` with the holds' labels, the events and the result; `readRecord` listing holds; the note in
       `reel-contract.md` (S-077). A run whose clips and cut all pass completes.
       **Proves: 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41.**
-- [ ] **Slice 5 — spending and faults.** The guards' refusals; the budget stops and their question entries; thrown
+- [x] **Slice 5 — spending and faults.** The guards' refusals; the budget stops and their question entries; thrown
       calls at every port; a short judge answer; every ending's events. **Checks 46 and 47 may be green before this
       slice's code** — Slices 3 and 4 already turn a throw into `failed` and write each ending's events; the breaks
       recorded when the slice is built are what show they can fail.

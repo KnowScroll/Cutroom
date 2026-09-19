@@ -58,7 +58,7 @@ export interface WorkerOptions {
   settings?: PlanSettings
   /** The BUDGET.md the per-reel cap is read from (D-100). Defaults to the pinned steering-ref's. */
   budgetPath?: string
-  /** The questions file a per-reel cap refusal is appended to (D-097). Defaults to QUESTIONS.md at the root. */
+  /** The questions file a per-reel cap refusal or stop is appended to (D-097). Defaults to QUESTIONS.md at the root. */
   questionsPath?: string
   /**
    * The only way the worker makes a picture (S-038). Required, like `model`: whoever starts the
@@ -173,6 +173,8 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     media: options.media,
     settings,
     render,
+    budgetPath: context.budgetPath,
+    questionsPath: context.questionsPath,
   }
   // No image, narration or video port: nothing can be bought once assembly begins (I-18, S-069).
   const assemble: AssembleJobContext = {

@@ -10,6 +10,7 @@ import {
   advanceClips,
   finishVideo,
   readClipsInputs,
+  readReelCapCents,
   readRequest,
   readRun,
   readSelectedPlan,
@@ -22,8 +23,9 @@ import { makeClips } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
 import { clipsRecorder } from './clips-recorder.ts'
 import { guardedNarrationPort } from './narration-port.ts'
+import { appendClipsStopQuestion } from './questions.ts'
 import { recordingPort } from './recording-port.ts'
-import { guardedVideoPort, validatingVideoPort } from './video-port.ts'
+import { guardedVideoPort, validatingVideoPort, type ClipsLimits } from './video-port.ts'
 
 // The `reel.clips` job (docs/features/reel-render.md, Gate 2 "The chain", "How a video run ends" and
 // "Cancel, and a restart"): the chain's third row, created only for a `video` run whose stills stage
@@ -41,6 +43,10 @@ export interface ClipsJobContext {
   media: MediaPort
   settings: PlanSettings
   render: RenderSettings
+  /** The BUDGET.md whose `Per reel, all-in` row is the cap (D-100), read once per attempt. */
+  budgetPath: string
+  /** The questions file a stop at the per-reel cap is appended to (D-097, D-100). */
+  questionsPath: string
 }
 
 export async function runClipsJob(
@@ -62,8 +68,14 @@ export async function runClipsJob(
 
   const request = readRequest(db, runId)
   const plan = readSelectedPlan(db, runId)
+  const ceilingCents = request.options.budgetCents
+  let capCents: number
   let inputs: ReturnType<typeof readClipsInputs>
   try {
+    // One figure, read once per attempt, as the keyframes job reads it: what every narration and clip
+    // call is compared with (D-100, S-035, S-059). A cap that cannot be read fails the run before any
+    // call is made.
+    capCents = readReelCapCents(context.budgetPath)
     inputs = readClipsInputs(db, runId)
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
@@ -75,6 +87,8 @@ export async function runClipsJob(
     return
   }
 
+  // What both guards compare with, and where either puts the call it refuses (S-087).
+  const limits: ClipsLimits = { capCents, ceilingCents, refused: [] }
   const outcome = await makeClips(
     { runId, attempt: job.attempts, request, plan, ...inputs },
     {
@@ -87,6 +101,7 @@ export async function runClipsJob(
           degradedShots: inputs.degradedShots,
           rateCents: context.settings.videoRateCentsPerSecond,
           style: { id: request.style.id, version: request.style.version },
+          limits,
         }),
       ),
       narration: guardedNarrationPort(context.narration, db, {
@@ -94,6 +109,7 @@ export async function runClipsJob(
         runId,
         attempt: job.attempts,
         rateCentsPerCharacter: context.render.narrationRateCentsPerCharacter,
+        limits,
       }),
       media: context.media,
       model: recordingPort(context.model, db, runId),
@@ -127,15 +143,53 @@ export async function runClipsJob(
     })
     return
   }
+
   if (outcome.kind === 'stopped-budget') {
-    // No guard refuses a narration or a clip until reel-render's Slice 5, which builds this ending.
+    // A call was refused, so it was not made: what was spent is what the guard read (S-059).
     ended({
       ...finished,
       costCents,
-      status: 'failed',
-      detail: 'a stop for budget in the clips stage is not built',
+      status: 'stopped',
+      reason: 'budget',
+      limit: outcome.limit,
+      estimateCents: outcome.estimateCents,
+      ceilingCents,
+      capCents,
     })
+    // The engine's own cap fired, so the owner is asked, naming the call that was not made — after
+    // the run is finished (D-100, S-026, S-035, S-087). A stop at the caller's ceiling is returned,
+    // not written.
+    const refused = limits.refused.at(-1)
+    if (outcome.limit === 'reel' && refused !== undefined) {
+      appendClipsStopQuestion(context.questionsPath, {
+        runId,
+        requestId: request.requestId,
+        refused:
+          refused.call === 'clip'
+            ? {
+                call: 'clip',
+                takeId: refused.request.takeId,
+                seconds: refused.request.durationSeconds,
+              }
+            : {
+                call: 'narration',
+                narrationId: refused.request.narrationId,
+                characters: [...refused.request.text].length,
+              },
+        estimateCents: outcome.estimateCents,
+        spentCents: costCents,
+        narrations: outcome.narrations.length,
+        clips: outcome.takes.length,
+        ceilingCents,
+        capCents,
+        imageRateCents: context.settings.imageRateCents,
+        videoRateCentsPerSecond: context.settings.videoRateCentsPerSecond,
+        narrationRateCentsPerCharacter: context.render.narrationRateCentsPerCharacter,
+        plan: { role: plan.role, units: plan.units.length, estimateCents: plan.estimateCents },
+      })
+    }
     return
   }
+
   ended({ ...finished, costCents, status: 'failed', detail: outcome.detail })
 }

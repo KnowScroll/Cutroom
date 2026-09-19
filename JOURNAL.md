@@ -2174,3 +2174,128 @@ index says so, so the gap does not read as a lost file.
 
 **Next.** Session 27: run `PROMPTS/027-reel-render-slice-5.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-19 — session 27, reel-render Slice 5: spending and faults
+
+**Intent.** Run `PROMPTS/027-reel-render-slice-5.md`: `reel-render`'s Slice 5 only — checks 42 to 47, tests first,
+nothing from Slice 6, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green, 254
+tests by the TAP count (c9a6e49). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`apps/worker`** — **`video-port.ts`**: `guardedVideoPort` compares, before every call, the chain's spend read again
+  plus the requested seconds at the video rate, `Math.ceil` over the total, with the cap and then the ceiling; above
+  either it answers `refused` with that limit and figure, puts the request on the attempt's list, and calls nothing.
+  `RefusedCall` and `ClipsLimits` — the cap the job read, the request's ceiling and that list — are declared there; they
+  hold requests, not a budget type (D-094). The validator stays outermost (S-083). **`narration-port.ts`**: the same for
+  a narration, its figure the text's code points at the narration rate (S-088). **`clips-job.ts`**: `budgetPath` and
+  `questionsPath` in its context; the cap read once per attempt after `startStage`, a file that cannot be read failing
+  the run before any call; one `ClipsLimits` handed to both guards; the stopped-budget ending — `stopped`, `reason:
+'budget'`, the limit, `estimateCents`, `ceilingCents`, `capCents`, `costCents` the spend, the attempt's events, then
+  `run.finished` — and, at the cap only, one question after the finish naming the refused call. Slice 3's placeholder
+  _"a stop for budget in the clips stage is not built"_ is gone. **`questions.ts`**: `appendClipsStopQuestion`, S-026's
+  form under a heading of its own — _"stopped: the next clip, <takeId>, would pass the per-reel cap"_, or _"the next
+  narration, <narrationId>,"_. **`worker.ts`**: the clips context handed `budgetPath` and `questionsPath`.
+- **`packages/providers/src/fake/narration.ts`** — the stand-in's receipt counts `characters` as code points, as the
+  guard does (S-088).
+- **`DECISIONS.md` — S-087** (the clips stage's guards; a stop's question names the call its guard refused, recorded by
+  the guard), **S-088** (a narration's characters are Unicode code points).
+- **Three test files, `tests/reel-render-{spending,faults,endings}.test.ts`: +30 tests, 254 → 284** — checks 42 to 45
+  one test each; 46 fourteen, one a port call (three `probe` sites: a narration's audio, a take's clip, the assembled
+  file); 47 twelve, one an ending, with a second failed-in-clips case for an unreadable BUDGET.md.
+- **Test support: none changed.** The harness already takes `budgetMd`, `settings`, `renderSettings`, per-entry throws,
+  `wrapAssembler`, `holding` and `whenHeld`. The spending file holds its own `budgetWithCap` (reel-stills' check 42's,
+  copied) and a request with one letter outside the Basic Multilingual Plane.
+- No verified check or its test changed. `CLAUDE.md` is unchanged: no sentence in it stopped being true. Slice 5
+  ticked; prompt 027's `Run` line set to session 27, in the file and the index.
+
+**Observed.**
+
+- **Collisions, read before any test; none needed the owner.**
+  - **Where a stop's entry gets the call's name**: Gate 3's `ClipsOutcome` carries only the limit and the figure. The
+    guard holds the request it refused, so it records it on a list the clips job hands both guards; no approved
+    signature changes and no budget type is declared (S-087). Rejected there: inferring the call from the records, and
+    widening Gate 3.
+  - **Characters**: a string's `length` counts UTF-16 units. Code points, in the guard and the stand-in's receipt
+    (S-088); check 42's fixture tells the two apart.
+  - **Rounding**: `Math.ceil(spent + figure)` in all three guards. While every spend is whole cents, rounding the total
+    and rounding the figure agree — not an S-entry, since nothing rejected could be caught.
+  - **After the last shot's clip no call follows, so no guard fires**: a last clip costing more than its rate completes
+    the run above its ceiling. No check's words reach it; recorded in S-087's _Not handled_, not built past the gates.
+  - **The clips job now reads BUDGET.md in every video run** — the pinned file unless a test hands `budgetMd`. No test
+    writes the default. Every existing video run's spend plus figure is far under 300, so no verified check moved.
+  - **Check 11's second test** is how 47's cancel before the assemble job lands; check 38's second test how a hold
+    rides a stopped assembly.
+- **Red first.** 42 to 45, against Slice 4's guards, each for its reason — every call over a limit was made and the run
+  then ran out of script: 42 _"the stand-in's script has no answer for witness call 8"_ (shot 3's take was made at a
+  ceiling of 241); 43 _"… witness call 7"_; 44 _"… witness call 6"_; 45 the refused clip made, and the next witness
+  answer, a picture's, _"is not a clip observation"_. **46 and 47 were written after 42–45's code, and run against
+  HEAD's with the slice's code stashed** (restored byte for byte, checked by `cmp`): **46 green, 14 of 14, before any
+  Slice 5 code** — as Gate 4 allows; **47 green 10 of 12**, red for the ending Slice 5 builds — _stopped for budget in
+  the clips stage_ ended `failed`, _"… no answer for witness call 7"_ — and for the unreadable BUDGET.md, which HEAD's
+  clips job never read (the run completed). The breaks below show each green case can fail.
+- **One fault of my own test, found before the campaign.** 42's cap runs first set the ceiling equal to the cap, so a
+  call one cent over the cap was also over the ceiling and _"one cent over made at the cap"_ would have been caught by
+  nothing. The cap runs now sit one cent under their ceiling, and two more runs pass both limits for the cap-before-
+  ceiling order. 42's red was seen in its first form; its breaks below show the second fails. Titles now carry Gate 3's
+  apostrophes.
+- **Measured, not assumed.** A run stopped in its clips stage takes about 1 s here, one that assembles 3.5 s; 42's eight
+  runs 7.6 s, 46's fourteen 29 s, 47's twelve 20 s. The fixture's texts are 82, 83, 34, 32, 26 and 52 characters;
+  0.75 cents a character and 4.5 cents a second give each boundary a fraction to round, and are binary fractions, so no
+  product lands a hair over a whole cent.
+- **What Slice 5 builds that no Slice 5 check asserts**: the stand-in's receipt count (break 88a, caught by nothing, as
+  S-088 says); the entry's _Refused_, _Plan_ and _Rates_ bullets and its count of what the attempt made; the entry
+  skipped when a stop has nothing on the list — only an inner port answering `refused` itself could do that.
+- **S-081's _Not handled_, narrowed again.** At a budget stop, check 42 holds each job row to the spend it compared, so
+  the clips job marked at the result's cost is caught (43j, by 39 and 42). At every other clips-job ending it is still
+  checked by nothing.
+- **Ninety deliberate breaks and one control, four of them runs again**, by session 25's runner in `.tmp/campaign/`
+  (ignored): each break's files saved as bytes and `fsync`ed to a record first, restored from them and read back, the
+  record removed; every modified and untracked file hashed after each restore against the chunk's first; a refusal to
+  start while a record exists; every find checked to occur once before the chunk; the built-in TAP reporter, the counts
+  required. **Narrowed, said plainly**: each break ran `tsc -b` and 107 tests — every `tests/reel-render-*.test.ts` and
+  `reel-stills`' spending and endings files, the two that share the questions file and the keyframes job's endings —
+  with `--test-concurrency=6 --test-timeout=240000`, about 80 s a break, one chunk, in the background with a foreground
+  waiter on the runner's own completion line. Afterwards: no record, `.artifacts/` empty, the fingerprints unchanged.
+
+  | check | breaks                                                                                                                                                                                                                                                                                                                                                                                                                                            | caught by                                                                                                                                                          |
+  | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+  | none  | **control**: a comment in `clips-job.ts`                                                                                                                                                                                                                                                                                                                                                                                                          | nothing                                                                                                                                                            |
+  | 42    | 42a the clip guard reading the spend once per attempt; 42b the narration guard; 42c2 the clip's figure not rounded; 42d rounded down; 42e2 the narration's not rounded; 42f rounded down; 42g the clip guard comparing the ceiling first; 42h the narration guard; 42i–42l each guard comparing one limit only; 42m–42p exactly equal refused, each guard at each limit; 42q–42t one cent over made, each guard at each limit                     | 42 each; 42b also 43, 45; 42e2, 42f, 42o also 44; 42j, 42l also 45; 42k also 43, 44                                                                                |
+  | 42    | 42u the narration's figure at the video rate; 42v by words; 42w by UTF-16 units (S-088); 42x the clip's at the narration rate; 42y at the plan's seconds                                                                                                                                                                                                                                                                                          | 42 each; 42u also 32 other checks; 42v also 43, 44; 42x also 18, 45; 42y also 45                                                                                   |
+  | 42    | 42z a refused clip made anyway; 42z2 a refused narration made anyway; 42z3 a refused narration writing a receipt and a row                                                                                                                                                                                                                                                                                                                        | 42 each; 42z also 45; 42z2 also 43–45; 42z3 also 43, 44                                                                                                            |
+  | 42/17 | 42z4 the guard outside the validator                                                                                                                                                                                                                                                                                                                                                                                                              | 17 alone (run again as 42z42; see flakes)                                                                                                                          |
+  | 43    | 43a the stop ending `failed`; 43b its limit always `ceiling`; 43c `estimateCents` the spend alone; 43d the narration guard's the figure alone; 43e the clip guard's; 43f2 `ceilingCents` and `capCents` swapped; 43g `costCents` the estimate; 43i the ceiling a constant                                                                                                                                                                         | 43a 42–45, 47; 43b 42, 45; 43c 42–45; 43d 42, 43, 45; 43e 42, 45; 43f2 42–45; 43g 42–45; 43i 42–45, 47                                                             |
+  | 43/45 | 43h a question for a stop at the ceiling                                                                                                                                                                                                                                                                                                                                                                                                          | 43 alone                                                                                                                                                           |
+  | S-081 | 43j the clips job marked at the result's cost                                                                                                                                                                                                                                                                                                                                                                                                     | 39, 42                                                                                                                                                             |
+  | 44    | 44a the narration guard refusing nothing; 44b the narration rate ignored                                                                                                                                                                                                                                                                                                                                                                          | 42, 43, 44 each; 44a also 45                                                                                                                                       |
+  | 45    | 45a no question at the cap; 45b the question before the run is finished; 45c two entries; 45d the heading naming no call; 45e a clip named as a narration; 45f the cap read before every call; 45j the entry's spend the estimate; 45k the file emptied first                                                                                                                                                                                     | 45 alone each (45b by its blocked case's wait)                                                                                                                     |
+  | 45    | 45g the cap a constant; 45h the cap from the pinned file, not the worker's                                                                                                                                                                                                                                                                                                                                                                        | 42, 45, 47 each                                                                                                                                                    |
+  | 45/47 | 45i a BUDGET.md that cannot be read not failing the run                                                                                                                                                                                                                                                                                                                                                                                           | 47 alone                                                                                                                                                           |
+  | 46    | a throw swallowed at each call: 46a narration, 46b clip, 46c a narration's probe, 46d a take's probe, 46e scan, 46f readText, 46g listen, 46h observe, 46i reconcile, 46j the output's probe, 46k frames, 46l assemble, 46m judgeCut; 46n a short judge answer accepted                                                                                                                                                                           | 46 each; 46h, 46l also 47                                                                                                                                          |
+  | 46    | 46o a throw in the clips stage ending `stopped`; 46p in the cut; 46q the clips stage's detail lost; 46r the cut's; 46s a returned `judgeCut`'s receipt dropped; 46t a returned `observe`'s                                                                                                                                                                                                                                                        | 46o 23, 46, 47; 46p, 46q 46, 47; 46r 41, 46, 47; 46s 38, 46; 46t 17, 23, 46                                                                                        |
+  | 47    | 47a a budget stop's verdicts dropped; 47c `run.finished` twice on a failed clips stage; 47e a hold's `degraded` event missing on a failed assembly                                                                                                                                                                                                                                                                                                | 47 alone each                                                                                                                                                      |
+  | 47    | 47b `stage.finished` for video on a budget stop; 47d on a failed assembly; 47f Gate 7's verdict before the holds' events; 47g `stage.finished` on a cancel before the assemble job; 47h `stage.started` for video on a cancel before the clips job; 47i no `stage.finished` for plan on a refusal; 47j `stage.finished` for stills on a stopped stills stage; 47k the reel's gate-5 verdict missing; 47l `stage.finished` before Gate 7's verdict | 47 each; 47b also 43; 47d also 41, 46; 47f also 30, 38; 47g, 47h also 11; 47i also 8; 47j also reel-render 10 and reel-stills 41, 43; 47k also 25; 47l also 30, 39 |
+  | S-088 | 88a the stand-in's receipt counting UTF-16 units                                                                                                                                                                                                                                                                                                                                                                                                  | **nothing** — read by no check, as S-088 says                                                                                                                      |
+
+- **Caught by nothing that a check's words promise: none.** 88a is named in S-088's _Not handled_. **Not built as
+  breaks, said plainly**: the guard reading only this attempt's spend on a restart (check 48's clause, Slice 6); a cap
+  read differently per guard.
+- **Runner faults and flakes, each run again.** 42c and 42e as first written replaced `Math.ceil(` with `(`, leaving a
+  parenthesised expression with a trailing comma — a syntax error, so every file failed to load and nothing was
+  measured; run again as `Number(`, 42c2 and 42e2 above. 43f ran across a stretch the machine slept (4937 s, 88 of 107
+  counted, failures by file); run again as 43f2. **42z4's first run also failed 42 and 25, which did not recur** when
+  run again (42z42: 17 alone): the machine had 678 MB of 16 GB free while an editor held about 4 GB, and breaks took
+  145 s instead of 80. No other break's failures were outside its own checks.
+- **Traps.** The rerun list, appended through a heredoc, arrived with its `\n` escapes turned into newlines — the
+  backslash trap `CLAUDE.md` names; node refused the file, nothing ran, and it was rewritten with the editing tool.
+  Every repository file was edited with the editing tool or a script whose finds were checked once.
+- `node scripts/check.mjs`: **everything green, 284 tests.** Checks 42–47 pass by number (30 tests).
+
+**Next.** `reel-render` Slice 6 — restart, no secrets, and the journeys: a worker killed mid-clips (the guard reading an
+earlier attempt's spend is check 48's clause) and one killed at Gate 7, the PATH-alone child; checks 48–50, then 1–47
+again, and the `reel-render`, `reel-stills`, `reel-plan` and `reel-contract` journeys (S-077). Worth carrying: S-081's
+clips-job cost at every clips ending but a budget stop is still unchecked; the last shot's overspent clip completes a
+run over its limit (S-087); `renderManifest`'s `request` is unread; break 34d is named by no check (deferred item 15).
+Owed outside this repository, unchanged: KnowScroll's check of a returned video (S-068) and serving the file (S-073);
+`reel-script` emitting a criterion's type (S-029); the steering stubs and the pin (S-033).

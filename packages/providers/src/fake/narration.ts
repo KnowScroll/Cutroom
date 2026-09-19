@@ -98,7 +98,8 @@ export function fakeNarration(
         timings: entry.timings ?? timings,
         receipt: {
           model: FAKE_NARRATION_MODEL,
-          characters: request.text.length,
+          // Code points, as the worker's guard counts them (S-088): not the UTF-16 length.
+          characters: [...request.text].length,
           costCents: entry.costCents ?? 0,
           fake: true,
         },

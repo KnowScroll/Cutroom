@@ -4,7 +4,7 @@
 - **Feature:** `reel-render` — [`docs/features/reel-render.md`](../docs/features/reel-render.md)
 - **Work:** Slice 5 of 6 — spending and faults; checks 42–47, tests first; no journey
 - **Written:** 2026-09-19, in session 26, after `reel-render`'s Slice 4 was committed (7f337f1) and pushed
-- **Run:** not yet
+- **Run:** session 27
 
 Paste everything inside the block below as the session's first message.
 

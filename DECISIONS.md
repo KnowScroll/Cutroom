@@ -2801,3 +2801,81 @@ narration's timings (S-070 splits on white space).
 **Caught by.** `reel-render`'s check 38 holds each shot's `sentences`, joined by one space, to its unit's sentences typed
 by hand and joined the same way. Session 25's breaks 38f, no sentences, and 38g, the words joined by two spaces, each
 caught by 38 alone.
+
+---
+
+## S-087 | 2026-09-19 | The clips stage's guards refuse as the image guard does, and a stop at the cap asks naming the call the guard refused
+
+**Chose.**
+
+- `apps/worker/src/narration-port.ts` and `video-port.ts` compare, **before every call**, the chain's spend read again
+  (`spentCents`) plus the call's figure — the narration's characters (S-088) at `narrationRateCentsPerCharacter`, or the
+  clip's requested seconds at `videoRateCentsPerSecond` — **rounded up over the total**, `Math.ceil(spent + figure)`,
+  the image guard's form (S-053, S-059), with the cap and then the ceiling. Above either, the answer is `refused` with
+  that limit and figure; nothing is called and nothing is written. Exactly equal is made. The validator stays outermost
+  (S-083).
+- **The clips job reads the cap once per attempt** from its `budgetPath`, after `startStage` and before any call, as
+  the keyframes job does; a file that cannot be read finishes the run `failed`, its reason the detail. Both guards are
+  handed one `ClipsLimits` (`video-port.ts`): the cap, the request's `budgetCents`, and a list.
+- **A guard that refuses puts the request it refused on that list.** When the stage answers `stopped-budget`, the clips
+  job ends the run stopped for budget — the stage's limit and `estimateCents`, the ceiling and the cap as read,
+  `costCents` the spend, the finishing attempt's events, then `run.finished` — and, for `limit: 'reel'` only, appends
+  one entry after the finish (S-026's order), `appendClipsStopQuestion` in `questions.ts`: a heading
+  `## <time> — run <id> stopped: the next clip, <takeId>, would pass the per-reel cap` (or _the next narration,
+  <narrationId>,_), then bullets for the request, the refused call with its seconds or characters at its rate, the
+  estimate, the spend and what this attempt made, the cap, the ceiling, the plan and the three rates, and one question.
+
+**Why.** Gate 3's `ClipsOutcome` carries only the limit and the figure on a budget stop, typed from `VideoAnswer`'s
+`refused`, while Gate 2 and check 45 want the entry to name the clip or the narration. The guard is the one place that
+holds the refused request, and it is already built per attempt knowing the cap and the ceiling (Gate 3, the paragraph
+under `WorkerOptions`): handing it one list more keeps every approved signature and declares no budget type (D-094) —
+the list holds requests. One rounding over the three guards: while every spend is whole cents, rounding the total and
+rounding the figure agree, and a second form would be a second rule.
+
+**Rejected.** **Widening `ClipsOutcome`, `VideoAnswer` or `NarrationAnswer` with the refused request** — Gate 3's
+approved signatures. **Inferring the call from the stage's records** — a narration with no take for its shot means its
+clip was refused, otherwise the next shot's narration was — an inference from the stage's order (S-070), which a stage
+making them in another order would falsify with no check failing: the records say what was made, not what was refused.
+**A list per guard** — two places to look. **Reading the cap before every call** — an edit to BUDGET.md would change the
+rule halfway through an attempt (S-059's reason).
+
+**Not handled.** **A clip on the last shot that costs more than its rate is followed by no call, so no guard fires**:
+the run completes with `costCents` above its ceiling or the cap, since assembly buys nothing (I-18). No check's words
+reach it; the contract's _"if that passes … your limit, it stops"_ cannot stop a spend already made. A crash between the
+finish and the append loses the question (S-026). An inner port answering `refused` itself — only the guard refuses
+(S-035) — would stop the stage with nothing on the list, and a stop at the cap would then write no entry. **S-081's
+clips-job ending cost** is read at a budget stop by check 42, which holds the job rows to the spend it compared; at
+every other clips-job ending it is still checked by nothing.
+
+**Caught by.** `reel-render`'s checks 42 (each guard at each limit, exactly equal made and one cent over refused, the cap
+before the ceiling, the spend read again), 43 and 44 (a stop's figures, and the call not made), 45 (one entry naming a
+clip, one naming a narration, a second stop appending, the cap the attempt read though BUDGET.md is rewritten while the
+stage runs, the run finished before the append), and 47 (the stop's events; an unreadable BUDGET.md failing the run).
+Session 27's breaks are in the journal.
+
+---
+
+## S-088 | 2026-09-19 | A narration's characters are its text's Unicode code points
+
+**Chose.** The narration guard's figure counts **code points**, `[...text].length`. The stand-in narration port's
+receipt reports `characters` the same way, so a receipt's count is the one the guard multiplied.
+
+**Why.** Gate 2 prices a narration at _"the text's characters × the narration rate"_. A JavaScript string's `length`
+counts UTF-16 units, in which a character outside the Basic Multilingual Plane — a mathematical letter, most emoji,
+rarer CJK — is two: that figure would overcharge exactly those texts. A code point is what Unicode calls a character.
+Every fixture was ASCII, so the two had never been told apart.
+
+**Rejected.** **`text.length`** — above. **Grapheme clusters, by `Intl.Segmenter`** — closer to what a reader sees, but
+segmentation follows the ICU data a Node build carries, so a guard's figure could change with the Node binary. **UTF-8
+bytes** — three for most CJK: a byte count, not characters. **What the provider bills** — the real T2A adapter is
+deferred and its count unread; when it is built, its receipt reports what it billed, and the guard's figure before the
+call may need an entry of its own.
+
+**Not handled.** Which count MiniMax's T2A bills. A rate that is not a binary fraction, such as 0.1, can make a product
+that is whole in decimals land a hair above it in floating point, and `Math.ceil` then adds a cent; today's rates are 0
+and whole cents, and the fixtures' fractional rates are binary fractions. The stand-in's receipt count is read by no
+check.
+
+**Caught by.** `reel-render`'s check 42: shot 2's narration holds one letter outside the BMP — 34 code points, 35 UTF-16
+units — and at 0.75 cents a character its figure is 216 + 25.5, rounded up to 242, made at a ceiling of exactly 242;
+counted by `length` it would be 216 + 26.25, rounded up to 243, and refused.
