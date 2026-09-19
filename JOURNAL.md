@@ -2128,3 +2128,49 @@ S-081's clips-job ending cost is still unchecked; a hold's labels with a failed 
 stop; `renderManifest`'s `request` is unread. Owed outside this repository, unchanged: KnowScroll's check of a returned
 video (S-068) and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the steering stubs and
 the pin (S-033).
+
+## 2026-09-19 — session 26, a question, a push, and the prompt for reel-render's Slice 5
+
+**Intent.** The owner asked _"Whats next"_, then said yes to pushing Slice 4 and writing Slice 5's prompt.
+
+**Changed.**
+
+- **Pushed** `main` to `origin`: `ea59e0e..7f337f1`, Slice 4's one commit.
+- **`PROMPTS/027-reel-render-slice-5.md`** — session 27's prompt, `Run: not yet`: Slice 5 only, checks 42–47, tests
+  first. It names what to read (sessions 25, 23, 22 and 18; Gate 2's admission, spending, endings, cancel and ports;
+  Gate 3's refused answers, `ClipsOutcome`, the paragraph under `WorkerOptions` and checks 42–47; S-035, S-036, S-053
+  and S-059 above all; the three guards, the clips and keyframes jobs, `questions.ts`, and the tests Slice 5 copies),
+  what Slice 5 builds and what it does not — restarts, the PATH-alone child and the journeys left to Slice 6 — a
+  working order, collision candidates, the break campaign run from `.tmp/campaign/` with its memory bounded from the
+  start, when to stop and ask, and the traps. Indexed in `PROMPTS/README.md`, with a line saying why there is no 026
+  (S-065).
+
+**Observed.**
+
+- **Answered from session 25's _Next_, read rather than remembered.** `main` was one commit ahead of `origin/main` at
+  the start, the tree clean. The status line the owner had selected, `Status: planned`, is the journey's, after Slice
+  6 (S-016): said to the owner.
+- **Checked while writing, so the prompt does not guess.**
+  - `narration-port.ts` and `video-port.ts` make every call, and each says the comparison is Slice 5's.
+    `guarded-image-port.ts` is the pattern: the cap first, then the ceiling, `Math.ceil` over the spend plus the
+    figure.
+  - `makeClips` already answers `stopped-budget` on a refused call (`clips/index.ts`), asserted by nothing; the clips
+    job's branch for it fails the run with _"a stop for budget in the clips stage is not built"_.
+  - `ClipsJobContext` holds no `budgetPath` or `questionsPath`, and the clips job reads no cap; the keyframes job reads
+    it once per attempt with `readReelCapCents`. `BUDGET_MD` is `steering-ref/steering/BUDGET.md`; there is no
+    `BUDGET.md` or `QUESTIONS.md` at this repository's root.
+  - **Gate 3's `ClipsOutcome` carries only `limit` and `estimateCents` on a budget stop, while check 45's entry names
+    the clip or the narration refused.** Where the name comes from is left to the session as a choice; widening an
+    approved signature for it, as a question for the owner.
+  - `spentCents` sums job rows' `cost_cents`. The narration rate defaults to 0, so after the last shot's clip no call
+    follows and no guard fires, whatever that clip cost: flagged in the prompt, not decided.
+  - The stand-ins throw per entry (video, narration), per role and call order (model), and per method and id (media;
+    a render's id is `a<attempt>-render`); the assembler can be made to throw only through `wrapAssembler`. Check 11's
+    second test already lands a cancel before the assemble job.
+- Nothing but markdown changed. `prettier --check` on the three files passes.
+
+**Why.** The prompt is numbered 027 because this session took 26 in this journal, as session 24 took 24 (S-065); the
+index says so, so the gap does not read as a lost file.
+
+**Next.** Session 27: run `PROMPTS/027-reel-render-slice-5.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
