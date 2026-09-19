@@ -2473,3 +2473,31 @@ steering stubs and the pin (S-033).
 
 **Next.** The owner's choice between `reel-takes` and `video-edits`; then that feature's gates, one at a time with an
 adversarial review. Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
+
+## 2026-09-19 — session 28, continued: a push, and the prompt for reel-takes' gates
+
+**Intent.** The owner chose `reel-takes`, and asked for the push and the next session's prompt.
+
+**Changed.**
+
+- **Pushed** `main` to `origin`: 21f7f37..73602b1 — Slice 6, the four journeys and the journal.
+- **`PROMPTS/029-reel-takes-gates.md`** — session 29's prompt, `Run: not yet`: `reel-takes`' four gates, no code, the
+  owner's questions first. Indexed in `PROMPTS/README.md` (S-065). Modelled on 020, `reel-render`'s gates prompt, and
+  carrying what that session and the slices after it learned.
+
+**Observed.**
+
+- **Checked while writing, so the prompt does not guess.** S-066 supersedes D-024, D-025, D-033, I-11, D-058, D-080 and
+  D-108 for `reel-render`'s build _"until `reel-takes` supersedes this entry in turn"_, and owes this feature's gates
+  checks 21 to 26 and 38 as premises in S-047's form; check 46 (a thrown call fails the run) and check 48 (a restart)
+  meet I-11's counter and item 5 as well, and the prompt says so. `reel-contract`'s Pending item 1 already says clip
+  entries in the record are compatible with version 1. The design sources exist where the prompt points:
+  `contentions.md` §1 and §4 and `VideoGenerationFlow.md` §2 S-3 and S-4 under
+  `steering-ref/docs/founding/reel-creation-engine/`, and `reel-engine`'s last plan at `7e50f79`.
+- **Three of the six items are named as likely the owner's** — the failure classes, a restart's takes against the cap,
+  the takes in the record — to be asked before any gate, as session 20 asked its three. Not asked now: the session that
+  writes the gates asks with the decisions read.
+- Nothing but markdown changed. `prettier --check` on the files passes.
+
+**Next.** Session 29: run `PROMPTS/029-reel-takes-gates.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.

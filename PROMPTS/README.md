@@ -20,6 +20,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 025 | [025-reel-render-slice-4.md](025-reel-render-slice-4.md) | `reel-render` | Slice 4   | 2026-09-18 | session 25 |
 | 027 | [027-reel-render-slice-5.md](027-reel-render-slice-5.md) | `reel-render` | Slice 5   | 2026-09-19 | session 27 |
 | 028 | [028-reel-render-slice-6.md](028-reel-render-slice-6.md) | `reel-render` | Slice 6   | 2026-09-19 | session 28 |
+| 029 | [029-reel-takes-gates.md](029-reel-takes-gates.md)       | `reel-takes`  | gates 1–4 | 2026-09-19 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
