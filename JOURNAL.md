@@ -2449,3 +2449,27 @@ unread; break 34d is named by no check (deferred item 15); a render row whose wo
 The suite now runs about 170 s here, most of it check 50's child. Owed outside this repository, unchanged: KnowScroll's
 check of a returned video (S-068) and serving the file (S-073); `reel-script` emitting a criterion's type (S-029); the
 steering stubs and the pin (S-033).
+
+## 2026-09-19 — session 28, continued: a question only — what is next
+
+**Intent.** The owner asked what is next, after `reel-render` was verified.
+
+**Changed.** Nothing but this entry.
+
+**Observed.**
+
+- **Six commits are not pushed**: `main` is ahead of `origin/main` by 8819d13 to 577c356 — the slice, the four journeys
+  and the journal.
+- **Two features are left, both with every gate pending**: `reel-takes` (S-066; its file lists six things to settle)
+  and `video-edits` (its file lists five). Read again for the answer:
+  - `reel-takes` gates any real video adapter: S-066's _"no real video adapter should be built before `reel-takes` is
+    verified"_. And `video-edits`' `reselect-take` (D-058) needs more than one take of a shot to exist, which only
+    `reel-takes` makes.
+  - `video-edits`' item 5 is answered now — `reel-render` makes real MP4s, and ffmpeg comes from PATH (S-075) — but its
+    items 2 and 4, one document or two and which surfaces are in scope (D-060), are the owner's and wider.
+  - `reel-takes`' items 2, 5 and 6 — the failure classes, a restart's takes against the cap, and whether the takes
+    amend contract version 1 — are the owner's to answer before its Gate 1, as S-066 to S-068 were for `reel-render`.
+- Recommended to the owner: push, then `reel-takes`' gates, asking those three first. The choice is the owner's.
+
+**Next.** The owner's choice between `reel-takes` and `video-edits`; then that feature's gates, one at a time with an
+adversarial review. Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
