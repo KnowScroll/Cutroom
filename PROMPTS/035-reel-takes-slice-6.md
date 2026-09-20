@@ -4,7 +4,7 @@
 - **Feature:** `reel-takes` — [`docs/features/reel-takes.md`](../docs/features/reel-takes.md)
 - **Work:** Slice 6 of 6 — endings, no secrets, and the journeys; checks 25–26, then five journeys
 - **Written:** 2026-09-20, at the end of session 34, after `reel-takes`' Slice 5 was committed (3c263fa)
-- **Run:** not yet
+- **Run:** session 35
 
 Paste everything inside the block below as the session's first message.
 

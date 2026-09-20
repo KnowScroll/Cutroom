@@ -851,7 +851,7 @@ _Endings, and no secrets_
       after it and re-emitting its verdicts; `readRenderInputs` reading each shot's finished and accepted rows, and
       `renderManifest` refusing two of either for one shot; `reel-render`'s check 48 as S-099 says.
       **Proves: 21, 22, 23, 24.**
-- [ ] **Slice 6 — endings, no secrets, and the journeys.** Every ending's events; the child with PATH alone.
+- [x] **Slice 6 — endings, no secrets, and the journeys.** Every ending's events; the child with PATH alone.
       **Proves: 25, 26, and re-runs 1–24**; then the `reel-takes` journey, and the `reel-render`, `reel-stills`,
       `reel-plan` and `reel-contract` journeys again (S-099).
 

@@ -3711,3 +3711,42 @@ kept take finished the shot** — the same set, spelled longer: a kept take that
 **Caught by.** `reel-takes`' check 21. Its second attempt's four takes are each reconciled as **not** showing
 `show-meadow`, the reel's unclaimed `mustShow`, and only the kept takes of shots 0 and 1 show it — so a stage counting
 this attempt's takes alone stops the run for `gate-5` where check 21 says it completes. Break 21g.
+
+---
+
+## S-107 | 2026-09-20 | `reel-takes`' check 26 runs its child four files at a time, and `reel-render`'s check 50 keeps its bound
+
+**Chose.** `tests/reel-takes-secrets.test.ts` starts its PATH-alone child with **`--test-concurrency=4`**
+and the same **300-second timeout** `reel-render`'s check 50 uses (S-028's form). **`reel-render`'s check 50
+is not touched**: neither its bound nor its timeout is widened for the second child.
+
+**Why.** Two PATH-alone children now run inside one suite, and each holds a whole feature's tests — nine
+restart runs in `reel-takes`' case, each starting a worker process of its own, and a video run in each that
+starts ffmpeg again and again. Measured on this machine on 2026-09-20, inside the suite, at 16 cores and
+15.7 GB:
+
+| check 26's child | its time | machine's least free memory | check 50's child | the whole suite |
+| ---------------- | -------- | --------------------------- | ---------------- | --------------- |
+| Node's default   | 101 s    | 815 MB                      | 248 s            | 291 s           |
+| bounded to four  | 130 s    | 1306 MB                     | 237 s            | 280 s           |
+
+The bound costs this child 29 s and gives the machine 491 MB back, takes 11 s off `reel-render`'s child —
+which is the one near its bound — and 11 s off the suite. Alone, outside the suite, the same child is 51 s
+at the default and 68 s bounded, so the bound's cost is small and its relief is not.
+
+**A bound and a timeout are test support**: every file still runs, every assertion is unchanged, and the
+roll call still holds that checks 1 to 25 each ran and passed in the child.
+
+**Rejected.** **Node's default concurrency** — 101 s is the faster child, but it is the one that leaves 815 MB
+free while `reel-render`'s child, already at 248 s of its 300, runs beside it; the suite is no faster for it.
+**Widening `reel-render`'s check 50 to 400 s** — it would hide exactly what its own bound is for, and CLAUDE.md's
+rule is that a check is never weakened to reach green; 237 s under 300 is a finding to report, not to paper over.
+**Bounding `reel-render`'s check 50 harder, to two** — a change to a verified feature's test for this feature's
+convenience, which S-099 does not allow.
+
+**Caught by.** Check 26 itself: a bound too tight, or a machine too loaded, ends the child at its 300-second
+timeout and the check fails with the child's output — it is never made green by widening. **Not caught:** a
+machine with fewer cores or less memory than this one, where both figures would differ; the numbers above are
+this machine's, dated, as check 50's are.
+
+**Confirmed-by.** Nothing asked of the owner: test support, measured.
