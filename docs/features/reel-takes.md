@@ -5,7 +5,7 @@ authority: plan
 
 # reel-takes — a clip that fails its checks is tried again, and at the cap its shot is held on its picture or the reel stops
 
-Status: planned
+Status: verified
 Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028, D-030, D-033, D-043, D-047, D-050, D-054, D-055, D-056, D-058, D-059, D-072, D-080, D-081, D-083, D-086, D-094, D-095, D-099, D-108, I-2, I-4, I-5, I-8, I-11, I-12, I-15, I-17, S-010, S-016, S-021, S-027, S-028, S-029, S-033, S-034, S-035, S-036, S-038, S-040, S-046, S-048, S-051, S-055, S-058, S-059, S-060, S-066, S-068, S-069, S-070, S-071, S-072, S-073, S-074, S-075, S-076, S-077, S-087, S-089, S-090, S-091, S-092, S-093, S-094, S-095, S-096, S-097, S-098, S-099
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
@@ -867,6 +867,8 @@ Every check appears in exactly one slice: 4 + 8 + 3 + 5 + 4 + 2 = 26.
 - [ ] Every clip made is in the record, and the whole journey passes with no secrets in its environment
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-20 journey=PASS at 6fe85b8 — every check green; 66 tests in tests/reel-takes-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
