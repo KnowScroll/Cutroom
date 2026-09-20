@@ -136,46 +136,144 @@ export function bandColours(path: string): Rgb[] {
 }
 
 /**
+ * WHICH OF `colours` EACH FRAME OF A FILE CARRIES, measured: the index of the one the frame's band
+ * strip is nearest — H.264 in yuv420p moves a colour a little, so nearest within a tolerance, never
+ * equal. Fails when two colours of the list are too alike to tell apart, or when a frame's is near
+ * none of them. `noun` and `named` are what a failure calls them.
+ */
+function nearestOfFrames(
+  path: string,
+  colours: readonly Rgb[],
+  named: readonly string[],
+  noun: string,
+): number[] {
+  colours.forEach((colour, i) => {
+    const next = colours[i + 1]
+    if (next === undefined) return
+    assert.ok(
+      distance(colour, next) > 80,
+      `${named[i]} and ${named[i + 1]} have ${noun}s too alike to find a boundary between them`,
+    )
+  })
+  return bandColours(path).map((colour, frame) => {
+    const ranked = colours.map((e, i) => ({ i, d: distance(colour, e) })).sort((x, y) => x.d - y.d)
+    const nearest = ranked[0]
+    assert.ok(
+      nearest !== undefined && nearest.d < 40,
+      `frame ${frame}'s ${noun} [${colour.join(', ')}] is no ${noun === 'band' ? 'take' : 'shot'}'s colour (nearest ${nearest?.d})`,
+    )
+    return nearest.i
+  })
+}
+
+/** The frame at which each colour of the list begins, each reached once and in order. */
+function startsOfFrames(
+  frames: readonly number[],
+  named: readonly string[],
+  changing: string,
+): number[] {
+  const starts: number[] = []
+  frames.forEach((which, frame) => {
+    if (frame === 0 || frames[frame - 1] !== which) starts.push(frame)
+  })
+  assert.deepEqual(
+    starts.map((frame) => frames[frame]),
+    named.map((_, i) => i),
+    changing,
+  )
+  return starts
+}
+
+/**
  * WHICH TAKE EACH FRAME OF A FILE CARRIES, measured: the index in `takeIds` of the take whose band
  * colour the frame's band is nearest — H.264 in yuv420p moves a colour a little, so nearest within a
  * tolerance, never equal. Fails when two takes of the list are too alike to tell apart, or when a
  * frame's band is near none of them.
  */
 export function takeOfFrames(path: string, takeIds: readonly string[]): number[] {
-  const expected = takeIds.map(bandOf)
-  expected.forEach((colour, i) => {
-    const next = expected[i + 1]
-    if (next === undefined) return
-    assert.ok(
-      distance(colour, next) > 80,
-      `${takeIds[i]} and ${takeIds[i + 1]} have bands too alike to find a boundary between them`,
-    )
-  })
-  return bandColours(path).map((colour, frame) => {
-    const ranked = expected.map((e, i) => ({ i, d: distance(colour, e) })).sort((x, y) => x.d - y.d)
-    const nearest = ranked[0]
-    assert.ok(
-      nearest !== undefined && nearest.d < 40,
-      `frame ${frame}'s band [${colour.join(', ')}] is no take's colour (nearest ${nearest?.d})`,
-    )
-    return nearest.i
-  })
+  return nearestOfFrames(path, takeIds.map(bandOf), takeIds, 'band')
 }
 
 /** The frame at which each shot's band begins: a shot boundary is where the band changes (S-073). */
 export function shotStarts(path: string, takeIds: readonly string[]): number[] {
-  const frames = takeOfFrames(path, takeIds)
-  const starts: number[] = []
-  frames.forEach((take, frame) => {
-    if (frame === 0 || frames[frame - 1] !== take) starts.push(frame)
-  })
-  // Each change must be to the next take of the list, so the starts are the shots', in order.
-  assert.deepEqual(
-    starts.map((frame) => frames[frame]),
-    takeIds.map((_, i) => i),
+  return startsOfFrames(
+    takeOfFrames(path, takeIds),
+    takeIds,
     'the bands do not change from each take to the next, once each',
   )
-  return starts
+}
+
+/**
+ * The same, for a reel in which a shot is HELD ON ITS PICTURE (S-097): a held shot's frames carry no
+ * take's band but its picture's own colour, so each shot is named by the colour it should carry —
+ * `bandOf(takeId)` for a clip shot, `pictureColourOf(pictureId)` for a held one.
+ */
+export function shotOfFrames(path: string, shots: ReadonlyArray<[string, Rgb]>): number[] {
+  return nearestOfFrames(
+    path,
+    shots.map(([, colour]) => colour),
+    shots.map(([name]) => name),
+    'colour',
+  )
+}
+
+/** The frame at which each shot's colour begins, for a reel holding a shot on its picture. */
+export function spanStarts(path: string, shots: ReadonlyArray<[string, Rgb]>): number[] {
+  return startsOfFrames(
+    shotOfFrames(path, shots),
+    shots.map(([name]) => name),
+    'the colours do not change from each shot to the next, once each',
+  )
+}
+
+/**
+ * The colour the image stand-in keys from a picture's id: its CRC-32's low three bytes, least first
+ * — the reverse of a take's band, which reads them most first (fake/image.ts, fake/video.ts).
+ */
+export function pictureColourOf(pictureId: string): Rgb {
+  const c = crc32(pictureId)
+  return [c & 0xff, (c >>> 8) & 0xff, (c >>> 16) & 0xff]
+}
+
+/** The colour of a bordered stand-in picture's 2-pixel edge: each channel of its own, flipped high. */
+export function borderColourOf(pictureId: string): Rgb {
+  const [r, g, b] = pictureColourOf(pictureId)
+  return [r ^ 0x80, g ^ 0x80, b ^ 0x80]
+}
+
+/** The mean colour of a strip `width` pixels wide down the left edge of one frame. */
+export function edgeColour(path: string, frame: number, width = 2): Rgb {
+  const { stdout } = decoded([
+    '-i',
+    path,
+    '-vf',
+    `select='eq(n,${frame})',crop=${width}:ih:0:0,scale=1:1:flags=area`,
+    '-frames:v',
+    '1',
+    '-f',
+    'rawvideo',
+    '-pix_fmt',
+    'rgb24',
+    '-',
+  ])
+  assert.equal(stdout.length, 3, `the file has no frame ${frame}`)
+  return [stdout[0] as number, stdout[1] as number, stdout[2] as number]
+}
+
+/** Which of the named colours one measured colour is nearest, with how far each is. */
+export function nearestColour(
+  measure: Rgb,
+  named: ReadonlyArray<readonly [string, Rgb]>,
+): { name: string; distances: string } {
+  const ranked = named
+    .map(([name, colour]) => ({ name, d: distance(measure, colour) }))
+    .sort((x, y) => x.d - y.d)
+  const best = ranked[0]
+  assert.ok(best !== undefined, 'no colour to compare with')
+  return {
+    name: best.name,
+    distances: ranked.map((r) => `${r.name} ${r.d.toFixed(1)}`).join(', '),
+  }
 }
 
 /**

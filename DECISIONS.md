@@ -3633,3 +3633,56 @@ file changed during the takes would be probed before it changed.
 **Caught by.** `reel-takes`' check 13, its run whose picture is replaced with other bytes during its third take's
 measure: with `readable` alone the shot is held and the run goes on, and the check's failed ending and its detail go
 red.
+
+---
+
+## S-104 | 2026-09-20 | A render manifest's shot is refused BY BRANCH: a clip shot or a still-hold shot, each strict
+
+**Chose.** `renderManifestSchema`'s `shots` are a **union of two strict objects**
+(`packages/pipeline/src/render/manifest.ts`): `clipShot` — every field `reel-render` built, and no `stillHold` — and
+`stillHoldShot` — the span's fields and a `stillHold` block, and no clip field. Because **each branch is strict**, a
+still-hold shot carrying a take id, a request id, an expanded prompt, a clip path, an opening, a clip measure, picture
+frames or a hold is refused by construction, and so is a clip shot carrying a `stillHold`: no combination of fields is
+written out by hand, so none can be forgotten. The still-hold branch itself refuses a shot whose `degradation` is
+missing or empty — **D-059's check, which S-073 left to this feature** — and one whose `takeIds` are not
+`TAKES_A_SHOT` of them.
+
+**Why.** S-097 makes `RenderShot` a union of two types, each making the other's fields `never`. A schema of one object
+with every field optional would describe a type that does not exist, and every refusal would then be a rule someone
+wrote: eight clip fields against the `stillHold`, in both directions. A pair nobody wrote is a shot the schema accepts —
+a rule that reads as coverage and catches nothing (S-014). Strictness already refuses an unknown key, so the two
+branches carry the whole rule for nothing.
+
+**Rejected.** **One strict object with every field optional and a `superRefine`** — the forgotten pair above.
+**A discriminated union on a `kind` field** — S-097 rejected a `kind` on every shot: every manifest's text, hash and
+fixture would change for shots that did not. **Leaving the refusal to the builder** — the schema is what a manifest
+must be (D-059), and a manifest is parsed again on the way in, which is what check 20's replay renders.
+
+**Caught by.** `reel-takes`' check 16 — its refusals of a still-hold shot with no reason, with other than three takes
+and with each clip field in turn, of a clip shot carrying a `stillHold`, and its manifest holding both kinds, which
+parses. Breaks 16a to 16d and 16g.
+
+---
+
+## S-105 | 2026-09-20 | A held shot's conform notes are its pad and its silence; making frames is not a frame-rate conversion
+
+**Chose.** A still-hold shot's `conform` is written by `stillConformNotes`
+(`packages/pipeline/src/render/manifest.ts`): **the pad**, computed from the picture's own probe exactly as a clip's is
+from its measured facts, and **the added silence** — a picture has no sound. It records **no frame-rate note**, whatever
+rate ffprobe reports of the picture's file, because **nothing is converted**: `zoompan` MAKES the span's frames at the
+profile's rate from the one picture.
+
+**Why.** D-055 records a conform note "where conforming changes anything beyond resampling — a letterbox, a crop, a
+frame-rate conversion". ffprobe calls the stand-in's PNG **25 frames a second** (measured on this machine, as S-103
+measured the rest of that probe), so reusing `conformNotes` would write _"frame rate: 25 to 24"_ on every held shot: a
+record of a conversion the pass never performs. I-4 wants a degradation recorded; it does not want a record of
+something that did not happen. The pad and the silence are both real — the picture is scaled to fit and padded, and
+silence is added for the span (S-097).
+
+**Rejected.** **Reusing `conformNotes`** — the spurious rate note above, on every held shot of every reel. **No notes at
+all** — the pad is a letterbox, which D-055 says is recorded, and the silence is what S-073 records for a clip with no
+sound. **A note naming `zoompan`** — a conform note says what was done to an input to make it fit the profile, not which
+filter did it.
+
+**Caught by.** `reel-takes`' check 17, which reads the held shot's conform notes as the manifest holds them. Break 17k,
+the clip's notes reused.

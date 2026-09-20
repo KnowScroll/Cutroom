@@ -5,8 +5,10 @@ import type {
   NarrationReceipt,
   NarrationRecord,
   PictureRecord,
+  ClipShot,
+  MediaProbe,
   RenderManifest,
-  RenderShot,
+  StillHold,
   TakeNumber,
   TakeRecord,
   VideoReceipt,
@@ -22,6 +24,7 @@ import {
   observation,
   picture,
   speechReceipt,
+  stillHold,
   take,
   takeObservation,
   takeReconciliation,
@@ -309,13 +312,15 @@ export function readClipsInputs(db: Db, runId: string): ClipsInputs {
 /** What a render manifest is built from, read from the run's rows (S-073). */
 export interface RenderInputs {
   /** The chosen pictures, in shot order, each with the verdicts that approved it. */
-  stills: Array<{ pictureId: string; shotUnit: number; verdicts: RenderShot['verdicts'] }>
+  stills: Array<{ pictureId: string; shotUnit: number; verdicts: ClipShot['verdicts'] }>
   /** The stills stage's degradations, in the order it reached them (S-058). */
   degradations: Array<{ shotId: string; reason: string }>
   /** The finishing clips attempt's takes, in the order made. */
   takes: TakeRecord[]
   /** The same attempt's narrations. */
   narrations: NarrationRecord[]
+  /** The shots held on their chosen pictures, in the order the ladders reached them (S-098). */
+  stillHolds: StillHold[]
   /** What the run's image, narration and video calls cost, every attempt's (D-081). */
   ledger: RenderManifest['ledger']
 }
@@ -333,8 +338,9 @@ function takeNumber(number: number, takeId: string): TakeNumber {
  * The rows a render manifest is built from, once the clips job has completed (S-073): the chosen
  * pictures with Gate 1's verdict and Gate 1S's where it ran, the stills stage's degradations, THE
  * FINISHING CLIPS ATTEMPT'S takes and narrations — the latest attempt's, since an attempt run again
- * starts over and only the one that finished advanced the run (S-076) — and the cost ledger, summed
- * from the three receipt tables.
+ * starts over and only the one that finished advanced the run (S-076) — the shots held on their
+ * chosen pictures, each with the probe its ladder stored (S-097), and the cost ledger, summed from
+ * the three receipt tables.
  */
 export function readRenderInputs(db: Db, runId: string): RenderInputs {
   const stills = db
@@ -349,7 +355,7 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
     .orderBy(picture.shotUnit)
     .all()
     .map((row) => {
-      const verdicts: RenderShot['verdicts'] = []
+      const verdicts: ClipShot['verdicts'] = []
       const gate1 = parsed<NonNullable<PictureRecord['gate1']>>(row.gate1)
       if (gate1 !== null && gate1.outcome !== null) {
         verdicts.push({ gate: '1', outcome: gate1.outcome, coverage: gate1.coverage })
@@ -439,6 +445,35 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
       probe: parsed(row.probe),
     }))
 
+  // The shots held on their chosen pictures, in the order the ladders reached them (S-098). The
+  // picture's PATH and its shot come off the picture row the still-hold's foreign key names, so the
+  // manifest's path is the one the file was written at and no shot id is read back out of text.
+  const stillHolds = db
+    .select({
+      shotUnit: picture.shotUnit,
+      pictureId: stillHold.pictureId,
+      path: picture.path,
+      probe: stillHold.probe,
+      takeIds: stillHold.takeIds,
+      reason: stillHold.reason,
+    })
+    .from(stillHold)
+    .innerJoin(
+      picture,
+      and(eq(stillHold.runId, picture.runId), eq(stillHold.pictureId, picture.pictureId)),
+    )
+    .where(eq(stillHold.runId, runId))
+    .orderBy(sql`still_hold.rowid`)
+    .all()
+    .map((row): StillHold => ({
+      shotUnit: row.shotUnit,
+      pictureId: row.pictureId,
+      path: row.path,
+      probe: JSON.parse(row.probe) as MediaProbe,
+      takeIds: JSON.parse(row.takeIds) as string[],
+      reason: row.reason,
+    }))
+
   const spent = (table: typeof generationReceipt | typeof speechReceipt | typeof videoReceipt) =>
     db
       .select({ cents: sql<number>`COALESCE(SUM(${table.costCents}), 0)` })
@@ -450,6 +485,7 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
     degradations,
     takes,
     narrations,
+    stillHolds,
     ledger: {
       imageCents: spent(generationReceipt),
       narrationCents: spent(speechReceipt),

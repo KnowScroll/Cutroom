@@ -23,6 +23,12 @@ export interface FakeImageEntry {
   costCents?: number
   /** The call throws this message instead of making anything. */
   throws?: string
+  /**
+   * A 2-PIXEL BORDER of another colour around the picture (S-097): what a check measures a held
+   * shot's slow push by. Two of the stand-in's 90 pixels, because a push to 1.1 takes about 4.1
+   * from each side — so a 2-pixel border is gone by the span's last frame and a 4-pixel one is not.
+   */
+  border?: true
 }
 
 /** Entries by `shot-<unit>-<label>` — or by a whole picture id, which wins. */
@@ -47,21 +53,37 @@ function chunk(type: string, data: Buffer): Buffer {
   return Buffer.concat([length, body, crc])
 }
 
-/** A solid-colour RGB PNG, its colour taken from the picture's id so no two pictures are alike. */
-function png(size: { width: number; height: number }, pictureId: string): Buffer {
+/** How wide a bordered picture's edge is, in the stand-in's own pixels (S-097). */
+const BORDER = 2
+
+/**
+ * A solid-colour RGB PNG, its colour taken from the picture's id so no two pictures are alike; with
+ * a border, its outermost BORDER pixels carry each channel of that colour flipped high, which is 128
+ * away in every one of them whatever the colour is.
+ */
+function png(size: { width: number; height: number }, pictureId: string, border = false): Buffer {
   const header = Buffer.alloc(13)
   header.writeUInt32BE(size.width, 0)
   header.writeUInt32BE(size.height, 4)
   header[8] = 8 // bits per channel
   header[9] = 2 // RGB
   const colour = crc32(pictureId)
-  const row = Buffer.alloc(1 + size.width * 3) // filter byte 0, then the pixels
-  for (let x = 0; x < size.width; x += 1) {
-    row[1 + x * 3] = colour & 0xff
-    row[2 + x * 3] = (colour >>> 8) & 0xff
-    row[3 + x * 3] = (colour >>> 16) & 0xff
+  const rgb = [colour & 0xff, (colour >>> 8) & 0xff, (colour >>> 16) & 0xff] as const
+  const paint = (edge: boolean) => {
+    const row = Buffer.alloc(1 + size.width * 3) // filter byte 0, then the pixels
+    for (let x = 0; x < size.width; x += 1) {
+      const sides = border && (edge || x < BORDER || x >= size.width - BORDER)
+      for (let c = 0; c < 3; c += 1) row[1 + x * 3 + c] = (rgb[c] as number) ^ (sides ? 0x80 : 0)
+    }
+    return row
   }
-  const pixels = Buffer.concat(Array.from({ length: size.height }, () => row))
+  const row = paint(false)
+  const edge = paint(true)
+  const pixels = Buffer.concat(
+    Array.from({ length: size.height }, (_, y) =>
+      border && (y < BORDER || y >= size.height - BORDER) ? edge : row,
+    ),
+  )
   return Buffer.concat([
     SIGNATURE,
     chunk('IHDR', header),
@@ -92,7 +114,11 @@ export function fakeImage(
       const bytes =
         entry.shape === 'unreadable'
           ? Buffer.from('these bytes are not a picture\n', 'utf8')
-          : png(entry.shape === 'wrong-size' ? WRONG_SIZE : SIZE, request.pictureId)
+          : png(
+              entry.shape === 'wrong-size' ? WRONG_SIZE : SIZE,
+              request.pictureId,
+              entry.border === true,
+            )
       mkdirSync(dirname(path), { recursive: true })
       writeFileSync(path, bytes)
       return {

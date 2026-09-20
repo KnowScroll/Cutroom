@@ -78,13 +78,14 @@ test("37. the assembler's source imports no domain, settings or network module a
   // shot's measured facts — `shot.clip.video`, or a `video` that is declared as exactly that.
   const FACTS = new Set(['width', 'height', 'fps', 'sampleRate', 'channels'])
   const from: string[] = []
-  const declared = new Map<string, string>()
+  const declared = new Map<string, string[]>()
   const visit = (node: ts.Node) => {
     if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
       assert.notEqual(node.expression.text, 'fetch', 'the assembler calls fetch')
     }
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
-      declared.set(node.name.text, node.initializer.getText(source))
+      const name = node.name.text
+      declared.set(name, [...(declared.get(name) ?? []), node.initializer.getText(source)])
     }
     if (ts.isPropertyAccessExpression(node) && FACTS.has(node.name.text)) {
       from.push(node.expression.getText(source))
@@ -98,7 +99,13 @@ test("37. the assembler's source imports no domain, settings or network module a
     ['video'],
     'a width, height, frame rate, sample rate or channel count is read off something else',
   )
-  assert.equal(declared.get('video'), 'shot.clip.video', '`video` is not the measured facts')
+  // TWO MEASURED SOURCES, and no third (S-099): a clip shot's measured facts, and a still-hold
+  // shot's picture probed by ffprobe when its ladder held the shot (S-097, D-055).
+  assert.deepEqual(
+    [...(declared.get('video') ?? [])].sort(),
+    ['shot.clip.video', 'shot.stillHold.probe.video'],
+    '`video` is neither a clip measured fact nor a held picture probe',
+  )
   // A clip's sound is fitted to the profile whatever it is: only WHETHER it has any is read.
   assert.ok(/shot\.clip\.audio === null/.test(source.getText()), 'added silence reads another fact')
 

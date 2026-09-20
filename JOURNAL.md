@@ -3041,3 +3041,175 @@ caught by nothing until check 19), `reel-render`'s check 37 widened. Carried: Sl
 `still_hold` row's attempt (14q); check 4's second restart (S-100); the narration guard's every-send rule (S-101);
 check 50's child margin; the access violation, if it comes again. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-20 — session 33: the prompt for reel-takes' Slice 4
+
+**Intent.** The owner asked what the next slice is, and for its prompt.
+
+**Changed.**
+
+- **`PROMPTS/033-reel-takes-slice-4.md`** — session 33's prompt, `Run: not yet`: Slice 4 only, checks 16–20, tests
+  first, no journey. It names what to read (sessions 32, 31 and 30; Gate 2's "The still-hold, in the one pass" in full,
+  plus the labels, events and S-099 sections; Gate 3's `ClipShot`/`StillHoldShot`/`RenderShot` signatures and checks
+  16–20; S-097 as the slice's spine, then S-099, S-073, S-098, S-090, S-103, and D-025, D-054, D-055, D-059, D-086,
+  D-008, D-074 with I-4, I-12, I-17), what Slice 4 builds and what it does not — no kept work, no checkpoint, no
+  restart (Slice 5); no endings sweep, no child-with-PATH test, no journey (Slice 6) — that Slice 3 left
+  `renderManifest` failing a held run _"has no accepted take to render"_ and this slice replaces it, a break campaign in
+  session 32's form with the breaks to run, when to stop and ask the owner, and the traps (the filtergraph's Windows
+  escaping, `zoompan` measured not assumed, no absolute path in check 20's second artifact root). Indexed in
+  `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Slice 4 is next** (Gate 4): _the still-hold, rendered_ — `RenderShot` as `ClipShot | StillHoldShot` and the
+  manifest's schema; the still-hold shot from its `still_hold` row and the probe it holds; `readRenderInputs` with the
+  still-holds; the assembler, the assemble job and `cutReel` taking both kinds — picture input, `zoompan`, silence; the
+  stand-in picture's 2-pixel border; the completed result's order of `degradations`; `reel-render`'s check 37 widened as
+  S-099 says, and the type-only support in two of its test files. Proves 16–20.
+- **Checked what already exists**, so the prompt does not ask for it twice: `zoompan` is in `PASS_FILTERS`
+  (`ffmpeg/tools.ts`) and `stillPush: { endZoom: 1.1 }` in `DEFAULT_RENDER_SETTINGS` — both Slice 1's, under check 2.
+  `RenderShot` is still `reel-render`'s single interface in `packages/contracts/src/render.ts`; `FakeImageEntry` has no
+  `border`; `RenderInputs` has no `stillHolds`. The next free S-number is S-104.
+- Nothing but markdown changed; no code check was run.
+
+**Next.** Session 33: run `PROMPTS/033-reel-takes-slice-4.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
+
+## 2026-09-20 — session 33, reel-takes Slice 4: the still-hold, rendered
+
+**Intent.** Run `PROMPTS/033-reel-takes-slice-4.md`: `reel-takes`' Slice 4 only — checks 16 to 20, tests first; nothing
+from Slice 5 or 6, no journey. `decisions.mjs`: pin current, 0 commits unpushed. The machine quiet. Baseline
+`check.mjs` green at cca9106, tests 213 s (332 by session 32's TAP count). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`packages/contracts`** — **`render.ts`**: `RenderShot` is `ClipShot | StillHoldShot` (Gate 3's signatures). An
+  unexported `ShotSpan` holds what every shot carries — shot id, join mode, narration, words, span, conform notes,
+  verdicts. `ClipShot` is `reel-render`'s shot with `stillHold?: never`; `StillHoldShot` carries the `stillHold` block —
+  the picture's id, path and probe, its three take ids, the reason and `endZoom` — and every clip field typed `never`.
+  Both exported through `index.ts`.
+- **`packages/pipeline`** — **`render/manifest.ts`**: the schema's `shot` is a **union of two strict objects**
+  (`clipShot`, `stillHoldShot`) — **S-104** — the still-hold branch requiring a non-empty `degradation` (D-059's check)
+  and exactly `TAKES_A_SHOT` take ids. `RenderInput.stillHolds`. `renderManifest` builds a still-hold shot in its place
+  in plan order from the run's `still_hold` row and **the probe that row holds**, never probing again: its takes read by
+  the ids its ladder consumed, its verdicts its picture's then those three takes', its push
+  `RenderSettings.stillPush.endZoom`. Its conform notes are the pad and the silence, **no frame-rate note** — **S-105**
+  (`stillConformNotes`). The span, the narration and the captions are now computed once for both kinds (`pushCaptions`).
+  Slice 3's _"has no accepted take to render"_ is now reached only by a shot that is neither held nor accepted.
+- **`packages/providers`** — **`ffmpeg/assemble.ts`**: `stillOf` — a held shot's picture scaled to fit and padded from
+  **its own probe**, `setsar`, `format`, then `zoompan` making exactly the span's frames, 1 at the first to `endZoom`
+  at the last, centred, with `s` and `fps` given (its defaults are 720p at 25). `soundOf` gives a held shot **silence
+  for the span, lowered by nothing**, with its narration mixed over it. The picture takes its clip's place among the
+  inputs, so the graph's labels stay the shot's index; `pictureOf` now takes a `ClipShot`. **`fake/image.ts`**:
+  `FakeImageEntry.border`, a 2-pixel edge of each channel flipped high — 128 away in every channel whatever the colour.
+- **`packages/domain`** — **`clips.ts`**: `RenderInputs.stillHolds`, read from `still_hold` joined to `picture` on the
+  foreign key, so the **path and the shot** come off the picture row and no shot id is read back out of text; in rowid
+  order.
+- **`apps/worker`** — `assemble-job.ts`: a completed result's `degradations` are the stills', **then the still-holds'**,
+  then this render's holds (S-098); a still-hold shot is never turned into a `hold` row.
+- **`reel-render`'s check 37 widened exactly as S-099 says** (`tests/reel-render-cut.test.ts`): the declarations named
+  `video` are collected rather than overwritten, and the assertion is that they are exactly `shot.clip.video` and
+  `shot.stillHold.probe.video` — a second measured source, and no third. The grep test is unchanged.
+- **Type-only support in two verified test files, no assertion changed (S-099):** `tests/reel-render-shapes.test.ts`'
+  `shot()` and `probe()` take and return a **clip** shot's types; `tests/reel-render-manifest.test.ts`' `rows()` carries
+  `stillHolds: []`, and check 29's path loop names a shot's clip **or its held picture** — the same values for this
+  fixture, which holds no held shot.
+- **Test support, no assertion:** `tests/engine/render.ts` — `shotOfFrames` and `spanStarts` (a shot's colour may be a
+  take's band or a held picture's), `pictureColourOf`, `borderColourOf`, `edgeColour`, `nearestColour`;
+  `takeOfFrames` and `shotStarts` are unchanged in behaviour and message, now written over the same two helpers.
+- **Four test files, +7 tests, 332 → 339**: `tests/reel-takes-still-shapes.test.ts` (check 16, 3 tests),
+  `-still-manifest.test.ts` (17, 1), `-still-render.test.ts` (18 and 20, 2, sharing one run), `-degradations.test.ts`
+  (19, 1). Each test titled with Gate 3's words.
+- **`DECISIONS.md` — S-104, S-105.** Slice 4 ticked. Prompt 033's `Run` line set to session 33, in the file and the
+  index (S-065).
+
+**Observed.**
+
+- **Measured before any test was written.** In the scratchpad, ffmpeg 8.1.1: a 90 × 160 PNG through `scale=108:192`,
+  `setsar`, `format`, `zoompan` with `d=36`, `s=108x192`, `fps=24` gave **exactly 36 frames** at 108 × 192, 24/1. Its
+  2-pixel border read **[31, 0, 225]** at frame 0 against a border colour of [40, 0, 232], and **[168, 129, 102]** at
+  frame 35 against a picture colour of [168, 128, 104]: in and gone, as Gate 2 says. ffprobe of the stand-in's PNG:
+  `png`, 90 × 160, **25/1**, one frame, no duration — the rate S-105 refuses to record as a conversion.
+- **Red first, each for its reason.** Before code, 7 of 7 red:
+  - 16, what compiles: _"has no exported member 'ClipShot'"_, _"has no exported member named 'StillHoldShot'"_ and four
+    _"Property 'stillHold' does not exist on type 'RenderShot'"_. 16, what is refused: the same missing exports. 16, the
+    schema: _"a manifest holding both kinds was refused: shots.1.takeId: … expected string, received undefined"_ and
+    eight more, ending _"shots.1: Unrecognized key: stillHold"_.
+  - 17, 18, 19 and 20: each run **failed**, _"the render manifest could not be built: shot-1 has no accepted take to
+    render"_ — Slice 3's leftover, which this slice replaces, exactly as the prompt said.
+  - **Two of my expectations were wrong, said plainly.** Check 16 expected the compiler to name `'stillHold'` and
+    `'clipPath'` in quotes for the two misuses written as a `RenderShot`; refused against **both** branches, it names
+    the types and the first incompatible field instead (`takeId`). Those rows now expect the bare word, with a comment.
+    And check 20's middle frame was first asserted to be the file's frame 300 exactly, and was found at 305: **inside a
+    held span two frames between one caption and the next are the same pixels**, because the picture is solid and the
+    captions are burned after the concat, so they are not pushed with it. It now asserts the frame to within a caption's
+    dwell (12 frames), that it is far from the same frame of the shots either side, and — the sharp part — that the
+    **first** frame Gate 7 was shown carries the border and the **last** does not.
+- **The measurements.** Check 18, on the held run: the file **696 frames** by ffprobe, the manifest's total; the spans
+  the file shows `[0, 216, 384, 456, 528, 576]`, the held shot's 168 frames from 216; **every one of those 168 frames
+  nearest the picture's colour** and at least 80 from each of `a1-shot-1-take-1`, `-2` and `-3` (whose distances from it
+  are 167.6, 139.7 and 161.8); the left 2-pixel strip nearest **the border** at frame 216 and **the picture** at frame
+  383; 220 Hz more than 20 dB down in the held span against shot 0's, and 660 Hz above −30 there. Check 20: the replay
+  under another artifact root gave the same frame count, the same duration within a millisecond and the same
+  boundaries, and the first file's bytes were unchanged.
+- **Check 37's two sources, and no third.** Its scan still finds every geometry, rate and channel read off `profile` or
+  off a binding named `video`, and the two such bindings are now exactly the clip's measured facts and the held
+  picture's probe. Break 37b — the assembler taking a held shot's geometry off the profile it renders to — is caught by
+  37 and 20.
+- **Forty-two breaks and a control**, by session 32's runner in `.tmp/campaign/` (its breaks, chunk log and results
+  moved aside to `s32/`; ignored), taught this slice's files; the runner gained `--only=<ids>`, an addition, so a break
+  could be run again wherever it sits in the list. Each break's files saved as bytes and `fsync`ed to a record before
+  they were touched, restored from those bytes and read back, the record removed; every modified and untracked file
+  fingerprinted after each restore; a refusal to start while a record exists; every find checked once first; `tsc -b`,
+  then NEW (this slice's four files, 7 tests) or FULL (with `reel-render`'s cut, manifest and shapes files and Slice 3's
+  hold and labels files, 33). Afterwards: no record, `.artifacts/` empty, the fingerprints unchanged, no runner fault.
+
+  | check | breaks                                                                                                                                                                                     | caught by                                         |
+  | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+  | none  | **control** c0: a comment in the still-hold branch                                                                                                                                         | nothing                                           |
+  | 16    | 16a two takes allowed; 16b no reason allowed; 16c the still-hold branch loose; 16d the clip branch loose; 16e a take id not typed `never`; 16f a clip shot's `stillHold` not typed `never` | 16 each (16a, 16b, 16f typecheck too)             |
+  | 16    | 16g the schema's push optional                                                                                                                                                             | nothing: typecheck alone                          |
+  | 17    | 17c the probe made up, not read off the row; 17e the push from the wrong setting                                                                                                           | 17, 20                                            |
+  | 17    | 17d the push fixed at 1 in the manifest                                                                                                                                                    | 17, 18, 20                                        |
+  | 17    | 17f the verdicts its picture's alone; 17g its takes' alone; 17h another reason; 17k the clip's conform notes reused; 17l the takes out of the ladder's order                               | 17 each (17f, 17k typecheck too)                  |
+  | 17    | 17a the still-hold shot dropped; 17b the still-hold shots put at the end; 17i the path the picture's id; 17j `readRenderInputs` reading none; 17m its shot read off the next picture's row | 19, 17, 18, 20 (17b, 17j typecheck too)           |
+  | 18    | 18a `zoompan` given a `d` that is not the span's; 18c given no rate; 18d the push fixed at 1 in the pass; 18e the zoom not centred; 18l the stand-in's border unpainted                    | 18, 20 (18d typecheck too)                        |
+  | 18    | 18b `zoompan` given no output size; 18i a held shot's sound taken from its clip; 18k its picture read from the narration's place among the inputs                                          | 19, 17, 18, 20                                    |
+  | 18    | 18f the picture neither scaled nor padded                                                                                                                                                  | 20                                                |
+  | 18    | 18j the narration not mixed over the silence                                                                                                                                               | 37, 38, 41, 29, 30, 19, 14, 17, 18, 20; typecheck |
+  | 18    | 18g the picture's aspect not kept; 18h the silence lowered by the duck; 18m the stand-in's border four pixels                                                                              | nothing                                           |
+  | 19    | 19a the still-holds before the stills'; 19b after the holds'; 19c left out; 19e the record's order; 19f the hold's reason worded as a still-hold's                                         | 19 each                                           |
+  | 19    | 19d a still-hold written as a hold row as well                                                                                                                                             | 19, 13, 14, 17, 18, 20; typecheck                 |
+  | 37    | 37b the assembler reading a held shot's geometry off the profile                                                                                                                           | 37, 20                                            |
+  | 37    | 37a check 37's own expectation replaced by one derived from what it reads                                                                                                                  | nothing                                           |
+
+- **Caught by nothing that a check's words promise: none.** Each said plainly:
+  - **16g** — the push optional in the schema: typecheck refuses it, since the schema then no longer satisfies
+    `z.ZodType<RenderManifest>`; check 16's words name the reason, the three takes and the clip fields, not the push.
+  - **18g** — the picture stretched rather than fitted: **every fixture profile is 9:16 (108 × 192) and the stand-in's
+    picture is 9:16 (90 × 160)**, so a stretch and a fit are the same numbers. Nothing here can tell them apart, and
+    check 18's words are the span, the colour, the border, the tone and the frame count.
+  - **18h** — the silence lowered by the duck: **no measurement can tell**, since silence at any gain is silence.
+  - **18m** — the stand-in's border four pixels rather than two: at the test profile a push to 1.1 crops **4.9** output
+    pixels from each side and a 4-pixel border is 4.8 of them, so check 18's clause stays true. S-097's "2 pixels" is
+    measured at the stand-in's own 90.
+  - **37a** — a break of check 37's own expectation, which only review catches, as it would of any check's text.
+- **Choices.** **S-104** — the schema refuses by branch; rejected: one object of optional fields with a `superRefine`
+  (a pair nobody writes is accepted, S-014), a `kind` field (S-097 rejected it), the refusal left to the builder.
+  **S-105** — a held shot's conform notes; rejected: reusing `conformNotes` (a frame-rate note for a conversion that
+  never happens), no notes at all, a note naming `zoompan`. **Not recorded**, nothing rejected could be caught: the
+  picture taking its clip's place among the pass's inputs rather than being appended (the graph's labels are the shot's
+  index either way, and break 18k shows a picture read from the wrong input is caught); and where a held shot's frames
+  come from, since the span **is** its narration's and the two cannot disagree.
+- **A fixture count, wrong at first.** `reel-render-shapes.test.ts` holds 2 tests, not the 5 my first break list said,
+  so every FULL run reported a runner fault. The counts were corrected and all twelve FULL breaks were run again: every
+  caught-by list was the same, and the counts then matched.
+- `node scripts/check.mjs`: **everything green, 339 tests** by the TAP count; checks 16–20 pass by number (7 tests), and
+  1–15 (44) with every moved `reel-render` check. The suite ran 231 s.
+
+**Next.** `reel-takes` Slice 5 — a restart picks up where it stopped: checks 21–24. `readClipsInputs`' kept work, the
+stage skipping it and numbering after it, `readRenderInputs` reading each shot's finished and accepted rows and
+`renderManifest` refusing two of either, `reel-render`'s check 48 as S-099 says. Carried: check 22 reading the
+`still_hold` row's attempt (session 32's break 14q); check 4's second restart onto checkpoints (S-100); the narration
+guard's every-send rule (S-101); the access violation seen once in session 32, not seen again. Owed outside this
+repository, unchanged: S-068, S-073, S-029, S-033.

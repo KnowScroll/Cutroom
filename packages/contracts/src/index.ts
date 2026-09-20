@@ -58,10 +58,12 @@ export type {
   AssembledFile,
   AssemblerPort,
   Caption,
+  ClipShot,
   CutVerdict,
   GateProfile,
   OutputProfile,
   RenderManifest,
   RenderShot,
+  StillHoldShot,
 } from './render.ts'
 export type { PlanSettings, RenderSettings, StillsSettings } from './settings.ts'

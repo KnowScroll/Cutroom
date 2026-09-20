@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import type { RenderManifest, RenderShot } from '@cutroom/contracts'
+import type { ClipShot, RenderManifest } from '@cutroom/contracts'
 import { clipObservation, renderManifestSchema, witnessObservation } from '@cutroom/pipeline'
 import { entity, observation } from './engine/stills.ts'
 
@@ -95,7 +95,7 @@ test("4. the clip observation schema requires actions, eventOrder and clippedByE
 
 // ---------------------------------------------------------------- 5
 
-const probe = (): RenderShot['clip'] => ({
+const probe = (): ClipShot['clip'] => ({
   readable: true,
   durationSeconds: 8,
   video: { codec: 'h264', width: 144, height: 256, fps: 24, frames: 192 },
@@ -103,7 +103,9 @@ const probe = (): RenderShot['clip'] => ({
   moovFirst: true,
 })
 
-function shot(unit: number, opening: RenderShot['opening'], startFrame: number): RenderShot {
+// A render shot is a clip shot or a still-hold shot (S-097): this builder makes the first, so its
+// opening is a CLIP shot's, which a still-hold shot has none of. Types only; no assertion changes.
+function shot(unit: number, opening: ClipShot['opening'], startFrame: number): ClipShot {
   return {
     shotId: `shot-${unit}`,
     joinMode: 'cut',

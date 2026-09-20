@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type {
   Caption,
+  ClipShot,
   MediaProbe,
   NarrationRecord,
   OutputProfile,
@@ -8,9 +9,12 @@ import type {
   RenderManifest,
   RenderSettings,
   RenderShot,
+  StillHold,
+  StillHoldShot,
   TakeRecord,
 } from '@cutroom/contracts'
 import type { SubmitRequest } from '@cutroom/reel-contract'
+import { TAKES_A_SHOT } from '../clips/ladder.ts'
 import { shotIdOf } from '../stills/place.ts'
 
 // The render manifest (docs/features/reel-render.md, Gate 2 "The render manifest" and "Spans, trims
@@ -51,25 +55,15 @@ const opening = z.union([
   }),
 ])
 
-const shot = z.strictObject({
+const span = {
   shotId: z.string().min(1),
   /** Required on every shot (D-036, S-067). */
   joinMode: z.literal('cut'),
-  takeId: z.string().min(1),
-  requestId: z.string(),
-  expandedPrompt: z.string(),
-  clipPath: z.string().min(1),
-  opening,
   narrationId: z.string().min(1),
   narrationPath: z.string().min(1),
   words: z.array(z.strictObject({ word: z.string(), startMs: count, endMs: count })),
-  clip: probe,
   startFrame: count,
   frames: count,
-  pictureFrames: count,
-  hold: z
-    .strictObject({ frames: count, seconds: z.number().nonnegative(), reason: z.string().min(1) })
-    .nullable(),
   conform: z.array(z.string()),
   verdicts: z.array(
     z.strictObject({
@@ -78,7 +72,47 @@ const shot = z.strictObject({
       coverage: z.unknown(),
     }),
   ),
+}
+
+/** reel-render's shot: its accepted take's clip (S-073). */
+const clipShot = z.strictObject({
+  ...span,
+  takeId: z.string().min(1),
+  requestId: z.string(),
+  expandedPrompt: z.string(),
+  clipPath: z.string().min(1),
+  opening,
+  clip: probe,
+  pictureFrames: count,
+  hold: z
+    .strictObject({ frames: count, seconds: z.number().nonnegative(), reason: z.string().min(1) })
+    .nullable(),
 })
+
+/**
+ * A shot held on its chosen picture at its take cap (D-025 rung 2, S-090, S-097). Strict, so a
+ * still-hold shot carrying ANY clip field is refused by the branch itself; its `degradation` is
+ * required and not empty — D-059's check, which S-073 left to `reel-takes` — and its takes are
+ * exactly the three its ladder consumed.
+ */
+const stillHoldShot = z.strictObject({
+  ...span,
+  stillHold: z.strictObject({
+    pictureId: z.string().min(1),
+    path: z.string().min(1),
+    probe,
+    takeIds: z.array(z.string().min(1)).length(TAKES_A_SHOT),
+    degradation: z.string().min(1),
+    endZoom: z.number().positive(),
+  }),
+})
+
+/**
+ * A shot is ONE OF TWO BRANCHES, never one object of optional fields (S-104): a clip shot with no
+ * `stillHold`, or a still-hold shot with no clip field. Each branch is strict, so a clip shot
+ * carrying a `stillHold` and a still-hold shot carrying a take id are refused by construction.
+ */
+const shot = z.union([clipShot, stillHoldShot])
 
 export const renderManifestSchema: z.ZodType<RenderManifest> = z
   .strictObject({
@@ -137,13 +171,15 @@ export interface RenderInput {
   plan: Plan
   request: SubmitRequest
   /** The chosen pictures, each with the verdicts that approved it: Gate 1, and Gate 1S where it ran. */
-  stills: ReadonlyArray<{ pictureId: string; shotUnit: number; verdicts: RenderShot['verdicts'] }>
+  stills: ReadonlyArray<{ pictureId: string; shotUnit: number; verdicts: ClipShot['verdicts'] }>
   /** The stills stage's degradations, in the order reached. */
   degradations: ReadonlyArray<{ shotId: string; reason: string }>
   /** The finishing clips attempt's takes, one accepted a shot. */
   takes: readonly TakeRecord[]
   /** The same attempt's narrations. */
   narrations: readonly NarrationRecord[]
+  /** The shots held on their chosen pictures, in the order the ladders reached them (S-098). */
+  stillHolds: readonly StillHold[]
   ledger: RenderManifest['ledger']
 }
 
@@ -188,14 +224,53 @@ function conformNotes(clip: MediaProbe, profile: OutputProfile): string[] {
 }
 
 /**
- * Builds a run's render manifest from its rows (S-073): every shot of the selected plan in plan order,
- * none removed (I-12), each with its take, its opening, its narration and timings, the clip's measured
- * facts, its span — its measured narration in frames, rounded up, starting where the shot before ends
- * — the picture frames used and its hold, its conform notes, and every verdict decided before
- * assembly; then the captions in reel time, one a narrated word, offset by its shot's start.
+ * What the conform does to a HELD SHOT'S PICTURE that is worth a note (D-055, S-097, S-105): the pad,
+ * read from the picture's own probe as a clip's is from its measured facts, and the silence — a
+ * picture has no sound. NO FRAME-RATE NOTE: nothing is converted, because `zoompan` MAKES the span's
+ * frames at the profile's rate from the one picture, whatever rate ffprobe reports of a PNG.
+ */
+function stillConformNotes(picture: MediaProbe, profile: OutputProfile): string[] {
+  const notes: string[] = []
+  const video = picture.video
+  if (video !== null && (video.width !== profile.width || video.height !== profile.height)) {
+    const fit = Math.min(profile.width / video.width, profile.height / video.height)
+    const width = Math.min(profile.width, Math.round(video.width * fit))
+    const height = Math.min(profile.height, Math.round(video.height * fit))
+    if (width !== profile.width || height !== profile.height) {
+      notes.push(`pad: ${width}×${height} inside ${profile.width}×${profile.height}`)
+    }
+  }
+  notes.push('silence: the clip has no sound, so silence is added')
+  return notes
+}
+
+/** One caption a narrated word, from its start to its end, offset by its shot's start (D-008). */
+function pushCaptions(
+  captions: Caption[],
+  words: ReadonlyArray<{ word: string; startMs: number; endMs: number }>,
+  startFrame: number,
+  fps: number,
+): void {
+  const startMs = Math.round((startFrame * 1000) / fps)
+  for (const word of words) {
+    captions.push({ text: word.word, startMs: startMs + word.startMs, endMs: startMs + word.endMs })
+  }
+}
+
+/**
+ * Builds a run's render manifest from its rows (S-073, S-097): every shot of the selected plan in
+ * plan order, none removed (I-12), each with its narration and timings and its span — its measured
+ * narration in frames, rounded up, starting where the shot before ends — its conform notes and every
+ * verdict decided before assembly; then the captions in reel time, one a narrated word, offset by its
+ * shot's start.
  *
- * It THROWS on rows that cannot make one — a shot with no accepted take, a narration never measured —
- * and on a manifest its own schema refuses; the worker fails the run.
+ * A shot is ONE OF TWO KINDS. A shot its ladder HELD on its chosen picture carries that picture's id,
+ * path and stored probe, its three takes, its reason and the push, and no take, opening, clip
+ * measure, picture frames or hold; every other shot carries its accepted take's clip, its opening,
+ * the picture frames used and its hold.
+ *
+ * It THROWS on rows that cannot make one — a shot neither held nor accepted, a narration never
+ * measured — and on a manifest its own schema refuses; the worker fails the run.
  */
 export function renderManifest(input: RenderInput, settings: RenderSettings): RenderManifest {
   const { profile } = settings
@@ -206,22 +281,74 @@ export function renderManifest(input: RenderInput, settings: RenderSettings): Re
   for (const planned of input.plan.shots) {
     const unit = planned.unit
     const shotId = shotIdOf(unit)
-    const take = input.takes.filter((t) => t.shotUnit === unit && t.outcome === 'accept').at(-1)
-    if (take === undefined) throw new Error(`${shotId} has no accepted take to render`)
-    if (take.probe === null || take.probe.video === null) {
-      throw new Error(`${shotId}'s take ${take.takeId} was never measured as a clip`)
-    }
     const narration = input.narrations.filter((n) => n.shotUnit === unit).at(-1)
     if (narration === undefined) throw new Error(`${shotId} has no narration to render`)
     if (narration.probe === null || narration.words === null) {
       throw new Error(`${shotId}'s narration ${narration.narrationId} was never measured and timed`)
     }
 
+    // The span is the narration's (S-073), whichever kind of shot this is.
+    const frames = framesUp(narration.probe.durationSeconds, profile.fps)
+    if (frames < 1) throw new Error(`${shotId}'s narration ${narration.narrationId} has no length`)
+    const still = input.stills.find((s) => s.shotUnit === unit)
+    const span = {
+      shotId,
+      joinMode: 'cut' as const,
+      narrationId: narration.narrationId,
+      narrationPath: narration.path,
+      words: narration.words.map((w) => ({ ...w })),
+      startFrame,
+      frames,
+    }
+
+    // A SHOT HELD ON ITS CHOSEN PICTURE at its take cap (D-025 rung 2, S-090, S-097): no take, no
+    // opening, no clip. Its geometry comes off THE PROBE THE CLIPS STAGE STORED when it held the
+    // shot — never taken again here — as a clip's comes off its measured facts (D-055, I-17); its
+    // verdicts are its picture's, then its three takes' in the order its ladder consumed them.
+    const held = input.stillHolds.find((h) => h.shotUnit === unit)
+    if (held !== undefined) {
+      if (held.probe.video === null) {
+        throw new Error(`${shotId}'s picture ${held.pictureId} was never measured as a picture`)
+      }
+      const takes = held.takeIds.map((takeId) => {
+        const of = input.takes.find((t) => t.takeId === takeId)
+        if (of === undefined)
+          throw new Error(`${shotId} is held on takes it has no row for: ${takeId}`)
+        return of
+      })
+      const shot: StillHoldShot = {
+        ...span,
+        stillHold: {
+          pictureId: held.pictureId,
+          path: held.path,
+          probe: held.probe,
+          takeIds: [...held.takeIds],
+          degradation: held.reason,
+          endZoom: settings.stillPush.endZoom,
+        },
+        conform: stillConformNotes(held.probe, profile),
+        verdicts: [...(still?.verdicts ?? []), ...takes.flatMap((t) => t.verdicts)].map((v) => ({
+          gate: v.gate,
+          outcome: v.outcome,
+          coverage: v.coverage,
+        })),
+      }
+      shots.push(shot)
+      pushCaptions(captions, narration.words, startFrame, profile.fps)
+      startFrame += frames
+      continue
+    }
+
+    const take = input.takes.filter((t) => t.shotUnit === unit && t.outcome === 'accept').at(-1)
+    if (take === undefined) throw new Error(`${shotId} has no accepted take to render`)
+    if (take.probe === null || take.probe.video === null) {
+      throw new Error(`${shotId}'s take ${take.takeId} was never measured as a clip`)
+    }
+
     // The opening: its chosen picture; words alone because its picture was degraded, with the
     // reason; or words alone because the plan gave it none, with no reason (D-027, D-050).
-    const still = input.stills.find((s) => s.shotUnit === unit)
     const degradation = input.degradations.find((d) => d.shotId === shotId)
-    let opening: RenderShot['opening']
+    let opening: ClipShot['opening']
     if (still !== undefined) {
       if (take.mode !== 'image-to-video' || take.pictureId !== still.pictureId) {
         throw new Error(`${take.takeId} was not made from ${shotId}'s chosen picture`)
@@ -237,37 +364,29 @@ export function renderManifest(input: RenderInput, settings: RenderSettings): Re
           : { kind: 'text-to-video', placed: true, degradation: degradation.reason }
     }
 
-    // The span is the narration's (S-073). A clip with at least that many frames is trimmed at the
-    // tail, the ordinary case; one with fewer holds its last frame for the rest (I-4).
-    const frames = framesUp(narration.probe.durationSeconds, profile.fps)
-    if (frames < 1) throw new Error(`${shotId}'s narration ${narration.narrationId} has no length`)
+    // A clip with at least the span's frames is trimmed at the tail, the ordinary case; one with
+    // fewer holds its last frame for the rest (I-4).
     const pictureFrames = Math.min(frames, framesAt(take.probe.video, profile.fps))
     if (pictureFrames < 1) throw new Error(`${shotId}'s take ${take.takeId} has no frame to show`)
-    const held = frames - pictureFrames
-    const seconds = Math.round((held / profile.fps) * 1000) / 1000
+    const holdFrames = frames - pictureFrames
+    const seconds = Math.round((holdFrames / profile.fps) * 1000) / 1000
     const hold =
-      held === 0
+      holdFrames === 0
         ? null
         : {
-            frames: held,
+            frames: holdFrames,
             seconds,
             reason: `${take.takeId} gives ${pictureFrames} frames of picture at ${profile.fps} a second and its narration spans ${frames}: its last frame is held for ${seconds} s (S-073)`,
           }
 
     shots.push({
-      shotId,
-      joinMode: 'cut',
+      ...span,
       takeId: take.takeId,
       requestId: take.requestId,
       expandedPrompt: take.expandedPrompt,
       clipPath: take.path,
       opening,
-      narrationId: narration.narrationId,
-      narrationPath: narration.path,
-      words: narration.words.map((w) => ({ ...w })),
       clip: take.probe,
-      startFrame,
-      frames,
       pictureFrames,
       hold,
       conform: conformNotes(take.probe, profile),
@@ -279,14 +398,7 @@ export function renderManifest(input: RenderInput, settings: RenderSettings): Re
     })
 
     // One caption a narrated word, from its start to its end, offset by its shot's start (D-008).
-    const startMs = Math.round((startFrame * 1000) / profile.fps)
-    for (const word of narration.words) {
-      captions.push({
-        text: word.word,
-        startMs: startMs + word.startMs,
-        endMs: startMs + word.endMs,
-      })
-    }
+    pushCaptions(captions, narration.words, startFrame, profile.fps)
     startFrame += frames
   }
 

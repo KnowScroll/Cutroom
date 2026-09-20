@@ -841,7 +841,7 @@ _Endings, and no secrets_
       yet made of a held shot: `renderManifest` fails such a run _"has no accepted take to render"_ — `reel-render`'s own
       fault, which no check of this slice asserts, and Slice 4 replaces.
       **Proves: 13, 14, 15.**
-- [ ] **Slice 4 — the still-hold, rendered.** `RenderShot` as `ClipShot | StillHoldShot` and the manifest's schema; the
+- [x] **Slice 4 — the still-hold, rendered.** `RenderShot` as `ClipShot | StillHoldShot` and the manifest's schema; the
       manifest's still-hold shot from its `still_hold` row and the probe it holds; `readRenderInputs` with the
       still-holds; the assembler, the assemble job and `cutReel` taking both kinds of shot — the pass's picture input,
       `zoompan` and silence; the stand-in picture's 2-pixel border; the completed result's order of `degradations`;

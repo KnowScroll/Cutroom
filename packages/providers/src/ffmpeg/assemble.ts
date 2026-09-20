@@ -1,6 +1,13 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
-import type { AssemblerPort, Caption, RenderManifest, RenderShot } from '@cutroom/contracts'
+import type {
+  AssemblerPort,
+  Caption,
+  ClipShot,
+  RenderManifest,
+  RenderShot,
+  StillHoldShot,
+} from '@cutroom/contracts'
 import { DEFAULT_ARTIFACT_ROOT, artifactPath } from '../artifacts.ts'
 import type { FfmpegTools, PassFilter } from './tools.ts'
 
@@ -15,6 +22,12 @@ import type { FfmpegTools, PassFilter } from './tools.ts'
 // setting and no network, and it never measures a clip — a clip's geometry, frame rate, sample rate
 // and channels come from the shot's measured facts in the manifest (D-055), which a video request
 // carries none of.
+//
+// A SHOT IS ONE OF TWO KINDS (S-097). A clip shot reads its take's clip. A STILL-HOLD SHOT reads its
+// chosen picture's file in place of one, conformed from THAT PICTURE'S OWN PROBE — the second
+// measured source the manifest carries — then pushed in by `zoompan`, which makes exactly the span's
+// frames from the one picture; its sound is silence for the span, lowered by nothing, with its
+// narration mixed over it. Both kinds are joined by the same `concat` filter in the one filtergraph.
 
 export type FfmpegAssembler = AssemblerPort & {
   /** Every render manifest the assembler was handed, in order — including one it refused. */
@@ -81,7 +94,7 @@ function subtitles(renderManifest: RenderManifest): string {
  * One shot's picture: conformed to the profile from its measured facts, then trimmed to the frames
  * its span uses and, where those are fewer than the span, its last frame held for the rest.
  */
-function pictureOf(shot: RenderShot, input: number, profile: RenderManifest['profile']): string {
+function pictureOf(shot: ClipShot, input: number, profile: RenderManifest['profile']): string {
   const video = shot.clip.video
   if (video === null) throw new Error(`${shot.takeId} was measured with no video stream`)
   const steps: string[] = []
@@ -109,9 +122,56 @@ function pictureOf(shot: RenderShot, input: number, profile: RenderManifest['pro
 }
 
 /**
+ * A HELD SHOT'S PICTURE (D-025 rung 2, S-097): its file, conformed to the profile from its own probe
+ * exactly as a clip is from its measured facts — scaled to fit keeping its aspect, padded, square
+ * pixels — and then `zoompan`, which makes EXACTLY the span's frames from that one picture at the
+ * profile's rate, zooming from 1 at the first to `endZoom` at the last, centred. Its `s` and `fps`
+ * are given: zoompan's own defaults are 720p at 25, which would join no other shot.
+ */
+function stillOf(shot: StillHoldShot, input: number, profile: RenderManifest['profile']): string {
+  const video = shot.stillHold.probe.video
+  if (video === null) throw new Error(`${shot.stillHold.pictureId} was measured with no picture`)
+  const steps: string[] = []
+  if (video.width !== profile.width || video.height !== profile.height) {
+    const fit = Math.min(profile.width / video.width, profile.height / video.height)
+    const width = Math.min(profile.width, Math.round(video.width * fit))
+    const height = Math.min(profile.height, Math.round(video.height * fit))
+    steps.push(filter('scale', `${width}:${height}`))
+    if (width !== profile.width || height !== profile.height) {
+      const x = Math.floor((profile.width - width) / 4) * 2
+      const y = Math.floor((profile.height - height) / 4) * 2
+      steps.push(filter('pad', `${profile.width}:${profile.height}:${x}:${y}:black`))
+    }
+  }
+  steps.push(filter('setsar', '1'))
+  steps.push(filter('format', 'yuv420p'))
+  // `on` is the output frame, 0 at the first and frames - 1 at the last; one frame holds zoom 1.
+  const { endZoom } = shot.stillHold
+  const zoom = shot.frames > 1 ? `1+(${endZoom}-1)*on/${shot.frames - 1}` : '1'
+  steps.push(
+    filter(
+      'zoompan',
+      [
+        `z=${zoom}`,
+        `d=${shot.frames}`,
+        'x=iw/2-(iw/zoom/2)',
+        'y=ih/2-(ih/zoom/2)',
+        `s=${profile.width}x${profile.height}`,
+        `fps=${profile.fps}`,
+      ].join(':'),
+    ),
+  )
+  steps.push(filter('setsar', '1'))
+  return `[${input}:v]${steps.join(',')}`
+}
+
+/**
  * One shot's sound: its clip's, fitted to the span — silence where it has none — and lowered by the
  * duck level for the whole span, since the narration fills every span (D-008); its narration, fitted
  * to the span; and the two summed. Exactly the span's samples, so the join never drifts.
+ *
+ * A HELD SHOT has no clip, so its sound is SILENCE for the span, lowered by nothing (S-097), with
+ * its narration mixed over it: the voice stays in sync because the span is exact.
  */
 function soundOf(
   shot: RenderShot,
@@ -128,9 +188,10 @@ function soundOf(
     filter('atrim', `end_sample=${samples}`),
     filter('apad', `whole_len=${samples}`),
   ].join(',')
+  const silence = `${filter('anullsrc', `r=${profile.sampleRate}:cl=${layout}`)},${filter('atrim', `end_sample=${samples}`)}`
   const clip =
-    shot.clip.audio === null
-      ? `${filter('anullsrc', `r=${profile.sampleRate}:cl=${layout}`)},${filter('atrim', `end_sample=${samples}`)}`
+    shot.stillHold !== undefined || shot.clip.audio === null
+      ? silence
       : `[${index * 2}:a]${fitted},${filter('volume', `-${duckDb}dB`)}`
   return {
     graph: [
@@ -164,7 +225,11 @@ export function ffmpegAssembler(
       const graph: string[] = []
       const joined: string[] = []
       shots.forEach((shot, index) => {
-        graph.push(`${pictureOf(shot, index * 2, profile)}[v${index}]`)
+        const seen =
+          shot.stillHold === undefined
+            ? pictureOf(shot, index * 2, profile)
+            : stillOf(shot, index * 2, profile)
+        graph.push(`${seen}[v${index}]`)
         const sound = soundOf(shot, index, renderManifest)
         graph.push(...sound.graph)
         joined.push(`[v${index}]`, sound.out)
@@ -179,7 +244,14 @@ export function ffmpegAssembler(
         '-hide_banner',
         '-nostdin',
         '-y',
-        ...shots.flatMap((shot) => ['-i', shot.clipPath, '-i', shot.narrationPath]),
+        // A held shot's picture takes its clip's place among the inputs, so every shot still has
+        // its own pair and the graph's labels stay the shot's index (S-097).
+        ...shots.flatMap((shot) => [
+          '-i',
+          shot.stillHold === undefined ? shot.clipPath : shot.stillHold.path,
+          '-i',
+          shot.narrationPath,
+        ]),
         '-filter_complex',
         graph.join(';'),
         '-map',

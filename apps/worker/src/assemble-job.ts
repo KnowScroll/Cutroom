@@ -107,7 +107,7 @@ export async function runAssembleJob(
   // A hold's four labels are written with whatever ending the job reaches (S-058's form): they are
   // facts of the manifest, decided before the pass ran.
   const holds: HeldShot[] = built.shots.flatMap((shot) =>
-    shot.hold === null
+    shot.stillHold !== undefined || shot.hold === null
       ? []
       : [
           {
@@ -138,7 +138,8 @@ export async function runAssembleJob(
   if (outcome.kind === 'completed' && outcome.assembled !== null) {
     // The stage produced its output, so it finished (S-025, S-069). The stills are the chosen
     // pictures, in shot order, at the paths their rows record; the degradations are the stills
-    // stage's in the order reached, then the holds' in shot order.
+    // stage's in the order reached, THEN THE STILL-HOLDS' in the order their ladders reached them,
+    // then this render's holds in shot order (S-098). A still-hold is not a hold (S-073).
     const inputs = readClipsInputs(db, runId)
     finishVideo(db, {
       runId,
@@ -159,6 +160,10 @@ export async function runAssembleJob(
         video: { path: outcome.assembled.path },
         degradations: [
           ...rows.degradations,
+          ...rows.stillHolds.map((held) => ({
+            shotId: shotIdOf(held.shotUnit),
+            reason: held.reason,
+          })),
           ...holds.map((held) => ({ shotId: held.shotId, reason: held.reason })),
         ],
       },

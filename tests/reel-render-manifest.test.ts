@@ -71,6 +71,8 @@ function rows(over: { narrations?: number[]; clips?: number[] } = {}) {
       takeRow(2, clips[2] ?? 5, { degraded: true }),
     ],
     narrations: WORDS.map((words, unit) => narrationRow(unit, narrations[unit] ?? 0, words)),
+    // No shot of this fixture is held on its picture: a still-hold shot is reel-takes' (S-097, S-099).
+    stillHolds: [],
     ledger: { imageCents: 12, narrationCents: 1, videoCents: 30 },
   }
 }
@@ -236,9 +238,15 @@ test("29. a completed run's render manifest holds every shot of the selected pla
     assert.deepEqual(manifest.ledger, { imageCents: 6, narrationCents: 2, videoCents: 4 })
     assert.equal(manifest.totalFrames, TOTAL)
 
-    // Every path is absolute, under the artifact root, and no string in it is a URL.
+    // Every path is absolute, under the artifact root, and no string in it is a URL. A shot names
+    // its clip or, where it is held on its picture, that picture (S-097, S-099): types only here,
+    // since no shot of this fixture is held.
     for (const shot of manifest.shots) {
-      for (const path of [shot.clipPath, shot.narrationPath]) {
+      const named =
+        shot.stillHold === undefined
+          ? [shot.clipPath, shot.narrationPath]
+          : [shot.stillHold.path, shot.narrationPath]
+      for (const path of named) {
         assert.ok(isAbsolute(path), `${path} is not absolute`)
         const inside = relative(engine.artifactRoot, path)
         assert.ok(!inside.startsWith('..') && !isAbsolute(inside), `${path} is outside the root`)
