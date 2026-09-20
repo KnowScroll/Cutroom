@@ -578,6 +578,7 @@ Every check appears in exactly one slice: 7 + 7 + 21 + 9 + 3 = 47.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-20 journey=PASS at 153fb37 — every check green; 50 tests in tests/reel-plan-*.test.ts pass
 - 2026-09-19 journey=PASS at 97f139c — every check green; 50 tests in tests/reel-plan-*.test.ts pass
 - 2026-09-16 journey=PASS at d5060a2 — every check green; 50 tests in tests/reel-plan-*.test.ts pass
 - 2026-09-15 journey=PASS at 915312d — every check green; 50 tests in tests/reel-plan-*.test.ts pass
