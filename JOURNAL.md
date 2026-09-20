@@ -3391,3 +3391,40 @@ the `reel-takes` journey and the `reel-render`, `reel-stills`, `reel-plan` and `
 Carried: the narration guard's every-send rule, checked by nothing (S-101); `reel-render`'s check 50 child's margin
 under its 300-second bound, with six more restart runs now in the suite; the access violation seen once in session 32,
 not seen since. Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.
+
+## 2026-09-20 — session 34, continued: the prompt for reel-takes' Slice 6
+
+**Intent.** The owner asked for the next slice's prompt.
+
+**Changed.**
+
+- **`PROMPTS/035-reel-takes-slice-6.md`** — session 35's prompt, `Run: not yet`: Slice 6 only, checks 25 and 26, then
+  the five journeys. It names what to read (sessions 34, 33 and **28** — `reel-render`'s own Slice 6, which is the
+  shape of this one; Gate 1 in full, Gate 2's "Events and endings", Gate 3's checks 25 and 26, Gate 4's Slice 6; S-069
+  as the spine, then S-094, S-098, S-092, S-106, S-096, S-095, S-087, S-090, S-028, S-075, S-016, S-099, and D-020,
+  D-015, D-097, D-100), the two tests whose form it copies — `tests/reel-render-endings.test.ts` and
+  `tests/reel-render-secrets.test.ts` — and `scripts/journey.mjs`' refusals. It says plainly that **check 25 is green
+  before this slice's code**, by Gate 4's own words, so the break campaign is what shows each of its six endings can
+  fail; it asks for check 26's child to be **measured before it is bounded**, with `reel-render`'s check 50 child
+  measured beside it, since two PATH-alone children now run in one suite; and it ends with the five journeys, each on
+  a clean tree and committed on its own, with no Evidence, Status or Divergence ever typed by hand. Indexed in
+  `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Slice 6 is next, and it is the last** (Gate 4): every ending's events, the child with PATH alone, the re-runs of
+  1–24, then the `reel-takes` journey and the `reel-render`, `reel-stills`, `reel-plan` and `reel-contract` journeys
+  again (S-099). `reel-takes` today holds **19 test files and 59 tests**; check 26's child will run every one of them
+  but its own, six restart runs among them.
+- **`docs/STATUS.md` is the prompt's first step.** It is still untracked, nothing in this repository writes it, and
+  `journey.mjs` refuses on any non-empty `git status --porcelain` — so every journey of Slice 6 would refuse while it
+  sits there. The prompt has session 35 ask the owner what it is and what to do with it, with a recommended option,
+  and forbids deciding for them. Session 19 hit the same thing with `nextPrompt.txt`, and the owner chose then too.
+- **Checked what already exists**, so the prompt does not ask for it twice: `tests/reel-takes-endings.test.ts` and
+  `tests/reel-takes-secrets.test.ts` do not exist; `reel-takes.md`'s four gates are approved and its `Status: planned`
+  is the journey's to change; its Evidence section is empty and its Divergence reads `none`. The next free S-number is
+  S-107.
+- Nothing but markdown changed; no code check was run beyond `check.mjs --code`.
+
+**Next.** Session 35: run `PROMPTS/035-reel-takes-slice-6.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
