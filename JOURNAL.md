@@ -3213,3 +3213,40 @@ stage skipping it and numbering after it, `readRenderInputs` reading each shot's
 `still_hold` row's attempt (session 32's break 14q); check 4's second restart onto checkpoints (S-100); the narration
 guard's every-send rule (S-101); the access violation seen once in session 32, not seen again. Owed outside this
 repository, unchanged: S-068, S-073, S-029, S-033.
+
+## 2026-09-20 — session 33, continued: the prompt for reel-takes' Slice 5
+
+**Intent.** The owner asked what the next slice is, and for its prompt.
+
+**Changed.**
+
+- **`PROMPTS/034-reel-takes-slice-5.md`** — session 34's prompt, `Run: not yet`: Slice 5 only, checks 21–24, tests
+  first, no journey. It names what to read (sessions 33, 32 and 31; Gate 2's "A restart picks up where it stopped" in
+  full, with the paragraph on the rows a render is read from; Gate 3's `ClipsInput.kept`, `readClipsInputs`,
+  `readRenderInputs` and checks 21–24; S-092 as the slice's spine, then S-089, S-100, S-099's check 48 bullet, S-098,
+  S-094, S-095, S-087, S-076, S-048, S-027, S-062, and D-002, D-024, D-014, D-081, D-015 with I-11 and I-15), what
+  Slice 5 builds and what it does not — no endings sweep, no child-with-PATH test, no journey, no re-run of 1–24
+  (Slice 6) — **the two checks it moves**: `reel-render`'s check 48 as S-099's bullet writes it, and `reel-takes`'
+  check 4's second restart as S-100 says, which is typed for S-076's start-over and goes red the moment checkpoints
+  land. It carries session 32's break **14q** forward by name: the `still_hold` row's attempt, caught by nothing until
+  check 22 holds a shot again after a kill. A break campaign in session 33's form, with the breaks to run and the
+  instruction to **count each test file before writing COUNTS** — session 33's first pass reported a runner fault on
+  every FULL break because one file's count was typed from memory. Indexed in `PROMPTS/README.md` (S-065).
+
+**Observed.**
+
+- **Slice 5 is next** (Gate 4): _a restart picks up where it stopped_ — `readClipsInputs`' kept work; the stage
+  skipping it, numbering after it and re-emitting its verdicts; the cap across attempts, with a shot of three kept
+  failed takes held again with no call; `readRenderInputs` reading each shot's finished narration and accepted take
+  whichever attempt made them, and `renderManifest` refusing two of either for one shot; `reel-render`'s check 48 and
+  `reel-takes`' check 4's second restart moved. Proves 21–24. Then Slice 6: checks 25 and 26, the re-runs of 1–24, the
+  `reel-takes` journey and the four journeys S-099 runs again.
+- **Checked what already exists**, so the prompt does not ask for it twice: `ClipsInputs` has no `kept` and
+  `readClipsInputs` reads the chosen pictures and the degraded shots alone; `readRenderInputs` still filters takes and
+  narrations to the finishing attempt — the filter S-092 replaces — while already returning the still-holds (Slice 4);
+  `renderManifest` takes each shot's **last** accepted take and narration, which is where the new fault goes;
+  `tests/engine/restart.ts` already has `killedMidVideo` and `takenUpVideo`. The next free S-number is S-106.
+- Nothing but markdown changed; no code check was run beyond `check.mjs --code`.
+
+**Next.** Session 34: run `PROMPTS/034-reel-takes-slice-5.md`. Owed outside this repository, unchanged: S-068, S-073,
+S-029, S-033.
