@@ -12,15 +12,19 @@ import {
   takesOf,
   videoRequest,
   videoScript,
+  type Take,
   type Videoed,
 } from './engine/video.ts'
 
 // reel-render, Slice 6 — check 48 (docs/features/reel-render.md): a restart in the clips stage (S-027,
-// S-076, D-081). A clips job whose worker was killed is claimed again when its lease runs out and run
-// from the start: every narration and take is made again and paid for again, under the next attempt's
-// ids. The killed attempt's narrations and takes stay in the tables with the gates each reached — no
-// outcome where one was cut off — and its receipts, files and cost stay, and the guard counts them.
-// The keyframes job before it is not run again.
+// S-092, D-081). A clips job whose worker was killed is claimed again when its lease runs out and run
+// from the start, and ITS STAGE PICKS UP AT WHAT THE FIRST ATTEMPT FINISHED (reel-takes' S-092,
+// superseding S-076's start-over and S-089's attempt filter; moved here as S-099 says, no assertion
+// removed): every narration it finished and every take it decided is kept and not bought again, and
+// the take it cut off is made again under the next attempt's id. The killed attempt's narrations and
+// takes stay in the tables with the gates each reached — no outcome where one was cut off — and its
+// receipts, files and cost stay, and the guard counts them. The keyframes job before it is not run
+// again.
 //
 // THE FIRST WORKER IS HELD AT A TAKE'S WITNESS CALL (S-062's form): the planner's two calls, the stills
 // stage's eight, then two a take, so take k's witness is call 11 + 2k. A take held there has been
@@ -139,7 +143,9 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
     )
     assert.equal(killed.before.job.cost_cents, 10)
 
-    const ran = await takenUpVideo(engine, killed, clipsScript(takes))
+    // The new worker's script answers FROM SHOT 2'S TAKE ON: shots 0 and 1 are kept, so the second
+    // attempt's first model call is the cut-off take's witness (S-092, S-099).
+    const ran = await takenUpVideo(engine, killed, clipsScript(takes.slice(2)))
     const row = renderOf(engine, ran.runId)
 
     // The run completes, with the second attempt's clips and the first attempt's cost.
@@ -156,15 +162,16 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
       degradations: [],
     })
 
-    // Every narration and take made again from the start, and paid for again (S-076) — by the new
-    // worker's stand-ins, under the next attempt's ids.
+    // What the first attempt finished is KEPT and not made again (S-092): the new worker's stand-ins
+    // are asked for the narrations of the shots it never reached, and for the take it cut off — made
+    // again under the next attempt's id — and the takes of those shots.
     assert.deepEqual(
       engine.narration.calls.map((c) => c.narrationId),
-      UNITS.map((u) => N(2, u)),
+      [3, 4, 5].map((u) => N(2, u)),
     )
     assert.deepEqual(
       engine.video.calls.map((c) => c.takeId),
-      UNITS.map((u) => T(2, u)),
+      [2, 3, 4, 5].map((u) => T(2, u)),
     )
 
     // No picture is made again: the keyframes job ran once, its receipts are the ones it wrote, and
@@ -205,7 +212,8 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
       'stage.started for video was written twice',
     )
 
-    // The first attempt's narrations, under attempt-1 ids, measured and timed, beside the second's.
+    // The first attempt's narrations, under attempt-1 ids, measured and timed, beside the second's —
+    // the three shots the first attempt never reached.
     assert.deepEqual(
       ran.narrations.map((n) => [
         n.narration_id,
@@ -217,9 +225,6 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
         [N(1, 0), 1, 18, 9],
         [N(1, 1), 1, 14, 7],
         [N(1, 2), 1, 6, 3],
-        [N(2, 0), 2, 18, 9],
-        [N(2, 1), 2, 14, 7],
-        [N(2, 2), 2, 6, 3],
         [N(2, 3), 2, 6, 3],
         [N(2, 4), 2, 4, 2],
         [N(2, 5), 2, 10, 5],
@@ -240,18 +245,18 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
         [T(1, 0), 1, all.map((g) => `${g} accept`), 'accept'],
         [T(1, 1), 1, all.map((g) => `${g} accept`), 'accept'],
         [T(1, 2), 1, ['2 accept', '3 accept'], null],
-        ...UNITS.map((u) => [T(2, u), 2, all.map((g) => `${g} accept`), 'accept']),
+        ...[2, 3, 4, 5].map((u) => [T(2, u), 2, all.map((g) => `${g} accept`), 'accept']),
       ],
     )
     const cutOff = ran.takes.find((t) => t.take_id === T(1, 2))
     assert.ok(cutOff !== undefined && cutOff.probe !== null && cutOff.scan !== null)
     assert.deepEqual(
       ran.takeObservations.map((o) => o.take_id).sort(),
-      [T(1, 0), T(1, 1), ...UNITS.map((u) => T(2, u))].sort(),
+      [T(1, 0), T(1, 1), ...[2, 3, 4, 5].map((u) => T(2, u))].sort(),
     )
     assert.deepEqual(
       ran.takeReconciliations.map((r) => r.take_id).sort(),
-      [T(1, 0), T(1, 1), ...UNITS.map((u) => T(2, u))].sort(),
+      [T(1, 0), T(1, 1), ...[2, 3, 4, 5].map((u) => T(2, u))].sort(),
     )
 
     // Their receipts are kept, under the same row ids and costs, before the second attempt's.
@@ -269,11 +274,11 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
     assert.deepEqual(ran.videoReceipts.slice(0, 3).map(clip), killed.before.clips)
     assert.deepEqual(
       ran.speechReceipts.slice(3).map((r) => [r.narration_id, r.cost_cents]),
-      UNITS.map((u) => [N(2, u), 0]),
+      [3, 4, 5].map((u) => [N(2, u), 0]),
     )
     assert.deepEqual(
       ran.videoReceipts.slice(3).map((r) => [r.take_id, r.cost_cents]),
-      UNITS.map((u) => [T(2, u), 0]),
+      [2, 3, 4, 5].map((u) => [T(2, u), 0]),
     )
     const firstTakeReceipts = killed.before.receipts.filter((r) => r.take_ids !== '[]')
     assert.deepEqual(
@@ -292,16 +297,20 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
       assert.ok(!firstPaths.has(made.path), `the second attempt wrote over ${made.path}`)
     }
 
-    // The video is the second attempt's: its render was made from that attempt's takes and
-    // narrations, and every frame of the output, measured, carries one of its clips, shot by shot.
+    // The video is made of ROWS FROM BOTH ATTEMPTS, by design (S-092): the first attempt's narration
+    // and take for shots 0 and 1, its narration and the second's take for shot 2, the second's for
+    // shots 3 to 5 — and every frame of the output, measured, carries that shot's clip.
+    const shown = [T(1, 0), T(1, 1), ...[2, 3, 4, 5].map((u) => T(2, u))]
     assert.deepEqual(
       row.renderManifest.shots.map((s) => [s.takeId, s.narrationId]),
-      UNITS.map((u) => [T(2, u), N(2, u)]),
+      [
+        [T(1, 0), N(1, 0)],
+        [T(1, 1), N(1, 1)],
+        [T(2, 2), N(1, 2)],
+        ...[3, 4, 5].map((u) => [T(2, u), N(2, u)]),
+      ],
     )
-    const frames = framesOf(
-      String(row.path),
-      UNITS.map((u) => T(2, u)),
-    )
+    const frames = framesOf(String(row.path), shown)
     assert.equal(frames.length, 696)
     assert.deepEqual(
       STARTS.map((start) => frames[start]),
@@ -312,11 +321,10 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
       assert.equal(shot, expected, `frame ${frame} carries shot ${shot}'s clip, not ${expected}'s`)
     })
 
-    // What a render is built from is the finishing attempt's rows alone (S-076). The run cannot show
-    // it: the manifest takes each shot's last accepted take and narration, and the finishing attempt's
-    // rows are always written last by one worker, so a render made from both attempts' rows is this
-    // same render. Only a late row from a worker whose lease outlasted it could tell the two apart
-    // (reel-plan's known limit), so the rows the render is read from are asked for directly (S-089).
+    // What a render is built from is EACH SHOT'S FINISHED NARRATION AND ACCEPTED TAKE, whichever
+    // attempt made them, and never the take a crash cut off (S-092, superseding S-089's filter). The
+    // run's own output cannot tell that from a filter on the finishing attempt alone, so the rows the
+    // render is read from are asked for directly (S-089's form).
     const db = openDatabase(engine.dbPath)
     try {
       const inputs = readRenderInputs(db, ran.runId)
@@ -325,8 +333,15 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
           takes: inputs.takes.map((t) => t.takeId),
           narrations: inputs.narrations.map((n) => n.narrationId),
         },
-        { takes: UNITS.map((u) => T(2, u)), narrations: UNITS.map((u) => N(2, u)) },
-        "the render is read from rows beside the finishing attempt's",
+        {
+          takes: shown,
+          narrations: [N(1, 0), N(1, 1), N(1, 2), ...[3, 4, 5].map((u) => N(2, u))],
+        },
+        "the render is read from rows beside each shot's finished narration and accepted take",
+      )
+      assert.ok(
+        !inputs.takes.some((t) => t.takeId === T(1, 2)),
+        'the render is read from the take the crash cut off',
       )
       // Every attempt's spend is in its ledger (D-081).
       assert.deepEqual(inputs.ledger, { imageCents: 0, narrationCents: 3, videoCents: 7 })
@@ -341,14 +356,21 @@ test("48. after a worker is killed mid-clips and a new one started, the run comp
 /**
  * One run whose first attempt's shot-0 clip costs 210 — made at 0 + 36, since its 9 seconds are 36 at
  * 4 cents a second — killed at that take's witness, call 11, before any next call; then taken up by a
- * new worker, whose attempt stops for budget under a ceiling of 240 (the plan's estimate is 220). The
- * guard counts what the first attempt spent (S-036, S-076). `made` is what the second attempt makes
- * before its refused call.
+ * new worker, whose attempt stops for budget under `ceiling` (the plan's estimate is 220). The guard
+ * counts what the first attempt spent (S-036, S-092). Shot 0's narration is KEPT, so the second
+ * attempt's first call is that take, made again. `made` is what it makes before its refused call.
  */
 async function budgetStop(
   requestId: string,
+  ceiling: number,
   narrationRateCentsPerCharacter: number,
-  expected: { estimate: number; made: { narrations: string[]; clips: string[] } },
+  expected: {
+    estimate: number
+    made: { narrations: string[]; clips: string[] }
+    script: readonly Take[]
+    takes: Array<[string, string[], string | null]>
+    verdicts: string[]
+  },
 ) {
   const engine = await startEngine({
     worker: false,
@@ -356,7 +378,7 @@ async function budgetStop(
     video: { [T(1, 0)]: { costCents: 210 } },
   })
   try {
-    const killed = await killedMidVideo(engine, videoRequest(requestId, 240), {
+    const killed = await killedMidVideo(engine, videoRequest(requestId, ceiling), {
       script: videoScript(THREE_RANKS, THREE_RANKS_PICS),
       holdAtCall: 11,
       running: 'reel.clips',
@@ -364,7 +386,7 @@ async function budgetStop(
     })
     assert.equal(killed.before.job.cost_cents, 210)
 
-    const ran = await takenUpVideo(engine, killed, clipsScript(takes))
+    const ran = await takenUpVideo(engine, killed, clipsScript([...expected.script]))
     const questioned = existsSync(engine.questionsPath)
     assert.deepEqual(ran.result, {
       contractVersion: 1,
@@ -375,7 +397,7 @@ async function budgetStop(
       reason: 'budget',
       limit: 'ceiling',
       estimateCents: expected.estimate,
-      ceilingCents: 240,
+      ceilingCents: ceiling,
       capCents: 300,
     })
     assert.deepEqual(
@@ -392,16 +414,17 @@ async function budgetStop(
     )
     assert.deepEqual(
       ran.videoReceipts.map((r) => [r.take_id, r.cost_cents]),
-      [[T(1, 0), 210]],
+      [[T(1, 0), 210], ...expected.made.clips.map((id) => [id, 0])],
     )
     assert.deepEqual(
       ran.takes.map((t) => [t.take_id, t.verdicts.map((v) => v.gate), t.outcome]),
-      [[T(1, 0), ['2', '3'], null]],
+      expected.takes,
     )
     assert.deepEqual(described(ran.events), [
       ...PLANNED,
       ...STILLS,
       'stage.started video',
+      ...expected.verdicts,
       'run.finished stopped',
     ])
     assert.deepEqual(
@@ -420,16 +443,27 @@ async function budgetStop(
 }
 
 test("48. when the first attempt's scripted cost leaves the second attempt's next call above the ceiling, the run stops for budget", async () => {
-  // The narration guard: at 0.5 cents a character, shot 0's narration — 82 characters — is 41, so
-  // the second attempt's first call would be 210 + 41 = 251, and is not made.
-  await budgetStop('r48-narration', 0.5, {
-    estimate: 251,
-    made: { narrations: [], clips: [] },
-  })
-  // The clip guard: at the default narration rate of 0, the second attempt's shot-0 narration is 210 +
-  // 0 and is made; its clip would be 210 + 36 = 246, and is not.
-  await budgetStop('r48-clip', 0, {
+  // The clip guard, under a ceiling of 240: shot 0's narration is kept and not spoken again, so the
+  // second attempt's first call is the take the kill cut off, made again — 210 + 36 = 246, and it is
+  // not made. The attempt makes nothing at all.
+  await budgetStop('r48-clip', 240, 0, {
     estimate: 246,
-    made: { narrations: [N(2, 0)], clips: [] },
+    made: { narrations: [], clips: [] },
+    script: [],
+    takes: [[T(1, 0), ['2', '3'], null]],
+    verdicts: [],
+  })
+  // The narration guard, under a ceiling of 250 at 0.5 cents a character: that take is made, 246
+  // being under it; the next narration the attempt needs is shot 1's — 83 characters, 41.5 — which
+  // would be 252, and is not spoken.
+  await budgetStop('r48-narration', 250, 0.5, {
+    estimate: 252,
+    made: { narrations: [], clips: [T(2, 0)] },
+    script: [takes[0] as Take],
+    takes: [
+      [T(1, 0), ['2', '3'], null],
+      [T(2, 0), ['2', '3', '4', '5'], 'accept'],
+    ],
+    verdicts: ['2', '3', '4', '5'].map((gate) => `verdict ${gate} shot-0 accept`),
   })
 })

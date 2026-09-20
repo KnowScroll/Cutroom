@@ -1,4 +1,4 @@
-import { and, eq, max, sql } from 'drizzle-orm'
+import { and, eq, inArray, isNotNull, or, sql, type SQL } from 'drizzle-orm'
 import type {
   ClipObservation,
   ClipReconciliation,
@@ -254,7 +254,7 @@ export function upsertTake(db: Db, runId: string, t: TakeRecord): void {
   )
 }
 
-/** What the clips stage is made from, read from the stills stage's rows. */
+/** What the clips stage is made from, read from the stills stage's rows and its own. */
 export interface ClipsInputs {
   /** The chosen pictures, in shot order, each with Gate 1's recorded observation (D-033). */
   stills: Array<{
@@ -265,7 +265,102 @@ export interface ClipsInputs {
   }>
   /** The shots the stills stage degraded, in the order it reached them (D-050 step 2). */
   degradedShots: number[]
+  /** What earlier attempts finished, which this one keeps and does not make again (S-092). */
+  kept: {
+    /** Every narration an earlier attempt made, measured and timed, in the order made. */
+    narrations: NarrationRecord[]
+    /** Every take an earlier attempt decided — accept or fail — in the order made. */
+    takes: TakeRecord[]
+  }
 }
+
+const parsed = <T>(text: string | null): T | null =>
+  text === null ? null : (JSON.parse(text) as T)
+
+/** A take row's number, which is its number among its shot's decided takes: 1 to 3 (D-024, S-094). */
+function takeNumber(number: number, takeId: string): TakeNumber {
+  if (number === 1 || number === 2 || number === 3) return number
+  throw new Error(`the take ${takeId} is numbered ${number}, and a take is numbered 1 to 3 (S-094)`)
+}
+
+/**
+ * The run's take rows that `where` admits, in the order made, each a whole record: its measures, the
+ * verdicts and outcome its gates left, and the observation and reconciliation it reached.
+ */
+function readTakes(db: Db, runId: string, where: SQL | undefined): TakeRecord[] {
+  const observed = new Map(
+    db
+      .select({ takeId: takeObservation.takeId, observation: takeObservation.observation })
+      .from(takeObservation)
+      .where(eq(takeObservation.runId, runId))
+      .all()
+      .map((row) => [row.takeId, JSON.parse(row.observation) as ClipObservation]),
+  )
+  const reconciled = new Map(
+    db
+      .select()
+      .from(takeReconciliation)
+      .where(eq(takeReconciliation.runId, runId))
+      .all()
+      .map((row) => {
+        const answer = JSON.parse(row.answer) as Pick<ClipReconciliation, 'subjects' | 'criteria'>
+        return [row.takeId, { ...answer, failed: JSON.parse(row.failed) as string[] }] as const
+      }),
+  )
+  return db
+    .select()
+    .from(take)
+    .where(where)
+    .orderBy(sql`rowid`)
+    .all()
+    .map((row): TakeRecord => ({
+      takeId: row.takeId,
+      attempt: row.attempt,
+      shotUnit: row.shotUnit,
+      number: takeNumber(row.number, row.takeId),
+      mode: row.mode,
+      pictureId: row.pictureId,
+      degraded: row.degraded,
+      prompt: row.prompt,
+      durationSeconds: row.requestedSeconds,
+      seed: row.seed,
+      requestId: row.requestId,
+      expandedPrompt: row.expandedPrompt,
+      path: row.path,
+      probe: parsed(row.probe),
+      scan: parsed(row.scan),
+      words: parsed(row.words),
+      sound: parsed(row.sound),
+      observation: observed.get(row.takeId) ?? null,
+      reconciliation: reconciled.get(row.takeId) ?? null,
+      verdicts: JSON.parse(row.verdicts) as TakeRecord['verdicts'],
+      outcome: row.outcome,
+      degradation: row.degradation,
+    }))
+}
+
+/** The run's narration rows that `where` admits, in the order made. */
+function readNarrations(db: Db, where: SQL | undefined): NarrationRecord[] {
+  return db
+    .select()
+    .from(narration)
+    .where(where)
+    .orderBy(sql`rowid`)
+    .all()
+    .map((row): NarrationRecord => ({
+      narrationId: row.narrationId,
+      attempt: row.attempt,
+      shotUnit: row.shotUnit,
+      text: row.text,
+      path: row.path,
+      words: parsed(row.words),
+      probe: parsed(row.probe),
+    }))
+}
+
+/** A narration an earlier attempt FINISHED: made, measured, and its timings parsed (S-092). */
+const finishedNarration = (runId: string) =>
+  and(eq(narration.runId, runId), isNotNull(narration.words), isNotNull(narration.probe))
 
 /**
  * The chosen pictures of a run, with their observations, and its degraded shots. A chosen picture
@@ -306,7 +401,15 @@ export function readClipsInputs(db: Db, runId: string): ClipsInputs {
     .all()
     .map((row) => Number(/^shot-(\d+)$/.exec(row.shotId)?.[1] ?? Number.NaN))
     .filter((unit) => Number.isInteger(unit))
-  return { stills, degradedShots }
+  // What earlier attempts finished, every one's, in the order made (S-092). The clips job reads this
+  // before its stage makes anything, so every row here is an earlier attempt's: a narration it
+  // measured and timed, and a take whose outcome it decided. A take a crash CUT OFF has no outcome,
+  // so it is not kept — it is made again under the next attempt's id, counting against no cap.
+  const kept = {
+    narrations: readNarrations(db, finishedNarration(runId)),
+    takes: readTakes(db, runId, and(eq(take.runId, runId), isNotNull(take.outcome))),
+  }
+  return { stills, degradedShots, kept }
 }
 
 /** What a render manifest is built from, read from the run's rows (S-073). */
@@ -315,9 +418,9 @@ export interface RenderInputs {
   stills: Array<{ pictureId: string; shotUnit: number; verdicts: ClipShot['verdicts'] }>
   /** The stills stage's degradations, in the order it reached them (S-058). */
   degradations: Array<{ shotId: string; reason: string }>
-  /** The finishing clips attempt's takes, in the order made. */
+  /** Each shot's accepted take and each held shot's three, whichever attempt made them (S-092). */
   takes: TakeRecord[]
-  /** The same attempt's narrations. */
+  /** Each shot's finished narration, whichever attempt made it (S-092). */
   narrations: NarrationRecord[]
   /** The shots held on their chosen pictures, in the order the ladders reached them (S-098). */
   stillHolds: StillHold[]
@@ -325,22 +428,17 @@ export interface RenderInputs {
   ledger: RenderManifest['ledger']
 }
 
-const parsed = <T>(text: string | null): T | null =>
-  text === null ? null : (JSON.parse(text) as T)
-
-/** A take row's number, which is its number among its shot's decided takes: 1 to 3 (D-024, S-094). */
-function takeNumber(number: number, takeId: string): TakeNumber {
-  if (number === 1 || number === 2 || number === 3) return number
-  throw new Error(`the take ${takeId} is numbered ${number}, and a take is numbered 1 to 3 (S-094)`)
-}
-
 /**
  * The rows a render manifest is built from, once the clips job has completed (S-073): the chosen
- * pictures with Gate 1's verdict and Gate 1S's where it ran, the stills stage's degradations, THE
- * FINISHING CLIPS ATTEMPT'S takes and narrations — the latest attempt's, since an attempt run again
- * starts over and only the one that finished advanced the run (S-076) — the shots held on their
- * chosen pictures, each with the probe its ladder stored (S-097), and the cost ledger, summed from
- * the three receipt tables.
+ * pictures with Gate 1's verdict and Gate 1S's where it ran, the stills stage's degradations, the
+ * shots held on their chosen pictures each with the probe its ladder stored (S-097), EACH SHOT'S
+ * FINISHED NARRATION AND ACCEPTED TAKE with each held shot's three failed takes — WHICHEVER ATTEMPT
+ * MADE THEM, never a cut-off take or a narration left unfinished, since a job run again picks up at
+ * what an earlier attempt finished (S-092, superseding S-076's start-over and S-089's attempt
+ * filter) — and the cost ledger, summed from the three receipt tables.
+ *
+ * With checkpoints a shot has at most one finished narration and at most one accepted take; rows
+ * holding two of either are refused by `renderManifest`, which names the shot (S-092).
  */
 export function readRenderInputs(db: Db, runId: string): RenderInputs {
   const stills = db
@@ -374,77 +472,6 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
     .orderBy(sql`rowid`)
     .all()
 
-  const finishing =
-    db
-      .select({ attempt: max(take.attempt) })
-      .from(take)
-      .where(eq(take.runId, runId))
-      .get()?.attempt ?? 0
-  const observed = new Map(
-    db
-      .select({ takeId: takeObservation.takeId, observation: takeObservation.observation })
-      .from(takeObservation)
-      .where(eq(takeObservation.runId, runId))
-      .all()
-      .map((row) => [row.takeId, JSON.parse(row.observation) as ClipObservation]),
-  )
-  const reconciled = new Map(
-    db
-      .select()
-      .from(takeReconciliation)
-      .where(eq(takeReconciliation.runId, runId))
-      .all()
-      .map((row) => {
-        const answer = JSON.parse(row.answer) as Pick<ClipReconciliation, 'subjects' | 'criteria'>
-        return [row.takeId, { ...answer, failed: JSON.parse(row.failed) as string[] }] as const
-      }),
-  )
-  const takes = db
-    .select()
-    .from(take)
-    .where(and(eq(take.runId, runId), eq(take.attempt, finishing)))
-    .orderBy(sql`rowid`)
-    .all()
-    .map((row): TakeRecord => ({
-      takeId: row.takeId,
-      attempt: row.attempt,
-      shotUnit: row.shotUnit,
-      number: takeNumber(row.number, row.takeId),
-      mode: row.mode,
-      pictureId: row.pictureId,
-      degraded: row.degraded,
-      prompt: row.prompt,
-      durationSeconds: row.requestedSeconds,
-      seed: row.seed,
-      requestId: row.requestId,
-      expandedPrompt: row.expandedPrompt,
-      path: row.path,
-      probe: parsed(row.probe),
-      scan: parsed(row.scan),
-      words: parsed(row.words),
-      sound: parsed(row.sound),
-      observation: observed.get(row.takeId) ?? null,
-      reconciliation: reconciled.get(row.takeId) ?? null,
-      verdicts: JSON.parse(row.verdicts) as TakeRecord['verdicts'],
-      outcome: row.outcome,
-      degradation: row.degradation,
-    }))
-  const narrations = db
-    .select()
-    .from(narration)
-    .where(and(eq(narration.runId, runId), eq(narration.attempt, finishing)))
-    .orderBy(sql`rowid`)
-    .all()
-    .map((row): NarrationRecord => ({
-      narrationId: row.narrationId,
-      attempt: row.attempt,
-      shotUnit: row.shotUnit,
-      text: row.text,
-      path: row.path,
-      words: parsed(row.words),
-      probe: parsed(row.probe),
-    }))
-
   // The shots held on their chosen pictures, in the order the ladders reached them (S-098). The
   // picture's PATH and its shot come off the picture row the still-hold's foreign key names, so the
   // manifest's path is the one the file was written at and no shot id is read back out of text.
@@ -473,6 +500,23 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
       takeIds: JSON.parse(row.takeIds) as string[],
       reason: row.reason,
     }))
+
+  // The takes a render is made of: each shot's ACCEPTED take, and each HELD shot's three, by the ids
+  // its ladder consumed — whichever attempt made them (S-092, S-098). A take a crash cut off has no
+  // outcome and is named by no still-hold, so it is never one; nor is a failed take of a shot that
+  // was not held.
+  const heldTakeIds = stillHolds.flatMap((hold) => [...hold.takeIds])
+  const takes = readTakes(
+    db,
+    runId,
+    and(
+      eq(take.runId, runId),
+      heldTakeIds.length === 0
+        ? eq(take.outcome, 'accept')
+        : or(eq(take.outcome, 'accept'), inArray(take.takeId, heldTakeIds)),
+    ),
+  )
+  const narrations = readNarrations(db, finishedNarration(runId))
 
   const spent = (table: typeof generationReceipt | typeof speechReceipt | typeof videoReceipt) =>
     db

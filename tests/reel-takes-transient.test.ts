@@ -353,6 +353,8 @@ test(`${CHECK_11} — makeClips read directly, handed a port that answers unavai
     plan: passingPlan(request),
     stills: [],
     degradedShots: [],
+    // Nothing kept: one attempt, with no earlier one to pick up from (reel-takes, S-092).
+    kept: { narrations: [], takes: [] },
   }
   const settings = { plan: DEFAULT_PLAN_SETTINGS, render: TEST_RENDER_SETTINGS }
   const busy = { kind: 'unavailable', detail: 'the provider is busy' } as const

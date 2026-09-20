@@ -46,6 +46,16 @@ import { clipPrompt, retryPrompt } from './prompts.ts'
 // then (D-055, S-097), recorded with its `degraded` event, and the stage goes on to the next shot
 // (S-090, S-098). Once every shot is done, accepted or held, a `mustShow` no sentence claims that no
 // ACCEPTED take showed stops the reel for gate-5: a held shot's failed takes show nothing (S-072, S-090).
+//
+// AND IT SKIPS WHAT AN EARLIER ATTEMPT FINISHED (S-092). `kept` is every narration an earlier attempt
+// finished and every take it decided, in the order made. A kept narration is the shot's — not spoken,
+// probed or parsed again — and a kept take is not made, measured, heard, witnessed or reconciled
+// again (I-15); no receipt is added for either. Reaching a shot, the stage emits each kept take's
+// verdicts as events, so every decided take's verdicts are events ONCE, in shot and take order. A
+// shot with a kept accepted take is finished; otherwise its next take is numbered its kept decided
+// takes PLUS ONE and is told every kept failed take's reasons, and a shot whose three kept takes all
+// failed reaches the ladder WITH NO CALL. A take a crash cut off is not kept and not resumed: it is
+// made again under this attempt's id, under the same number, counting against no cap.
 
 type Verdict = Extract<RunEvent, { type: 'verdict' }>
 type Degraded = Extract<RunEvent, { type: 'degraded' }>
@@ -89,6 +99,13 @@ export interface ClipsInput {
   }>
   /** The shots whose picture was degraded, which are made from words (D-050 step 2). */
   degradedShots: readonly number[]
+  /** What earlier attempts finished, which this one keeps and does not make again (S-092). */
+  kept: {
+    /** Every narration an earlier attempt made, measured and timed, in the order made. */
+    narrations: readonly NarrationRecord[]
+    /** Every take an earlier attempt decided — accept or fail — in the order made. */
+    takes: readonly TakeRecord[]
+  }
 }
 
 export interface ClipsPorts {
@@ -228,40 +245,53 @@ async function stage(
   for (const shot of plan.shots) {
     const unit = shot.unit
 
-    // The shot's narration, immediately before its clip (S-070).
-    const narrationId = narrationIdOf(attempt, unit)
-    const text = narrationText(unit, plan, request)
-    const spoken = await ports.narration.speak({
-      runId,
-      narrationId,
-      text,
-      voice: settings.render.voice,
-    })
-    if (spoken.kind === 'refused') return stopped(spoken)
-    if (spoken.kind === 'unavailable') throw unavailable('narration', narrationId, spoken.detail)
-    record.narrations.push({
-      narrationId,
-      attempt,
-      shotUnit: unit,
-      text,
-      path: spoken.audio.path,
-      words: null,
-      probe: null,
-    })
-    const n = record.narrations.length - 1
-    // Measured: the file's duration is the narration's (I-17).
-    const measured = await ports.media.probe({ id: narrationId, path: spoken.audio.path })
-    await narrated(n, { probe: measured })
-    const timings = wordTimings(text, measured.durationSeconds).safeParse(spoken.timings)
-    if (!timings.success) {
-      return {
-        kind: 'failed',
-        detail: `the word timings of ${narrationId} do not parse: ${timings.error.issues
-          .map((i) => `${i.path.join('.') || '(timings)'}: ${i.message}`)
-          .join('; ')}`,
+    // The shot's narration. One an earlier attempt FINISHED is the shot's, and is not spoken, probed
+    // or parsed again (S-092): its measure is the one that attempt took. Otherwise it is made now,
+    // immediately before its clip (S-070).
+    let measured: MediaProbe
+    const keptNarration = input.kept.narrations.find((k) => k.shotUnit === unit)
+    if (keptNarration !== undefined) {
+      if (keptNarration.probe === null || keptNarration.words === null) {
+        throw new Error(
+          `${shotIdOf(unit)} kept the narration ${keptNarration.narrationId}, which was never measured and timed (S-092)`,
+        )
       }
+      measured = keptNarration.probe
+    } else {
+      const narrationId = narrationIdOf(attempt, unit)
+      const text = narrationText(unit, plan, request)
+      const spoken = await ports.narration.speak({
+        runId,
+        narrationId,
+        text,
+        voice: settings.render.voice,
+      })
+      if (spoken.kind === 'refused') return stopped(spoken)
+      if (spoken.kind === 'unavailable') throw unavailable('narration', narrationId, spoken.detail)
+      record.narrations.push({
+        narrationId,
+        attempt,
+        shotUnit: unit,
+        text,
+        path: spoken.audio.path,
+        words: null,
+        probe: null,
+      })
+      const n = record.narrations.length - 1
+      // Measured: the file's duration is the narration's (I-17).
+      measured = await ports.media.probe({ id: narrationId, path: spoken.audio.path })
+      await narrated(n, { probe: measured })
+      const timings = wordTimings(text, measured.durationSeconds).safeParse(spoken.timings)
+      if (!timings.success) {
+        return {
+          kind: 'failed',
+          detail: `the word timings of ${narrationId} do not parse: ${timings.error.issues
+            .map((i) => `${i.path.join('.') || '(timings)'}: ${i.message}`)
+            .join('; ')}`,
+        }
+      }
+      await narrated(n, { words: timings.data })
     }
-    await narrated(n, { words: timings.data })
 
     // What every take of the shot is made from and held to: its first take's prompt, criteria and
     // requested seconds, and its mode — from its chosen picture, or from words at 9:16 (S-071, S-091).
@@ -280,9 +310,28 @@ async function stage(
     })
     const durationSeconds = requestedSeconds(measured.durationSeconds)
 
-    // Up to three decided takes, until one is accepted (D-024, D-030, S-094).
-    const failed: TakeRecord[] = []
-    for (let count = 1; count <= TAKES_A_SHOT; count += 1) {
+    // The takes an earlier attempt DECIDED for this shot are kept, in the order made, and their
+    // verdicts become events now — the finishing attempt emits them as it reaches the shot, so every
+    // decided take's verdicts are events once, in shot and take order (S-092). None of them is made,
+    // measured, heard, witnessed or reconciled again (I-15).
+    const kept = input.kept.takes.filter((k) => k.shotUnit === unit)
+    for (const earlier of kept) {
+      for (const verdict of earlier.verdicts) {
+        record.events.push({
+          type: 'verdict',
+          gate: verdict.gate,
+          outcome: verdict.outcome,
+          shotId: shotIdOf(unit),
+        })
+      }
+    }
+
+    // Up to three decided takes, EVERY ATTEMPT'S, until one is accepted (D-024, D-030, S-092, S-094):
+    // a shot with a kept accepted take is finished, and the next take of any other is numbered its
+    // kept decided takes plus one — so a shot with three kept failed takes makes no call at all.
+    const failed: TakeRecord[] = kept.filter((k) => k.outcome === 'fail')
+    const finishedEarlier = kept.some((k) => k.outcome === 'accept')
+    for (let count = kept.length + 1; !finishedEarlier && count <= TAKES_A_SHOT; count += 1) {
       const number = count as TakeNumber
       const takeId = takeIdOf(attempt, unit, number)
       // A retry is told every earlier failed take's reasons, and nothing else of them (D-033).
@@ -409,10 +458,11 @@ async function stage(
 
   // Every shot done, accepted or held: a mustShow no sentence claims must be shown by an ACCEPTED take
   // — a held shot's takes all failed, and show nothing for it (S-072, S-090).
+  const everyTake = [...input.kept.takes, ...record.takes]
   const unmet = request.criteria.mustShow.filter(
     (c) =>
       c.claimId === undefined &&
-      !record.takes.some(
+      !everyTake.some(
         (take) =>
           take.outcome === 'accept' &&
           take.reconciliation?.criteria.some((said) => said.id === c.id && said.shown),

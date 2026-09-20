@@ -25,7 +25,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 031 | [031-reel-takes-slice-2.md](031-reel-takes-slice-2.md)   | `reel-takes`  | Slice 2   | 2026-09-19 | session 31 |
 | 032 | [032-reel-takes-slice-3.md](032-reel-takes-slice-3.md)   | `reel-takes`  | Slice 3   | 2026-09-19 | session 32 |
 | 033 | [033-reel-takes-slice-4.md](033-reel-takes-slice-4.md)   | `reel-takes`  | Slice 4   | 2026-09-20 | session 33 |
-| 034 | [034-reel-takes-slice-5.md](034-reel-takes-slice-5.md)   | `reel-takes`  | Slice 5   | 2026-09-20 | not yet    |
+| 034 | [034-reel-takes-slice-5.md](034-reel-takes-slice-5.md)   | `reel-takes`  | Slice 5   | 2026-09-20 | session 34 |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

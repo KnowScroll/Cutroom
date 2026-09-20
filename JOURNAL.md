@@ -3250,3 +3250,144 @@ repository, unchanged: S-068, S-073, S-029, S-033.
 
 **Next.** Session 34: run `PROMPTS/034-reel-takes-slice-5.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-20 — session 34, reel-takes Slice 5: a restart picks up where it stopped
+
+**Intent.** Run `PROMPTS/034-reel-takes-slice-5.md`: `reel-takes`' Slice 5 only — checks 21 to 24, tests first; nothing
+from Slice 6, no journey. `decisions.mjs`: pin current, 0 commits unpushed. Baseline `check.mjs` green at eee53d3,
+tests 226 s (339 by session 33's TAP count). `ffmpeg` and `ffprobe` 8.1.1 ran from PATH.
+
+**Changed.**
+
+- **`packages/domain`** — **`clips.ts`**: `ClipsInputs.kept` — every earlier attempt's **finished** narrations and
+  **decided** takes, in the order made. Two readers now serve both queries: `readTakes(db, runId, where)`, a whole
+  `TakeRecord` a row with its observation and reconciliation, and `readNarrations(db, where)`; `finishedNarration` is
+  the one place that says what "finished" means — `words` and `probe` both written. `readRenderInputs` **loses its
+  attempt filter** (S-092, superseding S-089's): it reads the still-holds first, then the takes whose outcome is
+  `accept` **or whose id a still-hold names**, then every finished narration — each shot's, whichever attempt made it,
+  and never a cut-off take, an unfinished narration or a failed take of a shot that was not held.
+- **`packages/pipeline`** — **`clips/index.ts`**: `ClipsInput.kept`. Per shot, a kept **narration** is the shot's —
+  its stored probe is the measure, and nothing is spoken, probed or parsed; a kept narration that was never measured
+  is a fault. Its kept **takes** are found, and **each one's verdicts become events as the stage reaches the shot**,
+  in take order, so every decided take's verdicts are events once and a cut-off take's never. `failed` starts as the
+  kept failures, `finishedEarlier` is a kept `accept`, and the loop runs from `kept.length + 1` — so a shot with a
+  kept accepted take makes nothing, a retry after kept failures is told every one's reasons, and **a shot with three
+  kept failed takes reaches `atTheCap` with no call**. The reel's unclaimed `mustShow` is judged over **kept and made
+  takes together** — **S-106**. **`render/manifest.ts`**: a shot's narration and accepted take are chosen by
+  `narrations[0]` and `accepted[0]`, not `.at(-1)`, and **two of either are REFUSED, naming the shot** (S-092), so the
+  assemble job fails the run rather than choosing.
+- **`apps/worker`** — nothing: `clips-job.ts` already spreads `...inputs` into `makeClips`, so `kept` reaches the
+  stage with no edit.
+- **`reel-render`'s check 48 rewritten exactly as S-099's bullet says** (`tests/reel-render-restart.test.ts`), no
+  assertion removed. The completed restart, held at call 15: the new worker's script is `clipsScript(takes.slice(2))`;
+  its narration calls shots 3 to 5's, its clip calls shot 2's take made again and shots 3 to 5's; the narration rows
+  the first attempt's three and the second's three; the take rows the first's three and the second's four; the
+  observations and reconciliations `T(1,0)`, `T(1,1)` and the second's four; its receipts three narrations and four
+  clips; the manifest's shots and the takes `framesOf` measures the first attempt's for shots 0 and 1, its narration
+  and the second's take for shot 2, the second's for 3 to 5; `readRenderInputs` those same rows, and **the cut-off
+  take is not among them**. The budget stop now takes a ceiling: the clip guard's run keeps its figure, 246, and
+  **makes no call** — shot 0's narration is kept — and the narration guard's run is under a ceiling of 250 at 0.5
+  cents a character, where that clip is made and **shot 1's** narration, 252, is refused.
+- **`reel-takes`' check 4's second restart moved onto checkpoints as S-100 says** (`tests/reel-takes-record.test.ts`),
+  every clause kept: the same kill at call 16, the same record route, every expectation still typed by hand — the new
+  worker's script from shot 2's take on, the second attempt's **four** takes, and shots 0 and 1's first-attempt takes
+  **used**. Its comment now says the case no longer catches 4c or 4f, since under checkpoints no run can list an
+  attempt's takes out of shot order or show none of its accepted ones (S-100's own reading).
+- **Test support, no assertion:** `tests/reel-takes-transient.test.ts`' hand-built `ClipsInput` carries
+  `kept: { narrations: [], takes: [] }`.
+- **Three test files, +8 tests, 339 → 347**: `tests/reel-takes-kept.test.ts` (checks 21 and 23, 3 tests, one shared
+  restarted run), `-again.test.ts` (22, 3), `-restart-budget.test.ts` (24, 2). Each test titled with Gate 3's words.
+- **`DECISIONS.md` — S-106.** Slice 5 ticked. Prompt 034's `Run` line set to session 34, in the file and the index
+  (S-065).
+
+**Observed.**
+
+- **Red first, each for its reason.** Before code, 8 of 8 new tests and the two moved checks red:
+  - 21, 22 and 23's first test: the second attempt started over, so its first model call was shot 0's — answered from
+    a script that begins at the shot the kill cut off. Each run finished **failed**, _"“barons” was not asked about"_,
+    _"“seal” is answered 0 times, not once"_ — a reconciler answer for the wrong shot.
+  - 23's second test: _"Missing expected exception: two accepted takes of one shot were not refused"_ —
+    `renderManifest` took the last of them.
+  - 24, the clip guard: `narrationCalls` was `['a2-shot-0-narration']` where the check says `[]` — the kept narration
+    spoken again. 24, the narration guard: `estimateCents: 251`, not 252 — the refused call was shot 0's narration
+    made again, not shot 1's after the clip.
+  - 48 and 4's second restart: both red before the code and green after, exactly as S-099 and S-100 say.
+- **The call numbers each hold used**, counted from the fixture in each test: check 21's run holds **call 19**, shot
+  2's take 3's witness (the planner's 2, the stills stage's 8, then two a take: shot 0's take 1 at 11–12, shot 1's at
+  13–14, shot 2's take 1 at 15–16 and its take 2 at 17–18); check 22's three runs hold **15**, **17** and **19**;
+  check 24's two hold **11**; check 48's hold **15** and **11**, and check 4's second restart **16** — the last three
+  unchanged.
+- **A fixture collision, session 28's hazard, hit twice.** Check 23 measures every frame with `takeOfFrames`, which
+  refuses two adjacent takes whose bands are within 80. My first fixture put `a1-shot-0-take-1` beside
+  `a2-shot-1-take-2` — **76.8 apart** — and every fixture whose second attempt makes shots 3 and 4's first takes puts
+  `a2-shot-3-take-1` beside `a2-shot-4-take-1`, **72.1 apart**. The fixture was moved until every adjacent pair is
+  over 80 and the closest pair of all is **69.6**: the cut-off take is shot 2's, and shot 4's take 1 is black from its
+  first frame so its take 2 is the shot's. (`reel-render`'s check 48 keeps its own laxer `framesOf`, which asks only
+  that each frame's band be within 40 of one of the six, and is unchanged.)
+- **The measurements.** Check 21's output: **696 frames**, the manifest's total; the shots begin at
+  `[0, 216, 384, 456, 528, 576]`, the narrations' spans — the first attempt's for shots 0 to 2 — and every frame
+  carries its own shot's take, shots 0 and 1 the **first** attempt's clips.
+- **Twenty-four breaks, a control and three run again**, by session 33's runner in `.tmp/campaign/` (its breaks, chunk
+  logs and results moved aside to `s33/`; ignored). Each break's files saved as bytes and `fsync`ed to a record before
+  they were touched, restored from those bytes and read back, the record removed; every modified and untracked file
+  fingerprinted after each restore; a refusal to start while a record exists; every find checked once first; each test
+  file's count **read from the file** before `COUNTS` was written. `tsc -b`, then NEW (this slice's three files, 8
+  tests) or FULL (with check 4's, check 48's, and Slice 3's labels and Slice 4's still-manifest files — 21).
+  Afterwards: no record, `.artifacts/` empty, the fingerprints unchanged, **no runner fault**.
+
+  | check | breaks                                                                                                                                                                                                                              | caught by                |
+  | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+  | none  | **control** c0: a comment beside the kept work                                                                                                                                                                                      | nothing                  |
+  | 21    | 21a `readClipsInputs` reading no kept narration; 21a2 the stage ignoring the kept narrations; 21d a cut-off take kept as decided                                                                                                    | 48, 22, 21, 23, 4, 24    |
+  | 21    | 21b `readClipsInputs` reading no kept take; 21c a kept accepted take not finishing its shot                                                                                                                                         | 48, 22, 21, 23, 4        |
+  | 21    | 21e a kept take's verdicts emitted twice                                                                                                                                                                                            | 48, 21                   |
+  | 21    | 21f a kept take's verdicts never emitted                                                                                                                                                                                            | 48, 22, 21               |
+  | 21    | 21g the unclaimed `mustShow` over this attempt's takes alone (S-106's rejected option)                                                                                                                                              | 21, 23                   |
+  | 21    | **21h a shot's kept verdicts in reverse take order**                                                                                                                                                                                | **nothing at first**; 21 |
+  | 21    | **21i a narration kept though never measured and timed**                                                                                                                                                                            | **nothing at first**; 23 |
+  | 22    | 22a the next take numbered from one                                                                                                                                                                                                 | 22, 21, 23               |
+  | 22    | 22b a retry told nothing of the kept failed takes; 22c a shot with three kept failures calling once more; 22d the labels marking only this attempt's receipts; **22e the row's attempt off its third take's id (session 32's 14q)** | 22 each                  |
+  | 23    | 23a `readRenderInputs` keeping S-089's attempt filter                                                                                                                                                                               | 48, 22, 21, 23, 4        |
+  | 23    | 23b choosing the LAST of two accepted takes; 23d choosing the last of two finished narrations                                                                                                                                       | 23 each                  |
+  | 23    | **23c the two-accepted-takes fault not naming the shot**                                                                                                                                                                            | **nothing at first**; 23 |
+  | 23    | 23f the two-finished-narrations fault not naming the shot                                                                                                                                                                           | 23                       |
+  | 23    | 23e a held shot's three takes left out of what a render is read from                                                                                                                                                                | 22, 17; typecheck too    |
+  | 24    | 24a a kept narration guarded and bought again                                                                                                                                                                                       | 48, 22, 21, 24           |
+  | none  | x1 the kept narration's fault message reworded                                                                                                                                                                                      | nothing                  |
+
+- **Caught by nothing that a check's words promise: three, each fixed by ADDING.**
+  - **21h** — reversing a shot's kept verdicts. Check 21 says _"in shot and take order"_, and no shot of the fixture
+    had two kept takes whose verdicts DIFFERED, so reversing them printed the same lines. The fixture now holds the
+    kill one take later: shot 2's take 1 fails **Gate 3** and its take 2 fails **Gate 5**, so the two kept takes'
+    events differ and the order is readable. Run again: caught by 21.
+  - **21i** — keeping a narration that was never measured and timed. Check 23 says _"never … an unfinished
+    narration"_, and **no killed worker can leave one**: the hold is at a model call, and a narration is measured and
+    its timings parsed before its shot's first take. Check 23 now writes such a row into the finished run **by hand**
+    and asserts `readRenderInputs` leaves it out. Run again: caught by 23.
+  - **23c** — the two-accepted-takes fault not naming the shot. The fault lists the two take ids, and every take id
+    holds a shot id: `/shot-1/` matched a fault that named the shot nowhere. Check 23 now strikes every take and
+    narration id out of the message before looking for the shot. Run again: caught by 23; 23f, the same break on the
+    narration fault, was added and is caught by 23.
+- **Caught by nothing and promised by no check's words**, said plainly: **x1**, the wording of the fault for a kept
+  narration that was never finished — a fault no run reaches, since `readClipsInputs` only reads finished ones.
+- **Choices.** **S-106** recorded — the unclaimed `mustShow` over every decided take of the run, kept ones included;
+  rejected: this attempt's takes alone (a `gate-5` stop on a reel that is whole), re-reading the kept takes'
+  reconciliations from the tables, and spelling the same set longer. **Not recorded, nothing rejected could be
+  caught:** where `kept` is read (Gate 3's signature gives `readClipsInputs` no attempt argument, so every row it
+  reads is an earlier attempt's); how a cut-off take's number is found (it is never read — the next take is numbered
+  after the shot's kept DECIDED takes, which is the same number, and no run can hold two cut-off takes of one shot);
+  the two readers factored out of `readRenderInputs`; the faults' wording beyond naming the shot.
+- **An untracked `docs/STATUS.md` appeared mid-session, written by nothing in this repository.** It is not this
+  slice's and is not committed. It **aborted one campaign chunk** — the runner fingerprints every untracked file and
+  refused to go on after 23c, whose result was lost and which was run again — and it **failed `check.mjs`'s format
+  check**. Prettier's `--write` was run over it: the change is table padding alone, no word altered. The owner should
+  say what that file is.
+- **The suite: 347 tests, 217–223 s** by two TAP runs, against 226 s at the baseline.
+- `node scripts/check.mjs`: **everything green, 347 tests** by the TAP count; checks 21–24 pass by number (8 tests),
+  1–20 (51), and every moved `reel-render` check.
+
+**Next.** `reel-takes` Slice 6 — endings, no secrets, and the journeys: checks 25 and 26, the re-runs of 1–24, then
+the `reel-takes` journey and the `reel-render`, `reel-stills`, `reel-plan` and `reel-contract` journeys again (S-099).
+Carried: the narration guard's every-send rule, checked by nothing (S-101); `reel-render`'s check 50 child's margin
+under its 300-second bound, with six more restart runs now in the suite; the access violation seen once in session 32,
+not seen since. Owed outside this repository, unchanged: S-068, S-073, S-029, S-033.

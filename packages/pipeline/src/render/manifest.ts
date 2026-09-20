@@ -174,9 +174,9 @@ export interface RenderInput {
   stills: ReadonlyArray<{ pictureId: string; shotUnit: number; verdicts: ClipShot['verdicts'] }>
   /** The stills stage's degradations, in the order reached. */
   degradations: ReadonlyArray<{ shotId: string; reason: string }>
-  /** The finishing clips attempt's takes, one accepted a shot. */
+  /** Each shot's accepted take and each held shot's three, whichever attempt made them (S-092). */
   takes: readonly TakeRecord[]
-  /** The same attempt's narrations. */
+  /** Each shot's finished narration, whichever attempt made it (S-092). */
   narrations: readonly NarrationRecord[]
   /** The shots held on their chosen pictures, in the order the ladders reached them (S-098). */
   stillHolds: readonly StillHold[]
@@ -270,7 +270,9 @@ function pushCaptions(
  * the picture frames used and its hold.
  *
  * It THROWS on rows that cannot make one — a shot neither held nor accepted, a narration never
- * measured — and on a manifest its own schema refuses; the worker fails the run.
+ * measured, or a shot holding TWO accepted takes or TWO finished narrations, which a restart's
+ * checkpoints make impossible and a late row would not (S-092) — and on a manifest its own schema
+ * refuses; the worker fails the run.
  */
 export function renderManifest(input: RenderInput, settings: RenderSettings): RenderManifest {
   const { profile } = settings
@@ -281,10 +283,30 @@ export function renderManifest(input: RenderInput, settings: RenderSettings): Re
   for (const planned of input.plan.shots) {
     const unit = planned.unit
     const shotId = shotIdOf(unit)
-    const narration = input.narrations.filter((n) => n.shotUnit === unit).at(-1)
+    // A shot has at most ONE finished narration and at most ONE accepted take, whichever attempt
+    // made each: a job run again keeps what an earlier attempt finished and makes no second of
+    // either (S-092). Rows holding two are REFUSED, naming the shot, so the assemble job fails the
+    // run rather than choosing between them — what S-089's filter on the finishing attempt did.
+    const narrations = input.narrations.filter((n) => n.shotUnit === unit)
+    if (narrations.length > 1) {
+      throw new Error(
+        `${shotId} has ${narrations.length} finished narrations — ${narrations
+          .map((n) => n.narrationId)
+          .join(', ')} — and a render is made of one (S-092)`,
+      )
+    }
+    const narration = narrations[0]
     if (narration === undefined) throw new Error(`${shotId} has no narration to render`)
     if (narration.probe === null || narration.words === null) {
       throw new Error(`${shotId}'s narration ${narration.narrationId} was never measured and timed`)
+    }
+    const accepted = input.takes.filter((t) => t.shotUnit === unit && t.outcome === 'accept')
+    if (accepted.length > 1) {
+      throw new Error(
+        `${shotId} has ${accepted.length} accepted takes — ${accepted
+          .map((t) => t.takeId)
+          .join(', ')} — and a render is made of one (S-092)`,
+      )
     }
 
     // The span is the narration's (S-073), whichever kind of shot this is.
@@ -339,7 +361,7 @@ export function renderManifest(input: RenderInput, settings: RenderSettings): Re
       continue
     }
 
-    const take = input.takes.filter((t) => t.shotUnit === unit && t.outcome === 'accept').at(-1)
+    const take = accepted[0]
     if (take === undefined) throw new Error(`${shotId} has no accepted take to render`)
     if (take.probe === null || take.probe.video === null) {
       throw new Error(`${shotId}'s take ${take.takeId} was never measured as a clip`)

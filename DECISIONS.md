@@ -3686,3 +3686,28 @@ filter did it.
 
 **Caught by.** `reel-takes`' check 17, which reads the held shot's conform notes as the manifest holds them. Break 17k,
 the clip's notes reused.
+
+---
+
+## S-106 | 2026-09-20 | The reel's unclaimed `mustShow` is judged over every decided take of the run, kept ones included
+
+**Chose.** The clips stage's last check — a `mustShow` no sentence claims that **no accepted take showed** stops the
+reel for `gate-5` (S-072, S-090) — reads **every decided take of the run: the takes this attempt made AND the takes it
+kept from earlier attempts** (`makeClips`, `packages/pipeline/src/clips/index.ts`; S-092). A shot an earlier attempt
+accepted is a finished shot of this run, and the take that finished it is the take that showed what it showed.
+
+**Why.** Under checkpoints a finishing attempt makes nothing at all for a shot an earlier attempt accepted, so its own
+record holds no take for that shot. Judged over this attempt's takes alone, a restarted run whose unclaimed criterion
+was shown only by a kept take would stop for `gate-5` **with every shot accepted** — a stop no run of one attempt can
+reach, and one a caller could do nothing with, since nothing is wrong with the reel. S-092 has the finishing attempt
+emit a kept take's verdicts _"as if it had made them"_; the same reading applies to what those takes showed. The rule
+itself is unchanged: a HELD shot's takes all failed, so they still show nothing (S-090).
+
+**Rejected.** **This attempt's takes alone**, the code as Slice 3 left it — the stop above, on a reel that is whole.
+**Reading the kept takes' reconciliations from the tables at the end** — the stage is handed them already, and a second
+read is a second source that can disagree with the first (I-15's reason). **Judging it over kept takes only where a
+kept take finished the shot** — the same set, spelled longer: a kept take that failed is not accepted either way.
+
+**Caught by.** `reel-takes`' check 21. Its second attempt's four takes are each reconciled as **not** showing
+`show-meadow`, the reel's unclaimed `mustShow`, and only the kept takes of shots 0 and 1 show it — so a stage counting
+this attempt's takes alone stops the run for `gate-5` where check 21 says it completes. Break 21g.

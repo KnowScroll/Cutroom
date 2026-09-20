@@ -4,7 +4,7 @@
 - **Feature:** `reel-takes` — [`docs/features/reel-takes.md`](../docs/features/reel-takes.md)
 - **Work:** Slice 5 of 6 — a restart picks up where it stopped; checks 21–24, tests first; no journey
 - **Written:** 2026-09-20, at the end of session 33, after `reel-takes`' Slice 4 was committed (e4bc94a)
-- **Run:** not yet
+- **Run:** session 34
 
 Paste everything inside the block below as the session's first message.
 

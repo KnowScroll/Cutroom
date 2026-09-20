@@ -44,7 +44,7 @@ import {
 // - the plan and stills runs share an engine with a video run.
 //
 // The one that is not — a restart whose first attempt decided takes, added after the break campaign —
-// is typed for S-076's start-over, and Slice 5 moves it onto its checkpoints.
+// was typed for S-076's start-over, and Slice 5 moved it onto S-092's checkpoints (S-100).
 //
 // Every expectation is typed by hand.
 
@@ -201,15 +201,17 @@ test(`${CHECK_4} — a restarted run`, async () => {
 })
 
 test(`${CHECK_4} — a restarted run whose first attempt decided takes`, async () => {
-  // Added after this slice's break campaign (S-100): two wrong records passed every run above — the
+  // Added after Slice 1's break campaign (S-100): two wrong records passed every run above — the
   // takes listed in shot order rather than the order made, and every accepted take of a completed run
   // marked used — since neither differs from the right record while a restart's first attempt decided
   // no take. Held at call 16, shot 2's reconcile call: shots 0 and 1 were decided, both accepted, and
-  // shot 2's take was cut off with Gates 2, 3 and 4 and an observation. The second attempt starts over
-  // and makes all six again (S-076), so the first attempt's two accepted takes are shown by nothing.
+  // shot 2's take was cut off with Gates 2, 3 and 4 and an observation.
   //
-  // Typed for S-076's start-over: reel-takes' Slice 5 keeps decided takes (S-092), and moves this
-  // case onto its checkpoints, every clause kept (S-100).
+  // MOVED ONTO S-092'S CHECKPOINTS IN SLICE 5, every clause kept (S-100): the second attempt keeps
+  // shots 0 and 1, so its script answers from shot 2's take on and it makes four takes — the cut-off
+  // one made again, then shots 3 to 5 — and the first attempt's two accepted takes are the ones its
+  // video SHOWS. Under checkpoints no run can list an attempt's takes out of shot order or show none
+  // of its accepted ones, so the case catches neither here; it is kept for the record it reads.
   const engine = await startEngine({ worker: false })
   try {
     const killed = await killedMidVideo(engine, videoRequest('r4-restart-decided'), {
@@ -221,16 +223,16 @@ test(`${CHECK_4} — a restarted run whose first attempt decided takes`, async (
         takes: [T(1, 0), T(1, 1), T(1, 2)],
       },
     })
-    const ran = await takenUpVideo(engine, killed, clipsScript(takes))
+    const ran = await takenUpVideo(engine, killed, clipsScript(takes.slice(2)))
     assert.equal(ran.result.status, 'completed', JSON.stringify(ran.result))
     assert.deepEqual(
       renderOf(engine, ran.runId).renderManifest.shots.map((s) => s.takeId),
-      UNITS.map((u) => T(2, u)),
+      [T(1, 0), T(1, 1), ...UNITS.slice(2).map((u) => T(2, u))],
     )
-    // In the order made — the first attempt's three, then the second's six — which is not shot order.
+    // In the order made — the first attempt's three, then the second's four.
     assert.deepEqual((await recordOf(engine, ran.runId)).takes, [
-      decided(T(1, 0), 0, false),
-      decided(T(1, 1), 1, false),
+      decided(T(1, 0), 0, true),
+      decided(T(1, 1), 1, true),
       {
         takeId: T(1, 2),
         shotId: 'shot-2',
@@ -239,7 +241,7 @@ test(`${CHECK_4} — a restarted run whose first attempt decided takes`, async (
         observationId: `obs-${T(1, 2)}`,
         checks: accepted('2', '3', '4'),
       },
-      ...UNITS.map((u) => decided(T(2, u), u, true)),
+      ...UNITS.slice(2).map((u) => decided(T(2, u), u, true)),
     ])
   } finally {
     await engine.stop()

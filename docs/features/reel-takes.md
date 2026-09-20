@@ -847,7 +847,7 @@ _Endings, and no secrets_
       `zoompan` and silence; the stand-in picture's 2-pixel border; the completed result's order of `degradations`;
       `reel-render`'s check 37 widened as S-099 says, and the type-only support in two of its test files.
       **Proves: 16, 17, 18, 19, 20.**
-- [ ] **Slice 5 — a restart picks up where it stopped.** `readClipsInputs`' kept work; the stage skipping it, numbering
+- [x] **Slice 5 — a restart picks up where it stopped.** `readClipsInputs`' kept work; the stage skipping it, numbering
       after it and re-emitting its verdicts; `readRenderInputs` reading each shot's finished and accepted rows, and
       `renderManifest` refusing two of either for one shot; `reel-render`'s check 48 as S-099 says.
       **Proves: 21, 22, 23, 24.**
