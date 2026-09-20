@@ -3428,3 +3428,120 @@ not seen since. Owed outside this repository, unchanged: S-068, S-073, S-029, S-
 
 **Next.** Session 35: run `PROMPTS/035-reel-takes-slice-6.md`. Owed outside this repository, unchanged: S-068, S-073,
 S-029, S-033.
+
+## 2026-09-20 — session 35, reel-takes Slice 6: endings, no secrets, and five journeys
+
+**Intent.** Run `PROMPTS/035-reel-takes-slice-6.md`: `reel-takes`' Slice 6 — checks 25 and 26 — then the break
+campaign, then FIVE journeys (`reel-takes`' own, and `reel-render`'s, `reel-stills`', `reel-plan`'s and
+`reel-contract`'s again, S-099), each on a clean tree and committed on its own. `decisions.mjs`: pin current, 0
+commits unpushed. Baseline `check.mjs` green at `0722a64`, tests 240 s. `ffmpeg` and `ffprobe` 8.1.1 from PATH.
+
+**`docs/STATUS.md`, settled first.** It was untracked, appeared in session 34, and `journey.mjs` refuses on any
+dirty tree — so every journey of this slice would have refused while it sat there. Asked with AskUserQuestion, the
+owner chose **commit it under `docs/`**, which is `0722a64`, before any of this slice's work. It binds nothing; it
+says so in its own second line. It is a dated snapshot and now reads one slice behind, which the owner's option said.
+
+**Changed.**
+
+- **`tests/reel-takes-endings.test.ts` — check 25, six tests.** Six endings, each one run of THREE_RANKS, each event
+  list typed by hand, in the order the gates ran: **a shot accepted on a retry, completed** (shot 1's take 1 fails
+  Gate 5, its take 2 is the shot's); **a shot held, completed** (shot 1's three takes show no `show-crowd`, held on
+  its picture, its `degraded` event after the third take's verdicts, the stage going on to shot 2); **a shot failing
+  at its cap** (shot 0 claims `show-pressing`, an event, which no still can show: `gate-5` at step `video`); **a
+  retry stopped for budget** (check 9's figures — 213 + 28 = 241 over a ceiling of 240 — the shot not held); **a call
+  unavailable to the last send** (shot 1's take answered `unavailable` at each of three sends: the port throws, and
+  shot 1 has no verdict of any gate); and **a run picked up from its checkpoints, completed** (killed at model call
+  17, so the first attempt leaves shots 0 and 1 accepted, shot 2's take 1 failed at Gate 3 and its take 2 cut off;
+  the second attempt makes that take again and shots 3 to 5). Beside each list, the one fact that names the ending:
+  the still-hold's shot and reason, the rule and step, the budget figure, `I-11` in the detail, and the take rows of
+  the restarted run.
+- **`tests/reel-takes-secrets.test.ts` — check 26, one test.** S-028's form, `reel-render`'s check 50 copied and
+  re-aimed: the probe reading what a child started with `env: { PATH }` **actually** holds, the eleven names libuv
+  adds on Windows, the canary shaped like a key, every `tests/reel-takes-*.test.ts` but its own in one child, and the
+  roll call that checks 1 to 25 each ran and passed in the child and 26 did not.
+- **`DECISIONS.md` — S-107**: the child runs **four files at a time**, under the same 300-second timeout, with the
+  numbers measured inside the suite; and **`reel-render`'s check 50 is not touched** — neither its bound nor its
+  timeout is widened for the second PATH-alone child.
+- **Slice 6 ticked** in `docs/features/reel-takes.md`. Prompt 035's `Run` line set to session 35, in the file and the
+  index (S-065). **No production code changed**, and none needed to.
+- **+7 tests, 347 → 354** by TAP count over the whole suite; `reel-takes`' own 59 → 66.
+
+**Observed.**
+
+- **All six of check 25's endings were GREEN before this slice's code**, in their first run, 18 s for the file —
+  which is what Gate 4 says of check 25 and why it says the campaign matters more than the tests: Slices 2 to 5
+  already write every one of these endings' events (S-094's verdicts take after take, S-098's `degraded` after the
+  third take's verdicts, S-092's kept verdicts once, S-095's refused retry, S-096's throw). Nothing here was
+  red-first, and nothing should have been.
+- **Check 26's child, measured before it was bounded** (S-107). Alone, outside the suite: 51 s at Node's default
+  concurrency (16 cores, so 15 files at a time), 68 s bounded to four. **Inside the suite, which is the condition
+  that matters**, 2026-09-20:
+
+  | check 26's child | its time | least free memory | `reel-render`'s check 50 | the whole suite |
+  | ---------------- | -------- | ----------------- | ------------------------ | --------------- |
+  | Node's default   | 101 s    | 815 MB of 15.7 GB | 248 s                    | 291 s           |
+  | bounded to four  | 130 s    | 1306 MB           | 237 s                    | 280 s           |
+
+  Bounded is what the file carries. **Check 50 is the one near its bound**: 237–248 s of its 300 s, with a second
+  PATH-alone child now running beside it, and session 31 saw it overrun twice on a loaded machine. **It was not
+  widened** — that is a finding to report, not to paper over, and S-107 records the rejection. It passed in every run
+  of this session, including `reel-render`'s own journey.
+
+- **The break campaign, 16 breaks** (`.tmp/campaign/`, session 34's moved to `s34/`). Each break's files saved as
+  bytes and fsync'd before being touched, restored and read back, every modified and untracked file fingerprinted
+  after each restore, the record removed; `tsc -b` ok for all 16; every run's test count matched its files' counted
+  total, so no runner fault.
+
+  | break | what                                                                     | caught by                 |
+  | ----- | ------------------------------------------------------------------------ | ------------------------- |
+  | c0    | a comment in the stage — the control                                     | NOTHING (as meant)        |
+  | 25a   | a verdict event dropped from every take but a shot's first               | 25, 21, 14, 8             |
+  | 25b   | a retry's verdicts sorted by gate, so takes interleave                   | 22, 25, 21, 14, 8, 15     |
+  | 25c   | a held shot's `degraded` event dropped                                   | 22, 25, 14                |
+  | 25d   | a held shot's `degraded` event before its third take's verdicts          | 22, 25, 14                |
+  | 25e   | a cap stop emitting the unclaimed `mustShow`'s gate-5 verdict as well    | **25 alone**              |
+  | 25f   | `stage.finished video` written whatever the clips stage ends as          | 25, 21, 24, 8, 15         |
+  | 25g   | `run.finished` carrying `completed` whatever the run ended as            | 12, 25, 9, 13, 14, 24, 15 |
+  | 25h   | a restart emitting the kept takes' verdicts twice                        | 25, 21                    |
+  | 25i   | a restart emitting none of the kept takes' verdicts                      | 22, 25, 21                |
+  | 26a   | the child handed this process's whole environment                        | 26                        |
+  | 26b   | the canary passed through under an ALLOWED name (`TEMP`)                 | 26                        |
+  | 26c   | a test file left out of the child's list                                 | 26                        |
+  | 26d   | that file left out AND the roll call no longer asserting every check ran | NOTHING                   |
+  | 26e   | the worker requiring `HOME`, which the bare environment lacks            | 26 alone                  |
+  | x1    | the transient throw no longer naming how many sends were made            | 11                        |
+
+  **Every one of the six endings is broken at least once**: 1 by 25a and 25b, 2 by 25c and 25d, 3 by 25e, 4 and 5 by
+  25f and 25g, 6 by 25h and 25i. **25e is the one only check 25 catches** — an extra gate-5 verdict on a cap stop is
+  invisible to check 12, which reads the result and the last event, not the whole list. **26e is S-028's own watched
+  break, reproduced**: a worker reaching for a variable the bare environment lacks is caught by check 26 and by
+  nothing else, since every other test passes in the parent.
+
+- **Caught by nothing, and what was done.** **c0**, the control, as meant. **26d** is the deliberate pair: with the
+  roll call gone, leaving a test file out of the child passes — which is exactly what 26c shows the roll call is
+  there for, and no check promises to catch its own assertion being deleted (S-028's _"Not caught"_ is the same
+  shape). Nothing was added for it. **x1** shows check 25's ending 5 pins `I-11` in the detail and not the sends
+  count, which check 11 pins — the division the two checks were written with, not a gap: 25 is about the events of
+  an ending, 11 about what the throw says.
+- **The five journeys, each on a clean tree, each committed on its own** (S-016, S-099), none of the evidence typed:
+
+  | journey         | commit    | result | tests |
+  | --------------- | --------- | ------ | ----- |
+  | `reel-takes`    | `6fe85b8` | PASS   | 66    |
+  | `reel-render`   | `39cb517` | PASS   | 106   |
+  | `reel-stills`   | `29d8ff9` | PASS   | 63    |
+  | `reel-plan`     | `153fb37` | PASS   | 50    |
+  | `reel-contract` | `5f3c18b` | PASS   | 41    |
+
+  `reel-takes` is now **verified**, and `reel-takes.md`'s Status says so. Each journey ran every check — the whole
+  suite, 354 tests, about 270 s of it — plus its own tests, so the five together ran the suite five times and every
+  one was green. `check.mjs` itself: green, after one red `format` on the first run, which was `DECISIONS.md`'s new
+  entry unformatted and was fixed by running Prettier, not by editing a check.
+
+**Next.** The owner's call, and the two candidates are named in `docs/STATUS.md` and in `reel-takes.md`'s Deferred:
+**`video-edits`** — reorder, retime, recaption, reselect-take (D-058, S-066), a file of open questions, which needs
+four gates written and adversarially approved before any code; or **the paid path** — the real language-model, image,
+clip and voice adapters, the model registry, which provider errors are transient, whether a provider bills a failed
+call — which is not planned at all, is the size of `reel-stills` or larger, and is the only thing between the engine
+as it stands and a reel anyone would watch. Neither is started here. Owed outside this repository, unchanged:
+`reel-script` must emit each criterion's type (S-029), and the steering stubs and the pin (S-033).
