@@ -3545,3 +3545,81 @@ clip and voice adapters, the model registry, which provider errors are transient
 call — which is not planned at all, is the size of `reel-stills` or larger, and is the only thing between the engine
 as it stands and a reel anyone would watch. Neither is started here. Owed outside this repository, unchanged:
 `reel-script` must emit each criterion's type (S-029), and the steering stubs and the pin (S-033).
+
+## 2026-09-20 — session 35, continued: `paid-path`'s gates, and six owner answers
+
+**Intent.** The owner, after `reel-takes` was verified: _"before reel-edits, we need to have it be ready to work
+finally and start making real videos"_. That is the paid path, which had no feature file, no gates and no slices —
+and, as the gates found, no program to run either. Gates before code (CLAUDE.md), so this is planning: nothing was
+implemented.
+
+**What changed.**
+
+- **`docs/features/paid-path.md`** — a new feature, 400 lines, four gates **APPROVED** after one adversarial review
+  pass: **22 checks in 8 slices**. Gate 1 in the design's words; Gate 2 the five adapters and the wire each speaks;
+  Gate 3 the checks by number; Gate 4 the slices, ending in one real reel and six journeys. It builds **no stage, no
+  gate, no table and no route**: it replaces five stand-ins with five adapters and builds the program that starts
+  the engine.
+- **`DECISIONS.md` — S-108 to S-115**, eight entries, six of them the owner's answers.
+- **`PROMPTS/036-paid-path-slice-1.md`** and its index row (S-065).
+
+**The owner's six answers.**
+
+- **S-108** — which adapter a port gets is **one setting per port**, every default `'fake'`, read where the worker is
+  composed. Rejected: real-when-a-key-is-present (the default becomes whatever the machine holds), and a second
+  entry point (two composition roots drift).
+- **S-109** — a key comes from **the environment, read only inside `packages/providers`**, held by a **twentieth
+  boundary rule**, `keys-only-in-providers`. D-022 binds what a provider hands back: MiniMax's `subtitle_file` is a
+  presigned credential, used and dropped, never persisted.
+- **S-110** — the first real reel is **one reel under the $3.00 cap**, with the ceiling set lower, the 4-shot plan,
+  5-second clips and the cheapest admitted image entry: about **$1.32** at the budgeting rates. 768P stays (D-007);
+  the cap is not lowered, because BUDGET.md is the steering repository's.
+- **S-111** — a real adapter is proven **against recorded wire in the suite, and by one hand-run reel outside it**.
+  No test calls a provider; `reel-takes`' check 26 and `reel-render`'s check 50 keep their exact form.
+- **S-114** — **no model SDK.** The owner asked why the AI SDK was wanted and what was better. D-005 chose it for
+  _"schema-shaped model calls … and exactly one bounded tool loop"_ — and **the tool loop is the research episode,
+  which is KnowScroll's** (D-066, D-076, D-096). What is left here is four single structured calls, no tools, no
+  streaming, no UI, while the retry counter (S-096), the budget refusal (S-087) and the receipts already exist and
+  an SDK's own retry would have to be disabled. So: **`fetch` and `zod`**, superseding D-005 **for this engine
+  only**. `ai`/`@ai-sdk/*` were installed nowhere and `packages/providers` has zero npm dependencies, so nothing was
+  rewritten. For fal, the owner chose **decide in Slice 5**: plain `fetch` behind one `uploadReference` function,
+  which alone may become `@fal-ai/client` if fal's storage protocol proves fragile by hand.
+- **S-115** — **shots stay sequential.** The owner believed parallel shots were already decided. They were not:
+  D-023's _"independent shots generate in parallel"_ sits in its **Why**, as a gain supporting its binding choice —
+  the **unit** of generation — and no engine feature ever built it. S-070 makes narration serial with its own clip
+  by construction, S-057 orders the stills ladder deliberately, D-002 runs one job at a time. `parallel-shots`
+  becomes its own feature after Slice 8, owning the three things it actually costs: **the budget guard's race**
+  (the spend is read before every call, so two concurrent takes can both pass and together breach the cap), **event
+  order asserted by name everywhere** (checks 8, 21, 22, 25 and `reel-render`'s 47 type whole lists by hand), and
+  the provider's rate limits.
+
+**Observed.**
+
+- **The engine has no runnable program, and never has.** `startApi` and `startWorker` are libraries; grep finds no
+  `bin`, no start script and nothing outside `tests/engine/harness.ts` that has ever started either half. Every
+  claim that a caller "can ask the engine for a reel over HTTP" has been true only inside a test. So Slice 1 is not
+  an adapter — it is `apps/service`, the composition root that must exist before any of this can be spent through.
+  **`docs/STATUS.md`, committed earlier today, reads better than the facts on this point**; the paid path's Gate 1
+  states it plainly instead.
+- **ffmpeg 8.1.1 here has `blurdetect`, `signalstats` and `ssim`, and no `ocr` filter or tesseract** (checked with
+  `-filters` and `-buildconf`). So the real sensor is **local and free** for sharpness, brightness and similarity —
+  no new dependency — and its **text step is one vision call through the model port** (S-112), because the only
+  alternatives were a new machine dependency or a gate that always passes.
+- **A real clip takes minutes and the lease is 60 seconds, renewed by nothing** (D-002, `reel-takes`' known limit
+  14). Under checkpoints a second claim keeps the finished takes but **pays again for the one in flight** — a silent
+  repeated charge, which D-014 forbids. S-113: the service sets the lease from the adapters it was given, refuses
+  below a floor, and runs exactly one worker; renewal is deferred and named.
+- **The gate review found eight things**, all fixed before APPROVED, and they are recorded in the file: no program
+  (finding 1); check 1 asserting something untestable; no stated mechanism for serving recorded wire, which left
+  checks 3 and 6–16 with no way to run; **check 3 unable to fail as written**, since a stand-in reads no key; the
+  rule count and a rule's comment changing a verified feature with nothing recording it; the video receipt's cost
+  having no source, since fal returns no price; the local reference picture having nowhere to go; and this feature's
+  own tests having no PATH-alone child (now check 22).
+- **Nothing was implemented and no check was run beyond `tests/feature-files.test.ts`** — which passes, so the new
+  file's front matter and its _Created_ note are well-formed — and Prettier over what changed.
+
+**Next.** Session 36 runs `PROMPTS/036-paid-path-slice-1.md`: `apps/service`, `ProviderSettings`, the refusals,
+checks 1, 2 and 5, and a break campaign — no adapter, no key, no dependency. **Owed by the owner before Slice 8 can
+run: fal credit**, which the MiniMax token plan excludes (D-007). Still open upstream and unchanged: D-028's default
+image entry (the bake-off), the observed video rate owed to `BUDGET.md` (D-007's Q9), `reel-script`'s criterion type
+(S-029), and the steering stubs and the pin (S-033).

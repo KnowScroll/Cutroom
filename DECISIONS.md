@@ -3750,3 +3750,336 @@ machine with fewer cores or less memory than this one, where both figures would 
 this machine's, dated, as check 50's are.
 
 **Confirmed-by.** Nothing asked of the owner: test support, measured.
+
+---
+
+## S-108 | 2026-09-20 | Which adapter each port gets is one setting per port, defaulting to the stand-in
+
+**Chose.** A `ProviderSettings` block names **one adapter per port** — `model`, `image`, `sensor`, `video`,
+`narration` — each a value from a **closed set**: `'fake'` for the stand-in, or the one real adapter that port has
+(`'minimax'` for the model and the narration, `'fal'` for the image and the video, `'local'` for the sensor).
+**Every default is `'fake'`**, so a worker started with no provider settings is the engine as it is verified today:
+free, secretless, reaching no network but ffmpeg on this machine.
+
+- **The setting is read where the worker is composed**, in `apps/worker`'s entry point — the composition root that
+  already chooses the stand-ins — **and it names an adapter; it never constructs one**. `packages/providers` exports
+  one factory per port that takes the name and returns the port. **S-021 and S-038 stand**: the worker is handed its
+  ports, and `worker-no-providers` keeps `apps/worker/src` from importing `packages/providers` at all.
+- **A name outside the closed set, or a real adapter whose key is absent, refuses to start**, before the database is
+  opened, in the same place and the same shape as S-075's tools and S-096's transient settings: a worker that cannot
+  build the ports it was told to build claims no job and buys nothing.
+- **Mixed is legal and expected**: a real video adapter beside a stand-in image adapter is a setting, not a branch in
+  any stage. No stage, gate or job learns which it was handed; `receipt.fake` already says so, per call, on every
+  receipt the tables keep (S-036).
+
+**Why.** The owner chose it, over the two alternatives below. It keeps the one property every feature so far was
+verified against — **the suite runs on stand-ins, for $0, with no secret** — true by default rather than by
+circumstance, and it makes "make this reel for real" one setting rather than a second program. The engine already
+proves the shape works: `reel-takes` hands the worker validated, guarded, recording wrappers around whatever port it
+was given, and nothing below the worker knows the difference.
+
+**Rejected.** **Real whenever a key is present in the environment** — the default becomes whatever the machine
+happens to hold, a stray `FAL_KEY` in a shell turns a test run into a paid one, and the no-secrets checks would be
+proving something about that machine rather than about the engine. **A second entry point that composes the real
+ports** — the strongest separation and the most duplication: two composition roots drift, and the one that is not
+exercised by the suite is the one that breaks. **A per-call choice** — a stage would have to know, which is the
+boundary S-021 exists to hold.
+
+**Caught by.** The paid-path feature's checks: a worker refusing every name outside the set and every real adapter
+with no key; a run whose settings are all `'fake'` making exactly the calls it makes today; and a boundary rule test
+that `apps/worker` still imports no provider.
+
+**Confirmed-by.** The owner, 2026-09-20, asked how the engine chooses a real provider over a stand-in: _"A setting,
+per port (Recommended)"_.
+
+---
+
+## S-109 | 2026-09-20 | A provider's key comes from the environment, and only `packages/providers` may read one
+
+**Chose.** Each real adapter reads its key **from the environment, at the moment it is constructed, inside
+`packages/providers`** — `MINIMAX_API_KEY` for the model and the narration adapters, `FAL_KEY` for the image and the
+video adapters. **No other package, app or test may read a key**, and a **twentieth boundary rule**,
+`keys-only-in-providers`, is added to `scripts/drift.mjs` to hold it, with a deliberate violation built by
+`--prove` like the other nineteen.
+
+- **The environment is loaded from a gitignored `.env`** by the worker's entry point, one setting naming the file,
+  defaulting to `.env` beside the repository root (D-086's form: one setting, a default inside this repository).
+  **`.gitignore` already covers `.env`; no exception is added** (CLAUDE.md rule 4).
+- **A key is never written anywhere**: not into a receipt, a row, an event, a question, a log line or a fault's
+  message. An adapter that must name its call names the model and the request id, never a header.
+- **D-022 is binding on what a provider hands back.** A response field that is a URL — MiniMax T2A's
+  `subtitle_file` is a presigned OSS URL carrying `OSSAccessKeyId` and `Signature`, which is the exact shape that
+  leaked in the steering repository — **is used and dropped, never persisted**. The narration adapter fetches the
+  timings and stores the words; the video and image adapters download the file under the artifact root and store the
+  local path. **What is persisted is the host at most, never the query string.**
+- **The no-secrets checks keep their meaning.** `reel-takes`' check 26 and `reel-render`'s check 50 run the suite in
+  a child holding PATH alone; with every default `'fake'` (S-108) nothing in the suite constructs a real adapter, so
+  **no test needs a key and the guarantee stays unconditional** (S-111).
+
+**Why.** The owner chose it. The engine reads no secret today and two checks prove it; the rule that keeps that
+true as real adapters arrive has to be structural, not a habit — the same argument that made `pipeline-no-io` and
+`worker-no-providers` rules rather than review notes. D-022's finding is that scanning for your own keys proves
+nothing about what a provider handed you, so the boundary is where a response is recorded, not where a key is typed.
+
+**Rejected.** **A key file named by a setting** — one more file that must never be committed, and D-022's incident
+was a credential written into a file. **Keys reaching the worker as arguments** — the worker would hold a secret it
+has no use for, and `worker-no-providers` would be the only thing between it and a provider. **Reading a key at call
+time** — a run that starts without one would fail halfway through, after spending.
+
+**Caught by.** The paid-path feature's checks: `drift --prove` building a violation of `keys-only-in-providers`; an
+adapter's receipt and rows asserted to hold no key and no query string against a recorded response that carries
+both; and a worker refusing to start when a named real adapter's key is absent. **Changes a verified feature:**
+`reel-stills`' check 3 counts the boundary rules and says **nineteen** exactly (S-078) — it becomes twenty, by
+addition, in the slice that adds the rule, and `reel-stills`' journey runs again with the feature's own.
+
+**Confirmed-by.** The owner, 2026-09-20: _"Environment, read only in providers (Recommended)"_.
+
+---
+
+## S-110 | 2026-09-20 | The first real reel is one reel under the $3.00 cap, and is made as cheap as the decisions allow
+
+**Chose.** The paid path's first real run is **one reel**, under **BUDGET.md's $3.00 per-reel cap unchanged**
+(D-014, D-100), with **the caller's ceiling set lower than the cap** for that run, and every lever that does not
+break a decision pulled towards cheap:
+
+- **The plan's 4-shot side of the `shotCount` axis** where Gate 0 admits it (D-112, S-111's run is a caller's
+  request like any other), and **5-second clips**, the provider's floor (D-019's `duration` 5..15).
+- **The cheapest admitted image entry as the configured default for that run** — `flux-2-pro/edit` at about $0.03,
+  of D-028's four admitted entries. **This does not settle D-028's open default** (O-4 / C-8, the bake-off): it is a
+  setting for one run, and the entry is chosen because it is cheapest, not because it is best.
+- **Narration and every model call are token-plan covered** (D-019's spike: T2A `speech-2.8-hd` and all three text
+  models answered on the owner's plan), so the marginal cost of a first reel is **its images and its clips**: about
+  4 × $0.03 + 6 × 5 s × $0.04 = **$1.32** at the budgeting rates, against a $3.00 cap.
+- **768P stays, always** (D-007). 480P exists in the schema and is not taken: the resolution is hard-locked, and
+  `reel-stills`' and `reel-render`'s receipts are asserted against it.
+- **The observed rate is read from the provider and written into BUDGET.md** after the first paid clip — D-007's
+  and BUDGET.md's own open item (Q9), which no session has been able to close because nothing had ever made a paid
+  call.
+
+**Why.** The owner asked for one reel, at $3.00 at most, _"but try to keep it even cheaper"_. Every cheapening
+above is a lever the decisions already allow; none of them weakens a gate, changes a resolution or drops a check.
+The cap is not lowered in `BUDGET.md` — that file is the steering repository's authority, read through the pin — so
+the run is bounded by the caller's ceiling instead, which is what a ceiling is for (D-100).
+
+**Rejected.** **480P for the first run** — D-007 hard-locks 768P and two verified features assert it. **Lowering the
+$3.00 cap** — it lives in the pinned steering repository, and this repository does not edit it (D-115, S-017).
+**A shorter reel than Gate 0 admits** — Gate 0's 35–45 seconds is D-111's setting, and a run that dodges it is not
+the engine's path. **Skipping the rate read** — the estimate would stay a guess after money had been spent.
+
+**Caught by.** The paid-path feature's checks: the run's own receipts totalling under the ceiling; every video
+receipt carrying `768P`; and the journal entry recording what the dashboard said against what the receipts say.
+
+**Confirmed-by.** The owner, 2026-09-20: _"One reel, $3 cap max, but try to keep it even cheaper"_. **Open, and
+owed by the owner before the first paid call:** fal credit, which the MiniMax token plan does not cover (D-007).
+
+---
+
+## S-111 | 2026-09-20 | A real adapter is proven against recorded wire in the suite, and by one hand-run reel outside it
+
+**Chose.** **No test calls a provider.** Every real adapter is tested in the suite against **recorded responses** —
+the bodies a real call returned, saved as fixtures with D-022's redaction already applied — covering what it parses,
+what it downloads, what it records, and **which failures it turns into `unavailable` and which it throws** (S-096).
+The adapter is handed its transport, so a fixture is served without a network.
+
+- **One script, run by hand, makes a real reel**: `scripts/real-reel.mjs`, outside `tests/`, which starts the engine
+  with the real adapters named (S-108), submits one request and prints what it spent. **It is never run by
+  `check.mjs`, by a journey or by any test**, and `tests/` holds a check that no test file names it.
+- **The evidence of a real run is its receipts and the journal**, as every other claim in this repository is: the
+  run's rows, the file it produced, the dashboard's figure beside the receipts' — never a test asserting that a
+  provider was reachable on the day the suite ran.
+- **`reel-takes`' check 26 and `reel-render`'s check 50 keep their exact form**, and stay unconditional: with every
+  default `'fake'` (S-108) the child needs no key, and the suite is still $0.
+
+**Why.** The owner chose it. Gate 1 of every feature verified so far says nothing may cost money, read a secret or
+reach out of this machine, and two checks prove it by running the whole journey with PATH alone; a test that calls a
+provider would make those checks false or conditional, and a conditional check reads as coverage while proving
+nothing. What a recorded response cannot prove — that the endpoint still exists and still answers this shape — a
+hand-run reel proves once, with its evidence written down, which is what D-018 and D-019 already did with spikes.
+
+**Rejected.** **A live smoke test behind an environment flag** — skipped when the flag is absent, and a skipped test
+reads as coverage; `reel-takes`' check 26 asserts zero skipped for exactly that reason. **Always-on live tests** —
+every suite run spends money and needs a key, which contradicts four verified features' Gate 1. **No real run at
+all** — recorded wire proves the parser, never the provider; the engine would claim a paid path it had never used.
+
+**Caught by.** The paid-path feature's checks: the recorded-wire tests themselves; a check that no test file, and
+no `check.mjs` step, names the real-reel script; and checks 26 and 50, unchanged, still green.
+
+**Confirmed-by.** The owner, 2026-09-20: _"Recorded wire, plus one manual real run (Recommended)"_.
+
+---
+
+## S-112 | 2026-09-20 | The real sensor measures with ffmpeg, and reads text with one vision call
+
+**Chose.** The real `PictureSensorPort` (`packages/providers/src/ffmpeg/sensors.ts`) is **local and free**, built on
+the one real tool this repository already requires (S-075):
+
+- **`sharpness`** from ffmpeg's **`blurdetect`**, **`brightness`** from **`signalstats`**, **`similarity`** from
+  **`ssim`** over the two pictures — each mapped into the range `PictureMeasure` declares (0..1, and -1..1 for the
+  cosine), and `readable: false` for a file ffprobe does not read as a picture (S-050's naming, S-044's ranges).
+- **`readText` is one vision call through the `LanguageModelPort`** the adapter is composed with, asking what text
+  is visible in the picture, and its strings are the answer. **A failed call throws**; it never answers "no text".
+
+**Why.** Gate 1's four steps include a text step (D-042), and a sensor that cannot read text would have to answer
+"none" always — **a gate that always passes, which is weakening a check to make it buildable**, forbidden here.
+**This ffmpeg has no `ocr` filter and no tesseract**: checked on this machine on 2026-09-20, `ffmpeg -filters` lists
+`blurdetect`, `signalstats` and `ssim` and no `ocr`, and `-buildconf` names no tesseract. Of the two ways left — a
+new machine dependency, or a call to the model the engine already uses to look at pictures — the second adds
+nothing to install, is covered by the owner's token plan (D-019), and uses the model D-006 already routes every
+seeing call to. The three measures stay local because ffmpeg can do them exactly and a model cannot do them
+repeatably.
+
+**Rejected.** **Tesseract, or an ffmpeg built with it** — a second tool on PATH, which S-075's whole point is to
+keep to one, and nothing installs tools here. **A new npm image library (`sharp`)** — a native dependency for three
+numbers ffmpeg already computes. **A sensor that answers no text** — a gate that cannot fail. **Every measure by
+model call** — unrepeatable numbers where a filter gives exact ones, and four paid calls a picture where zero will do.
+
+**Caught by.** The paid-path feature's checks 18 and 19: each measure in its range from a real file, an unreadable
+file measuring unreadable with no model call, and the text step's strings coming from the vision call, with a failed
+call throwing.
+
+---
+
+## S-113 | 2026-09-20 | A real job's lease is set from the adapters it was given, with a floor, and one worker runs
+
+**Chose.** A real clip takes minutes where a stand-in takes milliseconds, and **nothing renews a lease** (D-002,
+`reel-takes`' known limit 14). So:
+
+- **The service sets `leaseMs` from the adapters it was told to build**, and **refuses to start when any real
+  adapter is named and the lease is below a floor** that covers the longest job a real run can make — a clips job of
+  six shots at up to three takes each, every take a real clip, plus their narrations. The floor is a setting with a
+  declared default, and **its figure is measured on the first real run, not guessed** (S-110).
+- **The service starts exactly one worker.** With one poller, no second claim exists to take a job whose lease ran
+  out while it was still alive.
+- **Lease renewal is deferred**, named in the feature's deferral list: a heartbeat extending a live job's lease is
+  what a second worker would need, and nothing here runs two.
+
+**Why.** Under checkpoints a second attempt keeps every finished narration and decided take (S-092) but **pays again
+for the take in flight** — so an expired lease on a real run is a real, silent, repeated charge, which is exactly
+what D-014's _"never silently overspends"_ forbids. A long lease costs only the time a genuinely dead worker's job
+waits; a short one costs money. One worker makes the race impossible rather than unlikely, which is the same shape
+as every other structural rule here (S-021, I-18).
+
+**Rejected.** **Leaving the 60-second default** — the first real clips job would outlive it and be claimed again.
+**A heartbeat now** — the honest fix, and a change to `domain`'s claim and `worker`'s loop for a fleet that does not
+exist; it is deferred, not denied. **Letting the worker extend its own lease implicitly by finishing** — a lease is
+read by whoever claims, not by whoever holds. **Running several workers for speed** — one job at a time is D-002's
+design and the per-reel cap's reading is per chain; concurrency is its own feature.
+
+**Caught by.** The paid-path feature's check 17: a service given a real adapter and a short lease refuses to start,
+naming the figure, and one worker is started.
+
+---
+
+## S-114 | 2026-09-20 | The engine speaks each provider's wire itself, with `fetch` and `zod`; no model SDK, and no vendor client unless one is earned
+
+**Chose.** **No provider SDK is installed in this repository.** Every real adapter in `packages/providers` makes its
+calls with the platform's `fetch` and parses what comes back with `zod`:
+
+- **The model adapter** posts to MiniMax's **OpenAI-compatible `/v1/chat/completions`** — the wire D-019 verified
+  live for all three models — asking for its schema through `response_format`, and carrying a picture or a clip as a
+  content part for the seeing calls. It **strips the `<think>…</think>` block before parsing**, budgets `max_tokens`
+  on top of reasoning, and records `usage`, including `reasoning_tokens` and `cached_tokens` where the model reports
+  them (D-006, D-019).
+- **The image and video adapters** drive fal's queue themselves: submit to `queue.fal.run/<slug>`, poll status, fetch
+  the result, **download the file under the artifact root** (D-086) and record the local path, never the provider's
+  URL (D-022).
+- **Every adapter is handed its transport** — a `fetch` and a base URL, each a setting with the provider's own as
+  its default — so a recorded response is served without a network (S-111), which is how these adapters are tested.
+
+**One escape hatch, named and conditioned.** `@fal-ai/client` may be adopted **for fal only, inside
+`packages/providers` only**, **if and only if** driving fal's **storage upload** by hand — the step that gets a
+local reference picture to a URL fal can fetch — proves fragile or undocumented in Slice 5. Adopting it is a new
+S-entry recording what was measured, and it changes nothing else: the download, the error classification and the
+receipts stay the engine's, and its own retry is disabled so it can never shadow S-096's counter.
+
+**Supersedes D-005**, on _"`ai` (Apache-2.0) for every model call"_ and on its `Confirmed-by` _"a test asserts no
+provider SDK is imported outside `packages/providers`"_ — **for this engine**. D-005's other clauses stand
+unchanged: orchestration is the job table and not an agent framework (D-002), and every model call writes a
+`model_receipt`. **D-005 continues to bind KnowScroll's side**, where the research episode lives (D-066, D-076,
+D-096), and this entry says nothing about it. **`model-client-only-in-providers` stays**, and gains S-114 beside
+D-005 in its comment: a rule forbidding a model client outside `packages/providers` is still true, and is now also
+what keeps one from being reintroduced anywhere.
+
+**Why.** **The one thing D-005 bought is not in this engine.** Its reason was _"a state machine with schema-shaped
+model calls between the states and exactly one bounded tool loop"_ — and **the tool loop is the research episode**,
+which belongs to KnowScroll (D-096: the engine receives derived criteria and opaque claim ids, and never searches).
+What is left here is four single structured calls — planner, witness `observe`, reconciler, `judgeCut` — with no
+tools, no streaming and no UI.
+
+**The harness the SDK would bring already exists here, and a second copy would fight it.** Receipts are
+`recordingPort`'s, the budget refusal before every send is S-087's, and the transient retry with backoff is S-096's,
+on its own counter, which D-024 says must never share with the take counter. An SDK's own retry would have to be
+disabled to be safe, which is a dependency carried for the parts we turn off.
+
+**D-019's findings want the raw wire.** Every model in the family emits a reasoning block, and a call whose budget
+is spent inside it returns nothing at all — the failure that reads as a schema error and is not one. Handling that,
+and recording reasoning tokens, is easier at the wire than through a layer designed to hide it.
+
+**And the cost of not having it is small and known**: `packages/providers` has **zero npm dependencies today**, and
+`ai`/`@ai-sdk/*` are installed nowhere in this repository — nothing imports them, so nothing is rewritten. What we
+write instead is request shaping, timeouts on `AbortSignal`, and response parsing we would have written schemas for
+anyway.
+
+**Rejected.** **The `openai` client with its `baseURL` pointed at MiniMax** — typed messages and a maintained
+transport, at the price of the first dependency tree in `providers`, types that do not carry MiniMax's extra fields,
+and a retry policy that must be set to zero to keep S-096 the only one. **`@ai-sdk/openai-compatible`** — the thin
+slice of D-005, still abstracting the reasoning block D-019 says to handle by hand. **Keeping the AI SDK whole** —
+the owner declined it, and the tool loop that justified it is another repository's. **`@fal-ai/client` adopted up
+front** — a dependency taken before the endpoint it would save us from has been tried once.
+
+**Caught by.** `model-client-only-in-providers`, unchanged, with its `--prove` violation; the paid-path feature's
+checks 6 to 8 and 14 to 16, each against a recorded response served to an injected transport; and the absence of any
+`ai`, `@ai-sdk/*` or `openai` entry in every `package.json`, which a check reads.
+
+**Confirmed-by.** The owner, 2026-09-20: asked why the AI SDK was wanted and what the better alternatives were, then
+chose _"Plain fetch + zod (Recommended)"_ for the model wire and _"Decide in Slice 5, from the wire (Recommended)"_
+for fal's.
+
+---
+
+## S-115 | 2026-09-20 | Shots stay sequential through the paid path; D-023's parallel gain is unbuilt, named, and planned for after the first real reel
+
+**Chose.** The paid path builds **nothing concurrent**. A run keeps the order every verified feature was built and
+checked against: one worker, one job at a time (D-002); each shot in plan order, its narration measured before its
+own clip is asked for (S-070); each shot's ladder finished before the next shot's begins (S-057); every take's
+verdicts in shot and take order (S-069, S-094, S-092).
+
+**D-023's third gain — _"Independent shots generate in parallel, which is the only latency lever available"_ — is
+NOT built, and never has been.** It sits in that decision's **Why**, supporting its binding choice, which is the
+**unit** of generation: shots of 5–15 s, joined by cuts, never one long clip. That choice is honoured in full. The
+latency lever is not, and this entry is what stops _"we decided parallel shots"_ from being read as _"the engine
+generates shots in parallel"_.
+
+**A `parallel-shots` feature follows the first real reel**, planned against measured figures rather than guesses,
+and it owns the three things concurrency actually costs here:
+
+1. **The budget guard races.** The chain's spend is read before every call and every send, and compared with the cap
+   and then the ceiling (S-059, S-087, S-095). Two concurrent takes can each pass that read and together breach the
+   cap. Concurrency needs a reservation, or a serialized guard — a change to the mechanism that makes an overspend
+   structurally impossible, which is why it is not done casually.
+2. **Event order is asserted by name, everywhere.** `reel-takes`' checks 8, 21, 22 and 25 and `reel-render`'s 47 type
+   whole event lists by hand, and dozens of checks assert exact call sequences. Parallel shots interleave them, so
+   the stage would have to buffer per shot and emit in plan order — and every journey re-runs (S-099's form).
+3. **The provider's own limits and this machine's.** Concurrent fal jobs meet rate limits, which arrive as
+   `unavailable` and back off (S-096), giving some of the win back; and every take runs ffmpeg probes and scans
+   beside the others (S-107 measured what the suite already costs in memory).
+
+**Why.** The owner's goal is a real reel, and the first paid run is the first time any of this repository's cost and
+latency figures stop being estimates — **the price has never been read** (D-007's open Q9) and **the latency has
+never been measured at all**. Changing the guard and the event ordering in the same feature that first spends money
+would mean a failure could be the provider, the guard or the ordering, with no earlier run to compare against.
+D-023's own reason for the lever — per-call latency is not controllable — is as true after one sequential reel as
+before it, and the feature is cheaper to plan once its numbers exist.
+
+**Rejected.** **Concurrency inside the paid path** — the first paid run and a rewrite of the budget guard landing
+together, against checks that assert the order it would change. **Declaring sequential permanent** — it gives up the
+only latency lever D-023 found, on no measurement; a 4–6 shot reel at minutes a clip is the case that decides it.
+**Parallelising only the stills stage** — S-057 chose its order deliberately, for the repair-next-to-its-verdict
+reading, and four image calls are seconds, not minutes: the wrong place for the lever.
+
+**Caught by.** `paid-path`'s checks, which assert sequential call order as every verified feature already does; its
+deferred list, which names this entry; and the `parallel-shots` feature's own gates, which cannot be written until
+Slice 8 has produced a measured run.
+
+**Confirmed-by.** The owner, 2026-09-20, asked whether parallel shots were already decided and chose _"After the
+first real reel (Recommended)"_.
