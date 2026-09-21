@@ -5032,3 +5032,94 @@ image rate. **One named limit carried forward:** `reel-render`'s check 50 is mar
 alone against a 300 s bound, and paid-path's check 22 is now a second PATH-alone child in the same run. Still
 open upstream and unchanged: D-028's default image entry (O-4 / C-8), `reel-script`'s criterion type (S-029), and
 the steering stubs and the pin (S-033).
+
+---
+
+## 2026-09-21 — session 43, continued: four attempts at the reel, and the account that stopped it
+
+**Intent.** The owner granted the permission session 43's harness had refused and asked for the reel to be made.
+Four attempts. **No reel, 0¢ spent, and the blocker is the MiniMax account rather than anything in this
+repository.** Two findings came out of it, one about our own script and one about the authority.
+
+**The script refused a confirmation that had been given, three times, and the cause is a measurement.** In an
+ESM script with a top-level `await`, `createInterface({ input: process.stdin })` over a **redirected file**
+emits `close` before it ever emits `line` — with no delay, no heavy import and no other reader involved. The
+same read in a first-tick `node -e` works, which is what made it look like the shell's fault for two attempts.
+**Fixed by reading fd 0 synchronously when stdin is not a terminal** (`79099d9`); a terminal still uses
+`readline`, because a person typing one line must not be made to signal end-of-file to be heard. Check 20 is
+unchanged and green — it asserts the ORDER of print, confirm and submit, and the order did not move.
+
+**Then the run submitted, and the provider refused it.** Two different refusals, in order, each classified
+correctly and neither retried:
+
+- **401** `login fail: Please carry the API secret key in the 'Authorization' field of the request header
+(1004)` — the first key.
+- **402** `insufficient_balance_error … insufficient balance (1008)` — after the owner replaced it.
+
+**Both are FAULTS, not transients, so the run stopped at its first call and bought nothing.** That is checks 6
+and 8 exercised against a live provider for the first time, and S-123's _"MiniMax reports its own outcome even
+under 200"_ confirmed live: **T2A answered HTTP 200 carrying `base_resp.status_code: 1008`**, which is exactly
+the case the narration adapter was built to catch.
+
+**What was ruled out, by measurement rather than inference.** Probes in `.tmp/`, each loading the environment
+through `loadEnvFile` and replacing the key with `<KEY>` before logging anything:
+
+| Axis                                         | Result                                                        |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| `GET /v1/models`, `GET /anthropic/v1/models` | **200**, listing MiniMax-M3 and MiniMax-M2.7                  |
+| `POST /v1/chat/completions`                  | 402 on M3, M2.5, M2.7, M2 and M2.7-highspeed                  |
+| `POST /anthropic/v1/messages`                | 402 on the same five, with Bearer **and** with `x-api-key`    |
+| `POST /v1/t2a_v2`                            | HTTP 200 carrying `base_resp.status_code: 1008`               |
+| `api.minimaxi.com`, `api.minimax.chat`       | **401 invalid api key (2049)** — so it is a `minimax.io` key  |
+| Key shape                                    | 129 characters, not JWT-shaped, no quotes or stray whitespace |
+
+**Reading the account works and generating does not.** So it is not the wire, not the model name, not the
+region, not the header style and not the credential — it is the account's entitlement. The discrimination is
+D-019's own, used on SERPdive: _"an intentionally bad key returns 401 `invalid_api_key`, ours returns 503 — so
+this is provider capacity, not our account."_ Same method here, opposite verdict: **it is our account.**
+
+**A claim of the authority has stopped holding, and it is owed upstream rather than edited here (D-115, S-017).**
+D-019 recorded, from real calls on 2026-09-03, that _"the token-plan key covers all three"_ text models and that
+T2A _"IS covered by the owner's token plan … No pay-as-you-go key is needed."_ Neither is true of this key
+today. **This is not only a figure but a structural one:** `estimate()` is
+`plannedImageCalls × imageRateCents + seconds × videoRateCentsPerSecond` and **has no model or narration term at
+all** — not zero, absent — because D-019 said they were free. If text and T2A start costing, the budget guard
+prices a reel on two of its four cost sources. Nothing was changed on the strength of this; it is recorded.
+
+**What MiniMax's own documentation says**, read the same day: the **Token Plan** _"extends upon our former
+Coding Plan by providing included Token Plan usage beyond language models"_ and covers _"the full MiniMax lineup
+(M3 / M2.7 / image / speech)"_, excluding _"MiniMax H3, voice design, rapid voice cloning"_. **That is exactly
+this engine's shopping list, and exactly D-007's exclusion** — so the architecture already matches the plan's
+shape, and a working Token Plan would need no design change at all.
+
+**And the alternative was researched rather than assumed.** The owner asked whether their OpenAI key could
+replace MiniMax. Against OpenAI's own docs: **eight of our nine calls port over** — including Gate 7, which
+already sends **frames** (three a shot, 12–18 an call) rather than video, well inside OpenAI's 1,500-image
+limit. **Gate 4 does not port**: it sends a whole MP4 as `video_url`, and _"all latest OpenAI models support
+text and image input"_ — there is no video modality. Substituting a frame strip turns D-043's `event` criteria
+into presence checks, which is weakening a verified gate (D-041, D-053, S-072). Narration is solvable only as
+TTS **plus** a `whisper-1` transcription with `timestamp_granularities[]`, since OpenAI's TTS returns no timings
+at all — which is D-008's `kokoro-js` + `whisper-cli` fallback in another coat. **So OpenAI is not a
+replacement; it relocates the Gate 4 problem rather than removing it**, and it would be its own feature with its
+own four gates.
+
+**Changed.** **`scripts/real-reel.mjs`** — the confirmation read (`79099d9`). **`PROMPTS/`** — the real-reel
+prompt renumbered **044 → 045**, since the research session now runs first and `NNN` is the session's number
+(S-065); **`PROMPTS/044-minimax-key.md`** written, carrying the ruled-out table so session 44 does not
+re-measure it, five hypotheses strongest-first, and the instruction to read OpenCode's, pi's and Hermes' own
+provider definitions and **replay the exact request one of them sends**. No source file changed beyond the
+confirmation read; the suite still counts **463**.
+
+**Observed, and worth keeping.** The prompt's own instruction — _"a run that fails partway HAS ALREADY SPENT:
+read its receipts before running anything again"_ — was followed four times and each time the receipts said
+zero, which is how four attempts cost nothing. **The guard that made that safe is the one nobody designed for
+it:** the estimate is printed before the confirmation is read, so a run that cannot pay never reaches a
+provider that could charge.
+
+**Next.** Session 44 runs `PROMPTS/044-minimax-key.md`: why the same key works in OpenCode, Hermes and pi and
+not here. The strongest untested hypothesis is a **request header** — reading works and generating does not, on
+every wire and every model, which is the shape of an entitlement keyed on something other than URL, model or
+credential; `stream: true` is the second. After it, `PROMPTS/045-paid-path-real-reel.md` makes the reel. **Slice
+8 stays unticked and the six journeys stay unrun**, because the reel does not exist. **Three figures are owed
+upstream:** the observed video rate (D-007's Q9), the corrected image rate, and now **whether the token plan
+covers text and T2A at all** (D-019).

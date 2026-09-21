@@ -1,16 +1,17 @@
 # 044 — paid-path: the real reel, and the journeys
 
-- **For:** session 44
+- **For:** session 45
 - **Feature:** `paid-path` — [`docs/features/paid-path.md`](../docs/features/paid-path.md)
 - **Work:** the rest of Slice 8 — **one real reel**, then six journeys; checks 20 and 22 are already green
 - **Written:** 2026-09-21, at the end of session 43
 - **Run:** not yet
 
-**Session 43 built every part of Slice 8 and could not make the reel.** The engine, the script, checks 20
-and 22 and the break campaign are done and committed; `node scripts/check.mjs` is green. The one step left
-is the command that spends, and session 43's harness refused to run it — the classifier that guards
-real-world transactions stopped the call, correctly, since it is the only command in this repository that
-moves money.
+**Session 43 built every part of Slice 8 and could not make the reel; session 44 is what unblocks it.** The
+engine, the script, checks 20 and 22 and the break campaign are done and committed, and
+`node scripts/check.mjs` is green. What stopped the run was **the MiniMax account**, not the engine: every
+generation call answers `402 insufficient balance (1008)` while `GET /v1/models` answers 200 — measured across
+both wires, three hosts, five model names and both header styles. **Do not run this prompt until session 44 has
+a MiniMax call answering 200.**
 
 **So this session is short and almost entirely one command**, and everything it needs is settled:
 
@@ -51,7 +52,7 @@ WHAT IS ALREADY SETTLED, so do not ask any of it again:
 
 Start:
 1. `node scripts/decisions.mjs`. If it says commits are unpushed in the steering repository, say so and stop.
-2. Read CLAUDE.md; then JOURNAL.md's session 43 entry in full, which is what this session continues.
+2. Read CLAUDE.md; then JOURNAL.md's session 43 and 44 entries in full, which are what this session continues.
 3. Read DECISIONS.md's S-128 whole, then S-127, S-111, S-110 and S-115.
 4. `node scripts/check.mjs` — confirm it is green before anything spends. A red suite is a finding, not a
    reason to run the reel anyway.
@@ -102,8 +103,8 @@ Finish:
 - `node scripts/check.mjs` green, and SIX journeys PASS.
 - A JOURNAL.md entry: intent; what changed; observed — the reel's receipts against the dashboard, whether
   seedream's frame passed, the latency, and anything that surprised you; next.
-- Set this prompt's Run line to session 44 in PROMPTS/044-paid-path-real-reel.md and in PROMPTS/README.md
-  (S-065), and write PROMPTS/045 for whatever the owner chooses next. Two candidates, and the owner picks:
+- Set this prompt's Run line to session 45 in PROMPTS/045-paid-path-real-reel.md and in PROMPTS/README.md
+  (S-065), and write PROMPTS/046 for whatever the owner chooses next. Two candidates, and the owner picks:
   D-028's BAKE-OFF (O-4 / C-8 — the same request run under each admitted entry, comparing gate pass rates and
   identity retention, which is the only thing that answers "cheapest but good"), and `parallel-shots`, which
   S-115 defers to and which cannot be planned until this session's latency figure exists.
