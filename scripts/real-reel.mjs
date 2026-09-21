@@ -28,6 +28,7 @@
  * environment variable's value and nothing a provider handed back but the figures above (D-022).
  * It submits exactly ONE request, and if it is run again it makes a second reel and spends again.
  */
+import { readFileSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 import { DatabaseSync } from 'node:sqlite'
 import { estimate, plannedImageCalls } from '@cutroom/pipeline'
@@ -215,17 +216,41 @@ if (high.cents > ceiling) {
 
 // ---------------------------------------------------------------- the confirmation
 
-const answer = await new Promise((resolve) => {
-  const rl = createInterface({ input: process.stdin })
-  process.stdout.write(
-    `  type ${bold(confirmation(ceiling))} to make it, or anything else to stop: `,
-  )
-  rl.once('line', (line) => {
-    rl.close()
-    resolve(line.trim())
-  })
-  rl.once('close', () => resolve(''))
-})
+process.stdout.write(`  type ${bold(confirmation(ceiling))} to make it, or anything else to stop: `)
+
+/**
+ * The line a person supplies, read the way the shell they are in actually supplies it.
+ *
+ * **A TERMINAL is read with `readline`**, because a person typing one line must not be made to
+ * signal end-of-file to be heard.
+ *
+ * **ANYTHING ELSE IS READ SYNCHRONOUSLY FROM FD 0**, and the reason is a measurement rather than a
+ * preference. Measured here on 2026-09-21: in an ESM script with a top-level `await`,
+ * `createInterface({ input: process.stdin })` over a REDIRECTED FILE emits `close` before it ever
+ * emits `line` — the line is lost, with no delay and no other reader involved, and the script
+ * refuses a confirmation that was given. The same read in a first-tick `node -e` works, which is
+ * what made it look like the shell's fault. `readFileSync(0)` does not go through the stream at
+ * all, so it cannot lose the line whatever the module graph does.
+ *
+ * Neither branch weakens what a confirmation IS: the figure, typed, and read only after the
+ * estimate above has been computed and printed.
+ */
+const answer = process.stdin.isTTY
+  ? await new Promise((resolve) => {
+      const rl = createInterface({ input: process.stdin })
+      rl.once('line', (line) => {
+        rl.close()
+        resolve(line.trim())
+      })
+      rl.once('close', () => resolve(''))
+    })
+  : (() => {
+      try {
+        return (readFileSync(0, 'utf8').split(/\r?\n/)[0] ?? '').trim()
+      } catch {
+        return ''
+      }
+    })()
 
 if (answer !== confirmation(ceiling)) {
   console.log(`\n${dim('nothing was submitted, and nothing was spent.')}\n`)
