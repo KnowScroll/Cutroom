@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { join, relative, sep } from 'node:path'
 import { test } from 'node:test'
 import type { NarrationAnswer, NarrationRequest } from '@cutroom/contracts'
-import { wordTimings } from '@cutroom/pipeline'
+import { DEFAULT_RENDER_SETTINGS, wordTimings } from '@cutroom/pipeline'
 import {
   AUDIO_SETTING,
   MINIMAX_BASE_URL,
@@ -12,6 +12,8 @@ import {
   T2A_PATH,
   minimaxNarration,
 } from '@cutroom/providers'
+import { SETTING_NAMES, readSettings } from '@cutroom/service'
+import { REPO } from './_repo.ts'
 import { readWire, recordedFetch, type Sent, type Wire } from './engine/wire.ts'
 
 // paid-path, Slice 4 — checks 9 and 10 (docs/features/paid-path.md): the MiniMax T2A narration
@@ -166,6 +168,54 @@ test('9. the adapter asks speech-2.8-hd with subtitle_enable, on the wire D-019 
   } finally {
     folder.clean()
   }
+})
+
+test('9. the service names the voice it speaks with, one setting, defaulting to what every stand-in run uses', () => {
+  // THE ADAPTER MAY NOT SPELL A VOICE. `speak` is handed `RenderSettings.voice` and sends it
+  // straight through as MiniMax's `voice_id` (S-070, D-008) — and the default was still the
+  // string `'stand-in'`, which the stand-in narration port ignores and a real provider refuses.
+  // Every narration call of a real run would have been refused before a single clip was bought,
+  // and sessions 40, 41 and 42 each carried it forward as a named limit (S-128).
+  //
+  // So it is a setting, like the image entry (S-127): the free path is byte-for-byte what every
+  // verified feature runs on, and the run that spends names its voice.
+  assert.equal(DEFAULT_RENDER_SETTINGS.voice, 'stand-in', "the pipeline's own default moved")
+  assert.equal(
+    readSettings({}).renderSettings.voice,
+    DEFAULT_RENDER_SETTINGS.voice,
+    'a plainly started service no longer renders with the pipeline’s own default',
+  )
+  assert.equal(
+    readSettings({ [SETTING_NAMES.narrationVoice]: 'English_Graceful_Lady' }).renderSettings.voice,
+    'English_Graceful_Lady',
+    'the voice setting does not reach the render settings the worker is handed',
+  )
+  // Nothing else about what the worker renders with moves with it.
+  const named = readSettings({
+    [SETTING_NAMES.narrationVoice]: 'English_Graceful_Lady',
+  }).renderSettings
+  assert.deepEqual(
+    { ...named, voice: DEFAULT_RENDER_SETTINGS.voice },
+    DEFAULT_RENDER_SETTINGS,
+    'naming a voice changed something else about the render settings',
+  )
+})
+
+test('9. the composition root HANDS the worker those render settings, read from its own source', () => {
+  // The setting reaching `ServiceSettings` proves nothing on its own: `startWorker` takes
+  // `renderSettings`, and `apps/service` had never passed it at all — every run rendered with the
+  // pipeline's own defaults whatever the settings said. Proving it end to end would mean a whole
+  // reel through a loopback wire; this is check 17's form instead, which reads the composition
+  // root's source for the one line, as check 11 reads it for a slug (S-128).
+  const source = readFileSync(join(REPO, 'apps', 'service', 'src', 'service.ts'), 'utf8')
+  assert.match(
+    source,
+    /renderSettings:\s*settings\.renderSettings/,
+    'apps/service does not hand the worker the render settings it read',
+  )
+  // And it is handed to `startWorker`, not kept somewhere nothing reads.
+  const call = /startWorker\(\{[\s\S]*?\n\s{4}\}\)/.exec(source)?.[0] ?? ''
+  assert.match(call, /renderSettings/, 'the render settings are not in the startWorker call')
 })
 
 test('9. it sends where the base URL it was handed says, so a test can never reach the provider', async () => {

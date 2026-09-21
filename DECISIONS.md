@@ -4924,3 +4924,97 @@ conditional admission rests on. And Gate 0's own `shaped()`, which refuses a 30-
 seedream's 9:16 is undocumented, chose to run the cheapest option first and see. The three
 corrections are facts measured from this repository's own source and gates on the same day, not
 preferences.
+
+---
+
+## S-128 | 2026-09-21 | Every admitted image entry carries its model's TEXT wire beside its edit wire, because the canonical picture is made from nothing; the narration voice is a service setting; and the first real reel's ceiling is 250¢
+
+**Chose.** Three choices, each between real alternatives, and the first two are **blockers found
+before anything spent** — read from fal's own published OpenAPI schemas on 2026-09-21, keyless and
+free, the way D-019's spike read H3's.
+
+- **AN ENTRY HAS TWO WIRES, AND THE CALL PICKS ONE BY WHETHER IT CARRIES A REFERENCE.**
+  `ImageEntry` gains **`textSlug`** beside `slug`, and `wireFor(entry, references)` answers the
+  text wire for a call with none and the edit wire for a call with one. The four are
+  `fal-ai/nano-banana-pro`, `fal-ai/nano-banana-2`, `bytedance/seedream/v5/lite/text-to-image` and
+  `fal-ai/flux-2-pro`, each verified to exist by the same schema read. **The receipt records the
+  wire that was called**, never the entry's edit slug whatever was sent.
+- **THE NARRATION VOICE IS `CUTROOM_NARRATION_VOICE`**, read by `apps/service` and handed to the
+  worker as `renderSettings.voice`, **defaulting to `DEFAULT_RENDER_SETTINGS.voice`** — still
+  `'stand-in'`. `apps/service` had never passed `renderSettings` at all; it does now, and its one
+  difference from the pipeline's own default is the voice.
+- **THE FIRST REAL REEL'S CEILING IS 250¢**, a constant in `scripts/real-reel.mjs` that `--ceiling`
+  can only LOWER. The script prints the estimate, computed from the same `estimate()` admission
+  uses, and **submits nothing until the figure is typed back** as `spend 250`.
+
+**Why.**
+
+- **No admitted entry could make the canonical picture.** `makeStills` calls `generate` with
+  `references: []` for the canonical's two best-of-2 candidates — it is the first picture of the
+  reel and there is nothing to derive it from (D-027, D-030, D-032) — and fal's schemas make
+  **`image_urls` a REQUIRED field** on `bytedance/seedream/v5/lite/edit`, `fal-ai/flux-2-pro/edit`
+  and `fal-ai/nano-banana-pro/edit`. **The first image call of the first real reel would have been
+  refused 422**, and the refusal would have read as the engine misbehaving. This is S-127's shape a
+  second time and in the same week: two decisions each correct on their own — D-028 admits edit
+  wires because D-026 requires reference input, D-027 makes the canonical from nothing — with
+  nothing computing their product. **D-028's closed set of MODELS is not touched**: the same four
+  models are admitted, at the same rates and the same limits, and a model has always had two wires.
+- **The voice was a named limit three sessions running, and it is a provider refusal.** The adapter
+  is handed `RenderSettings.voice` and sends it as MiniMax's `voice_id`; it may not spell one
+  (S-070). Left at `'stand-in'`, **every narration call of a real run is refused** — before any clip
+  is bought, but also before any reel exists. A setting keeps the free path byte-for-byte what four
+  verified features run on, and names the voice the way S-127 names the image entry: for one run.
+- **The ceiling is above the estimate and below the cap.** 147–194¢ on seedream, so one retake does
+  not stop a run with money already spent; BUDGET.md's 300¢ per-reel cap is the steering
+  repository's and is not lowered here (D-115, S-017), so the run is bounded by the caller's
+  ceiling, which is what a ceiling is for (D-100). It is a constant rather than a setting because
+  **a ceiling an environment variable could raise is a ceiling an accident can raise**.
+
+**Rejected.**
+
+- **Running on `fal-ai/nano-banana-2/edit`**, the one admitted entry whose `image_urls` is optional
+  — no code and no decision. It is an `ask: 'ratio'` entry, so the frame is **the provider's
+  choice** at the 1K tier rather than the exact 864 × 1536 sent to seedream and flux, and D-028 says
+  the 9:16 requirement fails silently and is judged on the produced frame: a frame that is not
+  exactly 9:16 fails **after it has been paid for**, four times over. It is also 8¢ a call against
+  3.5¢. Put to the owner with the schema read beside it; not chosen.
+- **Stopping, and putting the canonical to D-028 upstream.** It is the honest reading if this were
+  a change to which models are admitted. It is not: the models, their rates and their limits are
+  untouched, and what was missing was the second slug each of them has always published. Stopping
+  would have ended the slice with no reel and the Outcome lines unticked over a field name.
+- **Making the canonical carry a reference.** There is none. The canonical IS the reference every
+  other picture carries, which is the whole of D-027's ladder.
+- **Moving `DEFAULT_RENDER_SETTINGS.voice` to a real voice.** One line, and it is a verified
+  feature's default (`reel-render`): this feature's _What this feature changes in verified features_
+  lists exactly three changes, and adding a fourth is the thing that list exists to prevent. It also
+  puts a vendor's voice id on every stand-in run, which the stand-in ignores and which is then
+  untrue of what the free path does.
+- **A ceiling of 290¢**, the most headroom available under the cap, which barely constrains
+  anything the cap does not; and **210¢**, the tightest figure that admits every legal shape, whose
+  16¢ of headroom is less than one clip retake.
+- **A `--yes` flag on the script.** A confirmation that can be given without reading the estimate is
+  not a confirmation. The figure is typed back instead.
+
+**Caught by.** **Check 11**, whose words gain both wires by addition: every admitted entry carries
+two slugs, they are polled in the same place (fal polls a slug's first two segments, so a pair that
+did not would submit in one place and be polled in another), a call with no reference goes to the
+text wire and one with a reference to the edit wire, **and each receipt names the wire that was
+called**. A fault now names the wire called **and asserts the other one absent**, because the edit
+slug is the text slug plus a segment and `includes` alone would pass either way. Check 11's
+"no slug is spelled anywhere but the registry" holds **both** slugs. **Check 9**, whose words gain
+the voice setting by addition: the default is the pipeline's own, the setting reaches
+`renderSettings.voice`, and nothing else about what the worker renders with moves with it.
+**Check 20**, which reads the script's own source and fails if the estimate is printed after the
+submit, if more than one request is submitted, or if a confirmation is not read between them.
+And **the run itself**, whose receipts are compared with fal's dashboard (S-110).
+
+**A gap this found in the suite, closed by adding.** The recorded-wire harness throws when nothing
+matches a call's path, and the image adapter classifies that throw as `Unavailable` — so a fixture
+whose path stopped matching satisfied every transient assertion while proving nothing. Each
+transient and fault case now asserts `recorded.left()` is empty: **the fixture was served, or the
+test fails**. It was found because moving the canonical to the text wire moved five fixtures'
+paths out from under their tests, and all five went on passing.
+
+**Confirmed-by.** The owner, 2026-09-21, shown fal's schema read and both alternatives for the
+canonical, chose the two wires; shown D-019's spike voice and the cost of moving a verified
+feature's default, chose the setting. The ceiling is the owner's, 2026-09-21.

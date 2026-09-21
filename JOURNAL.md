@@ -4862,3 +4862,173 @@ measured after S-127 was written and the prompt's header was stale on it** — 1
 is 250¢. After it: the owner picks between **D-028's bake-off** (O-4 / C-8 —
 the same request under each admitted entry, which is the only thing that answers "cheapest but good") and
 **`parallel-shots`**, which cannot be planned until Slice 8's latency figure exists (S-115).
+
+---
+
+## 2026-09-21 — session 43, paid-path Slice 8: two blockers found before anything spent, and the one command that spends
+
+**Intent.** Run `PROMPTS/043-paid-path-slice-8.md`: `paid-path`'s Slice 8 — `scripts/real-reel.mjs`, **one real
+reel made under a 250¢ ceiling**, checks 20 and 22, a break campaign, then six journeys. `decisions.mjs`: pin
+current, 0 commits unpushed.
+
+**Everything but the reel is done and green. The reel is not made, and the reason is not a finding about the
+engine:** the harness's real-transaction guard refused the command, which is correct — it is the only command in
+this repository that moves money, and no automated classifier should let an agent run it unasked. The run and the
+six journeys are `PROMPTS/044-paid-path-real-reel.md`, and **Slice 8 is deliberately left unticked**, because
+`CLAUDE.md` says it is ticked when the reel exists.
+
+**Two blockers found BEFORE anything spent, both put to the owner with `AskUserQuestion`, both settled as S-128.**
+Each was read from fal's own published OpenAPI schemas — keyless, free, the way D-019's spike read H3's — rather
+than discovered by a failed paid call.
+
+- **No admitted image entry could make the canonical picture at all.** `makeStills` calls `generate` with
+  `references: []` for the canonical's two best-of-2 candidates — it is the first picture of the reel and there is
+  nothing to derive it from (D-027, D-030) — and **`image_urls` is a REQUIRED field** on `seedream/v5/lite/edit`,
+  `flux-2-pro/edit` and `nano-banana-pro/edit`. **The first image call of the first real reel would have been
+  refused 422**, and the refusal would have read as the engine misbehaving. Owner: **each entry carries its
+  model's TEXT wire beside its edit wire**, and `wireFor(entry, references)` picks one; all four text wires exist
+  and were verified by the same schema read, seedream's and flux's take `image_size` so the exact 864 × 1536 is
+  still asked for, and `imageCostCents` already priced a zero-reference call. **D-028's closed set of MODELS is
+  untouched** — same four, same rates, same limits; what was missing was the second slug each has always
+  published. Rejected, with the owner shown both: running on `nano-banana-2/edit`, the one entry whose
+  `image_urls` is optional, which needs no code and no decision but is an `ask: 'ratio'` entry — the frame would
+  be **the provider's choice** at the 1K tier rather than the exact frame sent to seedream and flux, and D-028
+  says the 9:16 requirement fails silently and is judged on the produced frame, so a wrong frame fails **after it
+  has been paid for**, four times, at 8¢ a call against 3.5¢; and stopping and putting it to D-028 upstream, which
+  is the honest reading only if this changed which models are admitted, and it does not.
+- **The narration voice was still the string `'stand-in'`.** The adapter is handed `RenderSettings.voice` and
+  sends it as MiniMax's `voice_id`, and may not spell one (S-070) — so **every narration call of a real run would
+  have been refused**, before any clip was bought but also before any reel existed. It was carried forward as a
+  named limit by sessions 40, 41 and 42. Owner: **`CUTROOM_NARRATION_VOICE`**, read by `apps/service` and handed
+  to the worker as `renderSettings.voice`, defaulting to `DEFAULT_RENDER_SETTINGS.voice` — still `'stand-in'`.
+  `apps/service` had **never passed `renderSettings` at all**, so every run rendered with the pipeline's defaults
+  whatever the settings said. Rejected: moving `DEFAULT_RENDER_SETTINGS.voice` to a real voice — one line, and a
+  verified feature's default, which would be a fourth entry on a list of exactly three, and which puts a vendor's
+  voice id on every stand-in run.
+
+**And three things decided here (S-128).** **The ceiling is 250¢ as a CONSTANT in the script**, which `--ceiling`
+can only lower: a ceiling an environment variable could raise is a ceiling an accident can raise. **The
+confirmation is the figure typed back** — `spend 250` — because a confirmation that can be given without reading
+the estimate is not a confirmation. **Check 3 moved into `tests/paid-path-env.test.ts`**, unchanged: check 22
+cannot run the file it lives in (S-028 rejected exactly that), so a check 22 sharing a file with check 3 would
+have to leave 3 out of its roll call of 1 to 21 — and a roll call with a hole in it is the state the roll call
+exists to prevent.
+
+**Changed.**
+
+- **`packages/providers/src/fal/registry.ts`** — `ImageEntry.textSlug` on all four entries; **`wireFor`**, the
+  branch beside the data so there is one answer to _"which slug is this call's"_; **`cheapestEntry()`**, computed
+  from the same `imageRateCents` every estimate and receipt use, which makes S-127's stale prose data; and the
+  comment on `CONFIGURED_IMAGE_SLUG` corrected to stop claiming a rank it does not hold.
+- **`packages/providers/src/fal/image.ts`** — the wire picked by `request.references.length`, **the receipt
+  records the wire that was called**, and a frame refusal names it rather than the entry's edit slug.
+- **`apps/service/`** — `CUTROOM_NARRATION_VOICE`, `ServiceSettings.renderSettings`, the voice on the banner, and
+  **`renderSettings` handed to `startWorker`**, which it never was.
+- **`scripts/real-reel.mjs`** — new, run by hand and by nothing else. It reads the settings a service reads with
+  every port real, **computes the estimate with the same `estimate()` admission uses** over the corners Gate 0
+  admits, prints it, **waits for the ceiling to be typed back**, submits ONE request, follows the events with
+  their timings, and prints every receipt, the totals and the latency of the run and of each clip.
+- **`tests/paid-path-real-reel.test.ts`** — check 20 in 6 tests. **`tests/paid-path-secrets.test.ts`** — check 22
+  in 1, S-028's form. **`tests/paid-path-env.test.ts`** — check 3, moved whole.
+  **`tests/paid-path-image.test.ts`** — +3, and `namesWire`. **`tests/paid-path-narration.test.ts`** — +2.
+- **`tests/fixtures/wire/`** — 63 → 64: `fal-image-bare`, the submit on a text wire. Five failure fixtures'
+  PATHS moved to the text wire, their bodies untouched, because the call they answer is the canonical's.
+- **`docs/features/paid-path.md`** — Gate 2's image paragraph gains both wires, its narration paragraph the voice
+  setting, its service list the voice; checks 9 and 11 gain their words **by addition**; _What this feature
+  changes in verified features_ gains the render settings, with `DEFAULT_RENDER_SETTINGS` itself unchanged; three
+  of four Outcome lines ticked. **Slice 8 is NOT ticked.** The check count is still **22**.
+  **`DECISIONS.md` — S-128.** Prompt 043's `Run` line set; **`PROMPTS/044-paid-path-real-reel.md`** written.
+- **+12 tests, 451 → 463** by TAP count over the whole suite; `paid-path`'s own 97 → 109.
+
+**Observed.**
+
+- **The file was RED FIRST** — check 20 with the script moved aside:
+  `ENOENT: no such file or directory, open '…\scripts\real-reel.mjs'`.
+- **The estimate printed before anything spent is 147–194¢**, computed from `readSettings` with every port real
+  and seedream configured: 35 s × 2 calls = 147¢, 35 × 4 = 154¢, 45 × 2 = 187¢, 45 × 4 = 194¢. **Exactly the range
+  the prompt predicted**, against a 250¢ ceiling and BUDGET.md's 300¢ cap.
+- **`CLAUDE.md`'s backslash trap fired twice, and the file is what caught it both times.** `\\b` written through a
+  heredoc arrived halved, and Python read `\b` as a **literal backspace**: `grep` showed the regex looking correct
+  and `cat -v` showed `/^H(spawn|…)/`. The same happened to `\\n` in a second regex, which arrived as a real line
+  break and broke the parse outright. Verified the files, not the commands, as the trap says. This is session 42's
+  finding in another file.
+- **The break campaign, 38 breaks** (`.tmp/campaign/`, session 42's moved to `s42/`). Catchers: checks 20 and 22
+  of this slice, checks 9, 11, 12 and 13 of Slices 4 and 5.
+
+  | break | what was broken                                                                        | tsc  | caught by   |
+  | ----- | -------------------------------------------------------------------------------------- | ---- | ----------- |
+  | c0    | a comment beside the ceiling constant — the control                                    | ok   | **nothing** |
+  | x1    | S-128 taken out of the registry's own comment on the text wire                         | ok   | **nothing** |
+  | c1    | the printed heading above the estimate reworded — a third control, and n4's first form | ok   | **nothing** |
+  | n1    | **A TEST FILE NAMES THE SCRIPT THAT SPENDS**, so a suite could reach it (S-111)        | ok   | 20          |
+  | n2    | **A STEP OF check.mjs NAMES IT**                                                       | ok   | 20          |
+  | n3    | a script check.mjs runs names it: journey.mjs would run it on every journey            | ok   | 20          |
+  | n4    | **THE ESTIMATE IS COMPUTED AND NEVER PRINTED**: it submits on a figure nobody read     | ok   | 20 †        |
+  | n4b   | the estimate printed AFTER the submit, so it is a receipt rather than a decision       | ok   | 20          |
+  | n5    | **NO CONFIRMATION IS READ**: the script confirms itself and submits                    | ok   | 20          |
+  | n6    | the script submits TWICE, so one run is two reels and two bills                        | ok   | 20          |
+  | n7    | **THE SUBMITTED BODY CARRIES NO CEILING**, so only the cap bounds it (D-100)           | ok   | 20 †        |
+  | n8    | `--ceiling` can RAISE the ceiling the owner set                                        | ok   | 20          |
+  | n9    | the ceiling moved off the figure the owner set                                         | ok   | 20          |
+  | n10   | **THE SCRIPT READS A KEY**, which only packages/providers may (S-109)                  | ok   | 20          |
+  | n11   | **A PROVIDER DEFAULT IS NOT `fake`**, so a plainly started engine spends (S-108)       | ok   | 20          |
+  | n12   | `reel-render`'s check 50 gains a SKIP, so the PATH-alone child reads as coverage       | ok   | 20          |
+  | n13   | check 50 no longer requires zero skipped                                               | ok   | 20          |
+  | n14   | check 50 TRUSTS ITS OWN ARGUMENT rather than probing the child (S-028)                 | ok   | 20          |
+  | p1    | **THE PATH-ALONE CHILD IS GIVEN THE WHOLE ENVIRONMENT**, canaries and all              | ok   | 22          |
+  | p2    | the roll call reduced to fewer checks than the child passes                            | ok   | 22          |
+  | p3    | **THE CANARIES ARE NEVER SET**, so a child inheriting one would go unnoticed           | ok   | 22 †        |
+  | w1    | **THE TEXT WIRE DROPPED**: every call goes to the edit wire, and the canonical 422s    | FAIL | 11, 12, 13  |
+  | w2    | the wire picked BACKWARDS                                                              | ok   | 11, 12, 13  |
+  | w3    | the branch never taken: `wireFor` kept and the entry slug sent anyway                  | ok   | 11, 12, 13  |
+  | w4    | **THE RECEIPT NAMES THE EDIT SLUG** whatever wire was called (D-028)                   | ok   | 11          |
+  | w5    | a fault names the wrong wire, so an operator is told a slug that made nothing          | ok   | 12          |
+  | w6    | an entry's two wires POLLED IN DIFFERENT PLACES, so every poll of it 404s              | ok   | 11          |
+  | w7    | an entry has one wire under two names: `textSlug` is the edit slug                     | ok   | 11, 12, 13  |
+  | w8    | a text slug SPELLED AT A CALL SITE rather than read from the registry (D-028)          | ok   | 11          |
+  | q1    | **cheapestEntry ANSWERS THE DEAREST** entry, and the claim reads as true either way    | ok   | 11          |
+  | q2    | cheapestEntry is the configured default, which is the prose S-127 replaced             | FAIL | 11          |
+  | q3    | a rate moved, so the rank cheapestEntry answers moves with nothing to notice           | ok   | 11, 13      |
+  | t1    | a transient fixture's path stops matching, which the adapter calls unavailable anyway  | ok   | 11 †        |
+  | v1    | **THE VOICE SETTING IGNORED**: the service always renders with the pipeline default    | ok   | 9           |
+  | v2    | the voice default moves off `'stand-in'`, so a free run names a vendor's voice         | ok   | 9           |
+  | v3    | **THE RENDER SETTINGS NEVER REACH THE WORKER**, so the setting changes nothing         | ok   | 9           |
+  | v4    | naming a voice changes something else about what the worker renders with               | ok   | 9           |
+  | v5    | the adapter spells a voice of its own rather than sending the caller's (S-070)         | ok   | 9           |
+
+  **†** — caught by nothing on the first run, and closed BY ADDING before the re-run.
+
+- **Four breaks were caught by nothing on the first run, and all four were real gaps closed BY ADDING.**
+  - **`n4` — the estimate never printed.** Check 20 looked for the printed heading with `indexOf`, and the
+    **section comment above it** satisfied the search: a break that changed the heading left the comment behind
+    and passed. Every position check 20 reads is now a **piece of code** — the `corners(…)` call, the range's own
+    template, the readline, the POST — and matches on comment lines are discarded. `n4` became "computed and
+    never printed", `n4b` was added for "printed after the submit", and the reworded heading was kept as a **third
+    control**, which is what it now is.
+  - **`n7` — the submitted body carries no ceiling.** `assert.match(source, /budgetCents/)` over the whole file
+    was satisfied by **the parameter's own name**. It now requires `budgetCents` inside the request's `options`,
+    and that the ceiling printed is the one submitted.
+  - **`p3` — the canaries never set.** _"The canary did not reach the child"_ is true of a canary that was never
+    set, so a sweep whose bait is missing reads exactly like a sweep that found nothing. Each canary is now
+    **asserted present in this process** before it is looked for in the child. `reel-render`'s check 50 has the
+    same shape and was **not edited** — that would be a fourth change to a verified feature.
+  - **`t1` — a fixture's path stops matching.** The recorded-wire harness throws when nothing matches a path, and
+    the image adapter classifies that throw as `Unavailable` — so a fixture whose path drifted satisfied every
+    transient assertion while proving nothing. **It was found because moving the canonical to the text wire moved
+    five fixtures out from under their tests, and all five went on passing.** Every transient and fault case now
+    asserts `recorded.left()` is empty: the fixture was served, or the test fails.
+- **The three controls are words, as before.** No check's words promise to catch a comment or a heading's wording.
+- **Check 22 measured ALONE: 52 s**, against a 360 s bound. The headroom is deliberate rather than generous —
+  `reel-render`'s check 50 takes 97 s alone and was killed once at 300 s **inside a loaded suite** (S-107), and
+  this child now runs beside that one.
+- **`node scripts/check.mjs` green**, nine checks, tests 383 s; the suite run alone counts **463 of 463**, with 0
+  failing, cancelled, skipped or todo.
+
+**Next.** Session 44 runs `PROMPTS/044-paid-path-real-reel.md`: **one command that spends**, then the journal
+figures it produces, then Slice 8's tick and six journeys. **Nothing in it is open** — seedream,
+`English_Graceful_Lady`, 250¢, and an estimate already printed at 147–194¢. **Two figures are owed upstream** and
+are restated by that run, not edited here (D-115, S-017): the observed video rate (D-007's Q9) and the corrected
+image rate. **One named limit carried forward:** `reel-render`'s check 50 is marginal inside this suite, 97 s
+alone against a 300 s bound, and paid-path's check 22 is now a second PATH-alone child in the same run. Still
+open upstream and unchanged: D-028's default image entry (O-4 / C-8), `reel-script`'s criterion type (S-029), and
+the steering stubs and the pin (S-033).

@@ -1,11 +1,11 @@
 {
-  "note": "A 200 whose body is a gateway’s HTML rather than this wire — what a proxy in front of a provider answers when it is confused. A body that does not parse is a FAULT, and it must not read as a transient or, worse, as a picture (S-096, S-124).",
+  "note": "A 200 whose body is a gateway’s HTML rather than this wire — what a proxy in front of a provider answers when it is confused. A body that does not parse is a FAULT, and it must not read as a transient or, worse, as a picture (S-096, S-124). THE PATH IS THE ENTRY'S TEXT WIRE, because the call it answers is the canonical picture's and the canonical carries no reference (S-128); the BODY recorded here is untouched, and the classification it drives is the same on either wire.",
   "provider": "fal",
   "call": "image",
   "case": "garbled",
   "request": {
     "method": "POST",
-    "path": "/fal-ai/flux-2-pro/edit"
+    "path": "/fal-ai/flux-2-pro"
   },
   "response": {
     "status": 200,

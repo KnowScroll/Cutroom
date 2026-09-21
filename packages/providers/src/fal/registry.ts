@@ -44,8 +44,27 @@ export interface Frame {
 }
 
 export interface ImageEntry {
-  /** fal's own slug. The ONE place any of them is spelled (D-028). */
+  /**
+   * The model's EDIT wire — the slug a call carrying a reference picture goes to. The ONE place
+   * any of them is spelled (D-028).
+   */
   slug: string
+  /**
+   * The model's TEXT wire — the slug a call carrying NO reference picture goes to.
+   *
+   * **D-027's ladder makes the canonical picture from nothing**: `makeStills` calls `generate`
+   * with `references: []` for the canonical's two candidates, because it is the first picture of
+   * the reel and there is nothing to derive it from; every picture after it is derived from that
+   * one. And fal's own published schemas, read on 2026-09-21, make `image_urls` a REQUIRED field
+   * on three of the four admitted edit wires — seedream's, flux's and nano-banana-pro's. So an
+   * entry with one wire cannot make the picture every other picture is made from: the first call
+   * of the first real reel would have been refused 422 (S-128).
+   *
+   * **The MODEL is what D-028 admits, and a model has always had two wires.** Both slugs are one
+   * entry's data, so the rate, the reference limit, the frame and the way that frame is asked for
+   * are the same figures whichever wire a call goes to — there is no second entry to drift.
+   */
+  textSlug: string
   rate: ImageRate
   /**
    * How many reference pictures the entry takes. **At least one, or it is not admitted**: without
@@ -92,6 +111,7 @@ export const PICTURE_MIN_SHORT_SIDE = 768
 export const IMAGE_REGISTRY: readonly ImageEntry[] = [
   {
     slug: 'fal-ai/nano-banana-pro/edit',
+    textSlug: 'fal-ai/nano-banana-pro',
     rate: { kind: 'perImage', cents: 15 },
     maxReferences: 14,
     frame: PICTURE_FRAME,
@@ -102,6 +122,7 @@ export const IMAGE_REGISTRY: readonly ImageEntry[] = [
   },
   {
     slug: 'fal-ai/nano-banana-2/edit',
+    textSlug: 'fal-ai/nano-banana-2',
     rate: { kind: 'perImage', cents: 8 },
     maxReferences: 14,
     frame: PICTURE_FRAME,
@@ -112,6 +133,7 @@ export const IMAGE_REGISTRY: readonly ImageEntry[] = [
   },
   {
     slug: 'bytedance/seedream/v5/lite/edit',
+    textSlug: 'bytedance/seedream/v5/lite/text-to-image',
     rate: { kind: 'perImage', cents: 3.5 },
     maxReferences: 10,
     frame: PICTURE_FRAME,
@@ -125,6 +147,7 @@ export const IMAGE_REGISTRY: readonly ImageEntry[] = [
   },
   {
     slug: 'fal-ai/flux-2-pro/edit',
+    textSlug: 'fal-ai/flux-2-pro',
     rate: { kind: 'perMegapixel', firstMpCents: 3, extraMpCents: 1.5 },
     maxReferences: 9,
     frame: PICTURE_FRAME,
@@ -138,12 +161,15 @@ export const IMAGE_REGISTRY: readonly ImageEntry[] = [
 ]
 
 /**
- * The entry configured when nothing names another: **the cheapest admitted one**, for the first
- * real run (S-110).
+ * The entry configured when nothing names another.
  *
- * **This settles D-028's open default not at all.** O-4 / C-8 is the owner's bake-off, and it is
- * answered by running the same reel under several entries and comparing gate pass rates — which is
- * changing one value, here. This line is a setting for one run, chosen because it is cheapest.
+ * **It settles D-028's open default not at all, and it claims no rank.** O-4 / C-8 is the owner's
+ * bake-off, answered by running the same reel under several entries and comparing gate pass
+ * rates — which is changing one value, here. This line said _"the cheapest admitted one"_ until
+ * S-127, and that was false the moment S-124 fixed the frame at 864 × 1536: flux is priced per
+ * megapixel, so its headline rate did not survive, and it is **second** of four. A run that wants
+ * the cheapest entry names it with `CUTROOM_FAL_IMAGE_MODEL`, and `cheapestEntry()` is what
+ * answers which that is — computed, so it cannot go stale the way this comment did.
  */
 export const CONFIGURED_IMAGE_SLUG = 'fal-ai/flux-2-pro/edit'
 
@@ -235,4 +261,39 @@ function rateFor(entry: ImageEntry, call: ImageCall): number {
  */
 export function imageRateCents(entry: ImageEntry): number {
   return rateFor(entry, { frame: entry.frame, references: [entry.frame] })
+}
+
+/**
+ * Which admitted entry is cheapest **at the frame and the call this engine actually makes**,
+ * computed from the same `imageRateCents` every estimate and every receipt already use.
+ *
+ * **It exists because the claim was prose, and prose went stale with nothing to notice** (S-127).
+ * `CONFIGURED_IMAGE_SLUG` asserted _"the cheapest admitted one"_ in a comment; S-124 then moved
+ * the frame to 864 × 1536, which reprices every per-megapixel entry, and the rank moved under the
+ * comment. This is S-124's rule for the image rate and S-125's for the lease floor a third time:
+ * **a figure that must agree with another figure is computed from it, or the two disagree the
+ * first time either moves, silently.**
+ *
+ * Ties are broken by the order the registry names its entries, so the answer is one entry and not
+ * a set, and it never depends on the order two equal rates happen to be compared in.
+ */
+export function cheapestEntry(registry: readonly ImageEntry[] = IMAGE_REGISTRY): ImageEntry {
+  const [first, ...rest] = registry
+  if (first === undefined) throw new Error('the image registry admits no entry at all (D-028)')
+  return rest.reduce(
+    (cheapest, entry) => (imageRateCents(entry) < imageRateCents(cheapest) ? entry : cheapest),
+    first,
+  )
+}
+
+/**
+ * Which of an entry's two wires one call goes to: its TEXT wire when the call carries no reference
+ * picture, its EDIT wire when it carries one (S-128).
+ *
+ * The branch is here, beside the data, and not in the adapter, so the one question _"which slug is
+ * this call's"_ has one answer — and a receipt records what this function returned rather than the
+ * entry's edit slug whatever was sent (D-028's _"every image receipt carries the model slug"_).
+ */
+export function wireFor(entry: ImageEntry, references: number): string {
+  return references === 0 ? entry.textSlug : entry.slug
 }

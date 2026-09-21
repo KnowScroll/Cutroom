@@ -6,7 +6,10 @@
 - **Written:** 2026-09-21, at the end of session 42, after Slice 7 was green and S-126 was recorded
 - **Revised:** 2026-09-21, after S-127 corrected three of S-110's cheapness levers, the owner chose
   the cheapest entry for the first run, and the owner set the ceiling at **250¢**
-- **Run:** not yet
+- **Run:** session 43 — everything but the reel. The engine, the script, checks 20 and 22 and the break
+  campaign are done and green; the command that spends was refused by the harness's real-transaction guard,
+  so the run itself, and the six journeys that follow it, are
+  [`044-paid-path-real-reel.md`](044-paid-path-real-reel.md).
 
 **This is the one slice that SPENDS, and nothing about it is still open.** Both keys are in `.env`
 (`MINIMAX_API_KEY`, `FAL_KEY`); the image entry for this run is the cheapest admitted one; the video

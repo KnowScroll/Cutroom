@@ -1,205 +1,153 @@
 import assert from 'node:assert/strict'
-import { readFileSync, readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { spawnSync } from 'node:child_process'
+import { readdirSync } from 'node:fs'
+import { basename } from 'node:path'
 import { test } from 'node:test'
-import { planRequest } from './engine/plans.ts'
-import { startService, waitFor, type Service } from './engine/service.ts'
-import { described, type Event } from './engine/video.ts'
-import { wireServer } from './engine/wire.ts'
+import { fileURLToPath } from 'node:url'
+import { REPO } from './_repo.ts'
 
-// paid-path, Slice 3 — check 3 (docs/features/paid-path.md): the service loads its environment
-// from the file its setting names; a key in that file reaches its adapter and appears in no row,
-// receipt, event, question, log line or fault message of a completed run (S-109, D-022).
+// paid-path, Slice 8 — check 22 (docs/features/paid-path.md), in S-028's form: every other test of
+// this feature passes in a child process whose environment holds only PATH and what the operating
+// system needs to start Node — the probe, the canary, the allowed names, and the roll call.
 //
-// This check could not fail until a real adapter existed, because a stand-in reads no key — which
-// is why it moved here (S-120). It is proven in the only arrangement in which it has teeth: the
-// SERVICE AS A PROCESS, with the model port told 'minimax', its key read from the environment
-// file and nowhere else, and its wire served by a loopback server this test starts (S-121).
+// THIS IS THE FEATURE THAT INTRODUCES KEYS, and it is the one that most needs this check. Checks 26
+// and 50 cover `reel-takes` and `reel-render`, and the gate review found that nothing would have
+// proven that the feature which reads `MINIMAX_API_KEY` and `FAL_KEY` needs neither: every adapter
+// here is tested against recorded wire served on loopback, every provider setting defaults to the
+// stand-in, and the only thing that spends is a script no test names (S-108, S-111, check 20).
 //
-// Nothing here spends and nothing here needs a real key: the two planner calls a plan run makes
-// are answered from tests/fixtures/wire, and the key below is a canary that exists to be hunted.
-
-/** The canary. Distinctive enough that a single occurrence anywhere is unambiguous. */
-const KEY = 'canary38-minimax-not-a-real-key'
-
-/** The one recorded exchange a plan run needs: one answer per grouping (S-121). */
-const PLAN_WIRE = ['minimax-chat-plan4', 'minimax-chat-plan6']
-
-/** The events a completed plan run writes: the 4-unit fork survives, the 6-unit fork fails. */
-const COMPLETED = [
-  'run.accepted',
-  'stage.started plan',
-  'verdict 0 accept',
-  'verdict 0 fail',
-  'stage.finished plan',
-  'run.finished completed',
+// On Windows a child never starts with only what it is given: libuv, which Node spawns through,
+// copies these eleven variables from the parent into any environment that lacks them (S-028). They
+// are what the operating system needs to start Node there, and all of them name the machine, the
+// user or a folder — none is a credential. Elsewhere nothing is added.
+const WINDOWS_ADDED = [
+  'HOMEDRIVE',
+  'HOMEPATH',
+  'LOGONSERVER',
+  'PATH',
+  'SYSTEMDRIVE',
+  'SYSTEMROOT',
+  'TEMP',
+  'USERDOMAIN',
+  'USERNAME',
+  'USERPROFILE',
+  'WINDIR',
 ]
+const ALLOWED = process.platform === 'win32' ? WINDOWS_ADDED : ['PATH']
 
-/** Every file under a folder, as bytes. A key written anywhere is a key written down. */
-function filesUnder(dir: string): string[] {
-  const out: string[] = []
-  for (const entry of readdirSync(dir)) {
-    const child = join(dir, entry)
-    if (statSync(child).isDirectory()) out.push(...filesUnder(child))
-    else out.push(child)
-  }
-  return out
+const OWN = basename(fileURLToPath(import.meta.url))
+
+/** The checks of the journey this one runs: every one but its own number. */
+const CHECKS = 21
+
+/**
+ * How long the child is given. **Measured alone on this machine on 2026-09-21: 52 seconds** for
+ * this feature's own tests, four files at a time, with the service processes and loopback wire
+ * servers they start.
+ *
+ * The bound is roughly six times that, and the headroom is deliberate: `reel-render`'s check 50
+ * takes 97 s alone and was killed once at a 300 s bound INSIDE A LOADED SUITE (S-107, session 41).
+ * This child runs beside that one. A bound that fits the measurement is a bound that fails when
+ * the machine is busy, and a check that fails on load says nothing about the property it holds.
+ */
+const BOUND_MS = 360_000
+
+/** The bait. Each is set in this process, asserted present here, and looked for in the child. */
+const CANARIES = ['sk-canary-not-a-real-key', 'fal-canary-not-a-real-key']
+
+/** PATH, under the name this process has it by — Windows keeps a variable's case as it was set. */
+function bareEnvironment(): Record<string, string> {
+  const key = Object.keys(process.env).find((k) => k.toUpperCase() === 'PATH')
+  assert.ok(key !== undefined, 'this process has no PATH to hand on')
+  return { PATH: process.env[key] as string }
 }
 
-// ---------------------------------------------------------------- 3
+// ---------------------------------------------------------------- 22
 
-test('3. the service loads its environment from the file its setting names, a key in that file reaches its adapter, and the completed run holds it in no row, receipt, event, question, log line or fault message', async () => {
-  const wire = await wireServer(PLAN_WIRE)
-  // `started` is what the finally closes; `service` is the narrowed value the test reads, so a
-  // refusal still closes the loopback server rather than leaving it listening.
-  let started: Service | undefined
-  try {
-    const service = await startService({
-      // The key is in the FILE and nowhere else: the process is started without it, so a service
-      // that ignored the file it was pointed at could not make a call at all (S-109).
-      envFileText: `MINIMAX_API_KEY=${KEY}\n`,
-      env: {
-        CUTROOM_PROVIDER_MODEL: 'minimax',
-        CUTROOM_MINIMAX_BASE_URL: wire.baseUrl,
-      },
-    })
-    started = service
-
-    const submitted = await service.http.submit(planRequest('paid-3'))
-    assert.equal(submitted.status, 202, JSON.stringify(submitted.json))
-    const runId = String(submitted.json.runId)
-
-    await waitFor(`run ${runId} to finish`, async () => {
-      const { json } = await service.http.status(runId)
-      return json.state === 'finished'
-    })
-
-    const result = (await service.http.result(runId)).json
-    assert.equal(result.status, 'completed', JSON.stringify(result))
-
-    const events = (await service.http.events(runId)).json.events as Event[]
-    assert.deepEqual(described(events), COMPLETED)
-
-    // THE KEY REACHED ITS ADAPTER. Without this the rest of the check is satisfied by a service
-    // that never made a call — which is the failure mode check 3 exists to rule out.
-    assert.equal(wire.sent.length, 2, `the run made ${wire.sent.length} model calls, not two`)
-    for (const sent of wire.sent) {
-      assert.equal(sent.headers.authorization, `Bearer ${KEY}`, JSON.stringify(sent.headers))
-    }
-    assert.deepEqual(wire.left(), [], 'a recorded answer was never asked for')
-
-    // The receipts are a real adapter's, so `fake` is false — the one thing a real run changes
-    // in a record (S-036). Anything else here would mean the stand-in answered.
-    const receipts = service.query<{ model: string; role: string; fake: number }>(
-      'SELECT model, role, fake FROM model_receipt',
+test('22. every other test of this feature passes in a child process whose environment holds only PATH and what the operating system needs to start Node', () => {
+  // Two variables shaped like a key, set in this process: a child that inherited anything would
+  // see them. One of them is spelled the way this feature's own adapters read a key, which is the
+  // shape that would actually matter here (S-109, `packages/providers/src/env.ts`).
+  //
+  // EACH IS ASSERTED PRESENT HERE BEFORE IT IS LOOKED FOR THERE. "The canary did not reach the
+  // child" is true of a canary that was never set, so a sweep whose bait is missing reads exactly
+  // like a sweep that found nothing — and a break that deleted these two lines passed every other
+  // assertion in this test (S-128).
+  process.env.CUTROOM_TEST_API_KEY = 'sk-canary-not-a-real-key'
+  process.env.CUTROOM_TEST_FAL_TOKEN = 'fal-canary-not-a-real-key'
+  for (const canary of CANARIES) {
+    assert.ok(
+      Object.values(process.env).includes(canary),
+      `the canary ${canary} is not in this process, so its absence from the child proves nothing`,
     )
-    assert.equal(receipts.length, 2, JSON.stringify(receipts))
-    assert.deepEqual(
-      receipts.filter((r) => r.fake !== 0),
-      [],
-      'a real adapter wrote a receipt saying it was a stand-in',
-    )
-    assert.deepEqual(
-      receipts.map((r) => `${r.role} ${r.model}`),
-      ['planner MiniMax-M2.7', 'planner MiniMax-M2.7'],
-      'D-006 routing did not reach the receipt',
-    )
-
-    // ---- and now the key appears NOWHERE.
-
-    // Every row of every table, whatever a later migration adds: the tables are read from the
-    // database itself, so a column this check has never heard of is read too.
-    const tables = service
-      .query<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table'")
-      .map((t) => t.name)
-    assert.ok(tables.length > 0, 'the service opened no database, so no row proves anything')
-    for (const table of tables) {
-      const rows = service.query<Record<string, unknown>>(`SELECT * FROM "${table}"`)
-      assert.doesNotMatch(JSON.stringify(rows), new RegExp(KEY), `the key is in a ${table} row`)
-    }
-
-    // The events and the answer a caller reads.
-    assert.doesNotMatch(JSON.stringify(events), new RegExp(KEY), 'the key is in an event')
-    assert.doesNotMatch(JSON.stringify(result), new RegExp(KEY), "the key is in the run's answer")
-
-    // Every log line the process wrote, which is where a banner or a thrown message would put it.
-    assert.doesNotMatch(service.output(), new RegExp(KEY), 'the key is in a log line')
-
-    // Every file the service owns EXCEPT the environment file it was given — the database's bytes
-    // (a value written and deleted is still in the file), the questions file, and anything a run
-    // wrote under the artifact root.
-    for (const file of filesUnder(service.dir)) {
-      if (file === service.envFile) continue
-      assert.doesNotMatch(
-        readFileSync(file).toString('latin1'),
-        new RegExp(KEY),
-        `the key is in ${file}`,
-      )
-    }
-  } finally {
-    if (started !== undefined) {
-      await started.stop()
-      started.clean()
-    }
-    await wire.close()
   }
-})
+  const env = bareEnvironment()
 
-test('3. a fault message from a real adapter holds no key either: the run fails, says why, and says nothing about the key', async () => {
-  // The completed run above cannot exercise a fault, and "no fault message holds the key" is half
-  // of what check 3 asks. So the same service is given wire that refuses: the second planner call
-  // is answered 401, which throws, fails the run, and is written into the run's own record.
-  const wire = await wireServer(['minimax-chat-plan4', 'minimax-chat-denied'])
-  // `started` is what the finally closes; `service` is the narrowed value the test reads, so a
-  // refusal still closes the loopback server rather than leaving it listening.
-  let started: Service | undefined
-  try {
-    const service = await startService({
-      envFileText: `MINIMAX_API_KEY=${KEY}\n`,
-      env: {
-        CUTROOM_PROVIDER_MODEL: 'minimax',
-        CUTROOM_MINIMAX_BASE_URL: wire.baseUrl,
-      },
-    })
-    started = service
-
-    const submitted = await service.http.submit(planRequest('paid-3-fault'))
-    assert.equal(submitted.status, 202, JSON.stringify(submitted.json))
-    const runId = String(submitted.json.runId)
-
-    await waitFor(`run ${runId} to finish`, async () => {
-      const { json } = await service.http.status(runId)
-      return json.state === 'finished'
-    })
-
-    const result = (await service.http.result(runId)).json
-    assert.equal(result.status, 'failed', JSON.stringify(result))
-    assert.doesNotMatch(JSON.stringify(result), new RegExp(KEY), 'the key is in a fault message')
-
-    const events = (await service.http.events(runId)).json.events as Event[]
-    assert.doesNotMatch(JSON.stringify(events), new RegExp(KEY), 'the key is in a fault event')
-    assert.doesNotMatch(service.output(), new RegExp(KEY), 'the key is in a log line')
-
-    const tables = service
-      .query<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table'")
-      .map((t) => t.name)
-    for (const table of tables) {
-      const rows = service.query<Record<string, unknown>>(`SELECT * FROM "${table}"`)
-      assert.doesNotMatch(JSON.stringify(rows), new RegExp(KEY), `the key is in a ${table} row`)
-    }
-    for (const file of filesUnder(service.dir)) {
-      if (file === service.envFile) continue
-      assert.doesNotMatch(
-        readFileSync(file).toString('latin1'),
-        new RegExp(KEY),
-        `the key is in ${file}`,
-      )
-    }
-  } finally {
-    if (started !== undefined) {
-      await started.stop()
-      started.clean()
-    }
-    await wire.close()
+  // What a child started with exactly this environment actually holds, read from inside it.
+  const probe = spawnSync(
+    process.execPath,
+    ['-e', 'process.stdout.write(JSON.stringify(process.env))'],
+    { cwd: REPO, env, encoding: 'utf8' },
+  )
+  assert.equal(probe.status, 0, probe.stderr)
+  const seen = JSON.parse(probe.stdout) as Record<string, string>
+  assert.deepEqual(
+    Object.keys(seen).filter((k) => !ALLOWED.includes(k.toUpperCase())),
+    [],
+    'the child holds a variable beyond PATH and what the operating system needs',
+  )
+  for (const canary of CANARIES) {
+    assert.ok(!Object.values(seen).includes(canary), `the canary ${canary} reached the child`)
   }
+  assert.ok(Object.keys(seen).length < Object.keys(process.env).length)
+
+  // Every test of this feature but this file's, so the check never runs itself.
+  const files = readdirSync(`${REPO}/tests`)
+    .filter((f) => f.startsWith('paid-path-') && f.endsWith('.test.ts') && f !== OWN)
+    .sort()
+    .map((f) => `tests/${f}`)
+  assert.ok(files.length > 0)
+  assert.ok(!files.some((f) => basename(f) === OWN))
+
+  // Four files at a time, as checks 26 and 50 run theirs: this feature's own tests start three
+  // service processes, a loopback wire server each, and an ffmpeg for every measure a sensor
+  // takes — and this child runs beside the whole suite. The bound and the concurrency are test
+  // support: every file still runs, and every assertion below is unchanged.
+  const suite = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      '--no-warnings',
+      '--test',
+      '--test-reporter=tap',
+      '--test-concurrency=4',
+      ...files,
+    ],
+    { cwd: REPO, env, encoding: 'utf8', timeout: BOUND_MS, maxBuffer: 32 * 1024 * 1024 },
+  )
+  const out = `${suite.stdout}${suite.stderr}`
+  const count = (name: string) => Number(new RegExp(`^# ${name} (\\d+)$`, 'm').exec(out)?.[1])
+  const failing = [...out.matchAll(/^not ok \d+ - (.*)$/gm)].map((m) => m[1])
+  assert.deepEqual(
+    failing,
+    [],
+    `tests fail with no secrets in their environment:\n${out.slice(-4000)}`,
+  )
+  assert.equal(suite.status, 0, out.slice(-4000))
+  assert.equal(count('fail'), 0)
+  assert.equal(count('cancelled'), 0)
+  assert.equal(count('skipped'), 0)
+  assert.equal(count('todo'), 0)
+  assert.ok(count('tests') > 0 && count('pass') === count('tests'), out.slice(-2000))
+
+  // Every check of this feature but this one ran and passed, and this one did not run. A child
+  // that ran fewer files, or matched none, would otherwise pass as green (S-028).
+  const passed = new Set([...out.matchAll(/^ok \d+ - (\d+)[.\s(]/gm)].map((m) => Number(m[1])))
+  const checks = Array.from({ length: CHECKS }, (_, i) => i + 1)
+  assert.deepEqual(
+    checks.filter((n) => !passed.has(n)),
+    [],
+    'a check of this feature did not run, or did not pass, in the child',
+  )
+  assert.ok(!passed.has(CHECKS + 1), 'check 22 ran itself')
 })

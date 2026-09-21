@@ -29,7 +29,9 @@ import {
   imagePort,
   imageRateCents,
   isUnavailable,
+  cheapestEntry,
   uploadReference,
+  wireFor,
   type ImageEntry,
 } from '@cutroom/providers'
 import { SETTING_NAMES, readSettings } from '@cutroom/service'
@@ -131,16 +133,38 @@ function adapter(names: readonly (string | Wire)[], artifactRoot: string, entry?
   return { port, recorded }
 }
 
-/** The calls one picture with no reference is made of. */
-const MADE = [
-  'fal-image-submitted',
-  'fal-image-completed',
-  'fal-image-made',
-  'fal-picture-vertical',
-]
+/** Everything after the submit: the poll, the result, and the file itself. */
+const ANSWERED = ['fal-image-completed', 'fal-image-made', 'fal-picture-vertical']
+
+/**
+ * The calls one picture with NO reference is made of — the canonical, which D-027 makes from
+ * nothing. It submits to the entry's TEXT wire, which is a different path from its edit wire and
+ * therefore a fixture of its own (S-128); everything after the submit is the same, because fal
+ * polls the first two segments of a slug and both wires of one model share them.
+ */
+const MADE = ['fal-image-bare', ...ANSWERED]
+
+/** The calls one picture WITH a reference is made of: the entry's edit wire. */
+const MADE_EDIT = ['fal-image-submitted', ...ANSWERED]
 
 /** The two upload calls that come first when the call carries a reference. */
 const UPLOAD = ['fal-upload-initiate', 'fal-upload-stored']
+
+/**
+ * A fault names THE WIRE THAT WAS CALLED, and not the entry's other one (S-128).
+ *
+ * `includes(textSlug)` alone would be satisfied by a message naming the edit slug, since the edit
+ * slug is the text slug plus a segment — so the other wire is asserted absent as well. Which model
+ * produced a bad frame is the finding D-028's bake-off is made of, and which of its two wires
+ * produced it is what an operator reads next.
+ */
+function namesWire(message: string, references: number): void {
+  const entry = imageEntry()
+  const called = wireFor(entry, references)
+  const other = called === entry.slug ? entry.textSlug : entry.slug
+  assert.ok(message.includes(called), `the fault does not name '${called}': ${message}`)
+  assert.ok(!message.includes(other), `the fault names the wire that was NOT called: ${message}`)
+}
 
 /** A fault that names the key is the leak this slice exists to prevent (S-109, D-022). */
 function noKey(error: unknown): true {
@@ -238,7 +262,7 @@ test('11. a call carrying more reference pictures than the entry takes is refuse
   const f = folder()
   try {
     const entry = imageEntry()
-    const recorded = recordedFetch([...UPLOAD, ...MADE])
+    const recorded = recordedFetch([...UPLOAD, ...MADE_EDIT])
     const port = falImage({
       key: KEY,
       entry,
@@ -304,12 +328,108 @@ test('11. no slug is spelled anywhere but the registry', () => {
     if (file === registry) continue
     const text = readFileSync(file, 'utf8')
     for (const entry of IMAGE_REGISTRY) {
-      assert.ok(
-        !text.includes(entry.slug),
-        `${relative(REPO, file)} spells the slug ${entry.slug}: only the registry may (D-028)`,
-      )
+      // BOTH WIRES. An entry has two slugs since S-128, and a text wire spelled at a call site is
+      // the same violation as an edit wire spelled there — it is the one the canonical goes to.
+      for (const slug of [entry.slug, entry.textSlug]) {
+        assert.ok(
+          !text.includes(slug),
+          `${relative(REPO, file)} spells the slug ${slug}: only the registry may (D-028)`,
+        )
+      }
     }
   }
+})
+
+test('11. every admitted entry carries BOTH wires, and both are polled in the same place', () => {
+  // S-128: D-027's ladder makes the canonical picture from NOTHING — `makeStills` passes
+  // `references: []` — and fal's published schemas make `image_urls` a REQUIRED field on three of
+  // the four admitted edit wires. An entry with one wire cannot make the picture every other
+  // picture of the reel is derived from, and the first call of the first real reel would have been
+  // refused 422.
+  for (const entry of IMAGE_REGISTRY) {
+    assert.ok(entry.textSlug.length > 0, `${entry.slug} has no text wire`)
+    assert.notEqual(entry.textSlug, entry.slug, `${entry.slug}'s two wires are one slug`)
+    // THE SAME MODEL, so the rate, the limits and the frame on the entry are true of both. fal
+    // polls the FIRST TWO SEGMENTS of a slug, so two wires of one model must share them — a pair
+    // that did not would submit in one place and be polled in another, and the poll would 404.
+    assert.equal(
+      entry.textSlug.split('/').slice(0, 2).join('/'),
+      entry.slug.split('/').slice(0, 2).join('/'),
+      `${entry.slug} and ${entry.textSlug} are polled in different places`,
+    )
+  }
+  // And the branch is the registry's own, beside the data, so there is ONE answer to "which slug
+  // is this call's" rather than one per adapter.
+  const entry = imageEntry()
+  assert.equal(wireFor(entry, 0), entry.textSlug, 'a call with no reference is not the text wire')
+  assert.equal(wireFor(entry, 1), entry.slug, 'a call with a reference is not the edit wire')
+  assert.equal(wireFor(entry, 2), entry.slug)
+})
+
+test('11. a call with no reference goes to the text wire, and one with a reference to the edit wire', async () => {
+  const f = folder()
+  try {
+    // The canonical: no reference, so the text wire. If it went to the edit wire the harness would
+    // have no fixture for the path, which is the 422 a real run would have been refused with.
+    const bare = adapter(MADE, f.dir)
+    const canonical = await bare.port.generate(request())
+    assert.equal(canonical.kind, 'made')
+    assert.deepEqual(bare.recorded.left(), [], 'a recorded call was never made')
+    const bareSubmit = bare.recorded.sent.find(
+      (sent) => sent.method === 'POST' && !sent.path.includes('/storage/'),
+    )
+    assert.equal(bareSubmit?.path, `/${imageEntry().textSlug}`)
+    assert.ok(!JSON.parse(bareSubmit?.body ?? '{}').image_urls, 'a bare call carries image_urls')
+
+    // A derived picture: one reference, so the edit wire, and the reference is uploaded first.
+    const derived = adapter([...UPLOAD, ...MADE_EDIT], f.dir)
+    const made = await derived.port.generate(
+      request({ pictureId: 'a1-shot-1-derived', references: [f.reference] }),
+    )
+    assert.equal(made.kind, 'made')
+    assert.deepEqual(derived.recorded.left(), [], 'a recorded call was never made')
+    const editSubmit = derived.recorded.sent.find(
+      (sent) => sent.method === 'POST' && !sent.path.includes('/storage/'),
+    )
+    assert.equal(editSubmit?.path, `/${imageEntry().slug}`)
+    assert.equal(JSON.parse(editSubmit?.body ?? '{}').image_urls?.length, 1)
+
+    // THE RECEIPT NAMES THE WIRE THAT WAS CALLED, each of them. A canonical made on the text wire
+    // and recorded as an edit is a row that cannot be reconciled with the provider's own, and it
+    // is the row D-028's bake-off compares gate pass rates across (D-028, S-128).
+    assert.equal(canonical.kind === 'made' && canonical.receipt.model, imageEntry().textSlug)
+    assert.equal(made.kind === 'made' && made.receipt.model, imageEntry().slug)
+  } finally {
+    f.clean()
+  }
+})
+
+test('11. cheapestEntry answers the cheapest admitted entry at this engine’s own frame', () => {
+  // S-127: "the cheapest admitted one" was PROSE beside CONFIGURED_IMAGE_SLUG, and it went stale
+  // the moment S-124 moved the frame to 864x1536 — flux is the only entry priced per megapixel, so
+  // its headline rate did not survive, and it is second of four. The claim is data now, computed
+  // from the same `imageRateCents` every estimate and receipt use.
+  const cheapest = cheapestEntry()
+  assert.equal(cheapest.slug, 'bytedance/seedream/v5/lite/edit')
+
+  // AND IT AGREES WITH THE ARITHMETIC. This is the assertion that fails the moment a rate moves
+  // and takes the rank with it, which is the whole reason the claim stopped being a comment.
+  const rates = IMAGE_REGISTRY.map((entry) => [entry.slug, imageRateCents(entry)] as const)
+  assert.deepEqual(rates, [
+    ['fal-ai/nano-banana-pro/edit', 15],
+    ['fal-ai/nano-banana-2/edit', 8],
+    ['bytedance/seedream/v5/lite/edit', 3.5],
+    ['fal-ai/flux-2-pro/edit', 7.5],
+  ])
+  assert.equal(
+    imageRateCents(cheapest),
+    Math.min(...rates.map(([, cents]) => cents)),
+    'cheapestEntry does not answer the entry with the lowest rate',
+  )
+
+  // The CONFIGURED default is NOT the cheapest, and saying so is the point: a default is D-028's
+  // bake-off to settle (O-4 / C-8, open) and a setting is one run's (S-127).
+  assert.notEqual(cheapest.slug, CONFIGURED_IMAGE_SLUG)
 })
 
 test('11. the service refuses to start when its image model setting names a slug outside the registry', async () => {
@@ -351,6 +471,10 @@ test('11. what is transient and what is a fault, classified as the two MiniMax a
         return true
       })
       assert.equal(recorded.sent.length, 1, `${name} was sent more than once by the adapter`)
+      // AND THE FIXTURE WAS ACTUALLY SERVED. A call the harness has no fixture for throws too,
+      // and the adapter classifies that throw as unavailable — so a fixture whose path stopped
+      // matching would satisfy every assertion above while proving nothing at all (S-128).
+      assert.deepEqual(recorded.left(), [], `${name} was never served: the call went elsewhere`)
     }
 
     // A body that is valid JSON and is NOT THIS WIRE is its own case, and it is not the same
@@ -361,7 +485,8 @@ test('11. what is transient and what is a fault, classified as the two MiniMax a
       provider: 'fal',
       call: 'image',
       case: 'wrongshape',
-      request: { method: 'POST', path: '/fal-ai/flux-2-pro/edit' },
+      // The canonical's wire: this call carries no reference (S-128).
+      request: { method: 'POST', path: '/fal-ai/flux-2-pro' },
       response: { status: 200, body: { ok: true, message: 'queued somewhere else' } },
     }
     const shaped = adapter([wrongShape], dir)
@@ -376,8 +501,9 @@ test('11. what is transient and what is a fault, classified as the two MiniMax a
 
     const faults = ['fal-image-denied', 'fal-image-refused', 'fal-image-garbled']
     for (const name of faults) {
-      const { port } = adapter([name], dir)
+      const { port, recorded } = adapter([name], dir)
       await assert.rejects(port.generate(request()), (error: Error) => {
+        assert.deepEqual(recorded.left(), [], `${name} was never served: the call went elsewhere`)
         assert.ok(!isUnavailable(error), `${name} was answered unavailable, so it would be re-sent`)
         assert.ok(error.message.length > 0)
         // The gateway's HTML is the case where a 200 is not JSON at all, and it says so: it is a
@@ -389,7 +515,7 @@ test('11. what is transient and what is a fault, classified as the two MiniMax a
     }
 
     // A job fal ACCEPTED AND THEN FAILED is a fault, and it carries the provider's own message.
-    const halted = adapter(['fal-image-submitted', 'fal-image-halted', 'fal-image-broken'], dir)
+    const halted = adapter(['fal-image-bare', 'fal-image-halted', 'fal-image-broken'], dir)
     await assert.rejects(halted.port.generate(request()), (error: Error) => {
       assert.ok(!isUnavailable(error))
       assert.match(error.message, /reference image could not be decoded/)
@@ -424,7 +550,7 @@ test('11. what is transient and what is a fault, classified as the two MiniMax a
 test('11. the key reaches one header, and no message, and neither base URL is ignored', async () => {
   const f = folder()
   try {
-    const recorded = recordedFetch([...UPLOAD, ...MADE])
+    const recorded = recordedFetch([...UPLOAD, ...MADE_EDIT])
     const port = falImage({
       key: KEY,
       entry: imageEntry(),
@@ -470,7 +596,7 @@ test('11. the key reaches one header, and no message, and neither base URL is ig
 test('12. a completed call writes the picture under the artifact root and records the local path', async () => {
   const f = folder()
   try {
-    const { port, recorded } = adapter([...UPLOAD, ...MADE], f.dir)
+    const { port, recorded } = adapter([...UPLOAD, ...MADE_EDIT], f.dir)
     const answer = await port.generate(request({ references: [f.reference] }))
     assert.equal(answer.kind, 'made')
     if (answer.kind !== 'made') return
@@ -499,7 +625,7 @@ test('12. a recorded response whose file is 16:9 fails the call naming the entry
   const f = folder()
   try {
     const { port } = adapter(
-      ['fal-image-submitted', 'fal-image-completed', 'fal-image-sideways', 'fal-picture-landscape'],
+      ['fal-image-bare', 'fal-image-completed', 'fal-image-sideways', 'fal-picture-landscape'],
       f.dir,
     )
     // A picture id of its own, so what is asserted below is this call's file and not the
@@ -509,7 +635,7 @@ test('12. a recorded response whose file is 16:9 fails the call naming the entry
       // The entry is named, because which model produced it is the finding: D-028's bake-off is
       // exactly "which of these keeps its promises", and a failure that does not say which model
       // failed cannot feed it.
-      assert.ok(error.message.includes(imageEntry().slug), error.message)
+      namesWire(error.message, 0)
       noKey(error)
       assert.match(error.message, /1536x864|1536×864/)
       assert.match(error.message, /9:16/)
@@ -556,13 +682,13 @@ test('12. a picture that is vertical and NOT 9:16 fails the call', async () => {
   const f = folder()
   try {
     const { port } = adapter(
-      ['fal-image-submitted', 'fal-image-completed', 'fal-image-stretched', 'fal-picture-tall'],
+      ['fal-image-bare', 'fal-image-completed', 'fal-image-stretched', 'fal-picture-tall'],
       f.dir,
     )
     await assert.rejects(
       port.generate(request({ pictureId: 'a1-shot-3-tall' })),
       (error: Error) => {
-        assert.ok(error.message.includes(imageEntry().slug), error.message)
+        namesWire(error.message, 0)
         noKey(error)
         assert.match(error.message, /1024x1536|1024×1536/)
         assert.match(error.message, /9:16/)
@@ -580,16 +706,11 @@ test('12. a file that is exactly 9:16 and below 768P fails the call', async () =
   const f = folder()
   try {
     const { port } = adapter(
-      [
-        'fal-image-submitted',
-        'fal-image-completed',
-        'fal-image-shrunken',
-        'fal-picture-undersized',
-      ],
+      ['fal-image-bare', 'fal-image-completed', 'fal-image-shrunken', 'fal-picture-undersized'],
       f.dir,
     )
     await assert.rejects(port.generate(request()), (error: Error) => {
-      assert.ok(error.message.includes(imageEntry().slug), error.message)
+      namesWire(error.message, 0)
       noKey(error)
       assert.match(error.message, /576/)
       assert.match(error.message, new RegExp(String(PICTURE_MIN_SHORT_SIDE)))
@@ -611,18 +732,15 @@ test('12. bytes that are no picture, and a completed job with no picture at all,
       request: { method: 'GET', path: '/files/vertical.png' },
       response: { status: 200, text: 'these bytes are not a picture\n' },
     }
-    const bad = adapter(
-      ['fal-image-submitted', 'fal-image-completed', 'fal-image-made', rubbish],
-      f.dir,
-    )
+    const bad = adapter(['fal-image-bare', 'fal-image-completed', 'fal-image-made', rubbish], f.dir)
     await assert.rejects(bad.port.generate(request()), (error: Error) => {
-      assert.ok(error.message.includes(imageEntry().slug), error.message)
+      namesWire(error.message, 0)
       noKey(error)
       assert.ok(!isUnavailable(error))
       return true
     })
 
-    const none = adapter(['fal-image-submitted', 'fal-image-completed', 'fal-image-empty'], f.dir)
+    const none = adapter(['fal-image-bare', 'fal-image-completed', 'fal-image-empty'], f.dir)
     await assert.rejects(none.port.generate(request()), (error: Error) => {
       assert.ok(!isUnavailable(error))
       return noKey(error)
@@ -767,7 +885,7 @@ test('13. an image receipt’s cost is the configured entry’s rate applied to 
     // input AND output, rounded up (BUDGET.md's second correction). At 864x1536 that is
     // 3 + 1.5 x ((2 - 1) + 2) = 7.5 cents, and a RECEIPT is whole cents rounded up, because
     // generation_receipt.cost_cents is an integer column and the budget guard rounds up (S-059).
-    const withRef = adapter([...UPLOAD, ...MADE], f.dir)
+    const withRef = adapter([...UPLOAD, ...MADE_EDIT], f.dir)
     const one = await withRef.port.generate(request({ references: [f.reference] }))
     assert.equal(one.kind, 'made')
     if (one.kind !== 'made') return

@@ -125,7 +125,7 @@ exactly the rule that keeps a stage from reaching for an adapter. So the root is
 **What the service settles, each one setting with a default inside this repository (D-086, and no absolute path
 anywhere — `tests/no-absolute-paths.test.ts`).** The database file and **its migrations, applied at startup before
 either half runs**; the artifact root; the port the API listens on, loopback only (D-098); the environment file
-(S-109); the lease (S-113); and `ProviderSettings` (S-108). **Every real adapter also takes its transport — a
+(S-109); the lease (S-113); **the narration voice** (S-128); and `ProviderSettings` (S-108). **Every real adapter also takes its transport — a
 `fetch` and a base URL, defaulting to the provider's own** — which is what lets a recorded response be served
 without a network, and is how checks 3, 6 to 16 are run at all (S-111, S-114).
 
@@ -156,14 +156,23 @@ A call that returns only reasoning **fails naming the budget**, because "the sch
 (D-008, D-019): audio plus a **`subtitle_file` URL that is a presigned credential belonging to MiniMax** (D-022).
 The adapter writes the audio under the artifact root, **fetches the timings, and drops the URL** — it reaches no row,
 no receipt and no log. The token plan covers T2A, so its receipt records the characters and a cost of zero.
+**The voice is the caller's setting and the adapter may not spell one** (S-070), so it is a service setting,
+`CUTROOM_NARRATION_VOICE`, defaulting to `DEFAULT_RENDER_SETTINGS.voice` — still `'stand-in'`, which the stand-in
+port ignores and a real provider refuses. Left unnamed, every narration call of a real run is refused before a clip
+is bought; named, the free path is byte-for-byte what four verified features run on (S-128).
 **Its transient is ANSWERED, not thrown** (S-123): `NarrationAnswer` carries the `unavailable` arm S-096 built, and
 the worker's guarded narration port is what sends the call again — which is where it differs from the model adapter,
 whose port has no such arm (S-122). **Named limit:** a transient on the SECOND call, the timings fetch, is answered
 `unavailable` like any other, and the whole `speak` is what is sent again — so the audio is made a second time. It is
 plan-covered, so it costs nothing today, and Slice 8 measures it.
 
-**The image** — fal, through **D-028's closed registry**: four admitted entries carrying their own slug, rate and
-limits, one configured default, no slug at a call site. Two admission gates, both asserted rather than trusted: the
+**The image** — fal, through **D-028's closed registry**: four admitted entries carrying their own slugs, rate and
+limits, one configured default, no slug at a call site. **An entry carries TWO wires and the call picks one by
+whether it carries a reference picture** (S-128): D-027's ladder makes the canonical from nothing — `makeStills`
+passes `references: []`, because it is the first picture of the reel — and fal's published schemas make `image_urls`
+a REQUIRED field on three of the four admitted edit wires, so an entry with one wire could not make the picture every
+other picture is derived from. The same four models, rates and limits; a second slug each of them has always
+published. **The receipt records the wire that was called**, never the edit slug whatever was sent. Two admission gates, both asserted rather than trusted: the
 entry **accepts reference pictures** (D-026, or the derive step has no mechanism, and the service refuses to start),
 and **the produced picture is 9:16 — checked on the frame**, because `image-to-video` has no `aspect_ratio` field and
 a non-vertical picture yields a landscape clip **with no error** (D-019, D-028).
@@ -286,6 +295,10 @@ again in Slice 8:
 - **`apps/worker`'s `recordingPort` gains the fifth arm** (Slice 7), so the text step writes a `model_receipt` row
   like every other call (D-084). `packages/pipeline`'s `gate1.ts` hands the sensor that call, and
   `packages/domain`'s receipt enum gains `'readText'` — **no migration**, the column is text.
+- **`apps/service` hands the worker its RENDER settings** (Slice 8), whose one difference from `packages/pipeline`'s
+  own `DEFAULT_RENDER_SETTINGS` is the voice, read from `CUTROOM_NARRATION_VOICE` and defaulting to that same
+  `'stand-in'`. **No verified feature's default moves**: `DEFAULT_RENDER_SETTINGS` is unchanged, and a plainly
+  started service renders with exactly what it rendered with before (S-128).
 - **Nothing else.** `reel-plan`, `reel-render`, `reel-takes` and `reel-contract` assert nothing about which adapter a
   port is: every one of them runs on stand-ins by default (S-108), and `receipt.fake` already carries the difference
   (S-036). Their journeys re-run in Slice 8 because the rule count moved, not because they were edited.
@@ -301,7 +314,7 @@ packages/contracts/src/providers.ts   ProviderSettings, the closed sets, the def
 packages/providers/src/env.ts    the ONLY read of a key, one function per key name
 packages/providers/src/transient.ts   the classification every real adapter shares (S-122)
 packages/providers/src/minimax/{model,narration}.ts
-packages/providers/src/fal/{image,video,registry,queue}.ts
+packages/providers/src/fal/{image,video,registry,queue}.ts   the registry carries BOTH wires an entry has (D-028, S-128)
 packages/providers/src/fal/h3.ts       the one video path as data: slugs, rate, bounds, wait (D-007, S-125)
 packages/providers/src/fal/frame.ts    the produced frame, read off the file itself (D-028, S-124)
 packages/providers/src/fal/upload.ts   uploadReference, and nothing else (Gate 2, S-114)
@@ -329,12 +342,12 @@ _The model adapter_
 
 _The narration adapter_
 
-9. `the adapter asks speech-2.8-hd with subtitle_enable, writes the audio under the artifact root, returns word timings the stage parses, and records the text's code points as characters; and 429, 5xx, a connection error and a timeout are ANSWERED unavailable while 400, 401 and a body that does not parse throw` — D-008, D-019, S-088, S-070, S-096, S-123.
+9. `the adapter asks speech-2.8-hd with subtitle_enable, writes the audio under the artifact root, returns word timings the stage parses, and records the text's code points as characters; and 429, 5xx, a connection error and a timeout are ANSWERED unavailable while 400, 401 and a body that does not parse throw; and the service names the voice it speaks with, one setting, defaulting to what every stand-in run uses` — D-008, D-019, S-088, S-070, S-096, S-123, S-128.
 10. `against a recorded response whose subtitle_file is a presigned URL carrying OSSAccessKeyId and Signature, nothing persisted holds that URL, either credential, or any query string — the timings are fetched and the reference dropped` — D-022, S-109.
 
 _The image adapter_
 
-11. `the registry holds D-028's four admitted entries with their rates and limits; a call naming a slug outside it is refused before any request; and a configured entry that does not advertise reference pictures makes the service refuse to start; and 429, 5xx, a connection error and a timeout THROW Unavailable while 400, 401, 422, a body that does not parse and a job the provider accepted and then failed throw a plain fault, with the key in one header and in no message` — D-028, D-026, S-096, S-124.
+11. `the registry holds D-028's four admitted entries with their rates, their limits and BOTH their wires — a call carrying no reference goes to the entry's TEXT wire and one carrying a reference to its EDIT wire, both polled in the same place, and each receipt names the wire that was called; a call naming a slug outside it is refused before any request; and a configured entry that does not advertise reference pictures makes the service refuse to start; and 429, 5xx, a connection error and a timeout THROW Unavailable while 400, 401, 422, a body that does not parse and a job the provider accepted and then failed throw a plain fault, with the key in one header and in no message` — D-028, D-026, S-096, S-124, S-128.
 12. `the produced picture's shape is asserted on the frame: a recorded response whose file is 16:9 fails the call naming the entry, and never reaches image-to-video` — D-028, D-019.
 13. `an image receipt's cost is the configured entry's rate applied to the call, and changing the configured entry changes what admission estimates — an unchanged estimate means a rate is hardcoded` — D-028, D-083.
 
@@ -412,15 +425,23 @@ it is the part that may differ per model.
       feature cannot be planned without** (S-115). **Proves: 20, 22**, then this feature's journey, and
       `reel-stills`', `reel-plan`'s, `reel-render`'s, `reel-takes`' and `reel-contract`'s again (S-099's form, for
       the rule count).
+      (Two blockers were found BEFORE anything spent, read from fal's own published schemas, and each was put to the
+      owner: **no admitted entry could make the canonical picture**, because `makeStills` passes `references: []`
+      and `image_urls` is a REQUIRED field on three of the four admitted edit wires — so an entry carries its model's
+      TEXT wire beside its edit wire and the call picks one; and **the narration voice was still `'stand-in'`**,
+      which the adapter may not replace and a real provider refuses — so it is a service setting defaulting to what
+      every stand-in run uses. The ceiling is 250¢, a constant the script can only lower, and the estimate is
+      printed and typed back before anything is submitted. `cheapestEntry()` makes S-127's stale claim data. Check 3
+      moved into a file of its own, unchanged, because check 22 cannot run the file it lives in — S-128.)
 
 Every check appears in exactly one slice: 3 + 2 + 4 + 2 + 3 + 4 + 2 + 2 = 22.
 
 ## Outcome
 
-- [ ] A person can start the engine on this machine and ask it for a reel, and it answers
-- [ ] Every part can be real or a stand-in by one setting, and the default is free, secretless and unchanged
+- [x] A person can start the engine on this machine and ask it for a reel, and it answers
+- [x] Every part can be real or a stand-in by one setting, and the default is free, secretless and unchanged
 - [ ] One real reel exists, made under its ceiling, with what it cost written down beside what the provider says
-- [ ] No key, and nothing a provider handed back, is ever written down — and no test spends or needs one
+- [x] No key, and nothing a provider handed back, is ever written down — and no test spends or needs one
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 

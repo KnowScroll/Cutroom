@@ -18,6 +18,7 @@ import {
   PICTURE_MIN_SHORT_SIDE,
   admitEntry,
   imageCostCents,
+  wireFor,
   type Frame,
   type ImageEntry,
 } from './registry.ts'
@@ -29,6 +30,14 @@ import { uploadReference } from './upload.ts'
 // IT RESOLVES ITS MODEL FROM D-028'S CLOSED REGISTRY. No slug is spelled here; the entry is handed
 // in, already admitted, and every figure the call is charged is that entry's own data. `fetch` and
 // `zod`, no SDK and no new npm package (S-114).
+//
+// AN ENTRY HAS TWO WIRES, AND THE CALL PICKS ONE (S-128). D-027's ladder makes the canonical
+// picture from NOTHING — `makeStills` passes `references: []`, because it is the first picture of
+// the reel — and every picture after it is derived from that one. fal's published schemas make
+// `image_urls` a REQUIRED field on three of the four admitted edit wires, so an entry with one
+// wire could not make the picture every other picture is made from. A call carrying no reference
+// goes to the entry's text wire and one carrying a reference to its edit wire; the receipt records
+// whichever was called.
 //
 // TWO REQUIREMENTS FAIL SILENTLY, AND BOTH ARE ASSERTED RATHER THAN TRUSTED.
 //
@@ -101,18 +110,22 @@ function frameInput(entry: ImageEntry): Record<string, unknown> {
   return { aspect_ratio: '9:16', resolution: entry.tier }
 }
 
-/** Why a produced frame is not one this engine may hand on, or nothing. */
-function frameRefusal(frame: Frame, entry: ImageEntry): string | undefined {
+/**
+ * Why a produced frame is not one this engine may hand on, or nothing. It names **the wire that
+ * was called**, not the entry's edit slug, because a canonical is made on the text wire and an
+ * operator reading the refusal needs the slug that produced the frame (S-128).
+ */
+function frameRefusal(frame: Frame, slug: string): string | undefined {
   if (frame.width * 16 !== frame.height * 9) {
     return (
-      `'${entry.slug}' produced a ${frame.width}x${frame.height} picture, which is not 9:16. ` +
+      `'${slug}' produced a ${frame.width}x${frame.height} picture, which is not 9:16. ` +
       `image-to-video has no aspect_ratio field, so this picture would yield a clip of its own ` +
       `shape with no error at all (D-019, D-028)`
     )
   }
   if (Math.min(frame.width, frame.height) < PICTURE_MIN_SHORT_SIDE) {
     return (
-      `'${entry.slug}' produced a ${frame.width}x${frame.height} picture, whose short side is ` +
+      `'${slug}' produced a ${frame.width}x${frame.height} picture, whose short side is ` +
       `below ${PICTURE_MIN_SHORT_SIDE}: a clip is 768P always, so this keyframe would be ` +
       `upscaled into the frame the viewer sees at t=0 (D-007, D-014, D-026)`
     )
@@ -137,7 +150,14 @@ export function falImage(options: FalImageOptions): ImagePort {
     acceptsReferences: entry.maxReferences >= 1,
 
     async generate(request): Promise<ImageAnswer> {
-      const what = `the picture ${request.pictureId} on '${entry.slug}'`
+      // WHICH OF THE ENTRY'S TWO WIRES THIS CALL GOES TO (S-128). A call carrying a reference
+      // picture is an edit; one carrying none is the canonical, the first picture of the reel,
+      // which there is nothing to derive from — and three of the four admitted edit wires make
+      // `image_urls` a required field, so the canonical sent to an edit wire is refused 422
+      // before anything is made. The branch is the registry's, beside the data, so there is one
+      // answer to "which slug is this call's" and the receipt records what was actually called.
+      const slug = wireFor(entry, request.references.length)
+      const what = `the picture ${request.pictureId} on '${slug}'`
 
       if (request.references.length > entry.maxReferences) {
         throw new FalFault(
@@ -164,7 +184,7 @@ export function falImage(options: FalImageOptions): ImagePort {
       const result = json(
         (
           await runQueued({
-            slug: entry.slug,
+            slug,
             what,
             base,
             pollMs,
@@ -207,7 +227,7 @@ export function falImage(options: FalImageOptions): ImagePort {
           `${what} answered ${bytes.length} bytes that are no picture this adapter can read`,
         )
       }
-      const refused = frameRefusal(frame, entry)
+      const refused = frameRefusal(frame, slug)
       // Thrown BEFORE the file is written, so a picture that failed its frame is not left under
       // the artifact root for anything to pick up.
       if (refused !== undefined) throw new FalFault(refused)
@@ -225,9 +245,11 @@ export function falImage(options: FalImageOptions): ImagePort {
         kind: 'made',
         picture: { pictureId: request.pictureId, path },
         receipt: {
-          // The entry configured, which is what a receipt is a record of — and what D-028's
-          // bake-off compares gate pass rates across.
-          model: entry.slug,
+          // THE WIRE THAT WAS ACTUALLY CALLED, which is what a receipt is a record of — and what
+          // D-028's bake-off compares gate pass rates across. Never `entry.slug` whatever was
+          // sent: a canonical made on the text wire and recorded as an edit is a row that cannot
+          // be reconciled with the provider's own (S-128, D-028).
+          model: slug,
           // The CONFIGURED ENTRY'S RATE applied to this call, in whole cents rounded up as the
           // guard rounds (S-059, D-083). Never a constant: the same arithmetic feeds admission's
           // estimate, so a reel cannot be priced by one model and bought from another.

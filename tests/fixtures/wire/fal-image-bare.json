@@ -1,0 +1,23 @@
+{
+  "note": "A picture accepted onto fal’s queue on the entry’s TEXT WIRE — the call the canonical picture is made with, which carries no reference at all (S-128). D-027's ladder makes the canonical from nothing and every later picture from that one, and fal's published schemas make `image_urls` a REQUIRED field on three of the four admitted edit wires, so a canonical sent to an edit wire is refused 422 before anything is made. The body is the same accepted-onto-the-queue shape as `fal-image-submitted`; what differs is the PATH, which is the entry's `textSlug` rather than its `slug`. Both wires of one model are polled at the same place, because fal polls the FIRST TWO SEGMENTS of a slug (`requestPath`). DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository had called fal when this was written, and Slice 8’s hand-run reel is what verifies it.",
+  "provider": "fal",
+  "call": "image",
+  "case": "bare",
+  "request": {
+    "method": "POST",
+    "path": "/fal-ai/flux-2-pro"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "request_id": "7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37",
+      "status": "IN_QUEUE",
+      "queue_position": 0,
+      "status_url": "https://queue.fal.run/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37/status",
+      "response_url": "https://queue.fal.run/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+    }
+  }
+}

@@ -5,9 +5,9 @@ import {
   type ProviderPort,
   type ProviderSettings,
 } from '@cutroom/contracts'
-import type { PlanSettings } from '@cutroom/contracts'
+import type { PlanSettings, RenderSettings } from '@cutroom/contracts'
 import { BUDGET_MD, DEFAULT_LEASE_MS } from '@cutroom/domain'
-import { DEFAULT_PLAN_SETTINGS, TAKES_A_SHOT } from '@cutroom/pipeline'
+import { DEFAULT_PLAN_SETTINGS, DEFAULT_RENDER_SETTINGS, TAKES_A_SHOT } from '@cutroom/pipeline'
 import {
   CONFIGURED_IMAGE_SLUG,
   DEFAULT_ARTIFACT_ROOT,
@@ -90,6 +90,7 @@ export const SETTING_NAMES = {
   falBaseUrl: 'CUTROOM_FAL_BASE_URL',
   falStorageBaseUrl: 'CUTROOM_FAL_STORAGE_BASE_URL',
   falImageModel: 'CUTROOM_FAL_IMAGE_MODEL',
+  narrationVoice: 'CUTROOM_NARRATION_VOICE',
 } as const
 
 /** `CUTROOM_PROVIDER_MODEL`, `_IMAGE`, `_SENSOR`, `_VIDEO`, `_NARRATION` (S-108). */
@@ -110,6 +111,15 @@ export interface ServiceSettings {
   transport: Transport
   /** Which admitted entry the image port is configured with (D-028). */
   falImageSlug: string
+  /**
+   * What the worker RENDERS with. It is `DEFAULT_RENDER_SETTINGS` except for the voice, which is
+   * a setting because the narration adapter never spells one: `speak` is handed
+   * `RenderSettings.voice` and sends it as MiniMax's `voice_id` (S-070, D-008). The default is
+   * still `'stand-in'`, which is what every verified feature runs on and what the stand-in
+   * narration port ignores — so a plainly started service behaves exactly as it always has, and a
+   * real run names its voice the way it names its image entry (S-128).
+   */
+  renderSettings: RenderSettings
   /**
    * What the worker plans and prices with. It is `DEFAULT_PLAN_SETTINGS` except for the rates a
    * real adapter actually charges: with a real image port, `imageRateCents` is THE CONFIGURED
@@ -194,6 +204,14 @@ export function readSettings(env: Env): ServiceSettings {
     ...(settings.video === 'fake' ? {} : { videoRateCentsPerSecond: H3_TURBO.rateCentsPerSecond }),
   }
 
+  // The voice the narration port speaks with. A real T2A call is refused by the provider unless
+  // this names one of its voices, and the adapter may not spell one — it is the caller's setting
+  // (S-070). The default is what every stand-in run has always used.
+  const renderSettings: RenderSettings = {
+    ...DEFAULT_RENDER_SETTINGS,
+    voice: text(env, SETTING_NAMES.narrationVoice, DEFAULT_RENDER_SETTINGS.voice),
+  }
+
   const apiPort = whole(env, SETTING_NAMES.apiPort, DEFAULT_API_PORT, 0)
   if (apiPort > 65535) throw new Error(`${SETTING_NAMES.apiPort} is ${apiPort}, which is no port`)
 
@@ -221,6 +239,7 @@ export function readSettings(env: Env): ServiceSettings {
     },
     falImageSlug,
     planSettings,
+    renderSettings,
     env,
   }
 }
@@ -238,6 +257,7 @@ export function banner(settings: ServiceSettings, baseUrl: string): string {
     `  fal        ${settings.transport.falBaseUrl ?? FAL_BASE_URL} ${settings.transport.falStorageBaseUrl ?? FAL_STORAGE_BASE_URL}`,
     `  image      ${settings.falImageSlug} at ${settings.planSettings.imageRateCents} cents`,
     `  video      ${settings.planSettings.videoRateCentsPerSecond} cents a second`,
+    `  voice      ${settings.renderSettings.voice}`,
     `  lease      ${settings.leaseMs} ms`,
     `  listening  ${baseUrl}`,
     '',

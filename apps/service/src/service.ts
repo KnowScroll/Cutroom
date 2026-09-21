@@ -116,6 +116,11 @@ export async function startService(settings: ServiceSettings): Promise<Service> 
       // defaults is `imageRateCents`, which with a real image port is the configured registry
       // entry's own rate — so pre-flight estimates what is actually configured (D-028, S-124).
       settings: settings.planSettings,
+      // What it RENDERS with. Its one difference from the pipeline's own defaults is the voice,
+      // which the narration adapter may not spell and sends as MiniMax's `voice_id` (S-070,
+      // D-008): a real run names it, and the default is the `'stand-in'` every verified feature
+      // runs on (S-128).
+      renderSettings: settings.renderSettings,
       ...ports,
     })
   } catch (error) {
