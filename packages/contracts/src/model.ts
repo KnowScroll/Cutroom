@@ -2,9 +2,15 @@ import type { z } from 'zod'
 import type { ClipRef } from './clip.ts'
 import type { PictureRef } from './picture.ts'
 
-// The one port for model calls (D-006, D-084), carrying four: `structured`, `observe`, `compare`
-// and `judgeCut`. Each is a shape ON this port and never a port of its own, so there is exactly
-// one seam a stand-in replaces and one place every call's receipt comes from (D-005).
+// The one port for model calls (D-006, D-084), carrying five: `structured`, `observe`, `compare`,
+// `judgeCut` and `readText`. Each is a shape ON this port and never a port of its own, so there is
+// exactly one seam a stand-in replaces and one place every call's receipt comes from (D-005).
+//
+// `readText` arrived with paid-path's Slice 7, the way `judgeCut` arrived with reel-render's
+// (S-077): Gate 1's text step is a real question about a picture, this machine's ffmpeg has no
+// `ocr` filter and no tesseract, and a sensor that could only answer "no text" is a gate that
+// always passes (S-112). It is a call on THIS port and not a function of its own for the reason
+// D-084 gives: a call off the port has no model id, no role and no receipt (S-126).
 //
 // PICTURES AND CLIPS ENTER THROUGH `observe`, `compare` AND `judgeCut` ONLY (S-037, S-072,
 // S-074). Review 4 of reel-engine found the witness could be sighted by another route: a
@@ -16,8 +22,8 @@ import type { PictureRef } from './picture.ts'
 /** Which job a call does. The model each role is routed to is a setting (D-006). */
 export type ModelRole = 'planner' | 'reconciler' | 'witness' | 'judge'
 
-/** Which of the port's four calls a receipt came from (S-037, S-074). */
-export type ModelCall = 'structured' | 'observe' | 'compare' | 'judgeCut'
+/** Which of the port's five calls a receipt came from (S-037, S-074, S-126). */
+export type ModelCall = 'structured' | 'observe' | 'compare' | 'judgeCut' | 'readText'
 
 /** What every call returns beside its value, and what becomes its `model_receipt` row (D-005). */
 export interface ModelReceipt {
@@ -91,6 +97,21 @@ export interface LanguageModelPort {
       frames: readonly PictureRef[]
     }>
     questions: readonly string[]
+    temperature: 0
+  }): Promise<{ value: unknown; receipt: ModelReceipt }>
+
+  /**
+   * Gate 1's text step, role `witness` (D-042, S-112, S-126): one picture and a temperature, and
+   * nothing else — the question is fixed inside the adapter, like every other call that carries a
+   * picture (I-8). The value is `unknown` and is parsed by whoever asked, the way an observation
+   * is; a call that fails must fail, because a text step that always answers "no text" is a gate
+   * that always passes.
+   *
+   * It records no observation: the one record of what a picture shows is still its one `observe`
+   * (I-15), and these two receipts are told apart by their `call` (S-037, S-046).
+   */
+  readText(call: {
+    picture: PictureRef
     temperature: 0
   }): Promise<{ value: unknown; receipt: ModelReceipt }>
 }

@@ -60,12 +60,30 @@ export interface PictureMeasure {
 }
 
 /**
+ * The ONE model call the text step makes, handed to the sensor by whoever holds the model port
+ * (S-126). A picture in; the model's answer out, unparsed, exactly as `observe` returns one.
+ *
+ * It is a FUNCTION and not a `LanguageModelPort` for two reasons. `model.ts` already depends on
+ * this file, so a port type here would be a cycle, which `no-circular` forbids. And a sensor
+ * needs one call, not a port — S-125's reason for handing the video adapter a probe rather than
+ * the whole `MediaPort`.
+ *
+ * Whoever passes it decides which port the call goes through, which is the point: the pipeline
+ * passes the model port it was handed, and inside a worker that is the RECORDING one, so the
+ * call writes its `model_receipt` row like every other (D-084, D-006).
+ */
+export type PictureTextReader = (picture: PictureRef) => Promise<unknown>
+
+/**
  * The pixel work `pipeline-no-io` forbids inside the pipeline, behind a port (S-038). Gate 1's
  * technical and text steps and Gate 1S's similarity are the three things that must read a file.
+ *
+ * `measure` and `similarity` are handed no reader and can reach none: they are local, free and
+ * deterministic, and "no model call, no spend" is true of them by construction (S-112).
  */
 export interface PictureSensorPort {
   measure(picture: PictureRef): Promise<PictureMeasure>
-  readText(picture: PictureRef): Promise<string[]>
+  readText(picture: PictureRef, read: PictureTextReader): Promise<string[]>
   /** A cosine over the two whole pictures, -1..1 (S-045). */
   similarity(a: PictureRef, b: PictureRef): Promise<number>
 }

@@ -120,6 +120,7 @@ test("9. an admitted video run whose stills stage completes has stage.finished f
     },
     compare: (call) => model.compare(call),
     judgeCut: (call) => model.judgeCut(call),
+    readText: (call) => model.readText(call),
   })
   const engine = await startEngine({
     worker: true,

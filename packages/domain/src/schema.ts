@@ -88,6 +88,10 @@ export const plan = sqliteTable(
  * `take_ids` arrived with reel-render's first slice, in S-055's form: a take's observation and
  * reconciliation are tied to their receipts by take id, and every row before it named no take
  * (S-072).
+ *
+ * `readText` arrived with paid-path's Slice 7 (S-126): Gate 1's text step is a vision call, so it
+ * is a call on the one model port and writes a row like every other (D-084). It needed no
+ * migration — the column is text, and the enum is the type this repository reads it through.
  */
 export const modelReceipt = sqliteTable('model_receipt', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -95,7 +99,7 @@ export const modelReceipt = sqliteTable('model_receipt', {
     .notNull()
     .references(() => run.runId),
   role: text('role').notNull(),
-  call: text('call', { enum: ['structured', 'observe', 'compare', 'judgeCut'] })
+  call: text('call', { enum: ['structured', 'observe', 'compare', 'judgeCut', 'readText'] })
     .notNull()
     .default('structured'),
   /** A JSON array of picture ids. */

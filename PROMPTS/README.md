@@ -27,7 +27,14 @@ its `JOURNAL.md` entry says it did (S-065).
 | 033 | [033-reel-takes-slice-4.md](033-reel-takes-slice-4.md)   | `reel-takes`  | Slice 4   | 2026-09-20 | session 33 |
 | 034 | [034-reel-takes-slice-5.md](034-reel-takes-slice-5.md)   | `reel-takes`  | Slice 5   | 2026-09-20 | session 34 |
 | 035 | [035-reel-takes-slice-6.md](035-reel-takes-slice-6.md)   | `reel-takes`  | Slice 6   | 2026-09-20 | session 35 |
-| 036 | [036-paid-path-slice-1.md](036-paid-path-slice-1.md)     | `paid-path`   | Slice 1   | 2026-09-20 | not yet    |
+| 036 | [036-paid-path-slice-1.md](036-paid-path-slice-1.md)     | `paid-path`   | Slice 1   | 2026-09-20 | session 36 |
+| 037 | [037-paid-path-slice-2.md](037-paid-path-slice-2.md)     | `paid-path`   | Slice 2   | 2026-09-20 | session 37 |
+| 038 | [038-paid-path-slice-3.md](038-paid-path-slice-3.md)     | `paid-path`   | Slice 3   | 2026-09-20 | session 38 |
+| 039 | [039-paid-path-slice-4.md](039-paid-path-slice-4.md)     | `paid-path`   | Slice 4   | 2026-09-20 | session 39 |
+| 040 | [040-paid-path-slice-5.md](040-paid-path-slice-5.md)     | `paid-path`   | Slice 5   | 2026-09-20 | session 40 |
+| 041 | [041-paid-path-slice-6.md](041-paid-path-slice-6.md)     | `paid-path`   | Slice 6   | 2026-09-21 | session 41 |
+| 042 | [042-paid-path-slice-7.md](042-paid-path-slice-7.md)     | `paid-path`   | Slice 7   | 2026-09-21 | session 42 |
+| 043 | [043-paid-path-slice-8.md](043-paid-path-slice-8.md)     | `paid-path`   | Slice 8   | 2026-09-21 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

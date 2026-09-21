@@ -1,0 +1,41 @@
+{
+  "note": "MiniMax's answer to Gate 1's text step, on the OpenAI-compatible wire D-019's spike verified live (POST /v1/chat/completions). The documented shape of a json_schema answer, with the content this repository asks for — every legible string in the picture, once each (S-112, S-126). Recorded from the published response schema rather than from a paid call; the first hand-run reel of paid-path's Slice 8 replaces it with the body a real call returned.",
+  "provider": "minimax",
+  "call": "readtext",
+  "case": "words",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0021",
+      "object": "chat.completion",
+      "created": 1758412800,
+      "model": "MiniMax-VL-01",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"text\":[\"MAGNA CARTA\",\"Anno 1215\"]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1544,
+        "completion_tokens": 24,
+        "total_tokens": 1568
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

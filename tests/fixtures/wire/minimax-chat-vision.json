@@ -1,0 +1,44 @@
+{
+  "note": "A witness answer about one picture, on the same wire: D-006 routes anything that must see to MiniMax-M3, the only model in the family that accepts images. The answer is D-041's shape as amended by D-044; the adapter does not parse it, because the pipeline parses an observation at the gate boundary (S-042).",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "vision",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0004",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M3",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"entities\":[{\"label\":\"a wax seal on parchment\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"a table in a stone hall\",\"lighting\":\"dim\",\"readableTextPresent\":false,\"ambiguities\":[],\"unsafeDepictions\":[]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1904,
+        "completion_tokens": 143,
+        "total_tokens": 2047,
+        "prompt_tokens_details": {
+          "cached_tokens": 128
+        }
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

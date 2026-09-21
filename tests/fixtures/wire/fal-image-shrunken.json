@@ -1,0 +1,28 @@
+{
+  "note": "A finished picture whose file is EXACTLY 9:16 and below 768P — fal’s own portrait_16_9 preset at 576x1024, which BUDGET.md records as too small for our clips. It passes the ratio test and would be upscaled by image-to-video, which the viewer sees at t=0 (D-014, D-007, D-026). DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body).",
+  "provider": "fal",
+  "call": "image",
+  "case": "shrunken",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "images": [
+        {
+          "url": "https://v3.fal.media/files/undersized.png",
+          "width": 576,
+          "height": 1024,
+          "content_type": "image/png"
+        }
+      ],
+      "seed": 7,
+      "prompt": "a keyframe below 768P"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "note": "A wrong or absent key at fal’s storage. 401 is a FAULT, not a transient: sending the same key again cannot make it right, so the run fails rather than being retried (S-096, S-124). DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body).",
+  "provider": "fal",
+  "call": "upload",
+  "case": "denied",
+  "request": {
+    "method": "POST",
+    "path": "/storage/upload/initiate"
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Unauthorized"
+    }
+  }
+}

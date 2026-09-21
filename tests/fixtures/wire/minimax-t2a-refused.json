@@ -1,0 +1,12 @@
+{
+  "note": "A 400 from T2A: the request itself was wrong — a voice_id that does not exist, a text over the limit — so sending it again cannot help. It throws and the run fails (S-096).",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "refused",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 400,
+    "headers": { "content-type": "application/json" },
+    "body": { "base_resp": { "status_code": 1013, "status_msg": "invalid parameters" } }
+  }
+}

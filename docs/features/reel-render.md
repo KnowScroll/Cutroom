@@ -9,6 +9,13 @@ authority: plan
 > steering repository's tools, and here the journey is `node scripts/journey.mjs`. **Item 5 below has since been
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
+>
+> **Amended by `paid-path` on 2026-09-21 — the gates below are not edited, and no assertion is removed** (**S-126**).
+> **Check 3's last clause reads `structured, observe, compare, judgeCut and readText`**, and its list is still
+> EXACT: a sixth call still fails it. `readText` is Gate 1's text step, which `reel-stills` proves and this feature
+> does not touch — it is a call on the ONE model port rather than a function of its own because D-084 requires every
+> model call to carry a model id, a role and a `model_receipt` row. Nothing else in this feature moves, and its
+> journey is run again in `paid-path`'s Slice 8.
 
 # reel-render — approved stills become a finished video, for $0
 
@@ -505,9 +512,12 @@ ends the run.
   music, and any method can be scripted to throw.
 - **`AssemblerPort`** (S-075) — `ready`; **`assemble(manifest)`**, answering the output's path and the invocations it
   ran.
-- **`LanguageModelPort`** carries **four calls**: `structured` gains optional `takeIds` for its receipt; **`observe`
-  takes a picture or a clip, and a temperature, and nothing else** (S-072); **`judgeCut`** takes the shots' frames and
-  sentences, the questions and a temperature, role `judge` (S-074). **`ModelReceipt`** gains **`takeIds`**: a take's
+- **`LanguageModelPort`** carries **four calls here, and five since `paid-path`'s Slice 7** (S-126): `structured`
+  gains optional `takeIds` for its receipt; **`observe` takes a picture or a clip, and a temperature, and nothing
+  else** (S-072); **`judgeCut`** takes the shots' frames and sentences, the questions and a temperature, role `judge`
+  (S-074); and **`readText`** takes one picture and a temperature, role `witness` — Gate 1's text step, added by
+  `paid-path` because this machine's ffmpeg has no `ocr` filter and a sensor that could only answer "no text" is a
+  gate that always passes (S-112). **`ModelReceipt`** gains **`takeIds`**: a take's
   observation and reconciliation are tied to the one `witness` and the one `reconciler` receipt whose `takeIds` is
   that take's (S-037's form). The model stand-in keeps `observe` calls on clips in their own list, so `reel-stills`'
   check 26 reads what it always did.
@@ -1150,7 +1160,7 @@ _The ports, the shapes and the rule_
 
 1. `compiled by TypeScript in the test: a text-to-video request without aspectRatio, an image-to-video request without an image or with an aspectRatio, a reference-to-video mode, a resolution other than 768P and an end image are each a type error; observe given a clip and a prompt, or a picture and a clip together, and judgeCut given a schema or a role, are each a type error; and the calls as Gate 3 writes them compile` — D-007, D-018, D-026, D-037, D-053, I-8, S-071, S-072, S-074.
 2. `processes-only-in-providers fires in drift:prove on an import of child_process and of node:child_process from each of apps/worker, apps/api and packages/domain, and drift, drift:prove and drift --audit pass` — S-075.
-3. `GATE_ORDER equals ['0', '1', '1S', '2', '3', '4', '5', '7'], asserted as data; the default gate profile is phase-1 with exactly those gates, and a worker handed a profile with other gates refuses to start and claims no job; and LanguageModelPort's calls are exactly structured, observe, compare and judgeCut` — D-049, D-052, D-063, S-067, S-068, S-074, S-077.
+3. `GATE_ORDER equals ['0', '1', '1S', '2', '3', '4', '5', '7'], asserted as data; the default gate profile is phase-1 with exactly those gates, and a worker handed a profile with other gates refuses to start and claims no job; and LanguageModelPort's calls are exactly structured, observe, compare, judgeCut and readText` — D-049, D-052, D-063, S-067, S-068, S-074, S-077, S-126.
 4. `the clip observation schema requires actions, eventOrder and clippedByEdge, and the still's observation schema still refuses actions and eventOrder` — D-041, D-044, D-053.
 5. `the render manifest schema refuses a manifest in which two shots hold one narration id, a shot with no join mode, a placed text-to-video opening with no degradation reason, and an unplaced one with a reason; and no type or field in packages/ or apps/ is named manifest or endCard — green before any code, since nothing is named either yet` — D-036, D-057, D-059, D-101, S-067, S-073.
 6. `the validator refuses a video request whose prompt lacks the negative audio block, and a text-to-video request without aspectRatio 9:16 — the worker's video port throws, and a recording port it wraps receives no call — and passes a request carrying both` — D-008, D-071, I-19, S-071.

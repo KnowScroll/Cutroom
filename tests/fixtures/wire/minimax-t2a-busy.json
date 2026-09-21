@@ -1,0 +1,12 @@
+{
+  "note": "T2A answering that it is busy. 429 is transient: the narration port ANSWERS unavailable rather than throwing, because NarrationAnswer carries that arm and the worker's guarded port is what sends it again, with backoff, on the transient counter (S-096) — which is where the narration adapter differs from the model adapter, whose port has no such arm (S-122). paid-path's check 9 asserts the classification.",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "busy",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 429,
+    "headers": { "content-type": "application/json" },
+    "body": { "base_resp": { "status_code": 1002, "status_msg": "rate limit exceeded" } }
+  }
+}

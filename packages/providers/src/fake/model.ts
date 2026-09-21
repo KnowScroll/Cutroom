@@ -13,10 +13,10 @@ import type {
 // answers each call from a script a test supplies, keyed by role and by call order within that
 // role, and holds no durable state.
 //
-// The calls keep what they received in FIVE LISTS. `calls` is the `structured` calls and only
+// The calls keep what they received in SIX LISTS. `calls` is the `structured` calls and only
 // those, so reel-plan's checks that read it are untouched (S-047); `observeCalls` is `observe` on a
 // picture and only that, so reel-stills' check 26 reads what it always did (S-072); and
-// `observeClipCalls`, `compareCalls` and `judgeCutCalls` are the rest. They are what a check reads
+// `observeClipCalls`, `compareCalls`, `judgeCutCalls` and `readTextCalls` are the rest. They are what a check reads
 // to see what actually reached the model — the type alone cannot prove a brief never got to the
 // witness, because a value passed as an argument compiles against a variable (S-037).
 
@@ -25,8 +25,8 @@ export type FakeAnswer = { value: unknown } | { throws: string }
 
 /**
  * The answers for each role, in the order that role's calls arrive. `witness` answers `observe`,
- * on a picture or a clip, and `judge` answers `compare` and `judgeCut`, since each of those calls
- * has exactly one role (S-037, S-072, S-074).
+ * on a picture or a clip, AND `readText`, Gate 1's text step; `judge` answers `compare` and
+ * `judgeCut`. Each call has exactly one role (S-037, S-072, S-074, S-126).
  */
 export type FakeScript = Partial<Record<ModelRole, readonly FakeAnswer[]>>
 
@@ -41,6 +41,8 @@ export type FakeObserveClipCall = Extract<ObserveCall, { clip: ClipRef }>
 export type FakeCompareCall = Parameters<LanguageModelPort['compare']>[0]
 /** A `judgeCut` call the stand-in received, exactly as it was made (S-074). */
 export type FakeJudgeCutCall = Parameters<LanguageModelPort['judgeCut']>[0]
+/** A `readText` call the stand-in received, exactly as it was made (S-112, S-126). */
+export type FakeReadTextCall = Parameters<LanguageModelPort['readText']>[0]
 
 export type FakeModel = LanguageModelPort & {
   /** Every `structured` call received, in order — including one whose answer failed or threw. */
@@ -53,6 +55,8 @@ export type FakeModel = LanguageModelPort & {
   readonly compareCalls: readonly FakeCompareCall[]
   /** Every `judgeCut` call received, in order. */
   readonly judgeCutCalls: readonly FakeJudgeCutCall[]
+  /** Every `readText` call received, in order — Gate 1's text step (S-126). */
+  readonly readTextCalls: readonly FakeReadTextCall[]
 }
 
 export function fakeModel(
@@ -64,6 +68,7 @@ export function fakeModel(
   const observeClipCalls: FakeObserveClipCall[] = []
   const compareCalls: FakeCompareCall[] = []
   const judgeCutCalls: FakeJudgeCutCall[] = []
+  const readTextCalls: FakeReadTextCall[] = []
   const answered: Record<ModelRole, number> = { planner: 0, reconciler: 0, witness: 0, judge: 0 }
 
   /** The next scripted answer for a role, or the error a missing one deserves. */
@@ -101,6 +106,7 @@ export function fakeModel(
     observeClipCalls,
     compareCalls,
     judgeCutCalls,
+    readTextCalls,
 
     async structured(call) {
       calls.push(call)
@@ -159,6 +165,23 @@ export function fakeModel(
         value: structuredClone((entry as { value: unknown }).value),
         receipt: receipt('judge', 'judgeCut', call.temperature, {
           pictureIds: call.shots.flatMap((s) => s.frames.map((f) => f.pictureId)),
+        }),
+      }
+    },
+
+    async readText(call) {
+      // Gate 1's text step (S-112, S-126). It is the WITNESS's model, and it is the witness's
+      // script: a picture past the technical step is asked twice, in gate1's order — the text
+      // step, then the observation. A run whose script holds one answer a picture runs out here,
+      // which is the stand-in doing its job (S-116).
+      readTextCalls.push(call)
+      const entry = next('witness')
+      // Unparsed, like every other call that carries a picture: the sensor is what turns this
+      // into `string[]`, and an answer that is not that shape must fail there (S-042's form).
+      return {
+        value: structuredClone((entry as { value: unknown }).value),
+        receipt: receipt('witness', 'readText', call.temperature, {
+          pictureIds: [call.picture.pictureId],
         }),
       }
     },

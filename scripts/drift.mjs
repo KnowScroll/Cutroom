@@ -4,7 +4,7 @@
  * actually catch what it forbids, and report any rule that has quietly stopped applying to
  * anything.
  *
- *   node scripts/drift.mjs            check this repository
+ *   node scripts/drift.mjs            check this repository, and read its source for a key
  *   node scripts/drift.mjs --prove    build a deliberate violation of every rule in a
  *                                     temporary folder and fail if any rule stays silent
  *   node scripts/drift.mjs --audit    report which folders each rule names, and fail when a
@@ -23,7 +23,15 @@
  * real dependency here, `--prove` watches every rule fire, and `--audit` watches for the
  * rule that still reads correctly while matching nothing.
  */
-import { existsSync, mkdirSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { createRequire } from 'node:module'
 import { join } from 'node:path'
 import { REPO, bold, dim, fail, green, pass, red, run, yellow } from './_lib.mjs'
@@ -80,6 +88,124 @@ function firedOn(result, rule, file, specifier) {
   return result.violations.some((v) => v.rule === rule && v.from === file && v.to === edge.resolved)
 }
 
+// ---------------------------------------------------------------- keys
+
+/**
+ * THE OTHER HALF OF `keys-only-in-providers` (S-109, S-119).
+ *
+ * The half in .dependency-cruiser.cjs holds the module that owns the read: nothing outside
+ * packages/providers may import packages/providers/src/env.ts, by path or by name. It cannot hold
+ * more than that, because a key is read with `process.env.NAME` — a property access on a global,
+ * which no tool that resolves imports will ever see. So this reads the source instead, and it is
+ * the half that catches the violation anyone would actually write.
+ *
+ * Both halves carry the one rule name, and `--prove` builds a deliberate violation of each.
+ */
+
+/** Where source lives. Anything outside these is not ours to hold (steering-ref, node_modules). */
+const KEY_ROOTS = ['packages', 'apps', 'tests', 'scripts']
+const KEY_SKIP = new Set(['node_modules', 'dist', '.tmp', '.artifacts', 'steering-ref', '.git'])
+const KEY_SOURCE = /\.(m|c)?(t|j)s$/
+
+/** The one folder a key may be read in (paid-path, Gate 2). */
+const KEY_HOME = 'packages/providers/src/'
+
+/** `*_API_KEY`, `*_KEY`, `*_TOKEN`, `*_SECRET` — a key's shape, whatever a provider calls it. */
+const KEY_SHAPE = /^[A-Za-z_$][\w$]*_(API_KEY|KEY|TOKEN|SECRET)$/
+
+/**
+ * An environment READ: `env.NAME`, `env['NAME']` or `env[NAME]`, under any spelling of the object
+ * it hangs off — `process.env`, or an `env` a function was handed. A name ASSIGNED is not a read:
+ * the secrets checks set a key-shaped canary on purpose, to watch it fail to reach a child
+ * (S-028), so an `=` that is not part of `==` immediately after ends the match.
+ */
+const KEY_READ =
+  /\benv\s*(?:\.\s*([A-Za-z_$][\w$]*)|\[\s*(?:'([^']*)'|"([^"]*)"|([A-Za-z_$][\w$]*))\s*\])(?!\s*=[^=])/g
+
+/** Every source file under `root`, as a path relative to it, in this repository's spelling. */
+function sourceFiles(root) {
+  const files = []
+  const stack = KEY_ROOTS.filter((r) => existsSync(join(root, r)))
+  while (stack.length > 0) {
+    const at = stack.pop()
+    for (const entry of readdirSync(join(root, at), { withFileTypes: true })) {
+      if (KEY_SKIP.has(entry.name)) continue
+      const child = `${at}/${entry.name}`
+      if (entry.isDirectory()) stack.push(child)
+      else if (KEY_SOURCE.test(entry.name)) files.push(child)
+    }
+  }
+  return files.sort()
+}
+
+/** Every key-shaped environment read outside KEY_HOME: the file, the line and the name. */
+function keyReads(root) {
+  const found = []
+  for (const file of sourceFiles(root)) {
+    if (file.startsWith(KEY_HOME)) continue
+    const text = readFileSync(join(root, file), 'utf8')
+    KEY_READ.lastIndex = 0
+    let match = KEY_READ.exec(text)
+    while (match !== null) {
+      const name = match[1] ?? match[2] ?? match[3] ?? match[4]
+      if (KEY_SHAPE.test(name)) {
+        found.push({ file, name, line: text.slice(0, match.index).split('\n').length })
+      }
+      match = KEY_READ.exec(text)
+    }
+  }
+  return found
+}
+
+function checkKeys() {
+  const found = keyReads(REPO)
+  const home = KEY_HOME.replace(/\/$/, '')
+  if (found.length === 0) {
+    pass(`0 key-shaped environment reads outside ${home}`)
+    return
+  }
+  console.error(
+    `\n${red(bold(`${found.length} key-shaped environment read(s) outside ${home}`))}\n`,
+  )
+  for (const { file, line, name } of found) {
+    console.error(`  ${red('keys-only-in-providers')}  ${file}:${line} ${dim('->')} ${name}`)
+  }
+  fail('a key is read outside packages/providers. Do not relax the rule; move the read (S-109).')
+}
+
+/**
+ * The scan's own cases. A file is written to read a key, and the scan must find it; a file is
+ * written to do the legal thing, and the scan must not. The bodies are BUILT rather than spelled,
+ * because a literal key read in this file is a key read outside packages/providers, and the scan
+ * reads scripts/ too — which is the point.
+ */
+const ENV = 'process.env'
+const readsMember = (name) => `export const k = ${ENV}.${name}`
+const readsSubscript = (name) => `export const k = ${ENV}[${JSON.stringify(name)}]`
+const assigns = (name) => `${ENV}.${name} = 'sk-canary-not-a-real-key'`
+
+/** Each entry: [file, name, body]. Every one of these must be reported. */
+const KEY_CASES = [
+  // One per root the scan walks: a package, an app, a test and a script. S-109 forbids the read
+  // to every package, app AND TEST, so a root dropped from the walk is a case going silent here
+  // rather than a hole nothing mentions.
+  ['apps/worker/src/reads-a-key.ts', 'FAL_KEY', readsMember('FAL_KEY')],
+  ['packages/domain/src/subscripts-a-key.ts', 'FAL_KEY', readsSubscript('FAL_KEY')],
+  ['tests/reads-a-key.test.ts', 'MINIMAX_API_KEY', readsMember('MINIMAX_API_KEY')],
+  ['scripts/reads-a-key.mjs', 'FAL_TOKEN', readsSubscript('FAL_TOKEN')],
+]
+
+/** The legal shapes. None of these may be reported, or the scan is wrong rather than the code. */
+const KEY_LEGAL = [
+  // The same read, inside the one folder a key may be read in.
+  ['packages/providers/src/env.ts', 'MINIMAX_API_KEY', readsMember('MINIMAX_API_KEY')],
+  // A setting is not a key: every path this engine writes is read exactly like this (D-086).
+  ['apps/service/src/settings.ts', 'CUTROOM_DB_PATH', readsMember('CUTROOM_DB_PATH')],
+  // A key-shaped name SET and never read — the secrets checks' canary, which must stay legal or
+  // checks 26 and 50 could not be written at all (S-028).
+  ['tests/canary.test.ts', 'CUTROOM_TEST_API_KEY', assigns('CUTROOM_TEST_API_KEY')],
+]
+
 // ---------------------------------------------------------------- check
 
 function check() {
@@ -124,6 +250,14 @@ const CASES = [
   ['processes-only-in-providers', 'apps/api/src/spawns-node.ts', 'node:child_process'],
   ['processes-only-in-providers', 'packages/domain/src/spawns.ts', 'child_process'],
   ['processes-only-in-providers', 'packages/domain/src/spawns-node.ts', 'node:child_process'],
+  // S-119: the import half of keys-only-in-providers. The module that owns the read, reached
+  // from outside providers. no-reaching-into-internals fires on this file too — a case counts as
+  // caught only when ITS rule fires on ITS edge, so the two are two things proven, not one.
+  [
+    'keys-only-in-providers',
+    'apps/worker/src/reads-a-key.ts',
+    '../../../packages/providers/src/env.ts',
+  ],
   ['api-no-providers', 'apps/api/src/index.ts', '../../../packages/providers/src/index.ts'],
   ['worker-no-providers', 'apps/worker/src/spends.ts', '../../../packages/providers/src/index.ts'],
   ['providers-no-domain', 'packages/providers/src/index.ts', '../../domain/src/index.ts'],
@@ -175,6 +309,7 @@ const EXTRA_FILES = [
   ['apps/worker/src/pong.ts', "import './ping.ts'"],
   ['packages/pipeline/src/cinematic/types.ts', 'export type Shot = { camera: string }'],
   ['packages/pipeline/src/split/internal/cut.ts', 'export const cut = 1'],
+  ['packages/providers/src/env.ts', 'export const falKey = () => undefined'],
 ]
 
 /**
@@ -226,6 +361,13 @@ const BY_NAME_CASES = [
   ['model-client-only-in-providers', 'apps/worker', 'ai'],
   ['model-client-only-in-providers', 'apps/api', '@ai-sdk/openai'],
   ['model-client-only-in-providers', 'packages/domain', 'ai', 'not installed'],
+
+  // S-119: the same half again, by the name someone reaching for the key readers would write.
+  // packages/providers exports only '.', so the specifier never resolves — and the rule matches
+  // it as a bare specifier for exactly that reason, the way model-client-only-in-providers
+  // catches a client that is not installed. If a subpath export is ever added, the resolved path
+  // is the rule's other alternation and it still fires.
+  ['keys-only-in-providers', 'apps/worker', '@cutroom/providers/env', 'no such subpath'],
 ]
 
 /**
@@ -320,8 +462,9 @@ const packageOf = (from) => from.split('/').slice(0, 2).join('/')
  * A miniature workspace: every package with a package.json that declares only `exports`, the
  * way the real ones do, and a link placed where pnpm places it — inside the IMPORTING package's
  * node_modules, to a workspace package or to a folder in node_modules/.pnpm. Then one file per
- * import, in the package's src/ or in the folder the case names. An import marked `not installed`
- * gets no link at all.
+ * import, in the package's src/ or in the folder the case names. An import carrying a NOTE gets
+ * no link at all — it is not installed, or the package declares no such subpath — so it reaches
+ * the graph as the bare specifier, which is what a rule matching by name has to fire on.
  *
  * Returns each import with the file it was written to.
  */
@@ -336,7 +479,7 @@ function buildByName(dir, imports) {
   }
   const written = imports.map(([from, specifier, note], i) => {
     const pkg = packageOf(from)
-    if (note !== 'not installed') {
+    if (note === undefined) {
       const workspace = PACKAGE_FOLDERS.find((f) => `@cutroom/${f.split('/')[1]}` === specifier)
       const target = workspace ? join(dir, workspace) : storeNpm(dir, specifier)
       const link = join(dir, pkg, 'node_modules', ...specifier.split('/'))
@@ -523,11 +666,45 @@ function prove() {
     }
   }
 
+  // 3. The twentieth rule's other half: a key READ rather than imported (S-119). The same rule
+  // name, a mechanism no resolver can provide, and its own violating and legal shapes.
+  const keys = join(root, 'keys')
+  build(
+    keys,
+    [...KEY_CASES, ...KEY_LEGAL].map(([file, , body]) => [file, body]),
+  )
+  const reads = keyReads(keys)
+  const readAt = (file, name) => reads.some((r) => r.file === file && r.name === name)
+  console.log(`\n${bold('The twentieth rule again, read rather than imported')}\n`)
+  for (const [file, name] of KEY_CASES) {
+    const label = `keys-only-in-providers  ${file} -> ${name}`
+    if (readAt(file, name)) {
+      console.log(`  ${green('caught')}  ${label}`)
+    } else {
+      console.log(`  ${red('SILENT')}  ${label}`)
+      silent += 1
+    }
+  }
+  for (const [file, name] of KEY_LEGAL) {
+    if (readAt(file, name)) {
+      console.log(`  ${red('EAGER')}   keys-only-in-providers  ${file} -> ${name}`)
+      overeager += 1
+    } else {
+      console.log(`  ${green('clean')}   ${file} -> ${name}`)
+    }
+  }
+  // A read the scan found that no case named is a scan that is guessing, not a rule.
+  for (const { file, name, line } of reads) {
+    if (KEY_CASES.some(([f, n]) => f === file && n === name)) continue
+    console.log(`  ${red('EAGER')}   keys-only-in-providers  ${file}:${line} -> ${name}`)
+    overeager += 1
+  }
+
   rmSync(root, { recursive: true, force: true })
   console.log('')
 
   const rules = new Set([...CASES, ...BY_NAME_CASES].map(([rule]) => rule)).size
-  const caseCount = CASES.length + BY_NAME_CASES.length
+  const caseCount = CASES.length + BY_NAME_CASES.length + KEY_CASES.length
   if (silent > 0) {
     fail(`${silent} case(s) stayed silent on a file written specifically to break a rule.`)
   } else if (overeager > 0) {
@@ -538,7 +715,8 @@ function prove() {
   } else {
     pass(
       `${rules} rules proven to fire across ${caseCount} cases, ${BY_NAME_CASES.length} of them by ` +
-        'package name, and silent on a legal shape both ways, every legal import resolved',
+        `package name and ${KEY_CASES.length} by reading rather than importing, and silent on a ` +
+        'legal shape every way, every legal import resolved',
     )
   }
 }
@@ -675,4 +853,9 @@ function audit() {
 const argv = process.argv
 if (argv.includes('--prove')) prove()
 else if (argv.includes('--audit')) audit()
-else check()
+else {
+  // Both halves of the twentieth rule, always: a green boundary graph says nothing about a key
+  // read, and a clean source says nothing about an import (S-119).
+  check()
+  checkKeys()
+}

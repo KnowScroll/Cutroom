@@ -4083,3 +4083,755 @@ Slice 8 has produced a measured run.
 
 **Confirmed-by.** The owner, 2026-09-20, asked whether parallel shots were already decided and chose _"After the
 first real reel (Recommended)"_.
+
+---
+
+## S-116 | 2026-09-20 | The stand-ins answer from one script file the service names, and without one the engine still behaves exactly as it always has
+
+**Chose.** A seventh setting, `CUTROOM_STAND_IN_SCRIPT`, names a JSON file the stand-ins answer from. Its shape is
+`StandInScripts` in `packages/providers` — `model`, `images`, `sensors`, `video`, `narration`, `media`, each optional
+— which is the same set `tests/engine/worker-process.ts` has passed on standard input since `reel-plan`'s Slice 3.
+**The setting absent is an empty script for every port**, so a service started plainly is byte-for-byte the behaviour
+every verified feature runs on.
+
+- **It exists because the stand-in model is the one stand-in that cannot work without a script.** `fakeModel` answers
+  from its script and throws `the stand-in's script has no answer for <role> call <n>` when it runs out — deliberately,
+  since a canned answer would make a plan the pipeline never planned. Every other stand-in has a working default: a
+  readable 9:16 picture, a clip, a voice, a measurement. So **an engine whose model port is the stand-in cannot finish
+  a reel at all** without this, and check 1 — the service completing a video run as a process — could not hold.
+- **It is a path, in D-086's form**: one setting, no absolute path written, and no default, because the free path
+  needs no such file.
+- **The service reads it and hands it to the factories.** No stage, no gate and no table learns a script exists.
+
+**Why.** Check 1 asks a plainly-started service to complete a video run over HTTP, and Gate 2's list of what the
+service settles had six settings and no script. Building the program showed the check could not hold as written.
+Making it hold takes one setting whose default changes nothing, which is strictly less than changing what the stand-in
+model does or what check 1 asserts.
+
+**Rejected.** **A canned default answer in `fakeModel`** — it would break every check that rests on an exhausted
+script failing (reel-plan's own, and every `throws` fixture), which is weakening tests to reach green. **A demo script
+shipped inside `packages/providers`** — a fixture in production code that matches exactly one request's sentences and
+criteria, so any other brief still dies at the first model call. **The script inline in the setting** — a whole
+fixture in an environment variable, with nothing on disk to read back when a run goes wrong. **Dropping "completes a
+video run" from check 1** — the assertion that the program works at all.
+
+**Caught by.** `paid-path`'s check 1, which is the only thing that uses it: a service started without the setting and
+asked for a reel fails at its first model call, and the check names the script file it was given. And the default
+staying `{}` is what keeps every other test of the suite unchanged — 354 tests passed before this entry and 363 after
+it, none of them edited.
+
+---
+
+## S-117 | 2026-09-20 | The one read of a key lands in `paid-path`'s Slice 1, because check 2 cannot hold without it; the twentieth rule stays in Slice 2
+
+**Chose.** `packages/providers/src/env.ts` — S-109's **only read of a key**, one function per key name — is written in
+Slice 1 rather than Slice 2. Nothing else moves: `keys-only-in-providers`, its `drift --prove` violation,
+`reel-stills`' check 3 counting twenty, the fixture guard and the recorded-wire harness are all still Slice 2's, and
+the rule count is still nineteen until then.
+
+**Why.** Gate 3's check 2 says a named real adapter **whose key is absent** refuses to start, and Gate 4 proves check
+2 in Slice 1 — while assigning the only file allowed to look at a key to Slice 2. A slice cannot check for a missing
+key with no way to look for one, so as written the two gates contradict each other. The options were to move one file
+forward or to write a check whose words say something its test does not, for six slices. **Add, never subtract**: the
+file moves.
+
+**What it costs, stated plainly.** For one slice a key is read with no boundary rule holding that read. It is a small
+window: no real adapter exists yet, so nothing uses a key for anything but refusing; no test needs one; and `env.ts`
+is 30 lines that return a key or `undefined` and never log, throw with, or persist one.
+
+**Rejected.** **Refusing a real adapter as "not built yet" and re-aiming the test in Slice 3** — check 2 would read as
+proven while proving something else, which is the state `drift --audit` exists to prevent in rules and is no better in
+checks. **Moving check 2's key case to Slice 2** — editing an approved gate's slice assignment, for a worse reason
+than this one.
+
+**Caught by.** `paid-path`'s check 2: a service told `minimax` or `fal` with no `MINIMAX_API_KEY` or `FAL_KEY` refuses
+before its database is opened, naming the port and the key — and a key set to white space refuses the same way, since
+a variable set to nothing is the same absence as one never set. Slice 2's check 4 then adds the rule that keeps the
+read where it is.
+
+**Confirmed-by.** The owner, 2026-09-20, asked how Slice 1 should resolve the contradiction and chose _"Move env.ts
+into Slice 1 (Recommended)"_.
+
+---
+
+## S-118 | 2026-09-20 | The service stops on SIGINT or on a `stop` line, one shutdown for both, because Windows delivers no signal to a child
+
+**Chose.** `startService` registers **one** shutdown function and wires SIGINT to it; `apps/service/src/main.ts` wires
+a `stop` line on standard input to the same one. Check 5 is proven in two tests: **a real process, stopped over
+standard input**, asserting the API refuses connections, no job is left running and the process **exits by itself**
+with code 0 — nothing calls `process.exit`, so a leaked timer, socket or database handle fails it; and **an
+in-process service**, asserting it registered exactly one SIGINT handler, that calling that handler — the one the
+operating system would call — closes the API and stops the worker, and that a stopped service leaves no handler
+behind.
+
+**Why.** Measured on this machine, 2026-09-20: **no signal can be delivered to a spawned child on Windows.**
+`child.kill('SIGINT')`, `'SIGBREAK'`, `'SIGTERM'` and `'SIGHUP'` each terminate the child outright — it exits with
+`code: null` and a signal, and a handler registered for that signal never runs and prints nothing. So a test that
+sends SIGINT proves nothing here except that the process died. What is left unproven is OS signal delivery, which
+nothing on this machine can prove; what is proven is that the shutdown SIGINT is wired to is the shutdown that works.
+
+**Rejected.** **Delivering a real Ctrl+C through PowerShell** — `AttachConsole` plus `GenerateConsoleCtrlEvent` is the
+only way to send one, and it means a P/Invoke inside the suite, a console window per run, and a test whose result
+depends on which process the console is attached to. **Proving check 5 in-process only** — it drops "exits without an
+open handle", which is the half that catches a leaked handle, and that is the half a composition root gets wrong.
+**Leaving check 5 unproven and calling it a known limit** — a check that reads as covered and is not.
+
+**Caught by.** `paid-path`'s check 5, both tests. The stdin path is not a second shutdown: it calls `service.stop()`,
+the same function SIGINT calls, so a change that broke one would break the other.
+
+**Confirmed-by.** The owner, 2026-09-20, shown the measurement, chose _"Stop on SIGINT or a stdin line, one function
+(Recommended)"_.
+
+---
+
+## S-119 | 2026-09-20 | `keys-only-in-providers` is carried by two mechanisms under one name, because no rule that resolves imports can see a key being read
+
+**Chose.** The twentieth boundary rule is held in **two places, both named `keys-only-in-providers`**, and
+`drift --prove` builds a deliberate violation of each:
+
+- **The config half**, in `.dependency-cruiser.cjs`: nothing outside `packages/providers/` may reach
+  `packages/providers/src/env.ts` — the module that owns the read — matched **both as the resolved path and as the
+  bare specifier `@cutroom/providers/env`**, which is what an import of a subpath that does not resolve looks like to
+  the graph. That second alternation is `model-client-only-in-providers`' trick (S-020), and it is what makes this
+  half catch something no other rule does: `no-reaching-into-internals` matches `^(apps|packages)/…` and is blind to
+  a bare specifier.
+- **The scan half**, in `scripts/drift.mjs`: every source file under `packages/`, `apps/`, `tests/` and `scripts/`
+  is read for an environment READ — `env.NAME`, `env['NAME']`, `env[NAME]` — whose name matches a key's shape
+  (`*_API_KEY`, `*_KEY`, `*_TOKEN`, `*_SECRET`), outside `packages/providers/src`. It runs on every plain
+  `node scripts/drift.mjs`, beside the graph check, and **a name assigned is not a read**, so the secrets checks'
+  key-shaped canary (S-028) stays legal.
+
+**The count is twenty**, by addition: the rule name is new, so `20 rules proven to fire` — and **both**
+`reel-stills`' check 3 **and `reel-render`'s check 2** assert that line (S-120).
+
+**Why.** Gate 2 says the twentieth rule is a dependency-cruiser rule with a `--prove` violation "as it does for the
+other nineteen". Building it found that unbuildable as stated, in exactly the shape CLAUDE.md already records for
+D-073: **a key is read with `process.env.NAME`, a property access on a global.** There is no import, no specifier and
+no edge, so no resolver will ever see one — and the only import shape that exists, a deep import of `env.ts`, is
+already forbidden to everything outside providers by `no-reaching-into-internals`. A config rule alone would
+therefore have read as S-109's guard while missing S-109's actual shape, which is the state `drift --audit` exists to
+prevent. Two mechanisms, one name, both proven: one going quiet while the other stays green is the failure this is
+built against.
+
+**What the scan does not hold.** It is a regular expression over source, so `process.env['FAL' + '_KEY']` passes it,
+as `child_process` would pass a rule written against import text. It is the same bargain every rule here makes: it
+catches what someone would write, not what someone would smuggle. And it holds Gate 2's boundary — the **folder**
+`packages/providers/src` — not S-109's stricter claim that `env.ts` is the only reader; inside providers that is held
+by the config half and by there being nothing else that needs one.
+
+**Rejected.** **The config rule alone** — silent on `process.env.FAL_KEY` written in `apps/worker`, which is the
+violation anyone would actually write. **The scan alone, with no entry in `.dependency-cruiser.cjs`** — then "the
+twentieth boundary rule" is not in the boundary config and `--audit`, which reads that config, never sees it.
+**Forbidding an import of `node:process`** — `process.env` is a global and needs no import, so the rule would be
+silent on every real case. **Adding a `./env` subpath export to `packages/providers` so the by-name case resolves** —
+it would legitimise the deep import the rule exists to forbid, to make a test convenient.
+
+**Caught by.** `paid-path`'s check 4, in four `caught` lines: the config half relative and by package name, and the
+scan half in each of the four roots it walks. Session 37's break campaign, 19 breaks: the rule deleted, its `to.path`
+renamed away, its by-name alternation removed, either half's `--prove` cases deleted, the scan's roots cut, its
+subscript spelling dropped, its assignment lookahead dropped, the scan unhooked from `drift`, and a key actually read
+in `apps/service` — **every one caught**, by check 4 and, where `drift` itself fails, by `reel-stills`' check 3 and
+`reel-render`'s check 2 as well.
+
+**Confirmed-by.** The owner, 2026-09-20, shown that a resolver cannot see a key read, chose _"Config rule + a key
+scan, one name (Recommended)"_.
+
+---
+
+## S-120 | 2026-09-20 | `paid-path`'s check 3 moves to Slice 3, and `reel-render`'s check 2 joins the list of what this feature changes
+
+**Chose.** Two corrections to an approved Gate 4, both by moving nothing but where a check is proven:
+
+- **Check 3 — a key reaching its adapter and appearing nowhere — is proven in Slice 3**, beside the MiniMax model
+  adapter it needs. Slice 2 proves **4 and 21**; Slice 3 proves **3, 6, 7 and 8**. Every check still appears in
+  exactly one slice: 2 + 4 + 3 + 2 + 3 + 4 + 2 + 2 = 22.
+- **`reel-render`'s check 2 also asserts `N rules proven to fire`** and becomes twenty with `reel-stills`' check 3.
+  The feature's _What this feature changes in verified features_ section named only `reel-stills`; it names both now.
+  `reel-render`'s journey was already being re-run in Slice 8, so nothing else moves.
+
+**Why.** The gate review's own finding 4 said check 3 "could not fail as written" against stand-ins and fixed it by
+pointing it at a real adapter — and Gate 4 then left it in the slice **before** the first real adapter exists. A
+stand-in reads no key, so in Slice 2 check 3 is a check that cannot fail; S-117 refused that state a slice ago and it
+is refused here. The alternative was to pull the model adapter back into Slice 2, which is a whole slice of work
+moved to keep one check number in place.
+
+The second is the same miss for the third time: S-049 found it in S-047, S-078 found it in S-077, and this feature's
+own changes-to-verified-features list carried it again. A test now asserts **both** files count twenty, so a session
+that updates one and forgets the other fails a named check rather than the suite.
+
+**Rejected.** **Splitting check 3 in two, proving the environment-file half in Slice 2** — for one slice check 3
+would read as proven while proving half of what its words say, which is the state `drift --audit` exists to prevent
+in rules and is no better in checks. **Leaving `reel-render`'s check 2 to be found by a red suite in Slice 8** — it
+was found by a red suite in THIS slice, and a count that two features pin is a fact worth asserting rather than
+rediscovering.
+
+**Caught by.** `paid-path`'s check 4's last test, which reads both `tests/reel-stills-rules.test.ts` and
+`tests/reel-render-rules.test.ts` and fails if either still says nineteen — session 37's breaks k12 and k13, each
+caught. And Slice 3's check 3, which is where a key now has an adapter to reach.
+
+**Confirmed-by.** The owner, 2026-09-20, asked where check 3 goes and chose _"Move check 3 to Slice 3
+(Recommended)"_.
+
+---
+
+## S-121 | 2026-09-20 | Check 3's completed run is a PLAN run through the service as a process, served recorded wire by a loopback HTTP server
+
+**Chose.** Check 3 — _"the service loads its environment from the file its setting names; a key in that
+file reaches its adapter and appears in no row, receipt, event, question, log line or fault message of a
+completed run"_ — is proven in this arrangement, and every part of it is load-bearing:
+
+- **The service as a PROCESS**, started the way a person starts it (`tests/engine/service.ts`), with
+  `CUTROOM_PROVIDER_MODEL=minimax` and **the key only in the environment file** the `CUTROOM_ENV_FILE`
+  setting names. The process is started without the key in its own environment, so a service that ignored
+  the file it was pointed at could not make a call at all — which is what makes the first clause an
+  assertion rather than a description.
+- **A loopback HTTP server the test starts**, `wireServer` in `tests/engine/wire.ts`, serving the same
+  fixtures `recordedFetch` serves, through the same matcher. The service's adapter is pointed at it by a
+  new setting, **`CUTROOM_MINIMAX_BASE_URL`**, which is Gate 2's _"every real adapter takes its
+  transport — a `fetch` and a base URL, each a setting defaulting to the provider's own"_. A `fetch` is a
+  function and cannot be written into an environment; a base URL can, and loopback is what D-098 already
+  allows.
+- **Every other port a stand-in**, and the run is a **plan run** — `until: 'plan'`, the eight sentences
+  `tests/engine/plans.ts` submits. The two groupings make **exactly two planner calls**: the 4-unit fork
+  passes Gate 0 and the 6-unit fork is 50 seconds and fails it, so one fork survives, nothing is scored,
+  and no other port is ever reached. Two calls, two recorded answers, and a completed run.
+- **The hunt is exhaustive and reads the machine, not a list**: every table in `sqlite_master`, every row
+  of each, the events, the caller's answer, everything the process wrote to stdout and stderr, and **every
+  file under the service's folder as bytes except the environment file itself** — so a key written into
+  the database and deleted is still caught, because the bytes are still there.
+- **A second test for the fault clause**, since a completed run has no fault: the same service, wire whose
+  second answer is a 401, a run that ends `failed`, and the same hunt over its detail, its events, its
+  rows and its files.
+
+**Why.** The gate review's finding 4 fixed check 3 by pointing it at a real adapter, because a stand-in
+reads no key and the assertion had nothing to bite on. That leaves one mechanical problem: **a recorded
+`fetch` lives in the test's process and the service lives in its own**, so something has to cross the
+boundary. A base URL crosses it; a function does not.
+
+A **plan** run rather than a video one is the smallest arrangement in which every clause is true. Check 1
+already proves a whole video run through the service, and repeating it here would buy nothing but thirty
+recorded model answers, each of which would have to be a valid gate answer — a fixture folder that is
+really the stand-in's script wearing a wire's envelope. Two genuine recorded bodies prove more.
+
+**Rejected.** **A recorded `fetch` handed to an in-process `startService`** — it needs no server and no
+setting, and it drops the one thing check 3 is about: a key read from a file by a program, which an
+in-process call supplies from the test's own environment. **A stub provider process** — a second program
+to keep true. **Pointing the adapter at a file URL** — `fetch` reads `file:` in no runtime we target, and
+it would prove nothing about a header. **A full video run on recorded wire** — every stills and clips
+answer becomes a fixture, and check 1 already covers the shape.
+
+**Caught by.** `paid-path`'s check 3, in `tests/paid-path-secrets.test.ts`, in two tests. Session 38's
+break campaign: the key sent in no header, the key written into a receipt, a row, a log line and a fault
+message, the environment file ignored, and the base-URL setting ignored — each caught.
+
+**Confirmed-by.** `PROMPTS/038-paid-path-slice-3.md` asks the session to decide this and write it down;
+the loopback server is the shape the prompt calls obvious, and the plan-run part is this session's.
+
+---
+
+## S-122 | 2026-09-20 | What the MiniMax model adapter sends: the wire D-019 verified, no unverified switch for thinking, and a budget that names itself
+
+**Chose.** Four things about the first real adapter, each between real alternatives:
+
+- **The path is `POST /v1/chat/completions`**, which is the wire D-019's spike ran live on 2026-09-03 —
+  `steering-ref/scripts/spikes/minimax-text.mjs` posts to exactly that URL and all three models answered
+  200 with usage. S-114 names it. **Slice 2's two chat fixtures recorded `/v1/text/chatcompletion_v2`
+  instead, and they are corrected**: MiniMax documents both, but only one of them has ever been shown to
+  answer, and a fixture is a record of what happened.
+- **Thinking is NOT switched off**, because nothing has verified a field that switches it off on this
+  wire. Gate 2 says _"disables thinking where the wire allows it"_; the spike sent `model`, `messages`,
+  `max_tokens` and `temperature` and nothing else, and an unverified field on the first paid call is the
+  404 lesson D-019 records. What carries D-019's finding instead is the pair that was verified: **the
+  reasoning prefix is stripped before anything is parsed**, and **`max_tokens` is the answer's budget plus
+  a reasoning budget on top** — 2048 and 4096, the larger for reasoning, because a budget never reached
+  costs nothing and a budget exhausted inside the block returns an empty string rather than an error.
+- **A call consumed by reasoning fails naming the budget**: what it spent, what it was given, and the
+  words _"This is the token budget, not the answer's shape"_. D-019: _"A schema call that 'returns
+  nothing' will be this, not a schema failure."_
+- **The classification is carried by the error's TYPE** — `Unavailable`, exported from
+  `packages/providers/src/transient.ts` — because `LanguageModelPort`'s four calls return
+  `{ value, receipt }` and have no `unavailable` arm, and nothing wraps the model port with retry.
+  429, 5xx, 408, a connection error and the adapter's own timeout throw `Unavailable`; 400, 401, 403, a
+  body that is not JSON, a body that is not this wire, and a `base_resp` code that is not 1002 throw a
+  plain `Error`. **The adapter only classifies**: it never sends again, waits or counts.
+
+**Why.** S-096 rejected _"a thrown error carrying a marker"_ for the video and narration ports, because the
+worker would have recognised a transient by an error's **shape** and a thrown bug of the same shape would
+have been sent again. A class is not a shape: nothing else constructs `Unavailable`, so no bug produces
+one, and no code reads a message to decide what happened. S-096 also says plainly that a thrown model call
+fails the run _"until the paid-path feature builds the adapters that fail transiently"_ — this slice builds
+the classification, and the sending is whatever first needs it.
+
+The receipt records **the model the call was routed to**, from the table in settings, not the one the
+response names: the receipt is the record of what the engine asked for, and D-006's routing is the thing a
+check can hold it to.
+
+**Rejected.** **`unavailable` as an arm on `LanguageModelPort`**, with a guarded model port in
+`apps/worker` — the full S-096 shape, and it rewrites the port in `packages/contracts`, the stand-in and
+every call site in `packages/pipeline`, touching four verified features, in a slice whose Gate 4 line is
+_"the transient classification"_. **A pure `classify()` the adapter never uses** — then the classification
+is provable only by calling the classifier, which is the state `drift --audit` exists to prevent in rules.
+**Sending a disable field anyway** — an unverified field, on the one call that spends. **Keeping the
+`/v1/text/chatcompletion_v2` fixtures** — a fixture that records a path nothing ever answered on is worse
+than no fixture.
+
+**Caught by.** `paid-path`'s checks 6, 7 and 8 in `tests/paid-path-model.test.ts`: the path and the budget
+on the request, the strip, the budget's own failure message, the receipt, D-006's routing read from a table
+the test replaces, and each wire case classified by the class it throws. Session 38's break campaign: the
+`<think>` block kept, a reasoning-exhausted call reported as a schema failure, the routing hardcoded, 429
+thrown, 400 answered unavailable, `fake` left true — each caught.
+
+**Confirmed-by.** The owner, 2026-09-20, shown that the model port has no `unavailable` arm and nothing
+retries a model call, chose _"A typed error, carrying the classification"_. The rest is this session's,
+recorded here because each is a choice a later session would otherwise have to re-make.
+
+---
+
+## S-123 | 2026-09-20 | The narration adapter ANSWERS `unavailable` where the model adapter throws it; T2A shares the model's base URL; and a transient on the timings fetch re-buys the audio, named
+
+**Chose.** Five things about the second real adapter, each between real alternatives:
+
+- **The classification is carried by the PORT'S OWN ARM, not by a thrown type.** `NarrationAnswer`
+  has `{ kind: 'unavailable'; detail }` — S-096 built it, `reel-takes` verified it, and the
+  worker's guarded narration port is what sends the call again, with backoff, on the transient
+  counter that is never the take counter. So 429, 5xx, a `base_resp` of 1002, a connection error
+  and the adapter's own timeout are **answered**; 400, 401, 403, a body that is not JSON, a body
+  that is not this wire and every other `base_resp` code **throw** a plain `Error`. The split is
+  the model adapter's exactly (S-122); only the carrier differs, and it differs because the ports
+  do. **The adapter still only classifies**: it never sends again, waits or counts.
+- **T2A shares `CUTROOM_MINIMAX_BASE_URL`.** One provider, one host — D-019's spike posted to
+  `https://api.minimax.io/v1/t2a_v2` and to `https://api.minimax.io/v1/chat/completions`, on one
+  key — so one setting points both, and `MINIMAX_BASE_URL`, `base_resp`, the transient code and
+  the body summariser move into `packages/providers/src/minimax/wire.ts`, which both adapters read.
+- **A transient on the SECOND call is answered `unavailable` like any other, AND THE AUDIO IS
+  BOUGHT AGAIN.** The guarded port sends the whole `speak` again, so a 429 on the timings fetch
+  costs one more audio call. This is a **named limit, not an oversight**: an adapter may not retry
+  a call of its own (S-096, S-122), T2A is covered by the owner's token plan so the second buy
+  costs nothing today (D-019, S-110), and Slice 8 measures it against the provider's own figures.
+  A test asserts the adapter did not send the audio call again itself.
+- **The subtitle body's shape is documented and has never been seen here, and a body that is not
+  it throws.** The spike recorded that a subtitle URL came back and withheld the URL, so nothing
+  in this repository has read what is behind one. **One entry becomes one word timing, trimmed,
+  and nothing is split**: an entry holding a whole sentence is passed on as it arrived and fails
+  S-070's parse at the stage's boundary, which is the boundary that owns that question (S-042).
+  Slice 8's hand-run reel is what verifies the shape.
+- **Check 9's words gain the classification, by addition.** Gate 2's _"What is transient, and what
+  is a fault"_ binds both providers, and neither check 9 nor check 10 named it — so the one thing
+  this slice builds beyond the request and the dropped URL had nothing whose words promised to
+  catch it, which is the state session 37 found check 3 in. Check 9 now ends _"and 429, 5xx, a
+  connection error and a timeout are answered unavailable while 400, 401 and a body that does not
+  parse throw"_. Nothing is removed, the check count stays **22**, and Slice 4 still proves 9 and 10.
+
+**The correction, because it is a fact and not a preference.** Slice 2's T2A fixture put
+`subtitle_file` at the top level of the body. **The spike read it at `data.subtitle_file`** —
+`steering-ref/scripts/spikes/minimax-t2a.mjs` reads `r.json.data.subtitle_file ?? r.json.data.subtitle`,
+and `spike-results.json` records `hasSubtitle: true` with the host it came from, so that read
+found something. The fixture now carries the field where the spike found it and the host
+`spike-results.json` records. This is session 38's `/v1/chat/completions` correction again, in the
+same shape: a fixture is a record of what happened.
+
+**Why.** **Throwing `Unavailable` from this adapter would leave a verified mechanism unreachable
+for the one adapter that can use it.** S-122 made the model's classification a thrown type for one
+stated reason — `LanguageModelPort`'s four calls return `{ value, receipt }` and have no
+`unavailable` arm, and nothing wraps the model port with retry. Neither clause is true here: the
+arm exists, and `apps/worker/src/narration-port.ts` reads it. A thrown `Unavailable` would
+propagate past `sentUntilAvailable`, fail the run on a 429, and leave S-096's backoff and its
+transient counter dead code behind a real adapter — a silent weakening, which is the one thing
+CLAUDE.md forbids absolutely.
+
+**A second base-URL setting would be a second thing to keep true.** Two settings for one host make
+it possible to point half of one provider at recorded wire and the other half at the internet,
+which is a way for a suite to reach the network by accident — the failure S-111 exists to prevent.
+
+**Rejected.** **Throwing `Unavailable` for symmetry with the model adapter** — above; symmetry
+between two ports that differ is not a virtue. **`CUTROOM_MINIMAX_T2A_BASE_URL`** — above.
+**Retrying the subtitle fetch inside the adapter** — it makes the adapter count, which S-096 puts
+in one place and D-024 says must never be two. **Throwing on a transient timings fetch** — a
+hiccup at the provider's storage would kill a reel after every earlier shot had been paid for,
+which is what S-096 built the transient path to prevent; the owner was shown both and chose the
+answer with the re-buy named. **Splitting a multi-word subtitle entry across its own span** — it
+invents the milliseconds inside it, and captions are burned from these timings (D-008, S-073).
+**Accepting the subtitle body in more than one shape** — a shape nothing has verified, accepted
+silently, is worse than one that fails loudly on the hand-run that would have found it.
+**Changing `DEFAULT_RENDER_SETTINGS.voice` from `'stand-in'`** — it is a fourth change to a
+verified feature, and this feature's _"What this feature changes in verified features"_ says
+"Nothing else". Naming a real voice belongs to Slice 8, with the run that needs one.
+
+**Caught by.** `paid-path`'s checks 9 and 10 in `tests/paid-path-narration.test.ts`: the request's
+path, model, `subtitle_enable`, voice and audio settings; the audio written under the artifact
+root and never carried as bytes; the timings run through `wordTimings`, the stage's own parser;
+the code points; each wire case classified by the arm or the throw it produces, including one on
+the second call; and the presigned sweep. Session 39's break campaign.
+
+**Confirmed-by.** The owner, 2026-09-20, shown that Gate 2 binds both providers while no check
+named the classification, chose _"Extend check 9's words, by addition"_; and shown that a
+transient on the timings fetch re-buys the audio, chose _"Answer unavailable; name the re-buy as a
+limit"_. The rest is this session's, recorded here because each is a choice a later session would
+otherwise have to re-make.
+
+---
+
+## S-124 | 2026-09-21 | The fal image adapter: the frame is exactly 9:16 at 864×1536, the registry admits by data, the transient is THROWN, and fal gets two base URLs because it has two hosts
+
+**Chose.** Six things about the third real adapter — the first on a second provider and a second
+key — each between real alternatives:
+
+- **The frame asked for is 864×1536, exactly 9:16.** `packages/pipeline/src/gates/gate1.ts`'
+  technical step demands `width * 16 === height * 9` — D-028's dimension assertion, verified in
+  `reel-stills` — and **BUDGET.md's assumed 768×1365 is not that**: 768×16 is 12288 and 1365×9 is
+  12285, so every picture at that size would fail Gate 1 for its shape. 864×1536 is the **smallest
+  exact 9:16 frame whose sides are both multiples of 32 and whose short side is at least 768**, so
+  a 768P clip (D-014, D-007) never upscales the keyframe the viewer sees at t=0 (D-026). **The
+  consequence is a corrected rate**: at 1.33 MP a flux-2-pro derived call bills about 7.5¢ rather
+  than BUDGET.md's ~6¢, and the corrected figure is owed upstream beside the video rate (D-115,
+  S-017), not edited here.
+- **The two admission gates are DATA and are asserted at the entry, not at a setting.** Every entry
+  carries `maxReferences`, and `admitEntry` refuses one that advertises none (D-026) — thrown where
+  the port is built, before the database is opened, which is the service refusing to start. It is
+  reached by the registry's **data**, not by an environment value: all four admitted entries
+  advertise references, so no setting can produce a failing one, and that is the closed registry
+  doing its job. A test builds such an entry and hands it to `falImage`; a second test asserts every
+  shipped entry passes the gate, so a future admission cannot drift past it. **The second gate stays
+  on the frame**: the produced file's own header is read and a picture that is not exactly 9:16
+  fails the call naming the entry — never the width and height in the provider's JSON, which is
+  what "checked on the produced frame, not trusted" forbids.
+- **The classification is THROWN as `Unavailable`, as the model adapter throws it** (S-122), not
+  answered. `ImageAnswer`'s two arms are `made` and `refused`, and `refused` is the worker's guarded
+  port's budget refusal, which a provider adapter may never construct (S-035). S-096 says plainly
+  _"Which calls: video and narration. Image and model calls are not covered."_ **The carrier follows
+  the port**, which is S-123's rule read the other way: there the arm existed and answering it was
+  the only way not to leave a verified mechanism unreachable; here no arm exists, and inventing one
+  rewrites `packages/contracts`, the stand-in and every call site in `packages/pipeline`, touching
+  two verified features in a slice whose Gate 4 line is the registry and the rate.
+- **The registry is entered through `imageEntry(slug)`, and no slug is spelled at a call site.** A
+  slug outside it is refused **before any request** — the port is never built, so nothing is sent.
+  `ImageRequest` carries no model field and this feature adds none (Gate 2 gives `packages/contracts`
+  `ProviderSettings` and nothing else), so D-028's _"overridable per call"_ is the **configured
+  entry**, read from `CUTROOM_FAL_IMAGE_MODEL`; a per-call override is unbuilt and named.
+- **The rate reaches admission through `PlanSettings.imageRateCents`**, which `apps/service` now
+  sets from the configured entry. `WorkerOptions.settings` already existed and no verified file
+  changes. A flat entry's rate is its own; a per-megapixel entry's is computed for the engine's own
+  frame and its one reference (D-027 allows one hop, never a chain), so **changing the configured
+  entry changes what admission estimates** — check 13's whole point, and an unchanged estimate means
+  a rate is hardcoded.
+- **fal takes TWO base-URL settings, because fal is two hosts.** `CUTROOM_FAL_BASE_URL`
+  (`https://queue.fal.run`) and `CUTROOM_FAL_STORAGE_BASE_URL` (`https://rest.alpha.fal.ai`). S-123
+  gave MiniMax one setting because its two wires are one host; the reasoning was never "one setting
+  a provider" but **"no half of a provider may be left pointing at the internet while the other half
+  is pointed at recorded wire"**, and with two hosts that needs two settings. A test asserts each is
+  honoured, because session 39's `n29` — a base URL ignored entirely — was caught by nothing until
+  one was added. The third URL in the upload, the one `initiate` hands back, is **not** a setting and
+  cannot be: it is the provider's own, followed as given, exactly as the subtitle URL is (S-123).
+
+- **Check 11's words gain the classification, by addition** — S-123's form, applied to the identical
+  situation rather than re-decided. Gate 2's _"What is transient, and what is a fault"_ binds both
+  providers, and none of checks 11, 12 and 13 named it, so the split this slice builds would have had
+  nothing whose words promised to catch it. Check 11 now ends _"and 429, 5xx, a connection error and a
+  timeout THROW Unavailable while 400, 401, 422, a body that does not parse and a job the provider
+  accepted and then failed throw a plain fault, with the key in one header and in no message"_. Nothing
+  is removed, the check count stays **22**, and Slice 5 still proves 11, 12 and 13. S-123 rejected a
+  check 23 for this — it moves the count off 22 and rewrites Gate 4's slice sum after the gates were
+  approved — and that reasoning transfers unchanged, so this session applied it rather than asking again.
+
+**The upload is documented and has never been seen here.** `uploadReference` posts to
+`/storage/upload/initiate`, PUTs the bytes to the `upload_url` it is handed, and returns the
+`file_url` — fal's documented REST storage, which nothing in this repository has ever called. It is
+the state Slice 4's subtitle body was in, and it is recorded rather than hidden: a body that is not
+this shape throws naming what arrived, so Slice 8's hand-run reel finds it at once. **S-114's escape
+hatch stays attached to this one function**: if the protocol proves fragile by hand, `@fal-ai/client`
+may replace `uploadReference` and nothing else, as its own entry recording what was measured.
+
+**Why.** **The frame had to be decided before anything else, because Gate 1 would have failed every
+picture.** BUDGET.md's figure was read off a pricing page, not off this engine's own gate, and the
+two disagree — the gate is verified and the figure is an estimate, so the figure moves. Saying so is
+the same correction Slice 3 made to a fixture's path and Slice 4 made to a fixture's field: **a
+number that describes what we will actually ask for is worth more than one that matches a document.**
+
+**A rate carried in the entry is what keeps the cap honest** (D-028): pre-flight prices what is
+configured, and a constant in code makes every estimate wrong in the direction that overspends the
+moment the default moves. That is why the rate reaches `imageRateCents` rather than staying inside
+the adapter — an adapter that priced its own receipts correctly while admission priced a different
+model would pass every receipt check and breach the cap.
+
+**Rejected.** **768×1365, BUDGET.md's frame** — it fails Gate 1's exact 9:16, which is D-028's own
+assertion; shipping it would mean every picture failing its technical step, or that step being
+loosened, which is the one thing CLAUDE.md forbids. **1080×1920** — exact and safe, and about 10.5¢ a
+derived flux call against S-110's _"as cheap as the decisions allow"_. **720×1280** — cheapest, and
+below 768P, so `image-to-video` upscales the frame D-026 says the viewer sees at t=0. **Making the
+registry injectable** so a service process could be pointed at an entry that fails admission — it
+reopens the registry D-028 closed on purpose, to admit a state no shipped configuration can reach.
+**Extending check 11's words** — the refusal thrown where the port is built, before the database is
+opened, IS the service refusing to start; nothing needed saying differently. **Answering
+`unavailable`** — there is no arm to answer with, and adding one rewrites two verified features.
+**A `data:` URI instead of an upload** — no second host and no unverified protocol, at the price of
+multi-megabyte bodies whose limit fal does not document, and a function Gate 2 and check 15 name
+`uploadReference` that would upload nothing. **Trusting the width and height in fal's result JSON** —
+D-028 says the requirement _"fails silently"_ and is therefore checked on the produced frame; reading
+the provider's own numbers is trusting exactly what the decision says not to trust. **One fal base
+URL** — it cannot reach two hosts, and an unsettable storage host is a suite that reaches the
+internet, which is what S-111 exists to prevent.
+
+**Caught by.** `paid-path`'s checks 11, 12 and 13 in `tests/paid-path-image.test.ts`: the four
+entries with their rates and limits; a slug outside the registry refused with nothing sent; an entry
+advertising no references refused with nothing sent, and every shipped entry passing; the frame read
+from the produced file, a 16:9 one failing the call and naming the entry; the receipt's cost as the
+configured entry's rate applied to the call; and two configured entries giving two different
+admission estimates for one plan. Session 40's break campaign.
+
+**Confirmed-by.** The owner, 2026-09-21, shown that Gate 1's exact 9:16 rules out BUDGET.md's frame,
+chose _"864×1536"_; shown that the closed registry leaves check 11's reference gate unreachable from
+any setting, chose _"At the factory, entry built in test"_; and shown that fal's storage is a second
+host on an unverified protocol, chose _"fal storage upload, second setting"_. The rest is this
+session's, recorded here because each is a choice a later session would otherwise have to re-make.
+
+---
+
+## S-125 | 2026-09-21 | The fal video adapter: the one path is data, the probe is the engine's one probe, the transient is ANSWERED, and the lease floor is computed from the wait a clip is allowed
+
+**Chose.** Six things about the fourth real adapter — the second on fal's queue, and the first that
+can buy the same thing twice — each between real alternatives:
+
+- **The one video path is DATA, in `packages/providers/src/fal/h3.ts`.** D-028 made the image model
+  a closed registry because four candidates are admitted and nothing has measured the axis that
+  separates them; **D-007 does the opposite for video and hard-locks one alias at one resolution**,
+  so there is nothing to choose. The figures still have to live somewhere **both the receipt a call
+  writes and the estimate admission makes can read** — the two slugs, the rate, the resolution and
+  the 5..15 bounds — because a rate that is a constant at a call site makes every pre-flight
+  estimate wrong in the direction that overspends the moment it moves (D-014, I-1). The entry is
+  **injectable**, so a test hands one whose rate is not the default's and a hardcoded figure fails;
+  and **no slug is spelled anywhere else**, which a test proves by reading this repository's own
+  source, as it does for the image slugs.
+- **The probe is the ffmpeg `MediaPort`'s own, handed to the adapter.** Check 15 asks that the clip
+  be _"probed before the answer returns"_, and this repository already has exactly one answer to
+  _"what does ffprobe say of this file"_. It is built in `ports.ts` from the tools `PortOptions`
+  already carries and passed in, so **`fal/` imports no ffmpeg** and there is no second
+  implementation to disagree with the one four verified gates read. It asks ONE question — is this
+  a readable file with a picture in it — and a file that fails it is **deleted and the call fails**,
+  so nothing that failed is left under the artifact root for a restart to find (S-124's shape for
+  the image frame). Duration, frame rate and streams are Gate 2's, judged on the same probe by a
+  verified feature; an adapter that judged them would be a gate in the wrong place.
+- **The whole-job WAIT is split from the per-request TIMEOUT, and it is ten minutes.** `runQueued`
+  used one figure for both because an image job answers in seconds. **A real clip takes minutes**
+  (S-113), and a shared 120 s would have declared a job fal was still working on `unavailable` —
+  which sends the whole call again and **buys a second clip**. The per-request figure is unchanged
+  and the image adapter passes its own timeout as its wait, so nothing about the image path moved.
+  Ten minutes is a declared default and a guess until Slice 8: the one measurement that exists is
+  D-019's spike, whose 5-second 768P clip came back in **7 seconds of wall clock**.
+- **THE LEASE FLOOR IS COMPUTED FROM THAT WAIT**, not declared beside it. A clips job asks for up to
+  eighteen clips — `max(shotCountUnits) * TAKES_A_SHOT`, read from the settings and the ladder
+  rather than typed — so the worst case this engine can actually produce is eighteen waits plus an
+  hour for the narrations, the ffmpeg work and the gates: **four hours**, where Slice 1 declared
+  one. Two constants beside each other drift, and the drift is a job that outlives its own lease, is
+  claimed again, and **pays a second time for the take in flight** — the exact double charge S-113
+  exists to prevent (S-092, D-014). A lease that is too long costs only the time a genuinely dead
+  worker's job waits, which is the only one of these errors that costs no money.
+- **The classification is carried by the PORT'S OWN ARM, as narration's is (S-123).** `VideoAnswer`
+  has `{ kind: 'unavailable'; detail }` — S-096 built it, `reel-takes` verified it, and
+  `apps/worker/src/video-port.ts` reads it through `sentUntilAvailable`. The SPLIT is the image
+  adapter's exactly (S-124) and the queue driver's, unchanged: 429, 5xx, 408, a connection error,
+  the adapter's own timeout and a job still queued when the wait runs out are transient; 400, 401,
+  403, 422, a body that is not JSON, a body that is not this wire, and **a job fal accepted and then
+  failed, carrying the provider's own message**, are faults. Only the carrier differs, and it differs
+  because the ports do. **The adapter still only classifies**: it never sends again, waits between
+  sends or counts.
+- **NAMED LIMIT: a transient after fal has ACCEPTED the job RE-BUYS THE CLIP.** A 429 or 5xx on a
+  status poll or on the file download, and a job still queued when the wait runs out, are answered
+  `unavailable`; the guarded port then sends the whole `generate` again, so a clip fal may already
+  have made and billed is bought a second time. **Unlike S-123's re-buy this one costs real money**
+  — T2A is covered by the owner's token plan and H3 video is explicitly excluded (D-007) — which is
+  why the owner was asked rather than S-123 being applied. Every re-send is budget-guarded, so the
+  cap and the ceiling still hold (S-095, S-059); there are at most three sends (S-096's default);
+  and Slice 8 measures what it actually cost against the dashboard.
+
+- **Check 15's words gain the download's transient, by addition** — S-123's form, applied rather than
+  re-decided, as S-124 applied it. Check 16 already names the poll, the wait and the rejected
+  request; **the download is the one video case no check named**, and it is the one that re-buys a
+  clip. Check 15 now ends _"and a 429 or 5xx on the download itself is answered unavailable like
+  every other transient, which re-buys the clip"_. Nothing is removed, the check count stays **22**,
+  and Slice 6 still proves 14, 15, 16 and 17.
+
+**A test of check 2's that moved, because the fact under it moved.** Slice 1 proved _"a real adapter
+named with its key present still refuses while no such adapter is built"_ against the VIDEO port,
+which was then unbuilt. It is built now, so the assertion moved to the **sensor**, the last of the
+five (Slice 7). The assertion is unchanged and nothing was dropped; what it points at is.
+
+**Why.** **Answering `unavailable` and naming the re-buy is what Gate 2 and check 16 already say
+for every other fal call**, and throwing would leave a verified mechanism unreachable for the one
+adapter that can use it — S-123's reasoning exactly. What does NOT transfer is S-123's stated reason
+for accepting the re-buy, so the owner was shown the difference and chose it anyway: a 5xx at fal's
+file host killing a reel after every earlier shot has been paid for is worse than buying one clip
+twice, and the cap is held either way.
+
+**Making the floor arithmetic is the same move as putting the image rate in the registry** (S-124):
+a figure that must agree with another figure should be computed from it, or the two disagree the
+first time either moves, silently, in the direction that costs money.
+
+**Rejected.** **A constant rate in `video.ts`** — it is one place, and a test cannot tell it from a
+figure typed at the call site, because there is nothing to change it to; an injectable entry makes
+the difference observable. **Adding video to D-028's registry** — that registry is a closed set of
+CANDIDATES for an unsettled choice, and D-007 settled this one; putting a locked path in it would
+read as a bake-off that is not happening. **Building the probe inside `fal/video.ts` from
+`FfmpegTools`** — a second ffprobe invocation beside `ffmpeg/media.ts`', which four verified gates
+read, and the two would answer differently the first time either changed. **Handing the adapter the
+whole `MediaPort`** — it needs one method, and the rest of that port reads text and listens from a
+script. **Probing duration and streams too** — Gate 2 does that, on the same probe, in the verified
+pipeline; an adapter that failed a clip for its duration would be a gate nobody could see.
+**Keeping one timeout for the queue** — it calls a working job unavailable after two minutes and
+buys a second clip. **Declaring the floor beside the wait** — above. **Retrying the poll or the
+download inside the adapter** — it makes the adapter count, which S-096 puts in one place and D-024
+says must never be two; S-124's break `t8` exists to catch exactly that. **Throwing a fault once fal
+has accepted the job** — nothing would ever be bought twice, and one 503 on a status poll would kill
+a reel; it also contradicts check 16's own words, which call a queued job answering 429 or 5xx
+unavailable. **Requiring `expanded_prompt` in the schema** — a clip that is made and paid for must
+not be thrown away over a field of metadata; it is optional, and a receipt says plainly when none
+came back (D-072).
+
+**Caught by.** `paid-path`'s checks 14, 15, 16 and 17 in `tests/paid-path-video.test.ts`: the
+submitted request's resolution, duration, seed and expansion mode, and the absence of `aspect_ratio`
+on image-to-video against its presence on text-to-video; every request the endpoint would reject
+refused with NOTHING SENT, not even the upload; the expansion on the receipt and nowhere else; no
+slug or endpoint spelled outside the file that owns it; the clip written under the artifact root,
+probed, and recorded by its local path with no provider URL anywhere; bytes that are not a clip
+failing the call and leaving nothing behind; the cost as the entry's rate times the seconds asked
+for, rounded up, proven against an entry whose rate is not the default's; the upload through the one
+`uploadReference` with no key on the presigned PUT; each wire case classified by the arm or the
+throw it produces, including one on the poll and one on the download; the floor equal to the
+arithmetic; a service refusing a short lease against an adapter that EXISTS and starting when the
+floor is honoured; and the composition root starting exactly one worker. Session 41's break campaign.
+
+**A measured limit of that last one, recorded because it changes what the check is worth.** "Exactly
+one worker" cannot be proven from the database on the free path. Measured twice, directly: a service
+started with a SECOND worker runs two runs in the same six seconds and `count(*) from job where
+state = 'running'` never reaches two, because the first worker's `drain()` claims every due job in a
+tight loop and stand-in work never yields long enough for a second poller's 500 ms timer to find
+anything due. What a second worker does change is the shutdown — only the one the root kept is
+stopped, so the process never exits, which check 5 catches. So check 17 reads the count from
+`apps/service/src/service.ts` itself, the way check 11 reads the source for a slug and check 4 reads
+it for a key; the two-runs sampling is kept beside it, holding the property the words name, with
+what it can and cannot tell written in the test.
+
+**Confirmed-by.** The owner, 2026-09-21, shown that a transient on the clip download re-buys a clip
+and that S-123's reason for accepting that does not transfer to H3, chose _"Answer unavailable; name
+the re-buy"_; and shown that the adapter's whole-job wait and S-113's lease floor are now coupled,
+chose _"10 min a clip, floor 4 hours, derived"_. The rest is this session's, recorded here because
+each is a choice a later session would otherwise have to re-make.
+
+---
+
+## S-126 | 2026-09-21 | The sensor's text step is a FIFTH call on the one model port, handed to the sensor by the pipeline; the measures are ffmpeg read from stdout; and check 2's "named and not built" assertion turns round rather than being deleted
+
+**Chose.** Six things about the fifth and last real adapter — the only one that costs nothing,
+reads no key and reaches no network — each between real alternatives:
+
+- **`readText` is a FIFTH CALL ON `LanguageModelPort`**: one picture and a temperature in, the
+  answer out unparsed, the question fixed inside the adapter (I-8), role `witness`, routed by
+  D-006's table. `ModelCall` and `model_receipt`'s enum gain `'readText'`; **no migration**, because
+  the column is text and the enum is the type this repository reads it through. `recordingPort`
+  gains the arm, so the call writes its row like every other.
+- **Two verified checks are amended BY ADDITION, in S-077's exact form.** `reel-render`'s **check
+  3** says in its own words that the port's calls are _"exactly structured, observe, compare and
+  judgeCut"_, and `reel-plan`'s **check 3** asserts the same list with a comment reading _"a fifth
+  call … still fails here"_. **Both now name five and both stay EXACT** — a sixth call still fails
+  them, and break `p5` proves it. Nothing is removed, no assertion is weakened, and each feature
+  gains an amendment block above its gates saying so. `paid-path`'s _"What this feature changes in
+  verified features"_ gains the two entries; both journeys were already going to be re-run in
+  Slice 8.
+- **The sensor is handed the ONE CALL, at CALL TIME, by the pipeline.** `PictureSensorPort.readText`
+  takes a `PictureTextReader` — a function, declared in `packages/contracts/src/picture.ts` — and
+  `gate1.ts` builds it from `ports.model`. Inside a worker that port is the **recording** one, so
+  the vision call leaves a `model_receipt` row. **`measure` and `similarity` are handed nothing and
+  can reach nothing**, so check 18's _"no model call, no spend"_ is true by construction. Every
+  existing implementation keeps its one-parameter signature, because TypeScript admits an
+  implementation that takes fewer parameters: the stand-in sensor and every test sensor are
+  unchanged.
+- **The three measures are ffmpeg, read from STDOUT.** `blurdetect` for sharpness through a
+  declared, injectable `BLUR_FLOOR`; `signalstats`' `YAVG` for brightness on the limited-range
+  scale, **clamped**; `ssim`'s **combined** figure for similarity, with `scale2ref` holding two
+  pictures of different sizes to one frame. Both filtergraphs print what they measured on stdout —
+  the `metadata` filter's `file=-` and ssim's `stats_file=-` — so **no log level can silence them**
+  and nothing depends on ffmpeg's log format. `./media.ts`' scan parses stderr because its
+  detectors report only there (S-072); these two do not have to.
+- **`SENSOR_FILTERS` join `REQUIRED_FILTERS`.** `PictureSensorPort` has no `ready()` of its own, so
+  the six filters the sensor names are demanded by EVERY ffmpeg port's `ready()` — which a worker
+  awaits before it opens its database (S-075). A machine without `blurdetect` refuses to start; it
+  does not measure 0 and carry on.
+- **Check 2's _"named and not built"_ assertion TURNS ROUND.** Slice 1 proved it against the video
+  port; S-125 moved it to the sensor; Slice 7 builds the sensor, so there is nothing left to point
+  at. It is not deleted — a test dropped when its subject is finished leaves the property
+  unwatched. It asserts the opposite, which is strictly stronger: **every name in every closed set
+  BUILDS**, given whatever key it needs, and a port answering _"not built"_ is the finding. The
+  `notBuilt` helper is gone rather than left as an unreachable branch.
+
+**Why.**
+
+**A call off the port has no model id, no role and no receipt.** That is D-084's argument for
+`StructuredCall`, word for word, and it applies unchanged: the text step is a paid vision call, so
+either it is on `LanguageModelPort` and writes a `model_receipt` row, or the run's record does not
+show a call that was made. The one option that touched nothing verified — a `minimax/vision.ts`
+function handed to the sensor — bought that by breaking D-084's _"every call writes a
+`model_receipt` row"_ and D-006's _"the model id is recorded in every receipt"_ for the one call
+nobody would ever see.
+
+**And none of the four existing calls fits.** `structured` may carry no picture at all — review 4
+of `reel-engine`'s finding, and I-8's rule. `observe` is the witness, with a fixed answer shape
+that has `readableTextPresent` and no strings, and a **second `observe` per picture breaks the
+observation's join**: an observation is tied to the one `observe` receipt whose `pictureIds` is its
+picture's, with no receipt id stored (S-037, S-046), so two would make that key ambiguous — a
+silent corruption, not a failing test. `compare` takes two pictures and subjects; `judgeCut` is
+Gate 7's, on the settings' closed questions.
+
+**The port had to be handed at call time because ports are built once and wrapped per run.**
+`apps/service` builds every port at startup; `apps/worker` wraps the model in
+`recordingPort(model, db, runId)` inside `keyframes-job.ts`, per run. A model port handed to the
+sensor in `PortOptions` is therefore the **unwrapped** one, and its receipts go on the floor — the
+same D-084 hole as a function off the port, arriving by a different door. The pipeline is the only
+place that holds both the sensor and the recording port, so it is the place that joins them.
+
+**A function rather than a port type, for two reasons.** `model.ts` already imports from
+`picture.ts`, and `clip.ts` sits between them, so a port type in `picture.ts` is a cycle
+`no-circular` forbids — and moving `PictureRef` alone does not break it, because `clip.ts` also
+takes `WitnessObservation` from there. And a sensor needs ONE call, not a port: S-125's stated
+reason for handing the video adapter a probe rather than the whole `MediaPort`.
+
+**A measurement that corrected a comment.** `format=yuv420p` was written here as what keeps black
+and white at 16 and 235. **It does not**: a full-range black JPEG reports a luma of 0 with or
+without it, measured on this machine on 2026-09-21. So the **clamp** is what holds brightness
+inside the range `PictureMeasure` declares, and the comment now says so. A file from outside this
+engine is still answered inside the range.
+
+**Rejected.** **A `minimax/vision.ts` function off the port** — above; it is the only option that
+moves nothing verified, and it pays for that with a paid model call the record does not show.
+**The witness's `observe` answer supplying the text** — one vision call a picture instead of two,
+already recorded and already routed; it needs `gate1`'s text step moved AFTER the witness and fed
+from its answer, which reorders a verified gate (D-042, S-031, S-041) and makes check 19's _"the
+sensor's answer"_ true only as pass-through. **A second `observe` call from inside the sensor** —
+the join above, broken silently. **A fifth `ModelRole`** — roles are read by name in three verified
+tests and by D-006's table, and the text step is a seeing call, which is what `witness` is.
+**Handing the sensor a `LanguageModelPort` in `PortOptions`** — two lines, and the receipts are
+lost. **An optional `useModel` the worker sets per run** — recorded correctly, and it puts mutable
+state on a port, correct only while everything is sequential (S-115) and a landmine for
+`parallel-shots`. **Parsing the measures off stderr, as the scan does** — it works, and it ties a
+measure to a log level; stdout cannot be silenced. **A sensor that answers "no text"** — S-112's
+own rejection, and the reason the step is a call at all. **Deleting check 2's finished assertion**
+— an unwatched property; turning it round keeps a test watching the same thing from the other end.
+
+**Caught by.** `paid-path`'s checks 18 and 19 in `tests/paid-path-sensor.test.ts`: a picture and
+the same picture blurred, measuring apart; a picture past the blur floor clamped to 0, and a flat
+frame, which `blurdetect` cannot measure at all, answering 0 rather than 1; black at 0, white at 1,
+and a full-range file clamped; ssim's combined figure told from every single channel by a pair with
+the same luma and a different colour; two pictures of different sizes answered rather than refused;
+a file that is not a picture measuring unreadable with no model call; the three filters in
+`REQUIRED_FILTERS`, and a `ready()` that refuses a filter the tools lack; one call and exactly one,
+whose strings are the port's answer; a failed call and an answer that does not parse both throwing;
+the picture, the fixed question and the receipt's `readText`, `witness` and `pictureIds` against
+recorded wire, with each wire case saying which failure it was; and a whole run through the service
+writing one `readText` receipt for every picture the witness saw.
+`tests/paid-path-refusals.test.ts` for every name in every closed set building.
+`tests/reel-plan-shapes.test.ts` and `tests/reel-render-profile.test.ts` for the five-call list,
+still exact. Session 42's break campaign.
+
+**Confirmed-by.** The owner, 2026-09-21, shown that `LanguageModelPort` has no call that answers
+"what text is in this picture" and that two verified checks pin it to exactly four, chose _"A fifth
+call, S-077's form"_; and shown that a port handed at construction is the unwrapped one whose
+receipts are lost, chose _"The pipeline hands it at call time"_. The rest is this session's,
+recorded here because each is a choice a later session would otherwise have to re-make.

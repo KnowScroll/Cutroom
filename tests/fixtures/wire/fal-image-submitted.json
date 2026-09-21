@@ -1,0 +1,23 @@
+{
+  "note": "A picture accepted onto fal’s queue: the request id is what every later call names. DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body). THE ADAPTER DOES NOT FOLLOW status_url OR response_url: it builds both from the base URL it was given and the slug, so a base-URL setting cannot be quietly bypassed by a URL the provider chose (session 39’s n29, S-124). They are recorded because a real answer carries them.",
+  "provider": "fal",
+  "call": "image",
+  "case": "submitted",
+  "request": {
+    "method": "POST",
+    "path": "/fal-ai/flux-2-pro/edit"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "request_id": "7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37",
+      "status": "IN_QUEUE",
+      "queue_position": 0,
+      "status_url": "https://queue.fal.run/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37/status",
+      "response_url": "https://queue.fal.run/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+    }
+  }
+}

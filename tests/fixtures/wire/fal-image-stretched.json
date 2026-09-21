@@ -1,0 +1,28 @@
+{
+  "note": "A finished picture whose file is 1024x1536 — vertical, and not 9:16. Serves the assertion that the adapter tests the ratio rather than the orientation. DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer (S-124).",
+  "provider": "fal",
+  "call": "image",
+  "case": "stretched",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "images": [
+        {
+          "url": "https://v3.fal.media/files/tall.png",
+          "width": 1024,
+          "height": 1536,
+          "content_type": "image/png"
+        }
+      ],
+      "seed": 11,
+      "prompt": "a vertical keyframe that is not 9:16"
+    }
+  }
+}

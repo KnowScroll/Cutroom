@@ -1,0 +1,19 @@
+{
+  "note": "503 on the CLIP DOWNLOAD itself, from fal's own file host. The clip exists and is billed, and answering unavailable buys it again — the named re-buy the owner chose over failing a reel that every earlier shot had been paid for (S-125). OUR KEY IS NOT SENT HERE: it is fal's file host with its own authorisation (S-109, D-022). DOCUMENTED SHAPE, AND THE WIRE ITSELF WAS DRIVEN LIVE. D-019's spike posted one 5-second 768P text-to-video job to this queue on 2026-09-03 and recorded what came back in steering-ref/docs/research/spike-results.json; the field names here are that answer's and fal's published schema. Slice 8's hand-run reel is what verifies the rest, and an answer that is not this shape throws naming what arrived (S-125).",
+  "provider": "fal",
+  "call": "clip",
+  "case": "busy",
+  "request": {
+    "method": "GET",
+    "path": "/files/clip.mp4"
+  },
+  "response": {
+    "status": 503,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "service temporarily unavailable"
+    }
+  }
+}

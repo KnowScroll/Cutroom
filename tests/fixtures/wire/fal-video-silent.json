@@ -1,0 +1,19 @@
+{
+  "note": "A job fal accepted and then failed whose RESULT ANSWERS 200 anyway, carrying what went wrong in its body. The 400 case (fal-video-broken) is the one the queue driver's own send classifies; this is the one the FAILED branch itself has to carry, and check 16 says the throw carries the provider's message either way (S-096, S-125). DOCUMENTED SHAPE, AND THE WIRE ITSELF WAS DRIVEN LIVE: D-019's spike posted one 5-second 768P text-to-video job to this queue on 2026-09-03 and recorded what came back in steering-ref/docs/research/spike-results.json; the field names here are that answer's and fal's published schema.",
+  "provider": "fal",
+  "call": "video",
+  "case": "silent",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/minimax-h3-turbo/requests/9b3e17c4-52a0-4f88-b1d7-6ae02c93d5aa"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "inference failed: the prompt was rejected by the safety checker"
+    }
+  }
+}

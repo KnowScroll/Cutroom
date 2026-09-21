@@ -1,0 +1,17 @@
+{
+  "note": "A 200 whose body is a gateway’s HTML rather than this wire — what a proxy in front of a provider answers when it is confused. A body that does not parse is a FAULT, and it must not read as a transient or, worse, as a picture (S-096, S-124).",
+  "provider": "fal",
+  "call": "image",
+  "case": "garbled",
+  "request": {
+    "method": "POST",
+    "path": "/fal-ai/flux-2-pro/edit"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "text": "<html><head><title>502 Bad Gateway</title></head><body>502 Bad Gateway</body></html>"
+  }
+}

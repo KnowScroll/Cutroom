@@ -605,6 +605,7 @@ export function holding(which: {
     },
     compare: (call) => model.compare(call),
     judgeCut: (call) => model.judgeCut(call),
+    readText: (call) => model.readText(call),
   })
   return { wrap, reached, release: () => release() }
 }

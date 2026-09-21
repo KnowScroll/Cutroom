@@ -1,0 +1,17 @@
+{
+  "note": "The second of the two upload calls: the bytes are PUT to the URL initiate handed back, which answers empty. DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body). OUR KEY IS NOT SENT ON THIS CALL — the URL carries its own authorisation and ours has no business at fal’s storage, which is the rule S-123 set for MiniMax’s subtitle fetch and S-124 keeps here.",
+  "provider": "fal",
+  "call": "upload",
+  "case": "stored",
+  "request": {
+    "method": "PUT",
+    "path": "/upload/elephant/reference-a1-shot-0-canonical.png"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "text": ""
+  }
+}

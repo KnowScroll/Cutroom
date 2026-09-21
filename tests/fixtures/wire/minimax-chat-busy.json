@@ -1,0 +1,22 @@
+{
+  "note": "MiniMax answering that it is busy, on the wire D-019's spike verified. 429 is transient: the call is sent again with backoff and costs no take (S-096), and paid-path's check 8 is what asserts that classification.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "busy",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 429,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "base_resp": {
+        "status_code": 1002,
+        "status_msg": "rate limit exceeded"
+      }
+    }
+  }
+}

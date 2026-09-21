@@ -5,7 +5,7 @@
 - **Work:** Slice 1 of 8 — the engine runs as a program; checks 1, 2 and 5
 - **Written:** 2026-09-20, at the end of session 35, after `reel-takes` was verified and `paid-path`'s gates were
   approved (`3a859a4` and the commit that adds them)
-- **Run:** not yet
+- **Run:** session 36
 
 Paste everything inside the block below as the session's first message.
 

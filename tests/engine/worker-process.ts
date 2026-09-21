@@ -85,6 +85,9 @@ const model: LanguageModelPort = {
   judgeCut(call) {
     return holds() ? held() : standIn.judgeCut(call)
   },
+  readText(call) {
+    return holds() ? held() : standIn.readText(call)
+  },
 }
 
 // A held call is a promise nothing will settle, and it keeps no process alive on its own.

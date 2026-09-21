@@ -60,6 +60,11 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > - **Check 3** asserts `LanguageModelPort`'s four calls, `judgeCut` added, and **check 29** asserts `GATE_ORDER` with
 >   Gates 2 to 5 and 7 (`reel-render`'s Slice 1). Both lists stay exact.
 > - This journey is run again in `reel-render`'s last slice.
+>
+> **Amended by `paid-path` on 2026-09-21 — the gates below are not edited, and no assertion is removed**
+> (**S-126**): **check 3 asserts `LanguageModelPort`'s FIVE calls**, `readText` added — Gate 1's text step, which
+> this machine's ffmpeg cannot do (S-112). The list stays exact, and this journey is run again in `paid-path`'s
+> Slice 8.
 
 ## Gate 1 — Product (no technical language)
 

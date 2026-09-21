@@ -1,0 +1,12 @@
+{
+  "note": "The SECOND call answering 429: the audio was made and the timings could not be fetched. It is answered unavailable like any other transient, which makes the worker's guarded port send the WHOLE speak again — so the audio is made a second time. That second buy is a named limit, not an accident: T2A is covered by the owner's token plan, so it costs nothing today (D-019, S-110), and an adapter may not retry a call of its own (S-096, S-122). paid-path's check 9 asserts it.",
+  "provider": "minimax",
+  "call": "subtitle",
+  "case": "busy",
+  "request": { "method": "GET", "path": "/audio_subtitle/recorded/subtitle.json" },
+  "response": {
+    "status": 429,
+    "headers": { "content-type": "text/plain" },
+    "text": "too many requests"
+  }
+}

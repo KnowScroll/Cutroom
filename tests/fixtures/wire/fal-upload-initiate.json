@@ -1,0 +1,20 @@
+{
+  "note": "The first of the two calls that get a local reference picture to a URL fal can fetch: POST /storage/upload/initiate answers where to PUT the bytes and what the file will be called afterwards. DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body). The upload_url a live answer carries is a PRESIGNED URL with a query string, which check 21 forbids a fixture to hold — so the one here has none, and the test that proves the adapter drops it builds a presigned-shaped one of its own (D-022, the arrangement check 10 uses).",
+  "provider": "fal",
+  "call": "upload",
+  "case": "initiate",
+  "request": {
+    "method": "POST",
+    "path": "/storage/upload/initiate"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "file_url": "https://v3.fal.media/files/elephant/reference-a1-shot-0-canonical.png",
+      "upload_url": "https://v3.fal.media/upload/elephant/reference-a1-shot-0-canonical.png"
+    }
+  }
+}

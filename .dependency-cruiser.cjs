@@ -87,6 +87,23 @@ module.exports = {
       to: { dependencyTypes: ['core'], path: '^(node:)?child_process$' },
     },
     {
+      name: 'keys-only-in-providers',
+      severity: 'error',
+      comment:
+        'S-109: a provider key is read in packages/providers and nowhere else. HALF OF THIS RULE ' +
+        'IS NOT HERE, and cannot be (S-119): a key is read with `process.env.NAME`, a property ' +
+        'access on a global, and a tool that resolves imports can never see one. So this half ' +
+        'holds the module that OWNS the read — packages/providers/src/env.ts, which nothing ' +
+        'outside providers may reach, by path or by the name @cutroom/providers/env, matched as a ' +
+        'bare specifier so it fires whether or not that subpath resolves. The other half is ' +
+        "`drift`'s key scan, which reads this repository's own source for a key-shaped " +
+        'environment read outside packages/providers/src. Both carry this one name, and ' +
+        '`drift --prove` builds a deliberate violation of each: one going quiet while the other ' +
+        'stays green is the state a rule that reads as coverage is in.',
+      from: { path: '^(packages|apps)/', pathNot: '^packages/providers/' },
+      to: { path: '^packages/providers/src/env\\.ts$|^@cutroom/providers/env$' },
+    },
+    {
       name: 'providers-no-domain',
       severity: 'error',
       comment:
@@ -237,8 +254,11 @@ module.exports = {
       severity: 'error',
       comment:
         'D-084: no module outside packages/providers constructs a model client, and D-005 names the ' +
-        'layer the one client would come from. Matched by package name as well as by path, so an ' +
-        'import of a client that is not installed is caught too.',
+        'layer the one client would come from. S-114 supersedes D-005 for this engine: no model ' +
+        'SDK is installed at all — four single structured calls through `fetch` and `zod`, with ' +
+        'the tool loop that D-005 was chosen for living in KnowScroll (D-066, D-076, D-096). So ' +
+        'this rule is now also what keeps one from being reintroduced. Matched by package name as ' +
+        'well as by path, so an import of a client that is not installed is caught too.',
       from: { pathNot: '^packages/providers/' },
       to: {
         path: '^ai$|^@ai-sdk/|node_modules/ai/|node_modules/@ai-sdk/|node_modules/\\.pnpm/ai@|node_modules/\\.pnpm/@ai-sdk\\+',

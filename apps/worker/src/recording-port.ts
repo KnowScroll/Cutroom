@@ -7,7 +7,7 @@ import { recordReceipt, type Db } from '@cutroom/domain'
  * (D-005, D-084). A call that throws returned nothing and leaves no receipt; every call before it
  * keeps its own, whatever happens to the run afterwards.
  *
- * All four calls are recorded (S-037, S-074): the observation and the reconciliation of a picture
+ * All five calls are recorded (S-037, S-074, S-126): the observation and the reconciliation of a picture
  * or a take are tied to their receipts by key — the one `observe` receipt whose `pictureIds` or
  * `takeIds` is that picture's or take's, and the one `reconciler` receipt likewise — so a call that
  * left no row would leave a record nothing can join.
@@ -34,6 +34,14 @@ export function recordingPort(model: LanguageModelPort, db: Db, runId: string): 
     },
     async judgeCut(call) {
       const answer = await model.judgeCut(call)
+      recordReceipt(db, runId, answer.receipt)
+      return answer
+    },
+    // Gate 1's text step (S-112, S-126). The sensor makes this call, through the reader the
+    // pipeline hands it — which is made from THIS port, so the vision call a real sensor pays for
+    // leaves a row like every other (D-084, D-006).
+    async readText(call) {
+      const answer = await model.readText(call)
       recordReceipt(db, runId, answer.receipt)
       return answer
     },

@@ -1,0 +1,29 @@
+{
+  "note": "MiniMax T2A v2, the call D-019's spike made live on 2026-09-02 (steering-ref/scripts/spikes/minimax-t2a.mjs). WHAT THE SPIKE RECORDED is its shape, not its body: covered, hasSubtitle, and the subtitle host — because the body itself could not be written down. THE SUBTITLE FIELD IS UNDER data: the spike read `r.json.data.subtitle_file` and found it, which is what `hasSubtitle: true` means; session 37 recorded it at the top level, and that is corrected here as session 38 corrected the chat path. The host is the one spike-results.json records. THE URL'S QUERY IS GONE AND NOT REPLACED: the real one is a presigned Alibaba OSS link carrying OSSAccessKeyId, Signature and Expires — a credential belonging to MiniMax, and the exact thing D-022 was written for. A check that needs a live-shaped presigned URL BUILDS ONE IN THE TEST. The path segment after the host, the audio bytes and extra_info's figures were never recorded; the audio here is the first bytes of an MP3 frame with an ID3 header, and the rest is the documented shape this repository has never seen answered.",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "redacted",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/json" },
+    "body": {
+      "data": {
+        "status": 2,
+        "audio": "4944330400000000000afffb90640000000000000000000000000000",
+        "subtitle_file": "https://minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com/audio_subtitle/recorded/subtitle.json"
+      },
+      "extra_info": {
+        "audio_length": 3168,
+        "audio_sample_rate": 32000,
+        "audio_size": 50688,
+        "bitrate": 128000,
+        "word_count": 9,
+        "audio_format": "mp3",
+        "usage_characters": 47
+      },
+      "trace_id": "recorded-0003",
+      "base_resp": { "status_code": 0, "status_msg": "success" }
+    }
+  }
+}

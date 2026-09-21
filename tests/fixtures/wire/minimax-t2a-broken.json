@@ -1,0 +1,12 @@
+{
+  "note": "A 5xx from T2A. Transient, like a 429: the provider made nothing and may if it is asked again (S-096, I-11: 'A 500 is not a bad picture and is often unbilled').",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "broken",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 503,
+    "headers": { "content-type": "text/plain" },
+    "text": "service unavailable"
+  }
+}

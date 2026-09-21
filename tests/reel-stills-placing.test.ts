@@ -64,6 +64,7 @@ test('12. a cancel that lands between the plan job and the keyframes job finishe
     observe: (call) => model.observe(call),
     compare: (call) => model.compare(call),
     judgeCut: (call) => model.judgeCut(call),
+    readText: (call) => model.readText(call),
   })
 
   const engine = await startEngine({

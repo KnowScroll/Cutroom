@@ -1,0 +1,17 @@
+{
+  "note": "A 5xx from MiniMax. Transient, like a 429: the provider made nothing and may if it is asked again (S-096, I-11: 'A 500 is not a bad picture and is often unbilled').",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "broken",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 503,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "text": "service unavailable"
+  }
+}

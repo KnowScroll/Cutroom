@@ -224,6 +224,7 @@ test('41. each stills endings events are exactly those S-046 lists, in the order
     observe: (call) => model.observe(call),
     compare: (call) => model.compare(call),
     judgeCut: (call) => model.judgeCut(call),
+    readText: (call) => model.readText(call),
   })
   const cancelled = await startEngine({
     worker: true,

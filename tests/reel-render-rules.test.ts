@@ -109,7 +109,9 @@ test('2. drift, drift:prove and drift --audit pass', () => {
   assert.equal(prove.status, 0, prove.out)
   assert.doesNotMatch(prove.out, /SILENT/, prove.out)
   assert.doesNotMatch(prove.out, /EAGER/, prove.out)
-  assert.match(prove.out, /19 rules proven to fire/, prove.out)
+  // paid-path's Slice 2 added a twentieth rule, keys-only-in-providers (S-109, S-119, S-120).
+  // The count stays exact here for the same reason it does in reel-stills' check 3 (S-078).
+  assert.match(prove.out, /20 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)

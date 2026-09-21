@@ -1,0 +1,21 @@
+{
+  "name": "@cutroom/service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The composition root: the environment, the settings, every port, the API and one worker.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@cutroom/api": "workspace:*",
+    "@cutroom/contracts": "workspace:*",
+    "@cutroom/domain": "workspace:*",
+    "@cutroom/pipeline": "workspace:*",
+    "@cutroom/providers": "workspace:*",
+    "@cutroom/worker": "workspace:*"
+  }
+}

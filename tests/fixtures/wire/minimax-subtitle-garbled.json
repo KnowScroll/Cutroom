@@ -1,0 +1,12 @@
+{
+  "note": "The subtitle body fetched and answered with something that is not the timings: an OSS error document, which is what a presigned link returns once its Expires has passed. It throws, naming what arrived, because a second send of the whole call would be answered the same way — and because a subtitle body this repository cannot read is exactly what Slice 8's hand-run reel has to find loudly rather than quietly.",
+  "provider": "minimax",
+  "call": "subtitle",
+  "case": "garbled",
+  "request": { "method": "GET", "path": "/audio_subtitle/recorded/subtitle.json" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/xml" },
+    "text": "<Error><Code>AccessDenied</Code><Message>Request has expired.</Message></Error>"
+  }
+}

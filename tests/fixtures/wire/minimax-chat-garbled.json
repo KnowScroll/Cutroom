@@ -1,0 +1,17 @@
+{
+  "note": "HTTP 200 whose body is not the wire at all: a gateway's HTML, which is what a proxy in front of a provider returns. An unparseable body throws rather than being answered unavailable, because nothing says a second send would return anything different (S-096).",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "garbled",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "text": "<html><head><title>502 Bad Gateway</title></head><body>nginx</body></html>"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "note": "A 200 whose body is valid JSON and is NOT this wire — what a proxy, a rewritten route or a changed API answers when it is not MiniMax's chat completion at all. It has no `choices`, so nothing can be read out of it. A FAULT that says what arrived, which is a different failure from a body that is not JSON (a gateway's HTML) and a different one again from a body that is this wire and reports a refusal in `base_resp`. DOCUMENTED SHAPE: this repository has never seen this answered, and it is here because the text step must fail on it rather than answering \"no text\" (S-112, S-126).",
+  "provider": "minimax",
+  "call": "readtext",
+  "case": "alien",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "ok": true,
+      "result": "accepted",
+      "detail": "this body parses and is not a chat completion"
+    }
+  }
+}

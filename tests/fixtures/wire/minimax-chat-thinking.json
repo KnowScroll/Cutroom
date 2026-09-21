@@ -1,0 +1,44 @@
+{
+  "note": "The same answer with the reasoning block D-019 found on every model in the family. The adapter strips the block and parses what follows; keeping it would make every structured call fail as a schema error, which is the lie D-019 warns about.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "thinking",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0002",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "<think>\nThe caller asked for one unit, so one shot.\n</think>\n\n{\"units\":[{\"sentence\":1,\"shot\":\"a wide, still frame\"}]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 812,
+        "completion_tokens": 128,
+        "total_tokens": 940,
+        "completion_tokens_details": {
+          "reasoning_tokens": 32
+        }
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

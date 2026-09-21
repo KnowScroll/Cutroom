@@ -8,6 +8,7 @@
   },
   "scripts": {
     "check": "node scripts/check.mjs",
+    "service": "node --experimental-strip-types --no-warnings apps/service/src/main.ts",
     "typecheck": "tsc -b --pretty",
     "lint": "eslint .",
     "format": "prettier --check .",
@@ -25,6 +26,7 @@
     "@cutroom/contracts": "workspace:*",
     "@cutroom/pipeline": "workspace:*",
     "@cutroom/providers": "workspace:*",
+    "@cutroom/service": "workspace:*",
     "@cutroom/reel-contract": "workspace:*",
     "@cutroom/worker": "workspace:*",
     "@eslint/js": "^9.38.0",
@@ -35,6 +37,7 @@
     "globals": "^17.12.0",
     "prettier": "^3.6.0",
     "typescript": "^5.9.0",
-    "typescript-eslint": "^8.46.0"
+    "typescript-eslint": "^8.46.0",
+    "zod": "^4.6.5"
   }
 }

@@ -1,0 +1,20 @@
+{
+  "note": "HTTP 200 whose data.audio is not hex at all — the shape a proxy or a partial write produces. It matters because Buffer.from(x, 'hex') TRUNCATES SILENTLY at the first character that is not hex: without a guard this body becomes a short file on disk and a made answer, and the run goes on with audio nobody can play. It throws instead. This is the mp3 cousin of D-019's reasoning trap, where a call that returns nothing reads as a schema failure and is not one.",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "clipped",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/json" },
+    "body": {
+      "data": {
+        "status": 2,
+        "audio": "494433zzzz",
+        "subtitle_file": "https://minimax-algeng-chat-tts-us.oss-us-east-1.aliyuncs.com/audio_subtitle/recorded/subtitle.json"
+      },
+      "trace_id": "recorded-0005",
+      "base_resp": { "status_code": 0, "status_msg": "success" }
+    }
+  }
+}

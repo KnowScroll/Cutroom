@@ -38,6 +38,25 @@ export type {
   NarrationRequest,
   WordTiming,
 } from './narration.ts'
+export {
+  DEFAULT_PROVIDER_SETTINGS,
+  IMAGE_ADAPTERS,
+  MODEL_ADAPTERS,
+  NARRATION_ADAPTERS,
+  PROVIDER_ADAPTERS,
+  PROVIDER_PORTS,
+  SENSOR_ADAPTERS,
+  STAND_IN,
+  VIDEO_ADAPTERS,
+  anyReal,
+  type ImageAdapter,
+  type ModelAdapter,
+  type NarrationAdapter,
+  type ProviderPort,
+  type ProviderSettings,
+  type SensorAdapter,
+  type VideoAdapter,
+} from './providers.ts'
 export type {
   Framing,
   ImageAnswer,
@@ -50,6 +69,7 @@ export type {
   PictureRecord,
   PictureRef,
   PictureSensorPort,
+  PictureTextReader,
   Reconciliation,
   StillsRecorder,
   WitnessObservation,

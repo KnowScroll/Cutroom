@@ -1,0 +1,19 @@
+{
+  "note": "429 on the submit: fal's rate limit. TRANSIENT — nothing was made and nothing was bought, so the adapter answers unavailable and the worker's guarded port sends the call again with backoff (S-096). DOCUMENTED SHAPE, AND THE WIRE ITSELF WAS DRIVEN LIVE. D-019's spike posted one 5-second 768P text-to-video job to this queue on 2026-09-03 and recorded what came back in steering-ref/docs/research/spike-results.json; the field names here are that answer's and fal's published schema. Slice 8's hand-run reel is what verifies the rest, and an answer that is not this shape throws naming what arrived (S-125).",
+  "provider": "fal",
+  "call": "video",
+  "case": "busy",
+  "request": {
+    "method": "POST",
+    "path": "/fal-ai/minimax-h3-turbo/image-to-video"
+  },
+  "response": {
+    "status": 429,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Rate limit exceeded. Please retry after a short wait."
+    }
+  }
+}

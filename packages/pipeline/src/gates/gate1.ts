@@ -113,7 +113,15 @@ export async function gate1(
   await progress({ measure, gate1: verdict(null) })
 
   // 2. text — the words read, recorded; never a failure (S-041).
-  const text = await ports.sensors.readText(ref)
+  //
+  // The sensor is handed the ONE model call the step may make, built here from the model port
+  // this gate was given (S-112, S-126). Inside a worker that port is the recording one, so a real
+  // sensor's vision call writes its receipt like every other; a sensor holding a port of its own
+  // would make the same call and leave no row (D-084). A stand-in sensor ignores it.
+  const text = await ports.sensors.readText(ref, async (picture) => {
+    const answer = await ports.model.readText({ picture, temperature: 0 })
+    return answer.value
+  })
   steps.push({ step: 'text', outcome: 'accept', reasons: [] })
   await progress({ text: [...text], gate1: verdict(null) })
 

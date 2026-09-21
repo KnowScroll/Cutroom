@@ -1,0 +1,16 @@
+{
+  "note": "HTTP 200 whose base_resp says the provider refused anyway — MiniMax reports its own outcome under 200 as well as in the status. 1002 is the rate limit, and it is the ONE code that means busy, so this is answered unavailable; every other code (1004 an invalid key, 1008 no balance, 1013 bad parameters) is a fault, because sending the same request again cannot change any of them. The audio field is absent, which is what a refusal under 200 looks like.",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "limited",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/json" },
+    "body": {
+      "data": { "status": 1 },
+      "trace_id": "recorded-0004",
+      "base_resp": { "status_code": 1002, "status_msg": "rate limit exceeded" }
+    }
+  }
+}

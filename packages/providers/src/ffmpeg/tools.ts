@@ -44,11 +44,32 @@ export type PassFilter = (typeof PASS_FILTERS)[number]
 export const STRIP_FILTERS = ['select'] as const
 export type StripFilter = (typeof STRIP_FILTERS)[number]
 
-/** Every filter the scan, the pass and the strip use: what `ready()` requires by default (S-075). */
+/**
+ * Every filter the real picture sensor uses (S-112, S-126): `blurdetect` for sharpness,
+ * `signalstats` for brightness, `ssim` for similarity, `metadata` to print what the first two
+ * measured, `scale2ref` to hold two pictures of different sizes to the same one, and `format` to
+ * pin the pixel format both are read in.
+ *
+ * `PictureSensorPort` has no `ready()` of its own, so these join the list EVERY ffmpeg port is
+ * made ready against — which is what a worker awaits before it opens its database (S-075). A
+ * machine without `blurdetect` refuses to start; it does not measure 0 and carry on.
+ */
+export const SENSOR_FILTERS = [
+  'blurdetect',
+  'signalstats',
+  'ssim',
+  'metadata',
+  'scale2ref',
+  'format',
+] as const
+export type SensorFilter = (typeof SENSOR_FILTERS)[number]
+
+/**
+ * Every filter the scan, the pass, the strip and the sensor use: what `ready()` requires by
+ * default (S-075, S-126).
+ */
 export const REQUIRED_FILTERS: readonly string[] = [
-  ...SCAN_FILTERS,
-  ...PASS_FILTERS,
-  ...STRIP_FILTERS,
+  ...new Set<string>([...SCAN_FILTERS, ...PASS_FILTERS, ...STRIP_FILTERS, ...SENSOR_FILTERS]),
 ]
 
 /** What one run of a tool printed, and how it ended. */

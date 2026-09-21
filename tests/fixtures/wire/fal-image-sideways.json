@@ -1,0 +1,28 @@
+{
+  "note": "THE TRAP, AS A RESULT BODY: a finished picture whose FILE is 16:9 while the body reports whatever it likes. image-to-video has no aspect_ratio field, so a landscape keyframe yields a landscape clip with no error (D-019, D-028). Check 12 serves this with the landscape file and asserts the call fails naming the entry. The width and height below are the RIGHT ones on purpose — an adapter that read them instead of the file would pass, and that is the break this fixture exists to catch.",
+  "provider": "fal",
+  "call": "image",
+  "case": "sideways",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "images": [
+        {
+          "url": "https://v3.fal.media/files/landscape.png",
+          "width": 864,
+          "height": 1536,
+          "content_type": "image/png"
+        }
+      ],
+      "seed": 2147483647,
+      "prompt": "a keyframe that is not vertical"
+    }
+  }
+}

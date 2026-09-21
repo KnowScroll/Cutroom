@@ -23,6 +23,9 @@ importers:
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:packages/reel-contract
+      '@cutroom/service':
+        specifier: workspace:*
+        version: link:apps/service
       '@cutroom/worker':
         specifier: workspace:*
         version: link:apps/worker
@@ -53,6 +56,9 @@ importers:
       typescript-eslint:
         specifier: ^8.46.0
         version: 8.70.0(eslint@9.39.5)(typescript@5.9.3)
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
 
   apps/api:
     dependencies:
@@ -62,6 +68,27 @@ importers:
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:../../packages/reel-contract
+
+  apps/service:
+    dependencies:
+      '@cutroom/api':
+        specifier: workspace:*
+        version: link:../api
+      '@cutroom/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@cutroom/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@cutroom/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
+      '@cutroom/providers':
+        specifier: workspace:*
+        version: link:../../packages/providers
+      '@cutroom/worker':
+        specifier: workspace:*
+        version: link:../worker
 
   apps/worker:
     dependencies:
@@ -123,6 +150,9 @@ importers:
       '@cutroom/contracts':
         specifier: workspace:*
         version: link:../contracts
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
 
   packages/reel-contract:
     dependencies:

@@ -1,0 +1,12 @@
+{
+  "note": "A 401 from T2A: the key is wrong, and sending it again cannot help. It THROWS, and the message names neither the key nor the header it was sent in (S-109, D-022).",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "denied",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 401,
+    "headers": { "content-type": "application/json" },
+    "body": { "base_resp": { "status_code": 1004, "status_msg": "invalid api key" } }
+  }
+}

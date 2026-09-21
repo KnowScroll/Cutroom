@@ -1,0 +1,41 @@
+{
+  "note": "The same witness on a whole clip (D-053, S-072): D-041's fields with the temporal block a clip has and a still does not. What carries the clip is a video part on the message, which is the shape D-006 means by 'the only vision model' accepting video.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "clip",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0005",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M3",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"entities\":[{\"label\":\"a wax seal on parchment\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"a table in a stone hall\",\"lighting\":\"dim\",\"readableTextPresent\":false,\"ambiguities\":[],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"a wax seal on parchment\",\"verb\":\"is pressed into hot wax\",\"completes\":true}],\"eventOrder\":[\"the seal is pressed\"]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 4211,
+        "completion_tokens": 188,
+        "total_tokens": 4399
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

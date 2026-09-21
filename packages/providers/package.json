@@ -11,6 +11,7 @@
     "src"
   ],
   "dependencies": {
-    "@cutroom/contracts": "workspace:*"
+    "@cutroom/contracts": "workspace:*",
+    "zod": "^4.6.5"
   }
 }

@@ -148,7 +148,7 @@ test('3. the default gate profile is phase-1 with exactly those gates, and a wor
   }
 })
 
-test("3. LanguageModelPort's calls are exactly structured, observe, compare and judgeCut", () => {
+test("3. LanguageModelPort's calls are exactly structured, observe, compare, judgeCut and readText", () => {
   const ports = names(sourceFiles('packages', 'apps')).filter(
     (n) => n.name === 'LanguageModelPort' && n.kind === 'interface',
   )
@@ -159,9 +159,14 @@ test("3. LanguageModelPort's calls are exactly structured, observe, compare and 
   )
   const port = (ports[0] as Name).node as ts.InterfaceDeclaration
   const members = port.members.map((m) => m.name && ts.isIdentifier(m.name) && m.name.text)
+  // `readText` joined the four when paid-path's Slice 7 built the real sensor: Gate 1's text step
+  // is a vision call, because this machine's ffmpeg has no `ocr` filter and a sensor that could
+  // only answer "no text" is a gate that always passes (S-112, S-126). The list stays EXACT, and
+  // this check's words were amended by addition, never relaxed — the way reel-render amended
+  // reel-plan's check 3 when `judgeCut` arrived (S-077).
   assert.deepEqual(
     members,
-    ['structured', 'observe', 'compare', 'judgeCut'],
-    'LanguageModelPort carries four calls: structured, observe, compare and judgeCut',
+    ['structured', 'observe', 'compare', 'judgeCut', 'readText'],
+    'LanguageModelPort carries five calls: structured, observe, compare, judgeCut and readText',
   )
 })

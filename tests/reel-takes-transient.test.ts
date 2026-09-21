@@ -319,6 +319,7 @@ function direct(video: VideoPort, narration: NarrationPort) {
     observe: never('observe'),
     compare: never('compare'),
     judgeCut: never('judgeCut'),
+    readText: never('readText'),
   }
   const recorder: ClipsRecorder = {
     take: async (take) => {

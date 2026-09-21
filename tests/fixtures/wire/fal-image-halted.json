@@ -1,0 +1,20 @@
+{
+  "note": "A poll answered FAILED: fal accepted the job and then could not finish it. This is a FAULT and not a transient — the provider did work and refused the result, and the adapter throws carrying what it said, which is what check 16 asks of the video adapter and what this queue driver does for both (S-096, S-124). DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body).",
+  "provider": "fal",
+  "call": "image",
+  "case": "halted",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37/status"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "status": "FAILED",
+      "request_id": "7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+    }
+  }
+}

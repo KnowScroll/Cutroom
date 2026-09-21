@@ -1,0 +1,41 @@
+{
+  "note": "The planner's answer for the 4-unit grouping of the eight sentences tests/engine/plans.ts submits: 40 seconds over four shots, three subjects. It passes Gate 0 and is the run's one survivor. Routed to MiniMax-M2.7 by D-006, which is what settings hold for the planner role.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "plan4",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0006",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"shots\":[{\"unit\":0,\"durationSeconds\":10,\"subjectIds\":[\"charter\",\"meadow\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"charter\",\"king\"]},{\"unit\":2,\"durationSeconds\":10,\"subjectIds\":[\"meadow\"]},{\"unit\":3,\"durationSeconds\":10,\"subjectIds\":[\"charter\"]}],\"subjects\":[{\"id\":\"charter\",\"name\":\"the charter\"},{\"id\":\"meadow\",\"name\":\"Runnymede meadow\"},{\"id\":\"king\",\"name\":\"a king\"}]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1180,
+        "completion_tokens": 214,
+        "total_tokens": 1394
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

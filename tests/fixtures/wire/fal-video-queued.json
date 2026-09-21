@@ -1,0 +1,21 @@
+{
+  "note": "A poll answered IN_QUEUE: the queue WORKING, which is neither a failure nor a transient. The adapter waits and polls again, up to the whole-job wait a clip is allowed (S-125). DOCUMENTED SHAPE, AND THE WIRE ITSELF WAS DRIVEN LIVE. D-019's spike posted one 5-second 768P text-to-video job to this queue on 2026-09-03 and recorded what came back in steering-ref/docs/research/spike-results.json; the field names here are that answer's and fal's published schema. Slice 8's hand-run reel is what verifies the rest, and an answer that is not this shape throws naming what arrived (S-125).",
+  "provider": "fal",
+  "call": "video",
+  "case": "queued",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/minimax-h3-turbo/requests/9b3e17c4-52a0-4f88-b1d7-6ae02c93d5aa/status"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "status": "IN_QUEUE",
+      "request_id": "9b3e17c4-52a0-4f88-b1d7-6ae02c93d5aa",
+      "queue_position": 1
+    }
+  }
+}

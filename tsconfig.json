@@ -15,6 +15,7 @@
     { "path": "./packages/pipeline" },
     { "path": "./packages/providers" },
     { "path": "./apps/api" },
+    { "path": "./apps/service" },
     { "path": "./apps/worker" },
     { "path": "./tsconfig.tooling.json" }
   ]

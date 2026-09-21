@@ -1,0 +1,22 @@
+{
+  "note": "A 400: the request itself was wrong, so sending it again cannot help. It throws and the run fails (S-096).",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "refused",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "base_resp": {
+        "status_code": 1013,
+        "status_msg": "invalid parameters"
+      }
+    }
+  }
+}

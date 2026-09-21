@@ -1,0 +1,41 @@
+{
+  "note": "MiniMax chat completion on the OpenAI-compatible wire D-019's spike verified live (POST /v1/chat/completions, steering-ref/scripts/spikes/minimax-text.mjs). The documented shape of a plain structured answer; recorded from the published response schema rather than from a paid call, and the first hand-run reel of paid-path's Slice 8 replaces it with the body a real call returned.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "plain",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0001",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"units\":[{\"sentence\":1,\"shot\":\"a wide, still frame\"}]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 812,
+        "completion_tokens": 96,
+        "total_tokens": 908
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

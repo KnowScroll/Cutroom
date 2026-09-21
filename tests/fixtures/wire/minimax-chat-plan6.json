@@ -1,0 +1,41 @@
+{
+  "note": "The planner's answer for the 6-unit grouping of the same sentences: 50 seconds, which is outside D-111's bounds, so this fork fails Gate 0 on shape and the 4-unit fork survives alone. One survivor means no reconciler call, so a plan run on this pair is exactly two model calls — which is what makes it the smallest completed run a real adapter can be proven on (S-121).",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "plan6",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0007",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"shots\":[{\"unit\":0,\"durationSeconds\":9,\"subjectIds\":[]},{\"unit\":1,\"durationSeconds\":9,\"subjectIds\":[]},{\"unit\":2,\"durationSeconds\":8,\"subjectIds\":[]},{\"unit\":3,\"durationSeconds\":8,\"subjectIds\":[]},{\"unit\":4,\"durationSeconds\":8,\"subjectIds\":[]},{\"unit\":5,\"durationSeconds\":8,\"subjectIds\":[]}],\"subjects\":[]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1194,
+        "completion_tokens": 186,
+        "total_tokens": 1380
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

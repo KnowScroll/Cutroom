@@ -1,0 +1,28 @@
+{
+  "note": "The body behind T2A's subtitle_file: the word-level timings D-008 needs and D-019 confirmed are given to us. THE SPIKE NEVER FETCHED IT — it recorded that a subtitle URL came back and withheld the URL, so this is the documented shape and not a body this repository has seen. The adapter translates it and judges nothing: one entry becomes one word timing, and whether those words are the narration's is the stage's parse (S-070, S-042), so an entry holding a whole sentence fails loudly at the boundary rather than being split into invented timings here. Its words are the spike's own text, 'Radar did not win the battle. The telephone did.', with battle. and did keeping their punctuation because the stage splits the text on white space. Slice 8's hand-run reel is what verifies this shape.",
+  "provider": "minimax",
+  "call": "subtitle",
+  "case": "words",
+  "request": { "method": "GET", "path": "/audio_subtitle/recorded/subtitle.json" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/json" },
+    "body": [
+      { "text": "Radar", "time_begin": 0, "time_end": 420, "text_begin": 0, "text_end": 4 },
+      { "text": "did", "time_begin": 500, "time_end": 700, "text_begin": 6, "text_end": 8 },
+      { "text": "not", "time_begin": 760, "time_end": 940, "text_begin": 10, "text_end": 12 },
+      { "text": "win", "time_begin": 1000, "time_end": 1240, "text_begin": 14, "text_end": 16 },
+      { "text": "the", "time_begin": 1300, "time_end": 1420, "text_begin": 18, "text_end": 20 },
+      { "text": "battle.", "time_begin": 1480, "time_end": 2020, "text_begin": 22, "text_end": 28 },
+      { "text": "The", "time_begin": 2140, "time_end": 2280, "text_begin": 30, "text_end": 32 },
+      {
+        "text": "telephone",
+        "time_begin": 2340,
+        "time_end": 2900,
+        "text_begin": 34,
+        "text_end": 42
+      },
+      { "text": "did.", "time_begin": 2960, "time_end": 3160, "text_begin": 44, "text_end": 47 }
+    ]
+  }
+}

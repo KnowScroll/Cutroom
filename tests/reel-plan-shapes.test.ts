@@ -74,14 +74,17 @@ test('3. no type named StructuredCall is exported as a standalone port', () => {
   )
   const port = (ports[0] as Name).node as ts.InterfaceDeclaration
   const members = port.members.map((m) => m.name && ts.isIdentifier(m.name) && m.name.text)
-  // reel-stills' Slice 1 added `observe` and `compare` (S-037, S-049), and reel-render's Slice 1
-  // added `judgeCut`, Gate 7's call on the assembled file's frames (S-074, S-077). The list stays
-  // exact: a fifth call, or a picture reaching the model by a route other than these, still fails
-  // here. What D-084 forbids is a call becoming a PORT of its own, which the line above asserts.
+  // reel-stills' Slice 1 added `observe` and `compare` (S-037, S-049), reel-render's Slice 1 added
+  // `judgeCut`, Gate 7's call on the assembled file's frames (S-074, S-077), and paid-path's
+  // Slice 7 added `readText`, Gate 1's text step, which this machine's ffmpeg cannot do (S-112,
+  // S-126). The list stays EXACT: a sixth call, or a picture reaching the model by a route other
+  // than these, still fails here. What D-084 forbids is a call becoming a PORT of its own, which
+  // the line above asserts — and what it requires is that every call carry a model id, a role and
+  // a receipt, which is why the text step is here and not a function of its own.
   assert.deepEqual(
     members,
-    ['structured', 'observe', 'compare', 'judgeCut'],
-    'LanguageModelPort carries four calls: structured, observe, compare and judgeCut',
+    ['structured', 'observe', 'compare', 'judgeCut', 'readText'],
+    'LanguageModelPort carries five calls: structured, observe, compare, judgeCut and readText',
   )
 })
 

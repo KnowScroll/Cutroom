@@ -1,0 +1,19 @@
+{
+  "note": "401 on submit: the key is wrong or absent. A FAULT — sending it again cannot make it right, and an adapter that retried here would send a wrong key for ever (S-096, S-124). DOCUMENTED SHAPE, NEVER SEEN HERE: nothing in this repository has ever called fal, so this body is fal’s published shape rather than a recorded answer. Slice 8’s hand-run reel is what verifies it, and an answer that is not this shape throws naming what arrived (S-124, the form S-123 used for the subtitle body).",
+  "provider": "fal",
+  "call": "image",
+  "case": "denied",
+  "request": {
+    "method": "POST",
+    "path": "/fal-ai/flux-2-pro/edit"
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "detail": "Unauthorized"
+    }
+  }
+}

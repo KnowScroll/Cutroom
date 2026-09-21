@@ -1,0 +1,44 @@
+{
+  "note": "D-019's trap, exactly as the spike saw it: a 16-token cap consumed inside the reasoning block, so no answer survived. finish_reason is length and the content is an UNTERMINATED think block. The adapter must fail naming the token budget, because 'the schema did not parse' would be a lie about what happened.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "reasoning",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0003",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "length",
+          "message": {
+            "role": "assistant",
+            "content": "<think>\nThe user wants a shot list. First I should work out how many units"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 812,
+        "completion_tokens": 16,
+        "total_tokens": 828,
+        "completion_tokens_details": {
+          "reasoning_tokens": 16
+        }
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}
