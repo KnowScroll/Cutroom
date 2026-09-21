@@ -4850,8 +4850,15 @@ disagree silently the first time either moves.**
 does not kill the run, below the 300¢ cap as S-110 requires — and a break for a `cheapestEntry()` that answers the
 wrong slug. No source file changed; `node scripts/check.mjs --code` green, 451 of 451.
 
-**Next.** Session 43 runs `PROMPTS/043-paid-path-slice-8.md`. **One figure is still the owner's**: the ceiling.
-Everything else Slice 8 needs is settled — both keys are in `.env`, the image entry is seedream for this run, and
-the video path is D-007's hard-locked H3 Turbo. After it: the owner picks between **D-028's bake-off** (O-4 / C-8 —
+**And the ceiling, settled the same day: 250¢.** Above the 147–194¢ estimate, so a retake does not stop the run
+mid-flight with money already spent; below BUDGET.md's 300¢ per-reel cap, as S-110 requires. Rejected: 290¢, the
+most headroom available under the cap, which barely constrains anything the cap does not; and 210¢, the tightest
+figure that admits every legal shape, whose 16¢ of headroom is less than one clip retake. **The seedream range was
+measured after S-127 was written and the prompt's header was stale on it** — 154–210¢ is flux's; seedream's is
+**147–194¢**, and the whole difference between the two entries is 16¢ on a reel whose video is 90% of the cost.
+
+**Next.** Session 43 runs `PROMPTS/043-paid-path-slice-8.md`, and **nothing in it is still open**: both keys are in
+`.env`, the image entry is seedream for this run, the video path is D-007's hard-locked H3 Turbo, and the ceiling
+is 250¢. After it: the owner picks between **D-028's bake-off** (O-4 / C-8 —
 the same request under each admitted entry, which is the only thing that answers "cheapest but good") and
 **`parallel-shots`**, which cannot be planned until Slice 8's latency figure exists (S-115).

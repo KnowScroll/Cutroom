@@ -4,18 +4,29 @@
 - **Feature:** `paid-path` — [`docs/features/paid-path.md`](../docs/features/paid-path.md)
 - **Work:** Slice 8 of 8 — the real reel, and the journeys; checks 20 and 22
 - **Written:** 2026-09-21, at the end of session 42, after Slice 7 was green and S-126 was recorded
-- **Revised:** 2026-09-21, after S-127 corrected three of S-110's cheapness levers and the owner
-  chose the cheapest entry for the first run
+- **Revised:** 2026-09-21, after S-127 corrected three of S-110's cheapness levers, the owner chose
+  the cheapest entry for the first run, and the owner set the ceiling at **250¢**
 - **Run:** not yet
 
-**This is the one slice that SPENDS.** The owner has confirmed both keys are in `.env`
-(`MINIMAX_API_KEY` and `FAL_KEY`) and has chosen the cheapest admitted image entry for the first
-run. **The ceiling is the one figure still to confirm** — the prompt names 250¢ and says to ask.
+**This is the one slice that SPENDS, and nothing about it is still open.** Both keys are in `.env`
+(`MINIMAX_API_KEY`, `FAL_KEY`); the image entry for this run is the cheapest admitted one; the video
+path is hard-locked by D-007; and **the ceiling is 250¢**.
 
-**What the run is expected to cost**, computed from this repository's own settings on 2026-09-21:
-**154–210¢** for one reel. The video is about 90% of it — 35–45 s at H3 Turbo's 4¢/s, hard-locked
-by D-007 — and all four keyframes together are 14¢ at seedream. MiniMax text, vision and T2A are
-token-plan covered and record zero.
+**What the run is expected to cost**, computed from `readSettings` with every port real, on
+2026-09-21 — seedream configured:
+
+| total | image calls | estimate |
+| ----- | ----------- | -------- |
+| 35 s  | 2           | 147¢     |
+| 35 s  | 4           | 154¢     |
+| 45 s  | 2           | 187¢     |
+| 45 s  | 4           | 194¢     |
+
+**147–194¢**, against a 250¢ ceiling and BUDGET.md's 300¢ cap. **The video is about 90% of it** —
+35–45 s at H3 Turbo's 4¢/s — and all four keyframes together are 14¢. The shot count does not move
+the figure at all, because every shot costs the same video with or without a keyframe (I-3).
+MiniMax text, vision and T2A are token-plan covered and record **zero**. On `flux-2-pro/edit` the
+same range is 155–210¢; the whole difference between the two entries is 16¢.
 
 Paste everything inside the block below as the session's first message.
 
@@ -24,7 +35,7 @@ Build paid-path's Slice 8 — scripts/real-reel.mjs, ONE REAL REEL made under it
 then six journeys. It is the LAST slice of paid-path and the first thing in this repository's history that spends
 money.
 
-WHAT THE OWNER HAS ALREADY SETTLED, so do not ask again:
+WHAT THE OWNER HAS ALREADY SETTLED, so do not ask any of it again:
 - Both keys are in .env: MINIMAX_API_KEY (model + narration, token-plan covered) and FAL_KEY (image + video, real
   money). Never print a key, never read .env yourself to show it — the service's own refusal names the KEY NAME and
   never its value, and that is the only check you need.
@@ -34,10 +45,11 @@ WHAT THE OWNER HAS ALREADY SETTLED, so do not ask again:
   answer to what D-028 flagged: record it, then run again on fal-ai/flux-2-pro/edit and record both. The downside is
   bounded at four image calls, about 14c, with NO video spend, because the stills stage runs before any clip.
 - The video path is D-007's hard-locked fal-ai/minimax-h3-turbo at 768P. There is nothing to choose.
-
-CONFIRM ONE FIGURE BEFORE THE FIRST PAID CALL: the ceiling, in cents, that the run is submitted with. The prompt
-proposes 250 — above the 154–210c estimate so a retake does not kill the run, below BUDGET.md's 300c per-reel cap
-as S-110 requires. Put it to the owner with AskUserQuestion, with the arithmetic, and use what they answer.
+- THE CEILING IS 250 CENTS, set by the owner on 2026-09-21: above the 147-194c estimate so a retake does not kill
+  the run, below BUDGET.md's 300c per-reel cap as S-110 requires. Submit with `budgetCents: 250`. Do not ask again,
+  and do not raise it mid-run — a run that would exceed it is stopped by the budget guard, and that is the guard
+  working (S-059, S-095). If the estimate printed before the submit is OUTSIDE 147-194c, something moved: stop and
+  report it rather than submitting.
 
 Start:
 1. Run `node scripts/decisions.mjs`. If it says commits are unpushed in the steering repository, say so and stop.
@@ -59,8 +71,9 @@ WHAT S-127 CORRECTED, because the run is built on it and a stale figure here spe
 - flux-2-pro is SECOND cheapest of the four admitted entries at 864x1536, not cheapest: seedream 3.5c, flux 7.5c,
   nano-banana-2 8c, nano-banana-pro 15c. S-110's "$0.03" was flux's headline first-megapixel rate, which the
   registry's own comment says does not survive our frame size.
-- So the estimate is 154-210c, not S-110's $1.32. Print it BEFORE submitting and check it against these figures; an
-  estimate outside that range means something moved and is a finding, not a number to accept.
+- So the estimate is 147-194c on seedream (155-210c on flux), not S-110's $1.32. Print it BEFORE submitting and
+  check it against those figures; an estimate outside the range means something moved and is a finding, not a
+  number to accept.
 
 What Slice 8 builds:
 - `packages/providers/src/fal/registry.ts` — `cheapestEntry()`, computed from the same `imageRateCents` every
