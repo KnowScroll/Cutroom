@@ -4787,3 +4787,71 @@ and the corrected image rate — 7.5¢ a derived flux call at 864 × 1536. **Two
 50 is marginal inside a loaded suite, 97 s alone against a 300 s bound, which matters because Slice 8 re-runs that
 journey. Still open upstream and unchanged: D-028's default image entry (O-4 / C-8), `reel-script`'s criterion type
 (S-029), and the steering stubs and the pin (S-033).
+---
+
+## 2026-09-21 — session 42, continued: Slices 1 to 7 pushed, and three of S-110's levers found not to hold
+
+**Intent.** The owner asked what was next, then for the seven slices to be committed and pushed, then for the
+estimate a real reel would carry — and the estimate is what found the drift. No implementation: one decision and
+one prompt.
+
+**Committed and pushed.** `0f448cc`, 137 files, `77183e5..0f448cc` on `main`. **One commit, not seven**, and the
+message says why: each slice was green when it was written, but the files now carry Slice 7's edits and no
+intermediate tree can be reconstructed that typechecks — `JOURNAL.md` holds the seven entries slice by slice.
+`.env` is gitignored and nothing key-shaped, generated or media-shaped was staged; every ignored path under
+`tests/`, `apps/`, `packages/` and `scripts/` is build output or `node_modules`, and every wire fixture is JSON.
+
+**The estimate, computed from `readSettings` with every port real** — no port built, no call made, no key read, and
+the probe deleted afterwards. **154–210¢ for one reel**, against the $3.00 cap. The video is about 90% of it:
+35–45 s at H3 Turbo's 4¢/s, hard-locked by D-007. Every model and narration call records **zero** — the owner's
+token plan covers them (D-019's spike). Shot count does not move the figure at all, because every shot costs the
+same video with or without a keyframe (I-3).
+
+**Three facts in S-110 do not hold, and the estimate is what surfaced them (S-127).** None is a gap in the plan;
+each is a fact that moved under a decision with nothing to notice.
+
+- **`flux-2-pro/edit` is not the cheapest admitted entry.** S-110 says it is, _"at about $0.03"_, and
+  `registry.ts` still asserts _"the cheapest admitted one"_ beside `CONFIGURED_IMAGE_SLUG`. At **864 × 1536 with
+  one reference**, measured from the registry's own rates: **seedream 3.5¢, flux 7.5¢, nano-banana-2 8¢,
+  nano-banana-pro 15¢**. The $0.03 was flux's **headline first-megapixel** rate — and the comment beside flux's own
+  entry already says _"we send custom dimensions, which is why its headline rate does not survive our frame size."_
+  Session 40 corrected the figure (S-124) and did not revisit the **rank** the figure decided. Flux is second of
+  four.
+- **"Five-second clips, the provider's floor" is unreachable.** Gate 0 wants **4 to 6 shots** (`SHOT_COUNT`), each
+  **5 to 15 seconds** (`SHOT_SECONDS`), totalling **35 to 45** (`totalSecondsBounds`, D-111). Six five-second shots
+  is **30 seconds and fails `shaped()`**. The cheapest legal reel is **35 seconds however it is cut**.
+- **So S-110's `4 × $0.03 + 6 × 5 s × $0.04 = $1.32` is wrong on both terms.** The floor is **155¢** and the range
+  runs to **210¢**. S-110's conclusion survives untouched — one reel, well under the cap — but three of the levers
+  it names do not.
+
+**Decided with the owner, and recorded as S-127.** The first real run is made on **`bytedance/seedream/v5/lite/edit`**,
+the cheapest — the owner's instruction, _"test first with the cheapest but good option, then we'll see"_ — named
+with **`CUTROOM_FAL_IMAGE_MODEL`** and **not** by moving `CONFIGURED_IMAGE_SLUG`, because a default is D-028's
+bake-off to settle and a setting is one run's. **The risk is named rather than discovered:** seedream is the one
+entry D-028 admits conditionally, _"9:16 undocumented"_, which `documentsVertical: false` records. **What it costs
+if it is wrong is bounded and early** — the frame is judged before the file is written (S-124), the call fails
+**naming the entry** (check 12), and the stills stage runs before any clip is bought, so the whole downside is
+about **14¢ with no video spend**, and the failure is itself the answer to what D-028 flagged.
+
+**An earlier recommendation of mine was wrong and is corrected here rather than defended.** I argued for flux
+first, on the grounds that a seedream failure would leave the first run unattributable between the engine and the
+model. Check 12's own words defeat that: the call fails **naming the entry**. The argument for flux is weaker than
+it looked, and the owner's choice is the better one.
+
+**And the claim becomes data.** _"The cheapest admitted entry"_ was prose, and prose went stale the moment a rate
+moved. Slice 8 adds **`cheapestEntry()`**, computed from the same `imageRateCents` every estimate and receipt
+already use, with a test pinning which slug it answers today. This is S-124's rule for the image rate and S-125's
+for the lease floor, a third time: **a figure that must agree with another figure is computed from it, or the two
+disagree silently the first time either moves.**
+
+**Changed.** **`DECISIONS.md` — S-127**, superseding S-110 on three levers and on nothing else.
+**`PROMPTS/043-paid-path-slice-8.md`** rewritten: the corrected arithmetic, the entry and why it is a setting, the
+`cheapestEntry()` work, a proposed ceiling of **250¢** for the owner to confirm — above the estimate so a retake
+does not kill the run, below the 300¢ cap as S-110 requires — and a break for a `cheapestEntry()` that answers the
+wrong slug. No source file changed; `node scripts/check.mjs --code` green, 451 of 451.
+
+**Next.** Session 43 runs `PROMPTS/043-paid-path-slice-8.md`. **One figure is still the owner's**: the ceiling.
+Everything else Slice 8 needs is settled — both keys are in `.env`, the image entry is seedream for this run, and
+the video path is D-007's hard-locked H3 Turbo. After it: the owner picks between **D-028's bake-off** (O-4 / C-8 —
+the same request under each admitted entry, which is the only thing that answers "cheapest but good") and
+**`parallel-shots`**, which cannot be planned until Slice 8's latency figure exists (S-115).

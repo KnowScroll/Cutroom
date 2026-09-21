@@ -4835,3 +4835,92 @@ still exact. Session 42's break campaign.
 call, S-077's form"_; and shown that a port handed at construction is the unwrapped one whose
 receipts are lost, chose _"The pipeline hands it at call time"_. The rest is this session's,
 recorded here because each is a choice a later session would otherwise have to re-make.
+---
+
+## S-127 | 2026-09-21 | Three of S-110's cheapness levers do not hold: flux is not the cheapest entry at this engine's frame, five-second clips fail Gate 0, and the first run names its entry with the SETTING rather than the default
+
+**Supersedes:** **S-110**, on three of its stated levers only — which entry is cheapest, the clip
+length, and the arithmetic that followed from them. **Its conclusion is untouched**: the first real
+run is still one reel, still under BUDGET.md's $3.00 per-reel cap unchanged, still with the caller's
+ceiling set below the cap, and still with every lever that does not break a decision pulled towards
+cheap. What changes is which levers those are.
+
+**Chose.**
+
+- **`flux-2-pro/edit` is NOT the cheapest admitted entry at the frame this engine asks for.** S-110
+  reads _"the cheapest admitted image entry as the configured default for that run —
+  `flux-2-pro/edit` at about $0.03"_. At **864 × 1536 with one reference** (S-124's frame), measured
+  from the registry's own rates: **`bytedance/seedream/v5/lite/edit` is 3.5¢** a derived call and
+  **flux is 7.5¢** — with `nano-banana-2` at 8¢ and `nano-banana-pro` at 15¢. S-110's $0.03 is
+  flux's **headline first-megapixel rate**, and `registry.ts`' own comment beside that entry already
+  says why it does not survive: _"we send custom dimensions, which is why its headline rate does not
+  survive our frame size."_ Session 40 corrected the figure to 7.5¢ (S-124) and did not revisit
+  which entry the corrected figure made cheapest. **Flux is second cheapest of four.**
+- **"Five-second clips, the provider's floor" is UNREACHABLE.** Gate 0 requires a plan of **4 to 6
+  shots** (`SHOT_COUNT`, D-014, D-063), each **5 to 15 seconds** (`SHOT_SECONDS`, D-019), totalling
+  **35 to 45 seconds** (`totalSecondsBounds`, D-111). Six five-second shots is **30 seconds and
+  fails `shaped()`**; four is 20 and fails harder. **The cheapest legal reel is 35 seconds however
+  it is cut**, so the video term has a floor of 35 × 4¢ = **140¢** and the shot count does not move
+  it at all — every shot costs the same video with or without a keyframe (I-3).
+- **S-110's total is therefore wrong on both terms**, and is restated: _"4 × $0.03 + 6 × 5 s ×
+  $0.04 = $1.32"_ becomes **4 × 7.5¢ + 35 s × 4¢ = 170¢** at flux, or **4 × 3.5¢ + 35 s × 4¢ =
+  154¢** at seedream, against a $3.00 cap. The floor across every legal shape is **155¢** and the
+  ceiling of the range is **210¢** (four image calls, 45 seconds, flux).
+- **THE FIRST RUN NAMES ITS ENTRY WITH `CUTROOM_FAL_IMAGE_MODEL`, NOT BY MOVING
+  `CONFIGURED_IMAGE_SLUG`.** A default is D-028's to settle and its bake-off is what settles it
+  (O-4 / C-8, open); a setting is one run's. Check 13 already proves the setting reaches admission
+  and changes what it estimates, so this needs no new mechanism — and `CONFIGURED_IMAGE_SLUG` stays
+  where it is, still settling nothing.
+- **The first run is made on `bytedance/seedream/v5/lite/edit`** — the owner's instruction, _"test
+  first with the cheapest but good option, then we'll see"_ — and the risk it carries is named
+  rather than discovered: **seedream is the one entry D-028 admits conditionally**, with _"9:16
+  undocumented — must pass the frame assertion before use"_, and `documentsVertical: false` records
+  that. **What that costs if it is wrong is bounded and early**: the frame is read off the produced
+  bytes and judged **before the file is written** (S-124), the call fails **naming the entry**
+  (check 12), and the stills stage runs **before any clip is bought** — so the whole downside is at
+  most four image calls, **14¢, with no video spend at all**. If the frame fails, the run is made
+  again on flux and the failure is itself the answer to the thing D-028 flagged.
+- **THE CLAIM BECOMES DATA.** _"The cheapest admitted entry"_ was asserted in a comment and went
+  stale the moment a rate moved, with nothing to notice. The registry gains **`cheapestEntry()`**,
+  computed from the same `imageRateCents` every estimate and receipt already use, and a test pins
+  which slug it answers today. This is S-124's rule for the image rate and S-125's for the lease
+  floor, applied a third time: **a figure that must agree with another figure is computed from it,
+  or the two disagree the first time either moves, silently.** The comment on
+  `CONFIGURED_IMAGE_SLUG` is corrected to say what it is — a default that settles nothing — and
+  stops claiming a rank it does not hold.
+
+**Why.** **None of this is a gap in the plan; it is three facts that moved under a decision and were
+not noticed.** S-110 was written on 2026-09-20 against BUDGET.md's rates and before the frame was
+decided. S-124 fixed the frame on 2026-09-21 and, with it, every per-megapixel rate in the registry
+— flux's most of all, because it is the only entry priced per megapixel rather than per image. The
+clip length was wrong from the start: D-111's 35-second floor and D-019's 5-second shot floor cannot
+both be taken at once at any admitted shot count, and nothing computed the product.
+
+**A decision that is wrong about its own arithmetic is worse than one that is silent**, because the
+next session reads it as measured. Slice 8 is the session that spends, and it would have submitted a
+run built on a clip length Gate 0 refuses and an entry chosen for a rank it does not hold — and the
+refusal would have read as the engine misbehaving.
+
+**Rejected.** **Moving `CONFIGURED_IMAGE_SLUG` to seedream** — it reads as settling D-028's open
+default by the back door, on price alone, which is the one axis the bake-off is not about; a setting
+says "for this run" and a default says "from now on". **Leaving S-110's levers and running on them**
+— a plan that fails Gate 0 before anything is bought, blamed on the engine. **Correcting the figures
+in a comment** — that is what went stale; `cheapestEntry()` is a function a test can hold.
+**Running flux first for safety** — considered and put to the owner, who chose cheap; and the
+argument for flux is weaker than it first looked, because the failure it guards against is
+attributable by check 12's own words, costs at most 14¢, and happens before a single clip is
+bought. **Widening `totalSecondsBounds` or `SHOT_SECONDS` to reach $1.32** — weakening a verified
+gate to match a superseded arithmetic, which is the exact move CLAUDE.md's rule 3 forbids.
+
+**Caught by.** `paid-path`'s check 13, unchanged, which already proves the configured entry reaches
+admission and that changing it changes the estimate — run in Slice 8 against seedream rather than
+flux. A new test in Slice 8 that **`cheapestEntry()` is `bytedance/seedream/v5/lite/edit` at the
+registry's current rates**, which fails the moment a rate moves and the rank with it. Check 12, which
+fails a call whose produced frame is not 9:16, **naming the entry** — the assertion seedream's
+conditional admission rests on. And Gate 0's own `shaped()`, which refuses a 30-second plan, in
+`reel-plan`'s verified checks.
+
+**Confirmed-by.** The owner, 2026-09-21, told that flux is second cheapest of four and that
+seedream's 9:16 is undocumented, chose to run the cheapest option first and see. The three
+corrections are facts measured from this repository's own source and gates on the same day, not
+preferences.
