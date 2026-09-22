@@ -5,7 +5,7 @@ authority: plan
 
 # paid-failures — a call the provider has already answered leaves its row, and a moment's failure does not end the run
 
-Status: planned
+Status: verified
 Decisions: D-002, D-005, D-006, D-007, D-008, D-019, D-022, D-024, D-025, D-026, D-027, D-028, D-081, D-083, D-084,
 D-086, D-094, D-100, I-4, I-11, S-021, S-035, S-036, S-038, S-043, S-046, S-048, S-053, S-059, S-070, S-075, S-087,
 S-095, S-096, S-099, S-108, S-109, S-111, S-114, S-122, S-124, S-125, S-128, S-133, S-137, S-141, S-142
@@ -239,7 +239,11 @@ Every check appears in exactly one slice: 2 + 3 + 3 + 3 + 1 = 12.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-22 journey=PASS at dcf58a1 — every check green; 17 tests in tests/paid-failures-*.test.ts pass
+
 ## Divergence (the first broken boundary, or "none")
+
+none
 
 ## Deferred
 
