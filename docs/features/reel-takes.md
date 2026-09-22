@@ -868,6 +868,7 @@ Every check appears in exactly one slice: 4 + 8 + 3 + 5 + 4 + 2 = 26.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-22 journey=PASS at b261e72 — every check green; 66 tests in tests/reel-takes-*.test.ts pass
 - 2026-09-20 journey=PASS at 6fe85b8 — every check green; 66 tests in tests/reel-takes-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
