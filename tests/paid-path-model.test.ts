@@ -10,8 +10,11 @@ import {
   DEFAULT_ANSWER_TOKENS,
   DEFAULT_REASONING_TOKENS,
   MINIMAX_BASE_URL,
+  SHAPE_PREFACE,
   Unavailable,
+  echoedTheSchema,
   minimaxModel,
+  unfenced,
 } from '@cutroom/providers'
 import { recordedFetch, type Sent } from './engine/wire.ts'
 
@@ -88,9 +91,15 @@ test('6. handed a recorded MiniMax response, the adapter returns the structured 
   const asked = body(sent)
   assert.equal(asked.model, MODELS.planner)
   assert.equal(asked.temperature, 0)
-  assert.deepEqual(asked.messages, [
-    { role: 'user', content: 'Cut these sentences into four shots.' },
-  ])
+  // THE PIPELINE'S PROMPT IS SENT WHOLE AND FIRST, and the shape follows it (S-130).
+  const messages = asked.messages as Array<{ role: string; content: string }>
+  assert.equal(messages.length, 1, 'a structured call sent more than one message')
+  assert.equal(messages[0]?.role, 'user')
+  const content = String(messages[0]?.content)
+  assert.ok(
+    content.startsWith('Cut these sentences into four shots.'),
+    `the pipeline's prompt is not what the call opens with: ${content.slice(0, 120)}`,
+  )
   // D-019: every max_tokens budgets for reasoning ON TOP of the answer, because a cap consumed
   // inside the reasoning block returns nothing at all.
   assert.equal(asked.max_tokens, DEFAULT_ANSWER_TOKENS + DEFAULT_REASONING_TOKENS)
@@ -98,7 +107,66 @@ test('6. handed a recorded MiniMax response, the adapter returns the structured 
     asked.response_format !== undefined,
     'the call asked for no schema, so nothing makes the answer JSON (S-114)',
   )
+  // AND THE SHAPE IS SAID IN THE MESSAGE TOO, because this wire answers 200 to `response_format`
+  // and ignores it: a planning answer came back with `duration` where the schema says
+  // `durationSeconds`, and the first real reel failed at its first parse (S-130). The field names
+  // are asserted from the SCHEMA, so a schema that gains a field gains this assertion with it.
+  assert.ok(content.includes(SHAPE_PREFACE), 'the shape was not said in the message at all')
+  for (const field of ['units', 'sentence', 'shot']) {
+    assert.ok(
+      content.slice(content.indexOf(SHAPE_PREFACE)).includes(`"${field}"`),
+      `the message does not name the schema's field "${field}"`,
+    )
+  }
+  // The rendering is the same one the header field carries, so the two cannot disagree.
+  const carried = (asked.response_format as { json_schema: { schema: unknown } }).json_schema.schema
+  assert.ok(
+    content.includes(JSON.stringify(carried)),
+    'the message and response_format carry different renderings of the schema',
+  )
   assert.deepEqual(wire.left(), [])
+})
+
+test('6. a boolean schema is not sent, and `additionalProperties` still is: this parser refuses one and accepts the other', async () => {
+  // `z.tuple` renders `"items": false`, a JSON Schema 2020-12 BOOLEAN SCHEMA. MiniMax's parser
+  // expects an object wherever a schema may sit and refuses the WHOLE REQUEST 400 — measured on
+  // M3 and M2.7 alike, and the reel's scoring call is a four-answer tuple, so every real run
+  // reached it (S-131). `additionalProperties: false` is a boolean too, was measured ACCEPTED,
+  // and is what tells the model to invent no field, so it is kept.
+  const yesNo = z.enum(['yes', 'no'])
+  const TUPLE = z.strictObject({ answers: z.tuple([yesNo, yesNo, yesNo, yesNo]) })
+  assert.match(
+    JSON.stringify(z.toJSONSchema(TUPLE, { io: 'input', unrepresentable: 'any' })),
+    /"items":false/,
+    'the schema no longer renders a boolean, so this check proves nothing',
+  )
+
+  const { wire, port } = adapter(['minimax-chat-plain'])
+  // The recorded body does not parse under this schema; what is asserted is what was SENT.
+  await port
+    .structured({
+      prompt: 'Answer four questions.',
+      schema: TUPLE,
+      role: 'reconciler',
+      temperature: 0,
+    })
+    .catch(() => undefined)
+
+  const asked = body(wire.sent[0] as Sent)
+  const carried = JSON.stringify(
+    (asked.response_format as { json_schema: { schema: unknown } }).json_schema.schema,
+  )
+  assert.doesNotMatch(carried, /"items":false/, 'the request carries the boolean this wire 400s on')
+  assert.match(carried, /"prefixItems"/, 'the tuple lost more than the boolean')
+  assert.match(carried, /"maxItems":4/, 'the bound that says what the boolean said is gone too')
+  assert.match(
+    carried,
+    /"additionalProperties":false/,
+    'the model is no longer told to add no field',
+  )
+  // The message carries the SAME rendering, so the two still cannot disagree (S-130).
+  const content = String((asked.messages as Array<{ content: string }>)[0]?.content)
+  assert.ok(content.includes(carried), 'the message and response_format disagree after the drop')
 })
 
 test('6. a content that opens with a <think> block is parsed as the answer AFTER it, and the block reaches nothing', async () => {
@@ -113,6 +181,78 @@ test('6. a content that opens with a <think> block is parsed as the answer AFTER
   assert.doesNotMatch(JSON.stringify(value), /think/i, 'the reasoning block reached the answer')
   // The reasoning is still paid for, so it is still counted.
   assert.equal(receipt.usage.outputTokens, 128)
+})
+
+test('6. an answer wrapped in BOTH a <think> block and a ```json fence is parsed, and neither wrapper reaches it', async () => {
+  // Recorded from a live MiniMax-M3 call on 2026-09-22, during the first real reel: with the
+  // shape said in the message the model answered correctly and fenced it, and `JSON.parse`
+  // refuses a fence. It is the same family as the reasoning block D-019 found — presentation the
+  // model adds around an answer that was asked for as JSON (S-132).
+  const yesNo = z.enum(['yes', 'no'])
+  const SCORE = z.strictObject({ answers: z.tuple([yesNo, yesNo, yesNo, yesNo]) })
+  const { port } = adapter(['minimax-chat-fenced'])
+  const { value } = await port.structured({
+    prompt: 'Answer each question about this plan with yes or no, in order.',
+    schema: SCORE,
+    role: 'reconciler',
+    temperature: 0,
+  })
+  assert.deepEqual(value, { answers: ['no', 'yes', 'yes', 'no'] })
+  assert.doesNotMatch(JSON.stringify(value), /think|```/i, 'a wrapper reached the answer')
+})
+
+test('6. an answer that is THE SCHEMA is refused as that, and not as bad JSON', async () => {
+  // Measured once on a real reel: the planner answered with the rendered schema document itself.
+  // `jsonOf` reported "answered something that is not JSON" — true of the truncated echo it got,
+  // and confusing to read beside a quote that is plainly JSON (S-136).
+  const { port } = adapter(['minimax-chat-echo'])
+  const failed = await port
+    .structured({ prompt: 'Cut these sentences.', schema: UNITS, role: 'planner', temperature: 0 })
+    .then(
+      () => undefined,
+      (error: unknown) => error as Error,
+    )
+  assert.ok(failed !== undefined, 'an answer that was the schema was accepted as one')
+  assert.match(failed.message, /THE SCHEMA rather than an object matching it/, failed.message)
+  assert.doesNotMatch(failed.message, /is not JSON/, 'the echo is still reported as bad JSON')
+  // The marks are the schema's own words, so an echo of any of this engine's schemas is caught.
+  assert.equal(echoedTheSchema('{"$schema":"https://json-schema.org/draft/2020-12/schema"}'), true)
+  assert.equal(echoedTheSchema('{"type":"object","properties":{"a":{}}}'), true)
+  assert.equal(echoedTheSchema('{"units":[{"sentence":1,"shot":"a wide, still frame"}]}'), false)
+})
+
+test('6. an answer CUT OFF mid-JSON names the token budget, not the shape — the other half of D-019', async () => {
+  // `answerOf` says "reasoning and no answer" when the budget is spent inside the <think> block
+  // and NOTHING is left. This is the other half: the block closed, the answer began, and the
+  // tokens ran out inside it — so the text is not empty and arrives at the parse as bad JSON.
+  // Only `finish_reason` tells the two apart. Measured on a real reel, 23¢ in (S-140).
+  const { port } = adapter(['minimax-chat-cut'])
+  const failed = await port
+    .structured({ prompt: 'Cut these sentences.', schema: UNITS, role: 'planner', temperature: 0 })
+    .then(
+      () => undefined,
+      (error: unknown) => error as Error,
+    )
+  assert.ok(failed !== undefined, 'a cut-off answer was accepted')
+  assert.match(failed.message, /cut off mid-answer/, failed.message)
+  assert.match(failed.message, /finished on length/, failed.message)
+  assert.match(
+    failed.message,
+    new RegExp(String(DEFAULT_ANSWER_TOKENS + DEFAULT_REASONING_TOKENS)),
+    'the message does not name the budget that ran out',
+  )
+  assert.doesNotMatch(failed.message, /is not JSON/, 'a cut-off answer is still blamed on shape')
+})
+
+test('6. only a WHOLE fenced answer is unwrapped: a fence in the middle of something is left alone', async () => {
+  // The narrow rule, so that a content which is not an answer in a wrapper still fails as one.
+  assert.equal(unfenced('```json\n{"a":1}\n```'), '{"a":1}')
+  assert.equal(unfenced('```\n{"a":1}\n```'), '{"a":1}')
+  assert.equal(unfenced('{"a":1}'), '{"a":1}')
+  assert.equal(
+    unfenced('here you go:\n```json\n{"a":1}\n```'),
+    'here you go:\n```json\n{"a":1}\n```',
+  )
 })
 
 test('6. a call consumed entirely by reasoning fails NAMING THE TOKEN BUDGET, not the schema', async () => {
@@ -184,6 +324,20 @@ test('7. a vision call carries its picture as the wire expects, and its receipt 
       parts.some((p) => p.type === 'text'),
       'the witness was sent a picture and no question',
     )
+    // The shape is said in the message here too, as its own part after the media (S-130). The
+    // carrier differs — a part rather than a suffix — because a vision call's content is parts.
+    const shape = parts[parts.length - 1] as { type: string; text?: string }
+    assert.equal(shape.type, 'text', 'the last part of a vision call is not the shape')
+    assert.ok(
+      String(shape.text).startsWith(SHAPE_PREFACE),
+      'a vision call said its shape in nothing but response_format, which this wire ignores',
+    )
+    for (const field of ['entities', 'framing', 'lighting', 'unsafeDepictions']) {
+      assert.ok(
+        String(shape.text).includes(`"${field}"`),
+        `the vision call does not name the observation's field "${field}"`,
+      )
+    }
 
     // The pipeline parses an observation at the gate boundary, so the adapter must NOT (S-042).
     assert.equal((value as { framing: string }).framing, 'medium')
@@ -217,6 +371,32 @@ test('7. a vision call carries its clip as the wire expects, and its receipt nam
     assert.deepEqual((value as { eventOrder: string[] }).eventOrder, ['the seal is pressed'])
     assert.deepEqual(receipt.takeIds, [files.clip.takeId])
     assert.deepEqual(receipt.pictureIds, [])
+  } finally {
+    files.clean()
+  }
+})
+
+test('7. a compare call QUOTES each subject and demands it back character for character', async () => {
+  // Measured on a real reel: asked about the subject `shelf`, MiniMax-M3 answered "Shelf of Bound
+  // Volumes" — the plan's display name — and Gate 1S refused an answer about a subject it never
+  // asked about, 34¢ into a run that had already passed Gate 1 on shot 0 (S-138).
+  const files = media()
+  const { wire, port } = adapter(['minimax-chat-vision'])
+  try {
+    await port.compare({
+      pictures: [files.picture, files.picture],
+      subjects: ['shelf', 'keeper'],
+      temperature: 0,
+    })
+    const asked = body(wire.sent[0] as Sent)
+    const parts = (asked.messages as Array<{ content: unknown }>)[0]?.content as Array<
+      Record<string, unknown>
+    >
+    const question = String(parts.find((p) => p.type === 'text')?.text)
+    assert.match(question, /- "shelf"/, 'a subject is listed unquoted, so it reads as a topic')
+    assert.match(question, /- "keeper"/)
+    assert.match(question, /character\s+for\s+character/, 'the question does not demand the string')
+    assert.doesNotMatch(question, /by its name/, 'the wording that invited a rename is back')
   } finally {
     files.clean()
   }

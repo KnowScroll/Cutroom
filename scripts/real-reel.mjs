@@ -80,15 +80,36 @@ function request(requestId, budgetCents) {
       { id: 'c4', role: 'supporting' },
     ],
     criteria: {
+      // ONE SIMPLE SUBJECT PER CLAIM. Gate 1 refuses a picture whose subject is clipped by the
+      // edge of the frame (D-046), and a canonical that must hold four named things whole in one
+      // 9:16 frame is a picture that is hard to make: two runs of five criteria were each refused
+      // three times and stopped by D-047, at 15¢ each (session 45).
+      //
+      // "SEEN WHOLE WITHIN THE FRAME" WAS TRIED AND MADE IT WORSE. It reads as part of what the
+      // criterion REQUIRES, so the reconciler began answering `show-log` "is not shown: a
+      // handwritten logbook, seen whole within the frame" — a stricter mustShow, where what was
+      // wanted was looser framing. The clipping rule already judges framing; the criterion says
+      // what must be in the picture and nothing about how it sits.
       mustShow: [
         { id: 'show-keeper', text: 'a lighthouse keeper', type: 'presence', claimId: 'c1' },
-        { id: 'show-log', text: 'a handwritten logbook', type: 'presence', claimId: 'c1' },
-        { id: 'show-writing', text: 'a line being written by hand', type: 'event', claimId: 'c2' },
-        { id: 'show-lamp', text: 'a lighthouse lamp at night', type: 'presence', claimId: 'c1' },
-        { id: 'show-shelf', text: 'a shelf of bound volumes', type: 'presence', claimId: 'c3' },
+        { id: 'show-log', text: 'a handwritten logbook', type: 'presence', claimId: 'c2' },
+        // A SHELF DOES NOT FIT A VERTICAL FRAME, and Gate 1 says so: three candidates in a row
+        // were refused for "Shelf of Bound Volumes is clipped by the edge of the frame", which is
+        // what a shelf photographed in 9:16 always is. A stack is the same thing, sized to the
+        // frame the reel is made in.
+        {
+          id: 'show-shelf',
+          text: 'a stack of bound volumes on a desk',
+          type: 'presence',
+          claimId: 'c3',
+        },
       ],
+      // "ANY REAL LIVING PERSON" IS WHAT THE POLICY MEANS BY A RECOGNISABLE ONE, and a reconciler
+      // reads it literally: shown a lighthouse keeper — which `show-keeper` REQUIRES — it judged
+      // the picture to show a real living person, and the request argued with itself. This is the
+      // caller's wording, in the caller's request; no gate, no policy and no check moved (S-134).
       mustNotShow: [
-        { id: 'never-person', text: 'any real living person', type: 'presence' },
+        { id: 'never-person', text: 'a recognisable real-world public figure', type: 'presence' },
         { id: 'never-modern', text: 'a computer screen', type: 'presence' },
       ],
       depictionPolicyVersion: 'policy-3',

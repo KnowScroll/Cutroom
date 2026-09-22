@@ -35,11 +35,10 @@ import { baseOf, baseResp, summary, transientCode } from './wire.ts'
 //     schema did not parse" would be a lie about what happened.
 //  3. `max_tokens` therefore budgets for reasoning ON TOP of the answer.
 //
-// Thinking is not switched off, because nothing has verified a switch for it on this wire. The
-// spike sent `model`, `messages`, `max_tokens` and `temperature` and nothing else, and an
-// unverified field on a first paid call is the Hermes 404 lesson D-019 records. Gate 2 asks for
-// the switch "where the wire allows it"; when one hand-run reel has shown which field this wire
-// accepts, it is one line and its own entry. Until then the budget and the strip carry it.
+// Thinking is not switched off, AND NOW THAT IS MEASURED RATHER THAN UNVERIFIED (S-135). Gate 2
+// asks for the switch "where the wire allows it"; four candidate fields were each answered 200
+// with a `<think>` block still in the content, so THIS WIRE DOES NOT ALLOW IT. The budget and the
+// strip carry it, and they are what the three findings above are about.
 //
 // A KEY REACHES ONE PLACE: the Authorization header. It is in no log line, no message, no receipt
 // and no detail — nothing here logs, and every error below names the model, the status and the
@@ -48,18 +47,49 @@ import { baseOf, baseResp, summary, transientCode } from './wire.ts'
 /** The one path. OpenAI-compatible, and the one the spike answered on (D-019, S-114). */
 export const CHAT_PATH = '/v1/chat/completions'
 
-/** What the answer itself may take. A structured plan is the longest thing any call asks for. */
-export const DEFAULT_ANSWER_TOKENS = 2048
+/**
+ * What the answer itself may take.
+ *
+ * **NOT A PLAN — AN OBSERVATION IS THE LONGEST THING ANY CALL ASKS FOR** (S-140). The comment
+ * here used to say a structured plan was, and 2048 was set for that. Measured on a real reel,
+ * 23¢ in: a witness describing one picture listed its entities with a `label` in its own words
+ * each, and **ran out mid-JSON** — the answer was cut off, not absent, so it read as a malformed
+ * body rather than as the budget it was. A picture with a dozen entities is several times a
+ * plan's length.
+ */
+export const DEFAULT_ANSWER_TOKENS = 8192
 
 /**
  * What reasoning may take ON TOP of the answer (D-019). It is deliberately the larger of the two:
  * the failure this guards against is silent — a call that returns an empty string rather than an
  * error — and the cost of a budget that is never reached is nothing at all.
+ *
+ * **4096 WAS NOT ENOUGH, MEASURED ON A REAL REEL** (S-135). A planning call spent the whole
+ * 6144 inside its reasoning block and answered nothing, finishing on `length` — exactly D-019's
+ * third finding, reported by naming the budget as this adapter was built to. The same call
+ * measured with room spends **2405 and 3131 completion tokens** for the eight-unit and four-unit
+ * groupings, so the blow-out is the TAIL and not the median: a budget set near the median stops
+ * a reel that is otherwise finished, at whatever it has already spent. This is set for the tail.
+ *
+ * **Thinking cannot be switched off on this wire, and that is measured rather than assumed.**
+ * Gate 2 asks for the switch "where the wire allows it"; `reasoning_effort: 'minimal'`,
+ * `thinking: { type: 'disabled' }`, `enable_thinking: false` and
+ * `chat_template_kwargs: { enable_thinking: false }` were each answered **200 with a `<think>`
+ * block still in the content**. The wire does not allow it — the third field it accepts and
+ * ignores in two days (S-129, S-130).
  */
-export const DEFAULT_REASONING_TOKENS = 4096
+export const DEFAULT_REASONING_TOKENS = 24576
 
-/** How long one call may take before it is unavailable. A vision call carries a whole clip. */
-export const DEFAULT_TIMEOUT_MS = 180_000
+/**
+ * How long one call may take before it is unavailable. A vision call carries a whole clip.
+ *
+ * **IT HAS TO COVER THE TOKEN BUDGET THE CALL IS GRANTED, or the budget is a lie** (S-137).
+ * 180 s was set beside a `max_tokens` of 6144; S-135 raised that to 26624, and a model emitting
+ * four times as many tokens needs the time to emit them. Measured: with the larger budget, a
+ * reconciler call answered **nothing within 180 s** and the run stopped — a transient, correctly
+ * classified, on a call that was doing exactly what it had been allowed to do.
+ */
+export const DEFAULT_TIMEOUT_MS = 600_000
 
 export interface MinimaxModelOptions {
   /** Read by `packages/providers` and nowhere else (S-109). Sent in one header, written nowhere. */
@@ -149,16 +179,85 @@ const clipPart = async (clip: ClipRef): Promise<Part> => ({
 
 const textPart = (text: string): Part => ({ type: 'text', text })
 
+/**
+ * The words the rendered schema is appended to the message under (S-130). A constant rather than
+ * a string spelled twice, so a check asserts the thing that is sent and not a copy of it (S-129's
+ * `SUBTITLE_TYPE`, the same rule).
+ *
+ * It says the FIELD NAMES because that is what this wire got wrong: the shape was right and every
+ * name was invented.
+ */
+export const SHAPE_PREFACE = [
+  'Answer with a JSON object of your own, never with the schema below and never any part of it.',
+  'That object must match this JSON Schema exactly, including every field name in it:',
+].join('\n')
+
+/**
+ * What an answer that is the SCHEMA rather than an instance of it looks like (S-136).
+ *
+ * Measured once, on a real reel: the planner answered with the rendered schema document itself.
+ * Twelve probe calls afterwards — six under each wording of `SHAPE_PREFACE` — never reproduced
+ * it, so it is a tail event and the wording is not what is relied on. What IS relied on is that
+ * when it happens the refusal says so: `jsonOf`'s "answered something that is not JSON" was a
+ * true sentence about a truncated echo and a confusing one to read, because the thing quoted
+ * after it was plainly JSON.
+ */
+const SCHEMA_ECHO = ['$schema', '"properties"', '"additionalProperties"']
+
+export function echoedTheSchema(text: string): boolean {
+  return SCHEMA_ECHO.some((mark) => text.includes(mark))
+}
+
+/**
+ * THE RENDERING WITH EVERY BOOLEAN SCHEMA REMOVED (S-131).
+ *
+ * JSON Schema 2020-12 lets a schema BE a boolean, and zod uses it: a `z.tuple` of four renders
+ * `"items": false` beside `prefixItems`, meaning "and no more than these". **MiniMax's own
+ * parser expects an object wherever a schema may sit and refuses the WHOLE REQUEST with 400** —
+ * `Mismatch type open_platform_oai.CCv2GlyphProperties with value bool` — on M3 and M2.7 alike,
+ * measured 2026-09-22. The reel's scoring call is a four-answer tuple, so every real run reached
+ * it and stopped there.
+ *
+ * Dropping it loses nothing that is said elsewhere: `"items": false` beside `prefixItems` and
+ * `maxItems: 4` says what `maxItems` already says, and the pipeline's own schema — which is what
+ * actually parses the answer — is untouched, so nothing about what is ACCEPTED moves. This is a
+ * rendering for one provider's parser, and it lives in that provider's adapter.
+ *
+ * **`additionalProperties` IS KEPT, although it is a boolean too.** It was measured accepted by
+ * the same parser in the same session, and it is load-bearing in the other direction: it is what
+ * tells the model to add no field of its own, and every pipeline schema is strict, so a field it
+ * invents is a refused answer. The rule is "the booleans this parser refuses", measured, and not
+ * "every boolean" — which would quietly stop asking for the one thing that keeps an answer
+ * parseable.
+ *
+ * It is applied ONCE, to the one rendering both `response_format` and the message carry, so the
+ * two still cannot disagree (S-130).
+ */
+const KEPT_BOOLEAN = 'additionalProperties'
+
+export function withoutBooleanSchemas(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(withoutBooleanSchemas)
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([k, v]) => typeof v !== 'boolean' || k === KEPT_BOOLEAN)
+        .map(([k, v]) => [k, withoutBooleanSchemas(v)]),
+    )
+  }
+  return value
+}
+
 // ---------------------------------------------------------------- the fixed questions (I-8)
 
 // The three calls that carry a picture or a clip carry NO PROMPT, NO SCHEMA AND NO CRITERION: the
 // question and the shape of the answer are fixed here, inside the adapter, because a free prompt
 // beside an image is a field a gate's brief could be written into (I-8, D-042, S-037).
 //
-// The schemas below are used for ONE thing: to ask for the answer's shape through
-// `response_format`. They never parse an answer. An observation is parsed by the pipeline at the
-// gate boundary, which is where a malformed one must be caught (D-041, S-042) — an adapter that
-// parsed it here would make that path unreachable.
+// The schemas below are used for ONE thing: to ask for the answer's shape — through
+// `response_format` AND, because this wire ignores that field, in the message itself (S-130).
+// They never parse an answer. An observation is parsed by the pipeline at the gate boundary,
+// which is where a malformed one must be caught (D-041, S-042) — an adapter that parsed it here
+// would make that path unreachable.
 
 const observedEntity = z.object({
   label: z.string(),
@@ -219,10 +318,22 @@ const OBSERVE_CLIP_QUESTION = [
   'clip; and the order the events happen in.',
 ].join('\n')
 
+/**
+ * Gate 1S's closed question (S-045).
+ *
+ * **"BY ITS NAME" WAS AN INVITATION TO RENAME, AND IT WAS TAKEN** (S-138). Asked about the
+ * subject `shelf`, MiniMax-M3 answered `"Shelf of Bound Volumes"` — the plan's display name for
+ * it, which is a name, and which Gate 1S refuses because it was not asked about. The run had
+ * already passed Gate 1 on shot 0 and spent 34¢. The strings are now quoted in the list and
+ * demanded back character for character, which is what `judgeCut` already says of its questions.
+ */
 const COMPARE_QUESTION = [
   'Two pictures follow, in order: the first is the canonical, the second is derived from it.',
-  'For each subject named below, answer whether it is the same thing in both pictures.',
-  'Answer yes or no for every subject named, by its name, once each, and for no other.',
+  'For each subject listed below, answer whether it is the same thing in both pictures.',
+  'Each subject is given as a quoted string. Use that string EXACTLY as it is written, character',
+  'for character, as the value of "subject". Do not rename it, expand it, translate it or',
+  'describe it, even if a more natural name for the thing is obvious from the pictures.',
+  'Answer yes or no for every subject listed, once each, and for no other.',
 ].join('\n')
 
 /**
@@ -258,9 +369,29 @@ const OPEN_THINK = /^\s*<think>/
  * inside it, so nothing is left — which the caller turns into the budget's failure, not a schema's.
  */
 export function answerAfterReasoning(content: string): string {
-  if (CLOSED_THINK.test(content)) return content.replace(CLOSED_THINK, '').trim()
+  if (CLOSED_THINK.test(content)) return unfenced(content.replace(CLOSED_THINK, '').trim())
   if (OPEN_THINK.test(content)) return ''
-  return content.trim()
+  return unfenced(content.trim())
+}
+
+/**
+ * A whole answer that is ONE fenced code block, with the fence removed (S-132).
+ *
+ * MEASURED 2026-09-22: with the shape said in the message, MiniMax-M3 answered the scoring call
+ * ```` ```json {"answers":["yes","no","yes","no"]} ``` ```` — the right answer, in a fence, which
+ * `JSON.parse` refuses. It is the same family as the `<think>` block D-019 found: presentation
+ * the model adds around an answer that was asked for as JSON, which no instruction reliably
+ * suppresses, so it is removed where the reasoning block is removed.
+ *
+ * It matches ONLY a content that is entirely one fenced block, opening at the start and closing
+ * at the end. A fence in the middle of something is left alone, because then the content is not
+ * an answer in a wrapper — it is something else, and `jsonOf` should say so.
+ */
+const WHOLE_FENCE = /^```[a-zA-Z0-9]*\r?\n?([\s\S]*?)\r?\n?```$/
+
+export function unfenced(text: string): string {
+  const fenced = WHOLE_FENCE.exec(text)
+  return fenced === null ? text : (fenced[1] ?? '').trim()
 }
 
 // ---------------------------------------------------------------- the adapter
@@ -273,13 +404,41 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
   const reasoningTokens = options.reasoningTokens ?? DEFAULT_REASONING_TOKENS
   const maxTokens = answerTokens + reasoningTokens
 
-  /** The shape asked for. A schema that cannot be rendered asks for JSON and says so in nothing. */
-  function responseFormat(schema: z.ZodType<unknown>, name: string): Record<string, unknown> {
+  /**
+   * THE SHAPE ASKED FOR, SAID TWICE — in `response_format`, and in the message itself (S-130).
+   *
+   * MEASURED against the live wire on 2026-09-22: **MiniMax accepts
+   * `response_format: { type: 'json_schema', … }` with HTTP 200 and IGNORES IT.** A planning
+   * answer came back with `duration` and `subjects` where the schema says `durationSeconds` and
+   * `subjectIds`, and with a different invented pair — `seconds`, `subjects` — for a different
+   * grouping of the same reel; `strict: true` behaved exactly like `type: 'json_object'`. The
+   * first real reel failed at its first parse, with nothing bought, which is where this was
+   * found. The same schema rendered into the MESSAGE answers with every field name exact, in
+   * both groupings.
+   *
+   * The message's rendering is the SAME `z.toJSONSchema` the header field gets, so the two cannot
+   * disagree: a schema that moves moves both, and neither is a field name typed beside a schema
+   * to go stale (S-124, S-125, S-127's rule). It is built from the schema alone — no time, no
+   * randomness — so a call at temperature 0 still asks the same thing and still replays (D-062,
+   * D-064). `response_format` is still sent: it costs nothing, and a model that honours it is
+   * answered by it. `strict` stays `false`, because `true` was measured to change nothing.
+   *
+   * A schema that cannot be rendered asks for JSON and says the shape in nothing — as before.
+   */
+  function shapeAsked(
+    schema: z.ZodType<unknown>,
+    name: string,
+  ): { format: Record<string, unknown>; said: string | undefined } {
     try {
-      const json = z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' })
-      return { type: 'json_schema', json_schema: { name, schema: json, strict: false } }
+      const json = withoutBooleanSchemas(
+        z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' }),
+      )
+      return {
+        format: { type: 'json_schema', json_schema: { name, schema: json, strict: false } },
+        said: `${SHAPE_PREFACE}\n${JSON.stringify(json)}`,
+      }
     } catch {
-      return { type: 'json_object' }
+      return { format: { type: 'json_object' }, said: undefined }
     }
   }
 
@@ -379,10 +538,30 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
   }
 
   /** What the answer parses to. The shape is the caller's business, or the gate's (S-042). */
-  function jsonOf(text: string, role: ModelRole, model: string): unknown {
+  function jsonOf(text: string, role: ModelRole, model: string, finish?: string): unknown {
+    // An answer that is the SCHEMA is reported as that, not as bad JSON (S-136). Read BEFORE the
+    // parse, because an echo that was cut off by the token budget does not parse either, and
+    // "not JSON" is a true sentence that sends the reader after the wrong thing.
+    if (echoedTheSchema(text)) {
+      throw new Error(
+        `the ${role} call to ${model} answered THE SCHEMA rather than an object matching it: ` +
+          `${summary(text)}`,
+      )
+    }
     try {
       return JSON.parse(text)
     } catch {
+      // AN ANSWER THAT WAS CUT OFF IS THE BUDGET, NOT THE SHAPE (S-140). `answerOf` already says
+      // so when the budget is spent inside the reasoning block and NOTHING is left; this is the
+      // other half — the block closed, the answer began, and the tokens ran out inside it. Both
+      // arrive here as text that will not parse, and only `finish_reason` tells them apart.
+      if (finish === 'length') {
+        throw new Error(
+          `the ${role} call to ${model} was cut off mid-answer: it finished on length against a ` +
+            `max_tokens of ${maxTokens}. This is the token budget, not the answer's shape — the ` +
+            `answer allowance is what to raise (D-019, S-140): ${summary(text)}`,
+        )
+      }
       throw new Error(
         `the ${role} call to ${model} answered something that is not JSON: ${summary(text)}`,
       )
@@ -421,37 +600,61 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
     about: { pictureIds?: readonly string[]; takeIds?: readonly string[] },
   ): Promise<{ value: unknown; receipt: ModelReceipt }> {
     const model = options.models[role]
+    // The shape is appended as a part of its own, after the question and the media (S-130). It is
+    // the ADAPTER'S OWN schema, fixed here — I-8's "no prompt, no schema, no criterion" is about
+    // what a CALLER may put beside a picture, and a caller puts nothing here.
+    const asked = shapeAsked(shape, name)
     const answer = await post(
       {
         model,
-        messages: [{ role: 'user', content: parts }],
+        messages: [
+          {
+            role: 'user',
+            content: asked.said === undefined ? parts : [...parts, textPart(asked.said)],
+          },
+        ],
         max_tokens: maxTokens,
         temperature,
-        response_format: responseFormat(shape, name),
+        response_format: asked.format,
       },
       role,
     )
-    const value = jsonOf(answerOf(answer, role, model), role, model)
+    const value = jsonOf(
+      answerOf(answer, role, model),
+      role,
+      model,
+      answer.choices[0]?.finish_reason ?? undefined,
+    )
     return { value, receipt: receiptOf(role, call, temperature, answer, about) }
   }
 
   return {
     async structured(call) {
       const model = options.models[call.role]
-      // The prompt is the pipeline's, sent verbatim: it is built from its inputs alone, so the
-      // same inputs ask the same thing and a call at temperature 0 replays.
+      // The prompt is the pipeline's, sent whole and first, with the shape appended after it
+      // (S-130). Both halves are built from their inputs alone — the prompt from the request, the
+      // shape from the schema — so the same inputs ask the same thing and a call at temperature 0
+      // replays.
+      const asked = shapeAsked(call.schema as z.ZodType<unknown>, 'answer')
       const answer = await post(
         {
           model,
-          messages: [{ role: 'user', content: call.prompt }],
+          messages: [
+            {
+              role: 'user',
+              content: asked.said === undefined ? call.prompt : `${call.prompt}\n\n${asked.said}`,
+            },
+          ],
           max_tokens: maxTokens,
           temperature: call.temperature,
-          response_format: responseFormat(call.schema as z.ZodType<unknown>, 'answer'),
+          response_format: asked.format,
         },
         call.role,
       )
       const text = answerOf(answer, call.role, model)
-      const value = call.schema.parse(jsonOf(text, call.role, model))
+      const value = call.schema.parse(
+        jsonOf(text, call.role, model, answer.choices[0]?.finish_reason ?? undefined),
+      )
       return {
         value,
         receipt: receiptOf(call.role, 'structured', call.temperature, answer, {
@@ -485,7 +688,9 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
     },
 
     async compare(call) {
-      const subjects = call.subjects.map((name) => `- ${name}`).join('\n')
+      // QUOTED, so the string to answer with has edges. Unquoted, `shelf` reads as a topic and a
+      // model answers it with a name of its own (S-138); `judgeCut` already quotes its sentences.
+      const subjects = call.subjects.map((name) => `- ${JSON.stringify(name)}`).join('\n')
       return ask(
         'judge',
         'compare',

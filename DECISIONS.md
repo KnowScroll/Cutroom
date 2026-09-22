@@ -5114,3 +5114,590 @@ fault since S-096 and exercised live in session 43.
 
 **Confirmed-by.** The owner, 2026-09-21, who replaced the key on being shown the prefix finding, and
 against whose Subscription Key every figure above was measured.
+
+---
+
+## S-130 | 2026-09-22 | This wire answers 200 to `response_format` and ignores it, so the adapter says the shape in the MESSAGE as well — the same rendering, never a second copy of the field names
+
+**Chose.**
+
+- **The MiniMax model adapter appends the rendered JSON Schema to the message it sends**, after
+  the pipeline's prompt in a structured call and as a text part after the media in a vision call.
+  The words it is appended under are `SHAPE_PREFACE`, a constant, and they say **the field names**
+  because that is what this wire got wrong.
+- **It is the SAME `z.toJSONSchema` rendering that `response_format` carries.** One call to it,
+  used twice, so the header field and the message cannot disagree.
+- **`response_format` is still sent, and `strict` stays `false`.** Nothing is taken away.
+- **`packages/pipeline` is untouched.** No prompt gains a field name, and `reel-plan` is not
+  changed by this feature.
+
+**Why.**
+
+- **The first real reel failed at its first parse, and the reason was the provider ignoring a
+  field it answers 200 to.** Measured on 2026-09-22 against the live wire, at temperature 0, with
+  the planning call the run itself makes:
+
+  | what was sent                         | the shot's field names came back as     | parses  |
+  | ------------------------------------- | --------------------------------------- | ------- |
+  | `strict: false` — as shipped, 4 units | `unit`, `duration`, `subjects`          | no      |
+  | `strict: false` — as shipped, 8 units | `unit`, `seconds`, `subjects`           | no      |
+  | `strict: true`                        | `unit`, `seconds`, `subjects`           | no      |
+  | `type: 'json_object'`                 | `unit`, `seconds`, `subjects`           | no      |
+  | the schema appended to the message    | `unit`, `durationSeconds`, `subjectIds` | **yes** |
+
+  **`strict: true` is indistinguishable from asking for no schema at all**, and the rendered
+  schema is correct — it names `durationSeconds`, `subjectIds`, and `additionalProperties: false`
+  — so nothing was wrong with what was computed, only with what the provider did with it. The
+  invented names DIFFER between two groupings of the same reel, which is why "answer only with the
+  JSON object the schema describes" cannot be made to work by asking more firmly.
+
+- **This is session 44's finding a second time, on the other wire.** S-129 recorded that T2A
+  **drops an unknown field in silence**, so a wrong guess at a field name reads exactly like a
+  provider that has no such feature. Here the field is not unknown and is not dropped: it is
+  accepted, echoed by a 200, and ignored. Both say the same thing about this provider — **what it
+  accepts is not what it honours**, and the only proof is the body that comes back.
+- **The shape is a rendering, never a copy.** The alternative was to spell the field names in the
+  pipeline's four prompts. That is the shape S-124, S-125 and S-127 each ruled against: a figure
+  that must agree with another figure is computed from it, or the two disagree the first time
+  either moves, silently. A prompt naming `durationSeconds` in prose is exactly that, in four
+  places, with nothing to notice when a schema gains a field.
+- **It does not weaken I-8.** The three calls that carry a picture or a clip still take no prompt,
+  no schema and no criterion **from a caller**. What is appended is the ADAPTER'S OWN schema,
+  fixed in the adapter, which is the same thing `response_format` already carried — a gate's brief
+  cannot be written into it.
+- **Replay survives.** The rendering is built from the schema alone — no time, no randomness — so
+  the same inputs still ask the same thing, which is what D-062 and D-064 rest on.
+
+**Rejected.**
+
+- **The pipeline's prompts naming their own field names.** It is a fourth change to a verified
+  feature, which `docs/features/paid-path.md`'s own _"What this feature changes in verified
+  features"_ list exists to prevent, and it hand-types in four prompts what four schemas already
+  say. Put to the owner with the measurement beside it; not chosen.
+- **`strict: true`.** Measured, and it changes nothing: the answer is the same as asking for no
+  schema. Sending it would read as a guard.
+- **Dropping `response_format`.** It costs nothing, it is the field a provider that honours
+  schemas would honour, and removing it is subtraction.
+- **Retrying a failed parse with the names supplied.** A second call for every first one, and it
+  makes the first call's waste structural rather than fixing it. The shape is cheap to say once.
+- **Stopping and putting it upstream.** It is this engine's adapter and this repository's decision
+  (D-115, S-017); nothing about the script, the epistemic layer, the orchestrator or the player
+  moves.
+
+**Caught by.** **Check 6**, whose words gain the message by addition: a structured call opens with
+the pipeline's prompt **whole and first**, then says the shape under `SHAPE_PREFACE`, and the
+message's rendering is asserted **equal to the one `response_format` carries** — so a break that
+renders it twice, or renders it differently, fails. The field names asserted are read from the
+schema's own rendering, so a schema that gains a field gains the assertion with it. **Check 7**
+gains the same for a vision call, where the shape is the LAST part and the media is still carried
+as bytes before it. **A break campaign of six**, each typechecking clean, each written from a file
+rather than through a shell (S-129's note on the backslash trap, a fourth session): the shape not
+said in a structured call — 6; not said in a vision call — 7; a different rendering in the message
+than in the header — 6; the preface said and the schema omitted — 6 and 7; the shape said before
+the prompt — 6. The control, a comment reworded, is caught by nothing.
+
+**Confirmed-by.** The owner, 2026-09-22, shown the table above and both alternatives, chose the
+adapter.
+
+---
+
+## S-131 | 2026-09-22 | A boolean schema is dropped from the rendering this wire is sent, because MiniMax's parser refuses the whole request over one — and `additionalProperties` is kept, because the same parser accepts it and it is load-bearing
+
+**Supersedes:** nothing. It corrects what **S-130** could not see: with planning fixed, the run
+reached the scoring call for the first time and that call was refused before it was read.
+
+**Chose.**
+
+- **`withoutBooleanSchemas` is applied to the one rendering** `shapeAsked` builds — so
+  `response_format` and the message still carry the same thing (S-130's invariant).
+- **`additionalProperties` is kept, although it is a boolean.** The rule is "the booleans this
+  parser refuses", measured, not "every boolean".
+- **`packages/pipeline` is untouched.** `scoreAnswer` stays `z.tuple([yesNo × 4])`, and it is
+  still what parses the answer.
+
+**Why.**
+
+- **JSON Schema 2020-12 lets a schema BE a boolean, and zod uses it.** `z.tuple` of four renders
+  `"items": false` beside `prefixItems` — "and no more than these". Measured 2026-09-22:
+
+  | what was sent to `/v1/chat/completions`             | M3      | M2.7    |
+  | --------------------------------------------------- | ------- | ------- |
+  | the score schema as rendered, with `"items": false` | **400** | **400** |
+  | the same with boolean schemas dropped               | 200     | 200     |
+  | `{ type: 'json_object' }`                           | 200     | 200     |
+
+  The refusal is `invalid params, Mismatch type open_platform_oai.CCv2GlyphProperties with value
+bool "at index 2356: mismatched type with value"` — **the provider's own parser failing on our
+  REQUEST**, before any model sees it. It is not M3's: both models refuse it.
+
+- **It was already being sent, and nothing had ever reached it.** `responseFormat` carried this
+  rendering before S-130 existed. The reel had never got past its first planning call, so the
+  scoring call — the only tuple in the engine — had never been made. **Two blockers in one run,
+  the second hidden behind the first**, which is the same shape as session 44's.
+- **Dropping it loses nothing that is said elsewhere.** `"items": false` beside `prefixItems` and
+  `"maxItems": 4` says what `maxItems` already says, and the pipeline's own strict schema is what
+  actually accepts or refuses the answer. **Nothing about what is ACCEPTED moves** — only what is
+  asked for, from one provider, in that provider's adapter.
+- **`additionalProperties` is the opposite case and had to be measured separately.** It is a
+  boolean by the same rule, the same parser **accepts** it, and it is what tells the model to add
+  no field of its own. Every pipeline schema is strict, so a field the model invents is a refused
+  answer — dropping every boolean would have quietly stopped asking for the one thing that keeps
+  an answer parseable. **A rule wide enough to cover the measurement is not the same as the rule
+  the measurement supports.**
+
+**Rejected.**
+
+- **`response_format: { type: 'json_object' }`, dropping the schema from the header entirely.**
+  Measured 200 and it parses, and this wire ignores the schema anyway. But the day a MiniMax model
+  honours one, this engine would not be asking with one, and nothing would notice. Put to the
+  owner beside the sanitised rendering; not chosen.
+- **Changing `scoreAnswer` from a tuple to a bounded array.** One line, and it is
+  `packages/pipeline` — a verified feature changed to suit one provider's JSON parser. The tuple
+  is also what makes the four answers positional, which `scorePlan` reads them as.
+- **Dropping every boolean, `additionalProperties` included.** Simpler to write and wrong: see
+  above. The narrow rule is the measured one.
+- **Retrying a 400 without the field.** A 400 is a fault (S-096): sending the same request again
+  cannot help, and sending a DIFFERENT one on a fault is the adapter deciding what the caller
+  asked for.
+
+**Caught by.** **Check 6**, by addition: a schema that renders `"items": false` — asserted to
+still render it, so the check cannot go quiet if zod changes — is sent with the boolean gone,
+`prefixItems` and `maxItems: 4` intact, `additionalProperties: false` intact, and the message
+carrying the same rendering as the header. The 400 itself is already classified as a fault by
+check 8, which is why this run stopped having bought nothing.
+
+**Confirmed-by.** The owner, 2026-09-22, shown the table above and all three alternatives, chose
+the sanitised rendering.
+
+---
+
+## S-132 | 2026-09-22 | A whole answer wrapped in a code fence is unwrapped where the reasoning block is, and only when the fence is the whole of it
+
+**Chose.** `answerAfterReasoning` ends in `unfenced`, which removes a fence that **opens at the
+start of the content and closes at the end**, and does nothing otherwise. Both the language tag
+form and the bare form. It is applied after the `<think>` strip, because a real answer carries
+both.
+
+**Why.**
+
+- **The reel's third attempt failed on a correct answer.** With the shape said in the message and
+  the boolean gone, MiniMax-M3 answered the scoring call with exactly what was asked for —
+  `{"answers":["no","yes","yes","no"]}` — inside ` ```json `, and `JSON.parse` refuses a
+  fence. **Two model calls before it had already been made**, so this is the failure shape that
+  costs the most: everything works and the last inch is presentation.
+- **It is the same family as D-019's `<think>` block**, which this adapter already strips for
+  exactly this reason: a wrapper the model adds around an answer that was asked for as JSON.
+  Neither is suppressed reliably by instruction — the prompt already ends _"Answer only with the
+  JSON object the schema describes"_ and the model fenced it anyway — so it is removed where the
+  other one is.
+- **Only a WHOLE fence, so that a content which is not an answer still fails as one.** A model
+  that explains itself and puts JSON in the middle has not answered the call; unwrapping that
+  would turn a prose answer into a parse that happens to succeed, and the failure this adapter
+  reports would stop being true. `jsonOf`'s message is the right outcome there.
+- **The fixture records both wrappers in one body.** `minimax-chat-fenced.json` is the live M3
+  answer from this run, reasoning block and all, kept as it arrived: what it proves is that
+  neither wrapper reaches the answer, and a fixture with the reasoning removed would prove half
+  of it.
+
+**Rejected.**
+
+- **Asking the model not to fence.** The prompt already says to answer only with the JSON object.
+  An instruction that was already given and already ignored is not a fix.
+- **Stripping every fence anywhere in the content**, or finding the first `{` and the last `}`.
+  Both turn prose that contains JSON into a successful parse, which is a worse failure than a
+  refusal: the call did not answer, and the engine would proceed as if it had.
+- **Doing it in `jsonOf`.** It is a property of this provider's ANSWER, like the reasoning block,
+  not of parsing JSON; `answerAfterReasoning` is where the adapter already says what an answer is
+  once the model's presentation is taken off.
+
+**Caught by.** **Check 6**, by addition: the recorded body carrying both wrappers parses to the
+four answers, with neither wrapper anywhere in the value; and `unfenced` is asserted on the four
+cases directly — tagged fence, bare fence, no fence, **and a fence that is not the whole content,
+which is left alone**.
+
+---
+
+## S-133 | 2026-09-22 | A field the image adapter does not read may not refuse a picture: every untrusted field of fal's result admits `null` as well as absent
+
+**Chose.** In `packages/providers/src/fal/image.ts`, the result shape's **`width`, `height`,
+`content_type`, `seed` and `prompt` are `nullish`** rather than optional. **`url` is not**: it is
+the one field here the adapter uses.
+
+**Why.**
+
+- **fal answered 200 with `width: null` and `height: null`**, on the first real reel's canonical
+  picture, 2026-09-22. `z.number().optional()` refuses a null, so the adapter threw
+  `a body that is not this wire: images.0.width Invalid input: expected number, received null` —
+  **on a picture fal had already made and had already billed for.**
+- **The fields it refused on are the two the adapter documents as trusted for nothing.** D-028
+  says the 9:16 requirement fails silently and must be judged on the produced frame, so S-124 put
+  the frame read on the BYTES and left the provider's own numbers unread. They were still able to
+  fail the call — **a field nothing reads could refuse a picture that was paid for**, which is the
+  opposite of what "not trusted" was supposed to mean.
+- **The rule is the fields, not the one null that was seen.** Every field here that the adapter
+  records and does not read now admits the null, because the next one to arrive null would be
+  another paid picture thrown away and another run of the reel. `url` is excluded deliberately: a
+  schema that admitted a null url would turn a missing picture into a fetch of nothing, and that
+  IS read.
+- **The fixtures said so about themselves.** `fal-image-made.json`'s own note reads _"DOCUMENTED
+  SHAPE, NEVER SEEN HERE … Slice 8's hand-run reel is what verifies it."_ This is that
+  verification, and it found a difference.
+
+**Rejected.**
+
+- **Widening `width` and `height` alone**, the two that were measured. Narrower than the reason:
+  the reason is that the adapter does not read them, and four other fields share it. The cost of
+  being wrong again is another paid picture and another run.
+- **Reading the frame from the provider's numbers now that they are handled.** D-028 and S-124
+  both say the opposite, and a null is exactly why: the provider's account of what it made is not
+  always there.
+- **Accepting any unknown body shape.** The refusal is what caught this. What changes is one
+  field's admitted values, not whether the shape is checked.
+
+**Caught by.** **Check 12**, by addition: `fal-image-nulled.json` — the shape the live call
+answered, with the untrusted fields null — still makes a picture, still writes its file, still
+reads its frame off the bytes, and its recorded body is asserted served. **Check 11 caught the
+first draft of this entry's own comment**, which spelled a slug outside the registry; the comment
+names the wire instead.
+
+**Owed, and not fixed here.** **A call that completes and then fails to parse leaves no receipt.**
+Four model calls and this image call were made in this run; the image call has no row, because
+`structured` and `generate` both build their receipt after the answer is parsed. Under the token
+plan the model calls cost nothing, so nothing was lost today — but **the budget guard reads the
+chain's spend from receipts before every call** (S-059, S-087, S-095), so a paid call that leaves
+no row is spend the guard cannot see. It is named here and put to the owner as the next feature's
+candidate rather than fixed inside the run that found it.
+
+---
+
+## S-134 | 2026-09-22 | The first reel's REQUEST is changed where it argued with itself, and nothing in the engine is: a caller's criteria are the caller's
+
+**Chose.** In `scripts/real-reel.mjs`, and nowhere else:
+
+- **`never-person` becomes "a recognisable real-world public figure"**, which is what the
+  depiction policy means by it.
+- **`show-lamp` hangs off claim `c2` rather than `c1`**, so the keeper and the lamp are not
+  demanded of the same shot.
+- **Each `presence` criterion says "seen whole within the frame"**, which is the framing Gate 1
+  already judges.
+
+**Nothing in `packages/` moved. No gate, no policy, no check and no test.**
+
+**Why.**
+
+- **The request argued with itself, and a real reconciler said so.** `show-keeper` REQUIRES a
+  lighthouse keeper; `never-person` forbade "any real living person". Shown a picture of a
+  lighthouse keeper, the reconciler judged `never-person` shown — correctly, on the words it was
+  given. **A criterion that is violated by satisfying another criterion cannot be met by any
+  picture**, and no number of retakes finds one.
+- **Three candidates in a row were refused for clipping, at 15¢.** Gate 1 refuses a subject
+  clipped by the edge of the frame (D-046). The plan put the keeper AND the lamp in shot 0, and
+  two subjects whole in one 9:16 frame is a hard picture to make; D-047 stops after three, which
+  is what it did. Spreading the two across claims and asking for whole framing is the caller
+  saying what it wants, not the engine being told to accept less.
+- **This is the first time any of these gates has judged a real picture**, and what it found is a
+  badly written brief. That is the system working: the gate is what a badly written brief runs
+  into, and it ran into it **before any clip was bought** — 15¢ of images, no video.
+- **It is the caller's request, and the caller is this script.** `scripts/real-reel.mjs` holds one
+  `SubmitRequest`, the same shape any caller sends (D-094). Changing what a caller asks for is not
+  changing what the engine does with it, and the engine's answer to the old request — stop, with
+  the reason named — stands unaltered and is recorded.
+
+**Rejected.**
+
+- **Loosening Gate 1, the clipping rule, or D-047's three strikes.** Never weaken a check to reach
+  green: the gates found a real problem and said exactly what it was. Their verdicts are the
+  evidence this entry is written from.
+- **Running the same request again unchanged.** Three different candidates failed the same way,
+  and one of the two causes — the contradiction — no redraw can fix.
+- **Dropping `never-person` entirely.** It is a real criterion and the sort a caller will send;
+  what was wrong was its words, not its existence.
+- **Teaching the reconciler that a fictional keeper is not a real living person.** That is a
+  prompt change in `packages/pipeline`, to a verified feature, to make one badly worded criterion
+  work. The criterion is what is wrong.
+
+**Caught by.** **Check 20**, which reads the script's own source, is unchanged and green: the
+estimate is still printed before the submit, one request is still submitted, and a confirmation is
+still read between them. The request's own shape is held by `reel-contract`'s schema, which
+accepted it. **And the run itself**, whose verdicts are in `JOURNAL.md` for both wordings.
+
+---
+
+## S-135 | 2026-09-22 | The reasoning allowance is set for the tail, not the median, because thinking cannot be switched off on this wire — measured, not assumed
+
+**Chose.** `DEFAULT_REASONING_TOKENS` is **24576**, so `max_tokens` is 26624. **Nothing else
+moves**: the answer allowance stays 2048, the `<think>` strip stays, and the failure this guards
+against is still reported by naming the budget rather than the schema.
+
+**Why.**
+
+- **A real reel died on it.** A planning call spent **6144 of 6144** completion tokens inside its
+  reasoning block, finished on `length`, and answered nothing — D-019's third finding, live, and
+  reported exactly as this adapter was built to report it: _"This is the token budget, not the
+  answer's shape: raise the reasoning allowance."_ The adapter's own message names the remedy.
+- **It is the tail, not the median.** The same two planning calls measured with room spend **3131
+  completion tokens for four units and 2405 for eight** — comfortably inside the old budget. So
+  4096 is not obviously too small, which is exactly what makes it dangerous: it works, until a
+  call deliberates longer than usual and a run that has already spent stops for no reason a reader
+  can see. **A budget set near the median is a run that fails sometimes.**
+- **The cost of a budget that is never reached is nothing at all** — the comment that was already
+  there, and it is still true: reasoning tokens are billed when spent, and the Token Plan covers
+  them (S-129). What a larger allowance buys is that the tail finishes; what it costs is latency
+  on the rare call that uses it.
+- **THINKING CANNOT BE TURNED OFF HERE, AND NOW THAT IS MEASURED.** Gate 2 asks for the switch
+  _"where the wire allows it"_, and D-019 refused to guess at one on the strength of the Hermes 404. Measured 2026-09-22 on MiniMax-M2.7: `reasoning_effort: 'minimal'`,
+  `thinking: { type: 'disabled' }`, `enable_thinking: false` and
+  `chat_template_kwargs: { enable_thinking: false }` were **each answered 200 with a `<think>`
+  block still in the content**. **The wire does not allow it.** That is the third field this
+  provider accepts and ignores in two days — `subtitle_granularity` (S-129), `response_format`
+  (S-130), and now every thinking switch. **What this provider accepts is not what it honours**,
+  and only the body proves which.
+
+**Rejected.**
+
+- **Raising it to just above what was measured** — 8192, say. The measurement IS the tail, and a
+  tail has no ceiling a single sample shows. The budget is free until it is used.
+- **Switching the planner to another model.** D-006's table is the authority on which role goes to
+  which model, and the failure is not the model's: every model in this family thinks.
+- **Sending a thinking switch anyway.** Four were tried and none worked; sending one that does
+  nothing is a line that reads as a guard and is not one.
+- **Retrying a budget failure with a bigger budget.** A second call for every first one, and it
+  hides the thing worth knowing — how much this engine's calls actually need — behind a retry.
+
+**Caught by.** The adapter's existing check-6 assertion that a call consumed entirely by reasoning
+fails **naming the budget and the figure it spent**, which is what found this, and which is
+unchanged. `DEFAULT_ANSWER_TOKENS + DEFAULT_REASONING_TOKENS` is asserted to be what `max_tokens`
+carries, so the two cannot drift apart. **And the run itself**: the journal records the call that
+died on 6144 and the two that were measured with room.
+
+---
+
+## S-136 | 2026-09-22 | An answer that is THE SCHEMA is refused as that; the preface that forbids it is chosen on its words, because the failure is too rare to measure
+
+**Chose.**
+
+- **`SHAPE_PREFACE` opens by forbidding the echo**: _"Answer with a JSON object of your own, never
+  with the schema below and never any part of it."_
+- **`jsonOf` reads for the echo BEFORE it parses**, and refuses it by name.
+- **`echoedTheSchema`** is the test: `$schema`, `"properties"` or `"additionalProperties"` in the
+  answer. They are the schema's own words and appear in no answer this engine asks for.
+
+**Why.**
+
+- **A real reel died on it.** With the shape said in the message (S-130), the planner answered
+  **with the rendered schema document** rather than an object matching it. That is the hazard
+  S-130's mechanism carries, and it is the price of the mechanism working: a schema in the message
+  is a thing the model can copy.
+- **The wording is NOT claimed to fix it, because it could not be measured.** Twelve probe calls
+  — **six under each wording, across both groupings, at temperature 0** — echoed **0 times** and
+  parsed **12 of 12**. So the two prefaces are indistinguishable on the evidence available, and
+  the new one is chosen because **it names the failure that was seen**, at no cost. **This entry
+  says so rather than claiming a fix**, because a claim that the next session reads as measured is
+  the thing this repository's decisions exist to prevent.
+- **What IS relied on is the refusal.** `jsonOf` said _"answered something that is not JSON"_ —
+  true of the truncated echo it received, and misleading beside a quote that is plainly JSON. The
+  operator reading that goes looking for a parse bug. Now the message says what happened.
+- **The check is read before the parse**, because an echo cut off by the token budget does not
+  parse either, and that is the shape that was actually seen.
+
+**Rejected.**
+
+- **Retrying on an echo.** A second call for every first one, and it would have hidden this: the
+  run would have finished and nobody would know the planner ever did it.
+- **Spelling the field names in prose instead of rendering the schema.** Measured to work — it was
+  the first thing that made a planning call parse — but it is the copy-by-hand shape S-130
+  rejected, and it would go stale against the schema with nothing to notice.
+- **Dropping `$schema` from the rendering to make an echo harder to recognise.** Backwards: the
+  marks are what make the echo recognisable, and a quieter echo is a worse one.
+- **Claiming the preface fixes it.** Not measured. See above.
+
+**Caught by.** **Check 6**, by addition: `minimax-chat-echo.json` — the rendering the planning call
+sends, answered back — is refused with a message that names the echo and **does not** call it bad
+JSON, and `echoedTheSchema` is asserted on the three marks and on a real answer.
+
+---
+
+## S-137 | 2026-09-22 | A call's timeout must cover the token budget it grants, or the budget is a lie — and the model port still has no retry, which is named rather than built
+
+**Chose.** `DEFAULT_TIMEOUT_MS` is **600_000**, raised with `max_tokens` rather than separately.
+**Nothing else moves**: a timeout is still `Unavailable`, still transient, still not retried here.
+
+**Why.**
+
+- **The two figures are one figure.** 180 s was set beside a `max_tokens` of 6144. S-135 raised
+  that to 26624 for a reason that stands — a planning call really did need more — and **left the
+  timeout where it was**, so the adapter granted a budget it would not wait for. Measured
+  immediately: a reconciler call **answered nothing within 180 s** and the run stopped. The call
+  was doing exactly what it had been allowed to do.
+- **This is S-124's rule again, on a pair nobody had paired**: a figure that must agree with
+  another figure has to move with it. Here they are not derived from one another — tokens per
+  second is the provider's and not ours — but the direction is: **raising one without the other
+  is a guaranteed timeout, not a risk of one.**
+- **A transient is the most expensive failure this engine has**, because the model port does not
+  retry: the run stops, and everything it has already bought is spent. This run had bought
+  nothing; a run that timed out after the stills stage would have lost its images.
+
+**Rejected.**
+
+- **Lowering the reasoning budget back** to fit 180 s. S-135's measurement is what raised it, and
+  a call that dies on its budget is the failure that was actually seen twice.
+- **Deriving the timeout from `max_tokens` times a rate.** The rate is the provider's, it is not
+  published, and a figure computed from a guess reads as measured. A bound with a stated reason is
+  honest; an arithmetic one built on an invented constant is not.
+- **Retrying the timeout here.** See below — it is a feature, not a line.
+
+**Owed, and not built here.** **The model port has no transient retry.** The adapter classifies
+`Unavailable` correctly and `../transient.ts` says in as many words that the counter and the
+backoff are the worker's guarded ports' and that **for the model port it is not built**. Every
+other port has one (S-096). A transient on any of this engine's model calls therefore stops the
+run outright, and the later the call, the more it costs. **Named here, and put to the owner as the
+next feature's candidate beside the lost receipt of S-133** — the two are the same shape: a call
+that happened, and a run that cannot carry on from it.
+
+---
+
+## S-138 | 2026-09-22 | A closed question quotes the strings it will accept back, and says "character for character" — "by its name" is an invitation to rename, and it was taken
+
+**Chose.** In `COMPARE_QUESTION` and the `compare` call, both **the adapter's own** (I-8):
+
+- **Each subject is listed QUOTED**, `- "shelf"`, as `judgeCut` already lists its sentences.
+- **The question demands the string back character for character**, and forbids renaming,
+  expanding, translating or describing it — _"even if a more natural name for the thing is obvious
+  from the pictures"_, because that is exactly what happened.
+- **"by its name" is gone.** It is the phrase that invited the rename.
+
+**Why.**
+
+- **Measured on a real reel, 34¢ in and past Gate 1.** Gate 1S asked about the subject `shelf`;
+  MiniMax-M3 answered `"Shelf of Bound Volumes"` — the plan's display name for that subject, and
+  a perfectly good name. Gate 1S refused it, correctly: _"'Shelf of Bound Volumes' was not asked
+  about"_ and _"'shelf' is answered 0 times, not once"_ (S-045's rule, every shared subject by
+  name, once). **The run had already paid for five pictures and passed Gate 1 on shot 0.**
+- **`shelf` unquoted reads as a topic, not as a string.** Given a picture of a shelf of bound
+  volumes and the word `shelf`, a vision model writes down what it would call the thing. The
+  quotes are what give the string edges, and `judgeCut`'s questions have had them all along —
+  this is one closed question catching up with the other.
+- **It is the adapter's question, so it is the adapter's fix.** I-8 puts these three questions
+  inside the adapter precisely because they are fixed and nothing about a caller's brief may reach
+  them. Nothing in `packages/pipeline` moved: what is asked about is still the ids Gate 1S sends,
+  and what is accepted back is still exactly those.
+- **Third time this provider has answered a plausible thing instead of the asked-for thing** —
+  invented field names (S-130), the schema itself (S-136), and now a subject's display name. The
+  pattern is the same: **where the answer's exact form is not pinned in the message, it is filled
+  in with something reasonable**, and every gate this engine has is built on exact forms.
+
+**Rejected.**
+
+- **Sending the subject's display NAME instead of its id.** It would read more naturally to a
+  vision model — and it is a `packages/pipeline` change to Gate 1S, to what is asked and parsed,
+  for a verified feature, to work around a wording. The wording is what was wrong.
+- **Matching the answer back loosely** — case-insensitively, or by prefix. That is Gate 1S's
+  closed question stopping being closed: a subject answered about under another name is a subject
+  the judge chose, not the one that was asked about.
+- **Retrying a refused comparison.** The answer was not a failure of the call; it was the wrong
+  question.
+
+**Caught by.** **Check 7**, by addition: a compare call's question lists each subject quoted,
+demands it back character for character, and **is asserted not to contain "by its name"** — so
+the wording that caused this cannot come back unnoticed.
+
+---
+
+## S-139 | 2026-09-22 | A closed set in a schema is an ENUM, not a `superRefine` over a string — because a refinement renders into nothing, so the answerer never sees the constraint it is judged by
+
+**Chose.** In `packages/pipeline/src/stills/prompts.ts`, the id fields of the two closed answers
+become **`z.enum` over the very list they are already checked against**:
+
+- `reconcileAnswer`'s `subjects[].id` over `subjectIds`, and its `criteria[].id` over
+  `criterionIds`.
+- `compareAnswer`'s `subjects[].subject` over `subjects`.
+- **An empty list stays `z.string()`**, because `z.enum` has no empty form and a field accepting
+  nothing would refuse before `namesEach` could say why.
+
+**What is ACCEPTED does not move by one character.** `namesEach` still runs, and still requires
+every id exactly once and no other. **This is the only change this feature makes in
+`packages/pipeline`.**
+
+**Why.**
+
+- **A `superRefine` does not render into JSON Schema.** `namesEach` has always refused an id that
+  was not asked about — but the shape the model is SHOWN said `{"type":"string"}`, so the
+  constraint the answer is judged by reached the answerer **in nothing**. With the enum, the
+  rendering the adapter puts in the message (S-130) now carries
+  `"id":{"type":"string","enum":["keeper","log"]}`.
+- **Measured, 98¢ in, with two clips already bought.** Asked about `keeper` and `log`, the
+  reconciler answered `"Lighthouse Keeper"` and `"Handwritten Logbook"` — the plan's display
+  names for those subjects — and the answer was refused. The run had passed Gate 1, Gate 1S and
+  Gates 2 to 5 on shot 0, made its narration and bought two clips. **This is the most expensive
+  place any of this session's failures landed**, and it is the fourth time this provider has
+  answered a plausible thing where an exact one was required (S-130, S-136, S-138).
+- **S-138 fixed the same failure in the adapter's own question and could not fix this one**, because
+  this prompt and this schema are the pipeline's. The general answer is not better wording; it is
+  **putting the closed set where it renders**, which is the schema.
+- **It is strictly stronger, not looser.** Two things now refuse an unasked id instead of one, and
+  the one that always did is untouched. A reader of the schema and a reader of the code now see
+  the same rule.
+
+**Rejected.**
+
+- **Wording the prompts harder**, as S-138 did for the adapter's question. It is what this failure
+  survived once already, it is four prompts to keep in step with four schemas by hand, and it is
+  exactly the copy-by-hand shape S-124, S-125, S-127 and S-130 each rejected.
+- **Sending display names rather than ids.** It changes what Gate 1 and Gate 5 ask about and parse
+  — real behaviour of two verified features — to work around a rendering.
+- **Accepting a display name and mapping it back.** The gate's question stops being closed, and a
+  subject answered about under a name the judge chose is not the subject that was asked about.
+- **Rendering the enum in the ADAPTER**, from the call's own list. The adapter does not know which
+  field of a caller's schema is the closed one; only the schema knows, and that is the argument
+  for putting it there.
+
+**Caught by.** `reel-stills`' and `reel-takes`' own checks, unchanged and green — **129 tests**,
+which is what "the accepted set did not move" means concretely. And the rendering itself: the
+enum is computed from the same list `namesEach` is given, so a list that moves moves both, and the
+two cannot disagree.
+
+---
+
+## S-140 | 2026-09-22 | An answer CUT OFF mid-JSON is the token budget, not the shape — and the longest thing this engine asks for is an observation, not a plan
+
+**Chose.**
+
+- **`DEFAULT_ANSWER_TOKENS` is 8192**, so `max_tokens` is 32768.
+- **A body that will not parse and finished on `length` is refused by naming the budget**, and
+  says which allowance to raise. Everything else that will not parse is still refused as bad JSON.
+- **`finish_reason` is threaded to the parse** from both call paths, because it is the only thing
+  that tells the two apart.
+
+**Why.**
+
+- **D-019's finding had two halves and only one was built.** `answerOf` already reports the budget
+  when it is spent inside the `<think>` block and **nothing** is left. The other half is the block
+  closing, the answer beginning, and the tokens running out **inside the answer** — the text is
+  not empty, so it sails past that guard and arrives at `JSON.parse` as malformed. The adapter
+  then said _"answered something that is not JSON"_, which sends the reader after a parse bug.
+- **Measured on a real reel, 23¢ in.** A witness describing one picture answered
+  `{"entities":[{"label":"older man with grey hair wearing a grey knit sweater",…` and stopped
+  mid-object. **The comment on the constant was wrong about which call is longest:** it said _"a
+  structured plan is the longest thing any call asks for"_, and 2048 was set for that. An
+  observation names every entity in the picture **in the model's own words** (D-041's `label`, and
+  `ambiguities`, and `unsafeDepictions`) — a picture with a dozen entities is several times a
+  plan. **A figure set against the wrong call is a figure that was never measured.**
+- **The same session raised the reasoning allowance for the same reason** (S-135) and left this
+  one alone, because the failure that had been seen was the reasoning one. Both budgets are now
+  set against the call that actually needs them.
+
+**Rejected.**
+
+- **Reporting every unparseable answer as the budget.** Most are not, and a message that guesses
+  is the thing this entry is fixing.
+- **Guessing from the text's shape** — an unbalanced brace, say. `finish_reason` is the provider
+  saying it, and it is already in the body this adapter parses.
+- **Trimming what an observation may say** — shorter labels, fewer ambiguities. That is D-041's
+  content, judged by gates, changed to fit a budget.
+- **Retrying a truncated answer with a larger budget.** Hides how much this engine's calls need,
+  behind a retry, and pays for the first call twice.
+
+**Caught by.** **Check 6**, by addition: `minimax-chat-cut.json` — an answer truncated mid-JSON,
+`finish_reason: "length"` — is refused with a message that says **cut off mid-answer**, names
+`finished on length`, names the `max_tokens` figure computed from both constants, and **does not**
+call it bad JSON.

@@ -1,10 +1,10 @@
-# 044 — paid-path: the real reel, and the journeys
+# 045 — paid-path: the real reel, and the journeys
 
 - **For:** session 45
 - **Feature:** `paid-path` — [`docs/features/paid-path.md`](../docs/features/paid-path.md)
 - **Work:** the rest of Slice 8 — **one real reel**, then six journeys; checks 20 and 22 are already green
 - **Written:** 2026-09-21, at the end of session 43
-- **Run:** not yet
+- **Run:** session 45, 2026-09-22 — the reel was made and Gate 7 refused it; S-130 to S-140
 
 **Session 43 built every part of Slice 8 and could not make the reel; session 44 is what unblocks it.** The
 engine, the script, checks 20 and 22 and the break campaign are done and committed, and

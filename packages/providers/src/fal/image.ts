@@ -71,18 +71,31 @@ import { uploadReference } from './upload.ts'
 // A KEY REACHES ONE PLACE: the Authorization header of a call to fal itself — never a URL fal
 // handed back, and never a message (S-109).
 
-/** What a finished image job answers. `width` and `height` are recorded and trusted for nothing. */
+/**
+ * What a finished image job answers. `width` and `height` are recorded and trusted for nothing.
+ *
+ * **EVERY FIELD THIS ADAPTER DOES NOT READ ADMITS `null` AS WELL AS ABSENT** (S-133). Measured
+ * 2026-09-22, on the first real reel's canonical picture: the seedream text wire answered **200
+ * with `width: null` and `height: null`**, and `z.number().optional()` refuses a null — so a
+ * picture fal had already made, and had already billed for, was thrown away by a field nothing
+ * reads.
+ *
+ * `url` is NOT among them. It is the one field here the adapter uses, it was not null, and a
+ * schema that admitted a null url would turn a missing picture into a fetch of nothing.
+ */
+const untrusted = <T extends z.ZodType>(of: T) => of.nullish()
+
 const produced = z.object({
   images: z.array(
     z.object({
       url: z.string().min(1),
-      width: z.number().optional(),
-      height: z.number().optional(),
-      content_type: z.string().optional(),
+      width: untrusted(z.number()),
+      height: untrusted(z.number()),
+      content_type: untrusted(z.string()),
     }),
   ),
-  seed: z.number().optional(),
-  prompt: z.string().optional(),
+  seed: untrusted(z.number()),
+  prompt: untrusted(z.string()),
 })
 
 export interface FalImageOptions {

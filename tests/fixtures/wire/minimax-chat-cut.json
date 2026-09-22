@@ -1,0 +1,41 @@
+{
+  "note": "THE FAILURE OBSERVED ON A REAL REEL, 2026-09-22, 23c in: a witness describing one picture listed its entities and RAN OUT OF TOKENS MID-JSON. The answer was cut off rather than absent, so answerOf let it through — it is not empty — and it arrived at the parse as text that will not parse. Only finish_reason tells a truncated answer from a malformed one, which is why this body carries finish_reason \"length\" (S-140).",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "cut",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0001",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "length",
+          "message": {
+            "role": "assistant",
+            "content": "{\"units\":[{\"sentence\":1,\"shot\":\"a wide, still fra"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 812,
+        "completion_tokens": 8192,
+        "total_tokens": 9004
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

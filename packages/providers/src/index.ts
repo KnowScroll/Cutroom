@@ -67,8 +67,11 @@ export {
   DEFAULT_REASONING_TOKENS,
   DEFAULT_TIMEOUT_MS,
   READ_TEXT_QUESTION,
+  SHAPE_PREFACE,
   answerAfterReasoning,
+  echoedTheSchema,
   minimaxModel,
+  unfenced,
   type MinimaxModelOptions,
 } from './minimax/model.ts'
 export {

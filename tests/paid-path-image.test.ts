@@ -621,6 +621,30 @@ test('12. a completed call writes the picture under the artifact root and record
   }
 })
 
+test('12. a result whose UNREAD fields are null is still a picture: only the fields this adapter reads may refuse one', async () => {
+  // Measured on the first real reel, 2026-09-22: the seedream text wire answered 200 with `width`
+  // and `height` NULL rather than absent, and `z.number().optional()` refuses a null — so a
+  // picture fal had already made, and had already billed for, was thrown away by two fields the
+  // adapter deliberately never reads, and no receipt was written for it (S-133). The frame is
+  // still read off the BYTES, which is what the assertion below holds.
+  const f = folder()
+  try {
+    const { port, recorded } = adapter(
+      ['fal-image-bare', 'fal-image-completed', 'fal-image-nulled', 'fal-picture-vertical'],
+      f.dir,
+    )
+    const answer = await port.generate(request())
+    assert.equal(answer.kind, 'made')
+    if (answer.kind !== 'made') return
+    assert.ok(existsSync(answer.picture.path), 'the picture has no file behind it')
+    assert.deepEqual(recorded.left(), [], 'the nulled body was never served')
+    // The frame in the receipt is the one read off the bytes, not the null the provider sent.
+    assert.equal(answer.receipt.fake, false)
+  } finally {
+    f.clean()
+  }
+})
+
 test('12. a recorded response whose file is 16:9 fails the call naming the entry, and never reaches image-to-video', async () => {
   const f = folder()
   try {

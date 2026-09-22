@@ -213,6 +213,26 @@ function namesEach(
  * each once, and nothing else; and an entity is a number the witness gave, or null. An answer that
  * does not parse fails the run (S-054), as a refused planning answer does.
  */
+/**
+ * An id field that SAYS WHICH IDS IT ACCEPTS (S-139).
+ *
+ * `namesEach` has always refused an id that was not asked about, and a `superRefine` **does not
+ * render into JSON Schema** — so the shape a model is shown said only `{"type":"string"}`, and
+ * the constraint reached it in nothing. Measured on a real reel, 98¢ in, with two clips already
+ * bought: asked about `keeper` and `log`, the reconciler answered `"Lighthouse Keeper"` and
+ * `"Handwritten Logbook"` — the plan's display names — and the answer was refused.
+ *
+ * **What is ACCEPTED does not move by one character**: `namesEach` still runs, and still requires
+ * every id exactly once and no other. What moves is what the schema SAYS, and therefore what the
+ * adapter's rendering of it tells the model (S-130). A constraint a reader of the schema cannot
+ * see is a constraint the answerer cannot meet.
+ *
+ * An empty list stays `z.string()`, because `z.enum` has no empty form and an id field that
+ * accepts nothing would refuse before `namesEach` could say why.
+ */
+const oneOf = (ids: readonly string[]) =>
+  ids.length === 0 ? z.string() : z.enum([...ids] as [string, ...string[]])
+
 export function reconcileAnswer(
   subjectIds: readonly string[],
   criterionIds: readonly string[],
@@ -221,8 +241,10 @@ export function reconcileAnswer(
   const entity = z.number().int().min(0).nullable()
   return z
     .strictObject({
-      subjects: z.array(z.strictObject({ id: z.string(), entity, countMatches: z.boolean() })),
-      criteria: z.array(z.strictObject({ id: z.string(), shown: z.boolean(), entity })),
+      subjects: z.array(
+        z.strictObject({ id: oneOf(subjectIds), entity, countMatches: z.boolean() }),
+      ),
+      criteria: z.array(z.strictObject({ id: oneOf(criterionIds), shown: z.boolean(), entity })),
     })
     .superRefine((answer, ctx) => {
       namesEach(answer.subjects, subjectIds, 'subjects', ctx)
@@ -255,7 +277,7 @@ export type ReconcileAnswer = z.infer<ReturnType<typeof reconcileAnswer>>
 export function compareAnswer(subjects: readonly string[]) {
   return z
     .strictObject({
-      subjects: z.array(z.strictObject({ subject: z.string(), same: z.enum(['yes', 'no']) })),
+      subjects: z.array(z.strictObject({ subject: oneOf(subjects), same: z.enum(['yes', 'no']) })),
     })
     .superRefine((answer, ctx) => {
       namesEach(

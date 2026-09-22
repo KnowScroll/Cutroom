@@ -5238,3 +5238,190 @@ is about**, and **that T2A's timings are sentence-level unless asked otherwise**
 subtitle URL came back, which is true, and nothing had ever read the body behind it. Still open upstream and
 unchanged: D-028's default image entry (O-4 / C-8), `reel-script`'s criterion type (S-029), and the steering
 stubs and the pin (S-033).
+
+---
+
+## 2026-09-22 — session 45: the reel was made, and the last gate refused it
+
+**Intent.** Run `PROMPTS/045-paid-path-real-reel.md`: make ONE REAL REEL, write down what it cost, run six
+journeys. `decisions.mjs`: pin current, 0 unpushed. Session 44's work was still uncommitted and is committed
+first (`8ae6fde`), green.
+
+**What happened, in one line.** **Fifteen attempts, twelve blockers, about $4.09 spent, and a finished reel
+that this engine's own final gate refused.** Every blocker was in the engine or in the brief, and every one is
+now a decision — **S-130 to S-140**. The last run made four shots, five clips, four narrations and an
+assembled MP4 for **202¢ against a 250¢ ceiling and a printed estimate of 155–210¢**, and stopped at
+**Gate 7**.
+
+**Slice 8 is NOT ticked and the "One real reel exists" Outcome line is NOT ticked**, for two reasons, both
+stated rather than worked around: the reel was **refused by Gate 7**, so the engine did not deliver one; and
+**the provider's own figures were never read**, so the second half of that line — _"beside what the provider
+says it cost"_ — has nothing in it.
+
+### The twelve blockers, in the order the reel hit them
+
+Every one was found by the engine's own refusal, and **nine of the twelve cost nothing at all**.
+
+| #   | What broke                                                                  | Found at | Entry     |
+| --- | --------------------------------------------------------------------------- | -------- | --------- |
+| 1   | `response_format` is accepted 200 and IGNORED: invented field names         | 0¢       | **S-130** |
+| 2   | `"items": false` — a boolean schema — 400s the whole request                | 0¢       | **S-131** |
+| 3   | a correct answer wrapped in a fenced code block                             | 0¢       | **S-132** |
+| 4   | fal answers `width: null`; a field nothing reads refused a paid picture     | 0¢ \*    | **S-133** |
+| 5   | seedream's frame is **1920x3416**, refused by check 12                      | 0¢ \*    | **S-133** |
+| 6   | the request argued with itself: a keeper required AND all persons forbidden | 15¢      | **S-134** |
+| 7   | a planner call spent all 6144 tokens thinking and answered nothing          | 0¢       | **S-135** |
+| 8   | the planner answered with THE SCHEMA                                        | 0¢       | **S-136** |
+| 9   | a 180 s timeout beside a 26624-token budget                                 | 0¢       | **S-137** |
+| 10  | the judge renamed `shelf` to "Shelf of Bound Volumes"                       | 34¢      | **S-138** |
+| 11  | a `superRefine` renders into nothing, so the ids reached the model in words | 98¢      | **S-139** |
+| 12  | an observation cut off mid-JSON read as bad JSON, not as the budget         | 23¢      | **S-140** |
+
+\* — these two calls were made, answered 200, and **left no receipt**. That is a finding of its own: see
+below.
+
+**The pattern under half of them, and it is one sentence.** **What this provider accepts is not what it
+honours.** `response_format` carrying a full JSON Schema: 200, ignored. `strict: true`: 200, identical to
+asking for no schema at all. Four different thinking switches: 200, `<think>` still in the content. S-129
+found the same thing the day before with `subtitle_granularity`. **Only the body proves anything**, and four
+of this session's decisions exist because a field was accepted and did nothing.
+
+**The pattern under the other half.** **Where the exact form of an answer is not pinned in the message, the
+model fills it in with something reasonable** — invented field names, the schema itself, a subject's display
+name. Every gate this engine has is built on exact forms. **S-139 is the general answer: put the closed set
+where it RENDERS**, which is the schema, because a `superRefine` renders into nothing and the answerer never
+sees the rule it is judged by.
+
+### What the finished run actually did
+
+`ffbd04b5-a00f-4675-bb67-36e90f69c417`, flux, `English_Graceful_Lady`, **795.4 s submit to finished**.
+
+```text
+  116.3s  plan finished     two plans, both accepted by Gate 0
+  339.9s  stills finished   3 shots accepted at Gate 1, 2 pairs accepted at Gate 1S
+  768.6s  4 shots through Gates 2, 3, 4 and 5 — shot-3 took one retake and passed
+  794.8s  GATE 7 REFUSED THE CUT
+```
+
+**Gate 7's words:** _"the judge answered no to 'Does every shot show something no other shot repeats?'. No
+edit exists to try, so the reel stops (S-066, S-074)."_ That is the brief again, not the engine: four shots
+of a keeper, a logbook and bound volumes repeat one another, and the final judge said so about the finished
+cut. **The engine assembled the reel, watched it, and refused it.** `a1-render.mp4` exists under the artifact
+root: 768x1366, 33.5 s, video and audio, 7.1 MB.
+
+### The figures
+
+**Receipts — 202¢, against a ceiling of 250¢ and an estimate of 155–210¢. The estimate was right.**
+
+| kind   | n   | cents | what                                                             |
+| ------ | --- | ----- | ---------------------------------------------------------------- |
+| model  | 30  | 0     | planner x2, reconciler x11, witness x16, judge x1 — plan-covered |
+| image  | 5   | 34    | text wire 5¢ x2, edit wire 8¢ x3                                 |
+| speech | 4   | 0     | `speech-2.8-hd`, plan-covered                                    |
+| video  | 5   | 168   | 42 s of clips at the configured 4¢/s, including one retake       |
+
+**THE PROVIDER'S OWN FIGURES WERE NOT READ, AND NOTHING IN THAT TABLE IS ONE.** Every cent there is **our
+configured rate applied to what we asked for**, computed by the same `estimate()` admission uses. fal's
+dashboard was never opened this session. Therefore:
+
+- **D-007's Q9 — the observed video rate — IS STILL OPEN.** It is not closed by a receipt that multiplies our
+  own constant by our own seconds. What closes it is one read of fal's billing page beside this run's id, and
+  that is **owed**.
+- **WHETHER A FAILED CALL BILLS IS NOT ESTABLISHED.** Gate 2 says this is read, never assumed, and it was not
+  read. What IS established is the half that lives here: **a call that completes and then fails to parse
+  leaves NO RECEIPT**, because `structured` and `generate` both build their receipt after the answer is
+  parsed. Two image calls this session were made, answered 200, and left no row. Under the token plan the
+  model calls cost nothing; **a paid call that leaves no row is spend the budget guard cannot see** (S-059,
+  S-087, S-095). Named in S-133, and owed.
+- **The corrected image rate is TWO figures, not one.** flux came to **5¢ on the text wire and 8¢ on the edit
+  wire** by our registry's own arithmetic — S-128's two wires showing up in the money. BUDGET.md records one
+  figure per entry. **Owed upstream** (D-115, S-017), and not edited here.
+
+**Latency, which `parallel-shots` could not be planned without (S-115).**
+
+| what                   | measured                                               |
+| ---------------------- | ------------------------------------------------------ |
+| the whole run          | **795.4 s**                                            |
+| one clip, speech→video | **21.2 s, 32.4 s, 49.8 s, 23.1 s, 111.1 s**            |
+| the plan stage         | 52–166 s across runs; 116.3 s in this one              |
+| one model call         | 3–45 s, and the tail is what S-135 and S-137 are about |
+
+**The clips are 5.2x apart and the whole run is thirteen minutes**, most of it sequential model calls. That is
+the figure S-115 deferred to, and it exists now.
+
+**D-019's 768x1344 margin held on a real clip, and it is thin.** Computed the way Gate 2 computes it,
+`|w/h − 9/16| ≤ 0.01`:
+
+| frame                            | ratio    | differs by | margin left  |
+| -------------------------------- | -------- | ---------- | ------------ |
+| **768x1344**, the clip fal made  | 0.571429 | 0.008929   | **0.001071** |
+| **768x1366**, the assembled reel | 0.562225 | 0.000275   | 0.009725     |
+| 1920x3416, seedream's picture    | 0.562061 | 0.000439   | 0.009561     |
+
+**0.001071 is session 41's 0.0011, measured on a real clip rather than on the spike.** The margin held, with
+about a tenth of it to spare.
+
+**A divergence worth naming, and not changing.** Seedream's 1920x3416 is **within Gate 2's 0.01 tolerance**
+and was **refused by the stills adapter**, whose frame rule is exact equality. The two strictnesses are
+deliberately different — D-028 says the 9:16 requirement fails silently and must be judged on the produced
+frame — but **a picture Gate 2 would accept is thrown away before Gate 2 ever sees it**, and nothing says so
+in one place.
+
+### Seedream: D-028's conditional admission is answered, and the answer is no
+
+D-028 admits `bytedance/seedream/v5/lite/*` with _"9:16 undocumented — must pass the frame assertion before
+use"_. **It does not pass it.** Asked for 864x1536 it produced **1920x3416** — its own size, ignoring the
+dimensions sent — and check 12 refused it **before the file was written and before any clip was bought**,
+naming the wire that was called. The whole cost of finding out was **two image calls**, exactly the bound
+S-127 predicted. The run then moved to `fal-ai/flux-2-pro/edit`, which produces the frame it is asked for, and
+every picture in the finished reel is flux's.
+
+### The brief, which is where four of the failures were
+
+Three changes to `scripts/real-reel.mjs`, and **none to any gate** (S-134):
+
+- `never-person` was _"any real living person"_ while `show-keeper` REQUIRED a lighthouse keeper. **A
+  criterion that is violated by satisfying another criterion cannot be met by any picture**, and the
+  reconciler said so. It is now _"a recognisable real-world public figure"_.
+- **"seen whole within the frame" was tried and made it worse.** It reads as part of what the criterion
+  REQUIRES, so the judge began answering _"show-log is not shown: a handwritten logbook, seen whole within the
+  frame"_ — a stricter mustShow, where what was wanted was looser framing. Reverted.
+- **A shelf does not fit a vertical frame.** Three candidates refused for _"Shelf of Bound Volumes is clipped
+  by the edge of the frame"_, which is what a shelf in 9:16 always is. It is now _"a stack of bound volumes on
+  a desk"_, and that shot passed.
+
+**All of this is the gates working.** They are what a badly written brief runs into, and it ran into them
+**before any clip was bought** every time but the last.
+
+### Changed
+
+- **`packages/providers/src/minimax/model.ts`** — the shape said in the message beside `response_format`
+  (S-130); boolean schemas dropped from the rendering (S-131); a whole fence unwrapped (S-132); the reasoning
+  allowance 4096 → 24576 and the answer allowance 2048 → 8192 (S-135, S-140); the timeout 180 s → 600 s
+  (S-137); the compare question quoting its subjects and demanding them character for character (S-138); a
+  schema echo and a cut-off answer each refused by name (S-136, S-140).
+- **`packages/providers/src/fal/image.ts`** — every field the adapter does not read admits `null` (S-133).
+- **`packages/pipeline/src/stills/prompts.ts`** — **the only pipeline change**, and it moves nothing that is
+  accepted: the closed id sets become `z.enum` so that they RENDER (S-139). `reel-stills` and `reel-takes`:
+  **129 tests, unchanged, green**, which is what "the accepted set did not move" means concretely.
+- **`scripts/real-reel.mjs`** — the caller's request, the three changes above (S-134).
+- **`tests/fixtures/wire/`** — 65 → 69. `minimax-chat-fenced` is a **live M3 answer carrying BOTH wrappers**,
+  reasoning block and fence; `minimax-chat-echo`, `minimax-chat-cut` and `fal-image-nulled` carry the other
+  three shapes that were seen.
+- **Checks 6, 7, 11 and 12 gained assertions, all by addition.** **Check 11 caught a comment of mine spelling
+  a slug outside the registry** — the rule doing its job on its own author.
+- **A break campaign of six** over S-130's code, each break written from a FILE rather than through a shell
+  (S-129's note on the backslash trap, a fourth session): every break typechecked clean, every one was caught
+  by check 6, check 7 or both, and the control — a comment reworded — was caught by nothing.
+
+### Spend
+
+**402¢ recorded across seven paying runs**, plus **about 7¢ in the two calls that left no receipt** — call it
+**$4.09**. Every run was individually under its 250¢ ceiling and under BUDGET.md's 300¢ cap. **The aggregate
+is bounded by nothing, because the guard is per-run by design (D-100).** That is not a fault and it is worth
+writing down: fifteen attempts at one reel cost more than four finished reels would have.
+
+**Next.** The reel does not exist, and the engine is not the reason. `PROMPTS/046` puts the choice to the
+owner. The two gaps this session named and did not close are **the lost receipt** (S-133) and **the model
+port's missing transient retry** (S-137) — the same shape twice: a call that happened, and a run that cannot
+carry on from it.

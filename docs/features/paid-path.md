@@ -441,6 +441,19 @@ it is the part that may differ per model.
       every stand-in run uses. The ceiling is 250¢, a constant the script can only lower, and the estimate is
       printed and typed back before anything is submitted. `cheapestEntry()` makes S-127's stale claim data. Check 3
       moved into a file of its own, unchanged, because check 22 cannot run the file it lives in — S-128.)
+      (**Session 45 ran it and the slice is still open.** Fifteen attempts, twelve blockers — **S-130 to
+      S-140** — and about **$4.09**. The last run planned four shots, took three canonical pictures through
+      Gate 1 and Gate 1S, spoke four narrations, bought five clips through Gates 2 to 5, assembled
+      `a1-render.mp4` with ffmpeg, and **Gate 7 refused the cut**: _"the judge answered no to 'Does every shot
+      show something no other shot repeats?'"_ — **202¢ against a 250¢ ceiling and an estimate of 155–210¢**,
+      so the estimate was right and the engine ran end to end on real providers. **The slice stays unticked
+      for two reasons:** the engine refused the reel, so no reel was delivered; and **the provider's own
+      figures were never read**, so _"beside what the provider says it cost"_ has nothing in it and D-007's Q9
+      is still open. Nine of the twelve blockers cost nothing, caught by the engine's own refusals before any
+      clip was bought. Two gaps are named and not closed: **a call that completes and then fails to parse
+      leaves no receipt** (S-133), and **the model port has no transient retry** (S-137). Seedream is
+      answered and the answer is no — asked for 864x1536 it produced **1920x3416**, refused by check 12 for
+      two image calls and no video spend, which closes D-028's conditional admission for that entry.)
 
 Every check appears in exactly one slice: 3 + 2 + 4 + 2 + 3 + 4 + 2 + 2 = 22.
 

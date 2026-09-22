@@ -1,0 +1,41 @@
+{
+  "note": "THE FAILURE OBSERVED ONCE ON A REAL REEL, 2026-09-22: asked for a plan with the schema rendered into the message (S-130), MiniMax-M2.7 answered with THE SCHEMA DOCUMENT rather than an object matching it. The content here is the rendering the planning call sends, which is what came back. Twelve probe calls afterwards — six under each wording of SHAPE_PREFACE — never reproduced it, so it is a tail event: what this fixture holds is that when it happens the refusal SAYS SO rather than calling it bad JSON (S-136).",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "echo",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-0001",
+      "object": "chat.completion",
+      "created": 1758326400,
+      "model": "MiniMax-M2.7",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"units\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{\"sentence\":{\"type\":\"integer\"},\"shot\":{\"type\":\"string\"}},\"required\":[\"sentence\",\"shot\"],\"additionalProperties\":false}}},\"required\":[\"units\"],\"additionalProperties\":false}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 812,
+        "completion_tokens": 96,
+        "total_tokens": 908
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}

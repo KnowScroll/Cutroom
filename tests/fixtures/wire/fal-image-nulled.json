@@ -1,0 +1,28 @@
+{
+  "note": "THE SHAPE A LIVE CALL ANSWERED, 2026-09-22 — the first real reel’s canonical picture, on the seedream text wire: HTTP 200 with `width` and `height` NULL rather than absent. `z.number().optional()` refuses a null, so the adapter threw on a picture fal had already made and already billed for, and the run stopped with no receipt for it (S-133). The refusal named exactly `images.0.width` and `images.0.height`; the rest of this body is `fal-image-made`’s published shape, which the same call satisfied. What it proves is that a field this adapter does not read cannot refuse a picture it does read.",
+  "provider": "fal",
+  "call": "image",
+  "case": "nulled",
+  "request": {
+    "method": "GET",
+    "path": "/fal-ai/flux-2-pro/requests/7f2c1a80-3b44-4d61-9d0e-5c8ab2e41f37"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "images": [
+        {
+          "url": "https://v3.fal.media/files/vertical.png",
+          "width": null,
+          "height": null,
+          "content_type": "image/png"
+        }
+      ],
+      "seed": null,
+      "prompt": null
+    }
+  }
+}

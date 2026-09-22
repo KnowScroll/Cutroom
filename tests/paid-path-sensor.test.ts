@@ -7,6 +7,7 @@ import type { PictureRef, PictureTextReader } from '@cutroom/contracts'
 import {
   BLUR_FLOOR,
   READ_TEXT_QUESTION,
+  SHAPE_PREFACE,
   REQUIRED_FILTERS,
   SENSOR_FILTERS,
   ffmpegSensors,
@@ -393,17 +394,26 @@ test('19. against recorded wire the adapter carries the picture and the question
     }
     assert.equal(body.model, MODELS.witness)
     const parts = body.messages[0]?.content ?? []
-    // I-8: a call that carries a picture carries NO PROMPT and NO SCHEMA the caller wrote. The
-    // question is the adapter's own, and the picture is carried as its own bytes.
+    // I-8: a call that carries a picture carries NO PROMPT and NO SCHEMA THE CALLER WROTE. The
+    // question is the adapter's own, the picture is carried as its own bytes, and the third part
+    // is the ADAPTER'S OWN schema, said in the message because this wire answers 200 to
+    // `response_format` and ignores it (S-130). Still nothing a caller's brief could be written
+    // into — that is what I-8 forbids, and all three parts are fixed inside the adapter.
     assert.deepEqual(
       parts.map((p) => p.type),
-      ['text', 'image_url'],
+      ['text', 'image_url', 'text'],
     )
     assert.equal(
       JSON.stringify(parts[0]),
       JSON.stringify({ type: 'text', text: READ_TEXT_QUESTION }),
     )
     assert.ok(parts[1]?.image_url?.url.startsWith('data:image/png;base64,'), 'no picture was sent')
+    const shape = parts[2] as { type: string; text?: string }
+    assert.ok(
+      String(shape.text).startsWith(SHAPE_PREFACE),
+      'the third part is not the shape, so something else reached a call that carries a picture',
+    )
+    assert.match(String(shape.text), /"text"/, "the shape does not name the answer's own field")
     assert.equal(sent.headers.authorization, `Bearer ${KEY}`)
     assert.deepEqual(recorded.left(), [])
   } finally {
