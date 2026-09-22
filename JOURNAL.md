@@ -5550,8 +5550,12 @@ run in three**, and every one of those has already bought everything.
 
 **Observed.**
 
-- **Five journeys PASS, then four more after B**: `paid-failures` at `dcf58a1`, and `reel-stills`,
-  `reel-render` and `reel-takes` again for the six-call bound, the worker's composition and check 1.
+- **Every runnable journey PASSES, three times over.** Five at the start, once `S-141` let them run at all;
+  four after B — `paid-failures` at `dcf58a1`, and `reel-stills`, `reel-render` and `reel-takes` again for
+  the six-call bound, the worker's composition and check 1; and **all six again at the end**, for the vision
+  question's new sentence: `paid-failures` 17, `reel-stills` 63, `reel-render` 106, `reel-takes` 66,
+  `reel-plan` 50, `reel-contract` 41. **`paid-path`'s own journey still refuses**, and will until a reel is
+  delivered.
 - **`node scripts/check.mjs` green**, nine checks, at every commit.
 - **Two break campaigns**, each written from a FILE rather than through a shell — and **the backslash trap
   fired three times anyway**, in a test regex, in a preface constant and in a second regex, each caught by
