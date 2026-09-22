@@ -2,7 +2,7 @@
 
 - **For:** session 46
 - **Feature:** `paid-path` — [`docs/features/paid-path.md`](../docs/features/paid-path.md)
-- **Work:** the owner picks one of three; each is written out below
+- **Work:** the six journeys FIRST (owed from session 45), then the owner picks one of three
 - **Written:** 2026-09-22, at the end of session 45
 - **Run:** not yet
 
@@ -95,6 +95,13 @@ WHAT IS ALREADY SETTLED, so do not ask any of it again:
   exceed it is stopped by the budget guard, and that is the guard working.
 - A run that reaches the video stage costs about 200c. A run that fails at Gate 1 costs about 15c. Gate 7
   cannot be reached without paying for the clips.
+
+FIRST, BEFORE THE CHOICE: THE SIX JOURNEYS ARE OWED. Session 45 started `node scripts/journey.mjs
+reel-stills` at 4825530 and the harness stopped it because the machine was low on memory — not a journey
+failure, and nothing was written. Run all six before anything else, one at a time rather than together, since
+that is what ran the machine out of memory: paid-path, reel-stills, reel-plan, reel-render, reel-takes,
+reel-contract (S-099's form). Never type the evidence, the status or the divergence by hand. A FAIL is the
+finding: stop and report.
 
 Start:
 1. `node scripts/decisions.mjs`. If it says commits are unpushed in the steering repository, say so and stop.
