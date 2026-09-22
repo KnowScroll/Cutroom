@@ -5905,3 +5905,182 @@ only one the budget guard could see.
 added to the arm (`retries?: number`) fails it, and the file was restored. And
 `docs/features/paid-failures.md`'s check 4, which asserts the row and the job row's figure for the
 re-buy case; and `reel-takes`' journey, re-run in that feature's last slice.
+
+---
+
+## S-144 | 2026-09-22 | A rendered enum is not enough for a vision call: the closed sets are SAID in the question too, computed from the shape — and this is not claimed as a fix, because it was measured and it is a tail
+
+**Chose.**
+
+- **`closedSetsSaid(shape)`** walks the rendered JSON Schema and returns one line per closed set —
+  `- entities.position: exactly one of "left", "centre", "right"` — under `CLOSED_SETS_PREFACE`,
+  which also says what to do with the thing the model would rather have said: _"Give the value from
+  the set even when a more exact description of what you see is available, and put that description
+  in `ambiguities` instead."_
+- **It is appended to the QUESTION'S OWN text part**, not added as a part of its own, so a vision
+  call still carries what checks 6 and 7 assert it carries: the question first, the media as bytes
+  after it, the rendered schema last.
+- **The lines are computed from the shape**, never typed beside it: a set that gains a value gains
+  the sentence.
+- **Nothing in `packages/pipeline` moves.** `position` is still `left | centre | right`, and an
+  answer outside it is still refused.
+
+**Why, and what the measurement actually says.**
+
+- **A finished run died on it, 152¢ in.** 2026-09-22, the reel with four different scenes: four
+  clips bought, three shots through Gates 2 to 5, and the run failed on
+  _"the witness's answer for a1-shot-3-take-1 is not a clip observation: lighting: Invalid option:
+  expected one of "bright"|"dim"|"mixed"|"silhouette""_. **Gate 7 was never reached.**
+- **The enum DOES render.** `shapeAsked` puts the whole JSON Schema in the message (S-130), and
+  `lighting` and `position` carry their values in it. **So S-139's answer — put the closed set where
+  it renders — was already in force here, and the model answered outside the set anyway.**
+- **Measured on the clip that killed the run**, at temperature 0, calls that cost nothing under the
+  Token Plan (S-129):
+
+  | wording                       | calls | answers outside a closed set | what was answered                                                    |
+  | ----------------------------- | ----- | ---------------------------- | -------------------------------------------------------------------- |
+  | as shipped, the enum only     | 14    | **2**                        | `"scattered between the tall pillars"`, `"bottom half"`, `"top"`     |
+  | the sets said in the question | 12    | **1**                        | `"foreground"`, `"background"` — the NEIGHBOURING field's vocabulary |
+
+- **So the wording is NOT claimed to fix it**, and this entry says so rather than implying a cure:
+  2 in 14 and 1 in 12 are not distinguishable, and the failure survived the change. It is chosen
+  because it costs nothing, because it names the failure that was seen, and because the alternative
+  readings of the evidence are worse (below). **This is S-136's honesty, a second time.**
+- **What the values say about the cause.** They are not synonyms and not spellings. They are the
+  model **preferring a more precise thing to say** over the set it was given — a phrase where a
+  token was asked for, and then, under the new wording, the adjacent field's set. No rendering
+  forbids that, and no wording has been shown to.
+- **What it costs when it happens is the whole run.** The observation is Gate 5's, which is reached
+  only after that shot's clip is bought: at four clips a reel, **an 8% per-call failure is a run in
+  three**, and the run has already spent everything by then.
+
+**Rejected.**
+
+- **Widening the pipeline's schema** to accept `"center"`, `"top"` or a free phrase. That is
+  weakening a gate's closed set so a model's answer passes, which is the one thing this repository
+  never does. The set is what makes Gate 5's reading of a clip comparable at all.
+- **Normalising a near-miss in the adapter** — mapping `"center"` to `"centre"`, `"top"` to
+  something. The adapter would be deciding what the answer meant, and `"scattered between the tall
+pillars"` has no answer to be mapped to. A closed question whose answers are repaired is not
+  closed.
+- **Retrying the observation.** It is the shape most likely to work — the draws look independent,
+  so a second ask would take a run's chance of dying from about a third to about a fiftieth — and
+  **it is not this entry's to take**: an adapter never sends again (S-096), and the stage that
+  parses is `packages/pipeline`, a verified feature. **Put to the owner as its own decision, with
+  the figures above.**
+- **Claiming the wording fixes it.** Not measured. See above.
+
+**Caught by.** **Check 7**, by addition: a vision call's question is asserted to carry
+`CLOSED_SETS_PREFACE` and one exact line per closed set — `framing`, `lighting`,
+`entities.position`, `entities.prominence` — with the values read from the pipeline's own schema,
+and the text-part count asserted so the sets cannot migrate into a part of their own and move the
+media or the shape. **Broken deliberately**, from a file rather than through a shell: `closedSetsSaid`
+made to return nothing fails check 7 naming the question, and the file was restored.
+
+**Owed.** Whether an unparseable observation should be asked again, and by whom. The figures are in
+this entry; the decision is the owner's.
+
+---
+
+## S-145 | 2026-09-22 | A brief whose four units share no subject makes the stills stage a no-op, and the reel is made from words — measured, and the finding is the brief's, not the engine's
+
+**Chose.** Nothing in `packages/` moves. This entry **records a measured consequence of a caller's
+request** and puts the choice it implies to the owner (below).
+
+**Why.**
+
+- **The reel of 2026-09-22 made no pictures at all.** The run's own events:
+  `stage.started stills` and `stage.finished stills` **in the same 0.0 s**, `image 0 receipts 0c`,
+  and every one of the four clips bought on `fal-ai/minimax-h3-turbo/**text-to-video**`. The reel
+  was made **from words**, and cost **152¢** rather than the 202¢ the earlier brief cost.
+- **The cause is the brief, and it is the same change that was made to satisfy Gate 7.** Session
+  45's cut was refused for repeating itself — four shots of a keeper, a logbook and bound volumes
+  (S-140's session). The rewrite made the four units **genuinely different scenes**: a lamp at
+  night, a page under lamplight, an instrument box on grass, open water at first light. **Different
+  scenes share no subject**, and D-027's ladder makes a canonical picture for a subject that
+  RECURS: with nothing recurring, there was nothing for the stills stage to make, and D-050's step 2
+  took every shot to text-to-video.
+- **So the two things pull against each other, and that is the finding.** Gate 7 asks whether every
+  shot shows something no other shot repeats. The stills stage exists to carry identity ACROSS
+  shots (D-026, D-027). A brief that satisfies the first by sharing nothing removes the second's
+  reason to run — and the engine's own promise, _"approved stills become a finished video"_, is
+  bypassed without a single gate refusing anything.
+- **Nothing was wrong with what the engine did.** Every stage did what it is specified to do, and
+  the cheaper reel is the honest consequence of a request with no recurring subject. **The engine
+  is not the finding; the brief is.**
+
+**Rejected.**
+
+- **Making the stills stage run anyway**, on a subject that appears once. It would buy pictures for
+  identity that nothing needs carried, against D-027's own reason for the ladder.
+- **Reading the earlier brief as the right one.** Its cut was refused by Gate 7 on a true judgement
+  about itself.
+- **Deciding the next brief here.** It costs about 150–200¢ to find out whether any particular
+  compromise passes Gate 7, and which compromise to buy is the owner's. See below.
+
+**Caught by.** The run's own record: `image 0 receipts`, the two `stage` events at the same instant,
+and four `text-to-video` receipts, all of them in `JOURNAL.md` beside this entry. And by
+`reel-stills`' own checks, which are unchanged and green — **nothing about the stage moved**.
+
+**Owed.** Which brief to spend the next ~200¢ on: one with a subject that recurs across two of its
+four shots and different scenes for the rest, or another shape entirely. The owner's.
+
+---
+
+## S-146 | 2026-09-22 | An observation the gate cannot parse is asked again ONCE, and that needs its gates before its code — the owner's, with the figures in front of them
+
+**Chose.** The direction, and nothing else today.
+
+- **An unparseable observation is asked again once.** Not a wording, not a normalisation, not a
+  wider schema: the same call, sent a second time, when the answer the stage parses is refused.
+- **NO IMPLEMENTATION FILE IS OPENED FOR IT IN THIS SESSION.** It breaks a written rule — _"an
+  adapter never sends again"_ (S-096) — and it lands in either `packages/contracts` and
+  `packages/providers` (a new arm on the model port) or `packages/pipeline` (a retry where the
+  stage parses), and that second one is a verified feature. **Gates before code**: it is a feature
+  of its own or a slice of one, with its four gates written and reviewed, and `PROMPTS/047` is
+  where it starts.
+- **The next reel's brief keeps one subject recurring across two of its four shots**, with the four
+  scenes still different in place, object and hour.
+
+**Why.**
+
+- **The figures are S-144's, and they are what the owner decided on.** Measured at zero cost on the
+  clip that killed the run: an answer outside a closed set in **2 of 14** calls as shipped and **1
+  of 12** with the sets said in the question. The draws look independent, so **one retry takes a
+  four-clip run's chance of dying here from about one in three to about one in fifty** — and the
+  retry buys nothing, because model calls are covered by the Token Plan (S-129).
+- **Wording has now been tried twice and measured twice**, and neither time did it move the rate:
+  S-136's preface against the schema echo, and S-144's closed sets against the free-text answer.
+  **The lever that is left is the second ask**, and the reason it was not taken earlier is a rule
+  written for a different failure: S-096 forbade an adapter retrying because a retry would spend
+  again and would hide a provider's transient behind a counter nobody could see. **Neither is true
+  of a model call that answered nothing usable**: it costs nothing, and the thing it hides —
+  how often this wire answers outside a rendered set — is exactly what S-144 has now measured and
+  written down.
+- **The brief keeps a recurring subject because the two demands pull against each other** (S-145).
+  Gate 7 refuses a cut that repeats itself; the stills stage exists to carry identity ACROSS shots,
+  and a brief with four unrelated scenes gives it nothing to do — which is how a reel came to be
+  made entirely from words, 152¢, no picture. One subject in two shots is the compromise neither
+  run has tried: the stills stage runs, Gate 1S has something to compare, and the cut still shows
+  four different things.
+
+**Rejected.**
+
+- **Building the retry now, in this session, against the measurement.** It would be an
+  implementation file for a feature with no gates, which is the rule this repository is built on.
+  The owner chose the direction; the gates are what say where it lives and what catches it.
+- **Refusing the answer in the adapter instead.** Put to the owner: it fails the run at the same
+  moment for the same money and buys a better message, not a better outcome.
+- **Leaving it and keeping the wording.** Put to the owner: about one run in three would die the
+  same way, and every one of those has already bought its clips.
+- **Running the all-different brief again** because it is cheaper. Put to the owner: it reaches
+  Gate 7, which nothing has ever passed, and it bypasses the stills stage entirely — so _"approved
+  stills become a finished video"_ would stay unproven on real providers.
+
+**Caught by.** `PROMPTS/047`, which is where the gates are written, and this entry, which is what a
+reviewer reads them against. **Nothing in the code claims any of it yet** — the only thing this
+session shipped on the subject is S-144's sentence and its check, which are honest about being a
+wording that was measured not to work.
+
+**Confirmed-by.** The owner, 2026-09-22, shown the two tables and all three alternatives on each
+question, chose the second ask and the recurring subject.

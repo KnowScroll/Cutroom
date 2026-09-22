@@ -5433,3 +5433,132 @@ five were not started. **They are owed**, and they are the first thing session 4
 else: `paid-path`, `reel-stills`, `reel-plan`, `reel-render`, `reel-takes`, `reel-contract` (S-099's form).
 `node scripts/check.mjs` is green at that commit, nine checks, which is what the journeys would be run
 against.
+
+---
+
+## 2026-09-22 — session 46, the journeys could not start, the two gaps are closed, and the reel died in a new place
+
+**Intent.** Run `PROMPTS/046-paid-path-gaps-then-gate-7.md`: the six owed journeys, then **B** — the two gaps
+session 45 named and did not close — then **A**, the reel that passes Gate 7. `decisions.mjs`: pin current,
+0 unpushed. `check.mjs` green at `d8a9d60`.
+
+**Three things happened, and the order matters: a check refused to run, a feature was built to close two
+holes in the money, and a reel was made that died in a place nothing had ever reached.**
+
+### 0 — the journeys could not start, and the reason was a wrapped line
+
+`node scripts/journey.mjs paid-path` answered **`REFUSED gate 'program-design' is not approved`**. That gate
+was approved on 2026-09-20 by an adversarial reviewer and says so in the file — **on the second line of a
+wrapped `Gates:` line**, where `journey.mjs`'s `/^Gates:(.*)$/m` cannot see it. The other five feature files
+carry the whole line, over 100 characters, unwrapped; `.prettierrc` sets no `proseWrap`, so nothing rewrapped
+it — **it was typed that way when `paid-path`'s gates were written**, and every journey of that feature has
+been unrunnable since.
+
+**The document changed, not the reader** (**S-141**): widening `journey.mjs` to read a continuation makes
+`Gates:` a paragraph with no stated end, and it is the thing every feature is judged by.
+`tests/feature-files.test.ts` gained a test asserting all four gate names on that one line in every feature
+file. **Broken deliberately once**, from a file: the line re-wrapped exactly as it was fails the test naming
+`program-design`.
+
+**Then the five runnable journeys PASSED**, one at a time, committing each — `reel-stills` 63, `reel-plan` 50,
+`reel-render` 106 (check 50 included, the fragile one), `reel-takes` 66, `reel-contract` 41.
+**`paid-path`'s own journey refuses by design**, because Slice 8 is not ticked and cannot be until a reel is
+delivered.
+
+### B — the two gaps, as a feature of their own
+
+The owner answered three questions before any gate was written (**S-142**): **a feature of its own**, because
+`paid-path`'s approved Gate 1 says it _"builds no new stage, gate, table or route"_ and this adds a table;
+**the receipt carried by a typed error** the worker catches; and **a table of its own** rather than a widened
+`generation_receipt`. `docs/features/paid-failures.md` — four gates, a review of six findings, five slices,
+twelve checks — and it is **verified**: `journey=PASS at dcf58a1`, 17 tests.
+
+**The load-bearing discovery is a boundary, and it explains the whole shape.** `Spent` and `Unavailable` are
+declared in **`packages/contracts`**, not in `providers` where the adapters throw them, because
+`worker-no-providers` forbids `apps/worker` importing that package (S-038) — **which is exactly why
+`Unavailable` had never been seen by the worker and why the model port had no retry** (S-137). Providers
+re-exports both, so no adapter's import line moved.
+
+**What every adapter does now.** One line, drawn at _"has the provider made something yet"_: before it, a
+fault or `Unavailable`, unchanged; after it, **`Spent`**, carrying the port, the wire called, the cost our
+configured rate gives that call, and a detail. The worker writes one `lost_call` row, adds the cost to the
+job row, and **rethrows unchanged**, so a run fails exactly as it did. `imageCallCount` counts a lost image
+call, so **D-027's six-call bound counts what was PAID FOR** rather than what came out well — tighter, never
+looser.
+
+**And a third leak came out from behind the first two (S-143).** A clip re-bought after a transient
+**download** is not a thrown failure at all: S-125 answers it `unavailable` and the guarded port buys the clip
+again, so a run paid twice and the guard saw once — **the largest of the three, at 40¢ a clip.**
+`VideoAnswer`'s unavailable arm gained an optional `spent`, set in that one case. **`reel-takes`' check 1
+caught the change on the same commit**, refusing a field that had not been declared to it, and it is amended
+by NAMING the field: the arm is now pinned as a whole object type, so a third key still fails it **and** a
+wrong-typed `spent` fails it too — proven by adding one.
+
+**The model port has the counter every other paying port had**, wrapped once in the worker, inside the
+recording port, on the render settings' figures. **A `Spent` is never sent again**, and neither is a fault.
+
+### A — the reel was made, and died in a place nothing had ever reached
+
+`ad65acbe-4084-499d-ad86-03f364470eed`, **152¢ against a 250¢ ceiling**, estimate 155–210¢, **364.0 s**. The
+brief was rewritten first, to what Gate 7's refusal asked for: four units that are genuinely different scenes.
+
+**Two findings, both written down rather than worked around.**
+
+1. **The stills stage did nothing, and the reel was made from WORDS** (**S-145**). `stage.started stills` and
+   `stage.finished stills` in the same instant; **0 image calls**; four clips on **text-to-video**. Four
+   different scenes **share no subject**, and D-027's ladder makes a canonical picture for a subject that
+   RECURS — so the change that satisfies Gate 7 removes the stills stage's reason to run. **The engine did
+   exactly what it is specified to do**; the finding is the brief's.
+2. **The run failed at the last shot's Gate 5**, on _"the witness's answer for a1-shot-3-take-1 is not a clip
+   observation: lighting: Invalid option"_ — **after all four clips were bought**, and **Gate 7 was never
+   reached**.
+
+**The second one was measured rather than guessed at, because model calls cost nothing under the Token Plan**
+(S-129). Observation calls on the clip that killed the run, at temperature 0:
+
+| wording                       | calls | outside a closed set | what came back                                                   |
+| ----------------------------- | ----- | -------------------- | ---------------------------------------------------------------- |
+| as shipped, the enum rendered | 14    | **2**                | `"scattered between the tall pillars"`, `"bottom half"`, `"top"` |
+| the sets also said in words   | 12    | **1**                | `"foreground"`, `"background"` — the NEIGHBOURING field's set    |
+
+**S-139's answer — put the closed set where it renders — was already in force, and the model answered outside
+it anyway.** The values are not synonyms or spellings: they are the model preferring a more precise thing to
+say over the set it was given. **S-144 ships the sentence and says plainly that it is not a fix**, the way
+S-136 did: 2-in-14 and 1-in-12 are not distinguishable. At four clips a reel, an 8% per-call failure is **a
+run in three**, and every one of those has already bought everything.
+
+**The owner's answers, with the figures in front of them (S-146): ask an unparseable observation again ONCE**
+— which breaks S-096's _"an adapter never sends again"_ and therefore **needs its own gates before any code**
+— **and give the next brief one subject that recurs across two of its four shots.** Neither is built here.
+
+**Changed.**
+
+- **`docs/features/paid-failures.md`** — new, four gates APPROVED after a six-finding review, five slices,
+  twelve checks, **journey PASS**. **`DECISIONS.md` — S-141 to S-146.**
+- **`packages/contracts/src/failures.ts`** — new: `Spent`, `isSpent`, `LostCall`, and `Unavailable` moved
+  here. **`clip.ts`** — the unavailable arm's optional `spent`.
+- **`packages/domain`** — the `lost_call` table, `db/migrations/0005_lost_call.sql`, `recordLostCall`, and
+  `imageCallCount` over both tables.
+- **`packages/providers`** — all four real adapters throw `Spent` after the provider has made something;
+  `transient.ts` re-exports the two moved names and gains `messageOf`; the model adapter says every closed
+  set of a vision call's shape **in the question**, computed from the shape (S-144).
+- **`apps/worker`** — `spend.ts` and `model-port.ts`, new; the recording port takes the job id; the three
+  guarded ports record a `Spent`; the guarded video port records a re-bought clip before it sends again.
+- **`tests/`** — `paid-failures-{adapters,record,retry,boundary,secrets}.test.ts`, +17; `feature-files` +1;
+  `reel-takes-ports` and `paid-path-model` amended by addition.
+- **`scripts/real-reel.mjs`** — the caller's request, four different scenes (no gate, no check moved).
+
+**Observed.**
+
+- **Five journeys PASS, then four more after B**: `paid-failures` at `dcf58a1`, and `reel-stills`,
+  `reel-render` and `reel-takes` again for the six-call bound, the worker's composition and check 1.
+- **`node scripts/check.mjs` green**, nine checks, at every commit.
+- **Two break campaigns**, each written from a FILE rather than through a shell — and **the backslash trap
+  fired three times anyway**, in a test regex, in a preface constant and in a second regex, each caught by
+  reading the file back rather than the command. **A fifth consecutive session.**
+- **Spend: 152¢ this session**, one run, no reel. Every cent of it is our configured rate applied to what we
+  asked for; **fal's own figures are still unread**, so D-007's Q9 and _"whether a failed call bills"_ are
+  still owed upstream, as is the corrected image rate's two figures (S-128).
+
+**Next.** `PROMPTS/047`: the observation's second ask, with its gates written first (S-146), and then the reel
+again on a brief with one recurring subject. **`parallel-shots` (S-115) is still held by the owner.**

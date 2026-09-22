@@ -193,6 +193,58 @@ export const SHAPE_PREFACE = [
 ].join('\n')
 
 /**
+ * The words the closed sets of a VISION call's shape are said under (S-144).
+ *
+ * The enum renders — `shapeAsked` puts the whole JSON Schema in the message, and every closed set
+ * in it carries its values — and **that was measured not to be enough**. On the clip a run of
+ * 2026-09-22 died on, fourteen observation calls at temperature 0 answered `position` and
+ * `lighting` OUTSIDE their sets twice: `"scattered between the tall pillars"`, `"bottom half"`,
+ * `"top"`. They are not synonyms or spellings — they are the model preferring a more precise thing
+ * to say over the set it was given, which no rendering forbids and only the question can.
+ *
+ * The line is built FROM the shape, never typed beside it: a set that gains a value gains the
+ * sentence (S-124, S-127, S-130's rule).
+ */
+export const CLOSED_SETS_PREFACE =
+  'Some of these fields take one of a fixed set of values, and nothing else is an answer. Give ' +
+  'the value from the set even when a more exact description of what you see is available, and ' +
+  'put that description in `ambiguities` instead:'
+
+/**
+ * Every closed set in one rendered shape, as lines a reader and a model both read the same way:
+ * `position: exactly one of "left", "centre", "right"`. Nested objects are walked, so an entity's
+ * fields are named by their path; a shape with no closed set says nothing at all.
+ */
+export function closedSetsSaid(schema: z.ZodType<unknown>): string | undefined {
+  let json: unknown
+  try {
+    json = z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' })
+  } catch {
+    return undefined
+  }
+  const lines: string[] = []
+  const walk = (node: unknown, path: readonly string[]): void => {
+    if (typeof node !== 'object' || node === null) return
+    const at = node as Record<string, unknown>
+    if (Array.isArray(at.enum) && path.length > 0) {
+      lines.push(
+        `- ${path.join('.')}: exactly one of ${at.enum.map((v) => JSON.stringify(v)).join(', ')}`,
+      )
+      return
+    }
+    if (at.items !== undefined) walk(at.items, path)
+    const properties = at.properties
+    if (typeof properties === 'object' && properties !== null) {
+      for (const [name, child] of Object.entries(properties as Record<string, unknown>)) {
+        walk(child, [...path, name])
+      }
+    }
+  }
+  walk(json, [])
+  return lines.length === 0 ? undefined : [CLOSED_SETS_PREFACE, ...lines].join('\n')
+}
+
+/**
  * What an answer that is the SCHEMA rather than an instance of it looks like (S-136).
  *
  * Measured once, on a real reel: the planner answered with the rendered schema document itself.
@@ -643,13 +695,29 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
     // the ADAPTER'S OWN schema, fixed here — I-8's "no prompt, no schema, no criterion" is about
     // what a CALLER may put beside a picture, and a caller puts nothing here.
     const asked = shapeAsked(shape, name)
+    // THE CLOSED SETS, SAID IN THE QUESTION ITSELF (S-144). The enum renders inside `asked.said`,
+    // and that was measured not to be enough: a witness answered `position` with "bottom half",
+    // "scattered between the tall pillars", and then with the NEIGHBOURING field's vocabulary —
+    // twice in fourteen calls and once in twelve, each time after the whole run's clips were
+    // bought. The sentence is built FROM the shape, so a set that moves moves it too.
+    //
+    // It is APPENDED TO THE QUESTION'S OWN TEXT PART rather than added as a part of its own, so
+    // the call still carries exactly what checks 6 and 7 assert: the question first, the media as
+    // bytes after it, the rendered schema last.
+    const sets = closedSetsSaid(shape)
+    let saidAlready = sets === undefined
+    const asking = parts.map((part) => {
+      if (saidAlready || part.type !== 'text') return part
+      saidAlready = true
+      return textPart(`${part.text}\n\n${String(sets)}`)
+    })
     const answer = await post(
       {
         model,
         messages: [
           {
             role: 'user',
-            content: asked.said === undefined ? parts : [...parts, textPart(asked.said)],
+            content: asked.said === undefined ? asking : [...asking, textPart(asked.said)],
           },
         ],
         max_tokens: maxTokens,

@@ -5,7 +5,7 @@
 - **Work:** the six owed journeys, then **B** (the two gaps, free), then **A** (the reel, ~200¢). **C is
   held.**
 - **Written:** 2026-09-22, at the end of session 45
-- **Run:** not yet
+- **Run:** session 46, 2026-09-22
 
 **Session 45 made the reel and the engine refused it.** Fifteen attempts, twelve blockers, **S-130 to
 S-140**, about **$4.09**. The last run — `ffbd04b5-a00f-4675-bb67-36e90f69c417` — planned four shots, took

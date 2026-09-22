@@ -7,6 +7,7 @@ import { z } from 'zod'
 import type { ClipRef, ModelRole, PictureRef } from '@cutroom/contracts'
 import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
 import {
+  CLOSED_SETS_PREFACE,
   DEFAULT_ANSWER_TOKENS,
   DEFAULT_REASONING_TOKENS,
   MINIMAX_BASE_URL,
@@ -338,6 +339,29 @@ test('7. a vision call carries its picture as the wire expects, and its receipt 
         `the vision call does not name the observation's field "${field}"`,
       )
     }
+
+    // AND EVERY CLOSED SET IS SAID IN THE QUESTION, not only rendered in the schema (S-144). The
+    // enum renders and the witness still answered `position` with "bottom half" and
+    // "scattered between the tall pillars", twice in fourteen calls, after a whole run's clips
+    // were bought. The lines are computed FROM the shape, so a set that gains a value gains the
+    // sentence: what is asserted is the values, read off the pipeline's own schema.
+    const question = String((parts.find((p) => p.type === 'text') as { text: string }).text)
+    assert.ok(
+      question.includes(CLOSED_SETS_PREFACE),
+      'a vision call does not say its closed sets in the question at all',
+    )
+    for (const [field, values] of [
+      ['framing', ['closeUp', 'medium', 'wide', 'extremeWide']],
+      ['lighting', ['bright', 'dim', 'mixed', 'silhouette']],
+      ['entities.position', ['left', 'centre', 'right']],
+      ['entities.prominence', ['foreground', 'midground', 'background']],
+    ] as const) {
+      const line = `- ${field}: exactly one of ${values.map((v) => JSON.stringify(v)).join(', ')}`
+      assert.ok(question.includes(line), `the question does not say ${field}'s set: ${line}`)
+    }
+    // The sets are in the QUESTION's own part, which is what keeps the media and the shape where
+    // the assertions above put them: a part of their own would move both.
+    assert.equal(parts.filter((p) => p.type === 'text').length, 2, 'a vision call gained a part')
 
     // The pipeline parses an observation at the gate boundary, so the adapter must NOT (S-042).
     assert.equal((value as { framing: string }).framing, 'medium')

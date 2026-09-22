@@ -453,6 +453,19 @@ it is the part that may differ per model.
       leaves no receipt** (S-133), and **the model port has no transient retry** (S-137). Seedream is
       answered and the answer is no — asked for 864x1536 it produced **1920x3416**, refused by check 12 for
       two image calls and no video spend, which closes D-028's conditional admission for that entry.)
+      (**Session 46 ran it again, with the brief rewritten, and the slice is still open.** The reel was made
+      from a brief whose four units are genuinely different scenes — the change Gate 7's refusal asked for —
+      and **two things came back that are both written down rather than worked around.** First, four
+      different scenes **share no subject**, so D-027's ladder had nothing to carry: `stage.started stills`
+      and `stage.finished stills` in the same instant, **0 image calls**, and all four clips bought on
+      text-to-video. The reel was made from WORDS, for **152¢**, and _"approved stills become a finished
+      video"_ went unexercised (**S-145**). Second, the run **failed at the last shot's Gate 5**, on
+      _"the witness's answer for a1-shot-3-take-1 is not a clip observation: lighting: Invalid option"_ —
+      after all four clips were bought. Measured at zero cost on that clip: an answer outside a rendered
+      closed set in **2 of 14** calls, and **1 of 12** with the sets also said in the question (**S-144**).
+      **Gate 7 has still never been reached.** The owner's answers, 2026-09-22: ask an unparseable
+      observation again ONCE, which needs its own gates (**S-146**), and give the next brief one subject
+      that recurs across two of its four shots.)
 
 Every check appears in exactly one slice: 3 + 2 + 4 + 2 + 3 + 4 + 2 + 2 = 22.
 

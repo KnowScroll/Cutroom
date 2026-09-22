@@ -37,7 +37,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 043 | [043-paid-path-slice-8.md](043-paid-path-slice-8.md)                   | `paid-path`   | Slice 8               | 2026-09-21 | session 43 |
 | 044 | [044-minimax-key.md](044-minimax-key.md)                               | —             | research              | 2026-09-21 | session 44 |
 | 045 | [045-paid-path-real-reel.md](045-paid-path-real-reel.md)               | `paid-path`   | the reel              | 2026-09-21 | session 45 |
-| 046 | [046-paid-path-gaps-then-gate-7.md](046-paid-path-gaps-then-gate-7.md) | `paid-path`   | the gaps, then Gate 7 | 2026-09-22 | not yet    |
+| 046 | [046-paid-path-gaps-then-gate-7.md](046-paid-path-gaps-then-gate-7.md) | `paid-path`   | the gaps, then Gate 7 | 2026-09-22 | session 46 |
+| 047 | [047-second-ask-then-the-reel.md](047-second-ask-then-the-reel.md)     | —             | the second ask        | 2026-09-22 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
