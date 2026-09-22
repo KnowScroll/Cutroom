@@ -1300,6 +1300,7 @@ Every check appears in exactly one slice: 6 + 4 + 18 + 13 + 6 + 3 = 50.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-22 journey=PASS at 8ab789d — every check green; 106 tests in tests/reel-render-*.test.ts pass
 - 2026-09-22 journey=PASS at 605ffb5 — every check green; 106 tests in tests/reel-render-*.test.ts pass
 - 2026-09-22 journey=PASS at 453c8c2 — every check green; 106 tests in tests/reel-render-*.test.ts pass
 - 2026-09-20 journey=PASS at 39cb517 — every check green; 106 tests in tests/reel-render-*.test.ts pass
