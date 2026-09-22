@@ -64,13 +64,19 @@ function request(requestId, budgetCents) {
     requestId,
     worldId: 'cutroom-first-real-reel',
     narration: [
-      { text: 'A lighthouse keeper kept a log every night for forty years.', claimIds: ['c1'] },
-      { text: 'He wrote the weather, the ships, and the hour the lamp was lit.', claimIds: ['c1'] },
-      { text: 'He was not writing for anyone in particular.', claimIds: [] },
+      { text: 'For forty years a lamp on a headland was lit at dusk.', claimIds: ['c1'] },
+      { text: 'It turned all night above water nobody else was watching.', claimIds: ['c1'] },
+      {
+        text: 'Before he slept, the keeper wrote the hour and the weather down.',
+        claimIds: ['c2'],
+      },
       { text: 'The log was a condition of the job, and he met it.', claimIds: ['c2'] },
-      { text: 'A century later the volumes were read by climate scientists.', claimIds: ['c3'] },
-      { text: 'Nightly sea temperatures from a coast nobody else had measured.', claimIds: ['c3'] },
-      { text: 'The keeper had no idea what he was making.', claimIds: [] },
+      { text: 'A slatted white box on the grass held his thermometers.', claimIds: ['c3'] },
+      { text: 'He read them at the same hour, whatever the sea was doing.', claimIds: ['c3'] },
+      {
+        text: 'A century later those columns became a record of the water itself.',
+        claimIds: ['c4'],
+      },
       { text: 'Kept things outlive the reason they were kept.', claimIds: ['c4'] },
     ],
     claims: [
@@ -80,34 +86,59 @@ function request(requestId, budgetCents) {
       { id: 'c4', role: 'supporting' },
     ],
     criteria: {
-      // ONE SIMPLE SUBJECT PER CLAIM. Gate 1 refuses a picture whose subject is clipped by the
-      // edge of the frame (D-046), and a canonical that must hold four named things whole in one
-      // 9:16 frame is a picture that is hard to make: two runs of five criteria were each refused
-      // three times and stopped by D-047, at 15¢ each (session 45).
+      // FOUR CLAIMS, FOUR SUBJECTS, AND NO TWO OF THEM THE SAME KIND OF PICTURE (session 45, and
+      // the reason this brief was rewritten). The engine made a whole reel on the earlier one —
+      // four shots of a keeper, a logbook and bound volumes — and **Gate 7 refused the finished
+      // cut**, answering no to _"Does every shot show something no other shot repeats?"_. That is
+      // a true answer about that brief: three of its four subjects were a man and his paper, and
+      // no criterion can make four shots of one subject differ.
+      //
+      // So the units are different SCENES rather than different sentences about one scene: a lamp
+      // at night, a page under lamplight, an instrument box on grass in daylight, open water at
+      // first light. Different place, different object, different hour — which is what makes
+      // "something no other shot repeats" true by construction rather than by luck.
+      //
+      // ONE SIMPLE SUBJECT PER CLAIM, still. Gate 1 refuses a picture whose subject is clipped by
+      // the edge of the frame (D-046), and a canonical that must hold several named things whole
+      // in one 9:16 frame is a picture that is hard to make: two runs of five criteria were each
+      // refused three times and stopped by D-047, at 15¢ each.
       //
       // "SEEN WHOLE WITHIN THE FRAME" WAS TRIED AND MADE IT WORSE. It reads as part of what the
       // criterion REQUIRES, so the reconciler began answering `show-log` "is not shown: a
       // handwritten logbook, seen whole within the frame" — a stricter mustShow, where what was
       // wanted was looser framing. The clipping rule already judges framing; the criterion says
       // what must be in the picture and nothing about how it sits.
+      //
+      // AND NO CRITERION REQUIRES A PERSON. `show-keeper` required a lighthouse keeper while
+      // `never-person` forbade one in the reconciler's reading, and a criterion violated by
+      // satisfying another criterion cannot be met by any picture (S-134). The narration still
+      // has its keeper; the pictures are of what he kept.
       mustShow: [
-        { id: 'show-keeper', text: 'a lighthouse keeper', type: 'presence', claimId: 'c1' },
-        { id: 'show-log', text: 'a handwritten logbook', type: 'presence', claimId: 'c2' },
-        // A SHELF DOES NOT FIT A VERTICAL FRAME, and Gate 1 says so: three candidates in a row
-        // were refused for "Shelf of Bound Volumes is clipped by the edge of the frame", which is
-        // what a shelf photographed in 9:16 always is. A stack is the same thing, sized to the
-        // frame the reel is made in.
         {
-          id: 'show-shelf',
-          text: 'a stack of bound volumes on a desk',
+          id: 'show-lamp',
+          text: 'a lighthouse lamp of glass and brass',
+          type: 'presence',
+          claimId: 'c1',
+        },
+        {
+          id: 'show-log',
+          text: 'an open handwritten logbook on a desk',
+          type: 'presence',
+          claimId: 'c2',
+        },
+        {
+          id: 'show-box',
+          text: 'a white slatted wooden instrument box standing on grass',
           type: 'presence',
           claimId: 'c3',
         },
+        { id: 'show-sea', text: 'open sea at first light', type: 'presence', claimId: 'c4' },
       ],
       // "ANY REAL LIVING PERSON" IS WHAT THE POLICY MEANS BY A RECOGNISABLE ONE, and a reconciler
-      // reads it literally: shown a lighthouse keeper — which `show-keeper` REQUIRES — it judged
-      // the picture to show a real living person, and the request argued with itself. This is the
-      // caller's wording, in the caller's request; no gate, no policy and no check moved (S-134).
+      // reads it literally: shown a lighthouse keeper — which the earlier `show-keeper` REQUIRED —
+      // it judged the picture to show a real living person, and the request argued with itself.
+      // This is the caller's wording, in the caller's request; no gate, no policy and no check
+      // moved (S-134).
       mustNotShow: [
         { id: 'never-person', text: 'a recognisable real-world public figure', type: 'presence' },
         { id: 'never-modern', text: 'a computer screen', type: 'presence' },
