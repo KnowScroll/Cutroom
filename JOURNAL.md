@@ -5425,3 +5425,11 @@ writing down: fifteen attempts at one reel cost more than four finished reels wo
 owner. The two gaps this session named and did not close are **the lost receipt** (S-133) and **the model
 port's missing transient retry** (S-137) — the same shape twice: a call that happened, and a run that cannot
 carry on from it.
+
+**The six journeys were NOT run.** `node scripts/journey.mjs reel-stills` was started at `4825530` and
+**stopped by the harness because this machine was low on memory** — not a journey failure, and nothing was
+written: the working tree was clean afterwards and no evidence, status or divergence line moved. The other
+five were not started. **They are owed**, and they are the first thing session 46 should do, before anything
+else: `paid-path`, `reel-stills`, `reel-plan`, `reel-render`, `reel-takes`, `reel-contract` (S-099's form).
+`node scripts/check.mjs` is green at that commit, nine checks, which is what the journeys would be run
+against.
