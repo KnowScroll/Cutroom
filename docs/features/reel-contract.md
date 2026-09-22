@@ -456,6 +456,7 @@ _Behaviour — against the stand-in_
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-22 journey=PASS at cd18a22 — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-22 journey=PASS at 24a79ed — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-20 journey=PASS at 5f3c18b — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-19 journey=PASS at 7d6cbd0 — every check green; 41 tests in tests/reel-contract-*.test.ts pass
