@@ -153,7 +153,15 @@ it and strips a reasoning prefix before parsing**, and every `max_tokens` budget
 A call that returns only reasoning **fails naming the budget**, because "the schema did not parse" would be a lie.
 
 **The narration** — `POST https://api.minimax.io/v1/t2a_v2`, `model: speech-2.8-hd`, `subtitle_enable: true`
-(D-008, D-019): audio plus a **`subtitle_file` URL that is a presigned credential belonging to MiniMax** (D-022).
+**and `subtitle_type: 'word'`** (D-008, D-019, S-129): audio plus a **`subtitle_file` URL that is a presigned
+credential belonging to MiniMax** (D-022). Without the granularity the timings come back at the provider's default,
+which is **one entry for the whole text** — measured live, and enough to make every narration of a real reel fail
+the stage's parse after it had been spoken and paid for. The body behind the URL is an array of **segments**, each
+carrying its own `timestamped_words`, and those tokens are not the stage's words: white space is a token, a full
+stop is a token, and `Radar` arrives as `R`, `ad`, `ar`. **The adapter joins them back into the text's white-space
+words** — a joined word begins where its first token begins and ends where its last one ends — and **splits
+nothing**: a sentence-level entry, or tokens that do not build the text, are passed on as they arrived, because
+whether they are the narration's words is the stage's question (S-070, S-042).
 The adapter writes the audio under the artifact root, **fetches the timings, and drops the URL** — it reaches no row,
 no receipt and no log. The token plan covers T2A, so its receipt records the characters and a cost of zero.
 **The voice is the caller's setting and the adapter may not spell one** (S-070), so it is a service setting,
@@ -342,7 +350,7 @@ _The model adapter_
 
 _The narration adapter_
 
-9. `the adapter asks speech-2.8-hd with subtitle_enable, writes the audio under the artifact root, returns word timings the stage parses, and records the text's code points as characters; and 429, 5xx, a connection error and a timeout are ANSWERED unavailable while 400, 401 and a body that does not parse throw; and the service names the voice it speaks with, one setting, defaulting to what every stand-in run uses` — D-008, D-019, S-088, S-070, S-096, S-123, S-128.
+9. `the adapter asks speech-2.8-hd with subtitle_enable AND subtitle_type word, writes the audio under the artifact root, returns word timings the stage parses — the provider's tokens joined back into the text's words with the provider's own figures at both ends, and a sentence-level body or tokens that are not the text's words passed on as they arrived for the stage to refuse — and records the text's code points as characters; and 429, 5xx, a connection error and a timeout are ANSWERED unavailable while 400, 401 and a body that does not parse throw; and the service names the voice it speaks with, one setting, defaulting to what every stand-in run uses` — D-008, D-019, S-088, S-070, S-096, S-123, S-128, S-129.
 10. `against a recorded response whose subtitle_file is a presigned URL carrying OSSAccessKeyId and Signature, nothing persisted holds that URL, either credential, or any query string — the timings are fetched and the reference dropped` — D-022, S-109.
 
 _The image adapter_

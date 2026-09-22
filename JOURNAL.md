@@ -5123,3 +5123,118 @@ credential; `stream: true` is the second. After it, `PROMPTS/045-paid-path-real-
 8 stays unticked and the six journeys stay unrun**, because the reel does not exist. **Three figures are owed
 upstream:** the observed video rate (D-007's Q9), the corrected image rate, and now **whether the token plan
 covers text and T2A at all** (D-019).
+
+---
+
+## 2026-09-21 — session 44, research: the key was the wrong KIND of key, and the timings were the wrong shape
+
+**Intent.** Run `PROMPTS/044-minimax-key.md`: why the same MiniMax subscription works in OpenCode, Hermes and
+pi and answers `402 insufficient balance (1008)` here. Five hypotheses, strongest first, each to be tested
+against the live API rather than reasoned about. `decisions.mjs`: pin current, 0 commits unpushed.
+
+**It was H5, the cheapest and the last-ranked: a different key string — and not a different VALUE but a
+different KIND.** MiniMax issues two credentials that an SDK will accept in the same field: a pay-as-you-go
+**API Key**, prefix `sk-api-…`, which draws on an account balance, and a Token Plan **Subscription Key**,
+prefix `sk-cp-…`, which draws on a seat or on purchased Credits. Its own documentation: _"It is not
+interchangeable with pay-as-you-go API Keys."_ `.env` held an `sk-api-…` key on an account with no balance,
+which is exactly what `1008` says and exactly why reading worked and generating did not. **The owner replaced
+it during the session and every surface answered 200.**
+
+**Nothing in `packages/providers/src/minimax/` had to change for it.** The adapter already sends, header for
+header, what MiniMax's own integration guide gives for a Subscription Key on the OpenAI-compatible wire.
+**Four sessions of 402s were a correct engine holding a credential of the wrong kind.**
+
+**And a second blocker came out from behind the first, before the reel could spend on it.** T2A's word
+timings — D-008's whole reason for a separate narration track — **do not come back at word granularity unless
+they are asked for**. `subtitle_enable: true` answers the provider's default, which is `sentence`: a
+twenty-word, three-sentence narration came back as **one entry for the whole text**, and `wordTimings` demands
+every word of the text exactly once in order. Every narration of a real reel would have been spoken, paid for,
+and then refused by the stage. **That is the second blocker in two sessions found before it could spend, and
+the third since Slice 8 began.**
+
+**Changed.**
+
+- **`packages/providers/src/minimax/narration.ts`** — `SUBTITLE_TYPE`, sent as `subtitle_type: 'word'`; the
+  subtitle schema corrected to the shape a live call answers (an array of **segments**, each carrying its own
+  optional `timestamped_words`); and **`timingsOf(entries, text)`**, which joins the provider's tokens back
+  into the text's white-space words and **splits nothing**. `bare()` beside it: every token as it arrived, for
+  a join that was abandoned.
+- **`packages/providers/src/index.ts`** — `SUBTITLE_TYPE` exported, so check 9 asserts the constant rather
+  than a string spelled twice.
+- **`tests/fixtures/wire/`** — 64 → 65. **`minimax-subtitle-words.json` REPLACED by a recording of a live
+  call**; **`minimax-subtitle-sentence.json`** new, the same call with the field left out. Session 38 wrote
+  the first from the documentation and said so in its own note; **no call has ever answered that shape.**
+- **`tests/paid-path-narration.test.ts`** — +2 tests and the granularity assertion, 13 → 15.
+- **`DECISIONS.md` — S-129**, naming **D-019** in `Supersedes`. **`docs/features/paid-path.md`** — Gate 2's
+  narration paragraph and check 9's words, both **by addition**. Prompt 044's `Run` line set.
+- **+2 tests, 463 → 465** by TAP count over the whole suite.
+
+**Observed.**
+
+- **Every hypothesis, what it was tested with, and what it answered.** Each call cost nothing while the
+  account was at 1008, so a 200 would have been the answer on its own.
+
+  | #      | Hypothesis                                            | Tested with                                                                                                                                                                                                              | Answered                             |
+  | ------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------ |
+  | H1     | a request header identifies coding-plan traffic       | `/anthropic/v1/messages` with the full Claude Code header set — `anthropic-beta: claude-code-20250219,oauth-2025-04-20,…`, `user-agent: claude-cli/…`, `x-app: cli`, four `x-stainless-*` — on Bearer and on `x-api-key` | **402 (1008)**                       |
+  | H1c    | the model id is the coding one                        | the same, `model: "MiniMax-M3[1m]"`, which MiniMax's own Claude Code guide prescribes                                                                                                                                    | **402 (1008)**                       |
+  | H2     | streaming is required                                 | `stream: true` on both wires, M3 and M2.7                                                                                                                                                                                | **402 (1008)**                       |
+  | H3     | it is a coding plan, honoured only on the coding path | a plain OpenAI-SDK-shaped body, no `max_tokens`, OpenAI user agent                                                                                                                                                       | **402 (1008)**                       |
+  | H4     | a quota window is spent                               | the error is `insufficient_balance_error`, not a quota; unchanged across two sessions hours apart                                                                                                                        | not it                               |
+  | **H5** | **a different key string**                            | the key's prefix, classified without printing it                                                                                                                                                                         | **`sk-api-…` — a pay-as-you-go key** |
+
+- **What the codebases said, read rather than inferred.** MiniMax's `other-tools` and `pi` integration pages
+  both give the Subscription Key as `sk-cp-…`; OpenCode's issue 22614 and pi's 2768 are each about `sk-cp-`
+  keys in a tool that would not take them. **The tools that work carry the other credential.** Our base URL,
+  path, header style and model ids are verbatim what the same page prescribes.
+- **With the Subscription Key in `.env`, every surface answers 200**: `POST /v1/chat/completions` on
+  MiniMax-M3 and MiniMax-M2.7, `/anthropic/v1/messages` on Bearer and on `x-api-key`, `POST /v1/t2a_v2` with
+  50 KB of audio, and `POST /v1/image_generation`. **D-019's coverage claim holds — of a Subscription Key.**
+- **`English_Wise_Woman`, the voice the narration test spells, does not exist**: `2054 voice id not exist`.
+  It is a test-only value and nothing sends it; `English_Graceful_Lady`, the one S-128 settled on, answers.
+- **The provider's tokens are not the stage's words.** At `subtitle_type: 'word'`: white space arrives as
+  tokens of its own, a full stop is its own token, `holds` arrives as `hold` then `s`, and `Radar` as `R`,
+  `ad`, `ar` — 34 tokens for a 16-word text. Joined back, the recorded call gives nine words for the spike's
+  sentence, in order and non-overlapping, with the provider's own figures at both ends.
+- **An unknown field is dropped in silence by this wire.** `subtitle_granularity`, `granularity`,
+  `subtitle_setting.granularity` and `subtitle_level` were each answered **200 with sentence-level timings**.
+  A wrong guess at the name reads exactly like a provider that has no word level — which is why the name came
+  from the provider's own reference and not from a guess.
+- **The break campaign, 8 breaks**, against check 9.
+
+  | break | what was broken                                                                 | tsc | caught by   |
+  | ----- | ------------------------------------------------------------------------------- | --- | ----------- |
+  | c0    | a comment beside the granularity reworded — the control                         | ok  | **nothing** |
+  | s1    | **THE GRANULARITY IS NOT ASKED FOR**: every narration comes back sentence level | ok  | 9           |
+  | s2    | the granularity asked for is the provider's default                             | ok  | 9           |
+  | s3    | **A SENTENCE ENTRY IS SPLIT** into words, inventing the milliseconds inside it  | ok  | 9 †         |
+  | s4    | **TOKENS THAT DO NOT BUILD THE TEXT are forced into its words anyway**          | ok  | 9 ‡         |
+  | s5    | a joined word begins at its LAST token rather than its first                    | ok  | 9           |
+  | s6    | white space is kept, so a token of it is offered as a word                      | ok  | 9, 10       |
+  | s7    | an abandoned join answers NOTHING rather than what the provider said            | ok  | 9           |
+
+  **†** — read as uncaught on the first run, and was not: **`CLAUDE.md`'s backslash trap fired again.** The
+  break's own regex arrived as `split(/s+/)` instead of `split(/\s+/)`, matched nothing, and the adapter went
+  on behaving. Verified the file rather than the command, as the trap says, and the second campaign writes its
+  breaks from a file rather than through a shell. **This is the third session running that this has happened
+  in.**
+
+  **‡** — caught by nothing at first, and it was a real gap closed BY ADDING. The forced join was undone by
+  the completeness guard, because the mismatched body had three tokens and the text nine words — so a break
+  that forced every token into a word of the text still ended at `bare(tokens)` and looked correct. **The
+  dangerous shape is tokens that are not the text's words but are the RIGHT NUMBER of them**: a join that gave
+  up matching and only counted would complete, and the stage would accept the text's own word against another
+  word's milliseconds — the reel made, and nobody told. That body is now a case of its own.
+
+- **`node scripts/check.mjs` green**, nine checks; the suite counts **465 of 465**, 0 failing, cancelled,
+  skipped or todo.
+
+**Next.** `PROMPTS/045-paid-path-real-reel.md` makes the reel: one command that spends, under the 250¢ ceiling,
+with the estimate printed at 147–194¢. **Nothing is open in it** — seedream, `English_Graceful_Lady`, and now a
+key that generates. **Slice 8 stays unticked and the six journeys stay unrun**, because the reel does not exist.
+**Four figures are owed upstream** and are restated by that run rather than edited here (D-115, S-017): the
+observed video rate (D-007's Q9), the corrected image rate, **which MiniMax credential D-019's coverage claim
+is about**, and **that T2A's timings are sentence-level unless asked otherwise** — D-019 recorded that a
+subtitle URL came back, which is true, and nothing had ever read the body behind it. Still open upstream and
+unchanged: D-028's default image entry (O-4 / C-8), `reel-script`'s criterion type (S-029), and the steering
+stubs and the pin (S-033).

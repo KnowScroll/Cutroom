@@ -51,6 +51,20 @@ export const T2A_PATH = '/v1/t2a_v2'
 /** The model D-008 and D-019 name, and the one the owner's token plan covers. */
 export const T2A_MODEL = 'speech-2.8-hd'
 
+/**
+ * WHAT GRANULARITY THE TIMINGS ARE ASKED FOR AT (S-129). `subtitle_enable` alone answers the
+ * provider's DEFAULT, which is `sentence` — one entry for the whole text, measured live on
+ * 2026-09-21 as a single entry spanning all 20 words of a three-sentence narration. D-008's whole
+ * reason for a separate narration track is the word timings, so the default is useless to it and
+ * the stage's parse would fail every real narration after it had been spoken and paid for.
+ *
+ * An unknown field is DROPPED IN SILENCE by this wire — `subtitle_granularity`, `granularity`,
+ * `subtitle_setting.granularity` and `subtitle_level` were each answered 200 with sentence-level
+ * timings — so a wrong name here reads exactly like a provider that has no word level at all.
+ * This is the name the provider's own reference gives, and the one measured answering with words.
+ */
+export const SUBTITLE_TYPE = 'word'
+
 /** What the audio is asked for as — the settings the spike sent, which answered (D-019). */
 export const AUDIO_SETTING = {
   sample_rate: 32_000,
@@ -100,33 +114,96 @@ const spoken = z.object({
 })
 
 /**
- * The subtitle body: one entry a word, each with the milliseconds it spans.
+ * The subtitle body, AS IT WAS MEASURED on 2026-09-21 rather than as it was documented (S-129).
  *
- * THIS SHAPE IS DOCUMENTED AND HAS NEVER BEEN SEEN HERE. The spike recorded that a subtitle URL
- * came back and withheld the URL, so nothing in this repository has read the body behind it.
- * A body that is not this throws, naming what arrived, so Slice 8's hand-run reel finds it at
- * once rather than quietly — which is the honest state for the one part of this adapter that
- * rests on a document rather than on a call.
+ * It is an array of SEGMENTS, not of words: asked at `subtitle_type: 'word'`, each segment carries
+ * its own `timestamped_words`, and that nested array is where the word timings live. Session 38
+ * recorded the documented shape — one entry a word — because the spike withheld the URL and
+ * nothing here had read the body. A live call answers neither: at the default granularity there
+ * is one segment for the whole text and no `timestamped_words` at all.
+ *
+ * `timestamped_words` is OPTIONAL here, because a provider that ignored the granularity must fail
+ * at the stage's parse — loudly, naming the words it gave — rather than here, where "are these the
+ * narration's words" is not this adapter's question (S-070, S-042).
  */
 const subtitle = z.array(
   z.object({
     text: z.string(),
     time_begin: z.number(),
     time_end: z.number(),
+    timestamped_words: z
+      .array(
+        z.object({
+          /** The SOURCE text's characters. `pronounce_word` is the spoken form and is not this. */
+          word: z.string(),
+          time_begin: z.number(),
+          time_end: z.number(),
+        }),
+      )
+      .optional(),
   }),
 )
 
 /** Every entry, translated and judged in no way: one entry is one word (S-070, S-042). */
-function timingsOf(entries: z.infer<typeof subtitle>): WordTiming[] {
-  // An entry holding a whole sentence would have to be split, and splitting it means inventing
-  // the milliseconds inside it. So it is passed on as it arrived, and the stage's parse — every
-  // word of the text, exactly once, in order — is what fails, loudly, at the boundary that owns
-  // that question. An adapter that guessed here would make that path unreachable.
-  return entries.map((entry) => ({
-    word: entry.text.trim(),
-    startMs: Math.round(entry.time_begin),
-    endMs: Math.round(entry.time_end),
-  }))
+function timingsOf(entries: z.infer<typeof subtitle>, text: string): WordTiming[] {
+  const tokens = entries.flatMap((entry) => entry.timestamped_words ?? [])
+  if (tokens.length === 0) {
+    // No word level came back. An entry holding a whole sentence would have to be SPLIT, and
+    // splitting it means inventing the milliseconds inside it. So it is passed on as it arrived,
+    // and the stage's parse — every word of the text, exactly once, in order — is what fails,
+    // loudly, at the boundary that owns that question (S-070, S-042). An adapter that guessed
+    // here would make that path unreachable.
+    return entries.map((entry) => ({
+      word: entry.text.trim(),
+      startMs: Math.round(entry.time_begin),
+      endMs: Math.round(entry.time_end),
+    }))
+  }
+
+  // THE PROVIDER'S TOKENS ARE NOT THE STAGE'S WORDS (S-129), measured live: white space arrives as
+  // tokens of its own, a full stop is its own token, and `holds` arrives as `hold` then `s`. The
+  // stage splits the narration's text on white space and wants exactly those words, so the tokens
+  // are JOINED BACK UP into them — which invents no millisecond, because a joined word begins when
+  // its first token begins and ends when its last one ends.
+  //
+  // The join is driven by the text itself and matches on `word`, the source characters. Nothing is
+  // normalised, trimmed into shape or guessed at: a run of tokens that does not build the next word
+  // of the text ABANDONS THE JOIN, and every token is passed on as it arrived, so the stage's parse
+  // fails naming what the provider actually said. Reporting it here would put the question in the
+  // adapter, which is the one place S-070 says it does not belong.
+  const wanted = text.split(/\s+/).filter((word) => word !== '')
+  const joined: WordTiming[] = []
+  let at = 0
+  let building = ''
+  let startMs = 0
+  for (const token of tokens) {
+    if (token.word.trim() === '') continue
+    if (building === '') startMs = token.time_begin
+    building += token.word
+    const word = wanted[at]
+    if (word === undefined || !word.startsWith(building)) return bare(tokens)
+    if (building !== word) continue
+    joined.push({ word, startMs: Math.round(startMs), endMs: Math.round(token.time_end) })
+    building = ''
+    at += 1
+  }
+  if (building !== '' || at !== wanted.length) return bare(tokens)
+  return joined
+}
+
+/**
+ * Every token as it arrived, for a stage that must see what the provider said (S-042). White
+ * space is dropped, because the stage splits on white space and a token of it is not a word in
+ * any reading; nothing else is touched.
+ */
+function bare(tokens: readonly { word: string; time_begin: number; time_end: number }[]) {
+  return tokens
+    .filter((token) => token.word.trim() !== '')
+    .map((token) => ({
+      word: token.word.trim(),
+      startMs: Math.round(token.time_begin),
+      endMs: Math.round(token.time_end),
+    }))
 }
 
 /** A fault: the provider will answer a second send the same way, so the run fails (S-096). */
@@ -219,6 +296,9 @@ export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPor
               // Without this there are no word timings at all, and D-008's whole reason for a
               // separate narration track is the word timings (D-019).
               subtitle_enable: true,
+              // And without THIS the timings come back at the provider's default granularity,
+              // which is one entry for the whole text (S-129, measured 2026-09-21).
+              subtitle_type: SUBTITLE_TYPE,
               // The voice is the caller's setting (S-070), never a value spelled here. It is
               // still `'stand-in'` by default in `DEFAULT_RENDER_SETTINGS`, which the stand-in
               // ignores and this adapter cannot: Slice 8's real run is what names a real voice.
@@ -265,6 +345,7 @@ export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPor
             subtitle,
             `${what}'s word timings`,
           ),
+          request.text,
         )
 
         // FILES, NOT BYTES (D-086, D-087). The audio is written under the one artifact root, in

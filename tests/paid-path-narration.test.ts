@@ -8,6 +8,7 @@ import { DEFAULT_RENDER_SETTINGS, wordTimings } from '@cutroom/pipeline'
 import {
   AUDIO_SETTING,
   MINIMAX_BASE_URL,
+  SUBTITLE_TYPE,
   T2A_MODEL,
   T2A_PATH,
   minimaxNarration,
@@ -139,6 +140,11 @@ test('9. the adapter asks speech-2.8-hd with subtitle_enable, on the wire D-019 
     assert.equal(asked.model, T2A_MODEL)
     assert.equal(asked.text, TEXT, 'the text is sent verbatim')
     assert.equal(asked.subtitle_enable, true, 'without this there are no word timings at all')
+    // AND WITHOUT THIS THE TIMINGS ARE SENTENCE LEVEL (S-129). Measured live on 2026-09-21:
+    // `subtitle_enable` alone answers ONE ENTRY FOR THE WHOLE TEXT, so every narration of a real
+    // reel would have been spoken, paid for, and then refused by the stage's parse.
+    assert.equal(asked.subtitle_type, 'word', 'the granularity is not asked for')
+    assert.equal(asked.subtitle_type, SUBTITLE_TYPE)
     assert.equal(asked.stream, false)
     assert.deepEqual(
       asked.voice_setting,
@@ -278,8 +284,9 @@ test('9. the timings it returns are the ones the stage parses — every word of 
     const { port } = adapter(['minimax-t2a-redacted', 'minimax-subtitle-words'], folder.path)
     const answer = made(await port.speak(REQUEST))
 
-    // S-070's parser, at the stage's boundary, against a measured duration a probe would give.
-    const parsed = wordTimings(TEXT, 3.2).safeParse(answer.timings)
+    // S-070's parser, at the stage's boundary, against a measured duration a probe would give —
+    // 4.3 s, which is what the recorded call's own sentence entry spans (S-129).
+    const parsed = wordTimings(TEXT, 4.3).safeParse(answer.timings)
     assert.ok(
       parsed.success,
       `the timings do not parse: ${JSON.stringify(parsed.error?.issues ?? [])}`,
@@ -288,8 +295,145 @@ test('9. the timings it returns are the ones the stage parses — every word of 
       parsed.data?.map((t) => t.word),
       TEXT.split(' '),
     )
-    assert.deepEqual(parsed.data?.[0], { word: 'Radar', startMs: 0, endMs: 420 })
-    assert.deepEqual(parsed.data?.at(-1), { word: 'did.', startMs: 2960, endMs: 3160 })
+    // THE FIGURES ARE THE PROVIDER'S OWN, joined (S-129). `Radar` is three tokens on the wire —
+    // `R`, `ad`, `ar` — so it begins where `R` begins and ends where `ar` ends, and `did.` is
+    // `did` and `.`. Nothing between them was invented.
+    assert.deepEqual(parsed.data?.[0], { word: 'Radar', startMs: 43, endMs: 597 })
+    assert.deepEqual(parsed.data?.at(-1), { word: 'did.', startMs: 3243, endMs: 3883 })
+
+    // AND THE JOIN INVENTS NOTHING: every figure above is a figure the provider sent. The first
+    // word begins where its FIRST token begins and ends where its LAST one ends, and no word's
+    // span reaches into the next word's.
+    const tokens = (
+      readWire('minimax-subtitle-words').response.body as {
+        timestamped_words: { word: string; time_begin: number; time_end: number }[]
+      }[]
+    ).flatMap((entry) => entry.timestamped_words)
+    const said = tokens.filter((t) => t.word.trim() !== '')
+    assert.equal(said[0]?.word, 'R', 'the recorded wire no longer splits Radar into tokens')
+    assert.equal(Math.round(said[0]?.time_begin ?? -1), parsed.data?.[0]?.startMs)
+    assert.equal(Math.round(said.at(-1)?.time_end ?? -1), parsed.data?.at(-1)?.endMs)
+    assert.ok(
+      said.length > (parsed.data?.length ?? 0),
+      'the provider gave one token a word, so nothing was joined and this test proves nothing',
+    )
+  } finally {
+    folder.clean()
+  }
+})
+
+test('9. sentence-level timings are passed on as they arrived, and the STAGE is what refuses them', async () => {
+  const folder = root()
+  try {
+    // What the wire answers when the granularity is not asked for, recorded live (S-129). This is
+    // the body every narration of a real reel would have been given: ONE ENTRY FOR THE WHOLE TEXT.
+    const { port } = adapter(['minimax-t2a-redacted', 'minimax-subtitle-sentence'], folder.path)
+    const answer = made(await port.speak(REQUEST))
+
+    // The adapter does not split it. Splitting one entry into nine words means inventing the
+    // milliseconds inside it, and an adapter that guessed here would make the stage's parse
+    // unreachable — so the entry is passed on, whole (S-070, S-042).
+    // The port types the timings `unknown` — the stage's parse is what gives them a shape (S-042).
+    const given = answer.timings as { word: string }[]
+    assert.equal(given.length, 1, 'the adapter split a sentence into words of its own')
+    assert.equal(given[0]?.word, TEXT)
+
+    // And the stage refuses it, loudly, naming what the provider actually said.
+    const parsed = wordTimings(TEXT, 4.3).safeParse(answer.timings)
+    assert.equal(parsed.success, false, 'sentence-level timings parsed as this text’s words')
+    assert.match(
+      JSON.stringify(parsed.error?.issues ?? []),
+      /the timings give 1 words/,
+      'the failure does not say how many words it was given',
+    )
+  } finally {
+    folder.clean()
+  }
+})
+
+test('9. tokens that do not build the text’s words ABANDON the join rather than being forced into it', async () => {
+  const folder = root()
+  try {
+    // A provider whose tokens are not this text's characters at all. The adapter may not bend
+    // them into the shape the stage wants — the one thing worse than a refused narration is one
+    // that is accepted with the wrong word against the wrong millisecond.
+    const wrong: Wire = {
+      note: 'Built in the test, not recorded: tokens that are not the text’s words.',
+      provider: 'minimax',
+      call: 'subtitle',
+      case: 'mismatched',
+      request: { method: 'GET', path: SUBTITLE_PATH },
+      response: {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        body: [
+          {
+            text: TEXT,
+            time_begin: 0,
+            time_end: 3900,
+            timestamped_words: [
+              { word: 'Sonar', time_begin: 40, time_end: 600 },
+              { word: ' ', time_begin: 600, time_end: 640 },
+              { word: 'did', time_begin: 640, time_end: 1024 },
+            ],
+          },
+        ],
+      },
+    }
+    const { port } = adapter(['minimax-t2a-redacted', wrong], folder.path)
+    const answer = made(await port.speak(REQUEST))
+
+    // Every token as it arrived, white space dropped: what the provider said, for a stage that
+    // has to be able to see it.
+    assert.deepEqual(answer.timings, [
+      { word: 'Sonar', startMs: 40, endMs: 600 },
+      { word: 'did', startMs: 640, endMs: 1024 },
+    ])
+    assert.equal(
+      wordTimings(TEXT, 4.3).safeParse(answer.timings).success,
+      false,
+      'tokens that are not this text’s words were accepted as them',
+    )
+
+    // AND THE DANGEROUS SHAPE: tokens that are not the text's words but are the RIGHT NUMBER of
+    // them, so a join that gave up on matching and just counted would COMPLETE — and the stage
+    // would accept the text's own word against another word's milliseconds, and the reel would be
+    // made with nobody told. The words below build nothing of this text and the count is exact.
+    const counted: Wire = {
+      ...wrong,
+      case: 'counted',
+      response: {
+        ...wrong.response,
+        body: [
+          {
+            text: 'Sonar did.',
+            time_begin: 0,
+            time_end: 1024,
+            timestamped_words: [
+              { word: 'Sonar', time_begin: 40, time_end: 600 },
+              { word: ' ', time_begin: 600, time_end: 640 },
+              { word: 'did.', time_begin: 640, time_end: 1024 },
+            ],
+          },
+        ],
+      },
+    }
+    const short = 'Radar did.'
+    const second = adapter(['minimax-t2a-redacted', counted], folder.path)
+    const counts = made(await second.port.speak({ ...REQUEST, text: short }))
+    assert.deepEqual(
+      counts.timings,
+      [
+        { word: 'Sonar', startMs: 40, endMs: 600 },
+        { word: 'did.', startMs: 640, endMs: 1024 },
+      ],
+      'a token that is not the text’s word was given the text’s word',
+    )
+    assert.equal(
+      wordTimings(short, 1.1).safeParse(counts.timings).success,
+      false,
+      'the stage was handed timings it could accept for words the provider never said',
+    )
   } finally {
     folder.clean()
   }
@@ -469,7 +613,7 @@ test('10. the timings are fetched FROM the presigned URL — the drop is a drop,
 
     const fetched = wire.sent[1] as Sent
     assert.equal(fetched.url, url, 'the adapter did not fetch the URL the provider gave it')
-    assert.ok(wordTimings(TEXT, 3.2).safeParse(answer.timings).success, 'no timings came back')
+    assert.ok(wordTimings(TEXT, 4.3).safeParse(answer.timings).success, 'no timings came back')
   } finally {
     folder.clean()
   }

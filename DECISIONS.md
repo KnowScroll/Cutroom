@@ -5018,3 +5018,99 @@ paths out from under their tests, and all five went on passing.
 **Confirmed-by.** The owner, 2026-09-21, shown fal's schema read and both alternatives for the
 canonical, chose the two wires; shown D-019's spike voice and the cost of moving a verified
 feature's default, chose the setting. The ceiling is the owner's, 2026-09-21.
+
+---
+
+## S-129 | 2026-09-21 | The MiniMax credential is the Token Plan SUBSCRIPTION key, not a pay-as-you-go API key; and T2A's word timings are asked for with `subtitle_type`, joined back into the text's words and never split
+
+**Supersedes.** **D-019**, in two of its recorded facts, each of which was true of the call it was
+read from and is not true as written. The corrected facts are owed upstream rather than edited into
+`steering-ref/` here (D-115, S-017).
+
+**Chose.**
+
+- **The key `apps/service` is given is MiniMax's Token Plan SUBSCRIPTION key**, the one at
+  Billing → Token Plan, prefix `sk-cp-…`. Nothing in this repository changed for it: the adapter
+  already sent what MiniMax's own integration guide gives for that key, header for header.
+- **The narration call asks for `subtitle_type: 'word'`**, beside `subtitle_enable: true`, because
+  `subtitle_enable` alone answers the provider's **default granularity, which is `sentence`**.
+- **The provider's tokens are JOINED back into the narration text's white-space words** inside the
+  adapter — `R` + `ad` + `ar` into `Radar`, `did` + `.` into `did.` — a joined word beginning where
+  its first token begins and ending where its last one ends. A run of tokens that does not build the
+  next word of the text **abandons the join**, and every token is passed on as it arrived.
+- **A body with no word level is still not split.** One entry holding a whole sentence is passed on
+  whole, and the stage's parse is what refuses it.
+
+**Why.**
+
+- **The engine could not generate at all, and the reason was the credential's TYPE.** Four sessions
+  of a paid path ended at `402 insufficient_balance_error … insufficient balance (1008)` on every
+  wire, every model and both header styles, while `GET /v1/models` answered 200 — reading worked and
+  generating did not. **That is what an entitlement keyed on the credential looks like**, and it was
+  measured to be exactly that: MiniMax issues **two** credentials that an SDK will accept in the
+  same field — a pay-as-you-go **API Key**, prefix `sk-api-…`, drawing on an account balance, and a
+  Token Plan **Subscription Key**, prefix `sk-cp-…`, drawing on a seat or on Credits. Its own
+  documentation: _"It is not interchangeable with pay-as-you-go API Keys."_ The key in `.env` was
+  `sk-api-…`, on an account with no balance. The same kind of key is what the working tools carry —
+  OpenCode's issue 22614 and pi's 2768 are both about `sk-cp-` keys.
+- **D-019 recorded "the token-plan key covers all three" from a real call on 2026-09-03**, and it is
+  still true of a Subscription Key: with one in `.env`, `POST /v1/chat/completions` answered 200 on
+  MiniMax-M3 and MiniMax-M2.7, `/anthropic/v1/messages` answered 200 on Bearer and on `x-api-key`,
+  `POST /v1/t2a_v2` answered 200 with 50 KB of audio, and `POST /v1/image_generation` answered 200.
+  What has to be said differently is **which credential**: "the key" is one of two things, and only
+  one of them generates. **`estimate()` still has no model or narration term**, which remains right
+  only while the plan covers them — it is the plan, not the endpoint, that makes them free.
+- **The word timings were the wrong shape, and the shape had never been seen.** D-008's whole reason
+  for a separate narration track is word timings, and D-019 recorded that `subtitle_enable: true`
+  answered "a subtitle_file URL" — which it does. The spike never fetched the body, so session 38
+  wrote the fixture from the documentation, one entry a word, and its own comment said so. **A live
+  call answers neither shape.** At the default granularity a three-sentence, twenty-word narration
+  came back as **one entry for the whole text**; `wordTimings` demands every word of the text,
+  exactly once, in order, so **every narration of a real reel would have been spoken, paid for and
+  then refused by the stage** — the second blocker in two sessions found before it could spend.
+- **An unknown field is dropped in silence by this wire.** `subtitle_granularity`, `granularity`,
+  `subtitle_setting.granularity` and `subtitle_level` were each answered **200 with sentence-level
+  timings** — so a wrong guess at the name reads exactly like a provider that has no word level.
+  `subtitle_type` is the name the provider's own reference gives, and the one measured answering
+  with words.
+- **Joining invents nothing; splitting would.** The provider's tokens are not the stage's words:
+  white space arrives as tokens of its own, a full stop is its own token, `holds` arrives as `hold`
+  then `s`, and `Radar` as `R`, `ad`, `ar`. Joining them is exact — the span is the first token's
+  begin and the last token's end, both the provider's own figures. Splitting a sentence entry into
+  words is the opposite: it would have to invent the milliseconds inside it.
+
+**Rejected.**
+
+- **Refusing a key whose prefix is not `sk-cp-`, at startup.** It would have turned four sessions of
+  402s into one message. It is also wrong: MiniMax's own reference says _"Treat the prefix as a
+  useful clue, not as proof that the key has the correct region, Team, balance, or resource
+  access"_, a pay-as-you-go key WITH balance is a legitimate way to run this engine, and a guard
+  that reads a credential's contents to decide whether to send it is a guard that has to be taught
+  every prefix MiniMax ever issues. The provider's own refusal is already classified as a fault, and
+  a fault stops the run at its first call having bought nothing — which is what happened.
+- **Splitting a sentence entry by character proportion**, or by the entry's `text_begin`/`text_end`
+  offsets. Both produce timings for every word and both are fabrications: nothing in a
+  sentence-level answer says when a word inside it was said. A wrong word against a wrong
+  millisecond is worse than a refused narration, because the reel is made and nobody is told.
+- **Reporting the mismatch from the adapter** when the tokens do not build the text. _"Are these the
+  narration's words"_ is the stage's question (S-070, S-042); answering it here would make the
+  stage's parse unreachable, which is the exact gap session 38 wrote the adapter to avoid.
+- **Matching on `pronounce_word` rather than `word`.** `pronounce_word` is the spoken form; the
+  stage compares against the text's own characters.
+- **Keeping the documented fixture beside the recorded one.** Two shapes, one of which no call has
+  ever answered, reads as coverage of a wire that does not exist.
+
+**Caught by.** **Check 9**, whose words gain the granularity by addition: the call asks
+`subtitle_type: 'word'`; the recorded word-level body — **recorded from a live call on 2026-09-21**,
+not written from a document — joins into the text's nine words with the provider's own figures at
+both ends, and the test fails if the recorded wire ever stops splitting `Radar` into tokens, because
+a body with one token a word would make the join prove nothing; **the sentence-level body, recorded
+from the same call without the field**, is passed on whole and is refused by `wordTimings` naming
+how many words it was given; and tokens that are not the text's words are passed on as they arrived
+rather than forced into it. **`tests/fixtures/wire/minimax-subtitle-words.json` and
+`minimax-subtitle-sentence.json`** are what pin both. The credential has no check and is not given
+one, for the reason under Rejected; what catches it is the provider's own 1008, classified as a
+fault since S-096 and exercised live in session 43.
+
+**Confirmed-by.** The owner, 2026-09-21, who replaced the key on being shown the prefix finding, and
+against whose Subscription Key every figure above was measured.

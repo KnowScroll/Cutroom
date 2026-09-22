@@ -1,0 +1,23 @@
+{
+  "note": "The same call with the granularity NOT asked for, recorded live on 2026-09-21 (S-129). subtitle_enable alone answers the provider’s default, which is sentence level: ONE ENTRY FOR THE WHOLE TEXT and no timestamped_words at all. This is what every narration of a real reel would have been given before this fixture existed, and what the adapter must not turn into word timings by splitting — splitting invents the milliseconds inside the entry. It is passed on as it arrived and the stage’s parse fails, loudly, at the boundary that owns the question (S-070, S-042).",
+  "provider": "minimax",
+  "call": "subtitle",
+  "case": "sentence",
+  "request": {
+    "method": "GET",
+    "path": "/audio_subtitle/recorded/subtitle.json"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": [
+      {
+        "text": "Radar did not win the battle. The telephone did.",
+        "time_begin": 0,
+        "time_end": 4288.571428571428
+      }
+    ]
+  }
+}

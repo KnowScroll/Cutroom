@@ -5,7 +5,13 @@
 - **Work:** find out what OpenCode, Hermes and pi send that we do not, and make our adapter send it — or
   establish that they cannot and say what does
 - **Written:** 2026-09-21, at the end of session 43
-- **Run:** not yet
+- **Run:** session 44 — H5, and it was the key's TYPE. MiniMax issues two credentials an SDK takes in the
+  same field: a pay-as-you-go API key, `sk-api-…`, on an account balance, and the Token Plan **Subscription
+  Key**, `sk-cp-…`, on a seat. `.env` held the first. H1, H2 and H3 were each falsified against the live API
+  before that was found — a full Claude Code header set, `MiniMax-M3[1m]`, and streaming all answered 402. With
+  the Subscription Key every surface answers **200**, and a second blocker surfaced behind it: T2A's timings
+  come back at **sentence** granularity unless `subtitle_type: 'word'` is asked for. **S-129**, +2 tests,
+  463 → 465.
 
 **Slice 8 is built, green and committed. The reel is blocked on one fact.** Every MiniMax generation call
 answers `402 insufficient balance (1008)`, while `GET /v1/models` on the same key answers **200**. The owner

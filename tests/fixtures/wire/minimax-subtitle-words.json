@@ -1,28 +1,135 @@
 {
-  "note": "The body behind T2A's subtitle_file: the word-level timings D-008 needs and D-019 confirmed are given to us. THE SPIKE NEVER FETCHED IT — it recorded that a subtitle URL came back and withheld the URL, so this is the documented shape and not a body this repository has seen. The adapter translates it and judges nothing: one entry becomes one word timing, and whether those words are the narration's is the stage's parse (S-070, S-042), so an entry holding a whole sentence fails loudly at the boundary rather than being split into invented timings here. Its words are the spike's own text, 'Radar did not win the battle. The telephone did.', with battle. and did keeping their punctuation because the stage splits the text on white space. Slice 8's hand-run reel is what verifies this shape.",
+  "note": "The body behind T2A's subtitle_file, RECORDED FROM A LIVE CALL on 2026-09-21 at subtitle_type: 'word' (S-129). It replaces the shape session 38 wrote from the documentation — one entry a word — which no call has ever answered: the body is an array of SEGMENTS, and the word timings live in each segment’s timestamped_words. The provider’s tokens are not the stage’s words: white space arrives as tokens of its own, a full stop is its own token, and Radar arrives as R, ad, ar. The adapter joins them back into the text’s white-space words and invents no millisecond — a joined word begins when its first token begins and ends when its last one ends. The text is the spike’s own sentence (D-019), spoken by English_Graceful_Lady; nothing of the presigned URL is kept, only the path the fixture matches on.",
   "provider": "minimax",
   "call": "subtitle",
   "case": "words",
-  "request": { "method": "GET", "path": "/audio_subtitle/recorded/subtitle.json" },
+  "request": {
+    "method": "GET",
+    "path": "/audio_subtitle/recorded/subtitle.json"
+  },
   "response": {
     "status": 200,
-    "headers": { "content-type": "application/json" },
+    "headers": {
+      "content-type": "application/json"
+    },
     "body": [
-      { "text": "Radar", "time_begin": 0, "time_end": 420, "text_begin": 0, "text_end": 4 },
-      { "text": "did", "time_begin": 500, "time_end": 700, "text_begin": 6, "text_end": 8 },
-      { "text": "not", "time_begin": 760, "time_end": 940, "text_begin": 10, "text_end": 12 },
-      { "text": "win", "time_begin": 1000, "time_end": 1240, "text_begin": 14, "text_end": 16 },
-      { "text": "the", "time_begin": 1300, "time_end": 1420, "text_begin": 18, "text_end": 20 },
-      { "text": "battle.", "time_begin": 1480, "time_end": 2020, "text_begin": 22, "text_end": 28 },
-      { "text": "The", "time_begin": 2140, "time_end": 2280, "text_begin": 30, "text_end": 32 },
       {
-        "text": "telephone",
-        "time_begin": 2340,
-        "time_end": 2900,
-        "text_begin": 34,
-        "text_end": 42
-      },
-      { "text": "did.", "time_begin": 2960, "time_end": 3160, "text_begin": 44, "text_end": 47 }
+        "text": "Radar did not win the battle. The telephone did.",
+        "time_begin": 0,
+        "time_end": 3905.442176870749,
+        "timestamped_words": [
+          {
+            "word": "R",
+            "time_begin": 42.666666666666664,
+            "time_end": 256
+          },
+          {
+            "word": "ad",
+            "time_begin": 256,
+            "time_end": 384
+          },
+          {
+            "word": "ar",
+            "time_begin": 384,
+            "time_end": 597.3333333333333
+          },
+          {
+            "word": " ",
+            "time_begin": 597.3333333333333,
+            "time_end": 640
+          },
+          {
+            "word": "did",
+            "time_begin": 640,
+            "time_end": 1024
+          },
+          {
+            "word": " ",
+            "time_begin": 1024,
+            "time_end": 1066.6666666666667
+          },
+          {
+            "word": "not",
+            "time_begin": 1066.6666666666667,
+            "time_end": 1194.6666666666665
+          },
+          {
+            "word": " ",
+            "time_begin": 1194.6666666666665,
+            "time_end": 1237.3333333333335
+          },
+          {
+            "word": "win",
+            "time_begin": 1237.3333333333335,
+            "time_end": 1450.6666666666665
+          },
+          {
+            "word": " ",
+            "time_begin": 1450.6666666666665,
+            "time_end": 1493.3333333333333
+          },
+          {
+            "word": "the",
+            "time_begin": 1493.3333333333333,
+            "time_end": 1749.3333333333333
+          },
+          {
+            "word": " ",
+            "time_begin": 1749.3333333333333,
+            "time_end": 1792
+          },
+          {
+            "word": "battle",
+            "time_begin": 1792,
+            "time_end": 1962.6666666666665
+          },
+          {
+            "word": ".",
+            "time_begin": 1962.6666666666665,
+            "time_end": 2261.3333333333335
+          },
+          {
+            "word": " ",
+            "time_begin": 2261.3333333333335,
+            "time_end": 2304
+          },
+          {
+            "word": "The",
+            "time_begin": 2304,
+            "time_end": 2474.666666666667
+          },
+          {
+            "word": " ",
+            "time_begin": 2474.666666666667,
+            "time_end": 2730.6666666666665
+          },
+          {
+            "word": "tele",
+            "time_begin": 2730.6666666666665,
+            "time_end": 2901.333333333333
+          },
+          {
+            "word": "phone",
+            "time_begin": 2901.333333333333,
+            "time_end": 3199.9999999999995
+          },
+          {
+            "word": " ",
+            "time_begin": 3199.9999999999995,
+            "time_end": 3242.6666666666665
+          },
+          {
+            "word": "did",
+            "time_begin": 3242.6666666666665,
+            "time_end": 3584
+          },
+          {
+            "word": ".",
+            "time_begin": 3584,
+            "time_end": 3882.6666666666665
+          }
+        ]
+      }
     ]
   }
 }
