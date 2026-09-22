@@ -115,7 +115,7 @@ export async function runClipsJob(
         transient: context.render.transient,
       }),
       media: context.media,
-      model: recordingPort(context.model, db, runId),
+      model: recordingPort(context.model, db, runId, job.id),
       recorder: clipsRecorder(db, runId),
     },
     { plan: context.settings, render: context.render },

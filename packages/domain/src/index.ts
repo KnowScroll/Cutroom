@@ -13,7 +13,7 @@ export {
   type RenderInputs,
 } from './clips.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
-export { imageCallCount, recordGeneration, spentCents } from './ledger.ts'
+export { imageCallCount, recordGeneration, recordLostCall, spentCents } from './ledger.ts'
 export { readRecord, upsertPicture, type DegradedShot } from './pictures.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
 export {

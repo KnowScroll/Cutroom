@@ -122,7 +122,7 @@ export async function runKeyframesJob(
         capCents,
         ceilingCents,
       }),
-      model: recordingPort(context.model, db, runId),
+      model: recordingPort(context.model, db, runId, job.id),
       sensors: context.sensors,
       recorder: stillsRecorder(db, runId),
     },

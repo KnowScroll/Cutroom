@@ -23,7 +23,15 @@ export {
   type StandInScripts,
   type Transport,
 } from './ports.ts'
-export { Unavailable, isUnavailable, transientStatus } from './transient.ts'
+export {
+  Spent,
+  Unavailable,
+  isSpent,
+  isUnavailable,
+  messageOf,
+  transientStatus,
+  type LostCall,
+} from './transient.ts'
 export { MINIMAX_BASE_URL } from './minimax/wire.ts'
 export {
   CONFIGURED_IMAGE_SLUG,

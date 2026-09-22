@@ -10,6 +10,15 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `paid-failures` on 2026-09-22 — the gates below are not edited, and no assertion is removed**
+> (**S-143**). **Check 1's video arm reads `'kind' | 'detail' | 'spent'`**, and it is pinned as a whole object type
+> rather than as a key list alone, so it is NARROWER than what it replaced: a third key still fails it, and now a
+> `spent` of the wrong type fails it too. `spent` is optional, is a `LostCall`, and is set in exactly one case — a
+> clip fal made and billed whose DOWNLOAD was then answered 429 or 5xx, which S-125 re-buys — so the clip already
+> paid for is on the record before the second one is bought. **The narration arm is unchanged**: T2A's re-buy is
+> plan-covered and there is no figure to lose. Nothing else in this feature moves, and its journey is run again in
+> `paid-failures`' last slice.
+>
 > **Created 2026-09-16 by S-066**, at the owner's choice, when `reel-render` was cut in two while its gates were
 > written. `reel-render` makes a gated video with **one take a shot**: a take that fails a gate stops the reel. This
 > feature deepens that without changing what the finished video is.

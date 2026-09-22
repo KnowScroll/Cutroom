@@ -1,4 +1,5 @@
-// WHAT IS TRANSIENT, AND WHAT IS A FAULT (S-096, I-11, docs/features/paid-path.md, Gate 2).
+// WHAT IS TRANSIENT, WHAT IS A FAULT, AND WHAT HAS ALREADY SPENT (S-096, S-142, I-11,
+// docs/features/paid-path.md Gate 2, docs/features/paid-failures.md Gate 2).
 //
 // A real adapter only CLASSIFIES. It never sends again, never waits and never counts: the sending,
 // the backoff and the counter belong to the worker's guarded ports, which S-096 built and
@@ -6,40 +7,21 @@
 // did the provider make nothing and might it if it is asked again, or is this wrong in a way that
 // a second send cannot fix?
 //
-// The video and the narration ports carry that answer in their types: `{ kind: 'unavailable' }` is
-// an answer those ports may return. `LanguageModelPort` has no such arm — its four calls return
-// `{ value, receipt }`, nothing wraps the model port with retry, and S-096 says plainly that a
-// thrown model call fails the run "until the paid-path feature builds the adapters that fail
-// transiently". So the model adapter carries the classification in the ERROR IT THROWS, as a type.
+// The video and the narration ports carry the transient answer in their types:
+// `{ kind: 'unavailable' }` is an answer those ports may return. `LanguageModelPort` has no such
+// arm, so the model adapter carries the classification in the ERROR IT THROWS, as a type, and
+// `apps/worker`'s model port counts those throws (S-137, paid-failures Slice 4).
 //
-// S-096 rejected "a thrown error carrying a marker" for video and narration, because the worker
-// would have recognised a transient by an error's SHAPE, and a thrown bug of the same shape would
-// have been sent again. This is not that: `Unavailable` is a class nothing else constructs, so no
-// bug can produce one by accident, and no code reads a message to decide what happened.
+// A THIRD ANSWER, since paid-failures: `Spent` — the provider made something and we could not use
+// it. It carries the row that call owes the record, because a paid call that leaves no row is
+// spend the budget guard reads as zero (S-133, S-059, S-087, S-095).
+//
+// BOTH CLASSES ARE DECLARED IN `packages/contracts` AND RE-EXPORTED HERE, unchanged in name and in
+// meaning, so that no adapter's import line moved. They live there because `worker-no-providers`
+// forbids `apps/worker` importing this package (S-038) and the worker is what catches them — which
+// is exactly why the model port had no retry until now. See `packages/contracts/src/failures.ts`.
 
-/**
- * The provider made nothing, and it may if it is asked again: 429, 5xx, a connection error, or a
- * call that timed out before an answer arrived (S-096).
- *
- * `detail` is what a caller records or puts in a message — the status, or what the transport said.
- * IT NEVER HOLDS A KEY: an adapter naming its call names the model and the request id, never a
- * header and never a credential (S-109, D-022).
- */
-export class Unavailable extends Error {
-  readonly kind = 'unavailable'
-  readonly detail: string
-
-  constructor(detail: string) {
-    super(`the provider is unavailable: ${detail}`)
-    this.name = 'Unavailable'
-    this.detail = detail
-  }
-}
-
-/** Whether one thrown thing is the transient answer. A class, never a shape or a message. */
-export function isUnavailable(error: unknown): error is Unavailable {
-  return error instanceof Unavailable
-}
+export { Spent, Unavailable, isSpent, isUnavailable, type LostCall } from '@cutroom/contracts'
 
 /**
  * An HTTP status a provider answered with: whether it is transient.
@@ -51,4 +33,13 @@ export function isUnavailable(error: unknown): error is Unavailable {
  */
 export function transientStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500
+}
+
+/**
+ * One thrown thing's message, for the `detail` of a {@link Spent}. An adapter's own message, never
+ * a stack and never a key: every message this repository's adapters build names the model and the
+ * request id and nothing else (S-109, D-022).
+ */
+export function messageOf(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
 }

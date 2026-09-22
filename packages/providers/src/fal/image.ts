@@ -3,6 +3,7 @@ import { dirname } from 'node:path'
 import { z } from 'zod'
 import type { ImageAnswer, ImagePort } from '@cutroom/contracts'
 import { artifactPath } from '../artifacts.ts'
+import { Spent, messageOf } from '../transient.ts'
 import { PICTURE_EXTENSION, pictureFrame } from './frame.ts'
 import {
   DEFAULT_FAL_POLL_MS,
@@ -63,6 +64,14 @@ import { uploadReference } from './upload.ts'
 // 429, 5xx, 408, a connection error and our own timeout are `Unavailable`; 400, 401, 403, 422, a
 // body that does not parse and a job fal accepted and then failed are faults. **The adapter only
 // classifies**: it never sends again, waits between sends or counts.
+//
+// AND A THIRD CLASS, ONCE THE JOB HAS COMPLETED (docs/features/paid-failures.md, S-142). From that
+// point fal has made the picture and billed for it, so every failure after it — a result body that
+// does not parse, no picture in it, a download that fails, bytes that are no picture, a frame this
+// entry refuses — is `Spent`, carrying the row that call owes the record. A plain fault there is
+// spend the budget guard reads as zero, which is what happened twice on the first real reel
+// (S-133). A transient status on the DOWNLOAD is `Spent` too, and not `Unavailable`: nothing
+// retries an image call, so calling it transient would buy no second send and only lose the row.
 //
 // FILES, NOT BYTES, AND NEVER THE PROVIDER'S URL. The picture is downloaded under the one artifact
 // root and the answer carries its local path. fal's result URL expires and is not ours: it reaches
@@ -194,56 +203,78 @@ export function falImage(options: FalImageOptions): ImagePort {
         )
       }
 
-      const result = json(
-        (
-          await runQueued({
-            slug,
-            what,
-            base,
-            pollMs,
-            timeoutMs,
-            // An image job answers in seconds, so its whole-job wait IS its per-request timeout —
-            // the one figure this adapter has always used. A clip takes minutes and takes its own
-            // (S-125); nothing about the image path moved when the two were split.
-            waitMs: timeoutMs,
-            fetch,
-            key: options.key,
-            input: {
-              prompt: request.prompt,
-              ...(image_urls.length > 0 ? { image_urls } : {}),
-              ...frameInput(entry),
-              num_images: 1,
-            },
-          })
-        ).body,
-        produced,
-        `${what}'s result`,
-      )
+      const answered = await runQueued({
+        slug,
+        what,
+        base,
+        pollMs,
+        timeoutMs,
+        // An image job answers in seconds, so its whole-job wait IS its per-request timeout —
+        // the one figure this adapter has always used. A clip takes minutes and takes its own
+        // (S-125); nothing about the image path moved when the two were split.
+        waitMs: timeoutMs,
+        fetch,
+        key: options.key,
+        input: {
+          prompt: request.prompt,
+          ...(image_urls.length > 0 ? { image_urls } : {}),
+          ...frameInput(entry),
+          num_images: 1,
+        },
+      })
+
+      // EVERYTHING BELOW THIS LINE IS PAID FOR (docs/features/paid-failures.md, Gate 2). The job
+      // COMPLETED: fal made the picture, and what fails now is our reading of it, not its making.
+      // So each of these is `Spent`, carrying the row the call owes the record — a plain fault
+      // here leaves the budget guard reading the spend as zero, which is what happened twice on
+      // the first real reel (S-133, S-142). The cost is the same arithmetic the receipt below
+      // uses, computed once, so a lost call and a made one cannot be priced differently.
+      const costCents = imageCostCents(entry, {
+        frame: entry.frame,
+        references: request.references.map(() => entry.frame),
+      })
+      const spent = (detail: string) => new Spent({ port: 'image', model: slug, costCents, detail })
+
+      let result: z.infer<typeof produced>
+      try {
+        result = json(answered.body, produced, `${what}'s result`)
+      } catch (error) {
+        throw spent(messageOf(error))
+      }
 
       const made = result.images[0]
       if (made === undefined) {
-        throw new FalFault(`${what} finished and carried no picture at all`)
+        throw spent(`${what} finished and carried no picture at all`)
       }
 
       // The file, fetched from the URL fal keeps it at. NO KEY on this call: it is fal's own file
       // host, with its own authorisation, and ours has no business there (S-109, D-022).
-      const bytes = await (
-        await send(made.url, `${what}'s file`, { method: 'GET', timeoutMs, fetch })
-      ).bytes()
+      //
+      // A FAILURE HERE IS `Spent` AND NOT `Unavailable`, although the same status would be
+      // transient before the job completed: nothing retries an image call (S-096, S-122), so
+      // classifying it as transient buys no second send and only loses the row.
+      let bytes: Uint8Array
+      try {
+        bytes = await (
+          await send(made.url, `${what}'s file`, { method: 'GET', timeoutMs, fetch })
+        ).bytes()
+      } catch (error) {
+        throw spent(messageOf(error))
+      }
 
       // THE FRAME IS READ OFF THE BYTES. `made.width` and `made.height` are the provider's account
       // of what it made, and D-028 says this requirement is checked on the produced frame because
       // it fails silently — so they are never read here.
       const frame = pictureFrame(bytes)
       if (frame === undefined) {
-        throw new FalFault(
+        throw spent(
           `${what} answered ${bytes.length} bytes that are no picture this adapter can read`,
         )
       }
       const refused = frameRefusal(frame, slug)
       // Thrown BEFORE the file is written, so a picture that failed its frame is not left under
       // the artifact root for anything to pick up.
-      if (refused !== undefined) throw new FalFault(refused)
+      if (refused !== undefined) throw spent(refused)
 
       const path = artifactPath(
         options.artifactRoot,
@@ -266,10 +297,7 @@ export function falImage(options: FalImageOptions): ImagePort {
           // The CONFIGURED ENTRY'S RATE applied to this call, in whole cents rounded up as the
           // guard rounds (S-059, D-083). Never a constant: the same arithmetic feeds admission's
           // estimate, so a reel cannot be priced by one model and bought from another.
-          costCents: imageCostCents(entry, {
-            frame: entry.frame,
-            references: request.references.map(() => entry.frame),
-          }),
+          costCents,
           fake: false,
         },
       }

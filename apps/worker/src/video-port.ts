@@ -5,8 +5,9 @@ import type {
   VideoPort,
   VideoRequest,
 } from '@cutroom/contracts'
-import { recordClip, spentCents, type Db } from '@cutroom/domain'
+import { recordClip, recordLostCall, spentCents, type Db } from '@cutroom/domain'
 import { readTakeId, validateVideoRequest } from '@cutroom/pipeline'
+import { recordingSpend } from './spend.ts'
 import { sentUntilAvailable } from './transient.ts'
 
 /**
@@ -112,7 +113,15 @@ export function guardedVideoPort(
               estimateCents,
             }
           }
-          return video.generate(request)
+          const answered = await recordingSpend(db, job, () => video.generate(request))
+          // A TRANSIENT ON THE DOWNLOAD COMES AFTER THE CLIP WAS MADE (paid-failures, S-142). The
+          // re-buy S-125 chose still happens — this send is answered `unavailable` and the whole
+          // call is sent again — and the clip that was already paid for is on the record first,
+          // so the second payment is not the only one the budget guard can see.
+          if (answered.kind === 'unavailable' && answered.spent !== undefined) {
+            recordLostCall(db, { jobId: job.jobId, runId: job.runId, lost: answered.spent })
+          }
+          return answered
         },
       )
       if (answer.kind !== 'made') return answer

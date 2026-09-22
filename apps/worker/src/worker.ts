@@ -31,6 +31,7 @@ import {
 import { runAssembleJob, type AssembleJobContext } from './assemble-job.ts'
 import { runClipsJob, type ClipsJobContext } from './clips-job.ts'
 import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
+import { retryingModelPort } from './model-port.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
 
@@ -161,18 +162,25 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     }
   }
 
+  // THE MODEL PORT'S TRANSIENT COUNTER, wrapped ONCE (paid-failures Slice 4, S-137). Every job's
+  // context is handed this port rather than the one the worker was given, so no job can forget it,
+  // and the figures are the render settings' — the same `maxAttempts` and `backoffMs` the video and
+  // narration ports count on, because a provider having a bad minute is one thing whichever port
+  // asks it.
+  const model = retryingModelPort(options.model, render.transient)
+
   const db = openDatabase(options.dbPath)
   const pollMs = options.pollMs ?? 500
   const leaseMs = options.leaseMs ?? DEFAULT_LEASE_MS
   const settings = options.settings ?? DEFAULT_PLAN_SETTINGS
   const context: PlanJobContext = {
-    model: options.model,
+    model,
     settings,
     budgetPath: options.budgetPath ?? BUDGET_MD,
     questionsPath: options.questionsPath ?? QUESTIONS_MD,
   }
   const keyframes: KeyframesJobContext = {
-    model: options.model,
+    model,
     image: options.image,
     sensors: options.sensors,
     settings,
@@ -181,7 +189,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     questionsPath: context.questionsPath,
   }
   const clips: ClipsJobContext = {
-    model: options.model,
+    model,
     video: options.video,
     narration: options.narration,
     media: options.media,
@@ -192,7 +200,7 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
   }
   // No image, narration or video port: nothing can be bought once assembly begins (I-18, S-069).
   const assemble: AssembleJobContext = {
-    model: options.model,
+    model,
     media: options.media,
     assembler: options.assembler,
     render,

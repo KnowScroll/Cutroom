@@ -1,6 +1,7 @@
 import type { ImagePort, StillsSettings } from '@cutroom/contracts'
 import { recordGeneration, spentCents, type Db } from '@cutroom/domain'
 import { framingFor, readPictureId, type Placement } from '@cutroom/pipeline'
+import { recordingSpend } from './spend.ts'
 
 /**
  * The only image port the stills stage is handed (docs/features/reel-stills.md, Gate 2 "Spending
@@ -51,7 +52,11 @@ export function guardedImagePort(
         return { kind: 'refused', limit: 'ceiling', estimateCents }
       }
 
-      const answer = await image.generate(request)
+      // A PICTURE FAL MADE AND WE COULD NOT USE LEAVES ITS ROW (paid-failures, S-142). The adapter
+      // throws `Spent` once the job has completed — a body that does not parse, a frame the entry
+      // refuses — and the row is written, and the cost added to this job, before the throw carries
+      // on and fails the run as it always did.
+      const answer = await recordingSpend(db, job, () => image.generate(request))
       if (answer.kind !== 'made') return answer
       recordGeneration(db, {
         jobId: job.jobId,

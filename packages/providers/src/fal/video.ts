@@ -1,9 +1,9 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { z } from 'zod'
-import type { MediaPort, VideoAnswer, VideoPort, VideoRequest } from '@cutroom/contracts'
+import type { LostCall, MediaPort, VideoAnswer, VideoPort, VideoRequest } from '@cutroom/contracts'
 import { artifactPath } from '../artifacts.ts'
-import { isUnavailable } from '../transient.ts'
+import { Spent, isUnavailable, messageOf } from '../transient.ts'
 import {
   CLIP_EXTENSION,
   DEFAULT_VIDEO_WAIT_MS,
@@ -71,6 +71,14 @@ import { uploadReference } from './upload.ts'
 // against the provider's own figures. Unlike T2A's re-buy (S-123) this one costs real money, and
 // the owner was shown that and chose it over failing a reel that every earlier shot had been paid
 // for.
+//
+// **THE RE-BUY STANDS, AND THE CLIP IT REPLACES IS NOW ON THE RECORD** (docs/features/paid-failures.md,
+// S-142). A transient on the DOWNLOAD comes after the job completed, so fal made that clip and
+// billed for it: the unavailable answer carries a `spent`, the worker writes the row and adds the
+// cost before it sends again, and what used to be a second payment the budget guard could not see
+// is now one it counts. Every failure after a completed job that is NOT transient — a result body
+// that does not parse, a download that fails for any other reason, a file ffprobe cannot read as a
+// clip — is `Spent`, which is thrown, carries the same row, and is never sent again.
 //
 // FILES, NOT BYTES, AND NEVER THE PROVIDER'S URL. The clip is downloaded under the one artifact
 // root, PROBED before the answer returns, and the answer carries its local path. A fal result URL
@@ -241,13 +249,38 @@ export function falVideo(options: FalVideoOptions): VideoPort {
         ...(image_url === undefined ? { aspect_ratio: '9:16' } : { image_url }),
       },
     })
-    const result = json(answered.body, produced, `${what}'s result`)
+    // EVERYTHING BELOW THIS LINE IS PAID FOR (docs/features/paid-failures.md, Gate 2, S-142). The
+    // job COMPLETED: fal made the clip and billed for it — the most expensive single call this
+    // engine makes — so a failure in our reading of it is `Spent`, carrying the row the call owes,
+    // and never a plain fault that leaves the budget guard reading the spend as zero (S-133).
+    // The cost is the same arithmetic the receipt below uses, computed once.
+    const costCents = videoCostCents(entry, request.durationSeconds)
+    const lost = (detail: string): LostCall => ({ port: 'video', model: slug, costCents, detail })
+
+    let result: z.infer<typeof produced>
+    try {
+      result = json(answered.body, produced, `${what}'s result`)
+    } catch (error) {
+      throw new Spent(lost(messageOf(error)))
+    }
 
     // The file, fetched from the URL fal keeps it at. NO KEY on this call: it is fal's own file
     // host, with its own authorisation, and ours has no business there (S-109, D-022).
-    const bytes = await (
-      await send(result.video.url, `${what}'s file`, { method: 'GET', timeoutMs, fetch })
-    ).bytes()
+    //
+    // A TRANSIENT HERE STILL RE-BUYS THE CLIP (S-125, check 15) — and the clip fal has already
+    // made goes on the record before the second one is bought, or this run pays twice and the
+    // guard sees one of them. That is what `spent` on the unavailable answer carries.
+    let bytes: Uint8Array
+    try {
+      bytes = await (
+        await send(result.video.url, `${what}'s file`, { method: 'GET', timeoutMs, fetch })
+      ).bytes()
+    } catch (error) {
+      if (isUnavailable(error)) {
+        return { kind: 'unavailable', detail: error.message, spent: lost(error.message) }
+      }
+      throw new Spent(lost(messageOf(error)))
+    }
 
     const path = artifactPath(
       options.artifactRoot,
@@ -268,9 +301,11 @@ export function falVideo(options: FalVideoOptions): VideoPort {
     const probed = await options.probe({ id: request.takeId, path })
     if (!probed.readable || probed.video === null) {
       rmSync(path, { force: true })
-      throw new FalFault(
-        `${what} downloaded ${bytes.length} bytes that ffprobe cannot read as a clip with a ` +
-          `picture in it, so the file is not what the provider said it made`,
+      throw new Spent(
+        lost(
+          `${what} downloaded ${bytes.length} bytes that ffprobe cannot read as a clip with a ` +
+            `picture in it, so the file is not what the provider said it made`,
+        ),
       )
     }
 
@@ -282,7 +317,7 @@ export function falVideo(options: FalVideoOptions): VideoPort {
         requestId: answered.requestId,
         // THE CONFIGURED RATE APPLIED TO THE SECONDS ASKED FOR, rounded up as the guard rounds —
         // fal's answer carries no price at all (S-059, D-083, the gate review's finding 6).
-        costCents: videoCostCents(entry, request.durationSeconds),
+        costCents,
         fake: false,
         // D-072: recorded on the receipt, and shown to no gate.
         expandedPrompt: result.expanded_prompt ?? NO_EXPANSION,

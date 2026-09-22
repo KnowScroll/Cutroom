@@ -1,6 +1,7 @@
 import type { NarrationAnswer, NarrationPort, RenderSettings } from '@cutroom/contracts'
 import { recordNarration, spentCents, type Db } from '@cutroom/domain'
 import { readNarrationId } from '@cutroom/pipeline'
+import { recordingSpend } from './spend.ts'
 import { sentUntilAvailable } from './transient.ts'
 import type { ClipsLimits } from './video-port.ts'
 
@@ -61,7 +62,10 @@ export function guardedNarrationPort(
               estimateCents,
             }
           }
-          return narration.speak(request)
+          // A narration the provider SPOKE and we could not use leaves its row too (S-142). The
+          // figure on it is zero, because T2A is plan-covered — what the row carries is that the
+          // call happened.
+          return recordingSpend(db, job, () => narration.speak(request))
         },
       )
       if (answer.kind !== 'made') return answer

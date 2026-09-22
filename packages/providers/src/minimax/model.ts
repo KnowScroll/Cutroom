@@ -10,7 +10,7 @@ import type {
   PictureRef,
 } from '@cutroom/contracts'
 import { visibleText } from '../text.ts'
-import { Unavailable, transientStatus } from '../transient.ts'
+import { Spent, Unavailable, isSpent, messageOf, transientStatus } from '../transient.ts'
 import { baseOf, baseResp, summary, transientCode } from './wire.ts'
 
 // THE MINIMAX MODEL ADAPTER — the first real adapter this engine has ever had
@@ -443,12 +443,45 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
   }
 
   /**
+   * What a model call costs when it answered and could not be read (S-142).
+   *
+   * **Zero, and the row exists anyway.** A model call is billed in tokens, and under the Token Plan
+   * those cost nothing (S-129) — so the figure is honest and the ROW is what the next session
+   * needs: a call that happened, on the record, with a figure that can be corrected when a model
+   * call costs money (paid-failures, Deferred item 2). A row invented later cannot be.
+   */
+  const MODEL_LOST_CENTS = 0
+
+  /**
+   * Everything after a 200: the provider answered, so this call spent whatever it spends. The
+   * detail is the reader's own message, which names the role and the model already.
+   */
+  const spent = (model: string, detail: string): Spent =>
+    new Spent({ port: 'model', model, costCents: MODEL_LOST_CENTS, detail })
+
+  /**
+   * One step of reading an answer the provider has already given. A failure in it is `Spent`, with
+   * the reader's own message as the detail — and a `Spent` from inside is passed through, never
+   * wrapped twice.
+   */
+  function read<T>(model: string, of: () => T): T {
+    try {
+      return of()
+    } catch (error) {
+      if (isSpent(error)) throw error
+      throw spent(model, messageOf(error))
+    }
+  }
+
+  /**
    * One call, sent and classified.
    *
-   * Everything that is not an answer is turned into one of two things here and nowhere else:
-   * `Unavailable`, which the provider may answer differently if it is asked again, or a thrown
-   * `Error`, which it will not (S-096). The adapter does not send again, wait or count — that is
-   * the worker's guarded ports', and for the model port it is not built (see ../transient.ts).
+   * Everything that is not an answer is turned into one of three things here and nowhere else:
+   * `Unavailable`, which the provider may answer differently if it is asked again; `Spent`, which
+   * it answered and we could not read, carrying the row that call owes (S-142); or a thrown
+   * `Error`, which is our request being wrong (S-096). The adapter does not send again, wait or
+   * count — that is the worker's guarded ports', and since paid-failures the model port has one
+   * too (see ../transient.ts).
    */
   async function post(body: Record<string, unknown>, role: ModelRole): Promise<Completion> {
     const model = String(body.model)
@@ -485,17 +518,23 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
       throw new Error(detail)
     }
 
+    // A 200 IS A CALL THAT SPENT (docs/features/paid-failures.md, Gate 2, S-142). The provider
+    // answered; what fails from here is our reading of what it said, so it is `Spent` and carries
+    // the row the call owes the record — never a plain fault, which the budget guard reads as no
+    // call at all (S-133).
     let parsed: unknown
     try {
       parsed = JSON.parse(text)
     } catch {
-      throw new Error(
+      throw spent(
+        model,
         `the ${role} call to ${model} was answered 200 with a body that is not JSON: ${summary(text)}`,
       )
     }
     const answer = completion.safeParse(parsed)
     if (!answer.success) {
-      throw new Error(
+      throw spent(
+        model,
         `the ${role} call to ${model} was answered 200 with a body that is not this wire: ` +
           answer.error.issues.map((i) => `${i.path.join('.')} ${i.message}`).join('; '),
       )
@@ -619,11 +658,15 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
       },
       role,
     )
-    const value = jsonOf(
-      answerOf(answer, role, model),
-      role,
-      model,
-      answer.choices[0]?.finish_reason ?? undefined,
+    // READING WHAT WAS ALREADY PAID FOR (S-142): the 200 is in hand, so a reasoning block with no
+    // answer, a fence, a schema echo, a cut-off body or anything that will not parse is `Spent`.
+    const value = read(model, () =>
+      jsonOf(
+        answerOf(answer, role, model),
+        role,
+        model,
+        answer.choices[0]?.finish_reason ?? undefined,
+      ),
     )
     return { value, receipt: receiptOf(role, call, temperature, answer, about) }
   }
@@ -651,10 +694,14 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
         },
         call.role,
       )
-      const text = answerOf(answer, call.role, model)
-      const value = call.schema.parse(
-        jsonOf(text, call.role, model, answer.choices[0]?.finish_reason ?? undefined),
-      )
+      // The same line as `ask`'s: the call is paid for, and everything from here is our reading of
+      // it — including the caller's own schema refusing the answer (S-142).
+      const value = read(model, () => {
+        const text = answerOf(answer, call.role, model)
+        return call.schema.parse(
+          jsonOf(text, call.role, model, answer.choices[0]?.finish_reason ?? undefined),
+        )
+      })
       return {
         value,
         receipt: receiptOf(call.role, 'structured', call.temperature, answer, {

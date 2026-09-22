@@ -30,6 +30,7 @@ export type {
   VideoReceipt,
   VideoRequest,
 } from './clip.ts'
+export { Spent, Unavailable, isSpent, isUnavailable, type LostCall } from './failures.ts'
 export type { LanguageModelPort, ModelCall, ModelReceipt, ModelRole } from './model.ts'
 export type {
   NarrationAnswer,

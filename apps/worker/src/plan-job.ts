@@ -43,11 +43,16 @@ interface Planned {
   outcome: PlanOutcome
 }
 
-async function plan(db: Db, runId: string, context: PlanJobContext): Promise<Planned> {
+async function plan(
+  db: Db,
+  runId: string,
+  jobId: number,
+  context: PlanJobContext,
+): Promise<Planned> {
   const request = readRequest(db, runId)
   // One figure, read once per job: what Gate 0 compares with (D-100, D-014).
   const capCents = readReelCapCents(context.budgetPath)
-  const model = recordingPort(context.model, db, runId)
+  const model = recordingPort(context.model, db, runId, jobId)
   const outcome = await planReel(request, model, capCents, context.settings)
   return { request, capCents, outcome }
 }
@@ -104,7 +109,7 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
 
   let planned: Planned
   try {
-    planned = await plan(db, runId, context)
+    planned = await plan(db, runId, job.id, context)
   } catch (error) {
     // A thrown call or a refused answer is a fault: the run fails with why, and every receipt of a
     // call that returned is already written.

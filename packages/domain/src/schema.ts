@@ -218,6 +218,34 @@ export const generationReceipt = sqliteTable('generation_receipt', {
   at: text('at').notNull(),
 })
 
+/**
+ * One call a provider answered and this engine could not use (docs/features/paid-failures.md,
+ * Gate 2; S-133, S-142). A table of its own, not a widened `generation_receipt`: every row there
+ * has a `picture_id` and a picture row written in the same transaction, and a call that made
+ * nothing has neither — so widening it would hand every existing reader a row shape it was not
+ * written for, and one that forgot to exclude it would fail silently.
+ *
+ * Written the way a generation is: one immediate transaction, the row and the cost added to the
+ * running job row's `cost_cents`, which is what `spentCents` sums over the chain (D-081). That is
+ * the whole point — the budget guard reads the chain's spend from the job rows before every call
+ * (S-035, S-087, S-095), and a paid call with no row is spend it reads as zero.
+ */
+export const lostCall = sqliteTable('lost_call', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  runId: text('run_id')
+    .notNull()
+    .references(() => run.runId),
+  /** Which port the call was made on. `image` is also counted by D-027's six-call bound. */
+  port: text('port', { enum: ['image', 'video', 'speech', 'model'] }).notNull(),
+  /** The wire that was actually called, as every receipt records it (S-128). */
+  model: text('model').notNull(),
+  /** The configured rate applied to what was asked for, rounded as the guard rounds (S-059). */
+  costCents: integer('cost_cents').notNull(),
+  /** What went wrong, in the adapter's own words. Never a key, a URL or a query string (D-022). */
+  detail: text('detail').notNull(),
+  at: text('at').notNull(),
+})
+
 /** A shot that goes on without an approved picture: its own table, so it is a query (I-4, D-025). */
 export const degradation = sqliteTable(
   'degradation',

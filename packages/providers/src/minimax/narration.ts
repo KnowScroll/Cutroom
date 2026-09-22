@@ -3,7 +3,7 @@ import { dirname } from 'node:path'
 import { z } from 'zod'
 import type { NarrationAnswer, NarrationPort, WordTiming } from '@cutroom/contracts'
 import { artifactPath } from '../artifacts.ts'
-import { transientStatus } from '../transient.ts'
+import { Spent, messageOf, transientStatus } from '../transient.ts'
 import { baseOf, baseResp, summary, transientCode } from './wire.ts'
 
 // THE MINIMAX T2A NARRATION ADAPTER — the second real adapter (docs/features/paid-path.md,
@@ -206,6 +206,13 @@ function bare(tokens: readonly { word: string; time_begin: number; time_end: num
     }))
 }
 
+/**
+ * What a narration that spoke and could not be read costs (S-142). **Zero**, because T2A is covered
+ * by the owner's token plan (D-019, D-057, S-070) — the same figure the receipt carries. The row
+ * is what matters: a call that happened, on the record.
+ */
+const NARRATION_LOST_CENTS = 0
+
 /** A fault: the provider will answer a second send the same way, so the run fails (S-096). */
 class Fault extends Error {}
 
@@ -281,34 +288,37 @@ export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPor
   return {
     async speak(request) {
       const what = `the narration ${request.narrationId}`
+      // WHETHER THE PROVIDER HAS SPOKEN YET (docs/features/paid-failures.md, Gate 2, S-142). Before
+      // the T2A call answers, a failure is a request of ours that was wrong, or a provider that
+      // made nothing; after it, the words have been spoken and the call has spent, so every
+      // failure in our reading of the answer is `Spent` and carries the row that call owes.
+      let answered = false
       try {
-        const body = json(
-          await get(`${base}${T2A_PATH}`, what, {
-            method: 'POST',
-            headers: {
-              'content-type': 'application/json',
-              authorization: `Bearer ${options.key}`,
-            },
-            body: JSON.stringify({
-              model,
-              text: request.text,
-              stream: false,
-              // Without this there are no word timings at all, and D-008's whole reason for a
-              // separate narration track is the word timings (D-019).
-              subtitle_enable: true,
-              // And without THIS the timings come back at the provider's default granularity,
-              // which is one entry for the whole text (S-129, measured 2026-09-21).
-              subtitle_type: SUBTITLE_TYPE,
-              // The voice is the caller's setting (S-070), never a value spelled here. It is
-              // still `'stand-in'` by default in `DEFAULT_RENDER_SETTINGS`, which the stand-in
-              // ignores and this adapter cannot: Slice 8's real run is what names a real voice.
-              voice_setting: { voice_id: request.voice, speed: 1, vol: 1, pitch: 0 },
-              audio_setting: { ...AUDIO_SETTING },
-            }),
+        const said = await get(`${base}${T2A_PATH}`, what, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${options.key}`,
+          },
+          body: JSON.stringify({
+            model,
+            text: request.text,
+            stream: false,
+            // Without this there are no word timings at all, and D-008's whole reason for a
+            // separate narration track is the word timings (D-019).
+            subtitle_enable: true,
+            // And without THIS the timings come back at the provider's default granularity,
+            // which is one entry for the whole text (S-129, measured 2026-09-21).
+            subtitle_type: SUBTITLE_TYPE,
+            // The voice is the caller's setting (S-070), never a value spelled here. It is
+            // still `'stand-in'` by default in `DEFAULT_RENDER_SETTINGS`, which the stand-in
+            // ignores and this adapter cannot: Slice 8's real run is what names a real voice.
+            voice_setting: { voice_id: request.voice, speed: 1, vol: 1, pitch: 0 },
+            audio_setting: { ...AUDIO_SETTING },
           }),
-          spoken,
-          what,
-        )
+        })
+        answered = true
+        const body = json(said, spoken, what)
 
         // MiniMax reports its own outcome even under 200, so a busy provider can arrive either way.
         const status = body.base_resp
@@ -375,7 +385,22 @@ export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPor
           },
         } satisfies NarrationAnswer
       } catch (error) {
+        // A transient is still the port's own arm, wherever it came from: the whole `speak` is
+        // sent again, and T2A's re-buy costs nothing under the Token Plan (S-123, S-129). That is
+        // why this answer carries no `spent` where the video port's does — there is no figure to
+        // lose. When a narration costs money, it gains what the clip has (paid-failures, Deferred).
         if (error instanceof Transient) return { kind: 'unavailable', detail: error.message }
+        // The provider spoke and we could not use what it said (S-142). The row carries a zero for
+        // the same reason the receipt does — T2A is plan-covered — and it is the ROW that matters:
+        // a call that happened, on the record, with a figure that can be corrected later.
+        if (answered) {
+          throw new Spent({
+            port: 'speech',
+            model,
+            costCents: NARRATION_LOST_CENTS,
+            detail: messageOf(error),
+          })
+        }
         throw error
       }
     },

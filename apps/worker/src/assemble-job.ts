@@ -99,7 +99,7 @@ export async function runAssembleJob(
     {
       assembler: context.assembler,
       media: context.media,
-      model: recordingPort(context.model, db, runId),
+      model: recordingPort(context.model, db, runId, job.id),
     },
     context.render,
   )

@@ -12,6 +12,14 @@ import { errorsIn } from './engine/compile.ts'
 // with a detail (S-096), on the video port and on the narration port alike, and that answer carries
 // nothing else: no budget figure, since only the guard answers `refused` (S-035), and no type a
 // caller would read is declared outside @cutroom/reel-contract (D-094).
+//
+// ONE FIELD WAS ADDED TO THE VIDEO ARM, AND THE ASSERTION IS STILL EXACT (S-143, paid-failures).
+// `spent` is optional, is a `LostCall`, and exists for one case: a clip fal made and billed, whose
+// DOWNLOAD was then answered 429 or 5xx. S-125 re-buys that clip, so without the field the run pays
+// twice and the budget guard sees one of the two payments. It carries no clip, no take and no
+// receipt — what it carries is what was already spent. **The narration arm is unchanged**, exactly
+// a kind and a detail, because T2A is plan-covered and its re-buy costs nothing (S-123, S-129); and
+// a THIRD key on either arm still fails this check.
 
 const CONTRACTS = '../../packages/contracts/src/index.ts'
 
@@ -20,6 +28,7 @@ const DIR = join(REPO, '.tmp', `takes-ports-${process.pid}`)
 
 const PREAMBLE = [
   'import type {',
+  '  LostCall,',
   '  NarrationAnswer,',
   '  NarrationPort,',
   '  TakeNumber,',
@@ -62,8 +71,12 @@ test(`${CHECK_1} — what compiles, each answer having exactly a kind and a deta
       "  const spoken: Awaited<ReturnType<NarrationPort['speak']>> = fromNarration",
       // A kind and a detail, and nothing else: an answer built before it is used is not checked for
       // excess properties, so the members' own keys are compared.
-      "  const videoKeys: Same<keyof VideoUnavailable, 'kind' | 'detail'> = true",
+      "  const videoKeys: Same<keyof VideoUnavailable, 'kind' | 'detail' | 'spent'> = true",
       "  const narrationKeys: Same<keyof NarrationUnavailable, 'kind' | 'detail'> = true",
+      // `spent` is OPTIONAL — every other unavailable answer has none — and it is a `LostCall`,
+      // the shape the worker writes a `lost_call` row from (S-142, S-143).
+      "  const videoSpentOptional: Same<VideoUnavailable, { kind: 'unavailable'; detail: string; spent?: LostCall }> = true",
+      "  const videoSpent: Same<VideoUnavailable['spent'], LostCall | undefined> = true",
       "  const videoDetail: Same<VideoUnavailable['detail'], string> = true",
       "  const narrationDetail: Same<NarrationUnavailable['detail'], string> = true",
       "  const made = await video.generate({ runId: 'r', takeId: 'a1-shot-0-take-1', prompt: 'p', durationSeconds: 5, resolution: '768P', seed: 1, promptExpansionMode: 'balanced', mode: 'text-to-video', aspectRatio: '9:16' })",
@@ -72,6 +85,7 @@ test(`${CHECK_1} — what compiles, each answer having exactly a kind and a deta
       "  if (said.kind === 'unavailable') void said.detail.length",
       '  void [one, two, three, numbers, clip, voice, answered, spoken]',
       '  void [videoKeys, narrationKeys, videoDetail, narrationDetail]',
+      '  void [videoSpentOptional, videoSpent]',
     ].join('\n'),
   )
   assert.deepEqual(

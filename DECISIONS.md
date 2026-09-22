@@ -5754,3 +5754,154 @@ of one**, written from a file rather than through a shell (CLAUDE.md's backslash
 session — and it fired again here, halving the regex in the new test before it was read back from
 the file): the line re-wrapped exactly as it was, and the test fails naming `program-design` and
 saying a gate below a wrap reads as unapproved. **And the journeys themselves**, which ran after it.
+
+---
+
+## S-142 | 2026-09-22 | The two gaps session 45 named get a feature of their own, `paid-failures`; a call the provider has already answered carries its receipt in the error it throws; and a paid call that made nothing gets a table of its own
+
+**Chose.** Three things, each put to the owner with its alternatives and each answered on
+2026-09-22.
+
+- **A FEATURE OF ITS OWN**, `docs/features/paid-failures.md`, with its four gates written and
+  reviewed before any implementation file — not a Slice 9 of `paid-path`.
+- **A TYPED ERROR CARRYING ITS RECEIPT.** `Spent`, a class in **`packages/contracts`**, thrown by
+  a real adapter once the provider has made something, carrying what the row needs: the port, the
+  wire, the cost and a detail. The worker catches it, writes the row, and **rethrows it unchanged**
+  — so nothing about how a run fails moves.
+- **A TABLE OF ITS OWN**, `lost_call`, rather than a widened `generation_receipt`. The cost reaches
+  `job.cost_cents` exactly as a made picture's does, which is what the budget guard reads; and
+  `imageCallCount` — D-027's six-call cap — is changed to count both tables, so **a paid call that
+  made no picture spends one of the six**.
+
+**Why.**
+
+- **A feature of its own, because `paid-path`'s approved scope excludes what this needs.** Its Gate
+  1 says in as many words that it _"builds no new stage, gate, table or route"_, and a reviewer
+  approved that sentence on 2026-09-20. B1 adds a table and a migration. A Slice 9 would widen a
+  feature past the text its review was written against, by an amendment nobody adversarial has
+  read — which is the drift the gates exist to catch. The cost is stated and accepted: gates plus a
+  review is most of a session, so **the reel that passes Gate 7 very likely waits for the next one.**
+- **The receipt travels in the error because the money is already spent by then.** A cost here is
+  **our configured rate applied to what we asked for** — `imageCostCents(entry, …)`,
+  `videoCostCents(entry, seconds)` — so it is fully known at the moment the provider answers, and
+  nothing in the answer is needed to compute it. What was missing was not the figure; it was a path
+  from an adapter that may keep no durable state to the worker, which is the only place that knows
+  both a stage and a table.
+- **`Unavailable` is the precedent, and it is a class for the same reason (S-096, S-122).** A
+  thrown error recognised by its SHAPE would be produced by a bug of the same shape; a class
+  nothing else constructs cannot be. `Spent` is that a second time.
+- **IT MUST LIVE IN `packages/contracts`, and this is the part that was not obvious.**
+  `worker-no-providers` forbids `apps/worker` importing `packages/providers` (S-038), so the worker
+  cannot name a class declared there — which is exactly why `Unavailable` has never been seen by
+  the worker, and why the model port has no retry today (S-137). Contracts imports nothing internal
+  and already holds runtime values beside its types (`PROVIDER_ADAPTERS`, `anyReal`), so both sides
+  can name one class without a new boundary or a new package.
+- **A table of its own, because `generation_receipt` is joined to a picture.** Every row there has
+  a `picture_id` and a picture row made in the same transaction (S-036). A call that made nothing
+  has neither. Widening the column to accept a null would leave every existing reader of that table
+  to exclude the picture-less rows by hand, and **one that forgot would fail silently** — a receipt
+  row read as a picture. A separate table leaves every existing reader's meaning exactly as it is
+  and makes the new rows something a reader has to ask for.
+- **And the six-call cap has to count them, or the cap leaks the same way the budget does.**
+  D-027 bounds a run at six image calls; `imageCallCount` reads `generation_receipt`. Two calls in
+  session 45 answered 200, made nothing readable, and counted for nothing — so a run could pay for
+  eight. Counting both tables makes the cap **stricter**, never looser.
+
+**Rejected.**
+
+- **A Slice 9 of `paid-path`.** See above: the approved scope excludes a new table. Put to the
+  owner with the cost of each; not chosen.
+- **Splitting the two gaps** — B1 its own feature, B2 a slice. They are one shape, said so in
+  S-133 and S-137 on the same day, and both are about what happens after a call that has already
+  spent. Two features would put the model port's retry and the receipt it may have to write in
+  different reviews.
+- **A new answer arm on every port** — `{ kind: 'spent', receipt }` beside `made` and
+  `unavailable`. Honest in the types rather than in a thrown class, and it moves `LanguageModelPort`
+  and `ImagePort` in `packages/contracts`, every stand-in, and every call site in
+  `packages/pipeline`: four verified features change so that one failure path can be recorded. Put
+  to the owner; not chosen.
+- **Recording a receipt from the estimate BEFORE the call and correcting it after.** It is the only
+  shape that also covers a call whose answer never reached us at all — and it makes a receipt stop
+  meaning _"one call that returned"_ (D-084), leaves rows for spend that may never have happened,
+  and would have to be unwound by every path that fails before sending. Put to the owner; not
+  chosen.
+- **Widening `generation_receipt` with a nullable `picture_id`.** One table and no change to the
+  cap's arithmetic, and it hands every existing reader a row shape it was not written for. See
+  above.
+- **Letting the adapter write the row.** `packages/providers` holds no durable state, and that is
+  the rule this whole shape exists to keep.
+
+**Caught by.** `docs/features/paid-failures.md`'s own checks, written in its Gate 3 and each one a
+test: that every adapter with an answer in hand throws `Spent` and every failure before the
+provider made anything does not; that the worker writes one row, adds the cost to the job row and
+rethrows unchanged; that `spentCents` and `imageCallCount` both count it, so the guard refuses the
+next call it should; and that `apps/worker` still imports no `packages/providers`, proven by
+`drift --prove` on the rule that says so. **This entry is what those checks answer to**, and the
+feature's journey is what says they ran.
+
+**Confirmed-by.** The owner, 2026-09-22, shown all three questions with their alternatives and the
+cost of each, chose the feature of its own, the typed error carrying its receipt, and the table of
+its own.
+
+---
+
+## S-143 | 2026-09-22 | The clip a re-buy replaces goes on the record: `VideoAnswer`'s unavailable arm gains an optional `spent`, and `reel-takes`' check 1 stays exact by naming it
+
+**Supersedes:** nothing. It completes **S-125**, whose named limit — a transient after fal has
+accepted the job **re-buys the clip** — is kept exactly as it is, and whose second payment was the
+only one the budget guard could see.
+
+**Chose.**
+
+- **`VideoAnswer`'s `{ kind: 'unavailable' }` arm gains `spent?: LostCall`.** Exactly one case sets
+  it: a **429 or 5xx on the DOWNLOAD**, which comes after the job has completed, so fal has made
+  the clip and billed for it. Every other unavailable answer — a busy submit, a poll, a wait that
+  runs out — leaves it absent, because nothing was made.
+- **The guarded video port writes the row and adds the cost BEFORE it sends again**, so the record
+  carries the clip that was paid for and then the clip that replaced it.
+- **`NarrationAnswer`'s arm is unchanged.** T2A's re-buy (S-123) costs nothing under the Token Plan
+  (S-129): there is no figure to lose, and an optional field nothing sets is a field that rots.
+- **`reel-takes`' check 1 is amended by NAMING the field, not by loosening.** It asserted
+  `Same<keyof VideoUnavailable, 'kind' | 'detail'>`; it now asserts
+  `'kind' | 'detail' | 'spent'`, that `spent` is `LostCall | undefined`, and that the whole arm is
+  that exact object type — **so a third key still fails it**, proven by adding one.
+
+**Why.**
+
+- **It is the largest leak of the three this feature closes, and it is not a thrown failure.** A
+  clip is the most expensive call this engine makes — 168¢ of the first real reel's 202¢ (S-140's
+  session). S-133's shape is a call that THROWS after spending, and `Spent` carries the row out
+  through the throw. A re-bought clip does not throw: the adapter answers `unavailable` and the
+  worker's counter sends the whole call again. **An answer is the only channel there is**, so the
+  row has to ride on the answer.
+- **Keeping the re-buy is S-125's decision and it stands.** The owner was shown it and chose it
+  over failing a reel that every earlier shot had been paid for. This entry does not reopen it: it
+  makes the cost of it visible, which is what the budget guard needs to stop a run at its cap
+  rather than past it (S-035, S-095, D-100).
+- **The check caught it, which is the check working.** The change was made and
+  `tests/reel-takes-ports.test.ts` failed on the same commit — a verified feature's type assertion
+  refusing a field that had not been declared to it. That is the order this repository wants: the
+  rule fires, and then a decision says why the rule's text moves.
+- **Exact, still.** The arm is pinned as a whole object type rather than as a key list alone, so
+  the amendment is narrower than what it replaced, not wider: a `spent` of the wrong type now fails
+  too, and it could not have before.
+
+**Rejected.**
+
+- **Throwing `Spent` on a post-completion download transient instead.** It would need no contract
+  change and no amendment — and it reverses S-125 on the quiet: the re-buy stops, and a reel that
+  has paid for every earlier shot dies of one 429 on a file fetch. A decision is not reopened by a
+  side effect of another feature.
+- **Leaving the re-buy invisible and recording nothing.** The whole feature exists because a paid
+  call the guard cannot see is spend that leaks; the clip is where the money is.
+- **Giving `NarrationAnswer` the same field for symmetry.** Nothing would ever set it. When a
+  narration costs money it gains what the clip has, and `paid-failures`' Deferred says so.
+- **A worker-side count of re-buys instead of a row.** The guard reads cents from job rows, not
+  counts, and a count cannot be priced later.
+- **Widening check 1 to "a kind, a detail and anything else".** That is the weakening this
+  repository forbids: it would have admitted the next field with nothing to notice.
+
+**Caught by.** **`reel-takes`' check 1**, amended as above and **broken deliberately**: a fourth key
+added to the arm (`retries?: number`) fails it, and the file was restored. And
+`docs/features/paid-failures.md`'s check 4, which asserts the row and the job row's figure for the
+re-buy case; and `reel-takes`' journey, re-run in that feature's last slice.

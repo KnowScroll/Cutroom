@@ -1,4 +1,5 @@
 import type { RunResult } from '@cutroom/reel-contract'
+import type { LostCall } from './failures.ts'
 import type { WordTiming } from './narration.ts'
 import type { PictureRef, WitnessObservation } from './picture.ts'
 
@@ -59,10 +60,15 @@ export type VideoAnswer =
     }
   /**
    * The provider made nothing and may if asked again (S-096). Only a provider answers it; the
-   * worker's guarded port sends the call again, and it is never a take (I-11). It carries a detail
-   * and nothing else.
+   * worker's guarded port sends the call again, and it is never a take (I-11).
+   *
+   * `spent` is the ONE case where the provider DID make something before the transient: the clip
+   * was made and billed, and the download of it was answered 429 or 5xx, which S-125 re-buys the
+   * clip for. The re-buy stands — what this adds is that the clip already paid for is on the
+   * record before the second one is bought, or the run pays twice and the guard sees once
+   * (docs/features/paid-failures.md, S-142). Absent on every other unavailable answer.
    */
-  | { kind: 'unavailable'; detail: string }
+  | { kind: 'unavailable'; detail: string; spent?: LostCall }
 
 export interface VideoPort {
   generate(request: VideoRequest): Promise<VideoAnswer>

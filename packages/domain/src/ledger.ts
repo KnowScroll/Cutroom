@@ -1,7 +1,7 @@
-import { count, eq, sql } from 'drizzle-orm'
-import type { ImageReceipt, PictureRecord } from '@cutroom/contracts'
+import { and, count, eq, sql } from 'drizzle-orm'
+import type { ImageReceipt, LostCall, PictureRecord } from '@cutroom/contracts'
 import type { Db } from './db.ts'
-import { generationReceipt, job, picture } from './schema.ts'
+import { generationReceipt, job, lostCall, picture } from './schema.ts'
 import { pictureValues } from './pictures.ts'
 
 // What a run has spent, and what each image call cost (docs/features/reel-stills.md, Gate 2
@@ -21,18 +21,65 @@ export function spentCents(db: Db, correlationId: string): number {
 }
 
 /**
- * The image calls a run has made: its `generation_receipt` rows, every attempt's (D-027, S-048). The
- * keyframes job reads it at the start of each attempt, and the attempt's reserve is six less these
- * and less the placement's calls — so an attempt run again after its worker died pays for what the
- * one before it made out of what is left, and no run makes more than six.
+ * The image calls a run has PAID FOR: its `generation_receipt` rows and its image `lost_call` rows,
+ * every attempt's (D-027, S-048, S-142). The keyframes job reads it at the start of each attempt,
+ * and the attempt's reserve is six less these and less the placement's calls — so an attempt run
+ * again after its worker died pays for what the one before it made out of what is left, and no run
+ * makes more than six.
+ *
+ * **A call that answered and made no usable picture counts here too**, since paid-failures: D-027
+ * bounds what a run may SPEND at pictures, and two such calls in the first real reel counted for
+ * nothing, so a run could have paid for eight (S-133). Counting them makes the bound tighter and
+ * can never make it looser — with no lost call this is the number it always was.
  */
 export function imageCallCount(db: Db, runId: string): number {
-  const row = db
+  const made = db
     .select({ n: count() })
     .from(generationReceipt)
     .where(eq(generationReceipt.runId, runId))
     .get()
-  return row?.n ?? 0
+  const lost = db
+    .select({ n: count() })
+    .from(lostCall)
+    .where(and(eq(lostCall.runId, runId), eq(lostCall.port, 'image')))
+    .get()
+  return (made?.n ?? 0) + (lost?.n ?? 0)
+}
+
+/**
+ * One call a provider answered and this engine could not use, in one immediate transaction (S-142):
+ * its `lost_call` row, and its cost added to the running job row's `cost_cents` — the same two
+ * writes `recordGeneration` makes, because the budget guard reads the chain's spend from the job
+ * rows and cannot see a call that left none (S-035, S-087, S-095).
+ *
+ * The caller rethrows the error unchanged afterwards: this records what was spent, it does not
+ * repair the run (S-046).
+ */
+export function recordLostCall(
+  db: Db,
+  entry: { jobId: number; runId: string; lost: LostCall },
+  now: Date = new Date(),
+): void {
+  const { jobId, runId, lost } = entry
+  db.transaction(
+    (tx) => {
+      tx.insert(lostCall)
+        .values({
+          runId,
+          port: lost.port,
+          model: lost.model,
+          costCents: lost.costCents,
+          detail: lost.detail,
+          at: now.toISOString(),
+        })
+        .run()
+      tx.update(job)
+        .set({ costCents: sql`${job.costCents} + ${lost.costCents}` })
+        .where(eq(job.id, jobId))
+        .run()
+    },
+    { behavior: 'immediate' },
+  )
 }
 
 /**
