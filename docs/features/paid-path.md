@@ -24,8 +24,7 @@ S-109, S-110, S-111, S-112, S-113, S-114, S-115, S-116, S-117, S-118, S-119, S-1
 S-123, S-124, S-125, S-126
 Supersedes, through the entries it rests on: D-005 for this engine's model layer (S-114) — KnowScroll's side keeps it
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
-Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer ·
-program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
+Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
 > **What this feature is not.** It builds no new stage, gate, table or route. Every gate a reel passes, every figure a
 > cap is compared with and every row the record keeps is `reel-plan`'s, `reel-stills`', `reel-render`'s and

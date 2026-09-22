@@ -5701,3 +5701,56 @@ two cannot disagree.
 `finish_reason: "length"` — is refused with a message that says **cut off mid-answer**, names
 `finished on length`, names the `max_tokens` figure computed from both constants, and **does not**
 call it bad JSON.
+
+---
+
+## S-141 | 2026-09-22 | A feature's four gates are named on the ONE line a journey reads, and the document is what changes — not the reader, which stays as strict as it was
+
+**Chose.**
+
+- **`docs/features/paid-path.md`'s `Gates:` line is one physical line**, as the other five feature
+  files' already are. Nothing about what it SAYS moves: the same four gates, the same
+  `APPROVED 2026-09-20 adversarial-reviewer`.
+- **`scripts/journey.mjs` is untouched.** It still reads the gates with `/^Gates:(.*)$/m`, which
+  sees one line.
+- **`tests/feature-files.test.ts` gains a test**: every feature file names all four gates on the
+  line that starts `Gates:`. **What each gate says is not constrained** — `video-edits` is
+  `pending` on all four, and refusing that is the journey's job, not this test's.
+
+**Why.**
+
+- **Every journey of `paid-path` refused, saying a gate that IS approved is not.** The first thing
+  session 46 ran was `node scripts/journey.mjs paid-path`, and it answered
+  `REFUSED gate 'program-design' is not approved`. The gate was approved on 2026-09-20 by an
+  adversarial reviewer and says so in the file — **on the second line of a wrapped `Gates:` line**,
+  where the reader cannot see it. The approval and the reading disagreed, and the document was the
+  one that was wrong: the other five files carry the whole line, over 100 characters, unwrapped.
+- **The mechanism is not at fault and the wrap is not prettier's.** `.prettierrc` sets no
+  `proseWrap`, so the default is `preserve` — the five long lines in the other feature files are
+  proof it does not rewrap prose. **The wrap was typed**, when `paid-path`'s gates were written.
+- **It fails in the safe direction, which is why it survived two days.** A gate below the wrap
+  reads as NOT approved, so a journey refuses rather than passing something unreviewed. That is the
+  right direction and it is still a fault: a refusal naming the wrong cause sends the next session
+  looking for an unapproved gate, and **the six owed journeys could not start**.
+- **The document changes, not the reader, because the reader is the thing every feature is judged
+  by.** Widening it to read a continuation line makes `Gates:` a paragraph rather than a line, and
+  then the question of where the gates stop has no answer a reader and a regular expression agree
+  on. One line is a rule a writer can keep and a reader can state.
+
+**Rejected.**
+
+- **Widening `journey.mjs` to read until the blank line.** It is the verification script, changed
+  to make a journey run — the shape this repository refuses on principle even when, as here, the
+  approvals are genuinely there. It also invites the next wrap rather than catching it.
+- **Detecting the wrap in `journey.mjs` and naming it in the refusal.** Better than widening, and
+  still a change to the reader for something the writer can simply not do; the test says the same
+  thing earlier, in `check.mjs`, to every feature file at once.
+- **Fixing the file and writing nothing down.** The journeys were owed for a session and the reason
+  they could not run was invisible. An entry is what stops the next wrap being diagnosed twice.
+
+**Caught by.** **`tests/feature-files.test.ts`**, by addition, and so in every run of `node scripts/check.mjs`: the four
+gate names are asserted on the `Gates:` line of every file in `docs/features/`. **A break campaign
+of one**, written from a file rather than through a shell (CLAUDE.md's backslash trap, a fifth
+session — and it fired again here, halving the regex in the new test before it was read back from
+the file): the line re-wrapped exactly as it was, and the test fails naming `program-design` and
+saying a gate below a wrap reads as unapproved. **And the journeys themselves**, which ran after it.

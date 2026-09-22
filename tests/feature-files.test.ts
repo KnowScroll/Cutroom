@@ -151,3 +151,28 @@ test('a feature the steering repository never held says it was created here, and
     )
   }
 })
+
+// - THE GATES LINE IS ONE LINE. `scripts/journey.mjs` reads the four gates with `/^Gates:(.*)$/m`,
+//   which sees one physical line; a line wrapped by a writer puts the gates after the wrap where no
+//   journey can read them, and every journey of that feature then refuses saying a gate that IS
+//   approved is not (S-141). So every feature file names all four gates on the line that starts
+//   `Gates:`. What each gate SAYS is not constrained here: `pending` is a feature that has not been
+//   through its review, and that is the journey's refusal to make.
+
+const GATES = ['product', 'architecture', 'program-design', 'slices']
+
+test('every feature file names all four gates on the one line journey.mjs reads (S-141)', () => {
+  const all = features()
+  assert.ok(all.length > 0, 'docs/features/ holds no feature file')
+  for (const { slug, text } of all) {
+    const line = /^Gates:(.*)$/m.exec(text)?.[1]
+    assert.ok(line !== undefined, `docs/features/${slug}.md has no line starting "Gates:"`)
+    for (const gate of GATES) {
+      assert.match(
+        line,
+        new RegExp(`(^|[\\s·])${gate}\\b`),
+        `docs/features/${slug}.md does not name the ${gate} gate on its Gates: line — journey.mjs reads that one line, so a gate below a wrap reads as unapproved`,
+      )
+    }
+  }
+})
