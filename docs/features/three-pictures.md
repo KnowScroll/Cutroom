@@ -5,7 +5,7 @@ authority: plan
 
 # three-pictures — up to three pictures a reel, by a setting, so a reel whose shots all differ still has pictures
 
-Status: planned
+Status: verified
 Decisions: D-014, D-026, D-027, D-029, D-030, D-032, D-035, D-038, D-041, D-042, D-043, D-047, D-048, D-049, D-050, D-064, D-083, D-086, D-114, S-028, S-035, S-036, S-039, S-043, S-046, S-048, S-058, S-061, S-075, S-099, S-111, S-126, S-128, S-134, S-145, S-148, S-149, S-150
 Named only in the deferral list: D-023, S-115
 Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED 2026-09-23 adversarial-reviewer · program-design APPROVED 2026-09-23 adversarial-reviewer · slices APPROVED 2026-09-23 adversarial-reviewer
@@ -241,6 +241,8 @@ Every check appears in exactly one slice: 5 + 5 + 2 + 1 = 13.
 3. **The rule a plan was priced under is the rule its pictures are made under**, whichever worker makes them.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-23 journey=PASS at 566b975 — every check green; 12 tests in tests/three-pictures-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
