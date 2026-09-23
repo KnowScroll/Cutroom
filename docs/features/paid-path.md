@@ -15,7 +15,7 @@ authority: plan
 
 # paid-path — the engine makes a real reel: real pictures, real clips, a real voice, and a program that runs it
 
-Status: planned
+Status: verified
 Decisions: D-001, D-002, D-006, D-007, D-008, D-014, D-018, D-019, D-022, D-023, D-024, D-026, D-027, D-028, D-030,
 D-042, D-050, D-055, D-056, D-057, D-059, D-072, D-076, D-081, D-083, D-084, D-086, D-087, D-094, D-096, D-097,
 D-098, D-099, D-100, D-111, D-112, I-1, I-11, I-15, I-17, S-016, S-021, S-027, S-033, S-035, S-036, S-038, S-042,
@@ -482,6 +482,8 @@ Every check appears in exactly one slice: 3 + 2 + 4 + 2 + 3 + 4 + 2 + 2 = 22.
 - [x] No key, and nothing a provider handed back, is ever written down — and no test spends or needs one
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-23 journey=PASS at 75bc74b — every check green; 119 tests in tests/paid-path-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
