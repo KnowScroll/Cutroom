@@ -6177,3 +6177,47 @@ amended by giving their refused witness TWO answers AND asserting today's exact 
 which is a thrown call and not a refusal.
 
 **Confirmed-by.** The owner, 2026-09-23, on both questions: the gate boundary, and both witnesses.
+
+---
+
+## S-148 | 2026-09-23 | A reel passed Gate 7 for 160¢, made from words again: the planner named the recurring logbook as TWO subjects, one per criterion — measured, and the choice of what to change is the owner's
+
+**Chose.** Nothing in `packages/` moves. This entry records what the first reel to pass Gate 7 did,
+and one measured reason the stills stage still made no picture.
+
+**What happened.** Run `f895e76d-1567-4cd5-8b5e-6e1a04dcf72f`, 2026-09-23, on the brief whose
+logbook recurs in two of four shots (S-146): **completed, Gate 7 accepted**, four shots each through
+Gates 2 to 5 on their first take, a 38.1 s 768x1366 file with sound, **160¢ by our receipts against a
+250¢ ceiling and an estimate of 155–210¢**, 450.5 s submit to finished. No `lost_call` row, and one
+witness receipt per take: the second ask (S-147) was never needed. **And again `stage.started stills`
+and `stage.finished stills` in the same instant, 0 image calls, four clips on text-to-video.**
+
+**Why the stills stage did nothing, read from the run's own `plan` rows.**
+
+- **Plan a — selected, score 5** — named four subjects, `lamp`, `log` ("Open Logbook"), `box` and
+  `archive` ("Archive Logbook"), one per shot. **The recurring logbook became two subjects**, one for
+  each criterion that describes it, so no subject recurs and `plannedImageCalls` is 0.
+- **Plan b — score 2.33, not selected** — six shots, with `box` and `archive` each in two, and 3 planned
+  image calls. The recurrence the stills stage needs was in the plan that lost.
+- So the brief's recurrence did not survive the planner: **each `mustShow` criterion reads as its own
+  subject**, and a criterion that describes the same object in a different place reads as a different
+  object. Nothing refused anything; every stage did what it is specified to do.
+
+**Rejected.**
+
+- **Calling the brief's change a success because Gate 7 passed.** Gate 7 passed; the stills stage's
+  promise — _"approved stills become a finished video"_ — is still unproven on real providers.
+- **Changing the planner's prompt or the plan score here.** Both are `reel-plan`'s, a verified feature,
+  and which one to move — or whether to move the brief instead, for instance one criterion naming the
+  logbook in both places — is a choice with real alternatives. **The owner's.**
+- **Ticking `paid-path`'s Slice 8 and its "One real reel exists" line.** Both require the reel's cost
+  written down **beside what the provider says it cost**. fal's figure for this run is on the owner's
+  dashboard and has not been read. They stay unticked until it is (below).
+
+**Caught by.** The run's record: two `plan` rows with their scores and subject lists, `image 0
+receipts`, the two `stage` events at one instant, and four `text-to-video` receipts, all in
+`JOURNAL.md` beside this entry.
+
+**Owed.** (1) **fal's own figure for run `f895e76d…`**, 160¢ by our arithmetic (36¢ × 3, 52¢ × 1), which
+closes Slice 8, the Outcome line and D-007's Q9 together. (2) **What to change so a subject recurs in
+the chosen plan**: the brief, the planner's prompt, or the score — the owner's.

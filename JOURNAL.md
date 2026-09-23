@@ -5584,3 +5584,77 @@ line still reads **not yet**.
 
 **Next.** Unchanged: `PROMPTS/047` — the second ask's gates and code first (S-146), then the reel on a brief
 with one recurring subject. fal's own figures are still unread; `parallel-shots` (S-115) is still held.
+
+## 2026-09-23 — session 47, continued: the second ask is built, and a reel passed Gate 7 — made from words
+
+**Intent.** The owner said _"Run 047"_: **B**, the second ask with its gates first, then **A**, the reel on a
+brief with one recurring subject. `decisions.mjs`: pin current, 0 unpushed.
+
+**What happened, in one line.** **`second-ask` is verified, and run `f895e76d-1567-4cd5-8b5e-6e1a04dcf72f` is the
+first reel this engine made that Gate 7 accepted — 160¢ against a 250¢ ceiling — but it was made from words again,
+and Slice 8 stays unticked because fal's own figure is still unread.**
+
+### 0 — the check was red twice on unchanged code
+
+`node scripts/check.mjs` at `1966348` failed its tests step twice (481 s) and passed three times (312–328 s), with
+nothing changed; the suite run directly passed 490 of 490 twice. **Which test failed is not known**: `check.mjs`
+prints the first 40 lines of a failing step, and a TAP stream's first 40 lines are passing subtests. Probably a
+timing-sensitive test under load. Recorded, not chased; `PROMPTS/048` asks the next session to find it if it recurs.
+
+### B — the second ask
+
+- **The owner answered two questions first** (S-147): the retry lives **at the gate that parses**, not on the model
+  port; and it covers **both witnesses**, Gates 1 and 4.
+- **`docs/features/second-ask.md`**: four gates, **two adversarial review passes** (fourteen findings, then seven),
+  then a third that APPROVED all four. The findings that mattered most:
+  - **two verified tests would have gone on passing while testing the wrong failure.** With one scripted answer, the
+    second ask runs off the stand-in's script and the run still fails — on a thrown call. `reel-render`'s check 23
+    and `reel-takes`' `r14-failed` asserted only that the run failed. **Proven**: `r14-failed`'s new assertion,
+    run against the old fixture, read `"the stand-in's script has no answer for witness call 11"`.
+  - **three binding decisions conflicted and were unnamed**: S-037's _"exactly one `observe` receipt"_, S-072's
+    _"one `observe` call"_, and D-045's _"at temperature 0 a duplicate call returns a duplicate answer"_ — which
+    S-144 measured false on this wire. And **I-15's count** ("one vision call per image") is superseded while its
+    reason stands: only an answer that parses ever becomes a record. S-147 names all of it.
+  - **"the refused words are printed when a run fails" was false**: a zod issue carries no value. Recorded as lost
+    today and after, Deferred item 1.
+- **Built in three slices**: `askWitness` in `packages/pipeline/src/gates/witness.ts`, called by Gates 1 and 4; the
+  adapter untouched, so S-096 stands as written. Nine checks, `tests/second-ask-*.test.ts`. **Broken deliberately
+  three times from a file**: no second ask (checks 2–5 red, and 6–8 through the worker); a third ask (checks 3 and 5
+  red); nine checks claimed for eight (check 9 red). Each restored and re-run.
+- **Journeys PASS**: `second-ask` 9, `reel-stills` 63, `reel-render` 106, `reel-takes` 66 — each running every check.
+
+### A — the reel
+
+- **The brief** (`scripts/real-reel.mjs`, S-134's kind of change): the logbook recurs — open on a desk under
+  lamplight, and closed on an archive shelf a century later, in place of the open sea.
+- **Estimate 155–210¢, read before answering; `spend 250` typed.**
+
+```text
+  111.2s  plan finished     two plans accepted by Gate 0; plan a selected
+  111.2s  stills started AND finished — 0 image calls, again
+  424.9s  4 shots through Gates 2, 3, 4 and 5, each on its first take
+  448.6s  verdict 7 accept — run.finished completed
+```
+
+- **Spent: 160¢ by our receipts** — `fal-ai/minimax-h3-turbo/text-to-video` at 36¢, 36¢, 36¢ and 52¢; 13 model and
+  4 speech receipts at 0¢ (Token Plan). **No `lost_call` row. One witness receipt per take**: the second ask was
+  never needed on this run. The file: 38.1 s, 768x1366, with sound, under `.artifacts/`.
+- **Why no picture, read from the `plan` rows (S-148)**: plan a named the logbook as **two subjects**, "Open Logbook"
+  and "Archive Logbook", one per criterion, so nothing recurs and it plans 0 image calls. Plan b recurred (`box` and
+  `archive` twice each, 3 image calls) and **lost on score, 2.33 to 5**. The brief's recurrence did not survive the
+  planner. What to change — the brief, the planner's prompt, or the score — is the owner's.
+
+**Slice 8 and the "One real reel exists" Outcome line are NOT ticked.** The reel exists and passed Gate 7; both
+lines also require its cost **beside what the provider says**, and fal's figure is on the owner's dashboard.
+
+**Changed.** `docs/features/second-ask.md` (new, verified); `DECISIONS.md` S-147, S-148;
+`packages/pipeline/src/gates/{witness,gate1,gate4}.ts`; doc comments in `packages/contracts/src/model.ts` and
+`apps/worker/src/recording-port.ts`; `tests/engine/{stills,video}.ts` (`twice`); `tests/second-ask-*.test.ts` (9);
+three amended checks and three amendment blocks; `scripts/real-reel.mjs`; `PROMPTS/047` Run line, `PROMPTS/048`.
+
+**Observed.** **The backslash-and-quote trap fired again, a sixth session**: backticks inside a double-quoted
+`node -e` ran as shell commands and dropped words from S-147 — caught by reading the file back, repaired with the
+editor. Check 9 was derived from paid-failures' check 12 by a script, so its regexes are byte-identical.
+
+**Next.** `PROMPTS/048`: the owner reads fal's figure for `f895e76d…`, which ticks Slice 8; then S-148's question.
+**`parallel-shots` (S-115) is still held.**

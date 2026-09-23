@@ -5,7 +5,7 @@
 - **Work:** **B** (the gates and the code for asking an unparseable observation again, free), then **A** (the
   reel, ~200¢). **`parallel-shots` is still held.**
 - **Written:** 2026-09-22, at the end of session 46
-- **Run:** not yet
+- **Run:** session 47, 2026-09-23
 
 **Session 46 closed the two gaps and made the reel, and the reel died somewhere new.** `paid-failures` is
 built and verified — a call that has already spent leaves its row, and the model port has the transient
