@@ -213,6 +213,12 @@ _The journey_
 **The least confident decisions.** Whether a real reel of different scenes made from pictures still passes Gate 7.
 Whether the first named subject is the right label for a many-subject shot's standalone (the picture shows them all).
 
+**ONE THING THE BUILD FOUND, recorded rather than worked around.** Check 12 cannot live in a `three-pictures-*`
+file: `paid-path`'s check 20 allows exactly one test file, `tests/paid-path-real-reel.test.ts`, to name the script
+that spends, and a check that reads the script names it. So check 12 lives there, beside check 20, titled as this
+feature's check 12, and this feature's journey runs checks 1 to 11 and 13 from its own files; check 12 is run by
+every `check.mjs` like every other test. Check 13's child therefore expects checks 1 to 11.
+
 ## Gate 4 — Slices
 
 - [x] **Slice 1 — the setting, the stored rule, placement and price.** `PlanSettings.pictures`, `Plan.pictures`,
@@ -221,7 +227,7 @@ Whether the first named subject is the right label for a many-subject shot's sta
 - [x] **Slice 2 — the standalone picture.** The entry and prompt; the stills stage split by role and its loop; the
       keyframes job and guarded image port placing by the plan's rule; `reel-plan`'s and `reel-stills`' amendment
       blocks. **Proves: 6, 7, 8, 9, 10.**
-- [ ] **Slice 3 — the clips stage, and the real reel's switch.** Check 11; `reel-render`'s amendment block;
+- [x] **Slice 3 — the clips stage, and the real reel's switch.** Check 11; `reel-render`'s amendment block;
       `scripts/real-reel.mjs`. **Proves: 11, 12.**
 - [ ] **Slice 4 — the journey.** Check 13; this feature's journey, and `reel-plan`'s, `reel-stills`' and
       `reel-render`'s again (S-099's form). **Proves: 13.**

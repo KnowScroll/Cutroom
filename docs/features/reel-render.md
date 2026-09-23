@@ -10,6 +10,11 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `three-pictures` on 2026-09-23 — nothing in this feature's code moves** (**S-150**). The clips
+> stage chooses image-to-video from a shot having an approved picture, whatever its role, so a `standalone` picture
+> opens its shot like any other; `three-pictures`' check 11 proves it on a video run under `pictures: 'upToThree'`.
+> Every check here runs on the default rule and none moves.
+>
 > **Amended by `second-ask` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
 > (**S-147**). **Gate 4 asks once more when its answer is refused**: the same `observe` call on the same clip, sent a
 > second time, and only a second refusal fails the run (S-042 in part; S-072's _"one `observe` call"_ becomes one, or

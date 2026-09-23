@@ -26,6 +26,11 @@ Supersedes, through the entries it rests on: D-005 for this engine's model layer
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
 Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
+> **Amended by `three-pictures` on 2026-09-23 — no gate below is edited, and no assertion is removed** (**S-150**).
+> `scripts/real-reel.mjs` sets `CUTROOM_PICTURES=upToThree` among its defaults (a value already set wins), prints the
+> rule, and prices its corners at 0 and 4 image calls. **`three-pictures`' check 12 lives in
+> `tests/paid-path-real-reel.test.ts`**, beside check 20, because check 20 allows that one file alone to name the script.
+>
 > **What this feature is not.** It builds no new stage, gate, table or route. Every gate a reel passes, every figure a
 > cap is compared with and every row the record keeps is `reel-plan`'s, `reel-stills`', `reel-render`'s and
 > `reel-takes`', verified and unchanged. **This feature replaces five stand-ins with five adapters, and builds the

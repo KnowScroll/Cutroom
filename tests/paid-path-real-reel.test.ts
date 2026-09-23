@@ -223,3 +223,28 @@ test("20. every provider default is 'fake', so the two PATH-alone children need 
   // And nothing a stand-in run renders with costs anything or names a vendor.
   assert.equal(settings.renderSettings.voice, 'stand-in', 'a stand-in run names a real voice')
 })
+
+// ---------------------------------------------------------------- three-pictures, check 12
+
+// three-pictures' check 12 (docs/features/three-pictures.md, S-150) lives HERE and not in a
+// `three-pictures-*` file, because check 20 above allows exactly one test file to name the script
+// that spends, and this is it. Like everything in this file, it only reads the script's source.
+test("20. (three-pictures check 12) the script that spends sets CUTROOM_PICTURES to 'upToThree' among its defaults, where a value already set wins; prints the rule; and prices its corners at 0 and 4 image calls", () => {
+  const source = read(SCRIPT)
+  const defaults = source.match(/const env = \{([\s\S]*?)\n\}/)?.[1]
+  assert.ok(defaults !== undefined, "the script's env defaults were not found")
+  const setAt = defaults.indexOf("CUTROOM_PICTURES: 'upToThree',")
+  const loadedAt = defaults.indexOf('...loaded,')
+  assert.ok(setAt >= 0, 'the script does not turn the picture rule on')
+  assert.ok(
+    loadedAt > setAt,
+    'a value already set does not win over the default, as every other does',
+  )
+  assert.match(source, /console\.log\(` {2}pictures {3}\$\{settings\.planSettings\.pictures\}/)
+  assert.match(
+    source,
+    /const calls = \[plannedImageCalls\(\[\]\), plannedImageCalls\(\['s1', 's2', 's3'\]\)\]/,
+  )
+  // And the rule it sets is one the service accepts.
+  assert.equal(readSettings({ CUTROOM_PICTURES: 'upToThree' }).planSettings.pictures, 'upToThree')
+})

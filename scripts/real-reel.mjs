@@ -13,7 +13,7 @@
  *
  *  1. Reads the settings a service would read, with every port told to be REAL, and PRINTS THE
  *     ESTIMATE — computed from `estimate()`, the same function admission uses, over the corners
- *     of the shapes Gate 0 admits (D-111's 35 to 45 seconds, D-014's 2 to 4 planned image calls).
+ *     of the shapes Gate 0 admits (D-111's 35 to 45 seconds, 0 to 4 planned image calls — S-150).
  *  2. WAITS. Nothing is started, no key is read into a port and nothing is submitted until the
  *     ceiling is typed back on standard input. Typing the figure back is what makes a confirmation
  *     impossible to give by accident, and it proves the estimate was read.
@@ -176,13 +176,15 @@ function request(requestId, budgetCents) {
  * rather than leaving a number typed here to go stale (S-124, S-125, S-127's rule, a fourth time).
  *
  * The bounds are Gate 0's own: a plan totals 35 to 45 seconds (D-111), and its planned image calls
- * are `plannedImageCalls`' own answers — 2 with one eligible subject, 4 with three or more (D-027).
+ * run from 0 — a plan with nothing to picture, which the skip rule of `pictures: 'upToThree'` can
+ * leave (S-150) — to 4, the most any plan carries under either rule (D-027). Only the high corner
+ * decides whether the estimate can exceed the ceiling.
  * The shot COUNT does not appear, because every shot costs the same video with or without a
  * keyframe (I-3).
  */
 function corners(settings) {
   const seconds = [35, 45]
-  const calls = [plannedImageCalls(['s1']), plannedImageCalls(['s1', 's2', 's3'])]
+  const calls = [plannedImageCalls([]), plannedImageCalls(['s1', 's2', 's3'])]
   const rows = []
   for (const total of seconds) {
     for (const plannedCalls of calls) {
@@ -231,6 +233,10 @@ const env = {
   CUTROOM_PROVIDER_IMAGE: 'fal',
   CUTROOM_PROVIDER_VIDEO: 'fal',
   CUTROOM_PROVIDER_SENSOR: 'local',
+  // UP TO THREE PICTURES A REEL (three-pictures, S-150): free picture slots go to shots holding
+  // none, so a reel whose shots all differ still opens some of them from checked pictures. A value
+  // already set wins, as every default here does.
+  CUTROOM_PICTURES: 'upToThree',
   ...loaded,
   ...(flag('model') === undefined ? {} : { CUTROOM_FAL_IMAGE_MODEL: flag('model') }),
   ...(flag('voice') === undefined ? {} : { CUTROOM_NARRATION_VOICE: flag('voice') }),
@@ -256,6 +262,7 @@ console.log(
 )
 console.log(`  video      ${settings.planSettings.videoRateCentsPerSecond}c a second, 768P (D-007)`)
 console.log(`  voice      ${settings.renderSettings.voice}`)
+console.log(`  pictures   ${settings.planSettings.pictures} (S-150)`)
 console.log(
   `  providers  ${Object.entries(settings.providers)
     .map(([p, a]) => `${p}=${a}`)
