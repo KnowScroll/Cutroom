@@ -115,6 +115,8 @@ export async function runKeyframesJob(
         jobId: job.id,
         runId,
         attempt: job.attempts,
+        // By the PLAN'S stored rule, never this worker's setting: the pictures made are the ones the
+        // plan was priced and admitted for, whichever worker runs this job (S-150, D-083).
         placements: placePictures(plan),
         rateCents: context.settings.imageRateCents,
         style: { id: request.style.id, version: request.style.version },

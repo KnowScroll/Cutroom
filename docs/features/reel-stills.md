@@ -32,6 +32,15 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `three-pictures` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
+> (**S-150**). A picture has a third role, **`standalone`**, placed only under a plan's own `pictures: 'upToThree'`: on
+> the earliest shots holding no picture and naming no pictured subject, up to three pictures in all, each made once
+> from scratch (no reference, no framing), through Gate 1 with one repair from the reserve, never Gate 1S, never
+> stopping the run. **The stage now splits its placements by ROLE, not by position** — a lone standalone is no
+> canonical — and runs the canonical, derived and Gate 1S blocks only when a canonical is placed, exactly as before;
+> standalones come after, in shot order. `placePictures` reads the rule from the PLAN, so a keyframes job makes the
+> pictures its plan was priced under whichever worker runs it. With the rule absent, every check here is unchanged.
+>
 > **Amended by `second-ask` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
 > (**S-147**). **Gate 1's witness step asks once more when its answer is refused**: the same `observe` call, sent a
 > second time, and only a second refusal fails the run (S-042 in part). So Gate 2's _"exactly one `observe` receipt per

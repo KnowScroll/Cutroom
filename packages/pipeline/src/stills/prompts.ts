@@ -37,11 +37,13 @@ const entryFields = {
 /**
  * The entry a picture's prompt is rendered from. **A canonical entry declares its axis** — framing,
  * the one thing its two candidates differ on — and one without it fails here, before any call
- * (D-032). A derived picture is made once and declares none.
+ * (D-032). A derived picture is made once and declares none; so is a standalone, made from scratch
+ * on a shot naming no pictured subject (three-pictures, S-150).
  */
 export const pictureEntry = z.discriminatedUnion('role', [
   z.strictObject({ role: z.literal('canonical'), ...entryFields, varyOn: z.literal('framing') }),
   z.strictObject({ role: z.literal('derived'), ...entryFields }),
+  z.strictObject({ role: z.literal('standalone'), ...entryFields }),
 ])
 
 export type PictureEntry = z.infer<typeof pictureEntry>
@@ -76,9 +78,13 @@ export function imagePrompt(entry: PictureEntry, framing: Framing | null): strin
     'Make the opening frame of one shot of a short vertical reel.',
     `Style: ${entry.style.text}`,
     `Shape: a vertical picture, ${entry.aspectRatio}.`,
-    entry.role === 'canonical'
-      ? `Framing: ${framing}.`
-      : 'Keep every subject exactly as it appears in the reference picture.',
+    // A canonical names its framing; a derived picture is held to its reference; a standalone has
+    // neither — it is made from scratch, with no reference to keep to (S-150).
+    ...(entry.role === 'canonical'
+      ? [`Framing: ${framing}.`]
+      : entry.role === 'derived'
+        ? ['Keep every subject exactly as it appears in the reference picture.']
+        : []),
     `It shows: ${entry.subjects.join('; ')}.`,
     'What is said over the shot:',
     ...entry.sentences.map((sentence) => `  ${quoted(sentence)}`),

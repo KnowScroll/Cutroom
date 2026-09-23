@@ -112,7 +112,11 @@ export interface Engine {
   media: FfmpegMedia
   /** The assembler the worker was handed. */
   assembler: FfmpegAssembler
-  startWorker(): Promise<Worker>
+  /**
+   * Starts the worker. `settings` overrides the engine's planning settings for THIS worker only — a
+   * second worker set differently from the one that planned (three-pictures check 6, S-150).
+   */
+  startWorker(override?: { settings?: PlanSettings }): Promise<Worker>
   /** Stops the worker — after the job in hand — so `startWorker()` starts a new one. */
   stopWorker(): Promise<void>
   /**
@@ -121,7 +125,13 @@ export interface Engine {
    * Its image and sensor stand-ins answer from the engine's `images` and `sensors`, and it is
    * handed the engine's `stillsSettings`.
    */
-  spawnWorker(options: { script: FakeScript; holdAtCall: number; leaseMs: number }): WorkerProcess
+  spawnWorker(options: {
+    script: FakeScript
+    holdAtCall: number
+    leaseMs: number
+    /** Overrides the engine's planning settings for this worker only (S-150). */
+    settings?: PlanSettings
+  }): WorkerProcess
   /**
    * Stops the worker and the API and starts the API again on the same database file, with a new
    * stand-in answering from `script`. The folder is kept. The worker is not started again until
@@ -218,7 +228,7 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
     narration: fakeNarration(options.narration ?? {}, imageOptions),
     media: ffmpegMedia(tools, { ...imageOptions, script: options.media ?? {} }),
     assembler: ffmpegAssembler(tools, imageOptions),
-    async startWorker() {
+    async startWorker(override = {}) {
       worker ??= await startWorker({
         dbPath,
         pollMs: 10,
@@ -229,7 +239,7 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
         narration: wrapNarration(engine.narration),
         media: wrapMedia(engine.media),
         assembler: wrapAssembler(engine.assembler),
-        settings,
+        settings: override.settings ?? settings,
         renderSettings,
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
@@ -242,13 +252,13 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       worker = undefined
       await stopping?.stop()
     },
-    spawnWorker({ script, holdAtCall, leaseMs }) {
+    spawnWorker({ script, holdAtCall, leaseMs, settings: own }) {
       const config: WorkerProcessConfig = {
         dbPath,
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
         artifactRoot,
-        settings,
+        settings: own ?? settings,
         ...(options.stillsSettings === undefined ? {} : { stillsSettings: options.stillsSettings }),
         script,
         images: options.images ?? {},

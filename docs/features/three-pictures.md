@@ -218,7 +218,7 @@ Whether the first named subject is the right label for a many-subject shot's sta
 - [x] **Slice 1 — the setting, the stored rule, placement and price.** `PlanSettings.pictures`, `Plan.pictures`,
       `PictureRecord.role` and the domain enum type (widened together, so the typecheck stays green); the fill;
       `plannedImageCallsFor`; `build()`; `CUTROOM_PICTURES`; the worker's refusal. **Proves: 1, 2, 3, 4, 5.**
-- [ ] **Slice 2 — the standalone picture.** The entry and prompt; the stills stage split by role and its loop; the
+- [x] **Slice 2 — the standalone picture.** The entry and prompt; the stills stage split by role and its loop; the
       keyframes job and guarded image port placing by the plan's rule; `reel-plan`'s and `reel-stills`' amendment
       blocks. **Proves: 6, 7, 8, 9, 10.**
 - [ ] **Slice 3 — the clips stage, and the real reel's switch.** Check 11; `reel-render`'s amendment block;

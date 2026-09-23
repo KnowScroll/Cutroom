@@ -27,6 +27,15 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `three-pictures` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
+> (**S-150**). `PlanSettings` gains **`pictures`**, default `'recurring'`, which reproduces this feature exactly: with it,
+> a plan's planned image calls are D-027's `plannedImageCalls(rankSubjects(…))` and the plan carries no new field.
+> Under `'upToThree'` (the service's `CUTROOM_PICTURES`) a plan carries **`pictures: 'upToThree'`** and the placement's
+> own calls, so its estimate, Gate 0's cost condition, D-114's choice of repair basis and admission all price the
+> pictures it will make. The repair prompt's cost words are left as they are: a recurring subject still costs one call
+> more than a standalone. Every check here runs on the default and none moves; `three-pictures`' check 1 holds the
+> default path to a verbatim copy of the old placement.
+>
 > **Amended by `reel-stills` on 2026-09-16 — the gates below are not edited, and no assertion is removed**
 > (**S-047**). Where Gate 1 and _Outcome_ say pictures are "not built yet", that is now true of **video only**:
 >
