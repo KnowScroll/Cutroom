@@ -13,6 +13,21 @@ cause as far as it was read from the run's own rows and files, what was done, an
 Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; **provider** — a provider answered badly;
 **engine** — the engine's own behaviour, fixable only by a feature.
 
+## To fix, and to review — the short list
+
+Kept current as entries are added. **Fix** is work that is understood and waits for a feature's gates; **review** is a
+question to look at, or an owner's choice, before anything is built.
+
+| what                                                                                    | kind   | from         | state                                         |
+| --------------------------------------------------------------------------------------- | ------ | ------------ | --------------------------------------------- |
+| **Re-ask a model once when its answer does not parse**, instead of failing the run      | fix    | P-001, P-004 | next session's work (owner, option 3)         |
+| **Keep the raw answer of a model whose answer did not parse**, so it can be read        | fix    | P-004        | next session's work, with the line above      |
+| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | planned, five owner questions open            |
+| Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | owner; the re-ask above supersedes it in part |
+| A text-made shot has no still to fall back on, so its third failed take stops the reel  | review | P-003        | owner: accept, or give such shots a fallback  |
+| Clip prompts could ask for no fade to black; space scenes are mostly dark               | review | P-003        | watch: fix only if it recurs after the brief  |
+| Brief-writing rules: compact subjects; no verbs of vanishing or darkness                | brief  | P-002, P-003 | applied; add to `PROMPTS/049`'s brief rules   |
+
 ## Open
 
 ### P-004 · provider · the picture witness answered a count as words, and the run failed
