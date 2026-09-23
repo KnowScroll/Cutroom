@@ -5752,3 +5752,11 @@ from approved pictures that passes Gate 7** (S-152). The file: `.artifacts/43656
 **Next.** fal's figures for `f895e76d…` and `436564c1…` close Slice 8 — the owner's. Whether the picture rule becomes the
 default — the owner's, gates first. **Spend this session: 160¢ + 231¢ + 228¢ = 619¢ by our receipts**, across three
 runs, two of which made a finished reel.
+
+**The picture rule as the service's default (S-153).** The owner: _"alright do that"_. Measured before choosing, by
+flipping each default locally and running the suite: the pipeline's default fails 26 of 512 tests, the service's fails
+one — the check that names the default. **The service now defaults to `upToThree`; the pipeline stays `recurring`**, so
+every verified test keeps proving D-027's rule. **The unidentified `tests` failures of this session were
+`reel-render`'s check 50 timing out at its 300 s bound under machine load**: 205 s alone at the time (S-107 recorded
+97 s), killed twice in full runs of 501 s and 838 s while other programs held the CPU. The owner closed them; the
+check then went green in 341 s. The bound was not touched.

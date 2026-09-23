@@ -155,9 +155,16 @@ const text = (env: Env, name: string, fallback: string): string => {
   return raw === undefined || raw.trim() === '' ? fallback : raw
 }
 
-/** `CUTROOM_PICTURES`: absent is D-027's `'recurring'`; a value outside the closed set is refused (S-150). */
+/** The service's picture rule when `CUTROOM_PICTURES` is absent (S-153). */
+export const SERVICE_PICTURES: PictureRule = 'upToThree'
+
+/**
+ * `CUTROOM_PICTURES`: absent is `'upToThree'` — the SERVICE's default since S-153, so every real reel makes up to
+ * three pictures; `'recurring'` (D-027's rule, and the pipeline's own default, which every verified test is built
+ * on) is accepted; a value outside the closed set is refused (S-150).
+ */
 function pictureRule(env: Env): PictureRule {
-  const raw = text(env, SETTING_NAMES.pictures, DEFAULT_PLAN_SETTINGS.pictures)
+  const raw = text(env, SETTING_NAMES.pictures, SERVICE_PICTURES)
   const rule = PICTURE_RULES.find((r) => r === raw)
   if (rule === undefined) {
     throw new Error(
@@ -218,7 +225,7 @@ export function readSettings(env: Env): ServiceSettings {
   // dashboard one line in `packages/providers` moves and both the estimate and the receipt follow.
   const planSettings: PlanSettings = {
     ...DEFAULT_PLAN_SETTINGS,
-    // Which shots get a picture (S-150): D-027's rule unless a real reel's caller turns the fill on.
+    // Which shots get a picture (S-150): up to three unless told `recurring` (S-153).
     // Refused here, before anything is built, if it names no rule (S-075's form).
     pictures: pictureRule(env),
     ...(settings.image === 'fake' ? {} : { imageRateCents: imageRateCents(entry) }),

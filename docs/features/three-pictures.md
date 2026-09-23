@@ -10,6 +10,13 @@ Decisions: D-014, D-026, D-027, D-029, D-030, D-032, D-035, D-038, D-041, D-042,
 Named only in the deferral list: D-023, S-115
 Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED 2026-09-23 adversarial-reviewer · program-design APPROVED 2026-09-23 adversarial-reviewer · slices APPROVED 2026-09-23 adversarial-reviewer
 
+> **Amended on 2026-09-23 by S-153 — no gate below is edited, and no assertion is removed.** The owner asked for
+> the picture rule as the default. **The SERVICE's default is now `'upToThree'`** (`CUTROOM_PICTURES` absent), so
+> every real reel makes up to three pictures; **the pipeline's own default stays `'recurring'`**, so the engine harness
+> and every verified test go on proving D-027's rule, which remains a supported value. Measured first: flipping the
+> pipeline's default fails 26 of 512 tests, the service's fails only check 5, which names the default. **Check 5 now
+> reads `'upToThree'` absent and `'recurring'` accepted**; check 1 is unchanged.
+>
 > **Created 2026-09-23 by S-150**, out of the owner's answer to S-149's finding: a reel whose shots are all different
 > passes Gate 7 and makes no picture, because D-027 makes a picture only for a subject that recurs; a plan whose
 > subject recurs makes pictures and is read as repeating itself. The owner chose four things, each of two or three put

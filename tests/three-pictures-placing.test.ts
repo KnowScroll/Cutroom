@@ -234,8 +234,10 @@ test("4. a plan built under 'upToThree' carries pictures: 'upToThree' and the ne
 
 // ---------------------------------------------------------------- 5
 
-test("5. readSettings: CUTROOM_PICTURES absent is 'recurring', 'upToThree' is accepted, anything else is refused before anything is built, and the banner prints it; a worker handed a rule outside the closed set refuses to start", async () => {
-  assert.equal(readSettings({}).planSettings.pictures, 'recurring')
+test("5. readSettings: CUTROOM_PICTURES absent is 'upToThree' (S-153), 'recurring' and 'upToThree' are accepted, anything else is refused before anything is built, and the banner prints it; a worker handed a rule outside the closed set refuses to start", async () => {
+  // The SERVICE's default is the picture rule (S-153); the pipeline's own stays D-027's (check 1).
+  assert.equal(readSettings({}).planSettings.pictures, 'upToThree')
+  assert.equal(readSettings({ CUTROOM_PICTURES: 'recurring' }).planSettings.pictures, 'recurring')
   assert.equal(readSettings({ CUTROOM_PICTURES: 'upToThree' }).planSettings.pictures, 'upToThree')
   for (const bad of ['UpToThree', 'three', 'all']) {
     assert.throws(

@@ -6464,3 +6464,37 @@ are made.
 **Owed — the owner's.** fal's own figures for this run and for `f895e76d…`, which close `paid-path`'s Slice 8 (either
 reel satisfies its "one real reel exists" — this one with pictures); and whether `pictures: 'upToThree'` becomes the
 default (`three-pictures`' Deferred item 1, gates first).
+
+---
+
+## S-153 | 2026-09-23 | The SERVICE's picture rule defaults to `'upToThree'`; the pipeline's own default stays `'recurring'`, so every verified test goes on proving D-027's rule
+
+**Chose.** The owner said to make the picture rule the default (_"alright do that"_, after S-152 — the first reel
+from approved pictures to pass Gate 7). **`CUTROOM_PICTURES` absent now means `'upToThree'` in `readSettings`** — so
+the service, and every real reel, makes up to three pictures unless told otherwise. **`DEFAULT_PLAN_SETTINGS.pictures`
+stays `'recurring'`**: the pipeline's default is what the engine harness and every verified test are built on, and
+they go on proving D-027's rule, which remains a supported value (`CUTROOM_PICTURES=recurring`).
+
+**Why this split.** Measured before choosing, by flipping each locally, running the whole suite, and reverting:
+
+- **The pipeline's default flipped: 26 of 512 tests fail** — about 21 in `reel-stills` and `reel-render`, whose
+  scripted answers, picture counts and receipts assume D-027's placement, and 5 of `three-pictures`' own. Rewriting
+  those expectations would move three verified features' checks to prove the new rule and stop proving the old.
+- **The service's default flipped: 3 fail** — `three-pictures`' check 5, which asserts the default by name, its
+  PATH-alone child (check 13), and `reel-render`'s check 50, which **timed out at its 300 s bound** in a loaded
+  suite (`null !== 0`: the child killed, every one of its tests having passed). That last is S-107's known load
+  sensitivity, not this change — and is very likely the unidentified `tests` failure seen twice at this session's
+  start.
+
+**Rejected.** **Flipping the pipeline's default** — 26 verified expectations rewritten, and D-027's rule left with no
+test proving it. **Keeping it a setting only the real-reel script turns on** — the owner asked for the default.
+
+**Supersedes:** **S-150**, on its rollout: _"a setting, default off"_ becomes _"default on in the service, off in the
+pipeline"_. **`three-pictures`' check 5** reads the new default by name — the one expectation that moves.
+
+**Caught by.** Check 5, amended: `CUTROOM_PICTURES` absent is `'upToThree'`, `'recurring'` is accepted, anything else
+refused. Check 1, unchanged: `DEFAULT_PLAN_SETTINGS.pictures` is `'recurring'` and the default path equals the old
+placement.
+
+**Confirmed-by.** The owner, 2026-09-23, _"alright do that"_, on making it the default; the split is this entry's,
+from the measurement above.
