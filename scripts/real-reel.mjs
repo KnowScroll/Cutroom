@@ -67,7 +67,9 @@ function request(requestId, budgetCents) {
     worldId: 'cutroom-black-holes',
     narration: [
       {
-        text: 'A black hole begins with a giant star, many times heavier than our Sun.',
+        // Reworded after run ee63e617 (session 48): MiniMax's word timings repeated its last word,
+        // "Sun. Sun.", and the stage's parse refused them (S-070). The owner chose to reword it.
+        text: 'A black hole begins with a giant star, far heavier than our own.',
         claimIds: ['c1'],
       },
       {
