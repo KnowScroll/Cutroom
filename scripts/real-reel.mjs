@@ -147,7 +147,10 @@ function request(requestId, budgetCents) {
         },
         {
           id: 'show-archive',
-          text: 'a closed handwritten logbook on a shelf in a daylit archive',
+          // SIMPLER, after run a08a9c9c (S-151): a text-made clip failed Gate 5 twice on "a closed
+          // handwritten logbook on a shelf in a daylit archive" — one object, in one state, in one place.
+          // The owner chose to simplify it, the caller's own text (S-134): what must be seen, no more.
+          text: 'a shelf of old bound logbooks in daylight',
           type: 'presence',
           claimId: 'c4',
         },
