@@ -5774,3 +5774,10 @@ rate is **0.5¢ a second** in the real adapter — at least 16× the most fal bi
 default stays 4¢, so no stand-in test's arithmetic moves. `paid-path`'s check 15 reads the new figures (5 s → 3¢). A
 real reel now estimates **18–53¢** where it estimated 140–210¢. `BUDGET.md`'s figure is owed upstream with S-154's
 table.
+
+**Next session's prompt, rewritten.** The owner wants to test the engine by making reels they describe. The earlier
+`PROMPTS/048` asked for work session 47 finished, so it is replaced by `PROMPTS/048-make-a-reel.md`: describe a reel,
+see its brief, approve it, get the file — with the brief-writing lessons of sessions 45–47 in it, and the measured
+times (7.5 and 27.5 min for the two finished reels; expect 10–25). **Asked whether KnowScroll can use the engine now**:
+the engine works end to end on this machine and its contract is verified, but nothing on KnowScroll's side calls it
+yet, it listens on loopback only (D-098), and two finished real reels are not yet a reliability figure.
