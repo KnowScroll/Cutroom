@@ -249,6 +249,7 @@ Every check appears in exactly one slice: 5 + 5 + 2 + 1 = 13.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-23 journey=PASS at cf1fb9e — every check green; 12 tests in tests/three-pictures-*.test.ts pass
 - 2026-09-23 journey=PASS at 566b975 — every check green; 12 tests in tests/three-pictures-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
