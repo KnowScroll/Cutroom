@@ -44,13 +44,15 @@ Start:
 3. `node scripts/check.mjs` — confirm green before anything else. Session 47 saw its tests step fail twice and pass
    three times with no change; if it fails, find WHICH test before anything else (check.mjs prints 40 lines only).
 
-A. SLICE 8. Ask the owner for fal's own figures for runs f895e76d… (160c) and 436564c1… (228c, the reel WITH pictures) and
-   whether any earlier call billed that our record does not show. Write both beside our 160c in JOURNAL.md, tick Slice 8 and the "One real reel exists" Outcome line
-   in docs/features/paid-path.md, and run paid-path's journey. If the figures disagree, that is the finding: record it
-   and say what it means for the budget guard before ticking anything.
+A. DONE IN SESSION 47: fal's figures were read and paid-path is verified (S-154). A clip is billed about 0.2c, not
+   36-52c; fal's quantity is not seconds of video. The rate was deliberately NOT changed.
 
-B. DONE IN SESSION 47: the service defaults to pictures: 'upToThree' (S-153); the pipeline stays 'recurring'.
-   Nothing to do here. If Slice 8 is closed, ask the owner what comes next — parallel-shots (S-115) is held by them.
+B. DONE IN SESSION 47: the service defaults to pictures: 'upToThree' (S-153).
+
+C. THE OPEN QUESTION — THE OWNER'S. Put S-154's choice with AskUserQuestion: keep 4c a second (safe, but stops reels
+   for money that is not spent, as S-151's run was); a lower per-second rate with a stated margin; or another rule.
+   A rate that can UNDER-price a clip is the direction D-014 forbids — say so beside any option that could. Then, if
+   the owner wants it, parallel-shots (S-115), held by them until they say otherwise.
 
 How to work:
 - Never weaken a check or a test to reach green. Every fix by addition.
