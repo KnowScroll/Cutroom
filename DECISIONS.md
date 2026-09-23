@@ -6221,3 +6221,88 @@ receipts`, the two `stage` events at one instant, and four `text-to-video` recei
 **Owed.** (1) **fal's own figure for run `f895e76d…`**, 160¢ by our arithmetic (36¢ × 3, 52¢ × 1), which
 closes Slice 8, the Outcome line and D-007's Q9 together. (2) **What to change so a subject recurs in
 the chosen plan**: the brief, the planner's prompt, or the score — the owner's.
+
+---
+
+## S-149 | 2026-09-23 | The planner is told that a subject is a thing, not a view of it — its instruction gains one sentence, measured on the real planner before any reel is bought, and not claimed as a fix until the measurement says so
+
+**Chose.**
+
+- **The owner's answer to S-148's question, 2026-09-23: change the planner's instructions** — not the
+  brief, not the plan score.
+- **A new feature, `one-subject`** (`docs/features/one-subject.md`), gates first, because the planning
+  prompt is `reel-plan`'s and `reel-plan` is verified.
+- **One sentence, in `planningBody`**, beside the sentence that already says a subject shown in several
+  shots is named once. It says what that sentence leaves unsaid: **the same object seen in another place,
+  state or time is ONE subject, named by what it is** — not by how it looks in one shot — **and given the
+  same id in every shot that shows it.** `planningBody` builds both the planning and the repair prompt,
+  so both carry it.
+- **Measured before a reel is bought.** A planner call costs nothing under the Token Plan (S-129), so the
+  planning stage is run on the real planner, on the brief of run `f895e76d…`, six times with today's
+  prompt and six times with the sentence. **The primary measure is the owner's goal**: a run counts when
+  the plan it SELECTS has one or more planned image calls AND the scorer answered yes to _"Does every
+  shot show something that no other shot has already shown?"_. **The sentence is kept only if it meets
+  the threshold written in `one-subject`'s Gate 2 before the first call** — at least 3 of 6 runs counting
+  AND at least the baseline plus 3; the premise is not reproduced at a baseline of 4 or more; and a rise
+  in the merge control stops it whatever the primary says — otherwise this entry is amended to say so,
+  the way S-136 and S-144 were, and the owner decides again. Whether the logbook became one subject is
+  recorded beside it, as a diagnostic.
+- **The sentence, exactly, one line:** _"A subject is a thing, not one view of it: the same object seen
+  in another place, state or time — a car parked or moving, a tree in summer or in winter, a house by
+  day or by night — is ONE subject. Name it once, for what it is rather than how it looks in one shot,
+  and give its id to every shot that shows it."_
+- **The sentence's examples are general, not the measured brief's** — a car, a tree, a house — so a
+  positive result measures the rule rather than an example's overlap with the brief.
+- **What it can deliver, said plainly.** A recurring subject gets ONE picture, on the first shot that
+  shows it; its later shots are still made from words (`placePictures`, D-029 part 4, S-039). So the
+  most this feature can do is give a reel whose shots are otherwise all different one canonical
+  picture opening one shot. **The owner was first told that pictures keep a thing looking the
+  same across shots; that was wrong for this engine, it was corrected to them on 2026-09-23 after the
+  gates' first review found it, and they chose to continue on the corrected description.** S-145's and
+  S-146's _"the stills stage exists to carry identity ACROSS shots"_ overstated it the same way, and
+  S-146's _"Gate 1S has something to compare"_ is false for one recurring subject, which makes no derived
+  picture; both entries stand as written, and this is their correction.
+- **And a second correction, found by the gates' second review.** The owner was then told the picture
+  step had never run on real providers, and S-148 says the stills promise is _"unproven on real
+  providers"_. **Both are wrong**: session 45's run `ffbd04b5…` made five pictures for 34¢, three shots
+  accepted at Gate 1 and two pairs at Gate 1S, and its cut was refused at Gate 7 for repeating itself.
+  **What has never happened is a reel with pictures that Gate 7 accepts.** The owner was told this and
+  chose a third time, on that gap; it is the primary measure above. S-148 stands as written, and this is
+  its correction.
+
+**Why.**
+
+- **S-148 read the cause off the run's own rows.** The chosen plan named `log` ("Open Logbook") and
+  `archive` ("Archive Logbook"), one subject per criterion, for one object. The planner was told to name a
+  subject once and reuse its id; it was never told what makes two appearances ONE subject, and it filled
+  that in with something reasonable (session 45's pattern: _where the exact form is not pinned in the
+  message, the model fills it in_).
+- **The owner chose it** over the brief and the score, with the three set out in front of them; they gave
+  no reason, and none is recorded for them here.
+
+**Rejected.**
+
+- **Rewording the brief** — put to the owner; rejected by them, 2026-09-23.
+- **Changing the plan score** — put to the owner; rejected by them. It would also make a plan that recurs
+  win without making the planner recur.
+- **A schema rule refusing two subjects with similar names**, or merging them in code. The code would be
+  deciding what two names meant — S-144's rejected normalisation, one stage earlier.
+- **Buying a reel to find out.** About 160–210¢ an answer, where the planning stage alone answers the same
+  question for nothing.
+- **Claiming the sentence fixes it before it is measured.** S-136 and S-144 are two wordings that did not.
+- **Examples taken from the measured brief** ("open or closed, on a desk or on a shelf"). A positive
+  result would then measure the example's overlap with the brief, not the rule.
+- **Carrying a recurring subject's picture into its later shots.** A change to placement and to D-029;
+  `one-subject`'s Deferred item 2, its own feature if the owner wants it.
+
+**Caught by.** `one-subject`'s checks: every planning and repair prompt carries the sentence exactly once,
+after the naming instruction; the prompt is still built from its inputs alone, so a call at temperature 0
+replays. And the measurement, in `JOURNAL.md`: every planner call's prompt hash and whether it carried
+the sentence (a call that disagrees with its arm voids its run), each run's selected plan, its planned
+image calls and the scorer's four answers, and the counts against the threshold.
+
+**Confirmed-by.** The owner, 2026-09-23, choosing the planner's instructions over the brief and the score;
+again the same day, told that it makes one picture on a subject's first shot and no more, choosing to
+continue over researching cross-shot consistency first and over pausing; and a third time, told that
+pictures HAD been made on real providers in session 45 and that the gap is a reel with pictures that
+passes Gate 7, choosing to continue over a brief between the two and over pausing.
