@@ -44,19 +44,15 @@ Start:
 3. `node scripts/check.mjs` — confirm green before anything else. Session 47 saw its tests step fail twice and pass
    three times with no change; if it fails, find WHICH test before anything else (check.mjs prints 40 lines only).
 
-A. SLICE 8. Ask the owner for fal's own figure for run f895e76d… and whether any earlier call billed that our record
-   does not show. Write both beside our 160c in JOURNAL.md, tick Slice 8 and the "One real reel exists" Outcome line
+A. SLICE 8. Ask the owner for fal's own figures for runs f895e76d… (160c) and 436564c1… (228c, the reel WITH pictures) and
+   whether any earlier call billed that our record does not show. Write both beside our 160c in JOURNAL.md, tick Slice 8 and the "One real reel exists" Outcome line
    in docs/features/paid-path.md, and run paid-path's journey. If the figures disagree, that is the finding: record it
    and say what it means for the budget guard before ticking anything.
 
-B. THE FIRST REEL UNDER THREE-PICTURES. Ask the owner for a go-ahead in THIS session; without it, stop. Then
-   `node --experimental-strip-types --no-warnings scripts/real-reel.mjs --model fal-ai/flux-2-pro/edit --voice
-   English_Graceful_Lady`, confirm its header prints `pictures upToThree`, read the estimate (140-210c), and type
-   `spend 250`. Read the run's plan rows: did the selected plan carry pictures: 'upToThree' and standalone
-   placements; how many pictures passed Gate 1; which shots were image-to-video; and what Gate 7 answered. A run that
-   fails partway has already spent: read its receipts and lost_call rows before anything else. If it passes Gate 7
-   WITH pictures, that is the first such reel: record it, and ask the owner whether the rule becomes the default
-   (three-pictures' Deferred item 1, gates first).
+B. THE PICTURE RULE AS THE DEFAULT? Session 47 made the first reel from approved pictures that passes Gate 7 (run
+   436564c1-7c6b-4d65-a8b5-a47de1c060ca, 228c, S-152). Put three-pictures' Deferred item 1 to the owner with
+   AskUserQuestion: make pictures: 'upToThree' the default (gates first — it rewrites expected picture counts in
+   verified tests), or keep it a setting. Do not run another reel without the owner's go-ahead in this session.
 
 How to work:
 - Never weaken a check or a test to reach green. Every fix by addition.
