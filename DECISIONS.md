@@ -6333,3 +6333,69 @@ what refused session 45's cut (with pictures). **So "a reel with pictures that p
 reachable by any change to the planner**: the gap is between D-027's rule — a picture only for a
 subject that recurs — and D-064's fourth question, which reads recurrence as repetition. Which of the
 two moves, if either, is the owner's; it is not decided here.
+
+---
+
+## S-150 | 2026-09-23 | Up to three pictures a reel, by a setting: free picture slots go to the earliest remaining shots as STANDALONE pictures, made from scratch — on for real reels, off by default
+
+**Chose.**
+
+- **The owner's answer to S-149's finding**, 2026-09-23, with three put to them: a picture for shots that hold none
+  today — not a rewording of the scorer's and Gate 7's fourth question, which would loosen the check a reel
+  is refused by, and not accepting text-made reels.
+- **A new feature, `three-pictures`** (`docs/features/three-pictures.md`), gates first: it changes D-027's placement
+  and touches `reel-plan`, `reel-stills` and the clips stage's inputs, all verified.
+- **The shape — the owner's second answer: up to three pictures, D-027's cap kept.** Recurring subjects are placed
+  exactly as today (canonical best-of-2, then derived, D-029 part 4). **Free slots, up to three pictures in all, go to
+  the earliest shots that hold no picture yet AND name no subject already pictured — the owner's fourth answer —
+  one each, labelled by the shot's first named subject.** A picture shows every subject its shot names, so a shot
+  that shows a pictured subject is passed over rather than drawn again from nothing.
+- **The rule is stored with the plan** (`Plan.pictures`, written only when on), and placement reads the plan's rule,
+  never a worker's setting — so pictures are made under the rule the plan was priced and admitted under, whichever
+  worker resumes the job (D-083, S-035).
+- **Each new picture is a new role, `standalone`**: made once, from scratch — no reference, no framing axis — through Gate 1, with
+  one repair from the reserve as a derived picture takes (S-043), and **no Gate 1S**, which compares a derived picture
+  with its canonical and has nothing to compare here. The six-call cap and the reserve are unchanged; planned image
+  calls stay at most four.
+- **The rollout — the owner's third answer: a setting, default off.** `PlanSettings.pictures`, `'recurring'` (today,
+  the default) or `'upToThree'`, read from `CUTROOM_PICTURES`. Every verified test runs on the default and none of
+  their expected results moves. `scripts/real-reel.mjs` sets it on.
+
+**Why.**
+
+- **S-149's measurement**: a reel whose shots are all different passes Gate 7 and makes no picture (D-027: a picture
+  only for a subject that recurs); a plan whose subject recurs makes pictures and is read as repeating itself. A
+  picture for a subject that appears once breaks that tie without loosening any check.
+- **A derived picture is edited FROM the canonical** (D-026, D-038) — a picture of a different object cannot be made
+  that way — so the new pictures are their own role, made from scratch like the canonical, but once.
+- **A setting**, because the default changing would rewrite expected picture counts, receipts and scripted answers
+  across three verified features' tests; the owner chose the smaller step, to be made the default once a real reel
+  proves it.
+
+**Rejected.**
+
+- **Rewording D-064's fourth question / Gate 7's** — put to the owner; it loosens the check a reel is refused by.
+- **Accepting text-made reels** — put to the owner.
+- **A picture for every shot, the cap raised** — put to the owner; a larger change to D-027 and to the reserve.
+- **Making the new pictures `derived`** — a derived picture is an edit of the canonical; there may be no canonical,
+  and when there is one it shows a different object.
+- **The new rule as the default** — put to the owner.
+- **A reference-carrying picture for a shot that shows a pictured subject, or redrawing it from scratch** — put to the
+  owner; such shots are skipped.
+
+**Supersedes,** each in part and **only when the setting is on**: **D-027** — _"one canonical, two derived, two bare
+shots"_ becomes _"up to three pictures: recurring subjects first as D-029 places them, then standalone pictures on the
+earliest shots holding none and naming no pictured subject"_; **D-029 part 1** — _"a keyframe belongs to a subject,
+not a shot"_ — a standalone belongs to its shot; **D-029 part 3, steps 2 and 5** — a subject appearing once can have a
+picture, and the calls left after the canonical can buy a standalone, not only a derived keyframe; **D-030's table**,
+which gains a row: standalone, made once, from scratch. **Unchanged**: `rankSubjects` and the plan score's recurrence
+term, so the scoring questions and weights are read exactly as today. **Not D-050's rejected "promoting an unrelated
+spare subject into the slot"**: D-050 rejected it because _"the shot's content is the epistemic layer's, not a
+resource-allocation outcome"_ — putting a different subject into a shot to use a slot. A standalone changes nothing
+a shot shows: it pictures exactly the subjects the plan already gave that shot, and only a shot none of whose
+subjects is pictured elsewhere.
+
+**Caught by.** `three-pictures`' checks (its Gate 3), and the default's: every verified test runs with the setting off.
+
+**Confirmed-by.** The owner, 2026-09-23: option 1 of three; "up to 3, cap kept" of two; "a setting, on for real
+reels" of two; and "skip such shots" of three, on a shot that shows a pictured subject.
