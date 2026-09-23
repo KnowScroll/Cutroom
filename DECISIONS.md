@@ -6084,3 +6084,96 @@ wording that was measured not to work.
 
 **Confirmed-by.** The owner, 2026-09-22, shown the two tables and all three alternatives on each
 question, chose the second ask and the recurring subject.
+
+---
+
+## S-147 | 2026-09-23 | The second ask lives at the gate that parses — Gates 1 and 4 call `observe` once more when their own schema refuses the answer — and the adapter still sends each call exactly once
+
+**Chose.**
+
+- **A new feature, `second-ask`** (`docs/features/second-ask.md`), with its four gates written and
+  reviewed before any implementation file is opened (S-146).
+- **The retry lives in `packages/pipeline`, at the two gate boundaries that parse an observation**:
+  Gate 1's witness step (a still, `witnessObservation`) and Gate 4 (a take's clip,
+  `clipObservation`). When the gate's own schema refuses the answer, the gate makes **the same
+  `observe` call once more** — the same picture or clip, temperature 0, nothing added — and parses
+  that. **A second refusal fails the run exactly as one refusal does today**, with the second
+  answer's issues as its detail. There is no third ask.
+- **Both witnesses**, because stills and clips answer the same closed sets (`framing`, `lighting`,
+  `entities.position`, `entities.prominence`, `entities.faceVisible`); the failure was measured on a clip (S-144) and
+  nothing about it is specific to one.
+- **The adapter is not touched, and S-096 stands as written**: an adapter still sends each call it is
+  given exactly once, and never parses an observation. The gate calls the port twice; the port
+  answers each call once.
+- **Each ask is a call, and each call keeps its receipt.** The recording port already writes a
+  `model_receipt` as a call returns, before the gate parses it, so a second ask leaves **two
+  `observe` receipts** for that picture or take. **The observation is tied to the LAST of them**
+  (receipts carry an autoincrement id); an earlier one is the refused ask. With no refusal there is
+  one receipt, exactly as today.
+
+**Supersedes:** **S-042**, in part — _"one that does not parse finishes the run `failed`"_ becomes
+_"one that does not parse is asked once more, and a second that does not parse finishes the run
+`failed`"_. Everything else S-042 says stands: the witness step is recorded only when an answer
+parses, a picture cut off there has no Gate 1 verdict outcome and no observation id, and no
+malformed observation reaches a consumer. **And D-045's I-15, in its count and not its reason** —
+_"one vision call per generated image"_ becomes _"one OBSERVATION per image or clip, from at most two
+witness calls, of which only the one that parses is ever recorded"_. I-15's reason is kept whole: _"a
+second pass over one image produces a second record that can disagree with the first, with no rule for
+which wins"_ — a refused answer is never a record (no observation row, no verdict, nothing downstream
+reads it), so there is still one record, and the rule for which counts is that only one of them can.
+D-033's _"no second vision call is made"_ is about the score and the clip prompt reading Gate 1's verdict,
+and still holds: neither makes a call. **And S-037's _"exactly one `observe` receipt per picture"_, and S-072's _"one
+`observe` call"_ for Gate 4** — each becomes one when the answer parses, two when the first was refused. **And
+D-045's premise that _"at temperature 0 a duplicate call returns a duplicate answer"_**, measured false on this
+wire by S-144: D-031 rule 5's replayable score is replayed from the one stored observation, never by asking
+again, and stands. S-126's argument — a second `observe` makes the join ambiguous, _"a silent corruption"_ — is
+answered in `second-ask`'s Gate 2: only one answer can become a record, and the receipt counts are asserted.
+**And the key-tie in `ModelReceipt`'s two doc comments and `recordingPort`'s header** —
+_"the one `observe` receipt whose `pictureIds` [or `takeIds`] is its picture's [or take's]"_ — which
+becomes _"the last"_.
+
+**Why.**
+
+- **The only schema that refuses lives at the gate.** The adapter's shapes exist to ASK for a shape
+  and are commented as never parsing an answer, so that the gate's refusal stays reachable (D-041,
+  S-042). A retry in the adapter would need its own copy of the schema to know when to retry, and
+  two copies of one closed set is the drift this repository exists to catch.
+- **It keeps every call on the record.** An adapter that retried inside one `observe` would return
+  one receipt for two paid-for calls, and the first call's tokens would vanish (D-005, D-084).
+- **It works identically for the stand-in**, so every check is written against the fake model with
+  no provider, no key and no spend (S-111).
+- **The cost is three verified features amended and re-journeyed**, `reel-stills` (Gate 1),
+  `reel-render` (Gate 4) and `reel-takes` (a check whose fixture refuses a take's observation) —
+  the owner accepted the amending of verified features when choosing the gate boundary.
+
+**Rejected.**
+
+- **A new arm on the model port** (`packages/contracts` and `packages/providers`), the adapter
+  checking its own copy of the shape and sending again. Put to the owner 2026-09-23; rejected for
+  the two copies of the schema, the adapter parsing what it is written never to parse, and the lost
+  first receipt.
+- **Gate 4 only**, where the failure was measured. Put to the owner; rejected because Gate 1 asks the
+  same closed sets and would die the same way.
+- **Asking again on a thrown call** — `Spent`, a fault, or `Unavailable`. A fault is a request that
+  was wrong; `Unavailable` already has the worker's counter (S-137, S-142); and a `Spent` observation
+  (an answer that is not JSON, is the schema, or is cut off) is the adapter failing to READ what it
+  was given, not the gate refusing a value. Those stay one send and a failed run.
+- **Widening a closed set or normalising a near-miss** — S-144's rejections, unchanged.
+- **A third ask, or a counter.** Once is the owner's figure (S-146); a loop has a provider's bad day
+  at the end of it.
+
+**A correction to S-146's figure, which is not edited.** S-146 says one retry takes a four-clip run
+from about one in three to _"about one in fifty"_. At S-144's 1 in 12 per call and independent draws
+it is 1 − (143/144)⁴, **about one in thirty-five**; one in fifty would need about 1 in 14. The
+decision does not move with the figure.
+
+**Caught by.** `second-ask`'s checks (its Gate 3), in `tests/second-ask-*.test.ts`: a first refusal
+then a parse accepts the second observation with two receipts; two refusals fail the run after
+exactly two calls; a call that throws is made once on the first ask and twice after a refusal,
+and its error comes out unchanged; the two schemas equal a hand-typed JSON Schema snapshot.
+`reel-stills`' check 46, `reel-render`'s check 23 and `reel-takes`' labels check (`r14-failed`) are
+amended by giving their refused witness TWO answers AND asserting today's exact words and two
+`observe` receipts — without both, each would stay green on the stand-in running out of answers,
+which is a thrown call and not a refusal.
+
+**Confirmed-by.** The owner, 2026-09-23, on both questions: the gate boundary, and both witnesses.
