@@ -6399,3 +6399,38 @@ subjects is pictured elsewhere.
 
 **Confirmed-by.** The owner, 2026-09-23: option 1 of three; "up to 3, cap kept" of two; "a setting, on for real
 reels" of two; and "skip such shots" of three, on a shot that shows a pictured subject.
+
+---
+
+## S-151 | 2026-09-23 | The first reel under `three-pictures`: three standalone pictures made and passed, three clips made from them and passed — and the one shot made from words failed Gate 5 twice, and the run stopped at its ceiling before Gate 7
+
+**Chose.** Nothing in `packages/` moves. This entry records what run `a08a9c9c-9d10-41bd-9f81-215edfef871f` did,
+2026-09-23, the first real reel with `pictures: 'upToThree'` (S-150), and puts the next choice to the owner.
+
+**What happened.** `stopped`, `budget`, limit `ceiling`, **231¢ spent** against a 250¢ ceiling and an estimate of
+140–210¢, 725.8 s, **no finished reel, Gate 7 never reached**.
+
+- **The picture rule did what S-150 says.** The selected plan carried `pictures: 'upToThree'` and 3 planned calls;
+  its four subjects did not recur (`lamp`, `log`, `box`, `archive` — the planner again named the logbook twice), so
+  shots 0, 1 and 2 got standalone pictures. **All three passed Gate 1 on the first try** — three image receipts at
+  **5¢ each**, the text wire's rate, as S-150's Gate 1 predicted (the estimate priced them at 7.5¢).
+- **All three pictured shots passed Gates 2, 3, 4 and 5 on their first take**, each `image-to-video` at 40¢.
+- **Shot 3 — the fourth, with no picture, because three is the cap — was `text-to-video`, and failed Gate 5 on both
+  takes**, each time on the same criterion: _"must show `show-archive` is not shown: a closed handwritten logbook on a
+  shelf in a daylit archive"_ (48¢ each). **A third take would have brought the estimate to 279¢, over the 250¢
+  ceiling**, so the run stopped there, as D-100 says it must.
+- No `lost_call` row; no second ask was needed (S-147).
+
+**What it says.** The only shot that failed is the only shot made from words, on a criterion that asks a text
+prompt for a specific object in a specific state in a specific place. It is ONE run, and it is not evidence that
+pictures make clips pass — but it is the first reel in which every pictured shot passed every gate.
+
+**Rejected.**
+
+- **Raising the ceiling for a third take.** The ceiling is the owner's constant (S-128), and `--ceiling` can only
+  lower it.
+- **Calling this a failure of `three-pictures`.** The feature did exactly what it specifies; the stop was a text-made
+  shot's criterion and the budget.
+
+**Owed — the owner's.** What to change before the next reel (about 220–250¢): the brief's fourth criterion (the
+caller's, no gates), a fourth picture for a four-shot reel (D-027's cap, gates), or nothing.

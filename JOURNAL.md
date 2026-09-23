@@ -5728,3 +5728,18 @@ repository fired twice more: a `RegExp.exec(` in that file tripped check 20's no
 
 **The real reel's estimate under the rule: 140–210¢** (0 to 4 image calls). **No reel was run**: that needs the owner's
 go-ahead. fal's figure for run `f895e76d…` is still owed for Slice 8.
+
+**The first reel under `three-pictures`** (the owner said _"push and yes run the reel"_; pushed `7cfada1..c46690f`
+first). Run `a08a9c9c-9d10-41bd-9f81-215edfef871f`: `pictures upToThree` printed, estimate 140–210¢, `spend 250`.
+
+```text
+   98.5s  plan finished; stills started — for real this time
+  303.3s  3 standalone pictures, each passed Gate 1 first time (5c each)
+  725.4s  shots 0-2 image-to-video, each through Gates 2-5 on take 1 (40c each)
+          shot 3 text-to-video, Gate 5 FAILED twice on show-archive (48c each)
+  725.4s  run.finished stopped — budget, ceiling: a third take would be 279c against 250c
+```
+
+**231¢ spent, no reel, Gate 7 not reached** (S-151). Every pictured shot passed every gate; the one shot made from
+words failed on "a closed handwritten logbook on a shelf in a daylit archive". The planner again split the logbook in
+two. What to change next is the owner's.
