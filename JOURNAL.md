@@ -5566,3 +5566,21 @@ run in three**, and every one of those has already bought everything.
 
 **Next.** `PROMPTS/047`: the observation's second ask, with its gates written first (S-146), and then the reel
 again on a brief with one recurring subject. **`parallel-shots` (S-115) is still held by the owner.**
+
+## 2026-09-23 — session 47, status only: where the reel stands, nothing changed
+
+**Intent.** The owner asked what has happened and where the work is. No prompt was run.
+`decisions.mjs`: pin current, 0 unpushed. Working tree clean at `1966348`.
+
+**Changed.** Nothing but this entry. No code, no decision, no spend.
+
+**Observed.** Read session 45's and 46's entries, the last fifteen commits and `PROMPTS/047`. The state as
+reported to the owner: `paid-failures` is verified; all six runnable journeys PASS; `paid-path`'s Slice 8 and
+its "One real reel exists" line are still unticked, because the last reel (152¢) died at Gate 5 on an answer
+outside a closed set, and the one before (202¢) was refused at Gate 7. `PROMPTS/047` is written and its `Run`
+line still reads **not yet**.
+
+**Why.** A status question is not a session's work; this entry exists because every session ends with one.
+
+**Next.** Unchanged: `PROMPTS/047` — the second ask's gates and code first (S-146), then the reel on a brief
+with one recurring subject. fal's own figures are still unread; `parallel-shots` (S-115) is still held.
