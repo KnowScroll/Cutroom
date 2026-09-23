@@ -55,8 +55,9 @@ finish the SAME run. Nothing that already passed its checks is paid for twice.
 ## Measured cost of not having it
 
 Run `ee63e617…`: 15¢ of pictures and about 3.6 minutes redone by the next run; with a bad answer on a later shot, every
-accepted clip before it too (about 1.5–2 minutes a clip). Run `879a27b7…` (the next one) stopped at Gate 2 on shot 2 with shots 0 and 1 finished — two pictures and two
-accepted clips, 22¢ and about 4 minutes, that a rerun makes again. Small in cents at today's rates (S-155), larger in time.
+accepted clip before it too (about 1.5–2 minutes a clip). Run `879a27b7…` (the next one) stopped at Gate 2 on shot 2
+with shots 0 and 1 finished — two pictures and two accepted clips, 22¢ and about 4 minutes, that a rerun makes again.
+Small in cents at today's rates (S-155), larger in time.
 
 ## Deferred
 
