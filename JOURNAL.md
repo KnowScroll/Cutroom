@@ -5743,3 +5743,12 @@ first). Run `a08a9c9c-9d10-41bd-9f81-215edfef871f`: `pictures upToThree` printed
 **231¢ spent, no reel, Gate 7 not reached** (S-151). Every pictured shot passed every gate; the one shot made from
 words failed on "a closed handwritten logbook on a shelf in a daylit archive". The planner again split the logbook in
 two. What to change next is the owner's.
+
+**And the reel after it passed.** The owner chose to simplify the last scene (and to push; pushed `c79d96f`, then
+`fda8fbd` with the brief). Run `436564c1-7c6b-4d65-a8b5-a47de1c060ca`: **completed, Gate 7 accepted, 228¢** — three
+shots from standalone pictures (one picture repaired once), one from words (passed on take 2). **The first reel made
+from approved pictures that passes Gate 7** (S-152). The file: `.artifacts/436564c1-…/a1-render.mp4`, 38.1 s.
+
+**Next.** fal's figures for `f895e76d…` and `436564c1…` close Slice 8 — the owner's. Whether the picture rule becomes the
+default — the owner's, gates first. **Spend this session: 160¢ + 231¢ + 228¢ = 619¢ by our receipts**, across three
+runs, two of which made a finished reel.

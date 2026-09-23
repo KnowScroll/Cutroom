@@ -6434,3 +6434,33 @@ pictures make clips pass — but it is the first reel in which every pictured sh
 
 **Owed — the owner's.** What to change before the next reel (about 220–250¢): the brief's fourth criterion (the
 caller's, no gates), a fourth picture for a four-shot reel (D-027's cap, gates), or nothing.
+
+---
+
+## S-152 | 2026-09-23 | The first reel made from approved pictures that Gate 7 accepts: run `436564c1…`, 228¢, three shots from standalone pictures and one from words
+
+**Chose.** Nothing in `packages/` moves. This records the run S-150 was built for and S-151 fell short of.
+
+**What happened.** Run `436564c1-7c6b-4d65-a8b5-a47de1c060ca`, 2026-09-23, `pictures: 'upToThree'`, the brief with its
+last criterion simplified to _"a shelf of old bound logbooks in daylight"_ (the owner's choice after S-151, the
+caller's text, S-134). **Completed; Gate 7 accepted.** A 38.1 s, 768x1366 file with sound at
+`.artifacts/436564c1-7c6b-4d65-a8b5-a47de1c060ca/a1-render.mp4`. **228¢ by our receipts** against a 250¢ ceiling;
+the selected plan's estimate was 167¢; 1652.8 s submit to finished. No `lost_call` row.
+
+- **Pictures**: three standalones planned; shots 0 and 2 passed Gate 1 first time; **shot 1 failed Gate 1, took its
+  one repair from the reserve, and the repair passed** — the standalone repair route's first real use. Four image
+  receipts at 5¢, 20¢.
+- **Clips**: shots 0–2 `image-to-video` (40¢, 36¢, 36¢), each through Gates 2–5 on take 1. Shot 3, made from words,
+  failed Gate 5 once — _"the count seen does not match its name"_ for "Archive Shelf of Old Bound Logbooks in
+  Daylight" — and passed on take 2 (48¢ each).
+- **Why 228¢ against a 167¢ estimate**: the estimate prices a plan as planned, not its repair and its retake — the
+  reserve is not counted (S-035), and every call is guarded as it is made. Both extras fit under the ceiling.
+
+**What it says, and what it does not.** It is the first reel in which approved pictures became clips and the cut
+passed the last check — the engine's own promise, _"approved stills become a finished video"_, is met once on real
+providers. It is ONE run. The planner again named the logbook twice; that is no longer what decides whether pictures
+are made.
+
+**Owed — the owner's.** fal's own figures for this run and for `f895e76d…`, which close `paid-path`'s Slice 8 (either
+reel satisfies its "one real reel exists" — this one with pictures); and whether `pictures: 'upToThree'` becomes the
+default (`three-pictures`' Deferred item 1, gates first).
