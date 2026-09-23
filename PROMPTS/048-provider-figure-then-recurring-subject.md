@@ -49,10 +49,8 @@ A. SLICE 8. Ask the owner for fal's own figures for runs f895e76d… (160c) and 
    in docs/features/paid-path.md, and run paid-path's journey. If the figures disagree, that is the finding: record it
    and say what it means for the budget guard before ticking anything.
 
-B. THE PICTURE RULE AS THE DEFAULT? Session 47 made the first reel from approved pictures that passes Gate 7 (run
-   436564c1-7c6b-4d65-a8b5-a47de1c060ca, 228c, S-152). Put three-pictures' Deferred item 1 to the owner with
-   AskUserQuestion: make pictures: 'upToThree' the default (gates first — it rewrites expected picture counts in
-   verified tests), or keep it a setting. Do not run another reel without the owner's go-ahead in this session.
+B. DONE IN SESSION 47: the service defaults to pictures: 'upToThree' (S-153); the pipeline stays 'recurring'.
+   Nothing to do here. If Slice 8 is closed, ask the owner what comes next — parallel-shots (S-115) is held by them.
 
 How to work:
 - Never weaken a check or a test to reach green. Every fix by addition.
