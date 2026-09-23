@@ -1,9 +1,9 @@
-# 048 — fal's own figure closes Slice 8; then a subject that recurs in the chosen plan
+# 048 — fal's own figure closes Slice 8; then the first reel made from standalone pictures
 
 - **For:** session 48
-- **Feature:** `paid-path`'s Slice 8, and whatever the owner chooses for S-148's second question
-- **Work:** **A** (tick Slice 8 once the owner has read fal's figure, free), then **B** (the owner's choice on
-  recurrence, gates first if it touches a verified feature). **`parallel-shots` is still held.**
+- **Feature:** `paid-path`'s Slice 8, then a real reel under `three-pictures` (S-150)
+- **Work:** **A** (tick Slice 8 once the owner has read fal's figure, free), then **B** (a real reel with the picture
+  rule on, 140–210¢, only with the owner's go-ahead). **`parallel-shots` is still held.**
 - **Written:** 2026-09-23, at the end of session 47
 - **Run:** not yet
 
@@ -18,18 +18,18 @@ named the recurring logbook as two subjects, and the plan that did recur lost on
    `fal-ai/minimax-h3-turbo/text-to-video`). Slice 8 and the Outcome line _"One real reel exists … beside what the
    provider says it cost"_ both need it, and so does D-007's Q9. Also: did any call from earlier runs bill that our
    record does not show?
-2. **Pictures AND Gate 7 — the question S-149's measurement left** (updated at the end of session 47). The owner
-   chose the planner's prompt for S-148; `one-subject` measured it for nothing and it was **not kept** (0 of 6, as the
-   baseline). Underneath: in all six runs where the selected plan would make a picture, the scorer answered **no** to
-   _"Does every shot show something that no other shot has already shown?"_ — Gate 7's question too. D-027 makes a
-   picture only for a subject that recurs; D-064's fourth question counts recurrence against the plan. Which, if
-   either, moves is the owner's.
+2. **Pictures AND Gate 7 — answered in session 47, not yet proven** (updated at its end). `one-subject` measured a
+   planner sentence for nothing and it was **not kept**; underneath, a recurring subject reads as repetition to the
+   scorer's fourth question, which is Gate 7's (S-149). The owner then chose `three-pictures` (S-150), **built and
+   verified**: with `CUTROOM_PICTURES=upToThree` — which `scripts/real-reel.mjs` sets — free picture slots, up to three
+   pictures a reel, go to shots holding none and naming no pictured subject, as `standalone` pictures made from
+   scratch. **Whether a real reel of different scenes made that way passes Gate 7 is unknown until one is made.**
 
 Paste everything inside the block below as the session's first message.
 
 ```text
-Work in this order: A (Slice 8, once the owner gives fal's figure), then B (a subject that recurs in the chosen
-plan). parallel-shots is HELD by the owner: do not start it. Everything is written out in
+Work in this order: A (Slice 8, once the owner gives fal's figure), then B (the first real reel under
+three-pictures). parallel-shots is HELD by the owner: do not start it. Everything is written out in
 PROMPTS/048-provider-figure-then-recurring-subject.md.
 
 WHAT IS ALREADY SETTLED, so do not ask any of it again:
@@ -40,7 +40,7 @@ WHAT IS ALREADY SETTLED, so do not ask any of it again:
 
 Start:
 1. `node scripts/decisions.mjs`. If it says commits are unpushed in the steering repository, say so and stop.
-2. Read CLAUDE.md; then JOURNAL.md's session 47 entry IN FULL; then DECISIONS.md's S-147, S-148 and S-149 (as amended).
+2. Read CLAUDE.md; then JOURNAL.md's session 47 entry IN FULL; then DECISIONS.md's S-147 to S-150.
 3. `node scripts/check.mjs` — confirm green before anything else. Session 47 saw its tests step fail twice and pass
    three times with no change; if it fails, find WHICH test before anything else (check.mjs prints 40 lines only).
 
@@ -49,12 +49,14 @@ A. SLICE 8. Ask the owner for fal's own figure for run f895e76d… and whether a
    in docs/features/paid-path.md, and run paid-path's journey. If the figures disagree, that is the finding: record it
    and say what it means for the budget guard before ticking anything.
 
-B. PICTURES AND GATE 7. Read S-149 as amended: a recurring subject reads as repetition to the scorer's fourth
-   question, which is Gate 7's. Put the choice to the owner with AskUserQuestion — for instance D-027's rule (a
-   picture only for a recurring subject), D-064's fourth question's wording, or leave both — each a change to a
-   verified feature and a D-entry, so gates first. Measure any wording for nothing first, as one-subject did
-   (.tmp/one-subject-measure.mjs is the pattern; it is not committed). A reel costs about 160-210c; do not run one
-   without the owner's go-ahead in this session.
+B. THE FIRST REEL UNDER THREE-PICTURES. Ask the owner for a go-ahead in THIS session; without it, stop. Then
+   `node --experimental-strip-types --no-warnings scripts/real-reel.mjs --model fal-ai/flux-2-pro/edit --voice
+   English_Graceful_Lady`, confirm its header prints `pictures upToThree`, read the estimate (140-210c), and type
+   `spend 250`. Read the run's plan rows: did the selected plan carry pictures: 'upToThree' and standalone
+   placements; how many pictures passed Gate 1; which shots were image-to-video; and what Gate 7 answered. A run that
+   fails partway has already spent: read its receipts and lost_call rows before anything else. If it passes Gate 7
+   WITH pictures, that is the first such reel: record it, and ask the owner whether the rule becomes the default
+   (three-pictures' Deferred item 1, gates first).
 
 How to work:
 - Never weaken a check or a test to reach green. Every fix by addition.

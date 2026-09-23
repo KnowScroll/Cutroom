@@ -5697,3 +5697,34 @@ the baseline had 0 — and **the scorer answered "no" to "does every shot show s
 and "yes" in every run without a picture.** A recurring subject reads as repetition to the scorer, and the same
 question is Gate 7's. D-027 makes a picture only for a subject that recurs; D-064's fourth question counts recurrence
 against the plan. Pictures AND Gate 7 may need one of those two to move, and that is the owner's call.
+
+## 2026-09-23 — session 47, continued: `three-pictures` built and verified, off by default
+
+**The owner chose option 1 of three** for S-149's finding — pictures for shots that hold none, not a rewording of the
+fourth question and not text-made reels — then, of two or three each: **up to three pictures, D-027's cap kept**; **a
+setting, default off, on for real reels**; and **skip a shot that shows an already-pictured subject** (S-150). Two
+findings on the way changed the design before any code: a derived picture is EDITED FROM the canonical (D-026, D-038),
+so pictures of other objects needed a new role, `standalone`, made from scratch; and review 1's first finding — a plan
+priced under one rule could be resumed by a worker set to another — put **the rule into the plan itself**.
+
+**Gates**: two review passes (twelve findings, then three), APPROVED at `80c07c5`. **Built in four slices**, each
+committed on a green `check.mjs`, each broken deliberately from a file and restored:
+
+| slice | what                                                      | broken by                                  | red        |
+| ----- | --------------------------------------------------------- | ------------------------------------------ | ---------- |
+| 1     | `PlanSettings.pictures`, `Plan.pictures`, the fill, price | the default flipped; the skip rule removed | 1, 4, 5; 3 |
+| 2     | the stage split by role; the standalone loop              | standalones routed down the derived path   | 6, 8–11    |
+| 3     | `real-reel.mjs` turns it on; check 12                     | the script set to `recurring`              | 12         |
+| 4     | check 13, PATH alone                                      | a twelfth check claimed                    | 13         |
+
+**Journeys PASS**: `three-pictures` 12 (+ check 12 in paid-path's file), `reel-plan` 50, `reel-stills` 63,
+`reel-render` 106. With the setting off every verified test runs unchanged, and check 1 holds the default path to a
+verbatim copy of the old placement.
+
+**Two things the build found.** Check 12 could not live in a `three-pictures-*` file — paid-path's check 20 lets one
+test file alone name the script that spends — so it lives there, titled as this feature's. And the trap of this
+repository fired twice more: a `RegExp.exec(` in that file tripped check 20's no-process scan (answered with
+`String.match`, the guard untouched), and a shell edit halved backslashes in a regex (caught, redone with the editor).
+
+**The real reel's estimate under the rule: 140–210¢** (0 to 4 image calls). **No reel was run**: that needs the owner's
+go-ahead. fal's figure for run `f895e76d…` is still owed for Slice 8.
