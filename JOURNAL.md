@@ -5803,9 +5803,22 @@ the join in general.
 
 **Why**: the owner is testing the engine with reels they describe.
 
-**Next**: the owner decides whether to rerun (unchanged, or with sentence 1 not ending on "Sun.") — no rerun without
-their yes. If the repeat recurs on other text, it is a finding for a feature (narration timings), not a brief fix.
+**Reel 2, run `879a27b7…`** — the owner chose option 2: sentence 1 reworded ("…far heavier than our own."). Plan 66 s;
+pictures 171 s — shots 0 and 1 accepted first time, **shot 2's "a star stretched into a long glowing stream" refused by
+Gate 1 twice, the stream clipped by the frame's edge** (D-046), so it degraded to words (D-050); clips — shots 0 and 1
+accepted first take (image-to-video), **shot 2's three text-made takes each failed Gate 2 on black frames at the end**
+(0.9 s, 2 s + 1.3 s frozen, 0.7 s, all after 11.6 s). A frame read at 12.9 s is entirely black: the model acted out
+sentence 6's "before it disappears for good" and faded the swirl to nothing. With no picture to hold, the reel **stopped
+at rule gate-2** (S-090). **53c** (4 images 20c, 5 clips 33c), 8.5 min, no `lost_call`. Both refusals are the brief's
+c3 — a long thing in a tall frame, and a sentence that asks for darkness — so a brief change can fix it.
 
-| runId       | description                                                                        | cost | time    | finished | why                                                                   |
-| ----------- | ---------------------------------------------------------------------------------- | ---- | ------- | -------- | --------------------------------------------------------------------- |
-| `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | 15c  | 3.6 min | no       | MiniMax repeated "Sun." in shot 0's word timings; stage parse refused |
+**Also this session**: the owner asked for a feature that keeps a failed run's good pieces and remakes only what failed —
+`docs/features/resume-failed.md`, `planned`, gates not written, five questions for the owner in it. Run `879a27b7…`
+would have kept two pictures and two accepted clips (22c, about 4 min).
+
+**Next**: the owner decides on c3's change; no rerun without their yes.
+
+| runId       | description                                                                        | cost | time    | finished | why                                                                                        |
+| ----------- | ---------------------------------------------------------------------------------- | ---- | ------- | -------- | ------------------------------------------------------------------------------------------ |
+| `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | 15c  | 3.6 min | no       | MiniMax repeated "Sun." in shot 0's word timings; stage parse refused                      |
+| `879a27b7…` | the same, sentence 1 reworded                                                      | 53c  | 8.5 min | no       | shot 2: picture clipped twice; three clips fade to black on "disappears for good" (Gate 2) |
