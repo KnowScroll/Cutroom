@@ -74,10 +74,13 @@ function request(requestId, budgetCents) {
       { text: 'A slatted white box on the grass held his thermometers.', claimIds: ['c3'] },
       { text: 'He read them at the same hour, whatever the sea was doing.', claimIds: ['c3'] },
       {
-        text: 'A century later those columns became a record of the water itself.',
+        text: 'A century later his logbook stands closed on an archive shelf.',
         claimIds: ['c4'],
       },
-      { text: 'Kept things outlive the reason they were kept.', claimIds: ['c4'] },
+      {
+        text: 'Its columns became a record of the water itself; kept things outlive their reason.',
+        claimIds: ['c4'],
+      },
     ],
     claims: [
       { id: 'c1', role: 'main' },
@@ -109,6 +112,14 @@ function request(requestId, budgetCents) {
       // wanted was looser framing. The clipping rule already judges framing; the criterion says
       // what must be in the picture and nothing about how it sits.
       //
+      // AND ONE SUBJECT RECURS, IN TWO OF THE FOUR SHOTS (S-145, S-146). Four different scenes share
+      // no subject, and the reel of 2026-09-22 measured what that does: the stills stage ran in
+      // 0.0 s, made no picture, and every clip was bought text-to-video. So the logbook appears
+      // twice — open on a desk under lamplight (c2), and closed on an archive shelf a century later
+      // (c4) — and the four scenes still differ in place, object and hour: a lamp room at night, a
+      // desk at night, grass in daylight, an archive by day. The stills stage has a subject to carry
+      // and Gate 1S has a pair to compare; Gate 7 still sees four different things.
+      //
       // AND NO CRITERION REQUIRES A PERSON. `show-keeper` required a lighthouse keeper while
       // `never-person` forbade one in the reconciler's reading, and a criterion violated by
       // satisfying another criterion cannot be met by any picture (S-134). The narration still
@@ -132,7 +143,12 @@ function request(requestId, budgetCents) {
           type: 'presence',
           claimId: 'c3',
         },
-        { id: 'show-sea', text: 'open sea at first light', type: 'presence', claimId: 'c4' },
+        {
+          id: 'show-archive',
+          text: 'a closed handwritten logbook on a shelf in a daylit archive',
+          type: 'presence',
+          claimId: 'c4',
+        },
       ],
       // "ANY REAL LIVING PERSON" IS WHAT THE POLICY MEANS BY A RECOGNISABLE ONE, and a reconciler
       // reads it literally: shown a lighthouse keeper — which the earlier `show-keeper` REQUIRED —
