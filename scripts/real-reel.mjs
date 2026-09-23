@@ -62,30 +62,47 @@ function request(requestId, budgetCents) {
   return {
     contractVersion: 1,
     requestId,
-    worldId: 'cutroom-first-real-reel',
+    // Session 48's reel, the owner's description: how black holes form, what they are, how they
+    // interact, and their types — surface level, between real and animated (S-134: the caller's text).
+    worldId: 'cutroom-black-holes',
     narration: [
-      { text: 'For forty years a lamp on a headland was lit at dusk.', claimIds: ['c1'] },
-      { text: 'It turned all night above water nobody else was watching.', claimIds: ['c1'] },
       {
-        text: 'Before he slept, the keeper wrote the hour and the weather down.',
+        text: 'A black hole begins with a giant star, many times heavier than our Sun.',
+        claimIds: ['c1'],
+      },
+      {
+        text: 'When its fuel runs out, the core collapses and the star explodes.',
+        claimIds: ['c1'],
+      },
+      {
+        text: 'What is left is crushed into a space far smaller than a city.',
         claimIds: ['c2'],
       },
-      { text: 'The log was a condition of the job, and he met it.', claimIds: ['c2'] },
-      { text: 'A slatted white box on the grass held his thermometers.', claimIds: ['c3'] },
-      { text: 'He read them at the same hour, whatever the sea was doing.', claimIds: ['c3'] },
       {
-        text: 'A century later his logbook stands closed on an archive shelf.',
+        text: 'Its edge is the event horizon; past it, not even light escapes.',
+        claimIds: ['c2'],
+      },
+      {
+        text: 'A star that drifts too close is stretched into a long thin stream.',
+        claimIds: ['c3'],
+      },
+      {
+        text: 'That gas swirls inward, glowing hot, before it disappears for good.',
+        claimIds: ['c3'],
+      },
+      {
+        text: 'Most black holes weigh a few Suns, each left behind by a single star.',
         claimIds: ['c4'],
       },
       {
-        text: 'Its columns became a record of the water itself; kept things outlive their reason.',
+        text: 'At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.',
         claimIds: ['c4'],
       },
     ],
     claims: [
       { id: 'c1', role: 'main' },
-      { id: 'c2', role: 'supporting' },
-      { id: 'c3', role: 'main' },
+      { id: 'c2', role: 'main' },
+      { id: 'c3', role: 'supporting' },
       { id: 'c4', role: 'supporting' },
     ],
     criteria: {
@@ -128,29 +145,26 @@ function request(requestId, budgetCents) {
       // has its keeper; the pictures are of what he kept.
       mustShow: [
         {
-          id: 'show-lamp',
-          text: 'a lighthouse lamp of glass and brass',
+          id: 'show-explosion',
+          text: 'a giant star exploding in space',
           type: 'presence',
           claimId: 'c1',
         },
         {
-          id: 'show-log',
-          text: 'an open handwritten logbook on a desk',
+          id: 'show-horizon',
+          text: 'a black sphere circled by a ring of glowing gas',
           type: 'presence',
           claimId: 'c2',
         },
         {
-          id: 'show-box',
-          text: 'a white slatted wooden instrument box standing on grass',
+          id: 'show-stream',
+          text: 'a star stretched into a long glowing stream',
           type: 'presence',
           claimId: 'c3',
         },
         {
-          id: 'show-archive',
-          // SIMPLER, after run a08a9c9c (S-151): a text-made clip failed Gate 5 twice on "a closed
-          // handwritten logbook on a shelf in a daylit archive" — one object, in one state, in one place.
-          // The owner chose to simplify it, the caller's own text (S-134): what must be seen, no more.
-          text: 'a shelf of old bound logbooks in daylight',
+          id: 'show-galaxy',
+          text: 'a spiral galaxy with a bright glowing centre',
           type: 'presence',
           claimId: 'c4',
         },
@@ -162,11 +176,15 @@ function request(requestId, budgetCents) {
       // moved (S-134).
       mustNotShow: [
         { id: 'never-person', text: 'a recognisable real-world public figure', type: 'presence' },
-        { id: 'never-modern', text: 'a computer screen', type: 'presence' },
+        { id: 'never-text', text: 'written words or labels', type: 'presence' },
       ],
       depictionPolicyVersion: 'policy-3',
     },
-    style: { id: 'style-1', version: 2, text: 'quiet, precise, natural light' },
+    style: {
+      id: 'style-black-holes',
+      version: 1,
+      text: 'semi-realistic animation, between real footage and illustration, soft cosmic glow, calm',
+    },
     options: { until: 'video', budgetCents },
   }
 }
