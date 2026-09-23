@@ -5822,11 +5822,22 @@ P-004. Plan 61 s; shot 0's picture accepted; then **failed at 137 s**: MiniMax-M
 gave `count` as a string for two entities, and an answer that does not parse fails the run (S-042). **10c**, no
 `lost_call`. P-004 — the second run in three failed by one model's malformed answer.
 
-**Next**: the owner decides: rerun unchanged, or stop reels until a feature re-asks a model once on an answer that does
-not parse. No rerun without their yes.
+**Reel 4, run `c52d418a…`** — the owner chose option 3: rerun unchanged, and put the fix into the next prompt. Plan
+53 s; shot 0's picture refused once (clipped, count) and its repair accepted; then **failed at 160 s on the witness's
+answer for shot 1's picture again** — a count of 0 this time. **15c.** Two runs, one shot, two malformed counts; both
+pictures are good by eye. P-004 updated: a kind of picture, not chance, and the brief cannot fix it. Reels stopped.
+
+**Session 48 in all: four runs, none finished, 93c.** Two brief faults fixed in the brief (P-002, P-003); three runs
+lost to one malformed model answer each (P-001, P-004). `docs/reel-pitfalls.md` keeps them, with a short list of what
+to fix and what to review. `docs/features/resume-failed.md` is planned. `PROMPTS/048`'s Run line set;
+`PROMPTS/049-ask-again-then-the-reel.md` written: a feature, gates first, that asks a model once more when its answer
+does not parse and keeps the raw answer — then the black-holes reel as committed.
+
+**Next**: `PROMPTS/049`.
 
 | runId       | description                                                                        | cost | time    | finished | why                                                                                        |
 | ----------- | ---------------------------------------------------------------------------------- | ---- | ------- | -------- | ------------------------------------------------------------------------------------------ |
 | `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | 15c  | 3.6 min | no       | MiniMax repeated "Sun." in shot 0's word timings; stage parse refused                      |
 | `879a27b7…` | the same, sentence 1 reworded                                                      | 53c  | 8.5 min | no       | shot 2: picture clipped twice; three clips fade to black on "disappears for good" (Gate 2) |
 | `c9f3df47…` | the same, c3 compact and lit                                                       | 10c  | 2.3 min | no       | witness gave a count as a string for shot 1's picture (P-004)                              |
+| `c52d418a…` | the same, unchanged                                                                | 15c  | 2.7 min | no       | witness gave a count of 0 for shot 1's picture (P-004 again)                               |

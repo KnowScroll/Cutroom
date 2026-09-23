@@ -20,7 +20,7 @@ question to look at, or an owner's choice, before anything is built.
 
 | what                                                                                    | kind   | from         | state                                         |
 | --------------------------------------------------------------------------------------- | ------ | ------------ | --------------------------------------------- |
-| **Re-ask a model once when its answer does not parse**, instead of failing the run      | fix    | P-001, P-004 | next session's work (owner, option 3)         |
+| **Re-ask a model once when its answer does not parse**, instead of failing the run      | fix    | P-001, P-004 | `PROMPTS/049`; P-004 recurred on reel 4       |
 | **Keep the raw answer of a model whose answer did not parse**, so it can be read        | fix    | P-004        | next session's work, with the line above      |
 | **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | planned, five owner questions open            |
 | Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | owner; the re-ask above supersedes it in part |
@@ -40,7 +40,13 @@ question to look at, or an owner's choice, before anything is built.
 - **Cause.** The provider's answer. Likely, not proven: a space picture is full of things no one counts — stars, dust,
   particles — and the model wrote something like "many" where a number belongs. Shot 0's stored observation shows
   the witness describing "scattered background stars" as `count: 1`, so it copes sometimes.
-- **Done.** Nothing to the brief yet; the owner is asked.
+- **Recurred** on run `c52d418a…` (reel 4, the brief unchanged, the owner's option 3): the witness's answer for shot 1's
+  picture again — `entities.2.count: Too small: expected number to be >0`, a count of 0 — at 160 s, 15¢. **Two runs, the
+  same shot, two different malformed counts.** Both pictures, read by eye, are good: a black disc in a bright ring of gas
+  on a starfield. So it is this kind of picture, not chance — likely an entity the witness lists as there but
+  uncountable (the dark centre, the starfield) — and still not provable without the raw answer.
+- **Done.** Nothing to the brief: it cannot fix a model writing the wrong type. Reels stopped; the fix is
+  `PROMPTS/049`'s feature, the owner's choice.
 - **For good.** The brief cannot reliably stop a model writing a word for a number. Engine options, each a feature:
   ask the witness once more on an answer that does not parse (as a provider's transient fault is); or keep the raw
   answer of a failed parse, so the next one of these can be read rather than guessed. And `resume-failed` would have

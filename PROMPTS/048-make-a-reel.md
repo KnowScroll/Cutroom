@@ -5,7 +5,7 @@
 - **Work:** the owner describes a reel in plain words; turn it into a brief, show it, run it on real providers, hand
   back the file. Repeat for as many reels as the owner asks for. **`parallel-shots` is still held.**
 - **Written:** 2026-09-23, at the end of session 47 (replacing the earlier 048, all of whose work session 47 finished)
-- **Run:** not yet
+- **Run:** session 48, 2026-09-24 — four runs of one brief (black holes), none finished, 93¢
 
 **Where things stand.** Session 47 finished everything the earlier 048 asked for: `paid-path` is verified with fal's
 own figures read (S-154); real reels make up to three pictures by default (S-153); fal video is priced at 0.5¢ a
