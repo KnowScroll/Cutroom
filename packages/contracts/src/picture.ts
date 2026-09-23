@@ -140,7 +140,8 @@ export interface PictureRecord {
   attempt: number
   shotUnit: number
   subjectId: string
-  role: 'canonical' | 'derived'
+  /** `standalone`: made once, from scratch, on a shot naming no pictured subject (S-150). */
+  role: 'canonical' | 'derived' | 'standalone'
   label: string
   path: string
   prompt: string

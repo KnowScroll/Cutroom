@@ -12,6 +12,7 @@ import { Criterion, PlanVaryOn, type SubmitRequest } from '@cutroom/reel-contrac
 import { estimate } from '../estimate.ts'
 import { gate0 } from '../gates/index.ts'
 import { plannedImageCalls, rankSubjects } from '../rank.ts'
+import { plannedImageCallsFor } from '../stills/ladder.ts'
 import { groupSentences } from '../split/index.ts'
 import {
   SCORE_QUESTIONS,
@@ -47,6 +48,7 @@ export const DEFAULT_PLAN_SETTINGS: PlanSettings = {
     questions: SCORE_QUESTIONS, // D-064, provisional until M-1
     weights: { coverage: 1, recurrence: 1, order: 1, pacing: 1, juxtaposition: 1, distinct: 1 },
   },
+  pictures: 'recurring', // D-027's rule; 'upToThree' only by setting (S-150)
 }
 
 const planSchema = z.strictObject({
@@ -63,6 +65,8 @@ const planSchema = z.strictObject({
   criteria: z.strictObject({ mustShow: z.array(Criterion), mustNotShow: z.array(Criterion) }),
   plannedImageCalls: z.number().int().min(0).max(4),
   estimateCents: z.number().int().min(0),
+  // Present only when the plan was made under 'upToThree' (S-150), so a default plan is unchanged.
+  pictures: z.literal('upToThree').optional(),
 })
 
 /**
@@ -100,7 +104,13 @@ function build(
     .sort((x, y) => x.unit - y.unit)
     .map((shot) => ({ ...shot, subjectIds: [...shot.subjectIds] }))
   const subjects = answer.subjects.map((subject) => ({ ...subject }))
-  const calls = plannedImageCalls(rankSubjects({ shots, subjects }))
+  // Under the default the count is D-027's, exactly as before. Under 'upToThree' it is the placement's
+  // own, and the rule is stored WITH the plan so its pictures are made under the rule it was priced
+  // and admitted under, whichever worker makes them (docs/features/three-pictures.md, S-150).
+  const upToThree = settings.pictures === 'upToThree'
+  const calls = upToThree
+    ? plannedImageCallsFor({ shots, subjects, pictures: 'upToThree' })
+    : plannedImageCalls(rankSubjects({ shots, subjects }))
   return {
     role,
     units,
@@ -113,6 +123,7 @@ function build(
     },
     plannedImageCalls: calls,
     estimateCents: estimate({ shots, plannedImageCalls: calls }, settings),
+    ...(upToThree ? { pictures: 'upToThree' as const } : {}),
   }
 }
 

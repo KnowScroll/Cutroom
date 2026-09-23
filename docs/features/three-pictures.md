@@ -215,7 +215,7 @@ Whether the first named subject is the right label for a many-subject shot's sta
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the setting, the stored rule, placement and price.** `PlanSettings.pictures`, `Plan.pictures`,
+- [x] **Slice 1 — the setting, the stored rule, placement and price.** `PlanSettings.pictures`, `Plan.pictures`,
       `PictureRecord.role` and the domain enum type (widened together, so the typecheck stays green); the fill;
       `plannedImageCallsFor`; `build()`; `CUTROOM_PICTURES`; the worker's refusal. **Proves: 1, 2, 3, 4, 5.**
 - [ ] **Slice 2 — the standalone picture.** The entry and prompt; the stills stage split by role and its loop; the

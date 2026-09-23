@@ -87,4 +87,5 @@ export type {
   RenderShot,
   StillHoldShot,
 } from './render.ts'
-export type { PlanSettings, RenderSettings, StillsSettings } from './settings.ts'
+export type { PictureRule, PlanSettings, RenderSettings, StillsSettings } from './settings.ts'
+export { PICTURE_RULES } from './settings.ts'

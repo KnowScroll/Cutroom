@@ -4,7 +4,8 @@ import type { GateProfile, OutputProfile } from './render.ts'
 
 // What planning, the stills stage and the render read from settings rather than from code
 // (docs/features/reel-plan.md, Gate 2; docs/features/reel-stills.md and reel-render.md, Gate 3).
-// The types only; the defaults arrive with the code that reads them.
+// The types, and one closed set a setting is refused against (S-150); the defaults arrive with the
+// code that reads them.
 
 export interface PlanSettings {
   /** The two unit counts a `shotCount` fork cuts the narration into (D-112). Default [4, 6]. */
@@ -19,7 +20,19 @@ export interface PlanSettings {
   models: Record<ModelRole, string>
   /** The plan score's four closed questions and every weight — provisional until M-1 (D-064). */
   score: { questions: readonly [string, string, string, string]; weights: Record<string, number> }
+  /**
+   * Which shots get a picture (docs/features/three-pictures.md, S-150). `'recurring'` — the default,
+   * and every verified feature's — is D-027's: pictures only for subjects that recur. `'upToThree'`
+   * gives the free slots, up to three pictures in all, to the earliest shots holding none and naming
+   * no pictured subject. It decides only how the plans made under these settings are built; the
+   * pictures are placed by the rule stored WITH the plan (`Plan.pictures`).
+   */
+  pictures: PictureRule
 }
+
+/** The closed set of picture rules (S-150). */
+export const PICTURE_RULES = ['recurring', 'upToThree'] as const
+export type PictureRule = (typeof PICTURE_RULES)[number]
 
 export interface StillsSettings {
   /**

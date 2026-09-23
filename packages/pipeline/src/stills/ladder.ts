@@ -1,4 +1,5 @@
-import type { Placement } from './place.ts'
+import type { Plan } from '@cutroom/contracts'
+import { placePictures, type Placement } from './place.ts'
 
 // The reserve, and the cap on a shot's repairs (docs/features/reel-stills.md, Gate 2 "The ladders
 // and the reserve"; D-014, D-027, D-048, S-043).
@@ -15,6 +16,17 @@ export const REPAIRS_PER_SHOT = 2
  */
 export function placementCalls(placements: readonly Placement[]): number {
   return placements.reduce((calls, p) => calls + (p.role === 'canonical' ? 2 : 1), 0)
+}
+
+/**
+ * The image calls a plan made under `pictures: 'upToThree'` plans: its placement's own calls — at most
+ * 3 with no canonical, at most 4 with one, as few as 0 (docs/features/three-pictures.md, S-150). The
+ * plan stage uses it ONLY under that rule; under the default it keeps D-027's
+ * `plannedImageCalls(rankSubjects(…))`, which differs from the placement's calls where S-039 leaves a
+ * rank without a shot, and must go on differing.
+ */
+export function plannedImageCallsFor(plan: Pick<Plan, 'shots' | 'subjects' | 'pictures'>): number {
+  return placementCalls(placePictures(plan))
 }
 
 /**

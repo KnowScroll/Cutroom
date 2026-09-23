@@ -131,7 +131,8 @@ export const picture = sqliteTable(
     attempt: integer('attempt').notNull(),
     shotUnit: integer('shot_unit').notNull(),
     subjectId: text('subject_id').notNull(),
-    role: text('role', { enum: ['canonical', 'derived'] }).notNull(),
+    // A text column with no CHECK: 'standalone' (S-150) needed no migration, as readText did not (S-126).
+    role: text('role', { enum: ['canonical', 'derived', 'standalone'] }).notNull(),
     label: text('label').notNull(),
     path: text('path').notNull(),
     prompt: text('prompt').notNull(),

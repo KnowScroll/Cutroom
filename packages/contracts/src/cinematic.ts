@@ -31,6 +31,12 @@ export interface Plan {
   plannedImageCalls: number
   /** Integer cents, computed by code after the call (D-035, D-083). */
   estimateCents: number
+  /**
+   * The picture rule this plan was priced and admitted under, present ONLY when it is not the
+   * default — so a plan made under `'recurring'` is byte-identical to one made before this field
+   * existed. Placement reads this, never a worker's setting (S-150, D-083).
+   */
+  pictures?: 'upToThree'
 }
 
 /** Two plans of the same words, and the axis they differ on — required, never defaulted here (D-062, D-078). */

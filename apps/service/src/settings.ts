@@ -5,7 +5,12 @@ import {
   type ProviderPort,
   type ProviderSettings,
 } from '@cutroom/contracts'
-import type { PlanSettings, RenderSettings } from '@cutroom/contracts'
+import {
+  PICTURE_RULES,
+  type PictureRule,
+  type PlanSettings,
+  type RenderSettings,
+} from '@cutroom/contracts'
 import { BUDGET_MD, DEFAULT_LEASE_MS } from '@cutroom/domain'
 import { DEFAULT_PLAN_SETTINGS, DEFAULT_RENDER_SETTINGS, TAKES_A_SHOT } from '@cutroom/pipeline'
 import {
@@ -91,6 +96,7 @@ export const SETTING_NAMES = {
   falStorageBaseUrl: 'CUTROOM_FAL_STORAGE_BASE_URL',
   falImageModel: 'CUTROOM_FAL_IMAGE_MODEL',
   narrationVoice: 'CUTROOM_NARRATION_VOICE',
+  pictures: 'CUTROOM_PICTURES',
 } as const
 
 /** `CUTROOM_PROVIDER_MODEL`, `_IMAGE`, `_SENSOR`, `_VIDEO`, `_NARRATION` (S-108). */
@@ -149,6 +155,18 @@ const text = (env: Env, name: string, fallback: string): string => {
   return raw === undefined || raw.trim() === '' ? fallback : raw
 }
 
+/** `CUTROOM_PICTURES`: absent is D-027's `'recurring'`; a value outside the closed set is refused (S-150). */
+function pictureRule(env: Env): PictureRule {
+  const raw = text(env, SETTING_NAMES.pictures, DEFAULT_PLAN_SETTINGS.pictures)
+  const rule = PICTURE_RULES.find((r) => r === raw)
+  if (rule === undefined) {
+    throw new Error(
+      `${SETTING_NAMES.pictures} is '${raw}', and a picture rule is one of ${PICTURE_RULES.map((r) => `'${r}'`).join(', ')} (S-150)`,
+    )
+  }
+  return rule
+}
+
 /** One adapter name per port, each from its closed set, every default `'fake'` (S-108). */
 function providers(env: Env): ProviderSettings {
   const read = <P extends ProviderPort>(port: P): ProviderSettings[P] =>
@@ -200,6 +218,9 @@ export function readSettings(env: Env): ServiceSettings {
   // dashboard one line in `packages/providers` moves and both the estimate and the receipt follow.
   const planSettings: PlanSettings = {
     ...DEFAULT_PLAN_SETTINGS,
+    // Which shots get a picture (S-150): D-027's rule unless a real reel's caller turns the fill on.
+    // Refused here, before anything is built, if it names no rule (S-075's form).
+    pictures: pictureRule(env),
     ...(settings.image === 'fake' ? {} : { imageRateCents: imageRateCents(entry) }),
     ...(settings.video === 'fake' ? {} : { videoRateCentsPerSecond: H3_TURBO.rateCentsPerSecond }),
   }
@@ -258,6 +279,7 @@ export function banner(settings: ServiceSettings, baseUrl: string): string {
     `  image      ${settings.falImageSlug} at ${settings.planSettings.imageRateCents} cents`,
     `  video      ${settings.planSettings.videoRateCentsPerSecond} cents a second`,
     `  voice      ${settings.renderSettings.voice}`,
+    `  pictures   ${settings.planSettings.pictures}`,
     `  lease      ${settings.leaseMs} ms`,
     `  listening  ${baseUrl}`,
     '',

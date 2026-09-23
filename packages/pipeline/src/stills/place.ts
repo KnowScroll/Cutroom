@@ -8,7 +8,7 @@ import { rankSubjects } from '../rank.ts'
 export interface Placement {
   subjectId: string
   shotUnit: number
-  role: 'canonical' | 'derived'
+  role: 'canonical' | 'derived' | 'standalone'
 }
 
 /** `shot-<unit>`: how the contract names a shot. */
@@ -37,8 +37,15 @@ export function readPictureId(
  * what D-029 part 2 forbids, and every one of those shots already opens with a checked picture
  * (S-039). Every other shot has no picture (D-027), and a plan with no subject in two shots places
  * nothing.
+ *
+ * UNDER THE PLAN'S OWN `pictures: 'upToThree'` (docs/features/three-pictures.md, S-150), the free
+ * slots — up to three pictures in all — then go to the earliest shots holding no picture AND naming
+ * no subject any placed shot names, one `standalone` each, labelled by the shot's first subject. A
+ * picture shows every subject its shot names, so a shot that shows a pictured subject is passed
+ * over rather than drawn again from nothing. The rule is the PLAN'S, never a worker's setting, so
+ * pictures are made under the rule the plan was priced and admitted under (D-083).
  */
-export function placePictures(plan: Pick<Plan, 'shots' | 'subjects'>): Placement[] {
+export function placePictures(plan: Pick<Plan, 'shots' | 'subjects' | 'pictures'>): Placement[] {
   const held = new Set<number>()
   const placed: Placement[] = []
   rankSubjects(plan)
@@ -49,5 +56,17 @@ export function placePictures(plan: Pick<Plan, 'shots' | 'subjects'>): Placement
       held.add(shot.unit)
       placed.push({ subjectId, shotUnit: shot.unit, role: rank === 0 ? 'canonical' : 'derived' })
     })
+  if (plan.pictures !== 'upToThree') return placed
+
+  const pictured = new Set(plan.shots.filter((s) => held.has(s.unit)).flatMap((s) => s.subjectIds))
+  for (const shot of plan.shots) {
+    if (placed.length >= 3) break
+    const [first] = shot.subjectIds
+    if (held.has(shot.unit) || first === undefined) continue
+    if (shot.subjectIds.some((id) => pictured.has(id))) continue
+    held.add(shot.unit)
+    for (const id of shot.subjectIds) pictured.add(id)
+    placed.push({ subjectId: first, shotUnit: shot.unit, role: 'standalone' })
+  }
   return placed
 }

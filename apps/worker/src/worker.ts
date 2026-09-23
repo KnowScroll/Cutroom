@@ -10,6 +10,7 @@ import type {
   StillsSettings,
   VideoPort,
 } from '@cutroom/contracts'
+import { PICTURE_RULES } from '@cutroom/contracts'
 import {
   ASSEMBLE_JOB,
   BUDGET_MD,
@@ -111,6 +112,12 @@ function refusal(
   stills: StillsSettings,
   render: RenderSettings,
 ): string | undefined {
+  // The picture rule a plan is built under (S-150). A worker handed settings directly, not through
+  // the service, must not fall into a default silently.
+  const pictures = (options.settings ?? DEFAULT_PLAN_SETTINGS).pictures
+  if (!PICTURE_RULES.some((rule) => rule === pictures)) {
+    return `the picture rule is '${String(pictures)}', and it is one of ${PICTURE_RULES.join(', ')} (S-150)`
+  }
   if (!options.image.acceptsReferences) {
     return 'the image port does not accept reference pictures, so no derived picture could be made from the canonical (D-026)'
   }
