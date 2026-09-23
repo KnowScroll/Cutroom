@@ -5,7 +5,7 @@ authority: plan
 
 # second-ask — a witness whose answer the gate cannot read is asked once more, and only once
 
-Status: planned
+Status: verified
 Decisions: D-005, D-031, D-033, D-041, D-042, D-044, D-045, D-051, D-053, D-084, D-086, I-8, I-15, S-028, S-031, S-037, S-038, S-042, S-046, S-072, S-096, S-099, S-111, S-113, S-125, S-126, S-129, S-130, S-136, S-137, S-139, S-142, S-144, S-146, S-147
 Named only in the deferral list: D-023, S-115
 Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED 2026-09-23 adversarial-reviewer · program-design APPROVED 2026-09-23 adversarial-reviewer · slices APPROVED 2026-09-23 adversarial-reviewer
@@ -246,6 +246,8 @@ Every check appears in exactly one slice: 5 + 3 + 1 = 9.
 3. **Every ask is on the record**, so the rate S-144 measured stays countable from the receipts of real runs.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-23 journey=PASS at cd89df7 — every check green; 9 tests in tests/second-ask-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
