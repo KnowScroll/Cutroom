@@ -5792,12 +5792,20 @@ or labels"; new world `cutroom-black-holes`, style `style-black-holes` v1. The o
 reel to 35–45 s, so the brief aims at about 42.
 
 **Observed**: decisions pin current, 0 unpushed; `check.mjs` green before anything. Header `pictures upToThree`,
-estimate 18–53c, ceiling 250c. Run `ee63e617…` submitted; in progress at the time of this entry.
+estimate 18–53c, ceiling 250c. Run `ee63e617…`: plan 79 s (Gate 0 accept); stills 133 s, three pictures made by `fal-ai/flux-2-pro`, each
+accepted by Gate 1 first time, no repair; then **failed 6 s into video, before any clip was bought**: the first shot's
+narration (sentences 1–2, 26 words) came back from MiniMax `speech-2.8-hd` with word timings giving 38 tokens — "…than
+our Sun. Sun. When its…" — the last word of the first sentence **repeated by the provider** at the sentence boundary,
+so the adapter's join fell back to bare sub-word tokens and the stage's parse (`narration.ts`, S-070) refused it. No
+retake: a narration that does not parse fails the run (S-042). **Spent 15c** (3 images at 5c; model and speech 0c), no
+`lost_call` rows. Earlier reels spoke two sentences a shot and parsed, so this is the provider's answer to this text, not
+the join in general.
 
 **Why**: the owner is testing the engine with reels they describe.
 
-**Next**: hand the reel over when it ends, and fill in the reel list below.
+**Next**: the owner decides whether to rerun (unchanged, or with sentence 1 not ending on "Sun.") — no rerun without
+their yes. If the repeat recurs on other text, it is a finding for a feature (narration timings), not a brief fix.
 
-| runId | description | cost | time | finished | why |
-| ----- | ----------- | ---- | ---- | -------- | --- |
-| `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | — | — | running | — |
+| runId       | description                                                                        | cost | time    | finished | why                                                                   |
+| ----------- | ---------------------------------------------------------------------------------- | ---- | ------- | -------- | --------------------------------------------------------------------- |
+| `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | 15c  | 3.6 min | no       | MiniMax repeated "Sun." in shot 0's word timings; stage parse refused |

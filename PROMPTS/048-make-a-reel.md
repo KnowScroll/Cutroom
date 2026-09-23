@@ -60,4 +60,7 @@ How to work:
 - Never print a key and never read .env to show one.
 - No absolute path in any committed file (D-086); the paths you tell me in chat are fine.
 - Close out with a JOURNAL.md entry, this prompt's Run line set here and in PROMPTS/README.md (S-065), and PROMPTS/049.
+
+
+Description : A reel that explain to the person how Black holes work, how they come into existance and how they work, what types of black holes exist. I need it to show visuals of the black hole and interactions, what it is made of ,etc. It should be animated (not super animated but a on a line between real and animated). Dont go into high details but surface level for a 50s reel.
 ```
