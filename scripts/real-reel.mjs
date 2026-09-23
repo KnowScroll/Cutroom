@@ -89,7 +89,9 @@ function request(requestId, budgetCents) {
         claimIds: ['c3'],
       },
       {
-        text: 'That gas swirls inward, glowing hot, before it disappears for good.',
+        // Reworded after run 879a27b7 (session 48): "before it disappears for good" made every
+        // text-made take fade to black, and Gate 2 refused all three (docs/reel-pitfalls.md).
+        text: 'That gas swirls inward, glowing hot, in a bright spiral.',
         claimIds: ['c3'],
       },
       {
@@ -160,7 +162,9 @@ function request(requestId, budgetCents) {
         },
         {
           id: 'show-stream',
-          text: 'a star stretched into a long glowing stream',
+          // Changed after run 879a27b7: "a long glowing stream" crossed the tall frame, and Gate 1
+          // refused it twice as clipped by the edge (D-046). Compact, so it fits.
+          text: 'a star being torn into a bright swirl of glowing gas',
           type: 'presence',
           claimId: 'c3',
         },
