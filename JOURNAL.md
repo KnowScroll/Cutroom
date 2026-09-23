@@ -5781,3 +5781,23 @@ see its brief, approve it, get the file — with the brief-writing lessons of se
 times (7.5 and 27.5 min for the two finished reels; expect 10–25). **Asked whether KnowScroll can use the engine now**:
 the engine works end to end on this machine and its contract is verified, but nothing on KnowScroll's side calls it
 yet, it listens on loopback only (D-098), and two finished real reels are not yet a reliability figure.
+
+## 2026-09-24 — session 48: the owner's reels, made from their descriptions (PROMPTS/048)
+
+**Changed**: `scripts/real-reel.mjs`' `request()` only — the caller's text (S-134), no gate, no check, no policy
+moved. Brief for reel 1, approved by the owner: black holes — how one forms, what it is, how it interacts, its types;
+eight sentences, four claims, four scenes (an exploding star, a black sphere ringed by glowing gas, a star stretched
+into a stream, a spiral galaxy); mustNotShow keeps the public figure and swaps "a computer screen" for "written words
+or labels"; new world `cutroom-black-holes`, style `style-black-holes` v1. The owner asked for about 50 s; D-111 holds a
+reel to 35–45 s, so the brief aims at about 42.
+
+**Observed**: decisions pin current, 0 unpushed; `check.mjs` green before anything. Header `pictures upToThree`,
+estimate 18–53c, ceiling 250c. Run `ee63e617…` submitted; in progress at the time of this entry.
+
+**Why**: the owner is testing the engine with reels they describe.
+
+**Next**: hand the reel over when it ends, and fill in the reel list below.
+
+| runId | description | cost | time | finished | why |
+| ----- | ----------- | ---- | ---- | -------- | --- |
+| `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | — | — | running | — |
