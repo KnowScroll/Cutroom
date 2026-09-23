@@ -229,7 +229,7 @@ every `check.mjs` like every other test. Check 13's child therefore expects chec
       blocks. **Proves: 6, 7, 8, 9, 10.**
 - [x] **Slice 3 — the clips stage, and the real reel's switch.** Check 11; `reel-render`'s amendment block;
       `scripts/real-reel.mjs`. **Proves: 11, 12.**
-- [ ] **Slice 4 — the journey.** Check 13; this feature's journey, and `reel-plan`'s, `reel-stills`' and
+- [x] **Slice 4 — the journey.** Check 13; this feature's journey, and `reel-plan`'s, `reel-stills`' and
       `reel-render`'s again (S-099's form). **Proves: 13.**
 
 Every check appears in exactly one slice: 5 + 5 + 2 + 1 = 13.
