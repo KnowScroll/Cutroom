@@ -10,6 +10,13 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `second-ask` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
+> (**S-147**). Gate 4 now asks once more when its answer is refused. **The labels check's `r14-failed` fixture gives
+> shot 3's take its wrong answer TWICE** — with one, the second ask would run off the script's end and the run would
+> fail on a thrown call, which the check never read closely enough to tell from a refusal — and it gains two
+> assertions: the detail is _"the witness's answer for <take> is not a clip observation: …"_, and that take has two
+> `observe` receipts. Nothing else in this feature moves, and its journey is run again in `second-ask`'s last slice.
+>
 > **Amended by `paid-failures` on 2026-09-22 — the gates below are not edited, and no assertion is removed**
 > (**S-143**). **Check 1's video arm reads `'kind' | 'detail' | 'spent'`**, and it is pinned as a whole object type
 > rather than as a key list alone, so it is NARROWER than what it replaced: a third key still fails it, and now a

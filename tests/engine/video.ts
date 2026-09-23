@@ -17,6 +17,7 @@ import {
   showsPerson,
   stillsRequest,
   stillsScript,
+  witnessAnswers,
   type Entity,
   type Pic,
   type Shape,
@@ -270,7 +271,7 @@ export function videoScript(
     planner: stills.planner,
     witness: [
       ...(stills.witness ?? []),
-      ...takes.map((t) => ({ value: over.witness?.[t.key] ?? seenClip(t) })),
+      ...takes.flatMap((t) => witnessAnswers(over.witness?.[t.key], seenClip(t))),
     ],
     reconciler: [
       ...(stills.reconciler ?? []),

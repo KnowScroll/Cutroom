@@ -10,6 +10,16 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `second-ask` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
+> (**S-147**). **Gate 4 asks once more when its answer is refused**: the same `observe` call on the same clip, sent a
+> second time, and only a second refusal fails the run (S-042 in part; S-072's _"one `observe` call"_ becomes one, or
+> two after a refusal). A take's observation is tied to the LAST `observe` receipt whose `takeIds` is that take's.
+> **Check 23's fixture gives take t1 its still-shaped answer TWICE** — with one, the second ask would run off the
+> script's end and the run would fail on a thrown call, which check 23's assertions could not tell from a refusal —
+> and it gains two assertions: the detail is _"the witness's answer for <take> is not a clip observation: …"_, and
+> that take has two `observe` receipts. Every other check is on takes whose witness parses, and its counts of one
+> stand. This feature's journey is run again in `second-ask`'s last slice.
+>
 > **Amended by `paid-path` on 2026-09-21 — the gates below are not edited, and no assertion is removed** (**S-126**).
 > **Check 3's last clause reads `structured, observe, compare, judgeCut and readText`**, and its list is still
 > EXACT: a sixth call still fails it. `readText` is Gate 1's text step, which `reel-stills` proves and this feature

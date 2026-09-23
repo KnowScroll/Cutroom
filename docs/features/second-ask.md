@@ -229,7 +229,7 @@ the same second ask; they are a different failure. Whether the lease slack is en
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the gates ask again.** `packages/pipeline/src/gates/witness.ts`; Gates 1 and 4 call it; the three
+- [x] **Slice 1 — the gates ask again.** `packages/pipeline/src/gates/witness.ts`; Gates 1 and 4 call it; the three
       doc comments; `twice` in the engine's scripts; checks 46, 23 and `r14-failed` amended in the same commit,
       because without them the suite is red (check 46) or silently green on the wrong failure (23, `r14-failed`); and
       the three amendment blocks that record those changes, beside them. **Proves: 1, 2, 3, 4, 5.**

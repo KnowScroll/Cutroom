@@ -32,6 +32,18 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `second-ask` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
+> (**S-147**). **Gate 1's witness step asks once more when its answer is refused**: the same `observe` call, sent a
+> second time, and only a second refusal fails the run (S-042 in part). So Gate 2's _"exactly one `observe` receipt per
+> picture"_ and _"Picture ids never repeat, so each key names one receipt"_ now read: **one `observe` receipt per
+> picture whose answer parsed first time, two when the first was refused, and the observation is tied to the LAST**.
+> Only an answer that parses ever becomes a record, so the one record of what a picture shows is still its one
+> observation (I-15's reason, whose count S-147 supersedes). **Check 46's fixture gives the barons' picture TWO
+> malformed answers** — with one, the second ask would read the next picture's answer — and it gains two assertions:
+> the detail is _"the witness's answer for a1-shot-1-single is not an observation: …"_, and the kept receipts show
+> that picture's `observe` twice. Every other check is on witnesses that parse, and its counts of one stand. This
+> feature's journey is run again in `second-ask`'s last slice.
+>
 > **Amended by `reel-render` on 2026-09-16 and 2026-09-17 — the gates below are not edited, and no assertion is
 > removed** (**S-077**, **S-078**). Where Gate 1 says a video is "not built yet", that is no longer true:
 >

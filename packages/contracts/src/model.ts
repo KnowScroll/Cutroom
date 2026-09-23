@@ -35,14 +35,18 @@ export interface ModelReceipt {
   /** True when the stand-in answered, never a real model. */
   fake: boolean
   /**
-   * The pictures this call was about. An observation is tied to the one `observe` receipt whose
-   * `pictureIds` is its picture's, and a reconciliation to the one `reconciler` receipt whose
-   * `pictureIds` is its picture's — by key, with no receipt id stored (S-037, S-046).
+   * The pictures this call was about. An observation is tied to the LAST `observe` receipt whose
+   * `pictureIds` is its picture's — one, or two when the first answer was refused and the witness
+   * was asked once more (S-147); an earlier one is the refused ask — and a reconciliation to the one
+   * `reconciler` receipt whose `pictureIds` is its picture's — by key, with no receipt id stored
+   * (S-037, S-046).
    */
   pictureIds: readonly string[]
   /**
-   * The takes this call was about. A take's observation and reconciliation are tied to the one
-   * `witness` and the one `reconciler` receipt whose `takeIds` is that take's (S-072, S-037's form).
+   * The takes this call was about. A take's observation is tied to the LAST `witness` receipt whose
+   * `takeIds` is that take's — two when its first answer was refused (S-147) — and its
+   * reconciliation to the one `reconciler` receipt whose `takeIds` is that take's (S-072, S-037's
+   * form).
    */
   takeIds: readonly string[]
 }

@@ -9,9 +9,10 @@ import { recordingSpend } from './spend.ts'
  * keeps its own, whatever happens to the run afterwards.
  *
  * All five calls are recorded (S-037, S-074, S-126): the observation and the reconciliation of a picture
- * or a take are tied to their receipts by key — the one `observe` receipt whose `pictureIds` or
- * `takeIds` is that picture's or take's, and the one `reconciler` receipt likewise — so a call that
- * left no row would leave a record nothing can join.
+ * or a take are tied to their receipts by key — the LAST `observe` receipt whose `pictureIds` or
+ * `takeIds` is that picture's or take's (two when the witness's first answer was refused and it
+ * was asked once more, S-147), and the one `reconciler` receipt likewise — so a call that left no
+ * row would leave a record nothing can join.
  *
  * Each row names its call, its picture ids and its take ids — the columns reel-stills' Slice 3
  * migration and reel-render's Slice 1 migration added (S-049, S-072).

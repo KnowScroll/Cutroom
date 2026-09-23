@@ -13,6 +13,7 @@ import {
   stills,
   stillsRequest,
   stillsScript,
+  twice,
   type Pic,
   type Stilled,
 } from './engine/stills.ts'
@@ -81,10 +82,19 @@ test('46. a witness answer that does not parse finishes the run failed with a de
   const malformed = seen(barons) as unknown as { entities: Array<Record<string, unknown>> }
   delete malformed.entities[0]?.clippedByEdge
   const answer = { ...malformed, actions: ['marching'] }
+  // TWICE, because a refused answer is asked for once more (second-ask, S-147): with one, the
+  // second ask would read the next picture's answer and this check would stop testing a refusal.
   const { ran, engine } = await faulted('r46', {
-    script: stillsScript(THREE_RANKS, THREE_RANKS_PICS, { witness: { [barons.key]: answer } }),
+    script: stillsScript(THREE_RANKS, THREE_RANKS_PICS, {
+      witness: { [barons.key]: twice({ value: answer }, { value: answer }) },
+    }),
   })
   assertFailed(ran, /witness/i)
+  // Today's exact words, so a stand-in running out of answers cannot pass for a refusal (S-147).
+  assert.match(
+    String(ran.result.detail),
+    /the witness's answer for a1-shot-1-single is not an observation: /,
+  )
 
   const row = pictureOf(ran, barons.key)
   assert.deepEqual(
@@ -110,10 +120,12 @@ test('46. a witness answer that does not parse finishes the run failed with a de
     0,
     'a verdict event for a picture whose verdict was never decided',
   )
-  // The witness's call returned, so its receipt is kept; nothing was reconciled after it.
+  // The witness's calls returned, so their receipts are kept — BOTH asks, the refused one and the
+  // one asked once more (S-147); nothing was reconciled after them.
   assert.deepEqual(pictureReceipts(ran), [
     ...observed('a1-shot-0-a'),
     ...observed('a1-shot-0-b'),
+    'observe witness a1-shot-1-single',
     'observe witness a1-shot-1-single',
   ])
   assert.deepEqual(

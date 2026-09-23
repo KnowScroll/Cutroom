@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { FakeScript } from '@cutroom/providers'
 import { startEngine, type Engine } from './engine/harness.ts'
-import { THREE_RANKS, THREE_RANKS_PICS, observation } from './engine/stills.ts'
+import { THREE_RANKS, THREE_RANKS_PICS, observation, twice } from './engine/stills.ts'
 import {
   described,
   retake,
@@ -119,14 +119,17 @@ function runs(): Promise<Runs> {
         }),
       )
       // A still's observation for shot 3's take — no actions and no event order, which a clip's
-      // requires (D-041) — does not parse, and fails the run (S-042).
+      // requires (D-041) — does not parse, TWICE, and fails the run (S-042 as S-147 amends it: a
+      // refused answer is asked for once more, so a single one would run off the script's end).
       const failed = await labelled(
         'r14-failed',
         300,
         videoScript(THREE_RANKS, THREE_RANKS_PICS, {
           takes: [t0, ...SHOT_1, t2, t3],
           reconciler: HOLD_SHOT_1,
-          witness: { 'shot-3-take-1': observation([]) },
+          witness: {
+            'shot-3-take-1': twice({ value: observation([]) }, { value: observation([]) }),
+          },
         }),
       )
       const holding = engine
@@ -301,6 +304,16 @@ test(`${CHECK_14} — with the run failed at a later shot`, async () => {
       [T(2), 'accept'],
       [T(3), null],
     ],
+  )
+  // It failed on the REFUSAL, asked twice — not on the stand-in running out of answers (S-147).
+  assert.match(
+    String(ran.result.detail),
+    new RegExp(`the witness's answer for ${T(3)} is not a clip observation: `),
+  )
+  assert.equal(
+    ran.receipts.filter((r) => r.call === 'observe' && r.take_ids.includes(T(3))).length,
+    2,
+    'the refused take has two observe receipts',
   )
   assert.ok(!ran.jobs.some((j) => j.kind === 'reel.assemble'), 'a reel.assemble row')
   assert.equal(described(ran.events).at(-1), 'run.finished failed')

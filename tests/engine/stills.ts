@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import type { WitnessObservation } from '@cutroom/contracts'
-import type { FakeScript } from '@cutroom/providers'
+import type { FakeAnswer, FakeScript } from '@cutroom/providers'
 import type { SubmitRequest } from '@cutroom/reel-contract'
 import { finished, type Engine } from './harness.ts'
 import { answer, bare, planRequest, type Subject } from './plans.ts'
@@ -357,6 +357,29 @@ export function judged(subjects: readonly string[], no: readonly string[] = []) 
   }
 }
 
+/** A witness override answered twice, in order (second-ask, S-147). Made only by `twice`. */
+export interface Twice {
+  readonly twice: readonly [FakeAnswer, FakeAnswer]
+}
+
+/**
+ * A witness override that queues TWO scripted answers for one picture or take — a value or a
+ * throw each — because a refused answer is now asked for once more (S-147). With one, the second
+ * ask reads the next picture's answer, or runs off the script's end and throws, and a check meant
+ * to prove a refusal would prove something else.
+ */
+export function twice(first: FakeAnswer, second: FakeAnswer): Twice {
+  return { twice: [first, second] }
+}
+
+/** A witness override's scripted answers: two for `twice`, else one, the default's if none. */
+export function witnessAnswers(override: unknown, fallback: unknown): FakeAnswer[] {
+  if (typeof override === 'object' && override !== null && 'twice' in override) {
+    return [...(override as Twice).twice]
+  }
+  return [{ value: override ?? fallback }]
+}
+
 /**
  * The script of one run: the planner's two answers, and for each picture past technical its
  * witness and reconciler answers — each passing unless replaced — then the judge's answers.
@@ -372,7 +395,7 @@ export function stillsScript(
 ): FakeScript {
   return {
     planner: plannerFor(shape),
-    witness: pics.map((p) => ({ value: over.witness?.[p.key] ?? seen(p) })),
+    witness: pics.flatMap((p) => witnessAnswers(over.witness?.[p.key], seen(p))),
     reconciler: pics.map((p) => ({ value: over.reconciler?.[p.key] ?? passes(p) })),
     judge: (over.judge ?? []).map((value) => ({ value })),
   }

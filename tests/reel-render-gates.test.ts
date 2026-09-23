@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { join, relative } from 'node:path'
 import { test } from 'node:test'
 import { startEngine, type Engine } from './engine/harness.ts'
-import { THREE_RANKS, THREE_RANKS_PICS, observation } from './engine/stills.ts'
+import { THREE_RANKS, THREE_RANKS_PICS, observation, twice } from './engine/stills.ts'
 import {
   CRITERION_TEXT,
   described,
@@ -299,15 +299,27 @@ test('23. every take past Gate 2 has exactly one observe receipt, role witness, 
 
 test('23. a witness answer that does not parse finishes the run failed, that take with Gates 2 and 3 only and no outcome', async () => {
   // A still's observation: no actions and no event order, which a clip's requires (D-041).
+  // TWICE, because a refused answer is asked for once more (second-ask, S-147): with one, the
+  // second ask would run off the script's end and the run would fail on a THROWN call instead.
   const still = observation([])
   const { engine, ran } = await threeRanks('r23-unparsed', {
-    witness: { [t1.key]: still },
+    witness: { [t1.key]: twice({ value: still }, { value: still }) },
     takes: [t0, t1],
   })
   try {
     assert.equal(ran.result.status, 'failed', JSON.stringify(ran.result))
     assert.ok(String(ran.result.detail).length > 0)
     const take = takeOf(ran, t1.key)
+    // Today's exact words, and both asks on the record (S-147).
+    assert.match(
+      String(ran.result.detail),
+      new RegExp(`the witness's answer for ${take.take_id} is not a clip observation: `),
+    )
+    assert.equal(
+      ran.receipts.filter((r) => r.call === 'observe' && r.take_ids.includes(take.take_id)).length,
+      2,
+      'the refused take has two observe receipts',
+    )
     assert.deepEqual(
       take.verdicts.map((v) => v.gate),
       ['2', '3'],

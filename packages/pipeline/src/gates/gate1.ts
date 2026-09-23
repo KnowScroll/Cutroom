@@ -11,6 +11,7 @@ import type {
 import type { Criterion } from '@cutroom/reel-contract'
 import { witnessObservation } from '../stills/observation.ts'
 import { reconcileAnswer, reconcilePrompt, type ReconcileAnswer } from '../stills/prompts.ts'
+import { askWitness } from './witness.ts'
 
 // Gate 1 (docs/features/reel-stills.md, Gate 2 "Gate 1 — four steps on each picture"; D-042, I-7,
 // S-031, S-040, S-041, S-042). Four steps on one picture, in order, deterministic steps first. A
@@ -125,17 +126,16 @@ export async function gate1(
   steps.push({ step: 'text', outcome: 'accept', reasons: [] })
   await progress({ text: [...text], gate1: verdict(null) })
 
-  // 3. witness — the picture and a temperature, nothing else (I-8), parsed at the gate (D-041).
-  const observed = await ports.model.observe({ picture: ref, temperature: 0 })
-  const parsed = witnessObservation.safeParse(observed.value)
-  if (!parsed.success) {
-    throw new Error(
-      `the witness's answer for ${ref.pictureId} is not an observation: ${parsed.error.issues
-        .map((i) => `${i.path.join('.') || '(answer)'}: ${i.message}`)
-        .join('; ')}`,
-    )
-  }
-  const observation = parsed.data
+  // 3. witness — the picture and a temperature, nothing else (I-8), parsed at the gate (D-041). An
+  // answer the schema refuses is asked for once more, the same call; a second refusal fails the run
+  // (S-042 as S-147 amends it, docs/features/second-ask.md).
+  const observation = await askWitness(
+    { picture: ref, temperature: 0 as const },
+    (call) => ports.model.observe(call),
+    witnessObservation,
+    ref.pictureId,
+    'an observation',
+  )
   steps.push({ step: 'witness', outcome: 'accept', reasons: [] })
   await progress({ observation, gate1: verdict(null) })
 
