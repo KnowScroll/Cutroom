@@ -6553,3 +6553,30 @@ spent); a lower per-second rate with a margin; or a ceiling set against fal's ac
 call was billed that our record does not show — **every one of the eleven requests on fal's image-to-video page** (runs `c4c9b112…`, `ffbd04b5…`, `a08a9c9c…` and
 `436564c1…`) **is a `video_receipt` of ours**, matched by request id — so on that page fal billed nothing we do not
 know about. The text-to-video and image pages were not read in full.
+
+---
+
+## S-155 | 2026-09-23 | fal's video rate is 0.5¢ a second — at least sixteen times the most fal has billed a second of clip — in the real adapter only; the pipeline's default stays 4¢
+
+**Chose.** The owner's answer to S-154: _"just keep the margin wide still if something goes on"_. **`H3_TURBO.rateCentsPerSecond`
+becomes 0.5** (`packages/providers/src/fal/h3.ts`) — the rate the real video adapter's receipts, and the service's
+`planSettings` when the video port is real, are priced at (S-125). **`DEFAULT_PLAN_SETTINGS.videoRateCentsPerSecond`
+stays 4**: the stand-in engine and every verified test are built on it, and moving it would move their arithmetic
+for nothing real (S-153's split, a second time).
+
+**Why 0.5.** The most fal billed a second of clip, of the seven read (S-154), is **0.030¢** — $0.00391 for shot 3's
+13 s. 0.5¢ is **at least 16× that**, so a clip that computes many times longer than any seen is still over-priced,
+never under (D-014). A four-shot reel of 45 s now estimates about 23¢ of video instead of 180¢, so a reel's ceiling is
+spent on something closer to money.
+
+**Rejected.** **Keeping 4¢** — S-154: it stopped a run at its ceiling for about 2¢ of billing. **A rate near fal's
+figure (0.03–0.05¢)** — too close: fal bills compute, not seconds, and a longer compute would under-price. **A
+per-clip price** — fal's quantity varies per clip, and a per-second rate with a margin covers it with no new rule.
+
+**Supersedes:** **D-007's planning figure for H3 Turbo 768P, as the real adapter prices it** — 4¢ a second becomes
+0.5¢. **Owed upstream**: `BUDGET.md`'s figure, with S-154's table (D-115, S-017).
+
+**Caught by.** `paid-path`'s check 15, amended: the default entry's 5-second clip costs **3¢** (2.5, rounded up), and
+an entry with its own rate still prices by its own. Every estimate the real service prints follows the entry.
+
+**Confirmed-by.** The owner, 2026-09-23, choosing a lower rate with a wide margin over keeping 4¢.

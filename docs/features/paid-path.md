@@ -26,6 +26,11 @@ Supersedes, through the entries it rests on: D-005 for this engine's model layer
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
 Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
+> **Amended on 2026-09-23 by S-155 — no gate below is edited.** fal's video rate is **0.5¢ a second** in the real
+> adapter (`H3_TURBO.rateCentsPerSecond`), at least 16× the most fal billed a second of clip (S-154); the pipeline's
+> default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its
+> own rate.
+>
 > **Amended by `three-pictures` on 2026-09-23 — no gate below is edited, and no assertion is removed** (**S-150**).
 > `scripts/real-reel.mjs` sets `CUTROOM_PICTURES=upToThree` among its defaults (a value already set wins), prints the
 > rule, and prices its corners at 0 and 4 image calls. **`three-pictures`' check 12 lives in

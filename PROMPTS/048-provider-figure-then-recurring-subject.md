@@ -49,10 +49,8 @@ A. DONE IN SESSION 47: fal's figures were read and paid-path is verified (S-154)
 
 B. DONE IN SESSION 47: the service defaults to pictures: 'upToThree' (S-153).
 
-C. THE OPEN QUESTION — THE OWNER'S. Put S-154's choice with AskUserQuestion: keep 4c a second (safe, but stops reels
-   for money that is not spent, as S-151's run was); a lower per-second rate with a stated margin; or another rule.
-   A rate that can UNDER-price a clip is the direction D-014 forbids — say so beside any option that could. Then, if
-   the owner wants it, parallel-shots (S-115), held by them until they say otherwise.
+C. DONE IN SESSION 47: fal video re-priced to 0.5c a second in the real adapter (S-155). Nothing is
+   owed but upstream: BUDGET.md's figure. Ask the owner what comes next; parallel-shots (S-115) is held by them.
 
 How to work:
 - Never weaken a check or a test to reach green. Every fix by addition.

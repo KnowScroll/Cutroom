@@ -494,12 +494,12 @@ test('15. the clip is PROBED before the answer returns: bytes that are not a rea
 test('15. the receipt’s cost is the CONFIGURED RATE applied to the SECONDS ASKED FOR, rounded up — and the rate comes from the entry, not from the call site', async () => {
   const f = folder()
   try {
-    // The default entry: 4 cents a second, D-007's H3 Turbo at 768P as BUDGET.md plans it.
+    // The default entry: 0.5 cents a second since S-155 — 2.5 for five seconds, rounded up to 3.
     const { answer } = await madeFromPicture(f)
-    assert.equal(made(answer).receipt.costCents, 20)
-    assert.equal(videoCostCents(H3_TURBO, 5), 20)
+    assert.equal(made(answer).receipt.costCents, 3)
+    assert.equal(videoCostCents(H3_TURBO, 5), 3)
 
-    // An entry whose rate is NOT the default's. A rate spelled at the call site gives 20 here.
+    // An entry whose rate is NOT the default's. A rate spelled at the call site gives 3 here.
     const dearer: VideoEntry = { ...H3_TURBO, rateCentsPerSecond: 7.5 }
     const bytes = await clip()
     const { port } = adapter(
@@ -515,8 +515,13 @@ test('15. the receipt’s cost is the CONFIGURED RATE applied to the SECONDS ASK
 
     // The seconds ASKED FOR, never the seconds that came back: D-019's spike asked for 5 and got a
     // 5.184-second file, and a receipt priced on that is a number nothing can reproduce.
-    for (const seconds of [5, 8, 15]) {
-      assert.equal(videoCostCents(H3_TURBO, seconds), 4 * seconds)
+    // At 0.5 a second (S-155), each rounded up: 2.5 → 3, 4 → 4, 7.5 → 8.
+    for (const [seconds, cents] of [
+      [5, 3],
+      [8, 4],
+      [15, 8],
+    ] as const) {
+      assert.equal(videoCostCents(H3_TURBO, seconds), cents)
     }
   } finally {
     f.clean()

@@ -5768,3 +5768,9 @@ reproduces it. All eleven requests on the image-to-video page match our `video_r
 billed that we did not record. **The guard errs safe by two orders of magnitude**, and it cost something real: S-151's
 run was stopped at its ceiling on an estimate of 279¢ for about 2¢ of billing. **No rate was changed**: how to re-price
 video is the owner's. `paid-path`'s Slice 8 and its "One real reel exists" line are ticked.
+
+**The video rate, re-priced (S-155).** The owner: _"keep the margin wide still if something goes on"_. fal's H3 Turbo
+rate is **0.5¢ a second** in the real adapter — at least 16× the most fal billed a second (0.030¢) — and the pipeline's
+default stays 4¢, so no stand-in test's arithmetic moves. `paid-path`'s check 15 reads the new figures (5 s → 3¢). A
+real reel now estimates **18–53¢** where it estimated 140–210¢. `BUDGET.md`'s figure is owed upstream with S-154's
+table.
