@@ -6498,3 +6498,58 @@ placement.
 
 **Confirmed-by.** The owner, 2026-09-23, _"alright do that"_, on making it the default; the split is this entry's,
 from the measurement above.
+
+---
+
+## S-154 | 2026-09-23 | fal's own figures, read: a clip is billed about 0.2¢, not 36–52¢ — the configured video rate overstates it about 190 times, so the budget guard errs safe by two orders of magnitude; `paid-path`'s Slice 8 is closed
+
+**Chose.** Record the provider's figures beside ours, as `paid-path`'s Slice 8 requires, and close it. **Change no
+rate here**: what to do about the gap is the owner's (below).
+
+**fal's own figures**, read by the owner from fal's **Billing events** page (per endpoint: Request ID, Timestamp, Auth
+Method, Quantity, Unit Price, Total Cost), 2026-09-23 — every clip billed at a Unit Price of **$0.00017** × a Quantity:
+
+| run             | take (request id)          | wire           | fal quantity | **fal total** | our receipt |
+| --------------- | -------------------------- | -------------- | ------------ | ------------- | ----------- |
+| `f895e76d…`     | shot 0 (`01a0cd5e-93a0-…`) | text-to-video  | 9            | **$0.00153**  | 36¢         |
+| `f895e76d…`     | shot 1 (`01a0cd5f-961d-…`) | text-to-video  | 9            | **$0.00153**  | 36¢         |
+| `f895e76d…`     | shot 2 (`01a0cd60-b3b6-…`) | text-to-video  | 9            | **$0.00153**  | 36¢         |
+| `f895e76d…`     | shot 3 (`01a0cd61-c394-…`) | text-to-video  | 23           | **$0.00391**  | 52¢         |
+| **`f895e76d…`** | **the whole reel**         |                |              | **$0.0085**   | **160¢**    |
+| `436564c1…`     | shot 0 (`01a0ce7d-e132-…`) | image-to-video | 12           | **$0.00204**  | 40¢         |
+| `436564c1…`     | shot 1 (`01a0ce7f-5720-…`) | image-to-video | 14           | **$0.00238**  | 36¢         |
+| `436564c1…`     | shot 2 (`01a0ce83-9030-…`) | image-to-video | 11           | **$0.00187**  | 36¢         |
+
+The page's timestamps are the owner's local time (UTC+5:30) and match every receipt's to the minute. `436564c1…`'s two
+text-to-video takes and every picture's charge were not read; nothing here depends on them.
+
+**What the figures say.**
+
+- **The configured video rate — 4¢ a second, "until Q9 is read" (D-007, S-125, `fal/h3.ts`) — overstates what fal
+  bills by about 190×** on these seven clips ($0.0085 against 160¢ for one whole reel).
+- **fal's Quantity is not the clip's seconds**: 9-second clips show 9, a 13-second clip shows 23, and three
+  image-to-video clips of 9–10 s show 11, 12 and 14. It looks like billed compute, not video length — so a per-second
+  rate CANNOT reproduce it, and no rate in this engine predicts it exactly.
+- **What it means for the budget guard.** Every estimate, cap comparison and admission is priced far above the real
+  charge. **That is the safe direction** — the engine cannot overspend a ceiling by mispricing video (D-014, I-1) — but
+  it is not harmless: **run `a08a9c9c…` was stopped at its ceiling (S-151) on an estimate of 279¢ for a run fal would
+  have billed about 2¢**, and every reel's ceiling is spent on a figure that is not money.
+- **D-007's Q9 — the observed video rate — is answered**: about $0.00017 per unit of fal's quantity, which is not
+  seconds of video. **Owed upstream** (D-115, S-017), with this table.
+
+**Slice 8 is closed.** A real reel exists, made under its ceiling, its cost written beside the provider's: run
+`f895e76d…` (160¢ ours, $0.0085 fal's), and run `436564c1…` — the reel made from approved pictures (S-152).
+
+**Rejected.**
+
+- **Lowering the video rate to fal's figure now.** fal bills compute, not seconds; a per-second rate low enough to
+  match these clips could UNDER-price a clip that computes longer, which is the direction D-014 forbids. Which rule
+  replaces it is the owner's.
+- **Leaving Slice 8 open until every picture's charge is read.** Slice 8 asks for one reel's cost beside the
+  provider's; `f895e76d…` has every call read.
+
+**Owed — the owner's.** Whether and how to re-price video: keep 4¢/s (safe, and stops reels for money that is not
+spent); a lower per-second rate with a margin; or a ceiling set against fal's actual billing. And whether any failed
+call was billed that our record does not show — **every one of the eleven requests on fal's image-to-video page** (runs `c4c9b112…`, `ffbd04b5…`, `a08a9c9c…` and
+`436564c1…`) **is a `video_receipt` of ours**, matched by request id — so on that page fal billed nothing we do not
+know about. The text-to-video and image pages were not read in full.

@@ -5760,3 +5760,11 @@ every verified test keeps proving D-027's rule. **The unidentified `tests` failu
 `reel-render`'s check 50 timing out at its 300 s bound under machine load**: 205 s alone at the time (S-107 recorded
 97 s), killed twice in full runs of 501 s and 838 s while other programs held the CPU. The owner closed them; the
 check then went green in 341 s. The bound was not touched.
+
+**fal's own figures, and Slice 8 closed (S-154).** The owner read fal's **Billing events** page: every clip billed at
+**$0.00017 a unit**, about **0.2¢ a clip** — run `f895e76d…` cost fal's **$0.0085** against our **160¢**, about 190×
+less. fal's quantity is not seconds of video (9 s → 9, 13 s → 23; image-to-video 11–14), so no per-second rate
+reproduces it. All eleven requests on the image-to-video page match our `video_receipt` rows by request id — nothing
+billed that we did not record. **The guard errs safe by two orders of magnitude**, and it cost something real: S-151's
+run was stopped at its ceiling on an estimate of 279¢ for about 2¢ of billing. **No rate was changed**: how to re-price
+video is the owner's. `paid-path`'s Slice 8 and its "One real reel exists" line are ticked.

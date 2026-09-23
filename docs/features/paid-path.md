@@ -431,7 +431,7 @@ it is the part that may differ per model.
       filtergraphs are read from STDOUT, so no log level can silence a measure; and check 2's "named and not built"
       assertion turns round — every name in every closed set now builds — S-126.)
       **Proves: 18, 19.**
-- [ ] **Slice 8 — the real reel, and the journeys.** `scripts/real-reel.mjs`; **one real reel made, under the
+- [x] **Slice 8 — the real reel, and the journeys.** `scripts/real-reel.mjs`; **one real reel made, under the
       ceiling**, its receipts compared with the provider's own figures and both written into `JOURNAL.md`; the
       observed rate recorded and owed upstream; **and the measured latency of a real reel, which the `parallel-shots`
       feature cannot be planned without** (S-115). **Proves: 20, 22**, then this feature's journey, and
@@ -478,7 +478,7 @@ Every check appears in exactly one slice: 3 + 2 + 4 + 2 + 3 + 4 + 2 + 2 = 22.
 
 - [x] A person can start the engine on this machine and ask it for a reel, and it answers
 - [x] Every part can be real or a stand-in by one setting, and the default is free, secretless and unchanged
-- [ ] One real reel exists, made under its ceiling, with what it cost written down beside what the provider says
+- [x] One real reel exists, made under its ceiling, with what it cost written down beside what the provider says
 - [x] No key, and nothing a provider handed back, is ever written down — and no test spends or needs one
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
