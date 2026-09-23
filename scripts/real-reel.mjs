@@ -117,8 +117,10 @@ function request(requestId, budgetCents) {
       // 0.0 s, made no picture, and every clip was bought text-to-video. So the logbook appears
       // twice — open on a desk under lamplight (c2), and closed on an archive shelf a century later
       // (c4) — and the four scenes still differ in place, object and hour: a lamp room at night, a
-      // desk at night, grass in daylight, an archive by day. The stills stage has a subject to carry
-      // and Gate 1S has a pair to compare; Gate 7 still sees four different things.
+      // desk at night, grass in daylight, an archive by day. If the plan names the logbook as ONE
+      // subject, the stills stage makes one canonical picture, on its first shot only; its second shot
+      // is still made from words, and one recurring subject makes no derived picture, so Gate 1S has
+      // nothing to compare (S-149's correction). Gate 7 still sees four different things.
       //
       // AND NO CRITERION REQUIRES A PERSON. `show-keeper` required a lighthouse keeper while
       // `never-person` forbade one in the reconciler's reading, and a criterion violated by

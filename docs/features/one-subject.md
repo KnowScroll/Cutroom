@@ -192,7 +192,7 @@ the planner is not deterministic. Whether a plan that recurs then wins on score.
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the baseline.** The measurement script under `.tmp/`; its first arm on today's prompt, before any
+- [x] **Slice 1 — the baseline.** The measurement script under `.tmp/`; its first arm on today's prompt, before any
       file under `packages/` changes; `real-reel.mjs`' comment corrected; the figures in `JOURNAL.md`. Committed in
       every branch. **If the premise is not reproduced** (4 or more of 6 runs count), stop: S-149 is amended with the
       figures, this file's `Status:` reads `stopped` with the reason, and the owner decides. **Proves: none** — it is

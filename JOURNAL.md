@@ -5658,3 +5658,31 @@ editor. Check 9 was derived from paid-failures' check 12 by a script, so its reg
 
 **Next.** `PROMPTS/048`: the owner reads fal's figure for `f895e76d…`, which ticks Slice 8; then S-148's question.
 **`parallel-shots` (S-115) is still held.**
+
+## 2026-09-23 — session 47, continued: `one-subject`'s baseline, measured for nothing
+
+**The owner chose the planner's instructions** for S-148 (S-149), and chose again twice after two corrections of what
+they had been told: a recurring subject gets ONE picture, on its first shot (`placePictures`); and session 45 HAD made
+real pictures — the gap is a reel with pictures that passes Gate 7. `docs/features/one-subject.md`: four gates, three
+review passes (eleven, ten, then four findings), APPROVED at `b953b1a`.
+
+**Slice 1, the baseline**: `.tmp/one-subject-measure.mjs` (never committed) ran the real planning stage — real planner,
+real scorer, the worker's settings (cap 300¢, image 7.5¢, video 4¢/s), the request of `de17dbb` (hash
+`f6d0b8cb4e5d6d7f`) — six times on today's prompt. 0¢.
+
+| measure                                               | baseline                      |
+| ----------------------------------------------------- | ----------------------------- |
+| **PRIMARY: selected plan makes a picture AND Q4 yes** | **0 of 6**                    |
+| logbook one subject, 4-unit plan / 6-unit plan        | 0 of 6 / 0 of 6               |
+| merge control (4-unit)                                | 0 of 6                        |
+| selected                                              | plan a, 6 of 6, 0 image calls |
+| failed, void, unscored                                | 0, 0, 0                       |
+| distinct planner answers, first call / second call    | 5 / 6                         |
+
+**The planner is NOT deterministic at temperature 0** — five and six distinct answers in six calls — so each arm is a
+sample, not one outcome. The premise is reproduced (0 is under 4). Names seen for the logbook's two appearances:
+"Open Logbook" / "Archive Logbook", "Handwritten Logbook" / "Archive Shelf", "Open Handwritten Logbook" / "Closed
+Logbook on Archive Shelf". **Plan b recurred in all six runs** (3 planned image calls each) **and lost on score in all
+six**, 2.33–3.33 against 4–5 — a finding for Deferred item 1, recorded, not acted on.
+
+Also in Slice 1: `scripts/real-reel.mjs`' comment no longer claims Gate 1S "has a pair to compare".
