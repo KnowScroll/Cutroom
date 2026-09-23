@@ -233,7 +233,7 @@ the same second ask; they are a different failure. Whether the lease slack is en
       doc comments; `twice` in the engine's scripts; checks 46, 23 and `r14-failed` amended in the same commit,
       because without them the suite is red (check 46) or silently green on the wrong failure (23, `r14-failed`); and
       the three amendment blocks that record those changes, beside them. **Proves: 1, 2, 3, 4, 5.**
-- [ ] **Slice 2 — through the worker.** `tests/second-ask-worker.test.ts`. **Proves: 6, 7, 8.**
+- [x] **Slice 2 — through the worker.** `tests/second-ask-worker.test.ts`. **Proves: 6, 7, 8.**
 - [ ] **Slice 3 — the journey.** Check 9, this feature's journey, and `reel-stills`', `reel-render`'s and
       `reel-takes`' again (S-099's form). **Proves: 9.**
 
