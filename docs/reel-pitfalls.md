@@ -15,6 +15,23 @@ Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; 
 
 ## Open
 
+### P-004 · provider · the picture witness answered a count as words, and the run failed
+
+- **Run** `c9f3df47…`, 2026-09-24, black holes, shot 1's picture (the black sphere ringed by glowing gas).
+- **What happened.** 61 s of planning, shot 0's picture accepted, then MiniMax-M3's witness answer for shot 1's picture
+  did not parse: `entities.2.count: … expected number, received string`, and the same for entity 3. A witness answer
+  that does not parse fails the run (S-042). 10¢ spent (two pictures), no `lost_call`. The answer itself is not
+  stored, because it never parsed.
+- **Cause.** The provider's answer. Likely, not proven: a space picture is full of things no one counts — stars, dust,
+  particles — and the model wrote something like "many" where a number belongs. Shot 0's stored observation shows
+  the witness describing "scattered background stars" as `count: 1`, so it copes sometimes.
+- **Done.** Nothing to the brief yet; the owner is asked.
+- **For good.** The brief cannot reliably stop a model writing a word for a number. Engine options, each a feature:
+  ask the witness once more on an answer that does not parse (as a provider's transient fault is); or keep the raw
+  answer of a failed parse, so the next one of these can be read rather than guessed. And `resume-failed` would have
+  kept the plan and shot 0's picture. **Second provider-answer failure in three runs** (P-001) — the pattern is: one bad
+  answer from a model fails a whole run.
+
 ### P-003 · brief + engine · a sentence that asks for darkness makes a clip that ends in black
 
 - **Run** `879a27b7…`, 2026-09-24, black holes, shot 2.

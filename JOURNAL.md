@@ -5816,9 +5816,17 @@ c3 — a long thing in a tall frame, and a sentence that asks for darkness — s
 `docs/features/resume-failed.md`, `planned`, gates not written, five questions for the owner in it. Run `879a27b7…`
 would have kept two pictures and two accepted clips (22c, about 4 min).
 
-**Next**: the owner decides on c3's change; no rerun without their yes.
+**Reel 3, run `c9f3df47…`** — the owner chose the c3 change (compact "a star being torn into a bright swirl of glowing
+gas"; sentence 6 "…in a bright spiral.") and asked for a running log of pitfalls: `docs/reel-pitfalls.md`, P-001 to
+P-004. Plan 61 s; shot 0's picture accepted; then **failed at 137 s**: MiniMax-M3's witness answer for shot 1's picture
+gave `count` as a string for two entities, and an answer that does not parse fails the run (S-042). **10c**, no
+`lost_call`. P-004 — the second run in three failed by one model's malformed answer.
+
+**Next**: the owner decides: rerun unchanged, or stop reels until a feature re-asks a model once on an answer that does
+not parse. No rerun without their yes.
 
 | runId       | description                                                                        | cost | time    | finished | why                                                                                        |
 | ----------- | ---------------------------------------------------------------------------------- | ---- | ------- | -------- | ------------------------------------------------------------------------------------------ |
 | `ee63e617…` | black holes: formation, what it is, interactions, types; between real and animated | 15c  | 3.6 min | no       | MiniMax repeated "Sun." in shot 0's word timings; stage parse refused                      |
 | `879a27b7…` | the same, sentence 1 reworded                                                      | 53c  | 8.5 min | no       | shot 2: picture clipped twice; three clips fade to black on "disappears for good" (Gate 2) |
+| `c9f3df47…` | the same, c3 compact and lit                                                       | 10c  | 2.3 min | no       | witness gave a count as a string for shot 1's picture (P-004)                              |
