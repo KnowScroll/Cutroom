@@ -6306,3 +6306,30 @@ again the same day, told that it makes one picture on a subject's first shot and
 continue over researching cross-shot consistency first and over pausing; and a third time, told that
 pictures HAD been made on real providers in session 45 and that the gap is a reel with pictures that
 passes Gate 7, choosing to continue over a brief between the two and over pausing.
+
+**Amended 2026-09-23 — the measurement, and the sentence NOT kept.** Held to the threshold written
+before the first call, the sentence did not move the primary measure, so it is not kept: the code, its
+checks and `reel-plan`'s amendment block were never committed, and `one-subject` is stopped.
+
+| measure (6 runs each, real planner and scorer, 0¢)           | baseline | sentence, void\* | sentence, re-run |
+| ------------------------------------------------------------ | -------- | ---------------- | ---------------- |
+| **PRIMARY: selected plan makes a picture AND Q4 yes**        | **0**    | **0**            | **0**            |
+| selected plan makes a picture                                | 0        | 3                | 3                |
+| — of those, the scorer's Q4 ("every shot new?") answered yes | —        | **0 of 3**       | **0 of 3**       |
+| logbook one subject, 4-unit / 6-unit                         | 0 / 0    | 3 / 1            | 1 / 1            |
+| merge control (4-unit)                                       | 0        | 0                | 0                |
+| distinct planner answers, first / second call                | 5 / 6    | —                | 6 / 6            |
+
+\* Two runs failed on `fetch failed` (a scorer call and a planner call that never reached MiniMax), so
+the arm was void by the rule and re-run once; its four completed runs are shown because they agree
+with the re-run. The drift run was not made: with both arms at 0, it could void nothing.
+
+**What the figures say, and it is the finding.** The sentence DID change the planner — a chosen plan
+with pictures in 3 of 6 runs, twice, against 0 of 6 — but **in every one of the six runs where the
+selected plan would make a picture, the scorer answered no to _"Does every shot show something that no
+other shot has already shown?"_, and in every run without one it answered yes.** On this wire, a
+subject shown in two shots is read as repetition in itself. The same question is Gate 7's, and it is
+what refused session 45's cut (with pictures). **So "a reel with pictures that passes Gate 7" may not be
+reachable by any change to the planner**: the gap is between D-027's rule — a picture only for a
+subject that recurs — and D-064's fourth question, which reads recurrence as repetition. Which of the
+two moves, if either, is the owner's; it is not decided here.

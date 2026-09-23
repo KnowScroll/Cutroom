@@ -5686,3 +5686,14 @@ Logbook on Archive Shelf". **Plan b recurred in all six runs** (3 planned image 
 six**, 2.33–3.33 against 4–5 — a finding for Deferred item 1, recorded, not acted on.
 
 Also in Slice 1: `scripts/real-reel.mjs`' comment no longer claims Gate 1S "has a pair to compare".
+
+**Slice 2, the sentence arm — and the stop.** The sentence went in, checks 1 and 2 passed, and the arm ran: two runs
+failed on `fetch failed`, which voids an arm, so it was re-run once. **Primary: 0 of 6 — as the baseline. Not kept.**
+Code, checks and `reel-plan`'s amendment block were reverted and never committed; `one-subject` is `stopped`; S-149
+amended with every figure.
+
+**The finding under it**: the sentence moved the planner — a selected plan with pictures in 3 of 6 runs, twice, where
+the baseline had 0 — and **the scorer answered "no" to "does every shot show something new?" in all six of those runs,
+and "yes" in every run without a picture.** A recurring subject reads as repetition to the scorer, and the same
+question is Gate 7's. D-027 makes a picture only for a subject that recurs; D-064's fourth question counts recurrence
+against the plan. Pictures AND Gate 7 may need one of those two to move, and that is the owner's call.

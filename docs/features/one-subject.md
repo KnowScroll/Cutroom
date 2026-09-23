@@ -5,7 +5,7 @@ authority: plan
 
 # one-subject — the planner is told that one object seen twice is one subject
 
-Status: planned
+Status: stopped — the sentence did not meet the threshold set in advance (0 of 6, as the baseline); S-149 as amended
 Decisions: D-026, D-027, D-029, D-034, D-035, D-061, D-062, D-064, S-028, S-039, S-099, S-111, S-129, S-134, S-136, S-144, S-145, S-146, S-148, S-149
 Named only in the deferral list: D-023, S-115
 Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED 2026-09-23 adversarial-reviewer · program-design APPROVED 2026-09-23 adversarial-reviewer · slices APPROVED 2026-09-23 adversarial-reviewer

@@ -18,9 +18,12 @@ named the recurring logbook as two subjects, and the plan that did recur lost on
    `fal-ai/minimax-h3-turbo/text-to-video`). Slice 8 and the Outcome line _"One real reel exists … beside what the
    provider says it cost"_ both need it, and so does D-007's Q9. Also: did any call from earlier runs bill that our
    record does not show?
-2. **What to change so a subject recurs in the plan that is chosen** (S-148): the brief (for instance one criterion
-   naming the logbook in both places), the planner's prompt, or the plan score. The last two are `reel-plan`'s, a
-   verified feature, and need gates.
+2. **Pictures AND Gate 7 — the question S-149's measurement left** (updated at the end of session 47). The owner
+   chose the planner's prompt for S-148; `one-subject` measured it for nothing and it was **not kept** (0 of 6, as the
+   baseline). Underneath: in all six runs where the selected plan would make a picture, the scorer answered **no** to
+   _"Does every shot show something that no other shot has already shown?"_ — Gate 7's question too. D-027 makes a
+   picture only for a subject that recurs; D-064's fourth question counts recurrence against the plan. Which, if
+   either, moves is the owner's.
 
 Paste everything inside the block below as the session's first message.
 
@@ -37,7 +40,7 @@ WHAT IS ALREADY SETTLED, so do not ask any of it again:
 
 Start:
 1. `node scripts/decisions.mjs`. If it says commits are unpushed in the steering repository, say so and stop.
-2. Read CLAUDE.md; then JOURNAL.md's session 47 entry IN FULL; then DECISIONS.md's S-147 and S-148.
+2. Read CLAUDE.md; then JOURNAL.md's session 47 entry IN FULL; then DECISIONS.md's S-147, S-148 and S-149 (as amended).
 3. `node scripts/check.mjs` — confirm green before anything else. Session 47 saw its tests step fail twice and pass
    three times with no change; if it fails, find WHICH test before anything else (check.mjs prints 40 lines only).
 
@@ -46,9 +49,12 @@ A. SLICE 8. Ask the owner for fal's own figure for run f895e76d… and whether a
    in docs/features/paid-path.md, and run paid-path's journey. If the figures disagree, that is the finding: record it
    and say what it means for the budget guard before ticking anything.
 
-B. RECURRENCE. Put S-148's question to the owner with AskUserQuestion: the brief, the planner's prompt, or the plan
-   score. A brief change is the caller's (S-134) and needs no gate; the other two are reel-plan's and need gates first.
-   A reel costs about 160-210c; do not run one without the owner's go-ahead in this session.
+B. PICTURES AND GATE 7. Read S-149 as amended: a recurring subject reads as repetition to the scorer's fourth
+   question, which is Gate 7's. Put the choice to the owner with AskUserQuestion — for instance D-027's rule (a
+   picture only for a recurring subject), D-064's fourth question's wording, or leave both — each a change to a
+   verified feature and a D-entry, so gates first. Measure any wording for nothing first, as one-subject did
+   (.tmp/one-subject-measure.mjs is the pattern; it is not committed). A reel costs about 160-210c; do not run one
+   without the owner's go-ahead in this session.
 
 How to work:
 - Never weaken a check or a test to reach green. Every fix by addition.
