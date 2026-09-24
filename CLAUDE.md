@@ -84,6 +84,22 @@ A package is entered **only** through its `src/index.ts`. Adding a package's fir
 means adding its reference to the root `tsconfig.json` — `tests/workspace.test.ts` fails if you
 forget, because an unreferenced package is one nothing typechecks.
 
+## Subagents, and the model each one runs on
+
+`.claude/agents/` holds the four this repository uses most. Each one names its own model, chosen by what a wrong
+answer costs. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10, Haiku $1/$5. No agent here uses Fable
+($10/$50).
+
+- **`gate-reviewer`** — `opus`. The adversarial review of a feature's four gates; every review so far. Code is
+  written against what it approves, so it gets the strongest model this repository uses.
+- **`test-impact`** — `sonnet`. Which verified checks a planned change turns red or wrongly green. Careful reading of
+  many test files, no design judgement.
+- **`check-runner`** — `haiku`. Runs `check.mjs`, one test file, a drift proof or a named journey, and returns the
+  verdict and the decisive lines — never the whole stream.
+- **`run-reader`** — `haiku`. Reads a real run's rows from the database, read-only, after it finishes or fails.
+
+None of them edits code. The reviewer's one allowed edit is the `Gates:` line of the file it approves.
+
 ## Environment traps, each one already paid for
 
 - **`pnpm` is not on PATH** and is not installed globally. Use `corepack pnpm <script>`, or skip
