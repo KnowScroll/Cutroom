@@ -1,6 +1,7 @@
 import type {
   ClipRef,
   ClipsRecorder,
+  RefusalRecorder,
   LanguageModelPort,
   MediaPort,
   MediaProbe,
@@ -117,6 +118,8 @@ export interface ClipsPorts {
   /** Recording. */
   model: LanguageModelPort
   recorder: ClipsRecorder
+  /** Where every answer a gate refuses is handed, to be kept (docs/features/ask-again.md, S-156). */
+  refusals: RefusalRecorder
 }
 
 export interface ClipsStageSettings {
@@ -283,11 +286,23 @@ async function stage(
       await narrated(n, { probe: measured })
       const timings = wordTimings(text, measured.durationSeconds).safeParse(spoken.timings)
       if (!timings.success) {
+        const reasons = timings.error.issues.map(
+          (i) => `${i.path.join('.') || '(timings)'}: ${i.message}`,
+        )
+        // KEPT, and not asked again (docs/features/ask-again.md, S-156): the owner kept a narration
+        // to one call, and what the provider answered is what the next reading needs (P-001).
+        await ports.refusals.keep({
+          port: 'speech',
+          role: null,
+          call: null,
+          about: [narrationId],
+          ask: 1,
+          reasons,
+          answer: JSON.stringify(spoken.timings) ?? String(spoken.timings),
+        })
         return {
           kind: 'failed',
-          detail: `the word timings of ${narrationId} do not parse: ${timings.error.issues
-            .map((i) => `${i.path.join('.') || '(timings)'}: ${i.message}`)
-            .join('; ')}`,
+          detail: `the word timings of ${narrationId} do not parse: ${reasons.join('; ')}`,
         }
       }
       await narrated(n, { words: timings.data })
@@ -402,7 +417,7 @@ async function stage(
 
       // Gate 4, the witness, given this take's clip alone (I-8): a cut-off take keeps the gates it
       // completed and no outcome.
-      const witnessed = await gate4(clip, ports.model)
+      const witnessed = await gate4(clip, ports.model, ports.refusals)
       await decided(t, witnessed.verdict, { observation: witnessed.observation })
 
       // Gate 5, given this take's own observation and its shot's brief; the outcome is decided now:

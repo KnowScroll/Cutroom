@@ -23,6 +23,18 @@ Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED
 > asked the same thing, the same way, a second time. It does not touch any adapter, and every gate's verdict on an
 > answer that parses is exactly what it is today.
 
+> **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
+> (**S-156**). **The second ask is TOLD WHY**: a new object, the first ask's keys and `refused` — the first answer's
+> issues under the witness's own schema, as a `WitnessRefusals` only `witnessRefusalsOf` can build — where S-147
+> sent the same object with nothing added. The four asks P-004's picture was refused on were what changed that: an
+> unchanged ask at temperature 0 answered the same way. **Every refused answer is kept**, handed by the gate to a
+> `refusals` port (Deferred item 1, done). So `askWitness` and `gate4` take that port, and **checks 1 to 5 hand it
+> one**; **check 2**'s _"the SAME argument object … holding only the picture or clip ref and temperature 0"_ becomes:
+> the first ask is the call the gate built, snapshotted as exactly that; the second is a new object, snapshotted as
+> that and `refused`, equal to the first answer's issues computed in the test. Check 3's exact words hold: the
+> `<path>: <message>` format is unchanged, now kept in one place (`refusals.ts`). A witness `Spent` is still never
+> asked again (check 4, the owner's choice). This feature's journey is run again in `ask-again`'s last slice.
+
 ## Gate 1 — Product (no technical language)
 
 **The problem.** Before a reel keeps a picture or a clip, the engine asks a second model to describe it, in a fixed

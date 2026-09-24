@@ -102,8 +102,22 @@ function portOf(observe: (argument: unknown) => Promise<{ value: unknown }>): La
 const TAKE: ClipRef = { takeId: 'a1-shot-2-take-1', path: 'clips/a1-shot-2-take-1.mp4' } as ClipRef
 const PICTURE = { pictureId: 'a1-shot-0-a', path: 'pictures/a1-shot-0-a.png' }
 
-const askStill = (observe: (c: unknown) => Promise<{ value: unknown }>, call: unknown) =>
-  askWitness(call, observe, witnessObservation, PICTURE.pictureId, 'an observation')
+/**
+ * AMENDED BY ask-again (S-156): Gate 4 and askWitness are handed a `refusals` port, where every
+ * refused answer is kept. These checks are about the asks, not the record, so it keeps nothing;
+ * ask-again's checks 16 and 17 hold what it is handed.
+ */
+const REFUSALS = { keep: async () => undefined }
+
+/** A refused answer's issues, in today's format — computed here, independently of the gate. */
+function issuesOf(schema: z.ZodType<unknown>, value: unknown): string[] {
+  const parsed = schema.safeParse(value)
+  assert.ok(!parsed.success, 'the answer parses')
+  return parsed.error.issues.map((i) => `${i.path.join('.') || '(answer)'}: ${i.message}`)
+}
+
+const askStill = (observe: (c: object) => Promise<{ value: unknown }>, call: object) =>
+  askWitness(call, observe, witnessObservation, PICTURE.pictureId, 'an observation', REFUSALS)
 
 // ---------------------------------------------------------------- 1
 
@@ -114,7 +128,7 @@ test('1. a witness answer that parses is asked for once: askWitness and gate4 ea
   assert.equal(onStill.seen.length, 1)
 
   const onClip = observer([{ value: clip }])
-  const { observation, verdict } = await gate4(TAKE, portOf(onClip.observe))
+  const { observation, verdict } = await gate4(TAKE, portOf(onClip.observe), REFUSALS)
   assert.deepEqual(observation, clip)
   assert.equal(verdict.outcome, 'accept')
   assert.equal(onClip.seen.length, 1)
@@ -122,25 +136,40 @@ test('1. a witness answer that parses is asked for once: askWitness and gate4 ea
 
 // ---------------------------------------------------------------- 2
 
-test('2. a first answer the schema refuses is asked for once more with the SAME argument object — identical by reference and, snapshotted at each call, holding only the picture or clip ref and temperature 0 — and the second answer, parsing, is the observation returned', async () => {
-  const onStill = observer([{ value: { ...still, lighting: 'top' } }, { value: still }])
+// AMENDED BY ask-again (S-156), which supersedes S-147's "nothing is added to the second ask": the
+// second ask is a NEW object — the first ask's keys and `refused`, the first answer's issues and
+// nothing else. The first ask is still exactly the call the gate built.
+test("2. a first answer the schema refuses is asked for once more — the first ask the call the gate built, snapshotted as only the picture or clip ref and temperature 0; the second a NEW object, snapshotted as that and refused, the first answer's issues (S-156; before it, the same object) — and the second answer, parsing, is the observation returned", async () => {
+  const first = { ...still, lighting: 'top' }
+  const onStill = observer([{ value: first }, { value: still }])
   const call = { picture: PICTURE, temperature: 0 }
   assert.deepEqual(await askStill(onStill.observe, call), still)
   assert.equal(onStill.seen.length, 2)
   assert.equal(onStill.seen[0]?.argument, call, 'the first ask is not the call the gate built')
-  assert.equal(onStill.seen[1]?.argument, call, 'the second ask is not the same object')
-  for (const { snapshot } of onStill.seen) {
-    assert.deepEqual(snapshot, { picture: PICTURE, temperature: 0 })
-  }
+  assert.notEqual(onStill.seen[1]?.argument, call, 'the second ask is the same object')
+  assert.deepEqual(onStill.seen[0]?.snapshot, { picture: PICTURE, temperature: 0 })
+  assert.deepEqual(onStill.seen[1]?.snapshot, {
+    picture: PICTURE,
+    temperature: 0,
+    refused: issuesOf(witnessObservation, first),
+  })
 
   const onClip = observer([{ value: badPosition }, { value: clip }])
-  const { observation } = await gate4(TAKE, portOf(onClip.observe))
+  const { observation } = await gate4(TAKE, portOf(onClip.observe), REFUSALS)
   assert.deepEqual(observation, clip)
   assert.equal(onClip.seen.length, 2)
-  assert.equal(onClip.seen[0]?.argument, onClip.seen[1]?.argument, 'Gate 4 built two arguments')
-  for (const { snapshot } of onClip.seen) {
-    assert.deepEqual(snapshot, { clip: { takeId: TAKE.takeId, path: TAKE.path }, temperature: 0 })
-  }
+  assert.notEqual(
+    onClip.seen[0]?.argument,
+    onClip.seen[1]?.argument,
+    'Gate 4 asked the same object',
+  )
+  const ref = { takeId: TAKE.takeId, path: TAKE.path }
+  assert.deepEqual(onClip.seen[0]?.snapshot, { clip: ref, temperature: 0 })
+  assert.deepEqual(onClip.seen[1]?.snapshot, {
+    clip: ref,
+    temperature: 0,
+    refused: issuesOf(clipObservation, badPosition),
+  })
 })
 
 // ---------------------------------------------------------------- 3
@@ -148,7 +177,7 @@ test('2. a first answer the schema refuses is asked for once more with the SAME 
 test("3. two refused answers, refused on DIFFERENT paths (lighting, then entities.0.position), throw after exactly two observe calls with exactly \"the witness's answer for <id> is not <noun>: \" followed by the second's issues in today's format; the first's path appears nowhere in the message; no third call is made", async () => {
   // A third answer that WOULD parse, so a third ask would return rather than throw.
   const onClip = observer([{ value: badLighting }, { value: badPosition }, { value: clip }])
-  await assert.rejects(gate4(TAKE, portOf(onClip.observe)), (error: Error) => {
+  await assert.rejects(gate4(TAKE, portOf(onClip.observe), REFUSALS), (error: Error) => {
     const expected = clipObservation.safeParse(badPosition)
     assert.ok(!expected.success)
     const issues = expected.error.issues
@@ -193,11 +222,14 @@ test('4. an observe that throws — a plain fault, Unavailable, or Spent — on 
   ]
   for (const error of errors) {
     const first = observer([{ throws: error }, { value: clip }])
-    await assert.rejects(gate4(TAKE, portOf(first.observe)), (thrown) => thrown === error)
+    await assert.rejects(gate4(TAKE, portOf(first.observe), REFUSALS), (thrown) => thrown === error)
     assert.equal(first.seen.length, 1, `${error.name} on the first ask was asked again`)
 
     const second = observer([{ value: badLighting }, { throws: error }, { value: clip }])
-    await assert.rejects(gate4(TAKE, portOf(second.observe)), (thrown) => thrown === error)
+    await assert.rejects(
+      gate4(TAKE, portOf(second.observe), REFUSALS),
+      (thrown) => thrown === error,
+    )
     assert.equal(second.seen.length, 2, `${error.name} on the second ask was asked a third time`)
   }
 })
@@ -291,7 +323,7 @@ test('5. the two schemas are exactly what they were: witnessObservation\'s and c
   for (const answer of nearMisses) {
     const port = observer([{ value: answer }, { value: answer }])
     await assert.rejects(
-      gate4(TAKE, portOf(port.observe)),
+      gate4(TAKE, portOf(port.observe), REFUSALS),
       /is not a clip observation: entities\.0\.position: /,
     )
     assert.equal(port.seen.length, 2)

@@ -10,6 +10,9 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `ask-again` on 2026-09-24, Slice 4 — the gates below are not edited, and no assertion is
+> removed** (**S-156**). **The clips stage's ports gained `refusals`**, so the hand-written `ClipsPorts` in `tests/reel-takes-transient.test.ts` gains a no-op one to typecheck; nothing on its scripts refuses. `r14-failed`'s words and its two `observe` receipts hold. This feature's journey is run again in `ask-again`'s last slice.
+>
 > **Amended by `second-ask` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
 > (**S-147**). Gate 4 now asks once more when its answer is refused. **The labels check's `r14-failed` fixture gives
 > shot 3's take its wrong answer TWICE** — with one, the second ask would run off the script's end and the run would

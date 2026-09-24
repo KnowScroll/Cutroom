@@ -329,7 +329,9 @@ function direct(video: VideoPort, narration: NarrationPort) {
       recorded.narrations.push(n)
     },
   }
-  return { ports: { video, narration, media, model, recorder }, recorded }
+  // AMENDED BY ask-again (S-156): the clips stage's ports gained `refusals`; nothing here refuses.
+  const refusals = { keep: async () => undefined }
+  return { ports: { video, narration, media, model, recorder, refusals }, recorded }
 }
 
 /** A narration port that speaks every word of the text, 300 ms each and 200 ms after. */

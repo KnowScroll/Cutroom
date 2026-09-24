@@ -24,6 +24,7 @@ import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
 import { guardedImagePort } from './guarded-image-port.ts'
 import { appendBudgetStopQuestion } from './questions.ts'
 import { stillsRecorder } from './recorder.ts'
+import { refusalRecorder } from './refusal-recorder.ts'
 import { recordingPort } from './recording-port.ts'
 
 // The `reel.keyframes` job (docs/features/reel-stills.md, Gate 2 "How a run goes" and "How a stills
@@ -127,6 +128,7 @@ export async function runKeyframesJob(
       model: recordingPort(context.model, db, runId, job.id),
       sensors: context.sensors,
       recorder: stillsRecorder(db, runId),
+      refusals: refusalRecorder(db, runId),
     },
     { plan: context.settings, stills: context.stills },
   )

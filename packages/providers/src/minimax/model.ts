@@ -210,6 +210,25 @@ export const SHAPE_PREFACE = [
  * The line is built FROM the shape, never typed beside it: a set that gains a value gains the
  * sentence (S-124, S-127, S-130's rule).
  */
+/**
+ * What a SECOND ask says, and only a second ask (docs/features/ask-again.md, Gate 2; S-156): one
+ * fixed sentence, the reasons the first answer was refused one a line, and one fixed instruction.
+ * The reasons are a `Refusals` or a `WitnessRefusals` — built only in `packages/contracts`, from a
+ * schema's issues — so nothing a caller writes can reach a call carrying a picture by this route
+ * (I-8). For `observe` it follows S-144's closed sets in the question's own text part; for
+ * `structured` it follows the prompt and precedes the shape (S-130's order). Without `refused`,
+ * nothing is added and every body is byte for byte what it was (`ask-again`'s check 1).
+ */
+export const REFUSED_SAID = 'Your previous answer to this was refused, for these reasons:'
+
+/** The instruction after the reasons. */
+export const REFUSED_AGAIN = 'Answer again, with every field exactly as the shape below says.'
+
+/** The block a second ask carries: the sentence, each reason as `- <reason>`, the instruction. */
+export function refusedSaid(reasons: readonly string[]): string {
+  return [REFUSED_SAID, ...reasons.map((reason) => `- ${reason}`), REFUSED_AGAIN].join('\n')
+}
+
 export const CLOSED_SETS_PREFACE =
   'Some of these fields take one of a fixed set of values, and nothing else is an answer. Give ' +
   'the value from the set even when a more exact description of what you see is available, and ' +
@@ -716,6 +735,7 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
     shape: z.ZodType<unknown>,
     name: string,
     about: { pictureIds?: readonly string[]; takeIds?: readonly string[] },
+    refused?: readonly string[],
   ): Promise<{ value: unknown; receipt: ModelReceipt }> {
     const model = options.models[role]
     // The shape is appended as a part of its own, after the question and the media (S-130). It is
@@ -731,12 +751,18 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
     // It is APPENDED TO THE QUESTION'S OWN TEXT PART rather than added as a part of its own, so
     // the call still carries exactly what checks 6 and 7 assert: the question first, the media as
     // bytes after it, the rendered schema last.
+    //
+    // A SECOND ASK'S REASONS FOLLOW THE SETS, in the same part (S-156): the parts stay the question,
+    // the media, and the shape.
     const sets = closedSetsSaid(shape)
-    let saidAlready = sets === undefined
+    const said = [sets, refused === undefined ? undefined : refusedSaid(refused)].filter(
+      (text): text is string => text !== undefined,
+    )
+    let saidAlready = said.length === 0
     const asking = parts.map((part) => {
       if (saidAlready || part.type !== 'text') return part
       saidAlready = true
-      return textPart(`${part.text}\n\n${String(sets)}`)
+      return textPart([part.text, ...said].join('\n\n'))
     })
     const answer = await post(
       {
@@ -781,7 +807,14 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
           messages: [
             {
               role: 'user',
-              content: asked.said === undefined ? call.prompt : `${call.prompt}\n\n${asked.said}`,
+              // A second ask's reasons after the prompt and before the shape (S-156, S-130).
+              content: [
+                call.prompt,
+                call.refused === undefined ? undefined : refusedSaid(call.refused),
+                asked.said,
+              ]
+                .filter((text): text is string => text !== undefined)
+                .join('\n\n'),
             },
           ],
           max_tokens: maxTokens,
@@ -819,6 +852,7 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
           witnessObservation,
           'observation',
           { pictureIds: [call.picture.pictureId] },
+          call.refused,
         )
       }
       return ask(
@@ -829,6 +863,7 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
         clipObservation,
         'clipObservation',
         { takeIds: [call.clip.takeId] },
+        call.refused,
       )
     },
 

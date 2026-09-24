@@ -8,6 +8,7 @@ import type {
   PictureSensorPort,
   Plan,
   PlanSettings,
+  RefusalRecorder,
   StillsRecorder,
   StillsSettings,
 } from '@cutroom/contracts'
@@ -79,6 +80,8 @@ export interface StillsPorts {
   model: LanguageModelPort
   sensors: PictureSensorPort
   recorder: StillsRecorder
+  /** Where every answer a gate refuses is handed, to be kept (docs/features/ask-again.md, S-156). */
+  refusals: RefusalRecorder
 }
 
 export interface StillsStageSettings {

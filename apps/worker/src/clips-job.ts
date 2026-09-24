@@ -22,6 +22,7 @@ import {
 import { makeClips, readTakeId } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
 import { clipsRecorder } from './clips-recorder.ts'
+import { refusalRecorder } from './refusal-recorder.ts'
 import { guardedNarrationPort } from './narration-port.ts'
 import { appendClipsStopQuestion } from './questions.ts'
 import { recordingPort } from './recording-port.ts'
@@ -117,6 +118,7 @@ export async function runClipsJob(
       media: context.media,
       model: recordingPort(context.model, db, runId, job.id),
       recorder: clipsRecorder(db, runId),
+      refusals: refusalRecorder(db, runId),
     },
     { plan: context.settings, render: context.render },
   )

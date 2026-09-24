@@ -6,6 +6,7 @@ import type {
   PictureSensorPort,
   PlanSubject,
   Reconciliation,
+  RefusalRecorder,
   WitnessObservation,
 } from '@cutroom/contracts'
 import type { Criterion } from '@cutroom/reel-contract'
@@ -91,7 +92,7 @@ export function reconcileFailures(
 export async function gate1(
   picture: PictureRef,
   brief: Brief,
-  ports: { sensors: PictureSensorPort; model: LanguageModelPort },
+  ports: { sensors: PictureSensorPort; model: LanguageModelPort; refusals: RefusalRecorder },
   progress: (fields: Partial<Gate1Progress>) => Promise<void>,
 ): Promise<'accept' | 'fail'> {
   // The picture as the port made it, and nothing more: an id and a path (I-8).
@@ -128,14 +129,15 @@ export async function gate1(
   await progress({ text: [...text], gate1: verdict(null) })
 
   // 3. witness — the picture and a temperature, nothing else (I-8), parsed at the gate (D-041). An
-  // answer the schema refuses is asked for once more, the same call; a second refusal fails the run
-  // (S-042 as S-147 amends it, docs/features/second-ask.md).
+  // answer the schema refuses is kept and asked for once more, told only its own schema's issues; a
+  // second refusal fails the run (S-042 as S-147 and S-156 amend it, docs/features/ask-again.md).
   const observation = await askWitness(
     { picture: ref, temperature: 0 as const },
     (call) => ports.model.observe(call),
     witnessObservation,
     ref.pictureId,
     'an observation',
+    ports.refusals,
   )
   steps.push({ step: 'witness', outcome: 'accept', reasons: [] })
   await progress({ observation, gate1: verdict(null) })

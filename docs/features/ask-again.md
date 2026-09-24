@@ -436,7 +436,7 @@ as 1, a count that parses and is false; it matters only when the uncountable thi
 - [x] **Slice 3 — the structured calls ask again.** `askStructured` at all five sites; the stand-in's `Spent`; the
       engine's `refusedThen`; `reel-plan`'s check 7 amended. Amendment blocks: `reel-plan`, `reel-stills` (check 27's
       count), `reel-render` (check 24's count). **Proves: 7 to 15.**
-- [ ] **Slice 4 — the witness is told, and the gates' refusals are kept.** `askWitness`' new object and `refusals`
+- [x] **Slice 4 — the witness is told, and the gates' refusals are kept.** `askWitness`' new object and `refusals`
       port; Gates 1 and 4 wired; `StillsPorts` and `ClipsPorts` gain `refusals`, and the worker's `refusalRecorder`
       fills it; refused timings in the clips stage; the adapter's rendering of `refused`; `second-ask`'s checks 1 to 5
       and `reel-takes`' hand-written ports amended. Amendment blocks: `second-ask`, `reel-stills`, `reel-render`,
