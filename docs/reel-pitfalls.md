@@ -18,22 +18,70 @@ Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; 
 Kept current as entries are added. **Fix** is work that is understood and waits for a feature's gates; **review** is a
 question to look at, or an owner's choice, before anything is built.
 
-| what                                                                                     | kind   | from         | state                                              |
-| ---------------------------------------------------------------------------------------- | ------ | ------------ | -------------------------------------------------- |
-| **One claim over two shots, one criterion that fits only one**: its takes can never pass | done   | P-008        | sentence 7 unclaimed; run 05611ff9 completed       |
-| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one     | done   | P-007        | `cut-rules`, verified: the clips are muted (S-158) |
-| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing    | done   | P-006        | `cut-rules`, verified (S-158)                      |
-| **Show the witness the shape the gate judges it by** — one copy, in contracts            | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf        |
-| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused      | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed      |
-| **Keep the raw answer of a model whose answer did not parse**, so it can be read         | done   | P-004        | `scripts/refused.mjs <run>`                        |
-| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed       | fix    | all four     | direction settled (S-157); gates next              |
-| Does S-042 (an answer that does not parse fails the run) still hold for real providers?  | review | P-001, P-004 | answered: S-156 supersedes it in part              |
-| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?   | review | P-005        | `ask-again` Deferred 2                             |
-| A text-made shot has no still to fall back on, so its third failed take stops the reel   | review | P-003        | owner: accept, or give such shots a fallback       |
-| Clip prompts could ask for no fade to black; space scenes are mostly dark                | review | P-003        | watch: fix only if it recurs after the brief       |
-| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness       | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)   |
+| what                                                                                           | kind   | from         | state                                                             |
+| ---------------------------------------------------------------------------------------------- | ------ | ------------ | ----------------------------------------------------------------- |
+| **Gate 7's caption question, judged from 18 frames, 13 of them silent**: refused a correct cut | review | P-011        | a feature: give the judge the caption text, or compare it exactly |
+| **An admitted image model whose frame never passes D-028**: nano-banana-2 at 1K, 768×1376      | review | P-010        | owner: drop it from the registry, or send a size it honours       |
+| **fal's flux upstream answered 504**, and each run threw away its plan and pictures            | fix    | P-009        | `resume-failed` (S-157): a provider fault, resumed once           |
+| **One claim over two shots, one criterion that fits only one**: its takes can never pass       | done   | P-008        | sentence 7 unclaimed; run 05611ff9 completed                      |
+| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one           | done   | P-007        | `cut-rules`, verified: the clips are muted (S-158)                |
+| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing          | done   | P-006        | `cut-rules`, verified (S-158)                                     |
+| **Show the witness the shape the gate judges it by** — one copy, in contracts                  | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf                       |
+| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused            | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed                     |
+| **Keep the raw answer of a model whose answer did not parse**, so it can be read               | done   | P-004        | `scripts/refused.mjs <run>`                                       |
+| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed             | fix    | all four     | direction settled (S-157); gates next                             |
+| Does S-042 (an answer that does not parse fails the run) still hold for real providers?        | review | P-001, P-004 | answered: S-156 supersedes it in part                             |
+| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?         | review | P-005        | `ask-again` Deferred 2                                            |
+| A text-made shot has no still to fall back on, so its third failed take stops the reel         | review | P-003        | owner: accept, or give such shots a fallback                      |
+| Clip prompts could ask for no fade to black; space scenes are mostly dark                      | review | P-003        | watch: fix only if it recurs after the brief                      |
+| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness             | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)                  |
 
 ## Open
+
+### P-011 · engine · Gate 7 refused a correct cut on its caption question
+
+- **Run** `bf8f4444…`, 2026-09-24 (session 50), volcanoes, the brief as committed (`497182b`), `flux-2-pro/edit`.
+- **What happened.** All six shots passed Gates 2–5 (one retake: shot 1, at Gate 5), the cut was assembled — 45.25 s
+  — and **Gate 7 answered no to _"Do the burned captions follow the narration?"_**, yes to its other three questions.
+  The reel stopped (S-066, S-074). **55¢**.
+- **The captions were right.** The subtitles file holds all 89 words of the narration, in order. Of the 18 frames the
+  judge was shown, **13 carry no caption**: they are each shot's first and last frames, which fall in the narration's
+  silences, and a caption is one word at a time. The judge had five isolated words — "rock,", "erupts.", "into",
+  "layers", "way," — to judge a 45-second narration by. Run `05611ff9…` was asked the same question over the same kind
+  of frames and answered yes.
+- **Cause.** The engine: the question asks what its frames cannot show. Not the brief.
+- **For good.** A feature, with its gates: give the judge the caption text beside the frames, or take the caption
+  question's frames at word midpoints — or answer it without a model: the subtitles file and the narration are both the
+  engine's own, and can be compared exactly. Gate 7 is not weakened meanwhile (CLAUDE.md rule 3).
+- **Also on this run.** One of shot 2's two pictures, `a1-shot-2-b.jpg`, had the narration's sentence **written across
+  it** — _"Above ground, magma is called lava, glowing hotter than a thousand degrees"_ — and Gate 1 refused it under
+  `never-text`; the other was accepted (D-047). One refused witness answer (`ambiguities` given as a string), asked
+  again, parsed (`scripts/refused.mjs bf8f4444`). The pieces made the hybrid reel of session 50, outside the engine.
+
+### P-010 · engine · an admitted image model whose picture can never pass the frame assertion
+
+- **Run** `bad736d1…`, 2026-09-24 (session 50), volcanoes, `--model fal-ai/nano-banana-2/edit`, chosen after P-009.
+- **What happened.** Its first picture came back **768×1376**, not 9:16, and the run failed there — correctly:
+  image-to-video has no aspect field, so the picture would have made a clip of its own shape with no error (D-019,
+  D-028). **8¢**.
+- **Cause.** `IMAGE_REGISTRY` admits `nano-banana-2/edit` asking for a ratio at its 1K tier, where the frame is the
+  provider's choice — already in `JOURNAL.md` from when the first real reel's image entry was chosen, and not read before
+  this run was recommended. Seedream's 1920×3416 was refused the same way (S-133). **`flux-2-pro/edit` is the only
+  admitted entry known to make the exact 864 × 1536 frame.**
+- **For good.** Review: drop from the registry the entries that cannot pass, or send them a size they honour — a
+  decision, and a change with its checks. Until then, a switch of image model is checked against the journal first.
+
+### P-009 · provider · fal's flux upstream answered 504, twice, and each run lost its plan and pictures
+
+- **Runs** `124f1124…` and `9b23d24a…`, 2026-09-24 (session 50), volcanoes, `flux-2-pro/edit`.
+- **What happened.** Gate 0 accepted a plan in each (69 s and 89 s of planning); each then failed in the stills stage:
+  `the provider is unavailable: … answered 504 … downstream_service_unavailable` — shot 0's picture on `flux-2-pro` in
+  the first, shot 4's derived picture on `flux-2-pro/edit` in the second, after shot 2's two pictures (**10¢**). No lost
+  call. fal's status page read _"All systems operational"_.
+- **Cause.** The provider: fal's upstream for FLUX.2, failing on and off for about ten minutes. The next flux run,
+  fifteen minutes on, made all four pictures.
+- **For good.** `resume-failed` (S-157) is this case exactly: a provider fault, resumed once, keeping the accepted plan
+  and pictures.
 
 ### P-008 · brief · a claim spanning two shots, and a criterion that fits only one of them
 
