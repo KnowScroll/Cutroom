@@ -169,7 +169,7 @@ to matter; a tie goes to the 4-unit plan, as today (D-064's tie rule).
 - [x] **Slice 3 — the sound.** `soundOf`; `duckDb` out of contracts, defaults, schema and build; `volume` out of
       `PASS_FILTERS`; `reel-render`'s checks 32, 34 and 37, its manifest check and typed fixture, and `reel-takes`'
       checks 16 and 18 amended. Amendment blocks: `reel-render`, `reel-takes`. **Proves: 3, 4.**
-- [ ] **Slice 4 — the journey.** Check 5; this feature's journey, and `reel-plan`'s, `reel-stills`', `reel-render`'s
+- [x] **Slice 4 — the journey.** Check 5; this feature's journey, and `reel-plan`'s, `reel-stills`', `reel-render`'s
       and `reel-takes`' again (S-099's form). **Proves: 5.**
 
 Every check appears in exactly one slice: 1 + 1 + 2 + 1 = 5.
