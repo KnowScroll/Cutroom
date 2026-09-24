@@ -5841,3 +5841,106 @@ does not parse and keeps the raw answer — then the black-holes reel as committ
 | `879a27b7…` | the same, sentence 1 reworded                                                      | 53c  | 8.5 min | no       | shot 2: picture clipped twice; three clips fade to black on "disappears for good" (Gate 2) |
 | `c9f3df47…` | the same, c3 compact and lit                                                       | 10c  | 2.3 min | no       | witness gave a count as a string for shot 1's picture (P-004)                              |
 | `c52d418a…` | the same, unchanged                                                                | 15c  | 2.7 min | no       | witness gave a count of 0 for shot 1's picture (P-004 again)                               |
+
+## 2026-09-24 — session 49: `ask-again` — the witness is shown the shape it is judged by, a refused answer is asked once more told why, and every refused answer is kept (PROMPTS/049)
+
+**Intent.** `PROMPTS/049`: plan and build the fix for one malformed model answer failing a whole real run (P-001,
+P-004), gates first; then the black-holes reel as committed. `decisions.mjs`: pin current, 0 unpushed; `check.mjs`
+green before anything.
+
+**What happened, in one line.** **`ask-again` is built and verified in five slices**, and on the way its first review
+found WHY P-004 kept happening: **the witness was shown a looser shape than the gate judged it by**, and a 0¢
+measurement on P-004's own pictures read, for the first time, what the witness wrote — `-1` and `"many"` for stars too
+many to count.
+
+### The finding first: the second ask already existed, and did not help
+
+P-004's two runs each left **two** `observe` receipts on shot 1's picture (ids 253–254, 266–267): `second-ask`
+(S-147) had asked again both times, and both second answers were refused too. So the prompt's premise — "ask once
+more" — was already built for the witness. Put to the owner with that: tell the witness why (chosen); ask the
+planner, scorer and reconcilers again too (chosen); keep raw answers in a table row (chosen); slug `ask-again`.
+
+### The gates: four reviews — 15, 8, 6, then 0 findings
+
+- **Round 1 (15)**, the one that mattered: **the MiniMax adapter asked the witness with its OWN copy of the observation
+  shape** — `count: z.number().int()` (any integer), `label: z.string()`, no strict object — while the gate parses
+  `count > 0`, a non-empty label and strict objects. **A count of 0 was an answer the witness had been told was fine.**
+  S-139's lesson on a number. Three more owner questions: **one copy, in contracts** (chosen over two copies pinned by a
+  check); **measure first** (chosen); **ask again only when an answer was held** — budget and wire failures stay one
+  send (chosen). Also: supersessions unnamed (S-037, S-072, D-035/D-061, D-064, S-040, S-130, S-136, S-116), a check
+  that could not live in its file (paid-path's check 20), second-ask's check 5 missed, the amended-check list deferred.
+- **The measurement** (`.tmp/ask-again-measure.mjs`, never committed; 0¢; real MiniMax-M3 witness; P-004's two
+  pictures, four asks each): **the adapter's copy 3 of 8 refused** — all on reel 4's picture, the background stars
+  counted −1, "many", −1; **the gate's schema 0 of 8** — and it counted reel 4's stars as **1 every time**, a count that
+  parses and is false (said in Gate 1 and S-156: it matters only when an uncountable thing is a shot's subject).
+- **Round 2 (8)**: one brand let the brief through (the timings and reconcile schemas quote it) — two brands now,
+  `WitnessRefusals` built only from the witness's own schemas; the layout made an import cycle (`no-circular` counts
+  type imports) — `brands.ts` imports nothing, the stages get a `refusals` port; the measurement was told too kindly.
+- **Round 3 (6)**: the supersession bullets still named the wrong brand; check 6 pinned the schema but not the value.
+- **Round 4: all four APPROVED** (`cc91fcf`). S-156 written; P-005 added to `docs/reel-pitfalls.md`.
+
+### The slices — each committed on a green `check.mjs`, each broken deliberately and restored
+
+1. **One shape** (`fe4f889`): `witnessObservation`/`clipObservation` moved unchanged to
+   `packages/contracts/src/observation.ts`; the adapter asks with them. Pins taken at 046ad37 before any edit (a
+   structured body's sha256, both question parts byte for byte). Broken: the old copy back — checks 1 and 2 red.
+2. **The record** (`c53be25`): brands, builders, `RefusedAnswer`; `LostCall.answer?`/`refused?`; `refused_answer`
+   (migration 0006) and `recordRefusedAnswer` (redact, then cap at 32 000); the recording port's rows. **Found while
+   building**: check 6 as approved forbade any `refused` property in providers/apps, and the budget guard has had its
+   own since S-035 — the scan now uses the type checker (a `refused` that lands in a brand or in nothing typed). Broken
+   four ways, each red; the `any` break names `recording-port.ts`.
+3. **Structured calls ask again** (`753d6c9`): `askStructured` at all five sites; the stand-in throws `Spent` on a
+   refused scripted value; `reel-plan`'s check 7 amended by addition. Broken three ways, each red.
+4. **The witness told, gate refusals kept** (`0119ac3`): `askWitness` sends a new object with `refused`; the adapter
+   renders it; timings kept; `second-ask`'s checks 1–5 amended. Broken four ways, each red.
+5. **The reader and the journey** (`083de3b`): `scripts/refused.mjs`, `real-reel.mjs`' count, checks 22–24.
+
+**Also this session**: the owner asked for `.claude/agents/` — four subagents with models chosen by cost of a wrong
+answer (`gate-reviewer` opus, `test-impact` sonnet, `check-runner` and `run-reader` haiku), `0da0d32`.
+
+**Observed.** The backslash-halving trap fired twice more (a seventh session): a regex through `node -e` in Git Bash,
+and a `'`-quoted title with an apostrophe — both caught by the parser, both fixed with the editor from a file.
+
+**Journeys PASS**, each after its evidence commit: `ask-again` 23, `paid-path` 120, `paid-failures` 17, `reel-plan`
+50, `reel-stills` 63, `reel-render` 106, `reel-takes` 66, `second-ask` 9. (The first loop ran all eight back to back
+and seven refused — `journey.mjs` refuses a tree the previous journey's evidence left dirty; the second loop committed
+between them.)
+
+### The reel — run `12a097bf-d3e5-48d0-8b68-f83fc80239ac`, the brief as committed
+
+Header `pictures upToThree`, estimate 18–53¢, `spend 250`; started after the journeys, at the owner's word.
+
+```text
+   82.8s  plan finished      Gate 0 accepted both plans
+  286.6s  stills finished    shots 0 and 1 accepted first time — shot 1 is P-004's picture, parsed on its FIRST ask;
+                             shot 2's picture and repair refused (subject "Tidal Stream of Star Gas" clipped), degraded
+  622.5s  4 shots through Gates 2, 3, 4 and 5, each on its first take
+  654.9s  verdict 7 fail — "Does every shot show something no other shot repeats?" no; run.finished stopped
+```
+
+- **Spent: 45¢ by our receipts** — 4 pictures `fal-ai/flux-2-pro` at 5¢ (20¢); 4 clips H3 Turbo, 5¢, 7¢, 6¢, 7¢
+  (25¢); 26 model and 4 speech receipts at 0¢. No `lost_call`. **One refused answer**, kept: shot 2's repair, the
+  witness counting "small background stars" as `"many"` — asked again, told why, parsed (`scripts/refused.mjs
+12a097bf`). The feature did on a real run exactly what it was built for.
+- **Shots from pictures**: 0 and 1 (image-to-video); 2 from words (degraded); 3 from words (no picture slot). No
+  retake; one picture repair (shot 2, refused again).
+- **The file exists and is kept**: `.artifacts/12a097bf-d3e5-48d0-8b68-f83fc80239ac/a1-render.mp4`, 49.2 s, 768×1366,
+  H.264/AAC, 9.8 MB — the first black-holes cut ever assembled. It failed Gate 7 on the brief's own terms: the witness
+  described shots 1, 2 and 3 each as a dark central object with a glowing ring. **P-006**, and **P-002 recurred**
+  through sentence 5 ("a long thin stream" named the subject). No rerun without the owner's yes.
+
+### `resume-failed` — the owner's answers (S-157)
+
+Asked while the journeys ran: both the engine and the caller may start a resume, one resume in all; provider faults
+only; pictures Gate 1 accepted are kept (S-048 superseded for those only); the caller sees a new run pointing back, and
+the failed run stays `failed`. Written into `docs/features/resume-failed.md`; its gates are next.
+
+**Why**: the owner's prompt, `PROMPTS/049`, and the owner's answers to thirteen questions across the session.
+
+**Next**: `PROMPTS/050` — P-006's choice put to the owner (rewrite scenes c3 and c4 as different kinds of picture and
+sentence 5 without "stream"; or review Gate 7's repetition question; or accept the file), the reel they choose; then
+`resume-failed`'s gates. **`parallel-shots` (S-115) is still held.**
+
+| runId       | description                                                              | cost | time     | finished | why                                                                |
+| ----------- | ------------------------------------------------------------------------ | ---- | -------- | -------- | ------------------------------------------------------------------ |
+| `12a097bf…` | black holes, the brief as committed, after `ask-again` (P-004's picture) | 45c  | 10.9 min | no       | Gate 7: three of four shots show a dark disc ringed by gas (P-006) |

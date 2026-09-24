@@ -18,19 +18,49 @@ Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; 
 Kept current as entries are added. **Fix** is work that is understood and waits for a feature's gates; **review** is a
 question to look at, or an owner's choice, before anything is built.
 
-| what                                                                                    | kind   | from         | state                                        |
-| --------------------------------------------------------------------------------------- | ------ | ------------ | -------------------------------------------- |
-| **Show the witness the shape the gate judges it by** — one copy, in contracts           | fix    | P-004, P-005 | `ask-again` Slice 1; measured 3/8 → 0/8      |
-| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused     | fix    | P-001, P-004 | `ask-again`, gates in review (S-156)         |
-| **Keep the raw answer of a model whose answer did not parse**, so it can be read        | fix    | P-004        | `ask-again` (`refused_answer`, S-156)        |
-| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | planned, five owner questions open           |
-| Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | answered: S-156 supersedes it in part        |
-| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?  | review | P-005        | `ask-again` Deferred 2                       |
-| A text-made shot has no still to fall back on, so its third failed take stops the reel  | review | P-003        | owner: accept, or give such shots a fallback |
-| Clip prompts could ask for no fade to black; space scenes are mostly dark               | review | P-003        | watch: fix only if it recurs after the brief |
-| Brief-writing rules: compact subjects; no verbs of vanishing or darkness                | brief  | P-002, P-003 | applied; add to `PROMPTS/049`'s brief rules  |
+| what                                                                                    | kind   | from         | state                                            |
+| --------------------------------------------------------------------------------------- | ------ | ------------ | ------------------------------------------------ |
+| **Three scenes of one kind of picture**: Gate 7 refuses the cut as repetitive           | review | P-006        | owner: rewrite the brief, or review Gate 7       |
+| **Show the witness the shape the gate judges it by** — one copy, in contracts           | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf      |
+| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused     | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed    |
+| **Keep the raw answer of a model whose answer did not parse**, so it can be read        | done   | P-004        | `scripts/refused.mjs <run>`                      |
+| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | direction settled (S-157); gates next            |
+| Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | answered: S-156 supersedes it in part            |
+| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?  | review | P-005        | `ask-again` Deferred 2                           |
+| A text-made shot has no still to fall back on, so its third failed take stops the reel  | review | P-003        | owner: accept, or give such shots a fallback     |
+| Clip prompts could ask for no fade to black; space scenes are mostly dark               | review | P-003        | watch: fix only if it recurs after the brief     |
+| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness      | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf) |
 
 ## Open
+
+### P-006 · brief · three of four scenes are one kind of picture, and Gate 7 refuses the cut as repetitive
+
+- **Run** `12a097bf…`, 2026-09-24 (session 49), black holes, the brief as committed, after `ask-again`.
+- **What happened.** The whole reel was made: plan 83 s (Gate 0 accepted both plans); pictures for shots 0 and 1
+  accepted first time — **shot 1 is P-004's picture, and its witness answer parsed on the first ask**; shot 2's picture
+  and its repair refused (P-002 again, below), so it was made from words; shot 3 had no picture (up to three). **All
+  four clips passed Gates 2–5 on their first take.** The cut, 49.2 s, then **failed Gate 7**: the judge answered no to
+  _"Does every shot show something no other shot repeats?"_ — every other question yes. **45¢**, 10.9 min, no
+  `lost_call`. The file is kept: `.artifacts/12a097bf-…/a1-render.mp4`.
+- **Cause.** The brief's own subject. The witness described shots 1, 2 and 3 alike — _"black circle; glowing ring of
+  light"_, _"central celestial object; swirling ring of light"_, _"spiral galaxy; dark central object; glowing ring"_.
+  Claims c2, c3 and c4 each picture a black hole with glowing gas around it; the judge is right that three shots repeat
+  one image. The same tension as S-145 and S-148, from the other side: here nothing recurs by name, and the pictures
+  recur anyway.
+- **Done.** Nothing; no rerun without the owner's yes.
+- **For good.** Brief: each scene a different KIND of picture — the explosion; the black sphere; the star being torn,
+  seen from far, as a comet-like smear rather than a ring; a whole galaxy from outside, with nothing ringed at its
+  centre. Or review whether Gate 7's repetition question should hold a topic reel whose subject is one kind of thing.
+
+### P-002 recurred · brief · the long subject came back through a SENTENCE
+
+- **Run** `12a097bf…`, shot 2. c3's criterion was made compact in session 48, but sentence 5 still reads _"…is
+  stretched into a long thin stream"_, and **the planner named the subject from it: "Tidal Stream of Star Gas"**. The
+  picture and its repair were each refused by Gate 1 — the stream clipped by the frame's edge — and the shot was made
+  from words, which then passed Gates 2–5.
+- **For good.** The brief-writing rule reaches the narration too: a sentence names what the planner will draw. And the
+  repair's witness answer was the one refused answer of the run — _"small background stars"_ counted `"many"` — asked
+  again, told why, and parsed (`scripts/refused.mjs 12a097bf`): `ask-again` doing its job.
 
 ### P-005 · engine · the witness was shown a looser shape than the gate judged it by
 
@@ -63,6 +93,7 @@ question to look at, or an owner's choice, before anything is built.
   same shot, two different malformed counts.** Both pictures, read by eye, are good: a black disc in a bright ring of gas
   on a starfield. So it is this kind of picture, not chance — likely an entity the witness lists as there but
   uncountable (the dark centre, the starfield) — and still not provable without the raw answer.
+- **Held, session 49.** On run `12a097bf…` shot 1's picture parsed on its first ask, under the gate's own shape.
 - **Read, session 49.** The cause is P-005: the witness was shown a shape that allowed −1 and 0; its answers,
   measured, counted the uncountable stars −1 or "many". Shown the gate's shape, 0 of 8 refused.
 - **Done.** Nothing to the brief: it cannot fix a model writing the wrong type. Reels stopped; the fix is

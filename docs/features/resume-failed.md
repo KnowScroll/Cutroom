@@ -15,7 +15,7 @@ Gates: product pending · architecture pending · program-design pending · slic
 > pictures that had nothing to do with the failure. The owner: _"keep the assets saved from a run, if it fails find out
 > what failed and re run for that and use the ones that were fine for that run."_
 >
-> **Its gates are not written.** This file records what the feature is, what is already decided that it builds on,
+> **Its gates are not written.** The owner answered its five questions on 2026-09-24 (S-157). This file records what the feature is, what is already decided that it builds on,
 > and what must be settled before its gates can be written. No implementation file until all four are approved by an
 > adversarial reviewer.
 
@@ -41,7 +41,29 @@ finish the SAME run. Nothing that already passed its checks is paid for twice.
 - `failed` is a terminal status in the caller's contract (D-094). Resuming a failed run changes what `failed` means to a
   caller, or needs a new status or a new call.
 
-## What must be settled before the gates (the owner's to choose)
+## What the owner settled (S-157, 2026-09-24)
+
+The five questions below were put in session 49 and answered; their gates are still to be written against them.
+
+1. **Who starts a resume — both**: the engine by itself, for a failure it judges a provider's fault, and the caller,
+   by a new call on a failed run.
+2. **Which failures — provider faults only**: a provider's malformed or missing answer, a network fault, a crash. A
+   gate refusing on the brief's own terms is not resumable; fixing the brief is a new request.
+3. **Pictures Gate 1 accepted are kept** — S-048 superseded for those only; a picture whose checks were cut off is
+   made again.
+4. **One resume in all**: if the engine has resumed a run, the caller cannot ask again; if it has not, the caller may
+   ask once. The ceiling and the per-reel cap bound the failed run and its resume together.
+5. **The caller sees a new run pointing back** to the failed one and inheriting its kept pieces; the failed run stays
+   `failed`, so D-094's terminal status keeps its meaning.
+
+**Still for the gates**: how the engine judges a failure a provider's (a closed list of failure kinds, and who names
+it); the new run's request and id, and how it points back (a field on the contract, D-094/D-099); what is kept when
+the failure was in the clips stage (S-092's rule after a crash, now after a failure); and how `ask-again`'s kept
+answers (S-156) inform the judgement.
+
+## The five questions, as they were put
+
+### What must be settled before the gates (the owner's to choose)
 
 1. **Who starts a resume** — the caller, by a new call on a failed run (`POST /v1/runs/<id>/resume`), or the engine by
    itself, once, for a failure it judges passing (a provider's malformed answer, a network fault)?

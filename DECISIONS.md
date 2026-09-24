@@ -6690,3 +6690,37 @@ brief never reaching it (16 to 21); the reader (22, 23); and the journey (24). A
 **Confirmed-by.** The owner, 2026-09-24, on seven questions in two rounds: tell the witness; ask the planner, scorer
 and reconcilers again; a table row; the slug `ask-again`; one copy in contracts; measure first; ask again only when an
 answer was held.
+
+---
+
+## S-157 | 2026-09-24 | `resume-failed`'s direction: a provider fault is resumed once — by the engine or at the caller's asking — as a NEW run that inherits the failed run's checked pieces, accepted pictures included
+
+**Chose.** The owner's answers of 2026-09-24 to the five questions `docs/features/resume-failed.md` held open, put in
+session 49 while `ask-again`'s journeys ran. **The direction, and nothing else**: its four gates are not written and
+no implementation file is opened (CLAUDE.md rule 1).
+
+- **Both may start a resume**: the engine by itself, for a failure it judges a provider's fault, and the caller, by a
+  new call on a failed run.
+- **One resume in all**: if the engine has resumed a run, the caller cannot ask again; if it has not — it judged the
+  failure not a provider's — the caller may ask once.
+- **Only provider faults are resumable**: a provider's malformed or missing answer, a network fault, a crash. A gate
+  refusing on the brief's own terms (S-145's Gate 7, S-151's Gate 5) would fail the same way, and fixing the brief is
+  a new request.
+- **Pictures Gate 1 ACCEPTED are kept** — superseding S-048 for those only; a picture whose checks were cut off is made
+  again, as S-048 says.
+- **The caller sees a NEW run that points back** to the failed one and inherits its kept pieces. The failed run stays
+  `failed`, so D-094's terminal status keeps its meaning and the orchestrator reads nothing new of it.
+- **The ceiling and the per-reel cap bound the spend of the failed run and its resume together**, as they bound every
+  attempt of one run today (D-014, D-100, S-036).
+
+**Why.** Session 48 lost four runs, 93¢, and each rerun paid again for pictures and plans that had passed (P-001 to
+P-004). `ask-again` (S-156) makes such failures rarer; this makes the next one cheaper. A new run rather than a
+reopened one keeps the caller's contract stable; one resume in all keeps a provider's bad day from looping.
+
+**Rejected** (each put to the owner). The engine alone, or the caller alone, starting a resume; any failure or stop
+resumable; keeping nothing of the stills; up to three resumes, or no count but the ceiling; one resume each for the
+engine and the caller (two in all); the same run id going from `failed` back to `running`.
+
+**Caught by.** Nothing yet: `resume-failed`'s gates, when written, name their checks against this entry.
+
+**Confirmed-by.** The owner, 2026-09-24, on six questions.

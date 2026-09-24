@@ -7,7 +7,7 @@
   black-holes reel with the brief as committed. **`parallel-shots` is still held.**
 - **Written:** 2026-09-24, at the end of session 48, on the owner's choice of option 3: rerun now, and put the fix into
   next session's prompt
-- **Run:** not yet
+- **Run:** session 49, 2026-09-24 — `ask-again` verified; the reel ran whole (run 12a097bf, 45c) and stopped at Gate 7
 
 **Where things stand.** Session 48 made four real runs of one brief — black holes — and **none finished**, for 93¢ in
 all. Two faults were the brief's and were fixed in it (P-002, P-003). **Three runs were lost to ONE malformed answer
