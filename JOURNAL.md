@@ -6058,3 +6058,15 @@ still held.**
 | ----------- | ------------------------------------------------- | ---- | -------- | -------- | -------------------------------------------------------- |
 | `af7447f0…` | black holes, after `cut-rules`; the six-unit plan | 60c  | 12.0 min | no       | shot 4 asked for a galaxy by claim c4 (P-008), Gate 5 ×3 |
 | `05611ff9…` | black holes, sentence 7 unclaimed (P-008's fix)   | 53c  | 13.5 min | **yes**  | Gate 7 accepted; 50.3 s                                  |
+
+## 2026-09-24 — side session, continued: the Hyperframes research file catches up with what the owner was told
+
+**Changed**: `docs/research/hyperframes.md` only — a plain-words explanation (a flipbook: freeze the page's clock, photo
+every 1/24 s, ffmpeg glues them); the answer to "can it look real?" (no: it places real footage made elsewhere and
+builds around it; HeyGen's avatars come from HeyGen's models); a new §4 F, **graphics over a real clip** — fal's
+realistic clip with a transparent layer of labels or a diagram laid over it in the one pass; and the recommended order
+redone: A, then F with E, then C and B, D last. §8's question 5 names F.
+
+**Why**: the owner asked whether the file says what the chat said. It did not say F or the realism answer.
+
+**Next**: the owner's answers to §8 — which first, and whether words beyond the captions may reach the screen.
