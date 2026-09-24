@@ -10,6 +10,19 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `cut-rules` on 2026-09-24, Slice 3 — the gates below are not edited; S-158 RETIRES the duck's
+> assertions, and every assertion that still holds is kept** (**S-158**). **A reel's only sound is its narration**: the
+> assembler mixes no clip's sound — every clip shot's sound is the silence a held shot has had since S-097 — because
+> the video model put a man's voice in a clip, and nothing here can hear one (P-007). So S-073's mix and `duckDb` go:
+> out of `RenderSettings`, `RenderManifest`, the schema and the build; `volume` leaves `PASS_FILTERS`. The note
+> `silence: the clip has no sound, so silence is added` keeps its text, as the record of an input fact. **Check 34**
+> — _"18 dB lower"_ — is rewritten to its successor: each clip file's own 220 Hz band above −30 dB, the reel within
+> 1 dB of the same manifest assembled over `-an` copies of its clips, and the narration moving by under 1 dB (kept).
+> **Check 32**'s _"shot 2's hold both"_ becomes: shot 2's clip file above −30 dB, and the reel's 220 Hz band there at
+> least 30 dB below it. **Check 37**'s _"only WHETHER it has any is read"_ becomes: no clip audio fact is read, and the
+> graph takes no `[0:a]`. The manifest check asserts `duckDb` absent; the typed fixtures drop it. This feature's
+> journey is run again in `cut-rules`' last slice.
+>
 > **Amended by `cut-rules` on 2026-09-24, Slice 2 — the gates below are not edited, and no assertion is removed**
 > (**S-158**). **Gate 7 asks four closed questions, not five**: the fifth — _"Does every shot show something no other
 > shot repeats?"_ — is gone, because it refused the first black-holes cut for showing black holes (P-006). So S-074's

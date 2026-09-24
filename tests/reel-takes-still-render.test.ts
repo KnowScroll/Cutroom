@@ -164,14 +164,23 @@ test(CHECK_18, async () => {
       `the border is still at the span's last frame: ${nearestColour(last, named).distances}`,
     )
 
-    // The clip tone is ABSENT under the narration's: shot 0's span holds both, the held span the
-    // narration's alone. (Shot 0 runs from 0 s to 9 s, the held shot from 9 s to 16 s.)
-    const withClip = toneDb(row.path, 220, { fromSeconds: 1, seconds: 6 })
-    const silent = toneDb(row.path, 220, {
-      fromSeconds: HELD.fromSeconds + 0.5,
-      seconds: HELD.seconds - 1,
-    })
-    assert.ok(withClip - silent > 20, `220 Hz: ${withClip} dB in shot 0, ${silent} dB in the hold`)
+    // The clip tone is ABSENT under the narration's — AMENDED BY cut-rules (S-158), which retires
+    // "shot 0's span holds both": a reel's only sound is its narration. Shot 0's CLIP FILE carries its
+    // 220 Hz tone (the premise), and the reel's 220 Hz band in shot 0 is at least 30 dB below it —
+    // two spans of one file are not compared, since their noise floors differ by up to 2 dB. (Shot 0
+    // runs from 0 s to 9 s, the held shot from 9 s to 16 s.)
+    const shotZero = row.renderManifest.shots[0]
+    assert.ok(
+      shotZero !== undefined && shotZero.stillHold === undefined,
+      'shot 0 is not a clip shot',
+    )
+    const own = toneDb(shotZero.clipPath, 220)
+    assert.ok(own > -30, `shot 0's clip file is ${own} dB at 220 Hz: no tone to leave out`)
+    const inReel = toneDb(row.path, 220, { fromSeconds: 1, seconds: 6 })
+    assert.ok(
+      own - inReel >= 30,
+      `220 Hz: ${inReel} dB in shot 0 against ${own} dB in its clip file — the clip's sound is in the reel`,
+    )
     const spoken = toneDb(row.path, 660, {
       fromSeconds: HELD.fromSeconds + 0.5,
       seconds: HELD.seconds - 1,

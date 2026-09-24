@@ -45,8 +45,6 @@ export const DEFAULT_RENDER_SETTINGS: RenderSettings = {
   technical: { aspectTolerance: 0.01, blackSeconds: 0.5, frozenSeconds: 1.0 },
   // S-073: burned from the manifest's captions by the assembler, which reel-render's Slice 4 builds.
   captionStyle: { id: 'word-captions-1', fontName: 'Arial', fontSize: 48, marginV: 200 },
-  // S-073: the clips' sound, under the narration for the whole span.
-  duckDb: 18,
   // S-074: each answered yes when the cut is right, so any no fails Gate 7 (I-16) — provisional
   // until M-1. FOUR, NOT FIVE (docs/features/cut-rules.md, S-158): the fifth asked whether every shot
   // showed something no other shot repeats, and refused the first black-holes cut for showing black

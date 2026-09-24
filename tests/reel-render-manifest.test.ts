@@ -234,7 +234,8 @@ test("29. a completed run's render manifest holds every shot of the selected pla
       gates: ['0', '1', '1S', '2', '3', '4', '5', '7'],
     })
     assert.deepEqual(manifest.captionStyle, SETTINGS.captionStyle)
-    assert.equal(manifest.duckDb, 18)
+    // AMENDED BY cut-rules (S-158): no duck level — a reel's only sound is its narration.
+    assert.ok(!('duckDb' in manifest), 'the manifest carries a duck level')
     assert.deepEqual(manifest.ledger, { imageCents: 6, narrationCents: 2, videoCents: 4 })
     assert.equal(manifest.totalFrames, TOTAL)
 

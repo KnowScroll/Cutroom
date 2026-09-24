@@ -63,8 +63,6 @@ export interface RenderSettings {
   /** Gate 2's thresholds: 0.01, 0.5 s and 1.0 s — provisional until M-1 (S-072). */
   technical: { aspectTolerance: number; blackSeconds: number; frozenSeconds: number }
   captionStyle: { id: string; fontName: string; fontSize: number; marginV: number }
-  /** How far a clip's sound sits under the narration. Default 18 (S-073). */
-  duckDb: number
   /**
    * Gate 7's four closed questions, each answered yes when the cut is right — provisional until M-1
    * (S-074). Never whether a shot repeats another: a reel may show one thing in every shot (S-158).

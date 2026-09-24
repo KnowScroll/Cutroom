@@ -238,7 +238,6 @@ const bothKinds = () => ({
   },
   gateProfile: { id: 'phase-1', gates: ['0', '1', '1S', '2', '3', '4', '5', '7'] },
   captionStyle: { id: 'word-captions-test', fontName: 'Arial', fontSize: 12, marginV: 20 },
-  duckDb: 18,
   ledger: { imageCents: 12, narrationCents: 1, videoCents: 30 },
   shots: [clipShot(), stillHoldShot()],
   captions: [{ text: 'A', startMs: 0, endMs: 300 }],

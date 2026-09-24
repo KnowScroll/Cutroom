@@ -10,6 +10,12 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `cut-rules` on 2026-09-24, Slice 3 — the gates below are not edited; S-158 retires one assertion's
+> premise, and the check keeps the rest** (**S-158**). **A reel's only sound is its narration**, so **check 18**'s
+> _"shot 0's span holds both"_ becomes: shot 0's clip file above −30 dB at 220 Hz, and the reel's 220 Hz band there at
+> least 30 dB below it; the held shot's narration is still asserted. **Check 16**'s manifest fixture drops `duckDb`,
+> which the schema no longer has. This feature's journey is run again in `cut-rules`' last slice.
+>
 > **Amended by `ask-again` on 2026-09-24, Slice 4 — the gates below are not edited, and no assertion is
 > removed** (**S-156**). **The clips stage's ports gained `refusals`**, so the hand-written `ClipsPorts` in `tests/reel-takes-transient.test.ts` gains a no-op one to typecheck; nothing on its scripts refuses. `r14-failed`'s words and its two `observe` receipts hold. This feature's journey is run again in `ask-again`'s last slice.
 >

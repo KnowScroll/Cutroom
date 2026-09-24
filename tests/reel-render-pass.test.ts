@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, extname, isAbsolute, join, relative } from 'node:path'
+import { basename, dirname, extname, isAbsolute, join, relative } from 'node:path'
 import { after, test } from 'node:test'
 import type { RenderManifest } from '@cutroom/contracts'
 import { DEFAULT_RENDER_SETTINGS } from '@cutroom/pipeline'
@@ -330,11 +331,20 @@ test('32. clips of another 9:16 size within the tolerance, at another frame rate
     )
     assert.deepEqual(black(600), [], "shot 5's picture fills the profile, and is padded")
 
-    // The silence is ADDED: shot 3's three seconds hold the narration's tone and no clip tone, where
-    // shot 2's hold both. (Shot 2 runs from 16 s to 19 s, shot 3 from 19 s to 22 s.)
-    const withClip = toneDb(row.path, 220, { fromSeconds: 16.5, seconds: 2 })
-    const silent = toneDb(row.path, 220, { fromSeconds: 19.5, seconds: 2 })
-    assert.ok(withClip - silent > 20, `220 Hz: ${withClip} dB in shot 2, ${silent} dB in shot 3`)
+    // AMENDED BY cut-rules (S-158), which retires "shot 2's hold both": a reel's only sound is its
+    // narration. Shot 2's CLIP FILE carries its 220 Hz tone (the premise), and the reel's 220 Hz band
+    // in shot 2 is at least 30 dB below it — measured about 52 dB on correct code, 18 under the
+    // retired duck. Two spans of one file are NOT compared: their noise floors differ by up to 2 dB.
+    // (Shot 2 runs from 16 s to 19 s, shot 3 from 19 s to 22 s.)
+    const shotTwo = row.renderManifest.shots[2]
+    assert.ok(shotTwo !== undefined && shotTwo.stillHold === undefined, 'shot 2 is not a clip shot')
+    const own = toneDb(shotTwo.clipPath, 220)
+    assert.ok(own > -30, `shot 2's clip file is ${own} dB at 220 Hz: no tone to leave out`)
+    const inReel = toneDb(row.path, 220, { fromSeconds: 16.5, seconds: 2 })
+    assert.ok(
+      own - inReel >= 30,
+      `220 Hz: ${inReel} dB in shot 2 against ${own} dB in its clip file — the clip's sound is in the reel`,
+    )
     const spoken = toneDb(row.path, 660, { fromSeconds: 19.5, seconds: 2 })
     assert.ok(spoken > -30, `shot 3's narration is at ${spoken} dB`)
   } finally {
@@ -389,26 +399,60 @@ test("33. every narrated word is one caption from its start to its end, offset b
 
 // ---------------------------------------------------------------- 34
 
-test("34. the clips' sound sits under the narration: one manifest rendered with the duck level at 18 and at 0 gives a clip-tone band 18 dB lower, within 1.5 dB, and a narration-tone band that moves by under 1 dB", async () => {
+/** A copy of a clip with its sound stream removed at the FILE (cut-rules, S-158). */
+function withoutSound(clipPath: string, dir: string): string {
+  const out = join(dir, basename(clipPath))
+  const ran = spawnSync(
+    'ffmpeg',
+    ['-hide_banner', '-nostdin', '-y', '-i', clipPath, '-an', '-c:v', 'copy', out],
+    { encoding: 'utf8' },
+  )
+  assert.equal(ran.status, 0, ran.stderr)
+  return out
+}
+
+// AMENDED BY cut-rules (S-158), which retires S-073's duck and with it this check's "18 dB lower": a
+// reel's only sound is its narration. What still holds is kept — the clips' tone is really there to
+// leave out (the premise, which the old 18 dB could only pass with), and the narration does not move
+// — and the successor is asserted: the clips' sound is not in the reel at all.
+test("34. the clips' sound is not in the reel: each clip file's own 220 Hz band is loud; the stored manifest assembled as made and assembled over -an copies of its clips give a clip-tone band within 1 dB of each other, and a narration-tone band that moves by under 1 dB", async () => {
   const { row } = await plain()
   const dir = mkdtempSync(join(tmpdir(), 'reel-render-duck-'))
   try {
     const stored = JSON.parse(row.text) as RenderManifest
-    assert.equal(stored.duckDb, 18, 'the default duck level is no longer 18 dB')
-    const tools = ffmpegTools()
-    const render = async (duckDb: number) => {
-      const assembler = ffmpegAssembler(tools, { artifactRoot: join(dir, `duck-${duckDb}`) })
-      return (await assembler.assemble({ ...stored, duckDb })).path
+    assert.ok(!('duckDb' in stored), 'the stored manifest carries a duck level')
+    for (const shot of stored.shots) {
+      if (shot.stillHold !== undefined) continue
+      const own = toneDb(shot.clipPath, 220)
+      assert.ok(
+        own > -30,
+        `${shot.shotId}'s clip file is ${own} dB at 220 Hz: no tone to leave out`,
+      )
     }
-    const ducked = await render(18)
-    const level = await render(0)
+    const bare = join(dir, 'bare-clips')
+    mkdirSync(bare)
+    const silenced: RenderManifest = {
+      ...stored,
+      shots: stored.shots.map((s) =>
+        s.stillHold === undefined
+          ? { ...s, clipPath: withoutSound(s.clipPath, bare), clip: { ...s.clip, audio: null } }
+          : s,
+      ),
+    }
+    const tools = ffmpegTools()
+    const asMade = (
+      await ffmpegAssembler(tools, { artifactRoot: join(dir, 'as-made') }).assemble(stored)
+    ).path
+    const noSound = (
+      await ffmpegAssembler(tools, { artifactRoot: join(dir, 'no-sound') }).assemble(silenced)
+    ).path
 
-    const clipTone = toneDb(level, 220) - toneDb(ducked, 220)
+    const clipTone = toneDb(asMade, 220) - toneDb(noSound, 220)
     assert.ok(
-      Math.abs(clipTone - 18) <= 1.5,
-      `the clips' 220 Hz tone is ${clipTone.toFixed(1)} dB lower at 18, not 18 ± 1.5`,
+      Math.abs(clipTone) <= 1,
+      `the clips' 220 Hz tone is ${clipTone.toFixed(1)} dB above a reel with no clip sound at all`,
     )
-    const narrationTone = toneDb(level, 660) - toneDb(ducked, 660)
+    const narrationTone = toneDb(asMade, 660) - toneDb(noSound, 660)
     assert.ok(
       Math.abs(narrationTone) < 1,
       `the narrations' 660 Hz tone moved by ${narrationTone.toFixed(1)} dB`,

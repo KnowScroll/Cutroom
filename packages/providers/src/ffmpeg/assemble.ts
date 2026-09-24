@@ -166,19 +166,20 @@ function stillOf(shot: StillHoldShot, input: number, profile: RenderManifest['pr
 }
 
 /**
- * One shot's sound: its clip's, fitted to the span — silence where it has none — and lowered by the
- * duck level for the whole span, since the narration fills every span (D-008); its narration, fitted
- * to the span; and the two summed. Exactly the span's samples, so the join never drifts.
+ * One shot's sound: SILENCE for the span, and its narration, fitted to the span, mixed over it —
+ * exactly the span's samples, so the join never drifts.
  *
- * A HELD SHOT has no clip, so its sound is SILENCE for the span, lowered by nothing (S-097), with
- * its narration mixed over it: the voice stays in sync because the span is exact.
+ * A REEL'S ONLY SOUND IS ITS NARRATION (docs/features/cut-rules.md, S-158). A clip's own sound is
+ * never read: the video model makes ambience at best and, measured on a real reel, a man's voice at
+ * worst (P-007), and nothing in this engine can hear which. So a clip shot's sound is the silence a
+ * HELD SHOT has always had (S-097), and the clip input's audio stream is left unused.
  */
 function soundOf(
   shot: RenderShot,
   index: number,
   renderManifest: RenderManifest,
 ): { graph: string[]; out: string } {
-  const { profile, duckDb } = renderManifest
+  const { profile } = renderManifest
   const at = (frame: number) => Math.round((frame * profile.sampleRate) / profile.fps)
   const samples = at(shot.startFrame + shot.frames) - at(shot.startFrame)
   const layout = layoutOf(profile.channels)
@@ -189,13 +190,9 @@ function soundOf(
     filter('apad', `whole_len=${samples}`),
   ].join(',')
   const silence = `${filter('anullsrc', `r=${profile.sampleRate}:cl=${layout}`)},${filter('atrim', `end_sample=${samples}`)}`
-  const clip =
-    shot.stillHold !== undefined || shot.clip.audio === null
-      ? silence
-      : `[${index * 2}:a]${fitted},${filter('volume', `-${duckDb}dB`)}`
   return {
     graph: [
-      `${clip}[c${index}]`,
+      `${silence}[c${index}]`,
       `[${index * 2 + 1}:a]${fitted}[n${index}]`,
       `[c${index}][n${index}]${filter('amix', 'inputs=2:duration=longest:normalize=0')}[a${index}]`,
     ],

@@ -112,7 +112,6 @@ export interface RenderManifest {
   /** The profile that ran (D-052). */
   gateProfile: GateProfile
   captionStyle: { id: string; fontName: string; fontSize: number; marginV: number }
-  duckDb: number
   ledger: { imageCents: number; narrationCents: number; videoCents: number }
   /** Every shot of the selected plan, in plan order (I-12). */
   shots: RenderShot[]

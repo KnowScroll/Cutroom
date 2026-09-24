@@ -106,8 +106,9 @@ test("37. the assembler's source imports no domain, settings or network module a
     ['shot.clip.video', 'shot.stillHold.probe.video'],
     '`video` is neither a clip measured fact nor a held picture probe',
   )
-  // A clip's sound is fitted to the profile whatever it is: only WHETHER it has any is read.
-  assert.ok(/shot\.clip\.audio === null/.test(source.getText()), 'added silence reads another fact')
+  // AMENDED BY cut-rules (S-158): a reel's only sound is its narration, so NO clip audio fact is read
+  // — where this read only WHETHER a clip had sound, it now reads nothing of it.
+  assert.ok(!/shot\.clip\.audio/.test(source.getText()), "the assembler reads a clip's audio fact")
 
   // And it does as its source says: handed measured facts that are NOT the file's, it conforms from
   // the facts — and it runs ffmpeg once and never measures the clip itself.
@@ -157,7 +158,6 @@ test("37. the assembler's source imports no domain, settings or network module a
       },
       gateProfile: { id: 'phase-1', gates: ['0', '1', '1S', '2', '3', '4', '5', '7'] },
       captionStyle: { id: 'word-captions-test', fontName: 'Arial', fontSize: 12, marginV: 20 },
-      duckDb: 18,
       ledger: { imageCents: 0, narrationCents: 0, videoCents: 0 },
       shots: [
         {
@@ -193,6 +193,9 @@ test("37. the assembler's source imports no domain, settings or network module a
     const graph = String(made.invocations[0]?.[made.invocations[0].indexOf('-filter_complex') + 1])
     assert.match(graph, /scale=108:192/, 'the conform did not scale from the facts it was handed')
     assert.match(graph, /fps=24/, 'the conform did not convert from the rate it was handed')
+    // AMENDED BY cut-rules (S-158): the facts say this clip has sound, and the pass takes none of it
+    // — input 0 is the clip, and no `[0:a]` is in the graph.
+    assert.doesNotMatch(graph, /\[0:a\]/, "the pass takes the clip's sound")
     assert.equal(measured(made.path).frames, 36)
   } finally {
     rmSync(dir, { recursive: true, force: true })

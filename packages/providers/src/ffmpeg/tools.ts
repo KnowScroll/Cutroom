@@ -33,7 +33,6 @@ export const PASS_FILTERS = [
   'aformat',
   'atrim',
   'apad',
-  'volume',
   'amix',
   'anullsrc',
   'zoompan',

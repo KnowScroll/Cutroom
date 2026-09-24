@@ -150,7 +150,6 @@ function manifest(): RenderManifest {
     },
     gateProfile: { id: 'phase-1', gates: ['0', '1', '1S', '2', '3', '4', '5', '7'] },
     captionStyle: { id: 'captions-1', fontName: 'Arial', fontSize: 18, marginV: 40 },
-    duckDb: 18,
     ledger: { imageCents: 0, narrationCents: 0, videoCents: 0 },
     shots: [
       shot(0, { kind: 'keyframe', pictureId: 'a1-shot-0-a' }, 0),

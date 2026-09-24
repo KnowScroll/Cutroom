@@ -166,7 +166,7 @@ to matter; a tie goes to the 4-unit plan, as today (D-064's tie rule).
       `reel-plan`, `reel-stills`, `reel-render` (their admission fixtures). **Proves: 1.**
 - [x] **Slice 2 — Gate 7.** Contracts' 4-tuple, `cutQuestions`, `CUT_QUESTIONS`, `gate7.ts`' header; `reel-render`'s
       checks 38 and 46 amended. Amendment block: `reel-render`. **Proves: 2.**
-- [ ] **Slice 3 — the sound.** `soundOf`; `duckDb` out of contracts, defaults, schema and build; `volume` out of
+- [x] **Slice 3 — the sound.** `soundOf`; `duckDb` out of contracts, defaults, schema and build; `volume` out of
       `PASS_FILTERS`; `reel-render`'s checks 32, 34 and 37, its manifest check and typed fixture, and `reel-takes`'
       checks 16 and 18 amended. Amendment blocks: `reel-render`, `reel-takes`. **Proves: 3, 4.**
 - [ ] **Slice 4 — the journey.** Check 5; this feature's journey, and `reel-plan`'s, `reel-stills`', `reel-render`'s
