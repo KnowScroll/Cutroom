@@ -18,21 +18,40 @@ Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; 
 Kept current as entries are added. **Fix** is work that is understood and waits for a feature's gates; **review** is a
 question to look at, or an owner's choice, before anything is built.
 
-| what                                                                                    | kind   | from         | state                                            |
-| --------------------------------------------------------------------------------------- | ------ | ------------ | ------------------------------------------------ |
-| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one    | fix    | P-007        | owner: mute the clips (S-158); `cut-rules`       |
-| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing   | fix    | P-006        | owner: remove it from both (S-158); `cut-rules`  |
-| **Show the witness the shape the gate judges it by** — one copy, in contracts           | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf      |
-| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused     | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed    |
-| **Keep the raw answer of a model whose answer did not parse**, so it can be read        | done   | P-004        | `scripts/refused.mjs <run>`                      |
-| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | direction settled (S-157); gates next            |
-| Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | answered: S-156 supersedes it in part            |
-| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?  | review | P-005        | `ask-again` Deferred 2                           |
-| A text-made shot has no still to fall back on, so its third failed take stops the reel  | review | P-003        | owner: accept, or give such shots a fallback     |
-| Clip prompts could ask for no fade to black; space scenes are mostly dark               | review | P-003        | watch: fix only if it recurs after the brief     |
-| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness      | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf) |
+| what                                                                                     | kind   | from         | state                                                         |
+| ---------------------------------------------------------------------------------------- | ------ | ------------ | ------------------------------------------------------------- |
+| **One claim over two shots, one criterion that fits only one**: its takes can never pass | brief  | P-008        | owner: split c4, so the galaxy is claimed by sentence 8 alone |
+| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one     | fix    | P-007        | owner: mute the clips (S-158); `cut-rules`                    |
+| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing    | fix    | P-006        | owner: remove it from both (S-158); `cut-rules`               |
+| **Show the witness the shape the gate judges it by** — one copy, in contracts            | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf                   |
+| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused      | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed                 |
+| **Keep the raw answer of a model whose answer did not parse**, so it can be read         | done   | P-004        | `scripts/refused.mjs <run>`                                   |
+| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed       | fix    | all four     | direction settled (S-157); gates next                         |
+| Does S-042 (an answer that does not parse fails the run) still hold for real providers?  | review | P-001, P-004 | answered: S-156 supersedes it in part                         |
+| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?   | review | P-005        | `ask-again` Deferred 2                                        |
+| A text-made shot has no still to fall back on, so its third failed take stops the reel   | review | P-003        | owner: accept, or give such shots a fallback                  |
+| Clip prompts could ask for no fade to black; space scenes are mostly dark                | review | P-003        | watch: fix only if it recurs after the brief                  |
+| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness       | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)              |
 
 ## Open
+
+### P-008 · brief · a claim spanning two shots, and a criterion that fits only one of them
+
+- **Run** `af7447f0…`, 2026-09-24 (session 49), black holes, the brief as committed, after `cut-rules`.
+- **What happened.** With the repetition question gone from the plan score, the **six-unit plan won** — a recurring
+  subject, three pictures (one derived, through Gate 1S), all accepted. Shots 0 to 3 passed Gates 2–5 on their first
+  take. **Shot 4 — sentence 7, _"Most black holes weigh a few Suns, each left behind by a single star."_ — failed Gate 5
+  on all three takes**: _must show "show-galaxy" is not shown: a spiral galaxy with a bright glowing centre_. Made from
+  words, with no picture to hold, the reel stopped (S-090). **60¢**, 12 min, no file.
+- **Cause.** The brief. Claim c4 covers sentences 7 AND 8, and its criterion — a spiral galaxy — fits only sentence 8.
+  A criterion claimed by c4 is asked of every shot whose sentences carry c4. In the four-unit plans both sentences were
+  one shot, so it never showed; the six-unit plan gave each its own shot, and shot 4 (the planner's subject: the black
+  hole) was asked to show a galaxy. The video model drew a black hole three times, correctly for its sentence.
+- **Also on this run.** One refused witness answer — the stars of shot 2's picture counted `"many"` — asked again,
+  told why, and parsed (`scripts/refused.mjs af7447f0`).
+- **For good.** Brief-writing: **a criterion's claim must be carried only by sentences the criterion fits** — split c4
+  into two claims, the galaxy claimed by sentence 8 alone. Engine, to review: a text-made shot still has nothing to
+  fall back on at its third failed take (P-003's row).
 
 ### P-007 · engine · a male voice under the narration, and Gate 3 has never heard a clip
 
