@@ -6724,3 +6724,63 @@ engine and the caller (two in all); the same run id going from `failed` back to 
 **Caught by.** Nothing yet: `resume-failed`'s gates, when written, name their checks against this entry.
 
 **Confirmed-by.** The owner, 2026-09-24, on six questions.
+
+---
+
+## S-158 | 2026-09-24 | A reel may show one thing in every shot — the repetition question leaves Gate 7 and the plan score — and a reel's only sound is its narration: the clips are muted
+
+**Chose.** The owner's two answers of 2026-09-24, after run `12a097bf…` — the first black-holes cut ever assembled —
+was stopped by Gate 7 on repetition, and the owner heard a male voice under the narration:
+
+- **The repetition question is removed from BOTH places it is asked**: Gate 7's fifth closed question, _"Does every
+  shot show something no other shot repeats?"_, and the plan score's fourth, _"Does every shot show something that no
+  other shot has already shown?"_. A reel that shows how a thing works shows that thing again and again; neither the
+  finished cut nor the plan is judged for it.
+- **The clips are muted: a reel's only sound is its narration.** The assembler mixes no clip audio; the narration
+  spans every shot as it does today.
+
+Both are built as a feature with its gates (`docs/features/cut-rules.md`), because each changes verified features —
+`reel-plan`'s score, `reel-render`'s Gate 7 and its mix — and their checks.
+
+**Supersedes:**
+
+- **D-064** — _"Gate 7's own questions … whether a shot repeats another's information"_ — in that question only: the
+  plan score's model terms are Gate 7's REMAINING questions, still asked of each storyboard independently, closed, by
+  the reconciler at temperature 0.
+- **S-074** — Gate 7 answers _"five closed questions"_, the fifth _"whether a shot repeats what another shows (D-064's
+  fourth question)"_ — becomes four. Everything else stands: one `judgeCut` call on the frame strip, every question
+  named once, any `no` fails Gate 7 (I-16).
+- **D-008** — _"H3's native audio is ducked under it during ffmpeg assembly"_ — and **S-073**'s mix — _"each clip's
+  sound resampled to the profile and fitted to its span … lowered by the duck level, a setting defaulting to 18 dB"_ —
+  become: no clip's sound is mixed; the narration is the reel's sound. D-008's reason for keeping narration a
+  separate T2A track stands, and so does every prompt forbidding speech and music.
+- **S-073's manifest bullet** — the manifest holds _"the caption style, the duck level and a cost ledger"_ — loses _"the
+  duck level"_: `duckDb` leaves `RenderManifest` and `RenderSettings`. And **S-073's** _"A conform note is recorded for …
+  added silence"_ and **D-055's** audio conform — _"resampled — including the provider's own clips"_, _"Audio is
+  conformed for the same reason video is"_ — no longer describe a clip's sound, which is not used: the note
+  `silence: the clip has no sound, so silence is added` keeps its text as the record of an input fact (the clip had no
+  sound stream), and every clip shot's sound is silence under the narration, noted or not.
+- **S-149**'s rejection of _"Changing the plan score — put to the owner; rejected by them"_: the owner changes it now, by
+  one question, having seen a whole reel refused for the thing that question measures.
+
+**Why.**
+
+- **The judge was right about the cut and wrong about the rule.** It said three of four shots showed a dark disc ringed
+  by glowing gas — true, and the topic's own picture. The owner: _"a shot can show what the previous shot shows, it
+  shouldn't discriminate. Say if a reel wants to show how a thing works it will obviously show that same thing
+  multiple times."_ And the same question in the plan score is what S-148 and S-149 found marking down every plan
+  whose subject recurs — which is also what earns a reel its pictures (D-027).
+- **Nothing in this engine can hear a clip.** Gate 3's `listen` has always answered from a script — _"real
+  text-reading and sound-classifying are the paid path's"_ — and the paid path never built one, so every real take
+  passed Gate 3's speech check unheard (P-007). H3 put a voice into a clip its prompt forbade, and the mix carried it
+  18 dB under the narration. Muting is certain; hearing is not buildable here today.
+
+**Rejected** (each put to the owner). **Gate 7 only** — the plan score would still push plans away from recurring
+subjects. **A narrower question** that fails only the same footage used twice — not asked for. **Keeping the ambience and building real listening** for Gate 3 — no speech
+detector is on this machine and none is proven on the model wire; and **muting now, listening later** — the owner
+chose narration only, with Gate 3's `listen` recorded as a stand-in (P-007).
+
+**Caught by.** `cut-rules`' checks, when its gates are written: the questions asked, by both callers; the assembled
+file's sound equal to the narration alone; and the verified checks each change amends.
+
+**Confirmed-by.** The owner, 2026-09-24, on both questions.

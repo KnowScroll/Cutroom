@@ -20,7 +20,8 @@ question to look at, or an owner's choice, before anything is built.
 
 | what                                                                                    | kind   | from         | state                                            |
 | --------------------------------------------------------------------------------------- | ------ | ------------ | ------------------------------------------------ |
-| **Three scenes of one kind of picture**: Gate 7 refuses the cut as repetitive           | review | P-006        | owner: rewrite the brief, or review Gate 7       |
+| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one    | fix    | P-007        | owner: mute the clips (S-158); `cut-rules`       |
+| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing   | fix    | P-006        | owner: remove it from both (S-158); `cut-rules`  |
 | **Show the witness the shape the gate judges it by** — one copy, in contracts           | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf      |
 | **Ask again, told why**, when a witness, plan, score or reconcile answer is refused     | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed    |
 | **Keep the raw answer of a model whose answer did not parse**, so it can be read        | done   | P-004        | `scripts/refused.mjs <run>`                      |
@@ -32,6 +33,20 @@ question to look at, or an owner's choice, before anything is built.
 | Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness      | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf) |
 
 ## Open
+
+### P-007 · engine · a male voice under the narration, and Gate 3 has never heard a clip
+
+- **Run** `12a097bf…`, 2026-09-24 (session 49). The owner, watching the cut: _"over the voiceover there is another
+  voice that can be heard in the background (male voice)"_.
+- **Cause.** Two things. **H3 generated speech** in at least one clip's own sound, which every clip prompt forbids
+  (D-008). And **Gate 3's speech check has never run on a real reel**: the ffmpeg media port answers `listen` from a
+  script, defaulting to no speech and no music — _"real text-reading and sound-classifying are the paid path's"_ — and
+  the paid path never built one. So every real take has passed Gate 3's sound check unheard, and the mix carried the
+  clip's sound 18 dB under the narration (S-073). A gate that always passes, as S-112 warned of the text step.
+- **Done.** The owner chose (S-158): **the clips are muted — a reel's only sound is its narration** — built as
+  `cut-rules`. Gate 3's `listen` stays a stand-in, now recorded as one.
+- **For good.** If ambience is ever wanted back, it needs a real listener first: no speech detector is on this machine,
+  and none is proven on the model wire.
 
 ### P-006 · brief · three of four scenes are one kind of picture, and Gate 7 refuses the cut as repetitive
 
@@ -47,7 +62,8 @@ question to look at, or an owner's choice, before anything is built.
   Claims c2, c3 and c4 each picture a black hole with glowing gas around it; the judge is right that three shots repeat
   one image. The same tension as S-145 and S-148, from the other side: here nothing recurs by name, and the pictures
   recur anyway.
-- **Done.** Nothing; no rerun without the owner's yes.
+- **Done.** The owner, 2026-09-24: _"a shot can show what the previous shot shows, it shouldn't discriminate"_ —
+  the repetition question leaves Gate 7 AND the plan score (S-158), built as `cut-rules`. No rerun yet.
 - **For good.** Brief: each scene a different KIND of picture — the explosion; the black sphere; the star being torn,
   seen from far, as a comet-like smear rather than a ring; a whole galaxy from outside, with nothing ringed at its
   centre. Or review whether Gate 7's repetition question should hold a topic reel whose subject is one kind of thing.
