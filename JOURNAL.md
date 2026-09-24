@@ -6070,3 +6070,58 @@ redone: A, then F with E, then C and B, D last. §8's question 5 names F.
 **Why**: the owner asked whether the file says what the chat said. It did not say F or the realism answer.
 
 **Next**: the owner's answers to §8 — which first, and whether words beyond the captions may reach the screen.
+
+## 2026-09-24 — session 50: the first hybrid reel — the engine's footage of volcanoes, with Hyperframes' labels and a diagram
+
+**Intent.** The owner asked what was next (`PROMPTS/050`: `resume-failed`'s gates), then: _"what about we make a reel
+with a hybrid of our engine + hyperframes, tell me if we can do that and we will give that a shot"_. Told yes — outside
+the engine, today, since an engine feature needs its four gates first (rule 1) — the owner chose: a new subject on a new
+run, **volcanoes**; **any labels and numbers** on screen; **graphics over the clips (§4 F) and one diagram shot
+(§4 C)**; and the side session's uncommitted notes committed as they were, then pushed.
+
+**Done, in order.**
+
+- The side session's second Hyperframes pass committed unchanged (`728a29a`, `1e7eaa8`) and **44 commits pushed**
+  (`1cd33fc..1e7eaa8`), at the owner's word. `check.mjs` green, 8 of 8.
+- **The proof before any spend.** A transparent Hyperframes layer renders as ProRes 4444 (`yuva444p12le`), and
+  `join.mjs` — the engine's one pass rebuilt from a run's render manifest, with one `overlay` input per layer — rejoined
+  run `05611ff9…` to its manifest's 1208 frames with a test layer on shot 2.
+- **The volcano brief** (`497182b`), the caller's text only (S-134): eight sentences, four claims of two, every
+  criterion one compact thing that fits both its sentences; nothing spoken as a digit, symbol or acronym; `never-text`
+  kept, since a model's lettering is garbled and the labels would be drawn by code. `check.mjs --code` green on it; the
+  no-spend look read `pictures upToThree`, 18–53¢.
+- **Four runs, 73¢** (below). The owner chose each retry. The switch to `nano-banana-2` was my recommendation, made
+  without reading the journal, which already said its frame is the provider's choice (P-010).
+- **The hybrid**, from run `bf8f4444…`'s pieces: `.artifacts/hyperframes-volcanoes/volcanoes-hybrid.mp4` — **45.25 s**,
+  768×1366, 24 fps, H.264 and AAC; 1086 frames, the manifest's count; the decoded sound identical to the engine's cut
+  (one MD5); Gate 2's scan clean; −17.4 LUFS. The engine's own cut beside it:
+  `.artifacts/bf8f4444-81d3-48b0-a640-8e0b6f03efb8/a1-render.mp4`.
+- `docs/reel-pitfalls.md`: P-009 to P-011 and three short-list rows. `docs/research/hyperframes.md`: the hybrid reel's
+  section and its seven rules. `PROMPTS/050`, never run, carried to 051.
+
+| run         | image model   | spent | time   | ended                                                                       |
+| ----------- | ------------- | ----- | ------ | --------------------------------------------------------------------------- |
+| `124f1124…` | flux-2-pro    | 0c    | 1.4 m  | stills: fal's upstream 504, `downstream_service_unavailable` (P-009)        |
+| `9b23d24a…` | flux-2-pro    | 10c   | 3.6 m  | the same, after shot 2's two pictures (P-009)                               |
+| `bad736d1…` | nano-banana-2 | 8c    | 1.5 m  | its picture 768×1376, refused by D-028's frame assertion (P-010)            |
+| `bf8f4444…` | flux-2-pro    | 55c   | 13.1 m | six shots through Gates 2–5; Gate 7 said no to its caption question (P-011) |
+
+**Observed.**
+
+- **Gate 7 stopped a correct cut.** All 89 words were in the subtitles, in order; 13 of the judge's 18 frames carried no
+  caption — each shot's first and last frames fall in silence, and a caption is one word. Run `05611ff9…` was asked the
+  same question and said yes. A feature: the caption text to the judge, frames on words, or an exact comparison (P-011).
+- **`never-text` earned its place**: one of shot 2's two pictures had the narration's sentence written across it, and
+  Gate 1 refused it.
+- **A label on generated footage is a claim about it**: the aerial coast is a model's island, so Mauna Kea and Kīlauea
+  went on cards with no line to it.
+- **The clips' cameras move** — the crater fell 230 px, the island 116 px — so the lines naming them follow keyframes
+  read off the clips' own frames.
+- `hyperframes check` caught a `const top` that collided with `window.top` — that layer's timeline never moved, and lint
+  was clean — and two labels off the frame's right edge.
+
+**Why.** The owner's reel. It answers the research file's §8 questions 2 and 5 by example, for this reel and not for the
+engine: no `S-` entry is written, since no feature is planned.
+
+**Next.** The owner watches the hybrid beside the engine's cut. Then `PROMPTS/051`: `resume-failed`'s gates (P-009 is its
+case), and P-003, P-010 and P-011 put to the owner. **`parallel-shots` (S-115) is still held.**
