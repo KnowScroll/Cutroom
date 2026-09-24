@@ -9,7 +9,9 @@
 - **Written:** 2026-09-24 at the end of session 49 as 050, on `resume-failed`; carried to 051 at the end of session 50;
   rewritten before it ran, on 2026-09-25, at the owner's word: _"optimize for time, test both (standalone and hybrid)
   with parallel method"_
-- **Run:** not yet
+- **Run:** session 51, 2026-09-25 — `check.mjs --changed` built (S-159); the jet-engine reel from code alone and the
+  hurricane hybrid (run 74bb96a0, 56c, completed first time, Gate 7 accepted) made at once, both in 67 minutes from the
+  session's start; `parallel-shots`' gates after `resume-failed`, at the owner's word
 
 **Where things stand.** Session 50 made the first hybrid reel — volcanoes, the engine's footage of run `bf8f4444…` with
 labels, lines that follow the picture and one diagram shot drawn over it by Hyperframes — and left its tools in the

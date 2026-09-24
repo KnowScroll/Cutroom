@@ -520,6 +520,106 @@ and **one diagram shot** (§4 C). Made outside the engine: nothing in the reposi
 7. **Repeatability held**: one worker against two, 47.2 dB on average and 43.6 dB at worst — the same to the eye, as §3
    measured — so the set-then-move kit survived the runtime's rewinds.
 
+## Two reels at once — one from code alone, one hybrid, each made in parallel (2026-09-25)
+
+The owner asked for time: `PROMPTS/051` made a standalone reel and a hybrid reel at the same time, each made in parallel
+inside, and timed every phase against session 50. Both are outside the engine. The files are in the ignored
+`.artifacts/hyperframes-jet/` (`jet-reel.mp4`) and `.artifacts/hyperframes-hurricanes/` (`hurricanes-hybrid.mp4`; the
+engine's own cut beside it is run `74bb96a0…`'s `a1-render.mp4`).
+
+- **Standalone: how a jet engine works.** Six scenes, 85 words, spoken by MiniMax `speech-2.8-hd`
+  (`English_Graceful_Lady`) through the repository's own adapter — six calls at once, 5.6 s, no word split into tokens.
+  One shared drawing, a turbofan in side cross-section with a camera of six presets, written once by the main thread, so
+  that six scenes written by six agents at once read as one camera travelling along one engine: suck, squeeze, bang,
+  blow, then all four at once. **44.46 s, 1067 frames — the six scenes' sum; Gate 2's scan finds nothing; −14.3 LUFS.**
+- **Hybrid: how a hurricane works.** Run `74bb96a0…` **completed on its first try** — 56¢, 10.9 min, every shot
+  accepted on its first take, Gate 7 yes to all its questions, P-011's included; shot 4's picture was refused twice for
+  a clipped palm tree and the shot made from words (P-012). Shot 0 is replaced by a diagram — a warm sea, wet air
+  rising, a cloud towering on _"higher"_. Five transparent layers over shots 1 to 5: inflow and spin arrows following
+  the camera's pull-back, the eye and the eye wall ringed and tracked, a palm tree's crown named, wind and rain streaks
+  the way the fronds blow — and seven facts on cards with no line to the picture. **43.58 s, 1046 frames — the
+  manifest's; Gate 2's scan finds nothing; −17.1 LUFS, the decoded sound identical to the engine's cut (one MD5).**
+
+### Timed against session 50
+
+| phase                                  | session 51                                                                                                 | session 50                                   |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| full `check.mjs` before the engine run | three runs, 17.4 min; one red (a type error in the new test); only the brief's (5.9 min) on the run's path | 13 min, before the first run                 |
+| the brief                              | drafted in 4.6 min, approved in 1.3                                                                        | —                                            |
+| engine run                             | 10.9 min, first try: plan 97 s, stills 197 s, video 359 s — six shots in turn, about 55 s each             | 13.1 min, after three failed runs (17 min)   |
+| standalone: narration                  | six calls at once, 5.6 s                                                                                   | six calls                                    |
+| standalone: kit and shared drawing     | about 9 min, main thread, during the engine run                                                            | —                                            |
+| standalone: six scenes                 | six agents at once: 12.1, 15.0, 16.1, 17.3, 19.3 and 19.5 min                                              | one thread, one scene after another          |
+| hybrid: diagram and five layers        | six agents, each started as its clip was accepted: 19.2 to 25.8 min each                                   | main thread                                  |
+| renders                                | six at once: 27 s (jet, two workers each), 36 s (hybrid, 14 workers)                                       | 17–20 s each in turn (CPU); 20–37 s (hybrid) |
+| joins                                  | 11 s (one concat pass, frame-exact) and 8 s                                                                | 6 s and 8 s                                  |
+| subjects chosen → finished file        | jet 42.9 min, hybrid 51.8 min — **both within 52 min**                                                     | CPU 31.7 min, volcano 67 min: 98.7 min       |
+| layers done after the engine's render  | **27.1 min**                                                                                               | 10.3 min                                     |
+
+### Tokens, from this session's transcripts, counted as session 50 counted
+
+| who                                    | calls    | total           | cache reads     | newly cached  | out, a floor  |
+| -------------------------------------- | -------- | --------------- | --------------- | ------------- | ------------- |
+| main thread, to both files (19:44 UTC) | 173      | 41.9 M          | 41.4 M          | 377 k         | —             |
+| six jet-scene agents (Opus)            | 122      | 16.3 M          | 14.9 M          | 1.18 M        | 211 k         |
+| six hybrid agents (Opus)               | 252      | 34.3 M          | 32.8 M          | 1.31 M        | 239 k         |
+| session 50: CPU reel / volcano hybrid  | 66 / 131 | 23.3 M / 36.8 M | 23.0 M / 36.2 M | 177 k / 352 k | 114 k / 230 k |
+
+A transcript stores each message's usage as its stream stood when a block was written, so output is undercounted — a
+scene's whole `Write` shows as 8 tokens; the column is a floor.
+
+### Which parallelism paid, and which did not
+
+**Paid.**
+
+1. **The engine run in the background.** The standalone's whole authoring was hidden behind the long pole: both reels
+   were done within 52 minutes of the subjects' choice, against 98.7 for session 50's two, one after the other.
+2. **Starting a layer when its clip is accepted.** The diagram started five minutes before the render, two layers
+   before it: the unit a layer needs is its clip, not the run.
+3. **Renders at once**: six compositions in 27 and 36 s, against about two minutes one after another. **Narration at
+   once**: six calls in 5.6 s. Small in minutes, and free.
+
+**Did not.**
+
+1. **An Opus agent per scene is slower per scene than one thread.** 12 to 26 minutes each: every agent starts cold — the
+   brief, the kit, `make.mjs`, an example, three to five minutes of reading — then verifies deeply (the rain layer made
+   54 calls; the eye's layer fitted an ellipse to the eye every quarter second). "Two rounds of fixes at most" did not
+   bind them. Six scenes at once still took 19.5 minutes of wall clock.
+2. **So the hybrid's long pole moved from the engine to the layers**: done 27.1 minutes after the render, against
+   session 50's 10.3.
+3. **Tokens.** Twelve agents spent 50.6 M, and the main thread's waiting cost too: 24 hand-backs and notifications, each
+   a re-read of a context of 250 to 420 k tokens — 25.9 M of its 41.4 M cache reads fell in the 32 minutes the agents
+   worked.
+4. **`check.mjs --changed` saved nothing on the run's path**: every commit before the run was code — the script itself, a
+   fix to its test's types, and the brief in `real-reel.mjs` — and the type error, missed before the first full run,
+   cost a second one. It pays on the documents that follow.
+
+The levers, if the layers are to be quicker: a clip's track measured once and handed to its writer; one composite check,
+not open-ended ones; a kit's fault fixed centrally at its first report (four writers re-invented one workaround, rule 4
+below). Which model writes the layers is a separate question; Sonnet is untried here.
+
+**What it ran into — seven more rules for any composed-shot feature:**
+
+1. **A moving dash pattern strobes at 24 fps** unless it moves less than about a quarter of its period a frame: a speed
+   of at most 5.5 × (dash + gap) a second. The kit's first speed, 180 on a 16-unit period, moved 0.47 of it a frame:
+   flicker, or motion read backwards.
+2. **Two sets of one property at one time race on a rewind.** Seeking backwards, GSAP renders a timeline's children last
+   to first, so the earlier-added set wins at that exact time. The kit hid the flame at 0 and every scene lit it at 0:
+   the flame blinked on each cut's first frame. A start state is set once, in one place.
+3. **In the page's sloppy-mode script, a `function` declared inside a block lands on `window`**: a helper named `blur`
+   replaces `window.blur`. The global-names rule covers blocks; `const` arrows do not leak.
+4. **A helper that tweens to an absolute value cannot be chained.** `run()` moved dashes to an offset counted from 0, so
+   a second call to speed them up slowed or reversed them. Four writers each wrote the same accumulated-offset
+   workaround: a shared kit's fault is paid once per writer unless it is fixed at the first report.
+5. **A single seeked frame needs its timestamp reset before an overlay**: after `-ss`, the clip's frame and the layer's
+   can carry timestamps a hair apart, and `overlay` passes the clip alone — an empty tile that is not an empty layer.
+   The join overlays whole streams and is not affected.
+6. **Text measured when the page's script runs is measured before its web font has loaded**: Hyperframes injects
+   Inter, so a box sized from the text's measure can come out wrong. One writer sized its label with CSS `calc-size()`
+   (Chrome 129 or later) instead; another measured, and its render happened to come out right.
+7. **An AAC stream runs a little past its video**, so a concat of six scenes padded the difference into one extra frame
+   — 1068 for 1067 — until each scene's sound was cut to exactly its own frames.
+
 ## Reproducing the spike
 
 In any scratch folder outside the repository:

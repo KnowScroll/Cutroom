@@ -6155,3 +6155,70 @@ prompt carries. `resume-failed`'s gates and the three reviews go to 052. Checked
 the two repository-wide scans, not the whole suite: only docs changed after the last green full run.
 
 **Next.** `PROMPTS/051`.
+
+## 2026-09-25 — session 51: `check.mjs --changed`, then two reels at once — a jet engine from code alone, a hurricane hybrid (PROMPTS/051)
+
+**Intent.** `PROMPTS/051`, rewritten before it ran at the owner's word — _"optimize for time, test both (standalone and
+hybrid) with parallel method"_: build `check.mjs --changed`, then make a standalone reel and a hybrid reel at the same
+time, each made in parallel inside, and time every phase against session 50.
+
+**Done, in order.**
+
+- `node scripts/decisions.mjs`: the pin current, nothing unpushed.
+- **`check.mjs --changed` (S-159, `a45def7`).** The paths that differ from HEAD — staged or not, untracked unless
+  ignored, renames as both their paths — are documents, code or unknown. Documents alone run the formatter, the two
+  authority checks and the three scans that read files other than code (about 13 s); one path of code or one unknown
+  path runs everything. `--dry-run` says which and why. `tests/check-changed.test.ts`: seven cases in a scratch
+  repository; four deliberate breaks of `check.mjs` (renames on, untracked ignored, the unknown read as a document, code
+  read as a document) each turned their case red. CLAUDE.md's "Before claiming anything is done" says when it is enough,
+  and now counts seven code checks, not six.
+- **Three full `check.mjs` runs**, 17.4 min: the first red at typecheck — `m[1]` in the new test is `string | undefined`
+  under `noUncheckedIndexedAccess`, a type error I did not check before starting a six-minute run — then green twice,
+  the second with the brief.
+- **The owner's choices**, in one question: a jet engine (standalone), hurricanes (hybrid), Opus for every writer. The
+  hurricane brief, shown and approved as it stands, committed as `ba1be17`.
+- **Run `74bb96a0…` completed on its first try**: 56¢, 653.4 s — plan 97 s, stills 197 s, video 359 s, six shots one
+  after another at about 55 s each (clips 13 to 33 s), Gate 7 yes. Shot 4's picture and its repair were refused for a
+  clipped palm tree and the shot made from words (P-012).
+- **The jet-engine reel**: narration through the repository's adapter (six calls at once, 5.6 s); a kit and one shared
+  engine drawing with a six-preset camera, written by the main thread while the run ran; six Opus agents, one per
+  scene, at once; my `check` on each; one kit fix; six renders at once in 27 s; one concat pass. **`jet-reel.mp4`:
+  44.46 s, 1067 frames — the scenes' sum; Gate 2's scan clean; −14.3 LUFS.**
+- **The hurricane hybrid**: `sheet.mjs` (an accepted clip, conformed as the join conforms it, with a labelled grid) and
+  `over.mjs` (a layer rendered and laid over its clip); `make.mjs` drafting from the run's own narration rows before the
+  render; the diagram and five layers by six Opus agents, each started as its clip was accepted; six renders at once in
+  36 s; `join.mjs` in 8 s. **`hurricanes-hybrid.mp4`: 43.58 s, 1046 frames — the manifest's; Gate 2's scan clean;
+  −17.1 LUFS and the decoded sound identical to the engine's cut (one MD5).**
+- `docs/research/hyperframes.md`: both reels, the timing and token tables beside session 50's, what paid and what did
+  not, seven more rules. `docs/reel-pitfalls.md`: P-012 and its short-list row; P-011 notes run `74bb96a0…`'s yes.
+  `PROMPTS/051`'s Run line; `PROMPTS/052` from 051's text at `01982a8`.
+
+| phase                           | session 51                                                        | session 50 (baseline)               |
+| ------------------------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| subjects chosen → finished file | jet 42.9 min, hybrid 51.8 min — both within 52 min                | CPU 31.7 min + volcano 67 min       |
+| full checks                     | 17.4 min, three runs; 5.9 min of it on the engine run's path      | ~20 min, three runs                 |
+| engine run                      | 10.9 min, first try                                               | 13.1 min, after 17 min of failures  |
+| scenes / layers, one agent each | 12.1–19.5 min (jet) and 19.2–25.8 min (hybrid) each, all at once  | one thread                          |
+| layers done after the render    | 27.1 min                                                          | 10.3 min                            |
+| renders                         | 27 s and 36 s, six at once each                                   | 17–37 s each, one after another     |
+| tokens                          | main 173 calls, 41.9 M to both files; 12 agents 374 calls, 50.6 M | 197 calls, 60.1 M; two Haiku agents |
+
+**Observed.**
+
+- **The engine was not the hybrid's long pole; the layers were.** Every writer, Opus, started cold and verified
+  deeply — 12 to 26 minutes, 13 to 54 calls each; "two rounds of fixes at most" did not bind. Six at once still beat
+  one thread for the jet's six scenes on the wall clock, not per scene.
+- **Twelve writers found four faults in what I handed them**, each fixed or routed once reported: dashes strobing at
+  24 fps (limits sent to the five writers still working), the flame blinking at every cut (two sets of one property at
+  one time, which a rewind resolves last-to-first — fixed in the kit), `run()` unable to change speed (four writers
+  worked round it), and `over.mjs` pairing seeked frames by timestamps a hair apart (fixed). All seven are rules now.
+- **Waiting is not free for the main thread**: 24 hand-backs and notifications, each a re-read of a 250–420 k context —
+  25.9 M of its 41.4 M cache reads fell in the 32 minutes the agents worked.
+- One writer ran a read-only `git status` against its brief's "no git commands"; nothing was changed.
+- **`--changed` saved nothing before the run**: every commit was code. This close-out's documents are its first use.
+
+**Why.** The owner's word for time. S-159 is the one decision; both reels are spikes outside the engine (rule 1), their
+media ignored under `.artifacts/` (rule 4), and no `S-` entry is written for them.
+
+**Next.** The owner: **`parallel-shots`' gates after `resume-failed`'s** — `PROMPTS/052` is `resume-failed`'s gates and
+the P-003, P-010 and P-011 reviews; 053 is `parallel-shots` (S-115), on this session's figures.
