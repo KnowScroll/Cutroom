@@ -65,8 +65,11 @@ export interface RenderSettings {
   captionStyle: { id: string; fontName: string; fontSize: number; marginV: number }
   /** How far a clip's sound sits under the narration. Default 18 (S-073). */
   duckDb: number
-  /** Gate 7's five closed questions, each answered yes when the cut is right — provisional until M-1 (S-074). */
-  cutQuestions: readonly [string, string, string, string, string]
+  /**
+   * Gate 7's four closed questions, each answered yes when the cut is right — provisional until M-1
+   * (S-074). Never whether a shot repeats another: a reel may show one thing in every shot (S-158).
+   */
+  cutQuestions: readonly [string, string, string, string]
   /**
    * A video or narration call answered `unavailable` is sent again, up to `maxAttempts` sends in all,
    * waiting `backoffMs` before the second and twice the last wait before each next (D-024, I-11,

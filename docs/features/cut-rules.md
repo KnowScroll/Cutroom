@@ -164,7 +164,7 @@ to matter; a tie goes to the 4-unit plan, as today (D-064's tie rule).
 - [x] **Slice 1 — the plan score.** Contracts' 3-tuple, `SCORE_QUESTIONS`, `scoreAnswer`, `QUESTION_TERMS`, the
       weights; `answers(...)` and every script on it; `reel-plan`'s checks 34–36 amended. Amendment blocks:
       `reel-plan`, `reel-stills`, `reel-render` (their admission fixtures). **Proves: 1.**
-- [ ] **Slice 2 — Gate 7.** Contracts' 4-tuple, `cutQuestions`, `CUT_QUESTIONS`, `gate7.ts`' header; `reel-render`'s
+- [x] **Slice 2 — Gate 7.** Contracts' 4-tuple, `cutQuestions`, `CUT_QUESTIONS`, `gate7.ts`' header; `reel-render`'s
       checks 38 and 46 amended. Amendment block: `reel-render`. **Proves: 2.**
 - [ ] **Slice 3 — the sound.** `soundOf`; `duckDb` out of contracts, defaults, schema and build; `volume` out of
       `PASS_FILTERS`; `reel-render`'s checks 32, 34 and 37, its manifest check and typed fixture, and `reel-takes`'

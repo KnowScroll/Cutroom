@@ -281,7 +281,7 @@ function frameOf(all: Buffer, picture: string): number {
   return best
 }
 
-test("38. Gate 7 is one judgeCut call per render, role judge, temperature 0, given every shot in timeline order with the frames of its span's start, middle and end and its sentences, and the five questions; its verdict records coverage frames and their number", async () => {
+test("38. Gate 7 is one judgeCut call per render, role judge, temperature 0, given every shot in timeline order with the frames of its span's start, middle and end and its sentences, and the four questions; its verdict records coverage frames and their number", async () => {
   const engine = await startEngine({
     worker: true,
     script: videoScript(THREE_RANKS, THREE_RANKS_PICS),
@@ -387,8 +387,9 @@ test('38. any answer no stops the run for rule gate-7 at step video, with the fi
     assert.deepEqual(row.gate7?.coverage, { strategy: 'frames', frames: 18 })
     assert.deepEqual(row.gate7?.reasons, [CUT_QUESTIONS[1], CUT_QUESTIONS[3]])
     assert.deepEqual(
+      // AMENDED BY cut-rules (S-158): four questions, so four answers.
       row.gate7?.answer.map((a) => a.answer),
-      ['yes', 'no', 'yes', 'no', 'yes'],
+      ['yes', 'no', 'yes', 'no'],
     )
     assert.equal(engine.model.judgeCutCalls.length, 1)
 

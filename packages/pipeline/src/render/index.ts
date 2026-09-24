@@ -48,13 +48,14 @@ export const DEFAULT_RENDER_SETTINGS: RenderSettings = {
   // S-073: the clips' sound, under the narration for the whole span.
   duckDb: 18,
   // S-074: each answered yes when the cut is right, so any no fails Gate 7 (I-16) — provisional
-  // until M-1.
+  // until M-1. FOUR, NOT FIVE (docs/features/cut-rules.md, S-158): the fifth asked whether every shot
+  // showed something no other shot repeats, and refused the first black-holes cut for showing black
+  // holes; a reel that shows how a thing works shows that thing again and again.
   cutQuestions: [
     'Are the shots in a sensible order?',
     'Does the pacing work?',
     'Does every shot sit well beside the shot that follows it?',
     'Do the burned captions follow the narration?',
-    'Does every shot show something no other shot repeats?',
   ],
   // D-024, I-11, S-096: a call answered unavailable is sent again, three sends in all, a second apart
   // and then two.

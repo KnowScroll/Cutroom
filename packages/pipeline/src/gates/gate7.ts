@@ -3,7 +3,8 @@ import type { CutVerdict, LanguageModelPort, PictureRef } from '@cutroom/contrac
 
 // Gate 7 (docs/features/reel-render.md, Gate 2 "Gate 7"; S-074, D-058, D-064). The assembled file,
 // judged once: ONE `judgeCut` call, role judge, temperature 0, given each shot in timeline order with
-// the frames of its span's start, middle and end and its sentences, and five closed questions. Its
+// the frames of its span's start, middle and end and its sentences, and four closed questions (five
+// until S-158 took out repetition, docs/features/cut-rules.md). Its
 // answer names every question once, yes or no, or it does not parse and the run fails. ANY NO FAILS
 // the gate (I-16): each question is worded so that yes is what a right cut answers.
 

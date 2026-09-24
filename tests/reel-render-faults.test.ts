@@ -229,15 +229,16 @@ const FAULTS: Fault[] = [
   {
     name: 'a judge answer leaving out a question',
     options: {
-      // Four of the five questions, each yes: the fifth is not answered at all.
+      // Three of the four questions, each yes: the fourth is not answered at all (AMENDED BY
+      // cut-rules, S-158 — four questions where there were five, so the fourth is left out).
       script: videoScript(THREE_RANKS, THREE_RANKS_PICS, {
         cut: {
-          answers: CUT_QUESTIONS.slice(0, 4).map((question) => ({ question, answer: 'yes' })),
+          answers: CUT_QUESTIONS.slice(0, 3).map((question) => ({ question, answer: 'yes' })),
         },
       }),
     },
     detail: new RegExp(
-      `does not name every question once.*${CUT_QUESTIONS[4].replace(/\?/g, '\\?')}`,
+      `does not name every question once.*${CUT_QUESTIONS[3].replace(/\?/g, '\\?')}`,
     ),
     asked: { narrations: ALL.map(N), clips: ALL.map(T) },
     speech: ALL.map(N),

@@ -10,6 +10,14 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `cut-rules` on 2026-09-24, Slice 2 — the gates below are not edited, and no assertion is removed**
+> (**S-158**). **Gate 7 asks four closed questions, not five**: the fifth — _"Does every shot show something no other
+> shot repeats?"_ — is gone, because it refused the first black-holes cut for showing black holes (P-006). So S-074's
+> _"five closed questions"_, Gate 3's five-tuple `cutQuestions` and check 38's _"the five questions"_ read four.
+> **Check 38** says four and records four answers; **check 46's** _"a judge answer leaving out a question"_ answers three
+> of the four and names the fourth; the engine's `CUT_QUESTIONS` are the four. Any `no` still fails Gate 7 (I-16).
+> This feature's journey is run again in `cut-rules`' last slice.
+>
 > **Amended by `cut-rules` on 2026-09-24, Slice 1 — the gates below are not edited, and no assertion is removed**
 > (**S-158**). The plan score asks three questions where it asked four, so this feature's admission check's
 > `forkOfTwo()` scripts three answers a plan — its only `no` is still the third, so plan b still wins. This

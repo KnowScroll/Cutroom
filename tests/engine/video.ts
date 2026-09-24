@@ -225,18 +225,18 @@ export function turned(take: Take, id: string): TakeAnswer {
 }
 
 /**
- * Gate 7's five closed questions, typed out BY HAND as the default render settings word them
- * (S-074): each is answered yes when the cut is right.
+ * Gate 7's four closed questions, typed out BY HAND as the default render settings word them
+ * (S-074): each is answered yes when the cut is right. The fifth, on repetition, left with S-158
+ * (cut-rules).
  */
 export const CUT_QUESTIONS = [
   'Are the shots in a sensible order?',
   'Does the pacing work?',
   'Does every shot sit well beside the shot that follows it?',
   'Do the burned captions follow the narration?',
-  'Does every shot show something no other shot repeats?',
 ] as const
 
-/** A judge's answer to the five questions: every one yes, but those whose position is in `no`. */
+/** A judge's answer to the four questions: every one yes, but those whose position is in `no`. */
 export function cutAnswer(no: readonly number[] = []) {
   return {
     answers: CUT_QUESTIONS.map((question, i) => ({
