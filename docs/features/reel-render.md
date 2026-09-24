@@ -10,6 +10,13 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
+> (**S-156**). **The witness's schemas moved to `packages/contracts/src/observation.ts`**, unchanged, so that the
+> MiniMax adapter asks with the very objects the gate parses under; `packages/pipeline/src/stills/observation.ts` and
+> `clips/observation.ts` re-export them, so every import keeps its path. No field, closed set, minimum or strictness
+> moves — `second-ask`'s check 5 snapshots both schemas and holds unchanged. This feature's journey is run again in
+> `ask-again`'s last slice.
+>
 > **Amended by `three-pictures` on 2026-09-23 — nothing in this feature's code moves** (**S-150**). The clips
 > stage chooses image-to-video from a shot having an approved picture, whatever its role, so a `standalone` picture
 > opens its shot like any other; `three-pictures`' check 11 proves it on a video run under `pictures: 'upToThree'`.

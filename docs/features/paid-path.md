@@ -31,6 +31,18 @@ Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED
 > default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its
 > own rate.
 >
+> **Amended by `ask-again` on 2026-09-24 — no gate below is edited, and no assertion is removed** (**S-156**).
+> **The MiniMax adapter asks the witness with the gate's own schemas**, `witnessObservation` and `clipObservation`, now
+> declared once in `packages/contracts/src/observation.ts`; its own copies — `observedEntity`, `observationShape`,
+> `clipObservationShape` — are deleted. They said a `count` was any integer, a `label` could be empty and no object
+> was strict, while the gate refused all three, and the witness wrote a count of −1 for stars too many to count
+> (P-004, P-005). So an `observe` body's rendered shape changes — `exclusiveMinimum: 0`, `minLength: 1`,
+> `additionalProperties: false` — and nothing else: `ask-again`'s check 1 pins the question part byte for byte and a
+> structured body's digest, both at `046ad37`. The adapter still never parses an observation (D-041, S-042); check 1
+> holds that too, on `tests/fixtures/wire/minimax-chat-uncountable.json`, a new fixture under this feature's check 21.
+> This feature's checks 6 and 7 assert the shape part, the field names, the closed-set lines and two text parts, and
+> hold unchanged. Its journey is run again in `ask-again`'s last slice.
+>
 > **Amended by `three-pictures` on 2026-09-23 — no gate below is edited, and no assertion is removed** (**S-150**).
 > `scripts/real-reel.mjs` sets `CUTROOM_PICTURES=upToThree` among its defaults (a value already set wins), prints the
 > rule, and prices its corners at 0 and 4 image calls. **`three-pictures`' check 12 lives in

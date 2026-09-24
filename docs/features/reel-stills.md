@@ -32,6 +32,13 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
+> (**S-156**). **The witness's schemas moved to `packages/contracts/src/observation.ts`**, unchanged, so that the
+> MiniMax adapter asks with the very objects the gate parses under; `packages/pipeline/src/stills/observation.ts` and
+> `clips/observation.ts` re-export them, so every import keeps its path. No field, closed set, minimum or strictness
+> moves — `second-ask`'s check 5 snapshots both schemas and holds unchanged. This feature's journey is run again in
+> `ask-again`'s last slice.
+>
 > **Amended by `three-pictures` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
 > (**S-150**). A picture has a third role, **`standalone`**, placed only under a plan's own `pictures: 'upToThree'`: on
 > the earliest shots holding no picture and naming no pictured subject, up to three pictures in all, each made once

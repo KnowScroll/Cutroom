@@ -426,7 +426,7 @@ as 1, a count that parses and is false; it matters only when the uncountable thi
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — one shape.** `packages/contracts/src/observation.ts`; the pipeline's two files re-export it; the
+- [x] **Slice 1 — one shape.** `packages/contracts/src/observation.ts`; the pipeline's two files re-export it; the
       adapter asks with it and its copies are deleted. Amendment blocks: `paid-path` (the adapter's asked shape),
       `reel-stills` and `reel-render` (where their schemas now live). **Proves: 1, 2.**
 - [ ] **Slice 2 — the record.** `brands.ts`, `refusals.ts` and `refused.ts` in contracts, `LostCall.answer?`/`refused?`,

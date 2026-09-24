@@ -32,6 +32,7 @@ export type {
 } from './clip.ts'
 export { Spent, Unavailable, isSpent, isUnavailable, type LostCall } from './failures.ts'
 export type { LanguageModelPort, ModelCall, ModelReceipt, ModelRole } from './model.ts'
+export { clipObservation, witnessObservation } from './observation.ts'
 export type {
   NarrationAnswer,
   NarrationPort,

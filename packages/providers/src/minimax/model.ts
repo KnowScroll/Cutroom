@@ -1,13 +1,15 @@
 import { readFile } from 'node:fs/promises'
 import { extname } from 'node:path'
 import { z } from 'zod'
-import type {
-  ClipRef,
-  LanguageModelPort,
-  ModelCall,
-  ModelReceipt,
-  ModelRole,
-  PictureRef,
+import {
+  clipObservation,
+  witnessObservation,
+  type ClipRef,
+  type LanguageModelPort,
+  type ModelCall,
+  type ModelReceipt,
+  type ModelRole,
+  type PictureRef,
 } from '@cutroom/contracts'
 import { visibleText } from '../text.ts'
 import { Spent, Unavailable, isSpent, messageOf, transientStatus } from '../transient.ts'
@@ -305,38 +307,19 @@ export function withoutBooleanSchemas(value: unknown): unknown {
 // question and the shape of the answer are fixed here, inside the adapter, because a free prompt
 // beside an image is a field a gate's brief could be written into (I-8, D-042, S-037).
 //
-// The schemas below are used for ONE thing: to ask for the answer's shape — through
+// The schemas the calls ask with are used for ONE thing: to ask for the answer's shape — through
 // `response_format` AND, because this wire ignores that field, in the message itself (S-130).
 // They never parse an answer. An observation is parsed by the pipeline at the gate boundary,
 // which is where a malformed one must be caught (D-041, S-042) — an adapter that parsed it here
 // would make that path unreachable.
-
-const observedEntity = z.object({
-  label: z.string(),
-  count: z.number().int(),
-  position: z.enum(['left', 'centre', 'right']),
-  prominence: z.enum(['foreground', 'midground', 'background']),
-  faceVisible: z.enum(['yes', 'partial', 'no', 'noFace']),
-  occluded: z.boolean(),
-  clippedByEdge: z.boolean(),
-})
-
-/** D-041's fields as D-044 amended them — a still's observation. */
-const observationShape = z.object({
-  entities: z.array(observedEntity),
-  framing: z.enum(['closeUp', 'medium', 'wide', 'extremeWide']),
-  setting: z.string(),
-  lighting: z.enum(['bright', 'dim', 'mixed', 'silhouette']),
-  readableTextPresent: z.boolean(),
-  ambiguities: z.array(z.string()),
-  unsafeDepictions: z.array(z.string()),
-})
-
-/** The same fields and the temporal block a clip has and a still does not (D-041, D-053, S-072). */
-const clipObservationShape = observationShape.extend({
-  actions: z.array(z.object({ entity: z.string(), verb: z.string(), completes: z.boolean() })),
-  eventOrder: z.array(z.string()),
-})
+//
+// AN OBSERVATION IS ASKED FOR WITH THE GATE'S OWN SCHEMA, `witnessObservation` or
+// `clipObservation` from `packages/contracts` — never a copy of it (docs/features/ask-again.md,
+// Slice 1; S-156). This file used to keep its own copy, in which `count` was any integer, a
+// `label` could be empty and no object was strict, while the gate refused all three; the witness
+// was told a count of −1 was fine, and wrote one for stars too many to count. Holding the gate's
+// objects, this adapter could now parse with them, and must not: `ask-again`'s check 1 holds that
+// an answer those schemas refuse comes back from `observe` as its value.
 
 /** Gate 1S's closed question: every shared subject, by name, once (S-045). */
 const compareShape = z.object({
@@ -786,7 +769,7 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
           'observe',
           call.temperature,
           [textPart(OBSERVE_QUESTION), await picturePart(call.picture)],
-          observationShape,
+          witnessObservation,
           'observation',
           { pictureIds: [call.picture.pictureId] },
         )
@@ -796,7 +779,7 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
         'observe',
         call.temperature,
         [textPart(OBSERVE_CLIP_QUESTION), await clipPart(call.clip)],
-        clipObservationShape,
+        clipObservation,
         'clipObservation',
         { takeIds: [call.clip.takeId] },
       )

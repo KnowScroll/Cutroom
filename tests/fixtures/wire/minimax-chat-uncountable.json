@@ -1,0 +1,41 @@
+{
+  "note": "A witness answer MiniMax-M3 actually gave, kept by ask-again's measurement (S-156) on the picture that stopped two reels (P-004): the background stars counted -1, the model's way of saying too many to count, under the adapter's old copy of the shape. The gate refuses it (count must be above zero); the adapter must return it as its value and never parse it (D-041, S-042), which ask-again's check 1 holds.",
+  "provider": "minimax",
+  "call": "chat",
+  "case": "uncountable",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "id": "recorded-uncountable",
+      "object": "chat.completion",
+      "created": 1790208000,
+      "model": "MiniMax-M3",
+      "choices": [
+        {
+          "index": 0,
+          "finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"entities\":[{\"label\":\"large dark circular object\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"glowing ring of light surrounding the dark circle\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"scattered stars\",\"count\":-1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"diffuse band of stars and dust stretching diagonally across the scene\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"closeUp\",\"setting\":\"outer space, with a star field and a faint galactic band\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"the exact nature of the central dark circle is unclear from the image alone — it could be interpreted as a sphere or a flat disk depending on viewing angle\",\"the glowing ring has subtle blue and brown tints near its inner edge that are difficult to distinguish in places\"],\"unsafeDepictions\":[]}"
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 2466,
+        "completion_tokens": 584,
+        "total_tokens": 3050
+      },
+      "base_resp": {
+        "status_code": 0,
+        "status_msg": ""
+      }
+    }
+  }
+}
