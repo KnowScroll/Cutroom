@@ -5,7 +5,7 @@ authority: plan
 
 # cut-rules — a reel may show one thing in every shot, and its only sound is its narration
 
-Status: planned
+Status: verified
 Decisions: D-008, D-027, D-055, D-059, D-064, D-084, I-6, I-16, S-028, S-072, S-073, S-074, S-075, S-097, S-099, S-111, S-112, S-148, S-149, S-158
 Named only in the deferral list: D-023, S-115
 Gates: product APPROVED 2026-09-24 adversarial-reviewer · architecture APPROVED 2026-09-24 adversarial-reviewer · program-design APPROVED 2026-09-24 adversarial-reviewer · slices APPROVED 2026-09-24 adversarial-reviewer
@@ -181,7 +181,11 @@ Every check appears in exactly one slice: 1 + 1 + 2 + 1 = 5.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-24 journey=PASS at 3cb421e — every check green; 5 tests in tests/cut-rules-*.test.ts pass
+
 ## Divergence (the first broken boundary, or "none")
+
+none
 
 ## Deferred
 
