@@ -248,3 +248,18 @@ test("20. (three-pictures check 12) the script that spends sets CUTROOM_PICTURES
   // And the rule it sets is one the service accepts.
   assert.equal(readSettings({ CUTROOM_PICTURES: 'upToThree' }).planSettings.pictures, 'upToThree')
 })
+
+test('20. (ask-again check 23) the script that spends prints the count of refused answers, and never reads the answer column', () => {
+  // AMENDED BY ask-again (S-156): the script prints nothing a provider handed back but figures, so it
+  // counts the answers a model wrote that could not be read and leaves their words to
+  // scripts/refused.mjs. It lives here because this is the one file allowed to name the script.
+  const source = read(SCRIPT)
+  const statements = [...source.matchAll(/'([^']*refused_answer[^']*)'/g)].map((m) => m[1])
+  assert.deepEqual(
+    statements,
+    ['SELECT COUNT(*) AS n FROM refused_answer WHERE run_id = ?'],
+    'the script reads refused_answer in some other way than a count',
+  )
+  assert.match(source, /`\s{2}refused\s{2}\$\{refused\} answer/, 'the count is not printed')
+  assert.match(source, /scripts\/refused\.mjs \$\{runId\}/, 'the reader is not named')
+})

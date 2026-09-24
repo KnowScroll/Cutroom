@@ -31,6 +31,13 @@ Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED
 > default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its
 > own rate.
 >
+> **Amended by `ask-again` on 2026-09-24, Slice 5 — no gate below is edited, and no assertion is removed**
+> (**S-156**). **`scripts/real-reel.mjs` prints how many answers a model wrote that could not be read** — the count only,
+> since it prints nothing a provider handed back but figures — and names `scripts/refused.mjs` for the words.
+> **`ask-again`'s check 23 lives in `tests/paid-path-real-reel.test.ts`**, beside check 20, as `three-pictures`' check 12
+> does, because check 20 allows that one file alone to name the script: it holds that the script reads
+> `refused_answer` only as a count.
+>
 > **Amended by `ask-again` on 2026-09-24, Slice 2 — no gate below is edited, and no assertion is removed**
 > (**S-156**). **A `Spent` the MiniMax adapter raises while reading an answer now carries that answer** — its text after
 > the reasoning block and a whole-answer fence — and, when the answer itself is at fault (the caller's schema refused

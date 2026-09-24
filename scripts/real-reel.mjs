@@ -463,6 +463,18 @@ for (const [kind, sql] of kinds) {
 }
 console.log(`\n  ${bold(`total ${total}c`)}  against a ceiling of ${ceiling}c\n`)
 
+// ANSWERS A MODEL WROTE THAT COULD NOT BE READ (docs/features/ask-again.md, S-156): the COUNT, and
+// nothing of what they say — this script prints nothing a provider handed back but figures (D-022).
+// The words are kept, redacted, for `scripts/refused.mjs` to print.
+const refused = Number(
+  db.prepare('SELECT COUNT(*) AS n FROM refused_answer WHERE run_id = ?').get(runId).n,
+)
+console.log(
+  `  refused  ${refused} answer${refused === 1 ? '' : 's'} a model wrote that could not be read` +
+    (refused === 0 ? '' : ` — read them with scripts/refused.mjs ${runId}`) +
+    '\n',
+)
+
 // THE LATENCY ONE CLIP TAKES — what `parallel-shots` cannot be planned without (S-115). A shot's
 // narration is measured BEFORE its own clip is asked for (S-070), so the gap between a shot's
 // speech receipt and its video receipt is that clip's call and the gates that follow the narration.

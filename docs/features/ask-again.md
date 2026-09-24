@@ -441,7 +441,7 @@ as 1, a count that parses and is false; it matters only when the uncountable thi
       fills it; refused timings in the clips stage; the adapter's rendering of `refused`; `second-ask`'s checks 1 to 5
       and `reel-takes`' hand-written ports amended. Amendment blocks: `second-ask`, `reel-stills`, `reel-render`,
       `reel-takes`. **Proves: 16 to 21.**
-- [ ] **Slice 5 — the reader and the journey.** `scripts/refused.mjs`, `real-reel.mjs`' count, check 23 in
+- [x] **Slice 5 — the reader and the journey.** `scripts/refused.mjs`, `real-reel.mjs`' count, check 23 in
       `paid-path`'s file, check 24; this feature's journey, and every amended feature's again — `paid-path`,
       `paid-failures`, `reel-plan`, `reel-stills`, `reel-render`, `reel-takes`, `second-ask` (S-099's form).
       **Proves: 22, 23, 24.**
