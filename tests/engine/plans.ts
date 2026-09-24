@@ -97,7 +97,8 @@ export const answerB = () =>
   )
 
 export type YesNo = 'yes' | 'no'
-export const answers = (...four: [YesNo, YesNo, YesNo, YesNo]) => ({ answers: four })
+/** A score answer: three yes/no, in the order the questions are asked (cut-rules, S-158). */
+export const answers = (...three: [YesNo, YesNo, YesNo]) => ({ answers: three })
 
 /**
  * Both plans pass Gate 0 at the default rates (each 3 image calls and 40 s: 205 cents). The 6-unit
@@ -106,10 +107,7 @@ export const answers = (...four: [YesNo, YesNo, YesNo, YesNo]) => ({ answers: fo
 export function twoSurvivors(): FakeScript {
   return {
     planner: [{ value: answerA() }, { value: answerB() }],
-    reconciler: [
-      { value: answers('yes', 'yes', 'no', 'yes') },
-      { value: answers('yes', 'yes', 'yes', 'yes') },
-    ],
+    reconciler: [{ value: answers('yes', 'yes', 'no') }, { value: answers('yes', 'yes', 'yes') }],
   }
 }
 

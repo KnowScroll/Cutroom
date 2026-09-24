@@ -27,6 +27,17 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `cut-rules` on 2026-09-24 — the gates below are not edited** (**S-158**). **The plan score asks three
+> closed questions, not four**: the fourth — _"Does every shot show something that no other shot has already shown?"_ —
+> is gone, and with it the term `distinct` and its weight, because it marked down every plan whose subject recurs
+> (S-148, S-149) and a reel that shows how a thing works shows that thing again and again. So Gate 2's _"four closed
+> questions"_ and Gate 3's `readonly [string, string, string, string]` read three. **Checks 34 to 36 are amended to
+> the three**, every assertion kept: check 34 scripts three answers and now also asserts four are refused, and its
+> `maybe` input is three long, so it is refused for `maybe`; check 35's `EVERY_ANSWER` is the eight sets of three,
+> its count `7 * 4 * 11`, its all-`no` input three long (its total `1 + 3/4` does not move: the removed answer was
+> `no`); its tie-break pair is two three-answer sets that tie; check 36's input is three long. The engine's
+> `answers(...)` takes three. This feature's journey is run again in `cut-rules`' last slice.
+>
 > **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
 > (**S-156**). **A planning, scoring or repair answer refused for its shape is asked once more, told why** — through
 > `askStructured`, at all three of `planReel`'s call sites — so D-061's and D-035's _"one structured call"_ per

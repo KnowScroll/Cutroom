@@ -10,6 +10,11 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `cut-rules` on 2026-09-24, Slice 1 — the gates below are not edited, and no assertion is removed**
+> (**S-158**). The plan score asks three questions where it asked four, so this feature's admission check's
+> `forkOfTwo()` scripts three answers a plan — its only `no` is still the third, so plan b still wins. This
+> feature's journey is run again in `cut-rules`' last slice.
+>
 > **Amended by `ask-again` on 2026-09-24, Slice 4 — the gates below are not edited, and no assertion is
 > removed** (**S-156**). **Gate 4's witness, asked again, is told why**, and every refused answer is kept: `ClipsPorts` gains `refusals`. **A narration whose word timings do not parse is kept too** — one `refused_answer` row, `speech`, about its narration id — and fails the run with exactly the words it always did; it is not spoken again (the owner's choice, P-001). Check 14's faults and check 23's words hold. This feature's journey is run again in `ask-again`'s last slice.
 >

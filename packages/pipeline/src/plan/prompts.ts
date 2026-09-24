@@ -187,18 +187,24 @@ export function repairPrompt(
 
 // ---------------------------------------------------------------- the plan score
 
-/** Gate 7's four topics, as closed questions (D-064). Defaults of a setting, provisional until M-1. */
+/**
+ * Gate 7's topics, as closed questions (D-064). Defaults of a setting, provisional until M-1.
+ *
+ * THREE, NOT FOUR (docs/features/cut-rules.md, S-158). The fourth asked whether every shot showed
+ * something no other shot had shown, and it marked down every plan whose subject recurs — measured
+ * (S-148, S-149) — while a reel that shows how a thing works shows that thing again and again. The
+ * owner removed it here and from Gate 7.
+ */
 export const SCORE_QUESTIONS = [
   'Does the order of the shots let each one build on the one before it?',
   'Does each shot last long enough for its narration, without lingering after it?',
   'Does each cut put two pictures side by side in a way that adds to what is said?',
-  'Does every shot show something that no other shot has already shown?',
 ] as const
 
 const yesNo = z.enum(['yes', 'no'])
 
-/** Four answers for one plan, in the order the questions are asked. */
-export const scoreAnswer = z.strictObject({ answers: z.tuple([yesNo, yesNo, yesNo, yesNo]) })
+/** Three answers for one plan, in the order the questions are asked. */
+export const scoreAnswer = z.strictObject({ answers: z.tuple([yesNo, yesNo, yesNo]) })
 
 /** The score prompt for ONE plan — never two in one request (D-064). */
 export function scorePrompt(plan: Plan, request: SubmitRequest, settings: PlanSettings): string {

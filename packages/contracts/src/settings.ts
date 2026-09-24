@@ -18,8 +18,11 @@ export interface PlanSettings {
   videoRateCentsPerSecond: number
   /** The model id each of the four roles is routed to (D-006, S-037). */
   models: Record<ModelRole, string>
-  /** The plan score's four closed questions and every weight — provisional until M-1 (D-064). */
-  score: { questions: readonly [string, string, string, string]; weights: Record<string, number> }
+  /**
+   * The plan score's three closed questions and every weight — provisional until M-1 (D-064). Never
+   * whether a shot repeats another: a reel may show one thing in every shot (S-158).
+   */
+  score: { questions: readonly [string, string, string]; weights: Record<string, number> }
   /**
    * Which shots get a picture (docs/features/three-pictures.md, S-150). `'recurring'` — the default,
    * and every verified feature's — is D-027's: pictures only for subjects that recur. `'upToThree'`

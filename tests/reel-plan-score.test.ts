@@ -65,14 +65,16 @@ test('34. the plan score is computed only when both plans survive Gate 0, each p
       `the first score call carries the other plan's "${name}"`,
     )
   }
-  // …and answers for one plan: four closed questions, yes or no.
-  assert.equal(first.schema.safeParse(answers('yes', 'no', 'yes', 'no')).success, true)
+  // …and answers for one plan: three closed questions, yes or no (AMENDED BY cut-rules, S-158 — the
+  // fourth, on repetition, is gone, and four answers are now refused).
+  assert.equal(first.schema.safeParse(answers('yes', 'no', 'yes')).success, true)
+  assert.equal(first.schema.safeParse({ answers: ['yes', 'no', 'yes', 'no'] }).success, false)
   assert.equal(
     first.schema.safeParse({ answers: ['yes', 'no', 'yes', 'no', 'yes', 'no', 'yes', 'no'] })
       .success,
     false,
   )
-  assert.equal(first.schema.safeParse({ answers: ['yes', 'no', 'maybe', 'no'] }).success, false)
+  assert.equal(first.schema.safeParse({ answers: ['yes', 'no', 'maybe'] }).success, false)
   for (const question of S.score.questions) {
     assert.ok(first.prompt.includes(question), `the score call does not ask "${question}"`)
   }
@@ -92,10 +94,7 @@ test('34. the plan score is computed only when both plans survive Gate 0, each p
   const tie = await plan(
     {
       ...twoSurvivors(),
-      reconciler: [
-        { value: answers('yes', 'no', 'yes', 'no') },
-        { value: answers('no', 'yes', 'no', 'yes') },
-      ],
+      reconciler: [{ value: answers('yes', 'no', 'no') }, { value: answers('no', 'yes', 'no') }],
     },
     flat,
   )
@@ -121,9 +120,8 @@ test('34. the plan score is computed only when both plans survive Gate 0, each p
 // ---------------------------------------------------------------- 35
 
 const YN: YesNo[] = ['yes', 'no']
-const EVERY_ANSWER = YN.flatMap((a) =>
-  YN.flatMap((b) => YN.flatMap((c) => YN.map((d) => [a, b, c, d] as const))),
-)
+/** Every set of three answers (cut-rules, S-158: three closed questions, not four). */
+const EVERY_ANSWER = YN.flatMap((a) => YN.flatMap((b) => YN.map((c) => [a, b, c] as const)))
 
 test('35. the plan score returns a number for every input, including every answer no, and has no path that rejects', () => {
   const request = planRequest('score-35')
@@ -153,7 +151,7 @@ test('35. the plan score returns a number for every input, including every answe
     infinite: Object.fromEntries(keys.map((k) => [k, Number.POSITIVE_INFINITY])),
     huge: Object.fromEntries(keys.map((k) => [k, 1e300])),
   }
-  const answerSets: unknown[] = [...EVERY_ANSWER, [], ['yes'], ['maybe', 'yes', 'no', 'yes']]
+  const answerSets: unknown[] = [...EVERY_ANSWER, [], ['yes'], ['maybe', 'yes', 'no']]
 
   let scored = 0
   for (const [label, weights] of Object.entries(weightings)) {
@@ -182,10 +180,10 @@ test('35. the plan score returns a number for every input, including every answe
       }
     }
   }
-  assert.equal(scored, 7 * 4 * 19)
+  assert.equal(scored, 7 * 4 * 11)
 
   // Every answer no still scores the countable terms.
-  const allNo = scorePlan(recurring, request, ['no', 'no', 'no', 'no'], S)
+  const allNo = scorePlan(recurring, request, ['no', 'no', 'no'], S)
   assert.equal(allNo.terms.coverage, 1)
   assert.equal(allNo.terms.recurrence, 3 / 4)
   assert.equal(allNo.total, 1 + 3 / 4)
@@ -216,8 +214,8 @@ test('36. the same two plans score identically twice', async () => {
   const request = planRequest('score-36')
   const { a } = first.outcome.fork
   assert.deepEqual(
-    scorePlan(a, request, ['yes', 'no', 'yes', 'yes'], S),
-    scorePlan(a, request, ['yes', 'no', 'yes', 'yes'], S),
+    scorePlan(a, request, ['yes', 'no', 'yes'], S),
+    scorePlan(a, request, ['yes', 'no', 'yes'], S),
   )
 })
 

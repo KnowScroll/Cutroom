@@ -47,7 +47,7 @@ export const DEFAULT_PLAN_SETTINGS: PlanSettings = {
   },
   score: {
     questions: SCORE_QUESTIONS, // D-064, provisional until M-1
-    weights: { coverage: 1, recurrence: 1, order: 1, pacing: 1, juxtaposition: 1, distinct: 1 },
+    weights: { coverage: 1, recurrence: 1, order: 1, pacing: 1, juxtaposition: 1 },
   },
   pictures: 'recurring', // D-027's rule; 'upToThree' only by setting (S-150)
 }

@@ -161,7 +161,7 @@ to matter; a tie goes to the 4-unit plan, as today (D-064's tie rule).
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the plan score.** Contracts' 3-tuple, `SCORE_QUESTIONS`, `scoreAnswer`, `QUESTION_TERMS`, the
+- [x] **Slice 1 — the plan score.** Contracts' 3-tuple, `SCORE_QUESTIONS`, `scoreAnswer`, `QUESTION_TERMS`, the
       weights; `answers(...)` and every script on it; `reel-plan`'s checks 34–36 amended. Amendment blocks:
       `reel-plan`, `reel-stills`, `reel-render` (their admission fixtures). **Proves: 1.**
 - [ ] **Slice 2 — Gate 7.** Contracts' 4-tuple, `cutQuestions`, `CUT_QUESTIONS`, `gate7.ts`' header; `reel-render`'s

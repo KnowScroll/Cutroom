@@ -32,6 +32,11 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `cut-rules` on 2026-09-24, Slice 1 — the gates below are not edited, and no assertion is removed**
+> (**S-158**). The plan score asks three questions where it asked four, so this feature's admission check's
+> `forkOfTwo()` scripts three answers a plan — its only `no` is still the third, so plan b still wins. This
+> feature's journey is run again in `cut-rules`' last slice.
+>
 > **Amended by `ask-again` on 2026-09-24, Slice 4 — the gates below are not edited, and no assertion is
 > removed** (**S-156**). **Gate 1's witness, asked again, is told why** — its first answer's issues, and nothing from the brief — and **every refused answer is kept**: `StillsPorts` gains `refusals`, which the worker fills with `refusalRecorder`, one `refused_answer` row a refusal. No verdict, observation or receipt count moves; check 46's words and its two `observe` receipts hold. This feature's journey is run again in `ask-again`'s last slice.
 >

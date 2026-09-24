@@ -77,10 +77,7 @@ const oneSubjectB = () =>
 
 const forkOfTwo = (): FakeScript => ({
   planner: [{ value: answerA() }, { value: oneSubjectB() }],
-  reconciler: [
-    { value: answers('yes', 'yes', 'no', 'yes') },
-    { value: answers('yes', 'yes', 'yes', 'yes') },
-  ],
+  reconciler: [{ value: answers('yes', 'yes', 'no') }, { value: answers('yes', 'yes', 'yes') }],
 })
 
 /** The same script `times` over, for an engine that runs more than one request. */
