@@ -21,6 +21,12 @@ the page's clock to each frame's time in turn, takes a screenshot of every frame
 the page's audio mixed in. No video model is involved: every pixel is what the code draws, or a picture or clip the
 code places.
 
+**In plain words: a flipbook.** The web page is the drawing, with instructions such as _"at 2.73 s, the word 'chip',
+light the chip up"_. Hyperframes freezes the page's clock, sets it to 0.000 s and takes a photo, then 0.042 s and
+another, 24 photos for every second, and ffmpeg glues the photos into a video with the narration. Nothing is guessed,
+so lines stay sharp, text is spelled exactly and motion lands on the spoken word. **Hyperframes is only the camera:**
+the look — colours, layout, how the lines draw themselves — is whoever wrote the page. A plain page records plain.
+
 **What that could give Cutroom** is a second way to make a shot, next to buying a clip from a video model:
 
 - **A shot that cannot fail the ways model clips have failed our reels.** No fade to black on a word like "disappears" (P-003), no voice
@@ -34,13 +40,18 @@ code places.
   better hold, and it is what the spike's shot 0 is.
 
 **What it does not give:** real-world motion. Code draws motion graphics, not cinema. It will not show a star being torn
-apart the way a video model does. And **cost is not the argument**: fal bills a clip about 0.2¢ (S-154), so replacing
+apart the way a video model does, and it **cannot invent a real-looking person or place**. It can only _place_
+real-looking footage that something else made — a photo, a clip from fal, a camera's video — and build around it:
+cuts, zooms, captions, labels drawn over it. HeyGen's own realistic avatars come from HeyGen's models; Hyperframes
+composes the video around them. Its 3D (Three.js) can draw people, but they look like a video game, not real. And **cost is not the argument**: fal bills a clip about 0.2¢ (S-154), so replacing
 clips saves almost nothing. The argument is **reliability and precision** where model clips are weakest.
 
 **The recommended way in**, smallest first: (1) the **composed hold** — a fixed template animates the approved picture
-at the take cap; (2) a **closed set of template shots** (diagram, scale, timeline, kinetic quote) that the planner can
-choose and fill with the narration's own words; (3) only after both have proved themselves, if ever, **model-written
-compositions**. Each is a feature with its four gates (CLAUDE.md rule 1). §8 gives the questions only the owner can
+at the take cap (§4 A); (2) **graphics over the real clips** — fal keeps making the realistic footage and Hyperframes
+draws labels, arrows or a small diagram over it (§4 F), with the word-lit **caption layer** (§4 E) beside it; (3) a
+**closed set of template shots** (diagram, scale, timeline, kinetic quote) that the planner can choose and fill with the
+narration's own words, which also gives a stopped shot a fallback (§4 C, B); (4) only after all of those have proved
+themselves, if ever, **model-written compositions** (§4 D). Each is a feature with its four gates (CLAUDE.md rule 1). §8 gives the questions only the owner can
 answer.
 
 ## 1. What it is
@@ -227,6 +238,7 @@ brief → plan (Gate 0) → pictures (Gate 1) → narration → clip takes, Gate
           └── the plan chooses a shot's kind ──→ C: a template shot ───────────┤       │
                                                  D: a model-written shot ─────┘       │
                                    the captions, from the word timings ──→ E: a caption layer
+                          a transparent layer over an accepted clip ──→ F: graphics over a real clip
 ```
 
 ### A. The composed hold — the approved picture, animated (recommended first)
@@ -284,6 +296,19 @@ it in the one pass in place of the `.ass` burn.
 
 - **Gives:** the caption styles the registry has — highlight, pill karaoke, pop — with the spoken word lit.
 - **Risk: low; value: taste.** Today's captions work. An owner's call on the look, and cheap to try after A.
+
+### F. Graphics over a real clip — realistic footage and exact drawing together
+
+fal keeps making the realistic clip, exactly as today. For the shots that call for it, a template renders a
+**transparent layer** (WebM VP9 alpha or ProRes 4444) of labels, arrows or a small diagram, timed to the shot's own
+narration words, and the one pass lays it over the accepted clip — one more input to D-054's single invocation, not a
+second pass. A real-looking black hole with its event horizon drawn and named at the word "horizon", for instance.
+
+- **Gives:** what neither can do alone — the realism only a video model makes, and the precision only code has.
+- **Risk: medium.** It puts new words on screen, so it waits on the owner's answer to §8's question 2, takes its words
+  from the narration only (D-096), and is bound by the reel's `mustNotShow` like a picture is — the black-holes brief's
+  "written words or labels" would forbid it there. Gates 2–5 judge the clip before assembly, so the overlay is judged
+  only by Gate 7, in the cut — a question for its gates. It needs A's port and adapter first.
 
 ### Not recommended: Hyperframes as the assembler
 
@@ -390,11 +415,52 @@ explainers). If a composed shot is wanted, the choice between them is a written 
 2. **Text on screen beyond the captions:** allowed at all? If so, only the narration's own words?
 3. **Is a free reel wanted** for the free path and for testing — composed shots with Kokoro's voice, no provider at all?
 4. **Chrome as a second dependency** of the engine, next to ffmpeg — acceptable?
-5. **Which first:** the composed hold (A), a composed shot where a reel would stop (B), or template shots in plans (C)?
+5. **Which first:** the composed hold (A), graphics over real clips (F), a composed shot where a reel would stop (B),
+   or template shots in plans (C)? A first is recommended: it builds the port, the adapter, the stand-in and Chrome's
+   check with the least at stake, and F, E, C and B each build on it.
 
 If A is chosen, the next step is a feature file in `docs/features/` — the name `composed-hold` is a suggestion — with
 the four gates written and adversarially reviewed before any code (CLAUDE.md rule 1), and the S- entries it would need:
 the new port, Chrome as a dependency, and the part of D-059 and S-097 it supersedes.
+
+## A whole reel from code — how a CPU works (2026-09-24)
+
+The owner then asked for a whole reel made this way, on a new subject, in animated diagrams rather than anything
+real-looking. Made outside the engine; nothing in the repository's code was touched. The files are in the ignored
+artifact root, `.artifacts/hyperframes-cpu/`, the finished reel at `cpu-reel.mp4`.
+
+- **Script:** six narrations, 146 words, written for it — the fetch–decode–execute loop; control unit, ALU, registers
+  and clock; slow memory, fast caches, several cores; x86 in PCs against ARM in phones; transistors as switches wired
+  into logic gates; wafers coated, exposed through a mask, etched layer after layer, cut and packaged. Spoken by
+  MiniMax `speech-2.8-hd`, voice `English_Graceful_Lady`, through the repository's own narration adapter: six calls,
+  838 characters.
+- **Pictures:** none. Every frame is SVG drawn and animated by GSAP in six Hyperframes compositions sharing one small
+  kit (colours, draw-on lines, pop-ins, word-keyed timing, captions lit word by word). Every cue is a narration word's
+  timestamp.
+- **Result:** 76.3 s, H.264 768×1366 at 24 fps + AAC 48 kHz, 7.1 MB, integrated loudness −14.2 LUFS. **Gate 2's scan
+  finds nothing** once one fault was fixed (below); no silence of a second or more. Longer than D-111's 35–45 s,
+  because the subject is broad — this reel was never an engine run.
+- **Time:** each scene rendered in 17–20 s warm; the six together about two minutes; the join 6 s. Authoring was the
+  cost: several hours of writing and checking scenes, frame sheet by frame sheet.
+
+**What it ran into — each one a rule for any composed-shot feature:**
+
+1. **MiniMax's word timings for "x86", "PCs" and "ARM" came back as 53 sub-word tokens for 23 words**, "x86" repeated
+   six times — P-001's fault again, on the text this time. The captions re-join the tokens to the text's words
+   (punctuation skipped, a run of identical whole-word tokens made one). The engine's stage would have refused the
+   narration (S-070).
+2. **A GSAP `fromTo` that sets a property only in its from-values drops it once the timeline is rewound past the
+   tween** — measured: after seeking to the end and back to 0, the property stays at its pre-tween value on every later
+   seek. The Hyperframes runtime rewinds, so every moving block of two scenes rendered invisible although lint passed
+   and a plain forward seek showed them. Written as set, then move, then fade instead, and proved by a check comparing
+   each scene's visible state at every half second, reached fresh and reached after a rewind: identical in five scenes,
+   one fading ring at 6% opacity in the sixth.
+3. **GSAP reads a `textContent` value like "x86" as a number to animate**, and rewinds it to "x0". Text is written when
+   the element is built and only revealed by a tween.
+4. **A diagram that holds still reads as frozen.** Scene 3 held still for 1.4 s between two cues, and Gate 2's scan
+   flagged it in the joined reel. The blocks were started a second earlier. A composed shot needs a motion floor.
+5. **Fills show before their strokes draw.** A draw-on animates the outline only; a filled shape must fade its fill in
+   with it, or it sits on screen as a dark silhouette from the first frame.
 
 ## Reproducing the spike
 
