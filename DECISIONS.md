@@ -6784,3 +6784,51 @@ chose narration only, with Gate 3's `listen` recorded as a stand-in (P-007).
 file's sound equal to the narration alone; and the verified checks each change amends.
 
 **Confirmed-by.** The owner, 2026-09-24, on both questions.
+
+---
+
+## S-159 | 2026-09-25 | `check.mjs --changed`: the checks are chosen by the paths that differ from HEAD — documents alone run the formatting, the scans and the authority; code, or any path it does not know, runs every check
+
+**Chose.** `node scripts/check.mjs --changed` lists every path that differs from HEAD — `git diff --name-only
+--no-renames HEAD`, staged or not, and every untracked path git does not ignore — and sorts each one:
+
+- **a document**: a Markdown file under `docs/` or `PROMPTS/`, or `JOURNAL.md`, `DECISIONS.md`, `CLAUDE.md`,
+  `README.md` or `AGENTS.md`;
+- **code**: anything under `packages/`, `apps/`, `tests/`, `scripts/` or `db/`, and the root's configs — the package
+  and workspace files, the lockfile, the `tsconfig`s, lint's, the formatter's, dependency-cruiser's and git's own;
+- **unknown**: every other path.
+
+When every path is a document, it runs **the formatting, the two authority checks and the three scans** that read files
+other than code — `tests/line-endings.test.ts`, `tests/no-absolute-paths.test.ts`, `tests/feature-files.test.ts`.
+**One path of code, or one unknown path, runs every check** — exactly the full run. Nothing changed runs the
+documents' set, since the authority can go red with no local change. `--dry-run` prints what it would run and skip,
+and why, and runs nothing; `--changed` refuses `--code`.
+
+**When it is enough.** Between the steps of a session. **The full run is still required before committing code**, and
+before a feature's journey — which runs it itself. `--changed` trusts HEAD, and that rule is what keeps HEAD green.
+
+**Why.** Session 50 ran the full `check.mjs` three times, about 20 minutes, and about 17 of them re-tested code nothing
+had touched; the owner, on 2026-09-25: _"optimize for time"_. Measured on this machine: the documents' set takes
+about 13 s — the formatter 11.4 s of it — against the full run's six to seven minutes, most of them the test suite.
+
+**Rejected.**
+
+- **The full run every time** — six minutes for a Markdown change is session 50's waste.
+- **No checks for documents** — the formatter reads Markdown, a feature file's front matter and `Gates:` line are read
+  by `journey.mjs` and checked by `feature-files`, and the pin can go stale with nothing changed here.
+- **Only the tests a changed file's imports reach** — finer, but its correctness is a claim about a graph and about
+  every test that reads a file by path; two coarse classes, with the unknown falling to everything, are checkable.
+- **Diffing against a stamp of the last green full run** instead of HEAD — state outside git, which goes stale or is
+  written from a dirty tree; the rule that code is committed only after the full run already keeps HEAD green.
+- **Every `.md` anywhere as a document** — a Markdown file under `tests/` or a package can be a fixture a test reads;
+  documents are named by place.
+
+**Caught by.** `tests/check-changed.test.ts`, in a scratch repository holding this `check.mjs`, dry-run: a change under
+`packages/`, one under `tests/`, an unknown path — alone and beside a document — an untracked file under
+`packages/`, and a file of code moved under `docs/` each choose every check, compared with what the full run's own
+dry run prints, so a step added to the full run must be chosen too; documents alone choose the formatting, the scans
+and the authority, and every check of code is said to be skipped. Each case was broken once in `check.mjs` — renames
+on, untracked files ignored, the unknown read as a document, code read as a document — and each break turned its case
+red.
+
+**Confirmed-by.** The owner, 2026-09-25, through `PROMPTS/051`'s text.

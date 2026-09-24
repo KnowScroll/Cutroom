@@ -125,11 +125,18 @@ None of them edits code. The reviewer's one allowed edit is the `Gates:` line of
 ## Before claiming anything is done
 
 ```bash
-node scripts/check.mjs
+node scripts/check.mjs            # every check: before committing code, and inside every journey
+node scripts/check.mjs --changed  # between steps: what the paths changed since HEAD can turn red
 ```
 
-Six code checks plus two about the authority. `--code` runs only the first six. A red
+Seven code checks plus two about the authority. `--code` runs only the first seven. A red
 `decisions pin` is not yours to fix by editing anything here.
+
+**`--changed` is enough between steps** (S-159): documents alone — Markdown under `docs/` or `PROMPTS/`, the journal,
+the decisions, this file — run the formatting, the two authority checks and the three scans that read files other than
+code, in about 13 s; one path of code, or one it does not recognise, runs everything. `--dry-run` says which and why.
+**The full run is required before committing code, and before a feature's journey**: `--changed` trusts HEAD, and
+that rule is what keeps HEAD green.
 
 **A feature in `docs/features/` is verified only by its journey** (S-016), run after its last slice is
 committed:
