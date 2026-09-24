@@ -6125,3 +6125,33 @@ engine: no `S-` entry is written, since no feature is planned.
 
 **Next.** The owner watches the hybrid beside the engine's cut. Then `PROMPTS/051`: `resume-failed`'s gates (P-009 is its
 case), and P-003, P-010 and P-011 put to the owner. **`parallel-shots` (S-115) is still held.**
+
+## 2026-09-25 — session 50, continued: what the reels cost in tokens, which checks were redundant, and a next session for time
+
+**Asked.** Which model wrote the Hyperframes code, and what each reel took in tokens; whether MiniMax could do that job;
+whether every check run is needed. Then: _"leave it for session 51, but i want to now optimize for time, test both
+(standalone and hybrid) with parallel method … write a prompt for the next session"_.
+
+**Measured, from the session transcripts.**
+
+- **Both reels' code was written by Claude Opus 5.5** (`claude-opus-5-5`), the coding session's own model. Hyperframes
+  runs no model; the engine's MiniMax models plan and judge, and write no code.
+- **CPU reel** (the side session, request to file 31.7 min): 66 calls, 23.3 M tokens — 114 k out, 177 k newly cached,
+  23.0 M cache reads. **Volcano hybrid** (67 min): 131 calls, 36.8 M — 230 k out, 352 k newly cached, 36.2 M cache
+  reads — plus two Haiku check agents (339 k) and the engine's own MiniMax calls over four runs (50 calls, 107 k in,
+  56 k out, 0¢ by our receipts). The code itself is about 10 k tokens (hybrid) and 12–13 k (CPU); the rest is context
+  read again on every call.
+- **Of session 50's three full `check.mjs` runs (~20 min), about 17 min re-tested code nothing had touched**: the start
+  (two docs changed since a green HEAD), after the brief (one data block in a script one test reads), before the docs
+  commit (Markdown only). `check.mjs` has no mode between `--code`, which includes the whole suite, and the full run.
+
+**Answered.** MiniMax can author as a coding agent through its Anthropic-compatible endpoint, for spikes like these,
+quality unmeasured; inside the engine the recommended way is templates that MiniMax fills with structured answers
+(research §4 C and F), never code a model writes at render time (§4 D).
+
+**Changed.** `PROMPTS/051`, never run, rewritten for time: `check.mjs --changed` with its `S-` entry, then a standalone
+and a hybrid reel made at once, each in parallel inside, every phase timed against session 50's baseline, which the
+prompt carries. `resume-failed`'s gates and the three reviews go to 052. Checked by format, the authority checks and
+the two repository-wide scans, not the whole suite: only docs changed after the last green full run.
+
+**Next.** `PROMPTS/051`.
