@@ -7,6 +7,7 @@ import type {
 } from '@cutroom/contracts'
 import type { Criterion } from '@cutroom/reel-contract'
 import { takeReconcileAnswer, takeReconcilePrompt } from '../clips/prompts.ts'
+import { askStructured } from './structured.ts'
 
 // Gate 5, the brief, on a take (docs/features/reel-render.md, Gate 2 "Gates 2 to 5 on each take";
 // S-072, S-040, D-043, D-044). One `structured` call, role reconciler, naming the take for its receipt,
@@ -59,7 +60,7 @@ export async function gate5(
   brief: TakeBrief,
   model: LanguageModelPort,
 ): Promise<{ reconciliation: ClipReconciliation; verdict: TakeVerdict }> {
-  const { value: answer } = await model.structured({
+  const { value: answer } = await askStructured(model, {
     prompt: takeReconcilePrompt(observation, brief.subjects, brief),
     schema: takeReconcileAnswer(
       brief.subjects.map((s) => s.id),

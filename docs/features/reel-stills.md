@@ -32,6 +32,13 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `ask-again` on 2026-09-24, Slice 3 — the gates below are not edited, and no assertion is
+> removed** (**S-156**). **Gate 1's reconcile goes through `askStructured`**: an answer refused for its shape is asked once more,
+> told why, so check 27's _"one structured call"_ reads _"one, or two when the first answer's shape was refused"_.
+> The check runs on answers that parse and holds as written; `ask-again`'s check 15 holds the second ask, with one
+> `refused_answer` row and one reconciler receipt — the second — for that id. The engine's reconciler scripts may now
+> queue two answers for one id (`refusedThen`), as its witness scripts already could; with one, nothing changes.
+>
 > **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
 > (**S-156**). **The witness's schemas moved to `packages/contracts/src/observation.ts`**, unchanged, so that the
 > MiniMax adapter asks with the very objects the gate parses under; `packages/pipeline/src/stills/observation.ts` and

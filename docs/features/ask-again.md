@@ -433,7 +433,7 @@ as 1, a count that parses and is false; it matters only when the uncountable thi
       `refused?` on both calls; the table, its migration and `recordRefusedAnswer`; the adapter's `answer`/`refused` on
       `Spent`; `recordingPort`'s rows. Amendment blocks: `paid-failures` (`LostCall`, the recording port), `paid-path`
       (the adapter). **Proves: 3, 4, 5, 6.**
-- [ ] **Slice 3 — the structured calls ask again.** `askStructured` at all five sites; the stand-in's `Spent`; the
+- [x] **Slice 3 — the structured calls ask again.** `askStructured` at all five sites; the stand-in's `Spent`; the
       engine's `refusedThen`; `reel-plan`'s check 7 amended. Amendment blocks: `reel-plan`, `reel-stills` (check 27's
       count), `reel-render` (check 24's count). **Proves: 7 to 15.**
 - [ ] **Slice 4 — the witness is told, and the gates' refusals are kept.** `askWitness`' new object and `refusals`

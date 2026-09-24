@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import ts from 'typescript'
+import { isSpent } from '@cutroom/contracts'
 import { DEFAULT_PLAN_SETTINGS, planForkSchema, planningAnswer, planReel } from '@cutroom/pipeline'
 import { finished, startEngine } from './engine/harness.ts'
 import { evenAnswer, planRequest, standIn, twoSurvivors } from './engine/plans.ts'
@@ -255,8 +256,30 @@ test("7. the planning call's schema refuses an answer with a unit that has two s
 
   // The stand-in parses its answer under the schema it was asked for, so a run cannot plan from one.
   const script = { planner: [{ value: withUnits([0, 1, 1, 2, 3]) }, { value: evenAnswer(6) }] }
+  const model = standIn(script)
   await assert.rejects(
-    planReel(planRequest('r7'), standIn(script), 300, DEFAULT_PLAN_SETTINGS),
+    planReel(planRequest('r7'), model, 300, DEFAULT_PLAN_SETTINGS),
+    (error: unknown) => {
+      // AMENDED BY ask-again (S-156): a refused planning answer is asked ONCE more, so grouping a's
+      // second ask reads the answer meant for grouping b — six units — which the 4-unit schema
+      // refuses too. That second refusal is what rejects, as a Spent carrying the stand-in's words.
+      assert.ok(isSpent(error), `the rejection is not a refusal: ${String(error)}`)
+      const six = planningAnswer(4).safeParse(evenAnswer(6))
+      assert.ok(!six.success)
+      assert.ok(
+        error.message.includes(six.error.message),
+        `the rejection is not the 4-unit schema's refusal of six units: ${error.message}`,
+      )
+      return true
+    },
     'a planning answer with two shots for one unit became a plan',
+  )
+  // And THIS check's own refusal is what the second ask was told: two shots for unit 1.
+  const planner = model.calls.filter((c) => c.role === 'planner')
+  assert.equal(planner.length, 2, 'a refused planning answer was not asked exactly once more')
+  assert.equal(planner[0]?.refused, undefined)
+  assert.ok(
+    planner[1]?.refused?.some((reason) => reason.includes('unit 1 has 2 shots')),
+    `the second ask was not told "unit 1 has 2 shots": ${JSON.stringify(planner[1]?.refused)}`,
   )
 })

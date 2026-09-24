@@ -372,7 +372,15 @@ export function twice(first: FakeAnswer, second: FakeAnswer): Twice {
   return { twice: [first, second] }
 }
 
-/** A witness override's scripted answers: two for `twice`, else one, the default's if none. */
+/**
+ * An answer refused, then the one that parses — for one picture, take or call — as `twice` scripts
+ * it (ask-again, S-156). A refused `structured` answer is now asked for once more, and a refused
+ * witness answer already was: with one scripted answer, the second ask would read the next one's.
+ */
+export const refusedThen = (refused: unknown, then: unknown): Twice =>
+  twice({ value: refused }, { value: then })
+
+/** An override's scripted answers — a witness's or a reconciler's: two for `twice`, else one, the default's if none. */
 export function witnessAnswers(override: unknown, fallback: unknown): FakeAnswer[] {
   if (typeof override === 'object' && override !== null && 'twice' in override) {
     return [...(override as Twice).twice]
@@ -396,7 +404,7 @@ export function stillsScript(
   return {
     planner: plannerFor(shape),
     witness: pics.flatMap((p) => witnessAnswers(over.witness?.[p.key], seen(p))),
-    reconciler: pics.map((p) => ({ value: over.reconciler?.[p.key] ?? passes(p) })),
+    reconciler: pics.flatMap((p) => witnessAnswers(over.reconciler?.[p.key], passes(p))),
     judge: (over.judge ?? []).map((value) => ({ value })),
   }
 }

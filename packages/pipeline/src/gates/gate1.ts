@@ -11,6 +11,7 @@ import type {
 import type { Criterion } from '@cutroom/reel-contract'
 import { witnessObservation } from '../stills/observation.ts'
 import { reconcileAnswer, reconcilePrompt, type ReconcileAnswer } from '../stills/prompts.ts'
+import { askStructured } from './structured.ts'
 import { askWitness } from './witness.ts'
 
 // Gate 1 (docs/features/reel-stills.md, Gate 2 "Gate 1 — four steps on each picture"; D-042, I-7,
@@ -141,7 +142,7 @@ export async function gate1(
 
   // 4. reconcile — the observation held against the brief, presence criteria only (D-043).
   const criteria = { mustShow: brief.mustShow, mustNotShow: brief.mustNotShow }
-  const { value: answer } = await ports.model.structured({
+  const { value: answer } = await askStructured(ports.model, {
     prompt: reconcilePrompt(observation, brief.subjects, criteria),
     schema: reconcileAnswer(
       brief.subjects.map((s) => s.id),

@@ -19,7 +19,9 @@ import { sentUntilAvailable } from './transient.ts'
  *
  * **What it must not do, and both are checks.** A `Spent` is passed straight through and NEVER sent
  * again: that call has been paid for, and a second one pays twice (S-142). A plain fault is passed
- * straight through too: a request that was wrong is wrong the second time.
+ * straight through too: a request that was wrong is wrong the second time. (A `structured` answer
+ * refused for its shape is asked once more — by the pipeline's `askStructured`, as a new call told
+ * why, never by this counter; S-156.)
  *
  * **Where it sits.** Inside `recordingPort`, which wraps the port each job hands the pipeline. So a
  * send that answers writes exactly one `model_receipt`, an `unavailable` send writes nothing at

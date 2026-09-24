@@ -11,6 +11,7 @@ import {
 import { Criterion, PlanVaryOn, type SubmitRequest } from '@cutroom/reel-contract'
 import { estimate } from '../estimate.ts'
 import { gate0 } from '../gates/index.ts'
+import { askStructured } from '../gates/structured.ts'
 import { plannedImageCalls, rankSubjects } from '../rank.ts'
 import { plannedImageCallsFor } from '../stills/ladder.ts'
 import { groupSentences } from '../split/index.ts'
@@ -160,7 +161,7 @@ export async function planReel(
 
   // One structured call per grouping, planner role, temperature 0 (D-061, D-062, D-035).
   const planned = async (role: 'a' | 'b', units: number[][]) => {
-    const { value } = await model.structured({
+    const { value } = await askStructured(model, {
       prompt: planningPrompt(request, units, settings),
       schema: planningAnswer(units.length),
       role: 'planner',
@@ -182,7 +183,7 @@ export async function planReel(
   if (survives(verdicts.a) && survives(verdicts.b)) {
     // Each plan in its own call, reconciler role, temperature 0 — never two plans at once (D-064).
     const scored = async (p: Plan) => {
-      const { value } = await model.structured({
+      const { value } = await askStructured(model, {
         prompt: scorePrompt(p, request, settings),
         schema: scoreAnswer,
         role: 'reconciler',
@@ -207,7 +208,7 @@ export async function planReel(
   // No survivor: one informed repair call, on the grouping D-114 picks, given both verdicts (D-064).
   const basis = repairBasis(fork, verdicts)
   const units = fork[basis].units.map((unit) => [...unit])
-  const { value } = await model.structured({
+  const { value } = await askStructured(model, {
     prompt: repairPrompt(request, fork, verdicts, basis, settings),
     schema: planningAnswer(units.length),
     role: 'planner',

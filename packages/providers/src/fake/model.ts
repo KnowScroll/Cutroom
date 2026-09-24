@@ -1,10 +1,12 @@
-import type {
-  ClipRef,
-  LanguageModelPort,
-  ModelCall,
-  ModelReceipt,
-  ModelRole,
-  PictureRef,
+import {
+  Spent,
+  refusalsOf,
+  type ClipRef,
+  type LanguageModelPort,
+  type ModelCall,
+  type ModelReceipt,
+  type ModelRole,
+  type PictureRef,
 } from '@cutroom/contracts'
 
 // The stand-in LanguageModelPort (docs/features/reel-plan.md, Gate 2 "The model port and the
@@ -113,8 +115,23 @@ export function fakeModel(
       const entry = next(call.role)
 
       // Parsed under the schema the call asked for, so a script that does not match fails the way
-      // a real answer would.
-      const value = call.schema.parse(structuredClone((entry as { value: unknown }).value))
+      // a real answer would — as `Spent`, carrying the answer and why it was refused, because that
+      // is what the MiniMax adapter throws when the caller's schema refuses what the model wrote
+      // (S-142, S-156). The pipeline asks such an answer once more; a `{ throws }` entry is a fault
+      // and is not asked again.
+      const scripted = structuredClone((entry as { value: unknown }).value)
+      const parsed = call.schema.safeParse(scripted)
+      if (!parsed.success) {
+        throw new Spent({
+          port: 'model',
+          model: options.models[call.role],
+          costCents: 0,
+          detail: `the stand-in's ${call.role} answer is refused by its schema: ${parsed.error.message}`,
+          answer: JSON.stringify(scripted) ?? String(scripted),
+          refused: refusalsOf(parsed.error),
+        })
+      }
+      const value = parsed.data
       return {
         value,
         receipt: receipt(call.role, 'structured', call.temperature, {

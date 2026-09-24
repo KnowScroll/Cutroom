@@ -275,7 +275,7 @@ export function videoScript(
     ],
     reconciler: [
       ...(stills.reconciler ?? []),
-      ...takes.map((t) => ({ value: over.reconciler?.[t.key] ?? passesTake(t) })),
+      ...takes.flatMap((t) => witnessAnswers(over.reconciler?.[t.key], passesTake(t))),
     ],
     judge: [...(stills.judge ?? []), { value: over.cut ?? cutAnswer() }],
   }

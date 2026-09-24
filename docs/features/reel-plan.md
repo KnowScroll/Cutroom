@@ -27,6 +27,19 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
+> (**S-156**). **A planning, scoring or repair answer refused for its shape is asked once more, told why** — through
+> `askStructured`, at all three of `planReel`'s call sites — so D-061's and D-035's _"one structured call"_ per
+> grouping and D-064's _"one informed repair call"_ each read _"one, or two when the first answer's shape was
+> refused"_; the manifest still comes whole from the one call that parses. Check 21's _"exactly two planning calls"_
+> is on answers that parse and stands. **The stand-in now throws `Spent`** — carrying the answer and its issues — when
+> its scripted `structured` value is refused, as the MiniMax adapter does, where it threw the schema's own error
+> (S-116's _"behaves exactly as it always has"_ holds for an absent script). **Check 7 is amended by addition**: its
+> grouping a's second ask reads `evenAnswer(6)`, meant for grouping b, which the four-unit schema refuses too — so
+> it gains assertions that the rejection is that `Spent`, that exactly two planner calls were made, and that the
+> second was told the check's own refusal, _"unit 1 has 2 shots"_. This feature's journey is run again in
+> `ask-again`'s last slice.
+>
 > **Amended by `three-pictures` on 2026-09-23 — the gates below are not edited, and no assertion is removed**
 > (**S-150**). `PlanSettings` gains **`pictures`**, default `'recurring'`, which reproduces this feature exactly: with it,
 > a plan's planned image calls are D-027's `plannedImageCalls(rankSubjects(…))` and the plan carries no new field.

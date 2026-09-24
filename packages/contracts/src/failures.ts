@@ -54,10 +54,15 @@ export interface LostCall {
  * frame the entry refuses, a download that is no clip, an answer that is not the JSON it was asked
  * for (S-133, S-124, S-125, S-140).
  *
- * The call is PAID FOR, so it is never sent again — that is the difference between this and
+ * The call is PAID FOR, so it is never SENT again — that is the difference between this and
  * {@link Unavailable}, which is the provider having made nothing. The worker writes the receipt
  * this carries and rethrows the error unchanged, so the stage fails the run exactly as it did
  * before this existed (S-046).
+ *
+ * One exception, and it is not a re-send (docs/features/ask-again.md, S-156): a model `structured`
+ * call whose `Spent` carries `refused` — the ANSWER was refused for its shape — is ASKED once more
+ * by the pipeline, a new call told why, because model calls cost nothing under the Token Plan
+ * (S-129). Every other `Spent` fails the run exactly as before.
  */
 export class Spent extends Error {
   readonly kind = 'spent'
