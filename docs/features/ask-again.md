@@ -5,7 +5,7 @@ authority: plan
 
 # ask-again — the witness is shown the shape it is judged by; an answer that cannot be read is asked once more, told why; and every one is kept
 
-Status: planned
+Status: verified
 Decisions: D-005, D-022, D-035, D-041, D-045, D-061, D-064, D-084, D-086, I-8, I-15, S-028, S-037, S-038, S-040, S-042, S-046, S-070, S-072, S-096, S-099, S-109, S-111, S-116, S-129, S-130, S-131, S-135, S-136, S-137, S-139, S-140, S-142, S-143, S-144, S-146, S-147, S-156
 Named only in the deferral list: D-023, S-115
 Gates: product APPROVED 2026-09-24 adversarial-reviewer · architecture APPROVED 2026-09-24 adversarial-reviewer · program-design APPROVED 2026-09-24 adversarial-reviewer · slices APPROVED 2026-09-24 adversarial-reviewer
@@ -460,7 +460,11 @@ Every check appears in exactly one slice: 2 + 4 + 9 + 6 + 3 = 24.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-24 journey=PASS at 083de3b — every check green; 23 tests in tests/ask-again-*.test.ts pass
+
 ## Divergence (the first broken boundary, or "none")
+
+none
 
 ## Deferred
 
