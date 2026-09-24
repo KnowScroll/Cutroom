@@ -62,12 +62,12 @@ function request(requestId, budgetCents) {
   return {
     contractVersion: 1,
     requestId,
-    // Session 50's reel, the owner's choice: how volcanoes work — magma rising, the eruption, lava
-    // hardening into new rock, an island built — as realistic footage (S-134: the caller's text).
-    // Exact labels and one diagram are drawn over the engine's finished cut afterwards, by
+    // Session 51's reel, the owner's choice: how a hurricane works — a storm cloud fed by a warm
+    // sea, the spin, the eye, the wind at the shore — as realistic footage (S-134: the caller's
+    // text). Exact labels and one diagram are drawn over the engine's finished cut afterwards, by
     // Hyperframes and outside the engine (docs/research/hyperframes.md); nothing here knows it.
-    // The black-holes brief this replaced made run 05611ff9, and is in this file's history.
-    worldId: 'cutroom-volcanoes',
+    // The volcano brief this replaced made run bf8f4444, and is in this file's history.
+    worldId: 'cutroom-hurricanes',
     // THE BRIEF-WRITING RULES, EACH ONE PAID FOR (docs/reel-pitfalls.md): no digit, symbol or
     // acronym in a sentence — MiniMax's word timings split them into sub-word tokens, and a
     // narration that does not parse fails the run (P-001; "x86" in the CPU reel); no verb of
@@ -77,35 +77,35 @@ function request(requestId, budgetCents) {
     // criterion fits (P-008).
     narration: [
       {
-        text: 'Deep underground, it is hot enough to melt solid rock.',
+        text: 'Every hurricane starts as a storm cloud over a warm tropical sea.',
         claimIds: ['c1'],
       },
       {
-        text: 'Molten rock, called magma, is lighter than solid rock, so it rises.',
+        text: 'Warm, wet air rises off the water and builds the cloud higher.',
         claimIds: ['c1'],
       },
       {
-        text: 'Gas trapped inside it builds pressure until the volcano erupts.',
+        text: 'More air rushes in below, and the storm begins to spin.',
         claimIds: ['c2'],
       },
       {
-        text: 'Fountains of glowing lava burst high into the air.',
+        text: 'It grows into a giant spiral, hundreds of kilometres wide.',
         claimIds: ['c2'],
       },
       {
-        text: 'Above ground, magma is called lava, glowing hotter than a thousand degrees.',
+        text: 'At its centre is the eye, a patch of calm, clear sky.',
         claimIds: ['c3'],
       },
       {
-        text: 'Its outer skin quickly hardens into a crust of fresh rock.',
+        text: "Around it, the eye wall carries the storm's fastest winds.",
         claimIds: ['c3'],
       },
       {
-        text: 'Eruption after eruption, those layers of rock can build a whole island.',
+        text: 'Those winds can bend a palm tree almost to the ground.',
         claimIds: ['c4'],
       },
       {
-        text: 'The island of Hawaii was built this way, and it is still growing.',
+        text: 'Rain flies sideways, straight past the bending tree.',
         claimIds: ['c4'],
       },
     ],
@@ -155,28 +155,29 @@ function request(requestId, budgetCents) {
       // has its keeper; the pictures are of what he kept.
       mustShow: [
         {
-          id: 'show-magma',
-          // A blob, not a pool or a chamber: a material filling the frame reads as a subject cut
-          // off by its edge (D-046, P-002), and a cutaway invites a model's lettering (never-text).
-          text: 'a glowing blob of molten rock',
+          id: 'show-cloud',
+          // One cloud, not a sky of them: a material filling the frame reads as a subject cut off
+          // by its edge (D-046, P-002). The sea is where it stands, not what is shown.
+          text: 'a towering white storm cloud over a tropical sea',
           type: 'presence',
           claimId: 'c1',
         },
         {
-          id: 'show-eruption',
-          text: 'a volcano erupting glowing lava',
+          id: 'show-spiral',
+          text: "a hurricane's spiral of white cloud, seen from above",
           type: 'presence',
           claimId: 'c2',
         },
         {
-          id: 'show-lava',
-          text: 'a blob of glowing lava with a cracked crust',
+          // The same storm as show-spiral, nearer: the recurring subject of S-145 and S-146.
+          id: 'show-eye',
+          text: 'the round eye at the centre of a hurricane, seen from above',
           type: 'presence',
           claimId: 'c3',
         },
         {
-          id: 'show-island',
-          text: 'a small volcanic island in the sea',
+          id: 'show-palm',
+          text: 'a palm tree bent over by strong wind',
           type: 'presence',
           claimId: 'c4',
         },
@@ -195,9 +196,9 @@ function request(requestId, budgetCents) {
       depictionPolicyVersion: 'policy-3',
     },
     style: {
-      id: 'style-volcanoes',
+      id: 'style-hurricanes',
       version: 1,
-      text: 'realistic nature documentary footage, vivid natural light, calm',
+      text: 'realistic nature documentary footage, vivid natural light, steady camera',
     },
     options: { until: 'video', budgetCents },
   }
