@@ -5968,3 +5968,93 @@ precision are — no fade to black, no voice in a clip, exact words, motion keye
 fixed template animating the approved picture), then a closed set of template shots whose words come from the
 narration only (D-096), model-written compositions last if ever — each a feature with four gates, and the choice of
 Hyperframes over Remotion, Motion Canvas or Manim an S- entry with what it rejected.
+
+## 2026-09-24 — side session, continued: a whole reel made from code — how a CPU works (no prompt)
+
+**Changed**: `docs/research/hyperframes.md` gains a section on it; nothing else in the repository. The reel and its six
+compositions are in the ignored `.artifacts/hyperframes-cpu/`; the scratch tools outside the repository.
+
+**Observed**: the owner asked for a whole reel through Hyperframes on how a CPU works — architectures, internal
+structure, how chips are made — in animated diagrams, nothing real-looking. Six narrations (146 words) spoken by MiniMax
+`speech-2.8-hd`, `English_Graceful_Lady`, through the repository's own adapter (six calls, 838 characters); six SVG + GSAP
+compositions keyed to the words. **`cpu-reel.mp4`: 76.3 s, 768×1366 24 fps, −14.2 LUFS, clean under Gate 2's scan.**
+Each scene rendered in 17–20 s. Found on the way: MiniMax gave 53 tokens for shot 3's 23 words ("x86" six times — P-001
+again), re-joined for the captions; a GSAP `fromTo` with a from-only property is dropped after a rewind, which the
+runtime does, so two scenes' moving blocks rendered invisible with lint green — fixed, and proved by a fresh-against-
+rewound state check per scene; `textContent: 'x86'` is tweened as a number; a 1.4 s still diagram tripped Gate 2's frozen
+check. Longer than D-111's 45 s; it is not an engine run.
+
+**Why**: the owner's request, after the Hyperframes research.
+
+**Next**: the owner watches it. The research file's §8 questions still stand; the five rules found here belong in any
+composed-shot feature's gates.
+
+## 2026-09-24 — session 49, continued: `cut-rules` — a reel may show one thing in every shot, and its only sound is its narration
+
+**Intent.** The owner watched run `12a097bf…`'s cut: _"a shot can show what the previous shot shows, it shouldn't
+discriminate… issue 2: over the voiceover there is another voice that can be heard in the background (male voice)"_.
+Then: _"build it, then rerun the reel"_.
+
+**What was found.** Gate 3's `listen` has never heard a clip on a real run — the ffmpeg media port answers it from a
+script defaulting to no speech (P-007) — so H3's voice went into the mix 18 dB under the narration. And the repetition
+question sat in two places: Gate 7's fifth and the plan score's fourth, the latter the term S-148/S-149 measured
+marking down recurring plans.
+
+**The owner chose** (S-158): the repetition question leaves both; the clips are muted. **`cut-rules`**: four gates,
+four adversarial rounds (9, then 4, then 1 — the reviewer's own round-2 tolerance measured wrong on correct code: two
+spans of one muted file differ by 1.5–1.8 dB of encoder floor — then APPROVED), built in four slices, each on a green
+`check.mjs`, each broken deliberately and restored:
+
+1. The plan score asks three questions; `distinct` gone (`dd67f1f`). Broken: terms swapped, the question restored.
+2. Gate 7 asks four (`055be70`). Broken: the fifth restored.
+3. The clips muted (`db8183a`): `soundOf` gives every clip shot a held shot's silence; `duckDb` out of the contract,
+   settings, schema and build; `volume` out of `PASS_FILTERS`; the silence note kept as an input fact. `reel-render`'s
+   check 34 rewritten to its successor (S-158 retires _"18 dB lower"_), with a positive control — each clip file's own
+   tone loud — and the narration's invariance kept; checks 32 and 18 bound at _"at least 30 dB below the clip file's
+   own"_ (measured ~52 dB on correct code, ~18 under the retired duck); check 37 reads no clip audio fact and the graph
+   takes no `[0:a]`. Broken: the ducked mix restored (five checks red); `duckDb` allowed in the schema.
+4. The journey check (`3cb421e`).
+
+**Journeys PASS**: `cut-rules` 5, `reel-plan` 50, `reel-stills` 63, `reel-render` 106, `reel-takes` 66. Two stalls,
+both a dirty tree: an untracked `docs/research/hyperframes.md` and a side session's journal entry — the owner said
+commit it as it is; both committed unchanged (`1191436`, `68c4d0d`).
+
+### Run `af7447f0…` — the brief as committed, after `cut-rules`
+
+Plan 93 s: **the six-unit plan won** — a recurring subject, the repetition term gone. Stills 296 s: three pictures, two
+after one repair each, one derived through Gate 1S. Shots 0–3 passed Gates 2–5 first take. **Shot 4 failed Gate 5 on
+all three takes** — _must show "show-galaxy"_ — and, made from words, stopped the reel (S-090). **60¢**, 12 min, no
+file. Cause (P-008, the brief): claim c4 covered sentences 7 and 8, its criterion a galaxy only sentence 8 shows; the
+six-unit plan gave sentence 7 its own shot. One refused witness answer (stars as `"many"`), asked again, parsed. The
+owner chose: **sentence 7 carries no claim** (`d245a40`).
+
+### Run `05611ff9-cade-47fc-ae61-7a0be565244e` — COMPLETED, Gate 7 accepted
+
+```text
+   76.9s  plan finished      the six-unit plan, the black hole recurring in shots 1, 3 and 4
+  265.6s  stills finished    shot 1's canonical (best of two), shot 2 derived through Gate 1S, shot 0 standalone —
+                             all accepted; shot 0's witness answered two counts of 0, asked again, told why, parsed
+  772.5s  6 shots through Gates 2–5; shot 3's first take failed Gate 5 (the swirl not shown), its second passed
+  806.8s  verdict 7 accept — run.finished completed
+```
+
+- **The file**: `.artifacts/05611ff9-cade-47fc-ae61-7a0be565244e/a1-render.mp4` — **50.3 s**, 768×1366, 24 fps, H.264
+  and AAC, narration and captions, **no clip sound** (S-158).
+- **Spent: 53¢ by our receipts** — 4 pictures 23¢ (flux-2-pro 5¢ ×3, the derived edit 8¢), 7 clips 30¢, 32 model and
+  6 speech receipts at 0¢. No `lost_call`. One refused answer, kept and read (`scripts/refused.mjs 05611ff9`).
+- **Shots from pictures**: 0, 1 and 2; from words: 3, 4 and 5. One retake (shot 3). No repair; shot 1's two pictures
+  are D-047's best of two.
+- **The first black-holes reel, after seven runs over two sessions and 251¢ in all** (93¢ in session 48; 45¢, 60¢ and
+  53¢ here).
+
+**Why**: the owner's reel, and what each failed run named — P-004/P-005 (`ask-again`), P-006/P-007 (`cut-rules`), P-008
+(the brief).
+
+**Next**: `PROMPTS/050` — `resume-failed`'s gates (S-157); the review of a text-made shot with nothing to fall back on
+(P-003); the Hyperframes questions the side session left in `docs/research/hyperframes.md`. **`parallel-shots` (S-115) is
+still held.**
+
+| runId       | description                                       | cost | time     | finished | why                                                      |
+| ----------- | ------------------------------------------------- | ---- | -------- | -------- | -------------------------------------------------------- |
+| `af7447f0…` | black holes, after `cut-rules`; the six-unit plan | 60c  | 12.0 min | no       | shot 4 asked for a galaxy by claim c4 (P-008), Gate 5 ×3 |
+| `05611ff9…` | black holes, sentence 7 unclaimed (P-008's fix)   | 53c  | 13.5 min | **yes**  | Gate 7 accepted; 50.3 s                                  |
