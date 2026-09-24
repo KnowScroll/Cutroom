@@ -887,6 +887,7 @@ Every check appears in exactly one slice: 4 + 8 + 3 + 5 + 4 + 2 = 26.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-24 journey=PASS at 4cf0656 — every check green; 66 tests in tests/reel-takes-*.test.ts pass
 - 2026-09-23 journey=PASS at 6f29671 — every check green; 66 tests in tests/reel-takes-*.test.ts pass
 - 2026-09-22 journey=PASS at ce9e0ab — every check green; 66 tests in tests/reel-takes-*.test.ts pass
 - 2026-09-22 journey=PASS at c5520b0 — every check green; 66 tests in tests/reel-takes-*.test.ts pass
