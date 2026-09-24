@@ -43,6 +43,13 @@
       "when": 1790089051477,
       "tag": "0005_lost_call",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1790237975366,
+      "tag": "0006_refused_answer",
+      "breakpoints": true
     }
   ]
 }

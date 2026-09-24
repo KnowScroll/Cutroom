@@ -15,12 +15,16 @@
 // class nothing else constructs cannot be produced by accident, and no code reads a message to
 // decide what happened.
 
+import type { Refusals } from './brands.ts'
+
 /**
  * What a call that has already spent owes the record (S-142): the port it was made on, the wire
  * that was actually called, what it cost by our configured rate, and what went wrong.
  *
- * IT NEVER HOLDS A KEY, a presigned URL or a query string: an adapter naming its call names the
- * model and the request id, never a header and never a credential (S-109, D-022).
+ * ITS `detail` NEVER HOLDS A KEY, a presigned URL or a query string: an adapter naming its call
+ * names the model and the request id, never a header and never a credential (S-109, D-022). Its
+ * `answer`, when there is one, is the MODEL's text, which the adapter does not vet: it is redacted
+ * where it is written, by `recordRefusedAnswer` (docs/features/ask-again.md, S-156).
  */
 export interface LostCall {
   port: 'image' | 'video' | 'speech' | 'model'
@@ -30,6 +34,19 @@ export interface LostCall {
   costCents: number
   /** What went wrong, in the adapter's own words. */
   detail: string
+  /**
+   * The model's answer, when the adapter held one and could not use it: its text after the reasoning
+   * block and a whole-answer fence (S-132). Absent for a body that is not the wire, a reasoning block
+   * with nothing after it, and every port but the model's (S-156).
+   */
+  answer?: string
+  /**
+   * Why the ANSWER was refused, when it is the answer's fault and asking again could change it: the
+   * caller's schema refused it, it is not JSON, or it is the schema. A `structured` call whose
+   * `Spent` carries this is asked once more by the pipeline, told these; one without it is not
+   * (S-156, S-140).
+   */
+  refused?: Refusals
 }
 
 /**

@@ -354,7 +354,7 @@ _The record — `tests/ask-again-record.test.ts`_
 3. `the MiniMax adapter, on recorded wire, puts on a Spent it raises while reading an answer: answer, exactly the text after the reasoning block with a whole-answer fence unwrapped — holding no <think>, no fence and none of the HTTP body — for a schema refusal, not JSON, the schema echoed and a cut-off answer; refused for the first three only, the schema refusal's as <path>: <message> lines; and neither on a body that is not JSON, not this wire, or reasoning with no answer — read off receipt.answer and receipt.refused directly` — S-156, S-142, S-140.
 4. `recordingPort writes one refused_answer row for each Spent carrying an answer, on each of the five calls — ask 2 when the call carried refused, ask 1 otherwise, reasons its refused or else its detail — and none for a Spent without one; the lost_call row is written exactly as before` — S-156, S-142.
 5. `recordRefusedAnswer drops a URL's whole query string, \/-escaped ones too; masks sk-, sd_live_ and JWT-shaped strings and the value of a credential-named JSON key; redacts before it cuts, so a key straddling 32 000 characters is masked; cuts a longer answer there with a marker naming its full length; and keeps a short clean answer byte for byte` — D-022.
-6. `only the witness's own schemas can fill observe's refused: a compile check finds observe({ picture, temperature: 0, refused: [criterion.text] }), observe({ clip, temperature: 0, refused: refusalsOf(anyZodError) }) and structured({ …, refused: ['x'] }) are type errors while witnessRefusalsOf's result compiles for observe and refusalsOf's and answerRefusal's for structured; witnessRefusalsOf throws for any schema but the two, by identity; and, reading syntax trees, no cast to either brand exists outside packages/contracts/src/refusals.ts, and an object property named refused — written out or shorthand — exists in packages/pipeline/src only in gates/witness.ts, bound to witnessRefusalsOf's result, and gates/structured.ts, bound to a caught Spent's receipt.refused; witnessRefusalsOf is called only in gates/witness.ts, and only on the value of the observe answer just received; and in packages/providers/src and apps/ a refused property is written only on a Spent's receipt in the MiniMax adapter and the stand-in, bound to refusalsOf's or answerRefusal's result — the worker reads call.refused and writes none` — I-8, S-037, S-072, S-156.
+6. `only the witness's own schemas can fill observe's refused: a compile check finds observe({ picture, temperature: 0, refused: [criterion.text] }), observe({ clip, temperature: 0, refused: refusalsOf(anyZodError) }) and structured({ …, refused: ['x'] }) are type errors while witnessRefusalsOf's result compiles for observe and refusalsOf's and answerRefusal's for structured; witnessRefusalsOf throws for any schema but the two, by identity; and, reading syntax trees, no cast to either brand exists outside packages/contracts/src/refusals.ts; with the type checker, an object property named refused — written out or shorthand — that lands in either brand, or in nothing typed, exists only in gates/witness.ts, bound to witnessRefusalsOf's result, in gates/structured.ts, bound to a caught Spent's receipt.refused, and in the MiniMax adapter and the stand-in, bound to refusalsOf's or answerRefusal's result — the worker writes none; and witnessRefusalsOf is called only in gates/witness.ts, and only on the value of the observe answer just received` — I-8, S-037, S-072, S-156.
 
 _The structured calls — `tests/ask-again-structured.test.ts`_
 
@@ -429,7 +429,7 @@ as 1, a count that parses and is false; it matters only when the uncountable thi
 - [x] **Slice 1 — one shape.** `packages/contracts/src/observation.ts`; the pipeline's two files re-export it; the
       adapter asks with it and its copies are deleted. Amendment blocks: `paid-path` (the adapter's asked shape),
       `reel-stills` and `reel-render` (where their schemas now live). **Proves: 1, 2.**
-- [ ] **Slice 2 — the record.** `brands.ts`, `refusals.ts` and `refused.ts` in contracts, `LostCall.answer?`/`refused?`,
+- [x] **Slice 2 — the record.** `brands.ts`, `refusals.ts` and `refused.ts` in contracts, `LostCall.answer?`/`refused?`,
       `refused?` on both calls; the table, its migration and `recordRefusedAnswer`; the adapter's `answer`/`refused` on
       `Spent`; `recordingPort`'s rows. Amendment blocks: `paid-failures` (`LostCall`, the recording port), `paid-path`
       (the adapter). **Proves: 3, 4, 5, 6.**
@@ -473,6 +473,17 @@ Every check appears in exactly one slice: 2 + 4 + 9 + 6 + 3 = 24.
 3. **The lease in the compound worst case** — `second-ask`'s Deferred item 5, now reachable from a `structured` call
    in a clips job (Gate 5).
 4. **Parallel shots** (D-023, S-115) — held by the owner.
+
+## Found while building
+
+1. **Slice 2 — check 6, as approved, could not be built.** It forbade any object property named `refused` in
+   `packages/providers/src` and `apps/`, and the budget guard has had its own since S-035: `ClipsLimits.refused`, the
+   calls a guard refused, in `clips-job.ts` and `questions.ts`. A name scan cannot tell them apart. **The scan now uses
+   the type checker** over every package and app: a `refused` property that lands in either brand — or in nothing typed
+   at all, which is how an `any` would carry one — is allowed only where the design puts it, bound to its one source.
+   That is the property the check exists for, and it is stricter where it matters: broken deliberately with a worker
+   passing `{ ...call, refused: JSON.parse('[]') }` to `observe`, it names `recording-port.ts` and the `WitnessRefusals`
+   it lands in. The check's title in Gate 3 reads accordingly; nothing else in the gates moved.
 
 ## Gate review 1 — 2026-09-24, adversarial reviewer, same session
 

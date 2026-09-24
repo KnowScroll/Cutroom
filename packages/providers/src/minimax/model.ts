@@ -2,7 +2,9 @@ import { readFile } from 'node:fs/promises'
 import { extname } from 'node:path'
 import { z } from 'zod'
 import {
+  answerRefusal,
   clipObservation,
+  refusalsOf,
   witnessObservation,
   type ClipRef,
   type LanguageModelPort,
@@ -10,6 +12,7 @@ import {
   type ModelReceipt,
   type ModelRole,
   type PictureRef,
+  type Refusals,
 } from '@cutroom/contracts'
 import { visibleText } from '../text.ts'
 import { Spent, Unavailable, isSpent, messageOf, transientStatus } from '../transient.ts'
@@ -491,8 +494,49 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
    * Everything after a 200: the provider answered, so this call spent whatever it spends. The
    * detail is the reader's own message, which names the role and the model already.
    */
-  const spent = (model: string, detail: string): Spent =>
-    new Spent({ port: 'model', model, costCents: MODEL_LOST_CENTS, detail })
+  const spent = (
+    model: string,
+    detail: string,
+    read?: { answer: string; refused?: Refusals },
+  ): Spent => new Spent({ port: 'model', model, costCents: MODEL_LOST_CENTS, detail, ...read })
+
+  /**
+   * An answer that was READ — its text in hand, after the reasoning block and a whole-answer fence
+   * — and could not be used (docs/features/ask-again.md, Gate 2 "Which refusals are asked again";
+   * S-156). The `Spent` it raises carries the ANSWER, so the worker can keep what the model wrote,
+   * and — only when the answer itself is at fault and asking again could change it — `refused`:
+   * the caller's schema refused it (its issues, `<path>: <message>`), it is not JSON, or it is the
+   * schema. An answer cut off by the token budget carries its text and no `refused`: the budget is
+   * not the answer's fault, and asking again at the same budget cuts it again (S-140). The detail is
+   * the reader's own message, exactly as before.
+   */
+  function answered<T>(
+    model: string,
+    role: ModelRole,
+    text: string,
+    finish: string | undefined,
+    parse: (json: unknown) => T,
+  ): T {
+    let json: unknown
+    try {
+      json = jsonOf(text, role, model, finish)
+    } catch (error) {
+      const detail = messageOf(error)
+      if (echoedTheSchema(text)) {
+        throw spent(model, detail, { answer: text, refused: answerRefusal('schema') })
+      }
+      if (finish === 'length') throw spent(model, detail, { answer: text })
+      throw spent(model, detail, { answer: text, refused: answerRefusal('not-json') })
+    }
+    try {
+      return parse(json)
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        throw spent(model, messageOf(error), { answer: text, refused: refusalsOf(error) })
+      }
+      throw spent(model, messageOf(error), { answer: text })
+    }
+  }
 
   /**
    * One step of reading an answer the provider has already given. A failure in it is `Spent`, with
@@ -710,14 +754,15 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
       role,
     )
     // READING WHAT WAS ALREADY PAID FOR (S-142): the 200 is in hand, so a reasoning block with no
-    // answer, a fence, a schema echo, a cut-off body or anything that will not parse is `Spent`.
-    const value = read(model, () =>
-      jsonOf(
-        answerOf(answer, role, model),
-        role,
-        model,
-        answer.choices[0]?.finish_reason ?? undefined,
-      ),
+    // answer, a fence, a schema echo, a cut-off body or anything that will not parse is `Spent` —
+    // and once the answer's text is in hand, the `Spent` carries it (S-156).
+    const text = read(model, () => answerOf(answer, role, model))
+    const value = answered(
+      model,
+      role,
+      text,
+      answer.choices[0]?.finish_reason ?? undefined,
+      (json) => json,
     )
     return { value, receipt: receiptOf(role, call, temperature, answer, about) }
   }
@@ -747,12 +792,14 @@ export function minimaxModel(options: MinimaxModelOptions): LanguageModelPort {
       )
       // The same line as `ask`'s: the call is paid for, and everything from here is our reading of
       // it — including the caller's own schema refusing the answer (S-142).
-      const value = read(model, () => {
-        const text = answerOf(answer, call.role, model)
-        return call.schema.parse(
-          jsonOf(text, call.role, model, answer.choices[0]?.finish_reason ?? undefined),
-        )
-      })
+      const text = read(model, () => answerOf(answer, call.role, model))
+      const value = answered(
+        model,
+        call.role,
+        text,
+        answer.choices[0]?.finish_reason ?? undefined,
+        (json) => call.schema.parse(json),
+      )
       return {
         value,
         receipt: receiptOf(call.role, 'structured', call.temperature, answer, {

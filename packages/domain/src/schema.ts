@@ -247,6 +247,32 @@ export const lostCall = sqliteTable('lost_call', {
   at: text('at').notNull(),
 })
 
+/**
+ * One model answer that could not be read, KEPT so a person can read it (docs/features/ask-again.md,
+ * S-156): what was asked, which ask, why it was refused, and what the model wrote — redacted, then
+ * capped at 32 000 characters, by `recordRefusedAnswer` (D-022). Nothing in the engine reads it.
+ */
+export const refusedAnswer = sqliteTable('refused_answer', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  runId: text('run_id')
+    .notNull()
+    .references(() => run.runId),
+  /** A model call, or a narration's word timings. */
+  port: text('port', { enum: ['model', 'speech'] }).notNull(),
+  /** The model's role and call; null for a timing. */
+  role: text('role'),
+  call: text('call'),
+  /** JSON: the picture, take or narration ids the answer was about, as its receipt names them. */
+  about: text('about').notNull(),
+  /** 1 for a first ask; 2 for the ask after a refusal. */
+  ask: integer('ask').notNull(),
+  /** JSON: why it was refused, one reason a line. */
+  reasons: text('reasons').notNull(),
+  /** What the model answered, redacted and capped. */
+  answer: text('answer').notNull(),
+  at: text('at').notNull(),
+})
+
 /** A shot that goes on without an approved picture: its own table, so it is a query (I-4, D-025). */
 export const degradation = sqliteTable(
   'degradation',

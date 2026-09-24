@@ -33,6 +33,9 @@ export type {
 export { Spent, Unavailable, isSpent, isUnavailable, type LostCall } from './failures.ts'
 export type { LanguageModelPort, ModelCall, ModelReceipt, ModelRole } from './model.ts'
 export { clipObservation, witnessObservation } from './observation.ts'
+export type { Refusals, WitnessRefusals } from './brands.ts'
+export { ANSWER_REFUSALS, answerRefusal, refusalsOf, witnessRefusalsOf } from './refusals.ts'
+export type { RefusalRecorder, RefusedAnswer } from './refused.ts'
 export type {
   NarrationAnswer,
   NarrationPort,

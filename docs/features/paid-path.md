@@ -31,6 +31,14 @@ Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED
 > default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its
 > own rate.
 >
+> **Amended by `ask-again` on 2026-09-24, Slice 2 — no gate below is edited, and no assertion is removed**
+> (**S-156**). **A `Spent` the MiniMax adapter raises while reading an answer now carries that answer** — its text after
+> the reasoning block and a whole-answer fence — and, when the answer itself is at fault (the caller's schema refused
+> it, it is not JSON, it is the schema), `refused`: the issues as `<path>: <message>` lines, or one fixed sentence. A
+> cut-off answer carries its text and no `refused`; a body that is not the wire, and a reasoning block with nothing
+> after it, carry neither. **Every detail is the reader's own message exactly as before**, so this feature's checks 6
+> and 8 and `paid-failures`' check 1, which match details, hold unchanged; `ask-again`'s check 3 holds the new fields.
+>
 > **Amended by `ask-again` on 2026-09-24 — no gate below is edited, and no assertion is removed** (**S-156**).
 > **The MiniMax adapter asks the witness with the gate's own schemas**, `witnessObservation` and `clipObservation`, now
 > declared once in `packages/contracts/src/observation.ts`; its own copies — `observedEntity`, `observationShape`,

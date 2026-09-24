@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import type { Refusals, WitnessRefusals } from './brands.ts'
 import type { ClipRef } from './clip.ts'
 import type { PictureRef } from './picture.ts'
 
@@ -62,18 +63,25 @@ export interface LanguageModelPort {
     pictureIds?: readonly string[]
     /** Ids for the receipt; never a clip (S-072). */
     takeIds?: readonly string[]
+    /**
+     * On a second ask only: why the first answer was refused (docs/features/ask-again.md, S-156).
+     * Built only by `refusalsOf` and `answerRefusal`; the adapter says it after the prompt.
+     */
+    refused?: Refusals
   }): Promise<{ value: T; receipt: ModelReceipt }>
 
   /**
-   * A picture OR a clip, and a temperature, and nothing else: role `witness` — one witness whose
-   * input is a still or a whole clip (D-053, S-072). The question and the answer shape are fixed
-   * inside the adapter, so there is no field a brief could be written into (I-8). The value is
-   * `unknown` and is parsed by the pipeline at the gate boundary (D-041, S-042).
+   * A picture OR a clip, and a temperature — and, on a second ask only, `refused` — and nothing
+   * else: role `witness`, one witness whose input is a still or a whole clip (D-053, S-072). The
+   * question and the answer shape are fixed inside the adapter, so there is no field a brief could
+   * be written into (I-8): `refused` is a `WitnessRefusals`, which only `witnessRefusalsOf` builds,
+   * from the witness's own two schemas over the answer it just gave (S-156). The value is `unknown`
+   * and is parsed by the pipeline at the gate boundary (D-041, S-042).
    */
   observe(
     call:
-      | { picture: PictureRef; clip?: never; temperature: 0 }
-      | { clip: ClipRef; picture?: never; temperature: 0 },
+      | { picture: PictureRef; clip?: never; temperature: 0; refused?: WitnessRefusals }
+      | { clip: ClipRef; picture?: never; temperature: 0; refused?: WitnessRefusals },
   ): Promise<{ value: unknown; receipt: ModelReceipt }>
 
   /**

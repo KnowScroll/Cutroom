@@ -26,6 +26,16 @@ Gates: product APPROVED 2026-09-22 adversarial-reviewer · architecture APPROVED
 > are exactly what they are today. **It changes what is written down when a call goes wrong, and how long a run
 > survives a provider having a bad minute.**
 
+> **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
+> (**S-156**). **`LostCall` gains two optional fields**: `answer`, the model's text when the adapter held one and
+> could not use it, and `refused`, why the ANSWER was refused when that is its fault. Its doc comment's _"never holds a
+> key, a presigned URL or a query string"_ now reads of its `detail`, which is unchanged; the `answer` is redacted
+> where it is written. **`recordingPort` writes one `refused_answer` row for a `Spent` that carries an answer**,
+> beside the `lost_call` row `recordingSpend` writes exactly as before — same table, same columns, same rethrow. This
+> feature's check 3 reads `everything(error)`, which does not reach the receipt; `ask-again`'s check 3 reads
+> `receipt.answer` directly, and `paid-path`'s env checks scan the new table's rows for the key. The lost-call table's
+> columns, which this feature's check 7 pins, do not move. Its journey is run again in `ask-again`'s last slice.
+
 ## Gate 1 — Product (no technical language)
 
 **The problem.** The engine now spends real money, and two things it does when a call goes wrong are wrong.
