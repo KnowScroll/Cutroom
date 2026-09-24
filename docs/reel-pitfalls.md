@@ -18,17 +18,35 @@ Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; 
 Kept current as entries are added. **Fix** is work that is understood and waits for a feature's gates; **review** is a
 question to look at, or an owner's choice, before anything is built.
 
-| what                                                                                    | kind   | from         | state                                         |
-| --------------------------------------------------------------------------------------- | ------ | ------------ | --------------------------------------------- |
-| **Re-ask a model once when its answer does not parse**, instead of failing the run      | fix    | P-001, P-004 | `PROMPTS/049`; P-004 recurred on reel 4       |
-| **Keep the raw answer of a model whose answer did not parse**, so it can be read        | fix    | P-004        | next session's work, with the line above      |
-| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | planned, five owner questions open            |
-| Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | owner; the re-ask above supersedes it in part |
-| A text-made shot has no still to fall back on, so its third failed take stops the reel  | review | P-003        | owner: accept, or give such shots a fallback  |
-| Clip prompts could ask for no fade to black; space scenes are mostly dark               | review | P-003        | watch: fix only if it recurs after the brief  |
-| Brief-writing rules: compact subjects; no verbs of vanishing or darkness                | brief  | P-002, P-003 | applied; add to `PROMPTS/049`'s brief rules   |
+| what                                                                                    | kind   | from         | state                                        |
+| --------------------------------------------------------------------------------------- | ------ | ------------ | -------------------------------------------- |
+| **Show the witness the shape the gate judges it by** — one copy, in contracts           | fix    | P-004, P-005 | `ask-again` Slice 1; measured 3/8 → 0/8      |
+| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused     | fix    | P-001, P-004 | `ask-again`, gates in review (S-156)         |
+| **Keep the raw answer of a model whose answer did not parse**, so it can be read        | fix    | P-004        | `ask-again` (`refused_answer`, S-156)        |
+| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed      | fix    | all four     | planned, five owner questions open           |
+| Does S-042 (an answer that does not parse fails the run) still hold for real providers? | review | P-001, P-004 | answered: S-156 supersedes it in part        |
+| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?  | review | P-005        | `ask-again` Deferred 2                       |
+| A text-made shot has no still to fall back on, so its third failed take stops the reel  | review | P-003        | owner: accept, or give such shots a fallback |
+| Clip prompts could ask for no fade to black; space scenes are mostly dark               | review | P-003        | watch: fix only if it recurs after the brief |
+| Brief-writing rules: compact subjects; no verbs of vanishing or darkness                | brief  | P-002, P-003 | applied; add to `PROMPTS/049`'s brief rules  |
 
 ## Open
+
+### P-005 · engine · the witness was shown a looser shape than the gate judged it by
+
+- **Found** 2026-09-24 (session 49) by `ask-again`'s first gate review, reading the code behind P-004.
+- **What happened.** The MiniMax adapter asked the witness with its OWN copy of the observation's shape
+  (`packages/providers/src/minimax/model.ts`, `observedEntity`): `count` any integer, `label` possibly empty, no
+  strict object. The gate parses under `count > 0`, a non-empty `label` and strict objects. The closed sets matched,
+  which is what S-144's check read; the constraints did not.
+- **Measured** (0¢, the real witness, P-004's two pictures, four asks each): the adapter's copy was refused **3 of 8**
+  times — all on reel 4's picture, the background stars counted **−1, "many", −1** ("too many to count"); the gate's
+  schema, **0 of 8**, the same stars counted 1, 100 or 150. The first raw witness answers anyone has read.
+- **Cause.** Two copies of one shape, because `packages/providers` cannot import the pipeline's schema. S-139's
+  lesson — the answerer never sees the constraint it is judged by — on a number rather than a closed set.
+- **Done.** The owner chose one copy, in `packages/contracts` (S-156): `ask-again`'s Slice 1.
+- **For good.** Any adapter-held shape a gate parses under is the same finding waiting: Gate 1S's and Gate 7's are
+  built per call at the gate, and stay the adapter's (`ask-again` Deferred item 2).
 
 ### P-004 · provider · the picture witness answered a count as words, and the run failed
 
@@ -45,6 +63,8 @@ question to look at, or an owner's choice, before anything is built.
   same shot, two different malformed counts.** Both pictures, read by eye, are good: a black disc in a bright ring of gas
   on a starfield. So it is this kind of picture, not chance — likely an entity the witness lists as there but
   uncountable (the dark centre, the starfield) — and still not provable without the raw answer.
+- **Read, session 49.** The cause is P-005: the witness was shown a shape that allowed −1 and 0; its answers,
+  measured, counted the uncountable stars −1 or "many". Shown the gate's shape, 0 of 8 refused.
 - **Done.** Nothing to the brief: it cannot fix a model writing the wrong type. Reels stopped; the fix is
   `PROMPTS/049`'s feature, the owner's choice.
 - **For good.** The brief cannot reliably stop a model writing a word for a number. Engine options, each a feature:

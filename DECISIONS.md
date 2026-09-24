@@ -6580,3 +6580,113 @@ per-clip price** — fal's quantity varies per clip, and a per-second rate with 
 an entry with its own rate still prices by its own. Every estimate the real service prints follows the entry.
 
 **Confirmed-by.** The owner, 2026-09-23, choosing a lower rate with a wide margin over keeping 4¢.
+
+---
+
+## S-156 | 2026-09-24 | The witness is shown the shape it is judged by — one copy, in contracts; an answer refused for its shape is asked once more and TOLD WHY; and every refused answer is kept, in a table row
+
+**Chose.** The owner's seven answers of 2026-09-24, put before `ask-again`'s gates were approved
+(`docs/features/ask-again.md`), after session 48 lost three of four black-holes runs to one malformed model answer
+each (`docs/reel-pitfalls.md`, P-001 and P-004):
+
+- **The witness's schemas are kept in ONE copy, in `packages/contracts/src/observation.ts`**, and the MiniMax adapter
+  asks with those objects; its own copies (`observedEntity`, `observationShape`, `clipObservationShape`) are deleted.
+  The gate still parses; the adapter still never does (D-041, S-042).
+- **Measured before anything was built** — and it was, below.
+- **The witness's second ask is told what was wrong with the first**: `observe` gains an optional `refused`, the first
+  answer's issues in today's `<path>: <message>` form, rendered by the adapter as one fixed sentence and those lines.
+- **The planner, the plan scorer and the reconcilers are asked once more — only when the model wrote an answer that
+  was refused for its shape**: the caller's schema refused it, it is not JSON, or it is the schema. The PIPELINE asks,
+  at every `structured` call site, through one helper (`askStructured`), with the refusal's reasons. A budget failure
+  (cut off, reasoning with nothing after it) and a wire failure stay one send.
+- **Every refused answer is kept in a table row**, `refused_answer` — the run, port, role and call, the ids it was
+  about, which ask, the reasons and the answer text, redacted then capped at 32 000 characters where it is written
+  (D-022). A gate-refused value is reported by the pipeline through a `refusals` port its stage is handed; an answer
+  the adapter could
+  not read travels on the `Spent` (`LostCall.answer`, `LostCall.refused`) and is written by the worker's recording
+  port. Read by `scripts/refused.mjs`; `real-reel.mjs` prints only the count.
+- **Two brands, because two callers**: `observe`'s `refused` is `WitnessRefusals`, built only by
+  `witnessRefusalsOf(value, schema)`, which parses under the witness's own two schemas by identity; `structured`'s is
+  `Refusals`, built by `refusalsOf(zodError)` and `answerRefusal`. Both live in `packages/contracts`, so no free text —
+  and no other schema's message, several of which quote the brief — can be put beside a picture without a cast, and a
+  scan forbids the cast.
+- **Not asked again, by the owner's choice**: the narration (its refused timings ARE kept), a witness `Spent`, and
+  `compare`, `judgeCut` and `readText`.
+
+**The measurement** (0¢ under the Token Plan; `.tmp/ask-again-measure.mjs`, never committed): the real witness
+(`MiniMax-M3`), P-004's two pictures, four asks each, today's adapter against the same call with the gate's schema
+rendered in place of the adapter's copy.
+
+| shown                      | reel 4's picture (`c52d418a…`) | reel 3's picture (`c9f3df47…`) | in all     |
+| -------------------------- | ------------------------------ | ------------------------------ | ---------- |
+| the adapter's copy (today) | 3 of 4 refused                 | 0 of 4 refused                 | 3 of 8     |
+| the gate's schema          | 0 of 4 refused                 | 0 of 4 refused                 | **0 of 8** |
+
+Every refusal was the background stars, counted **−1** twice and **"many"** once — "too many to count", which the
+shown shape (`count: z.number().int()`) allowed as a whole number. Shown `exclusiveMinimum: 0`, the witness counted
+reel 4's stars as **1 all four times** — a count that parses and is false — and 1, 100 or 150 on reel 3's. The shape
+has no way to say "too many to count"; a false count matters only when the uncountable thing is a shot's subject
+(S-040's count match), and here it is not. Eight asks an arm is not a rate; the raw answers are the mechanism.
+
+**Supersedes, each in part, in S-147's form:**
+
+- **S-042** as S-147 left it: _"one that does not parse is asked once more, and a second that does not parse finishes
+  the run `failed`"_ now covers `structured` answers refused for their shape, and the second ask is told why.
+- **S-142**'s _"The call is PAID FOR, so it is never sent again"_: for a model `structured` call whose ANSWER was
+  refused, the pipeline makes one new call carrying the reasons. `retryingModelPort` still never sends a `Spent` again,
+  and every other `Spent` is one send.
+- **S-147**'s _"nothing is added to the second ask — no hint, no quoted first answer"_ becomes _"the second ask carries
+  the first answer's issues, as `WitnessRefusals`, and nothing else"_; and its rejection of _"asking again on a thrown
+  call — `Spent`"_ is superseded for a `structured` `Spent` carrying `refused`, and stands for every other.
+- **S-037**'s `observe` — _"a picture and temperature 0, and nothing else"_ — and **S-072**'s Gate 4 — _"given the clip
+  and nothing else"_ — gain _"and, on a second ask only, `WitnessRefusals`"_. Their reason, that no text field beside a
+  picture can carry the brief, is kept by that brand: it is built only by `witnessRefusalsOf`, from the witness's own
+  two schemas over the answer the witness just gave — the planning, reconcile and timings schemas, whose messages quote
+  the brief, can build only `Refusals`, which `observe` does not take.
+- **D-035's and D-061's** _"one structured model call"_, **D-064's** _"one informed repair call"_, **S-040's** reconcile
+  as one structured call per picture (`reel-stills`' check 27) and **S-072's** Gate 5 _"One `structured` call"_
+  (`reel-render`'s check 24) each become _"one, or two when the first answer's shape was refused"_. The manifest
+  still comes whole from one call, the one that parses, so D-035's reason stands.
+- **S-130**'s rejection of _"retrying a failed parse with the names supplied"_ and **S-136**'s of _"retrying on an
+  echo"_: this asks again only after a refusal, and keeps and counts the refused answer, so neither reason — a second
+  call for every first one; a failure hidden — holds of it. **S-135 and S-140 stand**: a budget failure is one send.
+- **S-116**'s _"without one the engine still behaves exactly as it always has"_ holds for an absent script; a scripted
+  `structured` answer its schema refuses now throws `Spent`, as the real adapter does.
+- **`second-ask`'s check 2**, in its _"the SAME argument object"_: the second ask is a new object, the first's keys
+  and `refused`.
+
+**Why.**
+
+- **The engine showed the witness a looser rule than it judged it by.** The adapter kept its own copy of the shape,
+  with no minimum on `count`, no minimum on `label` and no strict object, because `packages/providers` cannot import
+  the pipeline's schema. The enums matched — that is what S-144's sentence read — and the constraints did not. S-139
+  found this on a closed set; this is the same finding on a number. **One copy makes it impossible**, not detected.
+- **The second ask was already there for the witness, and did not help**: P-004's two runs each left two `observe`
+  receipts (ids 253–254, 266–267). With the shape it was shown, the witness answers that picture the same way.
+- **A refused answer's words have never been kept** (`second-ask`'s Deferred item 1); this session's measurement is
+  the first time anyone read one, and it named the cause in eight calls.
+- **A `structured` refusal costs nothing to ask again**: model calls are 0¢ under the Token Plan (S-129), and the
+  first ask's `lost_call` row is still written, so the record is whole (D-084).
+
+**Rejected.**
+
+- **Two copies of the shape, pinned equal by a check** — put to the owner; smaller, but a second declaration of one
+  authority is the drift this repository exists to catch, and a check only finds it after it is written.
+- **Asking the witness again unchanged, and only keeping the raw answer** — put to the owner.
+- **Every answer on its receipt, and a file under the artifact root** — put to the owner; the first marks no refusal,
+  the second is queried by nothing and dies with the media.
+- **Asking every `Spent` again, budget and wire included** — put to the owner; S-135's and S-140's reasons stand.
+- **The retry in the adapter or in `retryingModelPort`** — the adapter never sends twice (S-096), and the counter is
+  for a provider that made nothing.
+- **Asking the narration again (P-001)** — put to the owner, who kept it to one call.
+- **Widening a shape** — a count of 0 or −1, a word for a number — S-144's rejections, unchanged.
+
+**Caught by.** `ask-again`'s twenty-four checks (`tests/ask-again-*.test.ts`, and check 23 in
+`tests/paid-path-real-reel.test.ts`): one shape (checks 1, 2); the record, its redaction and the brand (3 to 6); the
+structured calls asked once and never twice, and only for a refusal of the answer (7 to 15); the witness told, and the
+brief never reaching it (16 to 21); the reader (22, 23); and the journey (24). And the amended checks of `second-ask`
+(1 to 5) and `reel-plan` (7).
+
+**Confirmed-by.** The owner, 2026-09-24, on seven questions in two rounds: tell the witness; ask the planner, scorer
+and reconcilers again; a table row; the slug `ask-again`; one copy in contracts; measure first; ask again only when an
+answer was held.
