@@ -462,6 +462,64 @@ artifact root, `.artifacts/hyperframes-cpu/`, the finished reel at `cpu-reel.mp4
 5. **Fills show before their strokes draw.** A draw-on animates the outline only; a filled shape must fade its fill in
    with it, or it sits on screen as a dark silhouette from the first frame.
 
+## A hybrid reel — the engine's footage, code's labels and one diagram (2026-09-24)
+
+Then the owner asked for a reel made by the engine and Hyperframes together, and chose, for this reel only: a new
+subject (volcanoes) on a new engine run, **any labels and numbers** on screen, **graphics over the real clips** (§4 F)
+and **one diagram shot** (§4 C). Made outside the engine: nothing in the repository's code changed but the brief in
+`scripts/real-reel.mjs` (`497182b`). The files are in the ignored `.artifacts/hyperframes-volcanoes/`, the reel at
+`volcanoes-hybrid.mp4`; the engine's own cut of the same run is its `a1-render.mp4`, for comparison.
+
+- **The engine's half: run `bf8f4444…`**, the fourth of four (73¢ in all, `docs/reel-pitfalls.md` P-009 to P-011). The
+  six-unit plan, three pictures on `flux-2-pro`, six clips through Gates 2–5 — **55¢**. Gate 7 stopped its cut on the
+  caption question over correct captions (P-011); its pieces were used.
+- **Hyperframes' half: four compositions**, every one transparent but the diagram, each cue a word's time from the run's
+  own render manifest:
+  - **Shot 0, replaced by a diagram** (§4 C): the ground cut away under a volcano. The crust, the mantle, a rock glowing
+    on _"melt"_ into a blob of magma, rising from _"lighter"_ into a chamber on _"rises"_. Labels: _crust · solid rock_,
+    _mantle · hot rock_, _magma · ~1,200 °C_, _magma chamber · 1–10 km below the surface_.
+  - **Shot 1** (§4 F): rings swelling out of the crater on _"pressure"_; _vent_ on _"erupts"_, its line following the
+    crater as the camera pushes in; a measuring line rising with the fountain, and _lava fountains · can shoot up to
+    500 m high_ on _"high"_.
+  - **Shots 2–3**: _lava · magma above ground_ on the dome's glowing swirl; a thermometer filling on _"hotter"_ and
+    reading _~1,150 °C_ on _"thousand"_, carried across the cut; _crust · new basalt rock_ on _"hardens"_.
+  - **Shots 4–5**: _volcanic island_, its line tracking the island down the frame; an inset cross-section laying one
+    layer down on each _"eruption"_ and on _"layers"_, the sea rising round it on _"island"_; over the aerial coast, two
+    cards — _Mauna Kea, Hawaiʻi · 10,210 m from the sea floor — taller than Everest (8,849 m)_, and _Kīlauea · still
+    adding new land_.
+- **The join** (`join.mjs`) rebuilds the engine's one pass from the run's render manifest (D-059): each clip conformed
+  exactly as `assemble.ts` does, the narration fitted to its span over silence, the run's own subtitles burned last —
+  over everything. It adds **one input per layer, laid over by `overlay`**, and puts the diagram in shot 0's place.
+  One ffmpeg invocation, 8 s. **1086 frames, the manifest's count; the decoded sound identical to the engine's cut (one
+  MD5); Gate 2's scan finds nothing; −17.4 LUFS, as the engine's.** This is §4 F's shape inside the engine: one more
+  input per layer to D-054's single pass, no second encode.
+- **Time and weight.** Each layer rendered in 20–37 s as ProRes 4444 (`yuva444p12le`, real alpha). Authoring took about
+  three hours, most of it reading the clips' frames to place and time the labels.
+- **The numbers on screen are claims the epistemic layer never saw** (§5), put there at the owner's word for this reel:
+  magma ~1,200 °C; chambers 1–10 km down; fountains up to 500 m; Hawaiian lava ~1,150 °C; Mauna Kea 10,210 m from
+  its base; Everest 8,849 m; Kīlauea still adding land. An engine feature would first need an `S-` entry on where such
+  words may come from.
+
+**What it ran into — each one a rule for §4 F's and §4 C's gates:**
+
+1. **A label on generated footage is a claim about that footage.** Shot 5 is a model's coast, not Mauna Kea: a line from
+   "Mauna Kea" to it would say it is. Facts about the world go on cards with no line to the picture; a line names only
+   what the shot's own criterion says is there — a vent, lava, a crust, a volcanic island.
+2. **The camera moves.** Every clip pushed in or drifted: the crater fell 230 px across shot 1, the island 116 px across
+   shot 4. A line pinned to one point points at nothing within seconds, so the vent's and the island's lines follow
+   keyframes read off the clip's own frames. Inside the engine this needs positions over time from the witness, or a
+   tracker.
+3. **A line into a clip leaves before that clip's cut; a free graphic may cross it** — the thermometer kept its reading
+   across the cut between the two lava shots.
+4. **`hyperframes check` catches what `lint` passes.** A `const top` in a page's script collided with `window.top`,
+   threw, and that layer's timeline never advanced, with lint clean; two labels ran off the frame's right edge.
+5. **An SVG element's `transformOrigin` in pixels is measured from its own box, not the canvas**: the diagram's blob
+   jumped each time it pulsed until the origin was `'50% 50%'`.
+6. **A span ends with its narration's last word.** _"rises."_ ends shot 0, so the rise starts on _"lighter"_ and lands
+   on it, with the span's remaining second left for the chamber's label.
+7. **Repeatability held**: one worker against two, 47.2 dB on average and 43.6 dB at worst — the same to the eye, as §3
+   measured — so the set-then-move kit survived the runtime's rewinds.
+
 ## Reproducing the spike
 
 In any scratch folder outside the repository:
