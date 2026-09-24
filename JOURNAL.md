@@ -5944,3 +5944,27 @@ sentence 5 without "stream"; or review Gate 7's repetition question; or accept t
 | runId       | description                                                              | cost | time     | finished | why                                                                |
 | ----------- | ------------------------------------------------------------------------ | ---- | -------- | -------- | ------------------------------------------------------------------ |
 | `12a097bf…` | black holes, the brief as committed, after `ask-again` (P-004's picture) | 45c  | 10.9 min | no       | Gate 7: three of four shots show a dark disc ringed by gas (P-006) |
+
+## 2026-09-24 — side session: Hyperframes researched — video made from code, and where it could fit (no prompt)
+
+**Changed**: `docs/research/hyperframes.md`, new — nothing else. No code, no decision, no feature file; nothing
+committed. A session ran `cut-rules` in this working tree at the same time; nothing of it was touched.
+
+**Observed**: the owner asked what HeyGen's Hyperframes (`heygen-com/hyperframes`, Apache-2.0, 0.8.71, 52.8k stars) is
+and where it fits. It renders an HTML page to MP4: a virtual clock, a seek per frame in headless Chrome, a screenshot
+per frame, ffmpeg. Read its render engine, composition format and 21 agent skills; then a spike outside the repository
+remade two shots of run `12a097bf…` from that run's own picture, narration and word timings. Shot 0 (the approved
+picture, pushed, a flash keyed to "explodes.") rendered 10 s in 47.8 s cold, 25.1 s warm; shot 3 (canvas only) 13.75 s
+in 61.5 s; both H.264 768×1366 24 fps + AAC, **both clean under Gate 2's exact scan**. Two default renders differ in
+every frame (PSNR 45.8 dB); `--workers 1 --no-browser-gpu` gave byte-identical files. Shot 3 is crude and fails to show
+scale — the code path is only as good as its craft. Chrome's `browser ensure` hung after downloading (~270 MB into
+`~/.cache/hyperframes`); telemetry is on by default (`HYPERFRAMES_NO_TELEMETRY=1`); nothing intercepts the page's
+network.
+
+**Why**: the owner's question. Cost is not the case for it (fal bills a clip about 0.2¢, S-154); reliability and
+precision are — no fade to black, no voice in a clip, exact words, motion keyed to a word.
+
+**Next**: the owner's five questions in the file's §8. Recommended order if wanted: a composed hold at the take cap (a
+fixed template animating the approved picture), then a closed set of template shots whose words come from the
+narration only (D-096), model-written compositions last if ever — each a feature with four gates, and the choice of
+Hyperframes over Remotion, Motion Canvas or Manim an S- entry with what it rejected.
