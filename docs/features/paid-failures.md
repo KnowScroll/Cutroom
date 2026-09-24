@@ -249,6 +249,7 @@ Every check appears in exactly one slice: 2 + 3 + 3 + 3 + 1 = 12.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-24 journey=PASS at 567c4ea — every check green; 17 tests in tests/paid-failures-*.test.ts pass
 - 2026-09-22 journey=PASS at 7aa0703 — every check green; 17 tests in tests/paid-failures-*.test.ts pass
 - 2026-09-22 journey=PASS at dcf58a1 — every check green; 17 tests in tests/paid-failures-*.test.ts pass
 
