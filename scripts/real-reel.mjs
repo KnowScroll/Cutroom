@@ -62,47 +62,50 @@ function request(requestId, budgetCents) {
   return {
     contractVersion: 1,
     requestId,
-    // Session 48's reel, the owner's description: how black holes form, what they are, how they
-    // interact, and their types — surface level, between real and animated (S-134: the caller's text).
-    worldId: 'cutroom-black-holes',
+    // Session 50's reel, the owner's choice: how volcanoes work — magma rising, the eruption, lava
+    // hardening into new rock, an island built — as realistic footage (S-134: the caller's text).
+    // Exact labels and one diagram are drawn over the engine's finished cut afterwards, by
+    // Hyperframes and outside the engine (docs/research/hyperframes.md); nothing here knows it.
+    // The black-holes brief this replaced made run 05611ff9, and is in this file's history.
+    worldId: 'cutroom-volcanoes',
+    // THE BRIEF-WRITING RULES, EACH ONE PAID FOR (docs/reel-pitfalls.md): no digit, symbol or
+    // acronym in a sentence — MiniMax's word timings split them into sub-word tokens, and a
+    // narration that does not parse fails the run (P-001; "x86" in the CPU reel); no verb of
+    // vanishing, fading or darkness (P-003); a sentence names what the planner draws, so every
+    // subject in it is COMPACT — "the island", never "the islands", and no "the Earth", which the
+    // planner would draw as the planet (P-002); and a claim is carried only by sentences its
+    // criterion fits (P-008).
     narration: [
       {
-        // Reworded after run ee63e617 (session 48): MiniMax's word timings repeated its last word,
-        // "Sun. Sun.", and the stage's parse refused them (S-070). The owner chose to reword it.
-        text: 'A black hole begins with a giant star, far heavier than our own.',
+        text: 'Deep underground, it is hot enough to melt solid rock.',
         claimIds: ['c1'],
       },
       {
-        text: 'When its fuel runs out, the core collapses and the star explodes.',
+        text: 'Molten rock, called magma, is lighter than solid rock, so it rises.',
         claimIds: ['c1'],
       },
       {
-        text: 'What is left is crushed into a space far smaller than a city.',
+        text: 'Gas trapped inside it builds pressure until the volcano erupts.',
         claimIds: ['c2'],
       },
       {
-        text: 'Its edge is the event horizon; past it, not even light escapes.',
+        text: 'Fountains of glowing lava burst high into the air.',
         claimIds: ['c2'],
       },
       {
-        text: 'A star that drifts too close is stretched into a long thin stream.',
+        text: 'Above ground, magma is called lava, glowing hotter than a thousand degrees.',
         claimIds: ['c3'],
       },
       {
-        // Reworded after run 879a27b7 (session 48): "before it disappears for good" made every
-        // text-made take fade to black, and Gate 2 refused all three (docs/reel-pitfalls.md).
-        text: 'That gas swirls inward, glowing hot, in a bright spiral.',
+        text: 'Its outer skin quickly hardens into a crust of fresh rock.',
         claimIds: ['c3'],
       },
       {
-        // No claim, since run af7447f0 (session 49, P-008): c4's criterion is a spiral galaxy, which only
-        // sentence 8 shows, and a six-shot plan gave this sentence a shot of its own that was then
-        // asked to show a galaxy. The owner chose to leave this sentence unclaimed (S-134).
-        text: 'Most black holes weigh a few Suns, each left behind by a single star.',
-        claimIds: [],
+        text: 'Eruption after eruption, those layers of rock can build a whole island.',
+        claimIds: ['c4'],
       },
       {
-        text: 'At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.',
+        text: 'The island of Hawaii was built this way, and it is still growing.',
         claimIds: ['c4'],
       },
     ],
@@ -152,28 +155,28 @@ function request(requestId, budgetCents) {
       // has its keeper; the pictures are of what he kept.
       mustShow: [
         {
-          id: 'show-explosion',
-          text: 'a giant star exploding in space',
+          id: 'show-magma',
+          // A blob, not a pool or a chamber: a material filling the frame reads as a subject cut
+          // off by its edge (D-046, P-002), and a cutaway invites a model's lettering (never-text).
+          text: 'a glowing blob of molten rock',
           type: 'presence',
           claimId: 'c1',
         },
         {
-          id: 'show-horizon',
-          text: 'a black sphere circled by a ring of glowing gas',
+          id: 'show-eruption',
+          text: 'a volcano erupting glowing lava',
           type: 'presence',
           claimId: 'c2',
         },
         {
-          id: 'show-stream',
-          // Changed after run 879a27b7: "a long glowing stream" crossed the tall frame, and Gate 1
-          // refused it twice as clipped by the edge (D-046). Compact, so it fits.
-          text: 'a star being torn into a bright swirl of glowing gas',
+          id: 'show-lava',
+          text: 'a blob of glowing lava with a cracked crust',
           type: 'presence',
           claimId: 'c3',
         },
         {
-          id: 'show-galaxy',
-          text: 'a spiral galaxy with a bright glowing centre',
+          id: 'show-island',
+          text: 'a small volcanic island in the sea',
           type: 'presence',
           claimId: 'c4',
         },
@@ -185,14 +188,16 @@ function request(requestId, budgetCents) {
       // moved (S-134).
       mustNotShow: [
         { id: 'never-person', text: 'a recognisable real-world public figure', type: 'presence' },
+        // Kept on purpose for this reel too: a picture or video model garbles lettering. The labels
+        // this reel carries are drawn exactly, by code, over the finished cut — never asked of a model.
         { id: 'never-text', text: 'written words or labels', type: 'presence' },
       ],
       depictionPolicyVersion: 'policy-3',
     },
     style: {
-      id: 'style-black-holes',
+      id: 'style-volcanoes',
       version: 1,
-      text: 'semi-realistic animation, between real footage and illustration, soft cosmic glow, calm',
+      text: 'realistic nature documentary footage, vivid natural light, calm',
     },
     options: { until: 'video', budgetCents },
   }
