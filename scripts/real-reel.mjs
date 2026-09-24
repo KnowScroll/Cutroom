@@ -95,8 +95,11 @@ function request(requestId, budgetCents) {
         claimIds: ['c3'],
       },
       {
+        // No claim, since run af7447f0 (session 49, P-008): c4's criterion is a spiral galaxy, which only
+        // sentence 8 shows, and a six-shot plan gave this sentence a shot of its own that was then
+        // asked to show a galaxy. The owner chose to leave this sentence unclaimed (S-134).
         text: 'Most black holes weigh a few Suns, each left behind by a single star.',
-        claimIds: ['c4'],
+        claimIds: [],
       },
       {
         text: 'At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.',
