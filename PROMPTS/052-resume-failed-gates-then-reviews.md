@@ -7,6 +7,9 @@
   owner's word in session 51.
 - **Written:** 2026-09-25, at the end of session 51, from 051's text as it stood at commit `01982a8` (written in
   session 49 as 050 and carried twice), with its standing brought up to date
+- **Amended:** 2026-09-25, session 52, before it ran, at the owner's word — _"if we retry a run we should be able to
+  tell the system to regenerate the asset (with type) that is which asset we dont want reused"_: step 2 puts the
+  pieces a caller names to be made again, and five questions about them, before the product gate
 - **Run:** not yet
 
 **Where things stand.** Session 51 built `check.mjs --changed` (S-159): documents alone are checked in about 13 s, code
@@ -29,7 +32,21 @@ Write resume-failed's gates, then put the reviews real reels left to me.
    new run pointing back and the failed run stays failed. Settle what S-157 left for the gates: how the engine judges a
    failure a provider's (a closed list, and who names it — P-009's 504 is one), the new run's request and how it points
    back (D-094, D-099), what a clips-stage failure keeps (S-092 after a failure, not only a crash), and how ask-again's
-   kept answers inform the judgement. Put every real choice to me. Have the gates reviewed by the gate-reviewer agent
+   kept answers inform the judgement.
+   The owner's addition (session 52): a caller asking for a resume may name pieces NOT to keep — made again though
+   they passed their checks — as { kind: still | narration | clip, shot? }, no shot meaning every shot. The plan is
+   not nameable: a new plan keeps nothing, which is a new request. Only the caller names pieces; the engine's own
+   resume makes again only what failed. Before the product gate is written, put to me with AskUserQuestion:
+   (a) the list itself, and that a named piece takes down everything made from it — a still or a narration its
+   shot's clip (a clip's length is asked from its narration's measured seconds), any piece the cut and Gate 7 —
+   worked out by the engine, never the caller, and shown with its estimated cost before anything is spent;
+   (b) whether it stands outside S-157's provider-faults-only rule, since naming a piece overrules a check that
+   passed, and whether it spends the one resume;
+   (c) whether it may follow a gate's stop — Gate 7 refusing a cut whose clips all passed (P-011) is the strongest
+   case, a shot at Gate 2's cap the weakest;
+   (d) whether it may follow a completed run, or that is a feature of its own;
+   (e) a field on reel-contract's resume call (D-094, D-099), or a flag on the owner's script only.
+   Each answer an S- entry. Put every real choice to me. Have the gates reviewed by the gate-reviewer agent
    until approved or a finding needs me; use the test-impact agent for the amended-check list. Build only if all four
    are approved and there is time, slice by slice, each on a green check.mjs and broken deliberately.
 3. The reviews, to me with AskUserQuestion, each with what docs/reel-pitfalls.md says of it:

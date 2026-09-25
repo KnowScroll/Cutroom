@@ -6222,3 +6222,25 @@ media ignored under `.artifacts/` (rule 4), and no `S-` entry is written for the
 
 **Next.** The owner: **`parallel-shots`' gates after `resume-failed`'s** — `PROMPTS/052` is `resume-failed`'s gates and
 the P-003, P-010 and P-011 reviews; 053 is `parallel-shots` (S-115), on this session's figures.
+
+## 2026-09-25 — session 52: what is next, and the owner's addition to `resume-failed` — pieces a caller names to be made again
+
+**Asked.** _"What is next"_, then whether a failed run's assets could be kept for its regeneration, then: _"we shoul
+also have the flags or something right, so if we retry a run we should be able to tell the system to regenerate the
+asset (with type) that is which asset we dont want reused"_, and _"yes add them to 052"_.
+
+**Answered.** The first is `resume-failed` itself — the owner's session-48 words open its file — directed by S-157 and
+gated by `PROMPTS/052`. S-157 keeps nothing after a gate's stop, which leaves out run `879a27b7…` (Gate 2) and P-011's
+Gate 7 refusal of a correct cut. For the second, recommended: a list of pieces, `{ kind: still | narration | clip,
+shot? }`, not free flags; the plan not nameable, since a new plan keeps nothing; a named piece takes down what is made
+from it — a still or a narration its shot's clip, because a clip's length is asked from its narration's measured
+seconds (`packages/pipeline/src/clips/narration.ts`) — worked out by the engine and shown with its cost before any
+spend; only the caller names pieces.
+
+**Changed.** `PROMPTS/052`, never run, amended: step 2 puts that list and five questions to the owner before the product
+gate — the list itself; whether it stands outside S-157's provider-faults-only rule and spends the one resume; whether
+it may follow a gate's stop; whether it may follow a completed run; contract field or script flag. Each answer an `S-`
+entry. `docs/features/resume-failed.md` records the addition under what is still for the gates. No decision is written:
+nothing is chosen yet.
+
+**Next.** `PROMPTS/052`, as amended.

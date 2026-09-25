@@ -61,6 +61,14 @@ it); the new run's request and id, and how it points back (a field on the contra
 the failure was in the clips stage (S-092's rule after a crash, now after a failure); and how `ask-again`'s kept
 answers (S-156) inform the judgement.
 
+**And the owner's addition, 2026-09-25 (session 52):** a caller asking for a resume may name pieces not to keep — a
+still, a narration or a clip, by shot or for every shot — to be made again though they passed. The plan is not
+nameable (a new plan keeps nothing, which is a new request); a named piece takes down everything made from it, worked
+out by the engine and shown with its cost before anything is spent; only the caller names pieces. Five questions for
+the owner before the product gate: the list itself, whether it stands outside S-157's provider-faults-only rule and
+spends the one resume, whether it may follow a gate's stop (P-011's Gate 7), whether it may follow a completed run,
+and whether it is a contract field or a script flag — `PROMPTS/052`, step 2.
+
 ## The five questions, as they were put
 
 ### What must be settled before the gates (the owner's to choose)
