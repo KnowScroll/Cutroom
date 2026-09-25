@@ -81,6 +81,14 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-09-25 · session 53, continued
+
+- `docs/research/refusals.md` — new: every refusal of the 41 real runs, counted and listed, read from the database.
+  42% of pictures refused, 30 of 36 for clipping; no clip made from a picture ever refused, 16 of 49 made from words.
+- The owner: reels are to explain — facts, causes, plain words — not tell a story; the story tone was `PROMPTS/053`'s,
+  not the engine's (the narration is the caller's text, S-134). A self-healing harness asked about: pieces exist, the
+  whole does not; nothing decided.
+
 ### 2026-09-25 · session 53
 
 - Eight real runs, two reels completed: tsunamis `d459f6f5` (49¢, 36.5 s) and honeybees `098e97fd` (53¢, 37.1 s);
@@ -144,5 +152,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 | a session's reasoning            | `grep -n '^## 2026-09-25' JOURNAL.md`, then that entry           |
 | a feature's state                | `docs/features/<slug>.md`: its `Status:` and `Gates:` lines      |
 | a pitfall                        | `docs/reel-pitfalls.md`, the short list, then the `### P-` entry |
+| why pieces were refused, counted | `docs/research/refusals.md`: every refusal of the real runs      |
 | a run's rows                     | the `run-reader` agent, with the run's id                        |
 | how to run checks, and the traps | `CLAUDE.md`                                                      |

@@ -6488,3 +6488,46 @@ feature's gates. `scripts/real-reel.mjs` is put back as HEAD has it.
 
 **Next.** `PROMPTS/054`: `resume-failed`'s one approving read, then its build. P-013 and P-014 are small and in the same
 spirit — worth asking the owner whether they join `resume-failed` or become their own feature.
+
+## 2026-09-25 — session 53, continued: every refusal counted, reels that explain rather than tell a story, and a self-healing harness asked about
+
+**Asked.** Three things from the owner, after the two reels: _"are you keeping in notice, why the pictures were refused
+right? Note everything we will use it to fix our engine"_; _"do we have a harness in our engine that does selfhealing
+for us, fixing the engine or fixing the reels, etc. So failed runs dont fail"_; and _"Why do are reels feel more like
+stories than actual informational reels … it should have facts, simple explanations, causes, etc. … Is this
+configurable?"_
+
+**Changed.**
+
+- **`docs/research/refusals.md`** — new: every refusal of the 41 real runs, read from the database, read-only —
+  `picture.gate1`, `take.verdicts`, `render.gate7`, `degradation`, `lost_call`, `refused_answer` and each failed or
+  stopped run's result — counted by cause, and the whole ledger, 122 rows, as each gate wrote it.
+- `docs/context.md` — this entry, and a pointer to the new file under Where to look.
+
+**Observed.**
+
+- **42% of pictures were refused at Gate 1** (36 of 85), and **30 of the 36 for clipping** — 19 for clipping alone.
+  Canonical pictures fare worst: 22 of 40 refused. Every one of the 5 shots degraded to words was for clipping.
+- **No clip made from a picture has ever been refused: 0 of 34.** Clips made from words: 16 of 49 refused, two reels
+  stopped at a third take (P-003, P-008), one drifted out of the reel's world (P-015). That is the strongest single
+  fact in the file: a picture for every shot would have removed every clip refusal so far, at 5¢ to 8¢ each.
+- **The witness marks one thing in three as clipped** (190 of 582); only a named subject's clipping refuses a picture.
+- **The story tone was the brief's, not the engine's.** `PROMPTS/053` asked for _"Informative, but told as a story
+  rather than a lesson — a hook, a surprise, plain words"_, and the briefs followed it. The pipeline's prompts carry no
+  story, hook or cinematic wording (searched); the narration is the caller's sentences, spoken as written, and the
+  style is the caller's text (S-134, D-094). What the engine does fix: at least four sentences, 35–45 s (D-111), no
+  digit, symbol or acronym in a spoken sentence (P-001 — numbers spelt out), and footage only until `diagram-shots` and
+  `code-reels` add labels and diagrams (S-166, S-167). Kept as a memory: briefs explain.
+- **Self-healing, as the engine stands.** Inside a run: `ask-again` (a model answer in the wrong shape asked once more,
+  S-156), a second picture and a repair before a shot is made from words (D-047, S-043), three takes a shot (S-090),
+  two plans scored (Gate 0), a clip, a narration or a model call that finds the provider unavailable sent again with
+  backoff (S-096) — but not a picture. Planned:
+  `resume-failed` (S-157). Missing: looking again after a network error (P-013), asking the witness again when its
+  answer is not JSON (P-014), a brief read against the paid-for rules before anything is spent, and the loop this
+  session ran by hand — read the rows, change the brief, run again. **Not to be built**: anything that edits the
+  engine's own code or gates to get a reel through; that is how a gate gets weakened (CLAUDE.md rule 3).
+
+**Why.** The owner's questions, answered from the database and the code, not from memory.
+
+**Next.** The owner's call on two things: whether a self-healing harness is planned as a feature, and where it sits in
+S-168's order beside `resume-failed`; and whether the two reels are made again as explanations. Then `PROMPTS/054`.
