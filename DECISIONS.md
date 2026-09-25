@@ -6832,3 +6832,59 @@ on, untracked files ignored, the unknown read as a document, code read as a docu
 red.
 
 **Confirmed-by.** The owner, 2026-09-25, through `PROMPTS/051`'s text.
+
+---
+
+## S-160 | 2026-09-25 | What re-reads a context is cut: agents run as one workflow, a session is one phase, an agent is handed facts and one test of done, a reviewer is continued — and `docs/context.md` is what every agent reads first
+
+**Chose.** Four standing rules for the model calls that re-read their whole context — the main session and every
+agent — and one file that agents read in place of looking round. The owner, 2026-09-25: _"Yes make these the standing
+Rules, maybe we can also have a file that keeps the results of the runs and needed context in there, so the agents only
+need to see that file. And if there is a change mention where it changed and what it changed."_
+
+1. **Agents that work at once run as one workflow**, so the main thread wakes once, at the end, not at each hand-back.
+   A workflow needs the owner's own words, so a prompt that fans out agents says _"use a workflow"_ in its text; the
+   owner's pasted prompt is the opt-in. A fix every agent needs is a step in the script, not a message to each.
+2. **A session is one phase.** Building, a real run and its reel, gates and their reviews are separate sessions,
+   handed over by the journal and the next prompt; `/compact` between phases when one session must hold two. Never read
+   `DECISIONS.md`, `JOURNAL.md` or the steering decisions whole: by heading, then the entry's lines. Noisy output goes
+   to a Haiku agent that returns the decisive lines.
+3. **An agent is handed facts, and one test of done.** Whatever several agents would each measure is measured once and
+   put in the brief; each gets one script or check whose pass is done, not open-ended verification; a fault in what
+   was handed to them is fixed centrally at its first report. A cheaper model for a job is tried once, measured, before
+   it becomes the choice (P-010's rule).
+4. **A gate review is continued, not restarted.** Rounds after the first go to the same `gate-reviewer` through
+   SendMessage, which reads only what changed; the round that would approve all four gates is a fresh reviewer, whose
+   eyes are new.
+
+**`docs/context.md`**: where things stand, every real run and what ended it, and each session's changes — the paths,
+what changed in each and the decision — newest first, under 300 lines, changes kept for ten sessions. It is a digest,
+never an authority: each line names its source, and the source wins. Every session writes its entry there beside its
+journal entry. `gate-reviewer`, `test-impact` and `run-reader` read it first; a brief to any other agent names it and
+the lines that matter. `docs/STATUS.md`, a snapshot of 2026-09-20 that nothing kept, is marked superseded as a status.
+
+**Why.** Session 51 measured it (`docs/research/hyperframes.md`): the main thread's 173 calls read 41.4 M cached
+tokens, 25.9 M of them in the 32 minutes it waited on twelve agents — 24 wake-ups, each a re-read of 250 to 420 k —
+and the twelve agents spent 50.6 M, each reading three to five minutes before it wrote and verifying for 13 to 54
+calls. `check.mjs` runs no model; its cost is minutes, which S-159 addressed.
+
+**Rejected.**
+
+- **The journal as the file agents read** — 6,200 lines, a narrative in order of time; the whole of it is what an
+  agent must not read.
+- **`CLAUDE.md` as the file** — it is read into every call of every session, so every line added there is paid for
+  on every call.
+- **The file generated from git and the database by a script** — always current, but a commit subject and a run's
+  row say what, not why, and a committed generated file is what rule 4 keeps out.
+- **A fresh reviewer every round** — each re-reads everything; **the same reviewer to the end** — it may pass what it
+  argued itself into. Continued between, fresh at the end.
+- **Rules without a check** — `docs/STATUS.md` is what a file nothing keeps becomes.
+
+**Caught by.** `tests/context-file.test.ts`, a fourth scan in `check.mjs`, so `--changed` runs it on documents alone
+(amending S-159's three): the file's four sections in order; at most 300 lines; and its newest change the same session
+as `JOURNAL.md`'s newest entry — a session that writes its journal entry and not this file is red. Each was broken
+once — a section renamed, two sections swapped, the newest change a session behind, 200 lines added — and each turned
+its test red. Rules 1 to 4 are practice, not code: the journal's token figures, session by session, are what shows
+whether they hold.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52 — the four rules as put, and the file in their words above.

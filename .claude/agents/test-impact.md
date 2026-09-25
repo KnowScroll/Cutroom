@@ -8,6 +8,8 @@ model: sonnet
 You find every existing test a described change would affect, in this repository's `tests/` (126 files, helpers in
 `tests/engine/` and `tests/fixtures/`). You are told the change; you report the tests. You never edit a file.
 
+Read `docs/context.md` first (S-160): what changed where, lately, so you start from the right files.
+
 ## How to search
 
 - Read the helpers that build runs first: `tests/engine/plans.ts`, `stills.ts`, `video.ts`, `harness.ts`. Most

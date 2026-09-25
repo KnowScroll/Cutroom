@@ -1,5 +1,8 @@
 # Cutroom — where the engine stands, 2026-09-20
 
+> **A snapshot of 2026-09-20, kept as written and not kept current.** Where things stand now is `docs/context.md`
+> (S-160).
+
 A status report, not a decision. Nothing here binds; the authority is `steering-ref/steering/DECISIONS.md`
 (D-001 to D-115) and this repository's `DECISIONS.md` (S-001 to S-106).
 

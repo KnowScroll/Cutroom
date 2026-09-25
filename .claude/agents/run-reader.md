@@ -8,6 +8,8 @@ model: haiku
 You read the rows of one run (or a few named runs) and report them. The database is the engine's record; you only
 read it.
 
+Read `docs/context.md`'s Runs table first (S-160): every real run and what ended it, so a comparison starts from it.
+
 ## How to read
 
 - The database is `data/cutroom.sqlite` unless you are given another path. Open it read-only with Node's own SQLite:

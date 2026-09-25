@@ -9,7 +9,8 @@
   session 49 as 050 and carried twice), with its standing brought up to date
 - **Amended:** 2026-09-25, session 52, before it ran, at the owner's word — _"if we retry a run we should be able to
   tell the system to regenerate the asset (with type) that is which asset we dont want reused"_: step 2 puts the
-  pieces a caller names to be made again, and five questions about them, before the product gate
+  pieces a caller names to be made again, and five questions about them, before the product gate; and S-160's rules
+  on context cost — `docs/context.md` read first, one phase a session, a reviewer continued between rounds
 - **Run:** not yet
 
 **Where things stand.** Session 51 built `check.mjs --changed` (S-159): documents alone are checked in about 13 s, code
@@ -25,7 +26,8 @@ Paste everything inside the block below as the session's first message.
 Write resume-failed's gates, then put the reviews real reels left to me.
 
 1. `node scripts/decisions.mjs`. If it says commits are unpushed in the steering repository, say so and stop.
-   Read CLAUDE.md, JOURNAL.md's session-50 and session-51 entries and docs/reel-pitfalls.md — its short list.
+   Read docs/context.md first, then CLAUDE.md; open JOURNAL.md, DECISIONS.md and docs/reel-pitfalls.md only by the
+   headings it names, never whole (S-160).
    `node scripts/check.mjs --changed` once (S-159): HEAD's code passed the full run before it was committed.
 2. resume-failed: write its four gates in docs/features/resume-failed.md on S-157's direction — both the engine and
    the caller may start a resume, one in all; provider faults only; pictures Gate 1 accepted are kept; the caller sees a
@@ -47,7 +49,8 @@ Write resume-failed's gates, then put the reviews real reels left to me.
    (d) whether it may follow a completed run, or that is a feature of its own;
    (e) a field on reel-contract's resume call (D-094, D-099), or a flag on the owner's script only.
    Each answer an S- entry. Put every real choice to me. Have the gates reviewed by the gate-reviewer agent
-   until approved or a finding needs me; use the test-impact agent for the amended-check list. Build only if all four
+   until approved or a finding needs me — continued through SendMessage after round one, and a fresh reviewer for
+   the round that would approve all four (S-160); use the test-impact agent for the amended-check list. Build only if all four
    are approved and there is time, slice by slice, each on a green check.mjs and broken deliberately.
 3. The reviews, to me with AskUserQuestion, each with what docs/reel-pitfalls.md says of it:
    - P-003: a shot made from words has nothing to fall back on at its third failed take, so it stops the reel (S-090).
@@ -62,6 +65,8 @@ Write resume-failed's gates, then put the reviews real reels left to me.
 
 How to work:
 - --changed between steps; the full check.mjs before committing code, and before a journey (S-159).
+- S-160: one phase in this session — the gates and the reviews; a build, if its turn comes, after /compact. Hand
+  an agent its facts and the lines of docs/context.md that matter, not a search.
 - Add every new pitfall to docs/reel-pitfalls.md, and keep its short list current.
 - Before recommending a different model or provider, read its history in JOURNAL.md and DECISIONS.md (P-010).
 - Brief-writing rules: each criterion a COMPACT thing, and each sentence too; no verb of vanishing or darkness; a
@@ -69,6 +74,6 @@ How to work:
   a tall subject is framed small (P-012).
 - Never change a check or a test to reach green. Never raise the 250c ceiling. Never print a key or read .env.
 - No absolute path in any committed file (D-086).
-- Close out with a JOURNAL.md entry, this prompt's Run line set here and in PROMPTS/README.md (S-065), and
+- Close out with a JOURNAL.md entry and docs/context.md's entry for this session (S-160), this prompt's Run line set here and in PROMPTS/README.md (S-065), and
   PROMPTS/053 — parallel-shots' gates (S-115), on the figures in docs/research/hyperframes.md's session-51 section.
 ```

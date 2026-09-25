@@ -11,6 +11,10 @@ gates should NOT be approved. Quality here is load-bearing: an approved gate is 
 
 ## Read first
 
+- `docs/context.md` — where things stand, the real runs, what changed where (S-160). Its lines are a
+  digest: verify any one you rely on against the source it names.
+- **A later round, continued through SendMessage, reads only what changed** since your last findings (S-160); the
+  round that would approve all four gates is a fresh reviewer.
 - `CLAUDE.md` — gates before code, never weaken a check, the boundary rules, D-022 (secrets), D-086 (no absolute path).
 - The feature file under review, whole.
 - Every `D-`, `I-` and `S-` entry it cites or supersedes: `S-` in `DECISIONS.md`, `D-`/`I-` in

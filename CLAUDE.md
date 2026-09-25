@@ -100,6 +100,24 @@ answer costs. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10, Haiku $
 
 None of them edits code. The reviewer's one allowed edit is the `Gates:` line of the file it approves.
 
+**What re-reads a whole context is what costs** (S-160): every call of this session and of each agent reads its
+context again. `check.mjs` runs no model. Four standing rules:
+
+1. **Agents working at once run as one workflow**, so this thread wakes once, not at every hand-back. A prompt that
+   fans out agents says _"use a workflow"_ — the owner's pasted prompt is the opt-in. A fix every agent needs is a
+   step in the script.
+2. **A session is one phase** — building, a real run and its reel, gates and reviews — handed over by the journal
+   and the next prompt; `/compact` between two when one session must hold both. `DECISIONS.md`, `JOURNAL.md` and the
+   steering decisions are read by heading, then the entry's lines, never whole.
+3. **An agent is handed facts and one test of done**: what several would each measure is measured once and put in
+   its brief; its done is one script's pass; a fault in what it was handed is fixed centrally at the first report.
+4. **A gate review is continued through SendMessage** after the first round; the round that would approve all four
+   is a fresh reviewer.
+
+**`docs/context.md` is read first** — by this session and by every agent, before looking anywhere else: where things
+stand, every real run and what ended it, and each session's changes with their paths. **Every session writes its
+entry there beside its journal entry**; `tests/context-file.test.ts` is red when the two name different sessions.
+
 ## Environment traps, each one already paid for
 
 - **`pnpm` is not on PATH** and is not installed globally. Use `corepack pnpm <script>`, or skip
@@ -133,8 +151,8 @@ Seven code checks plus two about the authority. `--code` runs only the first sev
 `decisions pin` is not yours to fix by editing anything here.
 
 **`--changed` is enough between steps** (S-159): documents alone — Markdown under `docs/` or `PROMPTS/`, the journal,
-the decisions, this file — run the formatting, the two authority checks and the three scans that read files other than
-code, in about 13 s; one path of code, or one it does not recognise, runs everything. `--dry-run` says which and why.
+the decisions, this file — run the formatting, the two authority checks and the four scans that read files other than
+code (S-160 added `context-file`), in about 13 s; one path of code, or one it does not recognise, runs everything. `--dry-run` says which and why.
 **The full run is required before committing code, and before a feature's journey**: `--changed` trusts HEAD, and
 that rule is what keeps HEAD green.
 

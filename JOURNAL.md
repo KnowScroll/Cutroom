@@ -6244,3 +6244,33 @@ entry. `docs/features/resume-failed.md` records the addition under what is still
 nothing is chosen yet.
 
 **Next.** `PROMPTS/052`, as amended.
+
+## 2026-09-25 — session 52, continued: what re-reads a context is cut, and `docs/context.md` is read first (S-160)
+
+**Asked.** Whether the checks that run end to end are redundant; then, told `check.mjs` runs no model, _"what can we do
+about checks that read the whole context"_; then _"Yes make these the standing Rules, maybe we can also have a file
+that keeps the results of the runs and needed context in there, so the agents only need to see that file. And if there
+is a change mention where it changed and what it changed"_.
+
+**Changed.**
+
+- **S-160**, four standing rules in `CLAUDE.md` § Subagents: agents working at once run as one workflow (the prompt's
+  _"use a workflow"_ is the owner's opt-in); a session is one phase, and the big files are read by heading; an agent is
+  handed facts and one test of done; a gate review is continued through SendMessage, fresh for the approving round.
+- **`docs/context.md`**, new: where things stand, all 33 real runs from `data/cutroom.sqlite` (read-only, each run's
+  `run` row: 1,553¢ in all) with what ended each and its pitfall, the changes of sessions 50 to 52 by path, and where
+  to look. `gate-reviewer`, `test-impact` and `run-reader` read it first. `docs/STATUS.md` marked a snapshot.
+- **`tests/context-file.test.ts`**, a fourth scan in `check.mjs`: four sections in order, at most 300 lines, the newest
+  change the journal's newest session. Broken four ways — a section renamed, two swapped, the newest change a session
+  behind, 200 lines added — each red; restored, green.
+- `PROMPTS/052` carries S-160: `docs/context.md` first, one phase, the reviewer continued, the file kept at close-out.
+
+**Observed.** The measured cost is session 51's (`docs/research/hyperframes.md`): 25.9 M of the main thread's 41.4 M
+cached reads fell while it waited on twelve agents, and the agents spent 50.6 M. `check.mjs` spends minutes, not
+tokens. `docs/STATUS.md` was the warning: a status file nothing checks reads better than the facts within a day
+(session 36). Hence the test, and the tie to the journal's session.
+
+**Why.** The owner's word; S-160 holds what was rejected — the journal or `CLAUDE.md` as the file, a generated file,
+a fresh reviewer every round, rules without a check.
+
+**Next.** `PROMPTS/052`, as amended.

@@ -63,11 +63,12 @@ const CODE_PATH = [
   /^(\.dependency-cruiser\.cjs|\.gitattributes|\.gitignore|\.editorconfig|\.npmrc)$/,
 ]
 
-/** The three tests that read files other than code; the whole suite runs them too. */
+/** The four tests that read files other than code; the whole suite runs them too. */
 const SCANS = [
   'tests/line-endings.test.ts',
   'tests/no-absolute-paths.test.ts',
   'tests/feature-files.test.ts',
+  'tests/context-file.test.ts',
 ]
 
 const DOCUMENTS_ONLY = [
