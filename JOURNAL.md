@@ -6531,3 +6531,12 @@ configurable?"_
 
 **Next.** The owner's call on two things: whether a self-healing harness is planned as a feature, and where it sits in
 S-168's order beside `resume-failed`; and whether the two reels are made again as explanations. Then `PROMPTS/054`.
+
+**Then, the owner's answers.** A healer inside the engine is a feature: _"yeah we can have a like LLM harness inside the
+engine itself for healing and fixing. SO that can be another feature"_ — placed right after `resume-failed`. Written as
+**S-169** (supersedes S-168's order in part) and **`docs/features/self-heal.md`** (planned, gates not written). D-096
+bounds it: the engine receives the caller's narration and criteria as given, so the healer heals with what the engine
+owns — looking again, asking again, resuming, planning again, asking for a picture again with its framing named, a
+picture for a shot made from words — and a change to the brief goes back to the caller as a proposal. And the two reels
+are to be made again as explanations, on new subjects: the canonical story of JoJo's Bizarre Adventure, and how video
+game graphics have evolved, with examples.

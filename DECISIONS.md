@@ -7345,3 +7345,49 @@ away.
 **Confirmed-by.** The owner, 2026-09-25, in session 52: _"yes swap the order and commit"_.
 
 ---
+
+## S-169 | 2026-09-25 | A healer inside the engine becomes a planned feature, built right after `resume-failed`: a model reads why a run failed or stopped and heals it with what the engine owns — never its code, a gate or a check, and the caller's narration and criteria only by proposal
+
+**Chose.** At the owner's word, after session 53's eight real runs:
+
+- **`self-heal`** — a planned feature, `docs/features/self-heal.md`, gates not written: **a model inside the engine
+  that reads why a run failed or stopped, from the run's own rows, and heals it** — so a run that meets a fault it can
+  answer does not end there.
+- **What it heals with is what the engine owns**: looking again after a network error (P-013), asking a witness again
+  when its answer is not JSON (P-014), resuming (`resume-failed`, S-157), planning again with subjects the brief's
+  pictures can show (P-016's queen was the planner's choice), asking for a picture again with its framing named (31
+  of 49 picture reasons were clipping), giving a shot a picture it lacked (no clip made from a picture has been
+  refused), and holding a shot made from words to the reel's recurring subject (P-015). Every heal inside the caller's
+  ceiling (D-014, D-100), recorded with what was read and what was changed.
+- **What it never does**: edit the engine's code, a gate, a check, a threshold or a test (CLAUDE.md rule 3); raise a
+  ceiling; rewrite the caller's narration or criteria. **D-096 binds**: the engine receives them _"as given"_ and _"may
+  never weaken or remove one"_. A change to the brief — what session 53 made by hand three times — goes back to the
+  caller as a **proposal** in the run's result, and applying it is the caller's.
+- **Its place: right after `resume-failed`**, which it builds on — a heal that resumes is a resumed run. S-168's order
+  is otherwise unchanged: `caption-match` and the registry change, then `composed-hold`, `diagram-shots`, `code-reels`,
+  then `parallel-shots`.
+
+**Supersedes, in part, in S-147's form:** **S-168**'s order gains `self-heal` as its item 2, between `resume-failed`
+and `caption-match`. Everything else S-168 says stands.
+
+**Why.** Session 53: of six runs that ended early, three were one request — two network errors and one malformed
+witness answer — and three were the brief; the honeybee reel took six runs and 142¢ by hand, read, changed and run
+again. `docs/research/refusals.md` counts every refusal of the 41 real runs: 42% of pictures refused, 30 of 36 for
+clipping; 16 of 49 clips made from words refused, none of 34 made from a picture. Most of what the brief changes
+answered, the engine's own plan and prompts could have.
+
+**Rejected** (put to the owner). A healer outside the engine only — a caller's harness, as session 53 was; the owner
+chose inside. A healer that edits the engine's code or gates to get a reel through — how a check is weakened (rule 3).
+A healer that rewrites the caller's brief in place — against D-096's "as given"; it would need an entry superseding
+D-096, the owner's, at the product gate. Its place before `resume-failed`, whose gates are one read from approval.
+
+**Left open, for `self-heal`'s product gate**: which model heals and what it is shown; how many heals a run may take and
+at what cost; whether a proposal for the brief can be applied by the engine when the caller's request allows it — which
+would need D-096 superseded.
+
+**Caught by.** `docs/features/self-heal.md`, every gate pending; `docs/context.md`'s **Next**; nothing in code.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 53: _"yeah we can have a like LLM harness inside the engine itself
+for healing and fixing. SO that can be another feature"_, and its place: _"Right after resume-failed"_.
+
+---

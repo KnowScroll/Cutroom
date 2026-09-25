@@ -22,11 +22,12 @@ git and the journal keep them.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
   **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 054**: `resume-failed` (S-161 to S-164). **Planned, gates not
-  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `video-edits`,
+  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**, in the owner's order — reliability before speed (S-168): `PROMPTS/054` — `resume-failed`'s one approving
-  read, then its build, slice by slice. Session 53's two reels completed, and its engine findings wait for a feature:
+- **Next**, in the owner's order — reliability before speed (S-168, S-169): `PROMPTS/054` — `resume-failed`'s one
+  approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
+  failed run with what the engine owns, never its code or gates, and the caller's brief only by proposal (D-096). Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -85,6 +86,8 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 - `docs/research/refusals.md` — new: every refusal of the 41 real runs, counted and listed, read from the database.
   42% of pictures refused, 30 of 36 for clipping; no clip made from a picture ever refused, 16 of 49 made from words.
+- `DECISIONS.md` — S-169: `self-heal`, a healer inside the engine, planned right after `resume-failed` (supersedes S-168
+  in part). `docs/features/self-heal.md` — new, planned, gates not written.
 - The owner: reels are to explain — facts, causes, plain words — not tell a story; the story tone was `PROMPTS/053`'s,
   not the engine's (the narration is the caller's text, S-134). A self-healing harness asked about: pieces exist, the
   whole does not; nothing decided.
