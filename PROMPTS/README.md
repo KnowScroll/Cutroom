@@ -43,7 +43,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 049 | [049-ask-again-then-the-reel.md](049-ask-again-then-the-reel.md)                       | `ask-again`     | ask again, then the reel       | 2026-09-24 | session 49 |
 | 051 | [051-changed-checks-then-parallel-reels.md](051-changed-checks-then-parallel-reels.md) | —               | checks, then two reels at once | 2026-09-25 | session 51 |
 | 052 | [052-resume-failed-gates-then-reviews.md](052-resume-failed-gates-then-reviews.md)     | `resume-failed` | gates, then the reviews        | 2026-09-25 | session 52 |
-| 053 | [053-resume-failed-approve-then-build.md](053-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | not yet    |
+| 053 | [053-two-test-reels.md](053-two-test-reels.md)                                         | —               | two reels, no code touched     | 2026-09-25 | not yet    |
+| 054 | [054-resume-failed-approve-then-build.md](054-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
@@ -54,6 +55,7 @@ ran no prompt. 050, written for it and never run, was carried to 051 with its st
 date, then rewritten before it ran, at the owner's word, for time: `check.mjs --changed` and two reels made at once. Its
 `resume-failed` gates and reviews go to 052, from 051's text at commit `01982a8`.
 
-**053 was rewritten before it ran.** Written for `parallel-shots`' gates, it became `resume-failed`'s approving read and
-build when the owner put reliability before speed (S-168). The `parallel-shots` text is at commit `b15d203`, carried to
-the session that writes those gates.
+**053 was rewritten twice before it ran.** Written for `parallel-shots`' gates, it became `resume-failed`'s approving
+read and build when the owner put reliability before speed (S-168). The `parallel-shots` text is at commit `b15d203`,
+carried to the session that writes those gates. Then the owner put two test reels first: they are 053, and
+`resume-failed` moved to 054, as committed at `b1ffcfd`.

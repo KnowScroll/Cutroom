@@ -6341,8 +6341,12 @@ commit"_.
   Supersedes S-166's rejection of §4 F, in part. Research §8 question 1 answered.
 - **`docs/research/hyperframes.md`** §8 — the answer noted. **`docs/context.md`** — the planned list and this entry.
 - **S-168** — the order: `resume-failed` (approve, then build), then `caption-match` with the registry change, then
-  `composed-hold`, `diagram-shots`, `code-reels`, then `parallel-shots`' gates. **`PROMPTS/053`** rewritten for
-  `resume-failed`; the `parallel-shots` text stays at `b15d203`. `PROMPTS/README.md` — its row and a note.
+  `composed-hold`, `diagram-shots`, `code-reels`, then `parallel-shots`' gates. `resume-failed`'s prompt written as 053
+  (`b1ffcfd`); the `parallel-shots` text stays at `b15d203`.
+- **Two test reels first, at the owner's word**: **`PROMPTS/053`** — two real reels on harder subjects (a honeybee
+  swarm choosing a home, a tsunami crossing an ocean), briefs shown before any spend, one run after the other, no
+  check.mjs and no test; `request()` put back as HEAD has it at the end, so no code is committed. `resume-failed` moved
+  to **`PROMPTS/054`**. `PROMPTS/README.md` — the rows and a note.
 
 **Observed.**
 
@@ -6363,5 +6367,5 @@ commit"_.
 
 **Why.** CLAUDE.md rule 2: a choice between real alternatives is written, with what was rejected.
 
-**Next.** `PROMPTS/053` — `resume-failed`'s one approving read, then its build from Slice 1. The SDK question, when the
-owner returns to it.
+**Next.** `PROMPTS/053` — two test reels. Then `PROMPTS/054` — `resume-failed`'s one approving read, then its build
+from Slice 1. The SDK question, when the owner returns to it.
