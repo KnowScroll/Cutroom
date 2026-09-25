@@ -6,7 +6,9 @@
   it took, and what ended it
 - **Written:** 2026-09-25, at the end of session 52, at the owner's word: two reels before `resume-failed`'s build,
   which moved to `PROMPTS/054`, and no checks run, since no code changes
-- **Run:** not yet
+- **Run:** session 53, 2026-09-25 — both reels completed, after eight runs and 201¢: tsunamis on its second run
+  (`d459f6f5`, 49¢), honeybees on its sixth (`098e97fd`, 53¢) with the brief changed three times; at the owner's
+  word mid-session, every failure was read and run again without asking. P-013 to P-016 in `docs/reel-pitfalls.md`
 
 **Where things stand.** The engine makes a reel from a brief for about 55¢ against a 250¢ ceiling (D-014): a plan
 (MiniMax), up to three pictures (fal, `flux-2-pro/edit`), clips (fal, `minimax-h3-turbo`), narration (MiniMax speech)

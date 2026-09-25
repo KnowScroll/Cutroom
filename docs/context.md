@@ -25,9 +25,10 @@ git and the journal keep them.
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `PROMPTS/053` — two real reels on the engine as it stands, no code touched and no check run, at the
-  owner's word. Then, in the owner's order — reliability before speed (S-168): `PROMPTS/054` — `resume-failed`'s one
-  approving read, then its build, slice by slice. Then `caption-match`'s gates and build, with the registry change S-165 decided.
+- **Next**, in the owner's order — reliability before speed (S-168): `PROMPTS/054` — `resume-failed`'s one approving
+  read, then its build, slice by slice. Session 53's two reels completed, and its engine findings wait for a feature:
+  a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
+  never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
 - **Parked by the owner**: how KnowScroll uses the engine — an `@cutroom/sdk` package that starts the service, or an
   in-process library against D-098. Nothing decided; the journal's session 52 (S-167) entry has the options.
@@ -45,6 +46,14 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 
 | run        | UTC date   | world           | ending               | ¢   | what ended it                                                           |
 | ---------- | ---------- | --------------- | -------------------- | --- | ----------------------------------------------------------------------- |
+| `098e97fd` | 2026-09-25 | honeybees       | completed            | 53  | the brief changed three times; shot 4 made from words (clipped flight)  |
+| `52c63f62` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a cluster seen close, clipped (P-015, P-002)        |
+| `9bc5821e` | 2026-09-25 | honeybees       | failed               | 5   | a made picture's file: fetch failed (P-013)                             |
+| `0ac13e84` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a Queen Bee subject no picture shows (P-016)        |
+| `9d0914dd` | 2026-09-25 | honeybees       | stopped              | 54  | Gate 7 said no: a shot made from words drew bees on a flower (P-015)    |
+| `d459f6f5` | 2026-09-25 | tsunamis        | completed            | 49  | the brief's second run; shot 4 one retake, lettering on the boat        |
+| `62b5a191` | 2026-09-25 | tsunamis        | failed               | 10  | the witness answered not JSON, never asked again (P-014)                |
+| `d4d6c562` | 2026-09-25 | honeybees       | failed               | 0   | a picture's status check: fetch failed (P-013)                          |
 | `74bb96a0` | 2026-09-24 | hurricanes      | completed            | 56  | first try; shot 4's picture refused twice, made from words (P-012)      |
 | `bf8f4444` | 2026-09-24 | volcanoes       | stopped              | 55  | Gate 7 said no to the caption question on a correct cut (P-011)         |
 | `bad736d1` | 2026-09-24 | volcanoes       | failed               | 8   | nano-banana-2 made 768×1376, not the frame (P-010)                      |
@@ -71,6 +80,15 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-25 · session 53
+
+- Eight real runs, two reels completed: tsunamis `d459f6f5` (49¢, 36.5 s) and honeybees `098e97fd` (53¢, 37.1 s);
+  201¢ in all. The Runs table above. Both briefs word for word, and each run, in `JOURNAL.md`.
+- `docs/reel-pitfalls.md` — P-013 and P-014 (engine: a network error ends a run; a witness answer that is not JSON is
+  not asked again), P-015 and P-016 (brief: a criterion that names no scene; a thing hidden inside the subject), and
+  their short-list rows. `scripts/real-reel.mjs` put back as HEAD has it: no code changed.
+- `PROMPTS/053` and `PROMPTS/README.md` — the Run line.
 
 ### 2026-09-25 · session 52, continued
 

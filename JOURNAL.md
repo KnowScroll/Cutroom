@@ -6369,3 +6369,122 @@ commit"_.
 
 **Next.** `PROMPTS/053` — two test reels. Then `PROMPTS/054` — `resume-failed`'s one approving read, then its build
 from Slice 1. The SDK question, when the owner returns to it.
+
+## 2026-09-25 — session 53: two real reels, a honeybee swarm and a tsunami, both completed after eight runs (PROMPTS/053)
+
+**Asked.** `PROMPTS/053`: two informative reels, told as a story, on harder subjects — how a honeybee swarm chooses its
+new home, and how a tsunami crosses an ocean — no code touched and no check run. The owner approved both briefs and
+added _"a person in danger"_ to the tsunami's never-show list. After the first two runs failed, the owner: _"we want to
+make the reel okay, so dont stop if it fails see why it failed then go again with fix. Note everything it should be
+seamless"_ — so every later failure was read from its own rows and run again, with a brief change when the brief was
+the cause, without asking.
+
+**The tsunami brief, word for word** — unchanged, completed on its second run. `worldId` `cutroom-tsunamis`; style
+`style-tsunamis` v1, _"realistic nature documentary footage, calm wide views from above and from the shore, clear
+daylight, steady camera"_; claims c1 supporting, c2 main, c3 main, c4 supporting; `policy-3`.
+
+1. _Far out at sea, the seabed jolts and lifts a hill of water._ — c1
+2. _Then a wave races away across the ocean._ — none
+3. _In deep water, a ship sails over it and barely rocks._ — c2
+4. _Yet under the ship, it moves as fast as a jet._ — c2
+5. _Near the coast, it reaches shallow water by a small island._ — c3
+6. _It slows, and rears up tall against the island._ — c3
+7. _On the beach, the sea pulls back, leaving a boat on sand._ — c4
+8. _Minutes later, the wave rolls in._ — none
+
+Must show: `show-hill` _"a low hill of water rising from the open sea, seen from high above"_ (c1); `show-ship` _"a ship
+on the open sea, seen from above"_ (c2); `show-island` _"a wave breaking against a small rocky island"_ (c3); `show-boat`
+_"a small boat lying on bare wet sand"_ (c4). Never show: `never-person` _"a recognisable real-world public figure"_,
+`never-text` _"written words or labels"_, `never-danger` _"a person in danger"_. A wave is a line and crosses the 9:16
+frame edge to edge (P-002), so every claimed sentence names a compact thing, and the two about the wave travelling
+carry no claim (P-008).
+
+**The honeybee brief, word for word, as it completed** (run `098e97fd`). `worldId` `cutroom-honeybees`; style
+`style-honeybees` v1, _"realistic nature documentary footage, close and warm, summer light, steady camera"_; claims c1
+supporting, c2 main, c3 main, c4 supporting; `policy-3`.
+
+1. _One summer morning, a ball of bees hangs from a branch._ — c1
+2. _It is half a colony, and it has no home._ — c1
+3. _A scout flies off to a small hole in a tree._ — c2
+4. _She walks in and out, checking it is dry and roomy._ — c2
+5. _Back on the swarm, she dances to point the way._ — c3
+6. _Nobody leads, but the best place wins more and more of the swarm._ — c3
+7. _Once they agree, the whole swarm lifts off._ — c4
+8. _It flies over the meadow, straight to its new home._ — c4
+
+Must show: `show-cluster` _"a cluster of honeybees hanging from a branch"_ (c1); `show-scout` _"a honeybee at a small
+hole in tree bark"_ (c2); `show-dancers` _"a cluster of honeybees on a branch"_ (c3); `show-flight` _"a swarm of
+honeybees flying through the air, seen from a distance"_ (c4). Never show: `never-person`, `never-text`, as above.
+**As the owner first approved it**, sentence 2 was _"Half a colony clings round its old queen, with no home."_,
+sentence 6 _"Nobody leads, but the best place wins more dancers."_, and c3 _"honeybees crowded close together, seen up
+close"_. Between, for one run: sentence 6 _"…wins more dancers on the swarm."_, c3 _"a close view of a cluster of
+honeybees on a branch"_. The three changes are below, each with the run that caused it.
+
+**The eight runs**, one at a time (D-002), each `flux-2-pro/edit`, `English_Graceful_Lady`, header `pictures
+upToThree`, estimate 18–53¢, `spend 250`. Cents by our receipts.
+
+- **`d4d6c562` honeybees, failed, 0¢, 118.2 s.** Plan 72.8 s, Gate 0 yes twice, four shots one claim each. In stills,
+  the status check of `a1-shot-2-a` threw at the network: _"…'s status did not reach the provider: fetch failed"_. No
+  `lost_call`: fal had the job, and may have billed 5¢ no row holds (**P-013**). Run again unchanged.
+- **`62b5a191` tsunamis, failed, 10¢, 161.7 s.** Plan 83.6 s; shot 0's picture (a dome of water in rings) accepted by
+  Gate 1; shot 1's (a container ship from overhead) made, and the witness closed its object one brace early —
+  `…"ambiguities":[…]},"unsafeDepictions":[]}`. The adapter marks a not-JSON answer `refused`, and `askStructured`
+  would ask again; `askWitness` asks again only an answer that parsed, so the run failed on the first ask (**P-014**,
+  `scripts/refused.mjs 62b5a191`). Run again unchanged.
+- **`d459f6f5` tsunamis, COMPLETED, 49¢, 623.7 s** — plan 61.3 s, stills 135.0 s, video 424.9 s. **36.5 s,
+  768×1366.** Plan b, six units (4.33) over a (4.0): [1, 2] hill, [3, 4] ship, [5] island, [6] island, [7] boat, [8]
+  hill — the planner gave the unclaimed last sentence the hill. Pictures: shot 0 the hill (canonical, two made, `a`
+  chosen), shot 1 the ship, shot 2 the island (derived, Gate 1S accepted); shots 3 to 5 from words. Clips 33.5, 23.5,
+  17.8, 10.3, 14.7 + 61.2, 9.3 s. **One retake**: shot 4's first take showed lettering (on the boat), `never-text`.
+  Gate 7 yes to all four. File `.artifacts/d459f6f5-2b20-419b-a398-3cf981f03741/a1-render.mp4`. The dome of water reads
+  a little like a whale's back in its first second.
+- **`9d0914dd` honeybees, stopped at Gate 7, 54¢, 821.3 s.** Six shots, all through Gates 2–5 — shot 3 on its second
+  take (a count), shot 5 on its third (_"show-flight not shown"_; then a count, a public figure and lettering). The cut,
+  35.9 s, was assembled, and Gate 7 said **no to _"Does every shot sit well beside the shot that follows it?"_**. Shot
+  3, made from words with only _"Dancing Bees"_ and _"honeybees crowded close together, seen up close"_, was bees on a
+  **yellow flower**, between the swarm on a thin branch and a swarm on a thick one (**P-015**). Change: c3 _"a close view
+  of a cluster of honeybees on a branch"_; sentence 6 _"…wins more dancers on the swarm."_
+- **`0ac13e84` honeybees, stopped, 15¢, 227.1 s.** The plan named a **Queen Bee** subject from sentence 2's _"old queen"_
+  and gave shot 0 the cluster and the queen: three pictures refused at Gate 1 (D-047) — a count (the cluster counted as
+  100 bees), then "Queen Bee is not shown" twice (**P-016**). The two earlier plans on the same sentence named no queen.
+  Change: sentence 2 _"It is half a colony, and it has no home."_
+- **`9bc5821e` honeybees, failed, 5¢, 121.4 s.** The picture `a1-shot-2-a` made, and downloading its file failed at the
+  network — recorded this time, one `lost_call`, 5¢ (P-013 recurred). Run again unchanged.
+- **`52c63f62` honeybees, stopped, 15¢, 205.1 s.** My change for P-015 caused P-002: a cluster **seen close** fills the
+  frame, and the plan's "Dancers" subject (named from "dancers") was clipped, not shown, then clipped with lettering.
+  Change: c3 _"a cluster of honeybees on a branch"_; sentence 6 _"…wins more and more of the swarm."_
+- **`098e97fd` honeybees, COMPLETED, 53¢, 693.2 s** — plan 90.2 s, stills 208.0 s, video 394.1 s. **37.1 s,
+  768×1366.** Plan b, six units (4.33) over a (3.0): [1, 2] cluster, [3, 4] scout, [5] dancers, [6] cluster, [7]
+  flight, [8] flight. Pictures: shot 0 the cluster (canonical, `b` chosen), shot 1 the scout; shot 4's flight (derived)
+  refused twice as clipped and made from words (S-043); shots 2 to 5 from words. Clips 26.1, 27.5, 18.1, 15.4, 12.4,
+  13.5 s, **no retake**. Gate 7 yes to all four. File `.artifacts/098e97fd-6e02-4867-b72d-a1c60c60d873/a1-render.mp4`.
+  In the lift-off shot the cluster sits among meadow flowers rather than on its branch.
+
+**Compared with `74bb96a0` (hurricanes).** Hurricanes: 653.4 s (plan 97, stills 197, video 359), 56¢, six shots, one
+picture made from words (P-012), no retake, Gate 7 yes. Tsunamis: 623.7 s (61, 135, 425), 49¢, six shots, one retake,
+Gate 7 yes. Honeybees: 693.2 s (90, 208, 394), 53¢, six shots, one picture made from words, no retake, Gate 7 yes. The
+same shape and about the same cost and time, once a run completes. **What it took to complete**: tsunamis two runs
+(59¢), honeybees six (142¢); **201¢ for the session**.
+
+**Observed.**
+
+- **Three of the six failures were the engine or the network, not a brief.** Two network errors (P-013) and one
+  malformed witness answer (P-014) each ended a run on one request; `resume-failed` would have kept each plan, and a
+  second look at the status, the file or the answer would have cost nothing. They are the reliability S-168 put first.
+- **The planner reads every noun.** The queen (P-016) and "dancers" (P-015's first fix) each became a subject the brief
+  never asked for. The same sentence named no queen in two plans of three: a brief rule has to hold for the reading it
+  gets once in three.
+- **A fix can re-open an old pitfall**: "a close view" solved the scene and broke the frame (P-002).
+- **The six-unit plan was chosen in five of the seven runs that planned** (the first honeybee and the first tsunami
+  runs chose four), and each gave single sentences their own shots — P-008's rule held: no criterion was asked of a
+  shot its sentence did not fit.
+- **`run-reader` mixed runs once**: its picture section for `62b5a191` quoted observations of lamps and keepers from
+  earlier runs — picture ids repeat across runs, and it did not filter by run. Its other sections were right; later
+  runs were read directly, read-only.
+
+**Why.** The prompt's test of the engine as it stands, and the owner's word to keep going until both reels were made.
+No code, no check and no test changed (CLAUDE.md rules 1 and 3): the engine findings are P-013 and P-014, waiting for a
+feature's gates. `scripts/real-reel.mjs` is put back as HEAD has it.
+
+**Next.** `PROMPTS/054`: `resume-failed`'s one approving read, then its build. P-013 and P-014 are small and in the same
+spirit — worth asking the owner whether they join `resume-failed` or become their own feature.

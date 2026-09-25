@@ -20,6 +20,10 @@ question to look at, or an owner's choice, before anything is built.
 
 | what                                                                                               | kind   | from         | state                                                                                                            |
 | -------------------------------------------------------------------------------------------------- | ------ | ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **A sentence naming a thing hidden inside the subject**: the queen in the swarm, never shown       | brief  | P-016        | brief-writing rule: name nothing inside, behind or hidden by the subject                                         |
+| **A criterion naming no scene**: a shot made from words drew bees on a flower; Gate 7 said no      | brief  | P-015        | brief-writing rule: a criterion and its sentences name the scene, not only the creature                          |
+| **A witness answer that is not JSON is never asked again**: one stray brace failed the run         | fix    | P-014        | a feature, not yet planned: `askWitness` asks again on a `Spent` carrying `refused`, as `askStructured` does     |
+| **One status check's connection error failed the run**, with the picture's job already at fal      | fix    | P-013        | a feature, not yet planned: check again on a connection error; `resume-failed` keeps the plan                    |
 | **A tall subject clipped by the 9:16 frame**: a palm tree refused twice at Gate 1, made from words | brief  | P-012        | brief-writing rule: frame a tall subject small, or from a distance                                               |
 | **Gate 7's caption question, judged from 18 frames, 13 of them silent**: refused a correct cut     | fix    | P-011        | owner (S-165): an exact comparison, `caption-match`'s gates next; a caller may resume a Gate 7 stop once (S-161) |
 | **An admitted image model whose frame never passes D-028**: nano-banana-2 at 1K, 768×1376          | fix    | P-010        | owner (S-165): nano-banana-2 and seedream leave the registry, planned with their amended checks                  |
@@ -38,6 +42,81 @@ question to look at, or an owner's choice, before anything is built.
 | Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness                 | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)                                                                 |
 
 ## Open
+
+### P-016 · brief · a sentence named a thing hidden inside the subject, and the plan made it a subject no picture shows
+
+- **Run** `0ac13e84…`, 2026-09-25 (session 53), honeybees, after P-015's fix, `flux-2-pro/edit`.
+- **What happened.** The chosen plan named four subjects — Bee Cluster, **Queen Bee**, Scout Bee, Swarm of Bees — and
+  gave shot 0 two of them: the cluster and the queen, from sentence 2, _"Half a colony clings round its old queen, with
+  no home."_ Shot 0's canonical picture failed Gate 1 three times and the reel stopped (D-047), **15¢**, 3.8 min:
+  picture a, _"Bee Cluster: the count seen does not match its name"_ — the witness counted the cluster as 100 bees,
+  and did see a queen; picture b and the repair, _"Queen Bee is not shown"_. The two earlier plans on the same sentence
+  named no queen, so it is the planner's reading, one time in three.
+- **Cause.** The brief. A queen inside a swarm is hidden by it; naming her in a sentence invites a subject that a
+  picture of the swarm cannot show whole.
+- **Done.** Sentence 2 is _"It is half a colony, and it has no home."_ The queen leaves the narration.
+- **For good.** Brief-writing: a sentence names nothing that is inside, behind or hidden by the subject. And a subject
+  made of many things — a cluster, a swarm — can be counted as one or as a hundred; the count rule refused one of three.
+
+### P-015 · brief · a criterion naming no scene: a shot made from words drifted, and Gate 7 said no
+
+- **Run** `9d0914dd…`, 2026-09-25 (session 53), honeybees, the brief as first approved, `flux-2-pro/edit`.
+- **What happened.** Six shots, every one passed Gates 2–5 (shot 3 on its second take, shot 5 on its third), the cut
+  was assembled — 35.9 s — and **Gate 7 answered no to _"Does every shot sit well beside the shot that follows it?"_**,
+  yes to its other three. The reel stopped (S-066, S-074). **54¢**, 13.7 min.
+- **Cause.** The brief. c3's criterion, _"honeybees crowded close together, seen up close"_, named bees and no place,
+  and sentence 6 — _"Nobody leads, but the best place wins more dancers."_ — named none either. Its shot had no picture
+  (three were spent on shots 0 to 2), so the video model had only those words and "Dancing Bees", and drew an extreme
+  close-up of bees on a **yellow flower** — between the swarm on a thin branch (shots 0 and 2) and a swarm on a thick
+  branch (shot 4). The judge is right that it does not sit beside either.
+- **Done, twice.** First, c3's criterion became _"a close view of a cluster of honeybees on a branch"_ and sentence 6
+  ended _"…wins more dancers on the swarm."_ — and on run `52c63f62…` the plan named a "Dancers" subject from
+  "dancers", and its three pictures were refused at Gate 1 (clipped, not shown, clipped): **a cluster seen close fills
+  the frame and is cut by its edge**, P-002 from the fix itself, 15¢. Then c3's criterion became _"a cluster of
+  honeybees on a branch"_ — whole, compact, the same swarm as c1 — and sentence 6 _"Nobody leads, but the best place
+  wins more and more of the swarm."_
+- **For good.** Brief-writing: a criterion and its sentences name the SCENE, not only the creature — a shot made from
+  words has nothing else to keep it in the reel's world. Recurring subjects help, since a derived picture keeps the look.
+
+### P-014 · engine · a witness answer that is not JSON is never asked again, and the run failed on one stray brace
+
+- **Run** `62b5a191…`, 2026-09-25 (session 53), tsunamis, the brief in the journal's session 53 entry,
+  `flux-2-pro/edit`.
+- **What happened.** Plan 83.6 s, Gate 0 accepted both plans. Shot 0's picture was made and accepted by Gate 1. Shot
+  1's picture, a container ship seen from overhead, was made (5¢), and the witness describing it closed its object one
+  brace early: `…"ambiguities":[…]},"unsafeDepictions":[]}`. The adapter refused it as not JSON, and **the run failed on
+  the first ask**, at 161.7 s: _"the witness call to MiniMax-M3 answered something that is not JSON … — and the call
+  had already spent (S-142)"_. **10¢**, two pictures, no clip. The answer is kept: `scripts/refused.mjs 62b5a191`.
+- **Cause.** The engine. The MiniMax adapter marks a not-JSON answer `refused` — the answer is at fault and asking
+  again could change it — and `askStructured` asks such a plan, score or reconcile once more (`ask-again`'s table). But
+  `askWitness` (`packages/pipeline/src/gates/witness.ts`) asks again only when the answer PARSED and the gate's schema
+  refused it; a `Spent` thrown by `observe` passes straight through. So the same fault is asked again for a planner and
+  fatal for a witness. The answer itself was otherwise whole and right: the ship, its containers, open sea from above.
+- **No brief can fix it.** For good, a feature with its gates: `askWitness` treats a `Spent` carrying `refused` as it
+  treats a refused shape — kept, and asked once more, told why. `resume-failed` would have kept the plan and shot 0's
+  accepted picture (S-157).
+
+### P-013 · provider + engine · one status check's connection error failed the run, with a job already at fal
+
+- **Run** `d4d6c562…`, 2026-09-25 (session 53), honeybees, the brief in the journal's session 53 entry,
+  `flux-2-pro/edit`.
+- **What happened.** Plan 72.8 s, Gate 0 accepted both plans: four shots, one per claim, no subject recurring. The
+  stills stage started, and 44.8 s in, a check on the status of its first picture, `a1-shot-2-a`, threw at the network:
+  _"the provider is unavailable: the picture a1-shot-2-a on 'fal-ai/flux-2-pro''s status did not reach the provider:
+  fetch failed"_. The run failed at 118.2 s. **0¢ by our receipts**; no `lost_call`, no picture row, no artifacts
+  folder. fal's queue answered normally a few minutes later.
+- **Cause.** The provider or the network, for one request. And the engine: `send()` in
+  `packages/providers/src/fal/queue.ts` classes a connection error as `Unavailable`, and nothing retries an image call
+  (S-096, S-122), so a failed check on a job fal had **already accepted** ends the run. The check is a read of that
+  job; asking it again sends no second job and buys nothing.
+- **Perhaps spent, and not recorded.** fal had the job. If fal went on and made the picture, it billed 5¢ — a single
+  `flux-2-pro` picture — that no receipt holds; our rows cannot say. Only fal's own usage page can.
+- **No brief can fix it.** For good, a feature with its gates: a status check that fails on a connection error is asked
+  again within the job's wait, since the job exists. And `resume-failed` would have kept the plan (S-157).
+- **Recurred** on run `9bc5821e…`, the same session and reel, 121.4 s in: the picture was made, and **downloading its
+  file** failed at the network (_"…'s file did not reach the provider: fetch failed — and the call had already spent"_).
+  That half is recorded — one `lost_call`, 5¢ — as `paid-failures` meant; the download is a read of a file that exists,
+  and asking again would buy nothing either. fal's file host resolved normally a minute later.
 
 ### P-012 · brief · a tall subject clipped by the frame — the palm tree's picture refused twice
 
