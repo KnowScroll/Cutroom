@@ -1198,7 +1198,7 @@ slices; the three product statements corrected. The approving round goes to a fr
 ## Gate review 11 — 2026-09-25, a fresh reviewer; the last round, at the owner's word
 
 **5 findings; all four gates NOT APPROVED.** The owner, after ten rounds: fix what this round finds and stop — the
-approving read opens `PROMPTS/054`, before any code. Every finding is fixed here; none needed the owner.
+approving read opens `PROMPTS/055`, before any code. Every finding is fixed here; none needed the owner.
 
 1. **Check 42's `answers()` in `_lib.mjs` would break the strict typecheck and hand check 20's file a way to start a
    process.** **Fixed:** `scripts/_answers.mjs` with its declaration, importing nothing, tested in

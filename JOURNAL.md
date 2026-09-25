@@ -6540,3 +6540,10 @@ owns — looking again, asking again, resuming, planning again, asking for a pic
 picture for a shot made from words — and a change to the brief goes back to the caller as a proposal. And the two reels
 are to be made again as explanations, on new subjects: the canonical story of JoJo's Bizarre Adventure, and how video
 game graphics have evolved, with examples.
+
+**And the hand-over.** The owner approved both explainer briefs — video game graphics, with Nvidia's part added at
+their word (the GeForce two fifty six of 1999, sold as the first graphics processing unit; real-time ray tracing in
+2018; deep learning filling in detail — RTX and DLSS written out, P-001), and JoJo's Bizarre Adventure's canonical
+story, its pictures of real places and objects and never a character's likeness — and asked for them in a new session,
+for cost: this one's context is large, and every stage event of a run re-reads it (S-160). **`PROMPTS/054`** holds both
+briefs word for word, the healing loop and what to note; no test. `resume-failed` is renumbered **`PROMPTS/055`**.

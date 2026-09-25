@@ -21,12 +21,13 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
-  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 054**: `resume-failed` (S-161 to S-164). **Planned, gates not
+  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 055**: `resume-failed` (S-161 to S-164). **Planned, gates not
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**, in the owner's order — reliability before speed (S-168, S-169): `PROMPTS/054` — `resume-failed`'s one
-  approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
+- **Next**: `PROMPTS/054` — two explainer reels, video game graphics then JoJo's Bizarre Adventure, briefs approved,
+  each failed run healed by hand until it completes; no test. Then, in the owner's order — reliability before speed
+  (S-168, S-169): `PROMPTS/055` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
   failed run with what the engine owns, never its code or gates, and the caller's brief only by proposal (D-096). Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
@@ -86,6 +87,8 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 - `docs/research/refusals.md` — new: every refusal of the 41 real runs, counted and listed, read from the database.
   42% of pictures refused, 30 of 36 for clipping; no clip made from a picture ever refused, 16 of 49 made from words.
+- `PROMPTS/054` — new: two explainer reels, briefs approved; `resume-failed` renumbered 055 (and its feature file's
+  pointer). `PROMPTS/README.md` — the rows and a note.
 - `DECISIONS.md` — S-169: `self-heal`, a healer inside the engine, planned right after `resume-failed` (supersedes S-168
   in part). `docs/features/self-heal.md` — new, planned, gates not written.
 - The owner: reels are to explain — facts, causes, plain words — not tell a story; the story tone was `PROMPTS/053`'s,

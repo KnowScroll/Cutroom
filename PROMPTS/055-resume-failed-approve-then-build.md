@@ -1,12 +1,13 @@
-# 054 — `resume-failed`: one approving read of its gates, then its build, slice by slice
+# 055 — `resume-failed`: one approving read of its gates, then its build, slice by slice
 
-- **For:** session 54
+- **For:** session 55
 - **Feature:** `resume-failed` (S-157, S-161 to S-164)
 - **Work:** one fresh approving read of the four gates — its findings fixed, not another open round — then the build
   from Slice 1, each slice committed after the full check.
 - **Written:** 2026-09-25, at the end of session 52, when the owner put `resume-failed` ahead of `parallel-shots`
   (S-168). This file held `parallel-shots`' gates until then; that text is at `b15d203`, carried to the session that
-  writes them. Written as 053, renumbered 054 when the owner put two test reels first (`PROMPTS/053`).
+  writes them. Written as 053, renumbered 054 when the owner put two test reels first (`PROMPTS/053`), and 055 when
+  the owner put two explainer reels first (`PROMPTS/054`).
 - **Run:** not yet
 
 **Where things stand.** Session 52 wrote `resume-failed`'s four gates — 44 checks in 7 slices — on twenty-two owner
