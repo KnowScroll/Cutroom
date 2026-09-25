@@ -424,6 +424,10 @@ criteria texts; headless Chrome is a machine dependency like ffmpeg; and **A and
 `docs/features/composed-hold.md` first, then `docs/features/diagram-shots.md`, each planned, gates not written.
 Questions 1 and 3 stay open.
 
+**Answered 2026-09-25 (S-167), question 1:** yes — the engine makes three kinds of reel: footage, hybrid (drawn shots
+cut between clips, `diagram-shots`) and code-only, `docs/features/code-reels.md` (planned). **F is deferred, not
+rejected**: `docs/features/clip-overlays.md`, kept for later. Question 3 stays open, for `code-reels`' product gate.
+
 If A is chosen, the next step is a feature file in `docs/features/` — the name `composed-hold` is a suggestion — with
 the four gates written and adversarially reviewed before any code (CLAUDE.md rule 1), and the S- entries it would need:
 the new port, Chrome as a dependency, and the part of D-059 and S-097 it supersedes.

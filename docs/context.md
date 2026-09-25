@@ -21,11 +21,15 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
-  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 054**: `resume-failed` (S-161 to S-164). **Planned, gates not
-  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `video-edits`.
-- **Next**: `PROMPTS/053` — `parallel-shots`' gates (S-115), at most three review rounds before asking the owner. Then
-  054 — `resume-failed`'s one approving read, then its build, slice by slice.
-  Then `caption-match`'s gates, the registry change S-165 decided, `composed-hold`'s and `diagram-shots`' gates.
+  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 053**: `resume-failed` (S-161 to S-164). **Planned, gates not
+  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `video-edits`,
+  `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
+- **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
+- **Next, in the owner's order — reliability before speed (S-168)**: `PROMPTS/053` — `resume-failed`'s one approving
+  read, then its build, slice by slice. Then `caption-match`'s gates and build, with the registry change S-165 decided.
+  Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
+- **Parked by the owner**: how KnowScroll uses the engine — an `@cutroom/sdk` package that starts the service, or an
+  in-process library against D-098. Nothing decided; the journal's session 52 (S-167) entry has the options.
 - **Reviews answered** (S-165): P-011's caption question gets an exact comparison (`caption-match`); P-010's two
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
@@ -67,10 +71,18 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-09-25 · session 52, continued
+
+- `DECISIONS.md` — S-167: three kinds of reel; code-only reels planned; graphics over clips deferred, not rejected
+  (supersedes S-166 in part). `docs/features/code-reels.md` — new, planned, three owner questions before its product
+  gate. `docs/features/clip-overlays.md` — new, deferred. `docs/research/hyperframes.md` §8 — question 1 answered.
+- `DECISIONS.md` — S-168: the order, reliability before speed. `PROMPTS/053` — rewritten: `resume-failed`'s approving
+  read, then its build; `parallel-shots`' text kept at `b15d203`. `PROMPTS/README.md` — its row and a note.
+
 ### 2026-09-25 · session 52
 
 - `docs/features/resume-failed.md` — four gates, 44 checks, 7 slices; eleven review rounds, round 10 would approve, round
-  11's five findings fixed, the approving read in 054 (the owner stopped the review). S-161 to S-164 (DECISIONS.md).
+  11's five findings fixed, the approving read in 053 since S-168 (the owner stopped the review). S-161 to S-164 (DECISIONS.md).
 - `docs/features/caption-match.md`, `composed-hold.md`, `diagram-shots.md` — new, planned, gates not written (S-165,
   S-166). S-165: P-011 exact comparison, P-010 two registry entries to go, P-003 accepted. `docs/reel-pitfalls.md`'s
   short list; `docs/research/hyperframes.md` §8 answered. `PROMPTS/053` — `parallel-shots`' gates.

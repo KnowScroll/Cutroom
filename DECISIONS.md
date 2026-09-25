@@ -7265,3 +7265,83 @@ for labels; Chrome deferred.
 like ffmpeg.
 
 ---
+
+## S-167 | 2026-09-25 | The engine makes three kinds of reel — footage, hybrid and code-only; code-only reels become a planned feature; and graphics over a generated clip is kept for later, not rejected
+
+**Chose.** The owner's answers of 2026-09-25, given after S-166:
+
+- **Three kinds of reel.** **Footage** — every shot a video model's clip, as built (`paid-path`). **Hybrid** — shots
+  drawn by code cut between clips, which is `diagram-shots` (S-166, `docs/research/hyperframes.md` §4 C).
+  **Code-only** — every shot drawn by code, no picture or clip bought: the way sessions 50 and 51 made the CPU and
+  jet-engine reels, outside the engine.
+- **Code-only reels become a feature, `code-reels`** (`docs/features/code-reels.md`), planned here with four gates
+  before any code (CLAUDE.md rule 1). Its gates follow `composed-hold`'s and `diagram-shots`', whose port, Chrome
+  adapter, stand-in and startup check it reuses.
+- **Graphics over a generated clip (§4 F) is deferred, not rejected**: kept as `clip-overlays`
+  (`docs/features/clip-overlays.md`), with no gates written and no place in the queue until the owner gives it one.
+  S-166's reasons stand, as the problems its gates must answer: a line into generated footage must follow a moving
+  camera (230 px across one shot of the hybrid), and a label names what the footage may not show.
+- **The research's §8 question 1 is answered**: a reel may look like motion graphics — wholly (code-only) or in part
+  (hybrid) — and not only where a shot would otherwise stop the reel.
+
+**Supersedes, in part, in S-147's form:** **S-166**'s _"Graphics over real clips (§4 F) is not chosen"_ becomes
+_"Graphics over real clips (§4 F) is deferred, as `clip-overlays`"_, and _"Graphics over clips (§4 F)"_ leaves its
+**Rejected** list. Everything else S-166 says stands.
+
+**Left open, for `code-reels`' product gate** — each the owner's, asked before that gate is written:
+
+1. **How a reel's kind is chosen**: the caller asks for one — a contract field, so an amendment to version 1 in
+   S-034's form or a version 2 — or the planner chooses, shot by shot.
+2. **Who writes a code-only reel's shots**: vetted templates only (`diagram-shots`' set, grown), or a model writing
+   each shot's code (§4 D). The owner likes §4 D; the research puts it after A and C, for its risks — Chrome launched
+   with `--no-sandbox` and no request interception, a brief that could steer the code, quality that varies from run to
+   run — and the engine's model port answers from MiniMax, which has never written a composition. Sessions 50 and 51's
+   were written by Claude, and a person checked their frames.
+3. **The voice**: the paid narration, or a free one (§8 question 3, still open).
+
+**Why.** Sessions 50 and 51 showed a reel drawn by code exact where no video model is — labels spelled right, a
+diagram that holds its shape, motion that lands on a spoken word — and buying nothing but its narration. Graphics over
+a clip gives what neither makes alone, the model's realism and code's precision; what stopped it is the cost of
+following a camera and the checking of a label, which are problems for gates to answer, not reasons to discard it.
+
+**Rejected** (put to the owner). No code-only reels, as S-166 left the queue. Graphics over clips rejected for good, as
+S-166 wrote it.
+
+**Caught by.** `docs/features/code-reels.md` and `docs/features/clip-overlays.md`, each with every gate pending:
+`tests/feature-files.test.ts` reads both, and `scripts/journey.mjs` refuses either until its four gates are approved.
+Nothing is built.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52: _"we need all three types of reels (current, hybrid, code
+only)"_, and graphics over a generated clip kept _"as something that can be done in the future"_.
+
+---
+
+## S-168 | 2026-09-25 | Reliability before speed: `resume-failed` is built next, then `caption-match` and the registry change, then the code-drawn reels; `parallel-shots` waits until after them
+
+**Chose.** The order of the next work, at the owner's word:
+
+1. **`resume-failed`** — its one approving read, then its build, slice by slice. `PROMPTS/053` is rewritten for it.
+2. **`caption-match`** (S-165) — its gates and build — **and the registry change S-165 decided**, with its amended
+   checks, `test-impact` first.
+3. **`composed-hold`, `diagram-shots`, `code-reels`** (S-166, S-167), in that order.
+4. **`parallel-shots`** (S-115) — its gates after those. The prompt written for them (`PROMPTS/053` at `b15d203`) is
+   carried to the session that writes them, its figures brought up to date.
+
+**Why.** The real runs since the black-holes world: twelve, two completed. Of the ten that ended early, three were a
+provider's fault (P-009 twice, P-001) — what `resume-failed` answers; one was a correct cut stopped at Gate 7's caption
+question, the whole reel's 55¢ (P-011) — what `caption-match` answers; one was a registry entry that cannot make the
+frame (P-010). The other five were answered by features since verified (`ask-again`, `cut-rules`) or accepted (P-003).
+What still ends a reel is what the first two answer. `resume-failed`'s gates are written and one read from approval
+(round 10 would have approved all four), and they go stale while other work lands. `parallel-shots` buys time alone —
+the video stage is 359 s of run `74bb96a0`'s 10.9 minutes — while no caller waits on it, and it changes D-002's one
+job at a time.
+
+**Rejected** (put to the owner). `parallel-shots`' gates next, as session 51 ordered and the old `PROMPTS/053` wrote;
+the code-drawn reels before `caption-match`, taking new kinds of reel over the last known way a correct reel is thrown
+away.
+
+**Caught by.** `docs/context.md`'s **Next**, which the session start prints, and `PROMPTS/053`; nothing in code.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52: _"yes swap the order and commit"_.
+
+---

@@ -6325,3 +6325,43 @@ ultracode on, _"continue"_.
 
 **Next.** `PROMPTS/053`, `parallel-shots`' gates — with at most three review rounds before asking the owner. Then
 054: `resume-failed`'s one approving read, then its build.
+
+## 2026-09-25 — session 52, continued: three kinds of reel, graphics over clips kept for later, and reliability before speed (S-167, S-168)
+
+**Asked.** No prompt file: the owner's questions — how KnowScroll will use the engine, what is next, and where
+Hyperframes and the hybrid reels stand — then _"we need all three types of reels (current, hybrid, code only)"_, and
+graphics over a generated clip kept for the future. Then which feature is best next, and _"yes swap the order and
+commit"_.
+
+**Changed.**
+
+- **S-167** — three kinds of reel: footage (as built), hybrid (`diagram-shots`) and code-only. Code-only reels become
+  `docs/features/code-reels.md` (planned, gates not written, after `composed-hold` and `diagram-shots`). Graphics over
+  a generated clip (research §4 F) is deferred, not rejected: `docs/features/clip-overlays.md`, no place in the queue.
+  Supersedes S-166's rejection of §4 F, in part. Research §8 question 1 answered.
+- **`docs/research/hyperframes.md`** §8 — the answer noted. **`docs/context.md`** — the planned list and this entry.
+- **S-168** — the order: `resume-failed` (approve, then build), then `caption-match` with the registry change, then
+  `composed-hold`, `diagram-shots`, `code-reels`, then `parallel-shots`' gates. **`PROMPTS/053`** rewritten for
+  `resume-failed`; the `parallel-shots` text stays at `b15d203`. `PROMPTS/README.md` — its row and a note.
+
+**Observed.**
+
+- **The engine is not an SDK today.** D-098 made it a service KnowScroll calls over loopback HTTP; KnowScroll installs
+  only `@cutroom/reel-contract` — types, schemas, the version, no functions. No client, no launcher, and the package is
+  private, `0.0.0`, exporting `.ts`; how KnowScroll obtains it was left open by D-099 and never decided. Put to the
+  owner as A (an `@cutroom/sdk` package that starts the service as a child and wraps the routes; D-098 stands) or B (an
+  in-process library, reversing D-098), and whether KnowScroll always shares the machine. **The owner parked it** —
+  nothing written.
+- **I told the owner three things were rejected when only one was**: §4 F was the owner's (S-166); §4 D (model-written
+  compositions) and Hyperframes as the assembler were the research's advice, never put to the owner. Corrected in the
+  conversation.
+- **The owner likes §4 D.** Left open for `code-reels`' product gate with templates-only as the alternative, beside how
+  a reel's kind is chosen (caller or planner) and the voice (paid or free).
+- **What still ends a reel**, read from docs/context.md's runs: twelve since the black-holes world, two completed; of
+  the ten others, three a provider's fault, one Gate 7's caption question on a correct cut, one a registry entry, five
+  answered since by verified features or accepted. Hence S-168.
+
+**Why.** CLAUDE.md rule 2: a choice between real alternatives is written, with what was rejected.
+
+**Next.** `PROMPTS/053` — `resume-failed`'s one approving read, then its build from Slice 1. The SDK question, when the
+owner returns to it.
