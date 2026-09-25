@@ -20,6 +20,10 @@ question to look at, or an owner's choice, before anything is built.
 
 | what                                                                                               | kind   | from         | state                                                                                                            |
 | -------------------------------------------------------------------------------------------------- | ------ | ------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **This machine's DNS times out on fal's IPv6 lookup**: 11 s, past fetch's 10 s, so "fetch failed"  | fix    | P-020        | the machine's DNS, the owner's; the engine: ask again on a connection error (P-013), `resume-failed`             |
+| **A sentence naming a real game put its character in the picture**: `never-character` refused it   | brief  | P-019        | brief-writing rule: where a work is named, the criterion names a scene without its characters                    |
+| **A plural criterion id became a subject's name**: `show-polygons` failed the count on one screen  | brief  | P-018        | brief-writing rule: a criterion's id is a singular noun for one whole thing                                      |
+| **Objects that carry lettering in life**: a card's brand, a bezel, a desktop, a city's signs       | brief  | P-017        | brief-writing rule: made objects unbranded, a screen shows only its image, a place seen from far                 |
 | **A sentence naming a thing hidden inside the subject**: the queen in the swarm, never shown       | brief  | P-016        | brief-writing rule: name nothing inside, behind or hidden by the subject                                         |
 | **A criterion naming no scene**: a shot made from words drew bees on a flower; Gate 7 said no      | brief  | P-015        | brief-writing rule: a criterion and its sentences name the scene, not only the creature                          |
 | **A witness answer that is not JSON is never asked again**: one stray brace failed the run         | fix    | P-014        | a feature, not yet planned: `askWitness` asks again on a `Spent` carrying `refused`, as `askStructured` does     |
@@ -42,6 +46,70 @@ question to look at, or an owner's choice, before anything is built.
 | Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness                 | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)                                                                 |
 
 ## Open
+
+### P-020 · network · this machine's DNS times out on fal's IPv6 lookup, and every call to fal fails as "fetch failed"
+
+- **Runs** `1496bbb9…` and `fdff208b…`, 2026-09-25 (session 54), game graphics, `flux-2-pro/edit`; perhaps also
+  `cd9648c9…` and `a469e36b…`, the same reel, whose MiniMax calls failed the same way.
+- **What happened.** Each run planned (76.5 s, 100.9 s) and failed on its **first picture**: _"the provider is
+  unavailable: the picture a1-shot-1-a on 'fal-ai/flux-2-pro' did not reach the provider: fetch failed"_. 0¢ each. The
+  two before failed on MiniMax: `cd9648c9` the planner, `a469e36b` the witness (51¢ spent), each _"did not reach the
+  provider: fetch failed"_ at all 3 sends (I-11, S-096).
+- **Cause, read on this machine.** Node's `dns.lookup('queue.fal.run')` takes **11,056 ms**; with `family: 4`, 1 ms.
+  `nslookup -type=AAAA queue.fal.run` answers _"DNS request timed out"_; `curl` reaches fal in 11.8 s, and with `-4` in
+  0.78 s. The DNS server does not answer the IPv6 question for fal's host, and Node waits for it — past `fetch`'s 10 s
+  connect timeout. `fal.media` took 11 s to be not found; `v3.fal.media` 64 ms; `api.minimax.io`, which has IPv6
+  addresses, 60 ms when checked — so the two MiniMax failures are not explained by this lookup, only placed beside it.
+  The same machine made 13 calls to fal without a fault 40 minutes earlier (`a1cb6cfb`). Checked every minute for the
+  30 minutes after, it stayed at 11 s.
+- **No brief can fix it, and no code was changed** (the prompt forbids it). The owner was told at the third failure.
+- **For good.** The machine: a DNS server that answers IPv6 questions, or a different network. The engine, a feature
+  with its gates: a connection error before a request is sent is asked again (P-013's fix), and `resume-failed` keeps
+  the plan and what was made (S-157).
+
+### P-019 · brief · a sentence naming a real game put its character in the picture
+
+- **Run** `a469e36b…`, 2026-09-25 (session 54), game graphics, after P-017's first fix.
+- **What happened.** Shot 0's picture, for _"In nineteen seventy two, Pong was two paddles and a ball."_ and _"By
+  nineteen eighty five, Super Mario Bros drew whole worlds in pixels."_, was refused at Gate 1 for lettering; its repair
+  for lettering and _"must never show "never-character" is shown: a recognisable character from a real video game, comic
+  or anime"_. The shot was made from words (S-043) and its clip passed Gates 2 to 5.
+- **Cause.** The brief. Every sentence of a shot goes into its picture prompt ("What is said over the shot"), so a
+  sentence naming a game names its hero to the image model, which draws him — the thing `never-character` forbids.
+- **For good.** Brief-writing: where a work's name is spoken, the criterion names a scene without its characters — a
+  landscape of blocks, a paddle and a ball — and a picture refused for a character is answered by the criterion, never by
+  the fact.
+
+### P-018 · brief · a plural criterion id became a subject's name, and one screen failed the count rule
+
+- **Run** `a1cb6cfb…`, 2026-09-25 (session 54), game graphics, the brief as approved. **Stopped at Gate 5, 75¢**, 14.6
+  min.
+- **What happened.** The chosen plan named its four subjects by the criteria's ids — `show-tv`, `show-polygons`,
+  `show-card`, `show-monitor` — and gave `show-polygons` with `show-card` to shots 1 and 2. The witness saw one monitor
+  and the reconciler answered _"subject "s2" (show-polygons): the count seen does not match its name"_ on a picture and on
+  five of six clips. Shot 2, made from words after its picture was refused (no reserve slot, S-043), failed all three
+  takes on the count and on lettering and could not be held (D-050): _"shot-2's three takes failed their checks"_.
+- **Cause.** The brief, through the planner. An id is a name the planner may use as it is; `show-polygons` reads as
+  many things, and one screen is one. The other plan of the same run named the same subject "Low-Polygon 3D Screen".
+- **Done.** The id became `show-screen`. The next run's plan named it "Low-Polygon 3D Screen", and no count was refused.
+- **For good.** Brief-writing: a criterion's id is a singular noun for one whole thing. And two claims in one unit give
+  a shot two subjects to hold whole: sentences 3 (c2) and 4 (c3) were joined, and the card was clipped twice beside the
+  screen on the next run (P-002).
+
+### P-017 · brief · things that carry lettering in life — a card's brand, a monitor's bezel, a desktop, a city — refused as `never-text`
+
+- **Runs** `a1cb6cfb…` and `a469e36b…`, 2026-09-25 (session 54), game graphics.
+- **What happened.** On the first run, 5 of 6 pictures and 5 of 6 clips were refused for _"must never show "never-text"
+  is shown: written words or labels"_. The witness read a brand on a monitor's bezel (_"TELECAP"_), desktop icons and a
+  taskbar on a screen, _"STRIX"_ on a graphics card, and signs on the buildings of a rendered city. On the next run,
+  with the fix below, 3 of 6 pictures: the monitor's first, and shot 0's television (a pixel game's lettering) twice.
+- **Cause.** The brief. A graphics card, a monitor, a desktop and a city carry words in life, and the image model draws
+  them — more so when the narration names a brand (_"Nvidia's GeForce two fifty six"_) that goes into the prompt.
+- **Done.** The criteria became _"a screen showing only simple low-polygon three-dimensional graphics"_, _"an unbranded
+  computer graphics card"_ and _"an unbranded modern monitor showing a lifelike rendered city skyline"_; no fact moved.
+  The card and the monitor were not refused for lettering again; the monitor's first picture and the television were.
+- **For good.** Brief-writing: a criterion for a made object says it is unbranded, a screen shows only its image, and a
+  place is seen from a distance where no sign can be read. `never-text` stays (P-011's reel carries its words by code).
 
 ### P-016 · brief · a sentence named a thing hidden inside the subject, and the plan made it a subject no picture shows
 

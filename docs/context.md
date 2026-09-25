@@ -25,8 +25,9 @@ git and the journal keep them.
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `PROMPTS/054` — two explainer reels, video game graphics then JoJo's Bizarre Adventure, briefs approved,
-  each failed run healed by hand until it completes; no test. Then, in the owner's order — reliability before speed
+- **Next**: `PROMPTS/054` again, in a new session — session 54 made five runs of the game graphics reel and none
+  completed: one stop its brief caused (P-017, P-018, fixed), then this machine's DNS stalling 11 s on fal's host (P-020);
+  JoJo never ran. Run once fal's host resolves fast. Then, in the owner's order — reliability before speed
   (S-168, S-169): `PROMPTS/055` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
   failed run with what the engine owns, never its code or gates, and the caller's brief only by proposal (D-096). Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
@@ -48,6 +49,11 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 
 | run        | UTC date   | world           | ending               | ¢   | what ended it                                                           |
 | ---------- | ---------- | --------------- | -------------------- | --- | ----------------------------------------------------------------------- |
+| `fdff208b` | 2026-09-25 | game-graphics   | failed               | 0   | the first picture: fetch failed — this machine's DNS (P-020)            |
+| `1496bbb9` | 2026-09-25 | game-graphics   | failed               | 0   | the first picture: fetch failed — this machine's DNS (P-020)            |
+| `a469e36b` | 2026-09-25 | game-graphics   | failed               | 51  | the witness: fetch failed at 3 sends; a character drawn (P-019)         |
+| `cd9648c9` | 2026-09-25 | game-graphics   | failed               | 0   | the planner: fetch failed at 3 sends                                    |
+| `a1cb6cfb` | 2026-09-25 | game-graphics   | stopped              | 75  | Gate 5, shot 2's three takes: a plural id, lettering (P-018, P-017)     |
 | `098e97fd` | 2026-09-25 | honeybees       | completed            | 53  | the brief changed three times; shot 4 made from words (clipped flight)  |
 | `52c63f62` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a cluster seen close, clipped (P-015, P-002)        |
 | `9bc5821e` | 2026-09-25 | honeybees       | failed               | 5   | a made picture's file: fetch failed (P-013)                             |
@@ -82,6 +88,17 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-26 · session 54
+
+- Five real runs of the game graphics reel, none completed, 126¢: `a1cb6cfb` stopped at Gate 5 (a plural criterion id
+  as a subject's name; lettering on hardware), then four failed on the network — the last two read to this machine's DNS,
+  which takes 11 s on fal's IPv6 lookup against fetch's 10 s. JoJo never ran. The Runs table above; every run and brief
+  B as it last ran in `JOURNAL.md`.
+- `docs/reel-pitfalls.md` — P-017 to P-020 (lettering on objects that carry it; a plural id; a named game's character;
+  the DNS) and their short-list rows. `docs/research/refusals.md` — counts and ledger to 46 runs; the first
+  image-to-video takes refused.
+- `PROMPTS/054` and `PROMPTS/README.md` — the Run line. `scripts/real-reel.mjs` put back as HEAD has it.
 
 ### 2026-09-25 · session 53, continued
 

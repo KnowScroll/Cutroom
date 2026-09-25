@@ -44,7 +44,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 051 | [051-changed-checks-then-parallel-reels.md](051-changed-checks-then-parallel-reels.md) | —               | checks, then two reels at once | 2026-09-25 | session 51 |
 | 052 | [052-resume-failed-gates-then-reviews.md](052-resume-failed-gates-then-reviews.md)     | `resume-failed` | gates, then the reviews        | 2026-09-25 | session 52 |
 | 053 | [053-two-test-reels.md](053-two-test-reels.md)                                         | —               | two reels, no code touched     | 2026-09-25 | session 53 |
-| 054 | [054-two-explainer-reels.md](054-two-explainer-reels.md)                               | —               | two explainer reels, healed    | 2026-09-25 | not yet    |
+| 054 | [054-two-explainer-reels.md](054-two-explainer-reels.md)                               | —               | two explainer reels, healed    | 2026-09-25 | session 54 |
 | 055 | [055-resume-failed-approve-then-build.md](055-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.

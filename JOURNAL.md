@@ -6547,3 +6547,89 @@ their word (the GeForce two fifty six of 1999, sold as the first graphics proces
 story, its pictures of real places and objects and never a character's likeness — and asked for them in a new session,
 for cost: this one's context is large, and every stage event of a run re-reads it (S-160). **`PROMPTS/054`** holds both
 briefs word for word, the healing loop and what to note; no test. `resume-failed` is renumbered **`PROMPTS/055`**.
+
+## 2026-09-26 — session 54: five runs of the video game graphics reel, none completed — one brief cause, then this machine's DNS (PROMPTS/054)
+
+**Asked.** `PROMPTS/054`: two explainer reels from the engine as it stands — how video game graphics evolved, then the
+canonical story of JoJo's Bizarre Adventure — briefs approved by the owner, each failed run healed without asking; no
+code, no test, no `check.mjs` code run. Rule 3's last line: _"the same cause no brief can fix, three times on one reel:
+stop, and tell me."_
+
+**Brief B, the video game graphics reel, word for word as it last ran** (runs `cd9648c9` to `fdff208b`). `worldId`
+`cutroom-game-graphics`; style `style-game-graphics` v1, _"clean documentary footage, soft natural light, steady
+camera"_; claims c1 supporting, c2 supporting, c3 main, c4 main; `policy-3`.
+
+1. _In nineteen seventy two, Pong was two paddles and a ball._ — c1
+2. _By nineteen eighty five, Super Mario Bros drew whole worlds in pixels._ — c1
+3. _Then games moved into three dimensions, built from polygons._ — c2
+4. _In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit._ — c3
+5. _It lit and moved every triangle itself, freeing the main processor._ — c3
+6. _In twenty eighteen, Nvidia brought real time ray tracing to games._ — c4
+7. _It follows each beam of light as it bounces through a scene._ — c4
+8. _Deep learning now fills in detail, so games look almost like film._ — c4
+
+Must show: `show-tv` _"an old television showing blocky pixel game graphics"_ (c1); `show-screen` _"a screen showing
+only simple low-polygon three-dimensional graphics"_ (c2); `show-card` _"an unbranded computer graphics card"_ (c3);
+`show-monitor` _"an unbranded modern monitor showing a lifelike rendered city skyline"_ (c4). Never show: `never-person`
+_"a recognisable real-world public figure"_, `never-text` _"written words or labels"_, `never-character` _"a
+recognisable character from a real video game, comic or anime"_. **As the owner approved it** (run `a1cb6cfb`), c2 was
+`show-polygons` _"a screen showing simple low-polygon three-dimensional graphics"_, c3 _"a computer graphics card"_, c4
+_"a modern monitor showing a lifelike rendered city scene"_. No sentence changed.
+
+**Brief A, JoJo's Bizarre Adventure, was never run** — it is in `PROMPTS/054` word for word, unchanged.
+
+**The five runs**, one at a time (D-002), each `flux-2-pro/edit`, `English_Graceful_Lady`, header `pictures
+upToThree`, estimate 18–53¢, `spend 250`. Cents by our receipts; **126¢ in all**.
+
+- **`a1cb6cfb` stopped at Gate 5, 75¢, 873.9 s** — plan 68.7 s, stills 304.6 s, video 498.8 s. Plan b, six units
+  (3.67) over a (3.0): [1, 2] tv, [3, 4] polygons and card, [5] polygons and card, [6] card and monitor, [7] monitor,
+  [8] card and monitor — **its subjects named by the criteria's ids**. Pictures, 39¢: shot 1's canonical `a` refused
+  (_"subject "s2" (show-polygons) is clipped by the edge of the frame"_), `b` refused (lettering: desktop icons, a bezel
+  brand), the repair accepted; shot 3's derived picture refused twice (the card clipped and lettering, then lettering —
+  signs in the rendered city), made from words; shot 2's refused once (_"the count seen does not match its name"_ and
+  lettering), no reserve slot, made from words; shot 0 no picture. Clips, 36¢: shot 0 passed Gates 2–5; **shot 1's
+  three image-to-video takes all failed Gate 5** (the count on `show-polygons` and lettering) and the shot was held on
+  its picture (D-025, S-090) — the first image-to-video refusals of any real run; **shot 2's three takes failed Gate 5**
+  on the same two, _"STRIX"_ read on the card, and a shot made from words cannot be held (D-050): the reel stopped.
+  Clips 23.2, 33.1, 158.7, 231.1, 14.0, 62.8, 125.0 s. **Change 1** (P-017, P-018): `show-polygons` became
+  `show-screen`, and the three criteria above say "only" and "unbranded", and a skyline for a city scene.
+- **`cd9648c9` failed at plan, 0¢, 128.1 s**: _"the planner call was answered unavailable at each of its 3 sends, the
+  last saying "the planner call to MiniMax-M2.7 did not reach the provider: fetch failed""_. Run again unchanged.
+- **`a469e36b` failed in video, 51¢, 684.3 s** — plan 123.5 s, stills 289.2 s, video 269.3 s. Plan b, six units (3.5)
+  over a (3.0): [1, 2] tv, [3, 4] screen and card, [5] card, [6] [7] [8] monitor, the subjects named as things this time
+  ("Low-Polygon 3D Screen"); no count was refused. Pictures, 36¢: shot 3's monitor canonical `a` refused (lettering),
+  `b` accepted (the witness's first answer gave a count as a string, asked again and parsed); shot 1's derived picture
+  refused twice, the card clipped beside the screen, made from words; **shot 0's television refused for lettering, then
+  for lettering and _"must never show "never-character" is shown"_** — sentence 2 names Super Mario Bros (P-019) — made
+  from words. Clips: shot 0 passed Gates 2–5 (26.0 s); shot 1's first take made (28.2 s), and then the witness call to
+  MiniMax-M3 did not reach the provider at 3 sends, and the run failed. Run again unchanged.
+- **`1496bbb9` failed in stills, 0¢, 88 s** — plan 76.5 s, plan a chosen (3.5, tied with b); the first picture, _"the
+  picture a1-shot-1-a on 'fal-ai/flux-2-pro' did not reach the provider: fetch failed"_. The third network failure on
+  this reel: **stopped and told the owner**, with what was read (below). The owner: _"try again"_.
+- **`fdff208b` failed in stills, 0¢, 112.2 s** — plan 100.9 s; the same first picture, the same words. The owner: _"if
+  in 30 minuts it stil doesnt work just end everything will continue in a new session tomorrow"_. The lookup was
+  checked every minute for the 30 minutes; it never came under 11 s, so nothing more was run.
+
+**Observed.**
+
+- **This machine's DNS is the cause of the last two, read directly** (P-020). Node's `dns.lookup('queue.fal.run')`
+  takes 11,056 ms and with `family: 4` 1 ms; `nslookup -type=AAAA` times out; `curl` takes 11.8 s, and 0.78 s with
+  `-4`. `fetch` gives a connection 10 s, so every fal call fails as "fetch failed". `api.minimax.io` resolved in 60 ms
+  when checked, so the two MiniMax failures sit beside it unexplained. It began between 18:35 and 18:37 UTC:
+  `a1cb6cfb` made thirteen fal calls without a fault before that.
+- **Lettering is this reel's clipping** (P-017): hardware, screens and cities carry words in life. 7 of 12 refused
+  pictures and 6 of 6 refused clips carried `never-text`. "Unbranded" and "only" cleared the card and the screen on the
+  next run; the television's pixel game and one monitor picture still drew words.
+- **The planner can name a subject by its criterion's id** (P-018), and one plural id was enough to stop a reel.
+- **The first image-to-video takes ever refused** — three, all on one shot, for the plural name and lettering, and the
+  shot was held on its picture rather than stopping the reel. `docs/research/refusals.md` is brought to 46 runs.
+- **Two claims in one unit** made a shot hold a screen and a card whole in one 9:16 frame; the card was clipped twice.
+
+**Why.** The prompt's test of the engine as it stands. No engine code, gate, check or test changed (CLAUDE.md rules 1
+and 3). `scripts/real-reel.mjs` is put back as HEAD has it. The DNS fault is outside the repository and the owner's to
+fix; the engine's part is P-013's (ask again on a connection error) and `resume-failed`'s.
+
+**Next.** A new session continues `PROMPTS/054` — brief B as it last ran, then brief A — once fal's host resolves in
+well under a second (`node -e "const s=Date.now();require('dns').lookup('queue.fal.run',()=>console.log(Date.now()-s))"`).
+If the television's picture keeps drawing a character or words, P-019's rule is the change. Then `PROMPTS/055`,
+`resume-failed`.
