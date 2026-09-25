@@ -28,8 +28,8 @@ git and the journal keep them.
   nano-banana-2 and seedream never make the exact frame; P-011 Gate 7's caption question refused a correct cut.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: the last full `check.mjs` green on session 52's S-160 commit, tests 397 s; every later commit is documents, or names its
-  own full run below. `check.mjs --changed` between steps (S-159).
+- **Checks**: the last full `check.mjs` green on session 52's session-start hook commit; every later commit is
+  documents, or names its own full run below. `check.mjs --changed` between steps (S-159).
 
 ## Runs
 
@@ -73,6 +73,8 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   documents alone (S-160, S-159).
 - `.claude/agents/gate-reviewer.md`, `test-impact.md`, `run-reader.md` — each reads this file first (S-160).
 - `docs/STATUS.md` — marked a 2026-09-20 snapshot, superseded as a status by this file.
+- `.claude/hooks/session-start.sh` — prints this file's "Where things stand" and the journal's newest heading, not
+  the last two journal entries (S-160).
 - `PROMPTS/052` — step 2 asks the owner five questions about pieces a caller names to be made again on a resume;
   its "How to work" carries S-160's rules. `docs/features/resume-failed.md` — the addition, under what is still for
   the gates (`6566f1d`).

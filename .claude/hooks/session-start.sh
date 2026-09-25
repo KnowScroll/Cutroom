@@ -2,8 +2,9 @@
 # Runs at session start AND after /compact, so a session cannot begin uninformed and cannot
 # forget after a context reset. Everything printed here lands in the context before turn one.
 #
-# It is deliberately short and deliberately fast: the pin, the boundaries, the last journal
-# entries, the last commits. Not the test suite.
+# It is deliberately short and deliberately fast: the pin, the boundaries, where things stand
+# (docs/context.md, S-160), the last commits. Not the test suite, and not the journal: its entries
+# run to a hundred lines, and everything printed here is re-read on every call of the session.
 cd "$(dirname "$0")/../.." || exit 0
 
 echo "==================== Cutroom ===================="
@@ -22,22 +23,16 @@ echo "---------------- boundaries ----------------"
 node scripts/drift.mjs 2>&1 | sed 's/^/  /'
 
 echo
-echo "---------------- last 2 journal entries ----------------"
-if [ -f JOURNAL.md ]; then
-  # Start at the second-to-last entry heading, or the last one when there is only one.
-  # The steering repository's version of this splits on a record separator and drops the
-  # first record, which prints NOTHING for a journal with a single entry — exactly the
-  # state a new repository is in, and exactly when a session most needs to read it.
-  START="$(grep -n '^## ' JOURNAL.md | tail -2 | head -1 | cut -d: -f1)"
-  if [ -n "$START" ]; then
-    tail -n +"$START" JOURNAL.md | head -n 60
-  else
-    echo "  (no entries yet)"
-  fi
+echo "---------------- where things stand (docs/context.md) ----------------"
+if [ -f docs/context.md ]; then
+  # The one section, from its heading to the next; the runs and the changes are read when needed.
+  awk '/^## Where things stand$/ { on = 1; next } /^## / { on = 0 } on' docs/context.md
 else
-  echo "  (no journal yet)"
+  echo "  (no docs/context.md)"
 fi
-
+# One line, so the journal's newest entry is named without being read.
+NEWEST="$(grep '^## [0-9]' JOURNAL.md 2>/dev/null | tail -1)"
+[ -n "$NEWEST" ] && echo "  journal's newest entry: $(printf '%s' "$NEWEST" | cut -c4-)"
 echo
 echo "---------------- last 5 commits ----------------"
 git log -5 --oneline 2>/dev/null || echo "  (no commits yet)"
@@ -51,6 +46,7 @@ echo
 echo "  pnpm is NOT on this machine's PATH. Use: corepack pnpm <script>"
 echo "  or run the scripts directly: node scripts/check.mjs"
 echo
-echo "  Write a JOURNAL.md entry before you stop. The stop-gate checks."
+echo "  Before you stop: a JOURNAL.md entry, and this session's entry in"
+echo "  docs/context.md. The stop-gate and tests/context-file.test.ts check."
 echo "================================================================"
 exit 0

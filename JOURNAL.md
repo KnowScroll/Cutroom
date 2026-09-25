@@ -6264,6 +6264,9 @@ is a change mention where it changed and what it changed"_.
   change the journal's newest session. Broken four ways — a section renamed, two swapped, the newest change a session
   behind, 200 lines added — each red; restored, green.
 - `PROMPTS/052` carries S-160: `docs/context.md` first, one phase, the reviewer continued, the file kept at close-out.
+- **The session-start hook**, at the owner's word, prints `docs/context.md`'s "Where things stand" and the journal's
+  newest heading in place of the last two journal entries — about a hundred lines, re-read on every call. Its
+  heading strip, written `${NEWEST#\#\# }`, arrived with its backslashes halved and stripped nothing; `cut -c4-` now.
 
 **Observed.** The measured cost is session 51's (`docs/research/hyperframes.md`): 25.9 M of the main thread's 41.4 M
 cached reads fell while it waited on twelve agents, and the agents spent 50.6 M. `check.mjs` spends minutes, not
