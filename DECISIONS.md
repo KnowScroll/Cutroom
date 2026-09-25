@@ -6888,3 +6888,380 @@ its test red. Rules 1 to 4 are practice, not code: the journal's token figures, 
 whether they hold.
 
 **Confirmed-by.** The owner, 2026-09-25, in session 52 — the four rules as put, and the file in their words above.
+
+## S-161 | 2026-09-25 | A caller asking for a resume may name pieces not to keep; the engine takes down everything made from them, shows the cost first, and a named piece's shot starts its own bounds afresh — inside the provider-fault rule, spending the one resume, and after a Gate 7 stop too
+
+**Chose.** The owner's answers of 2026-09-25 to the questions `PROMPTS/052` step 2 put before `resume-failed`'s product
+gate (`docs/features/resume-failed.md`), on the owner's words of that morning: _"if we retry a run we should be able to
+tell the system to regenerate the asset (with type) that is which asset we dont want reused"_ — and one more, raised by
+the gates' first review.
+
+- **The list** — `{ kind: 'still' | 'narration' | 'clip', shot?: 'shot-<n>' }`, no shot meaning every shot that has
+  that piece; normalised (expanded, without duplicates, in shot and kind order) before it is compared or stored. The
+  plan is not nameable: a new plan keeps nothing, which is a new request.
+- **The full takedown, worked out by the engine, never the caller**: a still takes its shot's clip; **the canonical's
+  still takes every derived shot's still and clip too**, because a derived picture is made from it and compared with it
+  (the edge the question found in the code: `references: [chosen.ref]`, Gate 1S's pair); a narration takes its shot's
+  clip, whose length is asked from it (S-070); any piece takes the cut and Gate 7, which every resume makes again.
+  **Shown with its estimate before anything is spent** — the preview (S-162).
+- **Inside S-157's rule, and it spends the one resume**: naming rides only on a resume that is already allowed; the
+  engine's own resume never names anything.
+- **A run stopped by Gate 7 may be resumed by its caller**, with or without named pieces: the cut is made again and
+  Gate 7 asked again. Every other stop stays on the brief's terms.
+- **A completed run is not resumable**: remaking pieces of a delivered reel is a feature of its own.
+- **A named piece's shot starts its own bounds afresh**: its takes are numbered from 1 with three again, its picture
+  repairs are its own again, and its own old picture calls are not counted. **The reel's six picture calls stay one
+  bound**, shared with the pictures kept, so a named shot gets the repairs the six still allow (the owner's answer to
+  the first review). An unnamed resume continues each bound over what it keeps.
+
+**Supersedes, each in part, in S-147's form:**
+
+- **S-157**'s _"**Only provider faults are resumable**"_ and _"A gate refusing on the brief's own terms (S-145's Gate 7,
+  S-151's Gate 5) would fail the same way"_ become _"… and a run stopped by Gate 7, by its caller, once"_; its _"the
+  caller, by a new call on a failed run"_ becomes _"… on a failed run, or on one stopped by Gate 7"_. Everything else
+  S-157 says stands.
+- **D-058**'s _"**No provider call may follow the reel's first assembly.** If no edit op fixes the failure, the reel
+  **fails and is labelled** — it does not re-enter L3"_, **I-18**'s _"Nothing is bought after assembly begins … Gates 7
+  and 8 repair with edit ops or they fail the reel"_ (`steering-ref/docs/founding/reel-creation-engine/contentions.md`),
+  **S-066**'s _"a reel that fails Gate 7 stops for rule `gate-7`: nothing more is bought"_ and **S-099**'s _"a Gate 7
+  failure stays terminal"_ are read **per run** (the owner, after the ninth review): no provider call follows a run's
+  first assembly, and a run that fails Gate 7 stays stopped and buys nothing more. A caller's resume of it is a new run,
+  which buys only before its own first assembly — priced and admitted against the cap and the ceiling before any call,
+  as I-1's check before spending requires — and its own Gate 7 is final for it. `reel-render`'s _"Until then a Gate 7
+  failure is terminal"_ (`reel-render.md:1399`) is read the same way, in its amendment block.
+- **D-027**'s _"Two of the six permitted image calls are left unspent at plan time and held as reserve"_ is read with
+  S-164's reserve, a shot whose still a caller names not counting its own old calls.
+- **D-024**'s _"A shot may consume **3 paid clip takes** — one initial plus two retries"_ and its `Confirmed-by` _"no
+  fourth video job is submitted for it"_ are read per run, as S-092 read them across attempts: a shot whose clip, still
+  or narration a caller names may take three more in the resumed run (found by the gates' third review).
+- **D-014**'s _"retries ≤ 2 per shot"_ becomes _"retries ≤ 2 per shot, counted over the kept takes of a resumed run —
+  and a shot whose clip, still or narration a caller names starts its retries afresh"_. `BUDGET.md`'s row is the
+  steering repository's and is not edited; this entry is what it is read with here.
+
+**Why.** A person who has watched a reel knows things no check knows: a picture that passed and is wrong, a clip that
+passed and is dull. Today the only way to throw one piece away is to throw the reel away. Taking down what was made
+from a piece is the engine's, because only the engine holds the edges — a caller naming the canonical cannot know
+which shots were drawn from it. Keeping naming inside the provider-fault rule keeps one resume one resume: a person's
+wish to remake is not a reason to resume a reel the brief stopped. Gate 7's stop is the exception because P-011 showed
+it refusing a correct cut whose every clip had passed, where asking again costs 0¢ and run `74bb96a0…` answered yes.
+The six stay one bound because they bound the pictures a reel is made from, whichever run made them; the cap and the
+ceiling bound the money either way.
+
+**Rejected** (each put to the owner). Naming the canonical alone, its derived pictures kept against a new canonical;
+clips only; naming outside the provider-fault rule; naming as a second resume; any stop resumable if a piece is named;
+no stop resumable; a completed run resumable here; both runs' bounds with no exception; fresh bounds for every shot of a
+resume; a named shot's picture ladder outside the six.
+
+**Caught by.** `resume-failed`'s checks 13, 14, 27, 28, 32 and 33 (`tests/resume-failed-resume.test.ts`,
+`tests/resume-failed-contract.test.ts`).
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52, on five questions in the first two of four rounds and one after
+the gates' first review: the full takedown; inside the rule, spending it; Gate 7's stop only; a completed run a feature
+later; named pieces fresh; the six shared; and, after the ninth review, I-18 and D-058 read per run.
+
+---
+
+## S-162 | 2026-09-25 | A resume is asked for on a contract route with a free preview; it carries the same requestId and each run's status names the other; kept rows are copied into it; each run reports its own spend; and the guards count both runs
+
+**Chose.** The owner's answers of 2026-09-25 on how a resume is asked for and what a caller sees (`resume-failed`,
+Gate 2, "What the caller sees"), and the architecture they need:
+
+- **A contract route**, `POST /v1/runs/:runId/resume` with `ResumeRequest { contractVersion, remake?: Piece[], preview?:
+true }` and one `ResumeResponse`: `preview` (every piece made again, the estimate, what the reel spent, the cap, the
+  ceiling, and the limit it would cross — spending and writing nothing), `accepted`, or `refused` (`not-resumable`,
+  `resumed`, `budget` with D-100's figures, `version`, `invalid`, `unsupported`). **Version 1 amended**, in S-034's form:
+  no caller exists. **The API is handed one function that plans and admits** (`ResumeService`, typed in `domain`, built
+  by the service from the pipeline with the worker's own rates), so the preview, the call and the engine's resume are
+  one planner and one rule, and the API's dependencies do not change; `@cutroom/service` exports that builder, and the
+  test harness hands the same one to its API. **The planner normalises the list first** — by the plan, never the rows —
+  and answers a call on a run already resumed itself: `replayed` for the list stored, `resumed` for any other. The
+  contract's stand-in engine answers the route `422 unsupported`. The owner's script's `--resume` calls the preview, prints it, asks before spending, and resumes.
+- **The same requestId**: the resume is the same request and one reel. `run.request_id`'s unique index becomes partial,
+  `WHERE resumes IS NULL`; `run.resumes` is unique. **Lookup by requestId, and a replayed submit, answer the newest.**
+  `RunStatus` gains `resumes?` and `resumedBy?`, computed from the rows; the failed run's result and events never
+  change.
+- **Kept rows are copied into the new run** in the transaction that creates it — plan, picture, observation,
+  reconciliation, narration, take, take observation and take reconciliation rows, with `kept_from`; never a receipt, a
+  lost call, a refused answer, a degradation row, a still-hold, a render or a file. Every reader keeps reading one run.
+- **Its jobs start at the failed run's attempts**, so every id it makes is new and no take is sent the failed run's
+  seed (D-018): a named clip made again under the same id would be the same request. **Its first job has no parent**:
+  the link between the two runs is `run.resumes`.
+- **Each run reports its own spend** (`costCents` as today); `RunRecord`'s pictures and takes gain `keptFrom?`. **The
+  guards compare the reel's spend** — the run's and the run it resumes — through `reelSpentCents`.
+
+**Supersedes, each in part, in S-147's form:**
+
+- **D-081**'s _"The $3.00 per-reel cap (I-1) is enforced against the sum of `cost_cents` across one `correlation_id`"_
+  and **S-036**'s _"The spend the guard compares (S-035) is **`SUM(cost_cents)` over every job row sharing the run's
+  `correlation_id`**"_ become _"… across the run's `correlation_id` and that of the run it resumes"_. S-036's _"A run's
+  `costCents` is that sum"_ stands, for the run's own.
+- **S-069**'s _"**The chain** is `reel.plan` → `reel.keyframes` → `reel.clips` → `reel.assemble`, each row created,
+  with the run as `correlation_id` and the job before it as `parent_id`"_ is read, for a resumed run, with its chain
+  starting at `reel.keyframes` (or `reel.plan`, after a plan-stage fault) with no parent. D-081's _"linked by
+  `parent_id` and `correlation_id`"_ stands within each run, and its `Confirmed-by` _"A test that a reel's rows share
+  one `correlation_id`"_ becomes _"… a run's rows; a resumed reel's two runs each their own, linked by
+  `run.resumes`"_.
+- **S-046**'s _"**The record holds every picture made, every attempt's, in `seq` order**"_, **S-093**'s _"**one entry
+  per take made, every attempt's, in the order made** — a cut-off take too"_, and **`reel-contract`'s** _"One entry **per
+  picture made**"_ (Gate 2, and its check 21) become _"… made by the run, every attempt's, or copied into it, with
+  `keptFrom`"_; a failed run's cut-off and named pieces stay in the failed run's own record.
+- **`reel-contract`'s** _"The same `requestId` with the same content … returns the same run with `replayed: true`"_ and
+  its lookup _"to find a run again by your own name"_, **`reel-plan`'s** _"equal returns the stored run with `replayed:
+true`"_, and `packages/domain/src/schema.ts:16`'s _"One run per requestId"_ become _"… the newest run of the request —
+  its resume, once there is one"_ and _"one run per requestId, and its one resume"_.
+
+**Why.** S-157 decided a new run that points back; the contract is where a caller would look, and a route is the
+smallest addition that an orchestrator can use later without a second design. The preview is D-095's "free estimate"
+for a resume: the owner asked to see the cost before anything is spent. The same requestId keeps the caller's name for
+the reel reaching its current run — the only choice under which a caller that follows by its own name finds a resume
+the engine started, with nothing new on the failed run's result. Copying rows is what lets S-092's kept logic, the
+render's reads and every label work unchanged; reading two runs through a lineage would have changed each reader and
+broken `still_hold`'s foreign key. Own spend per run keeps a ledger that sums runs from counting a cent twice.
+
+**Rejected** (the first three put to the owner). A flag on the owner's script only; a new requestId per resume, the
+engine's own taking a reserved suffix; both runs' spend in the resumed run's `costCents`; reading kept rows through a
+lineage instead of copying; a pointer on the failed run's result or its `run.finished` event (against S-157); a seed
+derived from the run id (it would move a verified seed); the API importing the pipeline, or a second copy of the rule in
+it; the first job's `parent_id` pointing into the failed run (a link across two runs that nothing reads).
+
+**Caught by.** `resume-failed`'s checks 16, 17, 24 to 31, 34 and 41, and the amended checks 1, 2, 5 and 18 of
+`reel-contract`, 13 of `reel-plan` and 20 of `paid-path`.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52, on four questions: a contract route with a preview; the same
+requestId; its own spend; `keptFrom` in the record.
+
+---
+
+## S-163 | 2026-09-25 | The engine judges a provider's fault from a closed list of classes, decided where the error is caught; it resumes one by itself fifteen minutes on, in the service only, never a run its caller asked to cancel, and never at the cost of the run failing; a plan-stage fault is planned again; the owner's script asks about waiting runs at its start
+
+**Chose.** The owner's answers of 2026-09-25 on which failures are a provider's and when the engine resumes by itself
+(`resume-failed`, Gate 2, "Which endings are resumed"), two of them raised by the gates' first review:
+
+- **Three kinds are a provider's, and a fourth resumable**: `unavailable` (the provider made nothing — an
+  `Unavailable`, the counter spent included), `unreadable` (an answer we could not use — a `Spent`, or an `Unanswered`
+  a gate refused at its last ask, or refused word timings), `provider-failed` (fal accepted a job and reported it
+  FAILED); and `crashed` (S-061's reserve, reachable only after crashes — S-157's "a crash"). **Not**: `off-spec` (an
+  image entry that never makes the frame, P-010 — the same every time), `engine` (everything else: a request refused
+  as ours, ffmpeg, the engine's faults, the stand-in out of script). A run that failed before `run.failure` existed has
+  no kind and is not resumable.
+- **Decided by class, where the error is caught, by `failureKindOf`** — five new classes (`OffSpec extends Spent`,
+  `RefusedRequest extends Spent`, `Unanswered`, `ProviderFailed`, `StillUnavailable extends Unavailable`) thrown where
+  a plain error, or a `Spent` that meant something else, lost the fact today, each message unchanged. Written to
+  `run.failure`; the failed result does not change. **A request the provider refused as ours is `engine`** — MiniMax's
+  narration answering 200 with a non-transient status is a `RefusedRequest`, as the model adapter's same case is
+  already a plain error (the owner, after the third review). **Both shapes of a FAILED fal job** — its result read
+  answering 200 or an error — are `ProviderFailed`.
+- **A caller resumes only what the engine would**: a provider's fault (and, by S-161, a Gate 7 stop) — never an engine
+  or off-spec failure, whether or not the engine resumed (the owner, after the third review).
+- **A plan-stage provider fault is resumed by planning again**, keeping nothing.
+- **The engine's resume is due fifteen minutes after the failure** — P-009's outage lasted about ten — a setting,
+  `resumeDelayMs`.
+- **On in the service, off in the worker's default**, in S-153's form: verified tests go on proving that a provider
+  fault fails a run; this feature's tests switch it on.
+- **A run whose caller asked to cancel is never resumed by the engine**; its caller may still resume it by asking — an
+  explicit call is newer than the cancel.
+- **The engine's resume is made in the failing transaction, from the rows as it has labelled them**: the stage's labels
+  first, then a savepoint that reads the run — its cancel flag included — plans, admits and copies, then `endRun`. **A
+  resume that cannot be made never stops the run from failing**: a throw — the cap file unreadable included — rolls back
+  the savepoint only, the run fails with its kind, and one line in the questions file names why.
+- **The owner's script asks at its start**: before it starts the service it names every run still `running` with a job
+  queued or running, and cancels them unless told to let them run — so a resume left waiting by a stopped script is
+  never spent unasked by the next start.
+- **A run left `running` by a buried job is deferred**, named: not a provider's fault, never resumable.
+
+**Supersedes, in part, in S-147's form:** **S-157**'s _"if it has not — it judged the failure not a provider's — the
+caller may ask once"_ becomes _"if it has not, the caller may ask once — for a provider's fault or a Gate 7 stop, never
+an engine or off-spec failure"_. Everything else S-157 says stands, and S-161 names its other clauses.
+
+**Why.** `failures.ts` already forbids reading a message to decide what happened, and a stage's catch-all flattens the
+class into a string — so the kind must be taken where the class is still in hand. The record of real runs is what the
+list is drawn from: P-009's 504, P-001's timings, P-004's counts are the provider's; P-010's frame is the registry's and
+401/402 were the key's and the account's. A stand-in that runs out of script throws a plain error and is therefore
+`engine`, so no test can pass by accident on a resume. An immediate resume would meet P-009's outage and spend the one
+resume on it. A cancel is the caller's instruction and the engine must not overrule it; a resume that throws must not
+turn a failed run into one left running, which is Deferred 2's state.
+
+**Rejected** (put to the owner). The frame refusal as a provider's fault; waiting five minutes, or none; the engine's
+resume on everywhere; fixing buried jobs here; not resuming a plan-stage fault; a cancelled run never resumed, even at
+its caller's asking; Ctrl+C cancelling the followed resume, alone or with the question at the start. And, not put:
+reading `refused_answer` to judge (it reverses S-156's "no engine code reads it", and a thrown class already carries the
+fact); a message pattern.
+
+**Caught by.** `resume-failed`'s checks 1 to 5, 21, 35 to 40, 42 and 43.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52, on five questions, two more after the gates' first review and
+two after the third: unavailable, unreadable and job-failed are a provider's, the frame refusal not; a plan fault
+planned again; fifteen minutes; on in the service only; buried jobs deferred; the script asks at its start; a
+cancelled run resumed only at its caller's asking; a caller resumes provider kinds only; a request refused as ours is
+`engine`.
+
+---
+
+## S-164 | 2026-09-25 | Every picture whose checks finished is kept — accepted or failed, after a failure and after a crash — the stills stage picks up at the first step not done, and a shot whose ladder ended stays ended
+
+**Chose.** The owner's answers of 2026-09-25 on what a stills stage keeps (`resume-failed`, Gate 2, "What a resumed
+run's stages do with kept rows"), and what they need:
+
+- **Every decided picture is kept**, as S-092 keeps decided takes: accepted or failed, its Gate 1 finished. The ladder
+  consults the kept pictures before every call: a kept picture is not made or checked again, and its verdicts are
+  events once; the canonical stays best of two (a kept `a` with `b` never decided makes `b`), two kept survivors ranked
+  by the score totals their rows store, never today's weights (found by the gates' fifth review); a kept accepted repair is
+  chosen outright and a kept failed one stops for `gate-1`; a kept derived picture whose Gate 1S never ran has it run,
+  with no image call; a kept failed picture's stored reasons reach its repair, and a kept repair counts toward the
+  shot's repairs and takes no slot again. A picture whose checks were cut off is made again.
+- **One rule for a crash and a resume**: a keyframes job claimed again after its lease runs out keeps its earlier
+  attempts' decided pictures too.
+- **A shot whose ladder ended is never reopened**: a kept picture carries its degradation, and its shot is degraded
+  again with that reason and no call, whatever the reserve now holds — found by the gates' first review, where a shot
+  degraded for want of a slot would otherwise have bought a repair in the resumed run and met its own kept
+  text-to-video take.
+- **The reserve** is `6 − earlier − unmade`: `earlier` the run's image receipts, image lost calls and copied pictures;
+  `unmade` the first calls of placements no kept picture satisfies. **S-061's two failures keep their places and change
+  their words** to the figures compared. `picture.seq` is the run's greatest plus one.
+- **S-092 after a failure**: a resumed run's copied narrations and takes are "what earlier attempts finished".
+- **A degraded shot's receipts marked** are those of the pictures the deciding attempt used, made or kept, in whichever
+  run holds them — never a picture cut off.
+
+**Supersedes, each in part, in S-147's form:**
+
+- **D-047**'s `Confirmed-by` _"No run produces four image calls against one canonical entry"_ and _"A fixture manifest
+  entry that cannot pass Gate 1 produces exactly three image receipts … with all three verdicts attached"_, **D-065**'s
+  _"terminates with three image calls"_ and **D-030**'s _"a derived keyframe issues exactly one call unless its gate
+  fails"_ — which S-048 superseded _"for a restarted attempt only"_ — are read per run with the pictures it keeps, for a
+  restarted attempt and a resumed run alike: a resumed run's receipts for one entry, with its kept pictures, carry at
+  most three; the reel's two runs together carry at most the failed run's cut-off calls beyond that.
+- **S-043**'s _"**The reserve is 6 − the placement's calls** — 2 for a placed canonical and 1 for each placed derived
+  picture, a rank with no free shot left out (S-039) — less a restarted attempt's earlier calls (S-048)"_ becomes S-061's
+  new formula below, `6 − earlier − unmade`.
+- **S-048**'s _"**makes every picture again from the start, and pays for them again**"_ becomes _"keeps every picture an
+  earlier attempt decided — accepted or failed — and makes again only a picture whose checks were cut off, paying for
+  that"_; its reserve clause becomes S-061's new formula. What stands: a cut-off picture is made again and never looked
+  at twice (D-045, I-15), its receipt, file and cost stay, and a restart that cannot fit fails before its call.
+- **S-092**'s _"**S-048 stands for the stills stage**: a keyframes job run again still starts over and pays again"_
+  becomes _"a keyframes job run again keeps its earlier attempts' decided pictures, as the clips job keeps its decided
+  takes"_; and its _"its stage skips what earlier attempts finished"_ is read, in a resumed run, with the failed run's
+  finished narrations and decided takes among them, because they are copied into it. Every other rule of S-092 stands.
+- **S-061**'s _"**`reserveOf(placements, earlierImageCalls)`** (`stills/ladder.ts`) is 6 − the earlier calls − the
+  placement's calls"_ becomes _"6 − the earlier calls, the run's copied pictures among them, − the first calls of the
+  placements no kept picture satisfies"_; its _"**`imageCallCount`** (`packages/domain/src/ledger.ts`) is the number of
+  the run's `generation_receipt` rows, every attempt's"_ becomes _"… its `generation_receipt` rows and image `lost_call`
+  rows, every attempt's, and its pictures copied from the run it resumes"_; and its details _"the run made 3 before it
+  and its placement makes 4, 7 in all (S-048)"_ and _"the run having made 2 image calls before it and its placement
+  making 4 of the 6 (S-048)"_ become _"the run made E before it and its placement makes U more, E+U in all (S-048)"_ and
+  _"the run having made E image calls before it and its placement making U more of the 6 (S-048)"_. Their places and
+  order stand; their run's kind is `crashed`. Its `Caught by` _"exactly 0 failed (also 48)"_ passes to checks 49a and
+  49d, amended: check 48's reserve is now 1.
+- **S-046**'s _"a restarted attempt's earlier pictures are none chosen"_ becomes _"a restarted attempt's earlier
+  pictures are chosen when the ladder keeps them"_; its _"**A picture's row is written with its image receipt**"_
+  stands for every picture a run makes, a copied picture's receipt being in the run that made it; its _"Only the
+  finishing attempt's verdicts become events"_ stands, the finishing attempt emitting its kept pictures' verdicts too,
+  each once.
+- **S-046**'s _"Each row carries **`seq`**, the run's image-call number, taken from the run's receipts in that
+  transaction"_, and `reel-stills`' Gate 2 _"the run's image-call number, 1 to 6"_, become _"… the run's picture number,
+  its greatest plus one — above 6 in a resumed run, whose copied pictures keep their numbers"_.
+- **S-055**'s _"taking **`seq`** there as the run's receipt count plus one"_ becomes _"… as the run's greatest `seq`
+  plus one"_ — the same number wherever no picture is copied.
+- **S-037**'s _"exactly one `observe` receipt per picture"_ (superseding D-045's _"Exactly one vision call appears in
+  the receipts per generated image"_) is read per run that made the picture: a copied picture's one `observe` receipt
+  is in the run that made it, and the resumed run adds none for it.
+- **S-058**'s _"The receipts marked are the shot's pictures **this attempt made**"_ becomes _"… the shot's pictures the
+  deciding attempt used, made or kept, in whichever run holds their receipts"_. Its rejection of _"**Every attempt's
+  pictures of the shot**"_ stands for a picture cut off, which no ladder used — and so does **S-063**'s _"the first
+  attempt's picture of that shot has its receipt unmarked and no degradation"_, whose first-attempt picture is cut off.
+- **S-157**'s _"**Pictures Gate 1 ACCEPTED are kept** — superseding S-048 for those only; a picture whose checks were cut
+  off is made again, as S-048 says"_ becomes _"every picture whose checks finished is kept — accepted or failed, after a
+  failure and after a crash"_.
+- **D-027**'s `Confirmed-by` _"No Phase 1 reel's receipts carry more than 6 image calls"_ becomes _"No run's receipts,
+  with the pictures it keeps from the run it resumes, carry more than 6 image calls; a resumed reel's two runs together
+  carry at most its failed run's calls that left nothing kept, and its named shots' old calls, beyond that"_.
+
+**Why.** S-048's reason was a picture whose checks were cut off — a second witness look (D-045, I-15). A picture whose
+checks finished needs no second look, and S-092 already drew that line for clips; keeping only accepted pictures would
+have taken a lone canonical `a` without its `b` (against D-042's best of two) and dropped the failed pictures a repair
+is told about (D-047). A crash and a resume are the same fact once the rows are copied — an earlier attempt's decided
+pictures — so one rule is one code path, and S-061's reserve failure, which only a crash reached, now needs several.
+A degradation is the one decision a ladder makes from its reserve, and the reserve of a resumed run is not its failed
+run's, so the decision is carried rather than made again.
+
+**Rejected** (the first two put to the owner). Only Gate 1-accepted pictures kept, a lone `a` taken outright; S-048
+standing for crashes; counting every image call of the failed run in the resumed run's six (a resume after crashes
+would fail the same way); copying the degradation rows themselves (their re-insert under the resumed run would collide).
+
+**Caught by.** `resume-failed`'s checks 6 to 12, 18 to 20, 22 and 40, and the amended checks 48 and 49 of
+`reel-stills`.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52, on two questions: every decided picture; one rule for both. The
+carried degradation is the fix to the first review's first finding, in the form the reviewer proposed.
+
+---
+
+## S-165 | 2026-09-25 | The three reviews real reels left: Gate 7's caption question is answered by an exact comparison, which gets its gates; nano-banana-2 and seedream leave the image registry; a shot made from words still stops at its third failed take
+
+**Chose.** The owner's answers of 2026-09-25 to the three reviews `docs/reel-pitfalls.md`'s short list held open
+(`PROMPTS/052`, step 3):
+
+- **P-011 — the caption question is answered without a model**: the subtitles file and the narration are both the
+  engine's own, and are compared word for word. Gate 7's judge keeps its other three questions. A feature,
+  `caption-match`, gets its four gates before any code (CLAUDE.md rule 1); until it is verified, Gate 7 asks as it does
+  today — it is not weakened meanwhile (rule 3).
+- **P-010 — `fal-ai/nano-banana-2/edit` and `bytedance/seedream/v5/lite/edit` leave `IMAGE_REGISTRY`**, so no setting
+  can choose an entry that has never made the exact 864 × 1536 frame; `flux-2-pro/edit` is the only entry known to. A
+  check will pin that every admitted entry has made the frame on record. It moves verified checks —
+  `tests/paid-path-image.test.ts`'s check 11 (_"cheapestEntry answers … `bytedance/seedream/v5/lite/edit`"_) and the
+  fixtures at `:190`, `:420-421`, `:934`, `:1002`, `:1010` — so it is planned with its amended checks, found by
+  `test-impact` first, in a session of its own; nothing is removed in this one. `nano-banana-pro` stays admitted and
+  unmeasured, and a switch to it is checked against the journal first (P-010's rule).
+- **P-003 — accepted, for now**: a shot made from words whose third take fails stops the reel (S-090). Every case on
+  record was the brief's — a verb of darkness, a long subject in a tall frame — and brief-writing rules answer it. P-003
+  stays on watch, a feature only if it recurs after them.
+
+**Why.** P-011's question asks eighteen frames what only the words can say; the words are the engine's own, so a model
+adds only chance. P-010's entries cannot pass D-028's frame assertion and the registry admits them anyway, so a setting
+chosen without the journal fails a run on its first picture (run `bad736d1…`, 8¢). P-003 has no case the brief did not
+cause.
+
+**Rejected** (put to the owner). For P-011: frames taken on words; the caption text shown to the judge. For P-010:
+sending each a size it honours, a measured feature; leaving them admitted. For P-003: a picture made at the cap and held;
+holding a neighbouring shot's picture.
+
+**Caught by.** For P-011, `caption-match`'s checks, when its gates are written. For P-010, the registry check this entry
+names, in the slice that removes the entries. For P-003, `docs/reel-pitfalls.md`'s short list, which says what would
+reopen it.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52, on three questions: an exact comparison; drop both; accept, for
+now.
+
+---
+
+## S-166 | 2026-09-25 | Two code-made visuals become engine features with their gates — the composed hold, then diagram shots; words on screen come only from the narration and the criteria; and headless Chrome is a machine dependency like ffmpeg
+
+**Chose.** The owner's answers of 2026-09-25 to `PROMPTS/052` step 4, from `docs/research/hyperframes.md` §4 and §8
+and its two hybrid-reel sections:
+
+- **`composed-hold`** (§4 A — the approved picture animated by code where a shot is held) **and `diagram-shots`** (§4
+  C — a closed set of vetted templates the planner may choose for a shot) each become a feature, planned here with four
+  gates before any code (CLAUDE.md rule 1). **`composed-hold`'s gates come first**: it builds the port, the Chrome
+  adapter, its stand-in and its startup check that `diagram-shots` reuses (§8's order). Graphics over real clips (§4 F)
+  is not chosen: a line into generated footage must follow a moving camera (230 px across one shot of the hybrid) and
+  names what the footage may not be (the hybrid's rule 1).
+- **Words on screen beyond the captions come only from the narration and from the brief's criteria texts** — both sent
+  by the caller, neither evidence (D-096). A number appears only if one of them says it. The hybrid's numbers (magma
+  ~1,200 °C, Mauna Kea 10,210 m) could not be shown by the engine.
+- **Headless Chrome is a machine dependency like ffmpeg** (S-075, D-086): found on PATH, never installed or pathed by
+  this repository, behind a port in `packages/providers`, and checked when a worker starts — a worker refuses to start
+  without it only when a feature that needs it is switched on.
+
+**Why.** The hybrid reel showed code exact where no video model is — a labelled cross-section, a scale — and cost three
+hours of hand placement, most of it following the camera; a template shot has no camera to follow. The composed hold
+has the least at stake and builds what the diagram shots need. Criteria texts are the caller's own words about what a
+shot shows, so a label drawn from them is no new claim.
+
+**Rejected** (put to the owner). Graphics over clips (§4 F); none yet; the narration's words only; a new contract field
+for labels; Chrome deferred.
+
+**Caught by.** Each feature's checks, when its gates are written; until then, nothing is built.
+
+**Confirmed-by.** The owner, 2026-09-25, in session 52, on three questions: A and C; the criteria's words too; Chrome
+like ffmpeg.
+
+---

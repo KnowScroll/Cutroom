@@ -11,7 +11,9 @@
   tell the system to regenerate the asset (with type) that is which asset we dont want reused"_: step 2 puts the
   pieces a caller names to be made again, and five questions about them, before the product gate; and S-160's rules
   on context cost — `docs/context.md` read first, one phase a session, a reviewer continued between rounds
-- **Run:** not yet
+- **Run:** session 52, 2026-09-25 — `resume-failed`'s four gates written on 22 owner answers (S-161 to S-164) and
+  reviewed in eleven rounds (the owner stopped the review; the approving read is 054's); the three reviews answered (S-165); step 4 answered — `composed-hold` then `diagram-shots`
+  (S-166); `PROMPTS/053` written
 
 **Where things stand.** Session 51 built `check.mjs --changed` (S-159): documents alone are checked in about 13 s, code
 still runs everything. It then made two reels at once, both outside the engine: a jet-engine reel from code alone and a

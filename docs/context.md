@@ -21,11 +21,13 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
-  **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `resume-failed` (S-157), `video-edits`.
-- **Next**: `PROMPTS/052` — `resume-failed`'s gates, with the owner's addition of pieces a caller names to be made
-  again; then the P-003, P-010 and P-011 reviews. Then `PROMPTS/053` — `parallel-shots`' gates (S-115).
-- **Open reviews** (`docs/reel-pitfalls.md`, its short list): P-003 a shot made from words has no fallback; P-010
-  nano-banana-2 and seedream never make the exact frame; P-011 Gate 7's caption question refused a correct cut.
+  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 054**: `resume-failed` (S-161 to S-164). **Planned, gates not
+  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `video-edits`.
+- **Next**: `PROMPTS/053` — `parallel-shots`' gates (S-115), at most three review rounds before asking the owner. Then
+  054 — `resume-failed`'s one approving read, then its build, slice by slice.
+  Then `caption-match`'s gates, the registry change S-165 decided, `composed-hold`'s and `diagram-shots`' gates.
+- **Reviews answered** (S-165): P-011's caption question gets an exact comparison (`caption-match`); P-010's two
+  registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
 - **Checks**: the last full `check.mjs` green on session 52's session-start hook commit; every later commit is
@@ -66,6 +68,14 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
 ### 2026-09-25 · session 52
+
+- `docs/features/resume-failed.md` — four gates, 44 checks, 7 slices; eleven review rounds, round 10 would approve, round
+  11's five findings fixed, the approving read in 054 (the owner stopped the review). S-161 to S-164 (DECISIONS.md).
+- `docs/features/caption-match.md`, `composed-hold.md`, `diagram-shots.md` — new, planned, gates not written (S-165,
+  S-166). S-165: P-011 exact comparison, P-010 two registry entries to go, P-003 accepted. `docs/reel-pitfalls.md`'s
+  short list; `docs/research/hyperframes.md` §8 answered. `PROMPTS/053` — `parallel-shots`' gates.
+
+### 2026-09-25 · session 52, its start
 
 - `CLAUDE.md` § Subagents — four standing rules on context cost; this file named first (S-160).
 - `docs/context.md` — new: this file. `tests/context-file.test.ts` — new: its sections, its 300 lines, and its newest

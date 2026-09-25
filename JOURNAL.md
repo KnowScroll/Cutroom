@@ -6277,3 +6277,51 @@ tokens. `docs/STATUS.md` was the warning: a status file nothing checks reads bet
 a fresh reviewer every round, rules without a check.
 
 **Next.** `PROMPTS/052`, as amended.
+
+## 2026-09-25 — session 52, continued: `resume-failed`'s gates, and the reviews real reels left (PROMPTS/052)
+
+**Asked.** `PROMPTS/052`, as amended: _"Read @PROMPTS/052-resume-failed-gates-then-reviews.md and go"_, then, with
+ultracode on, _"continue"_.
+
+**Changed.**
+
+- **`docs/features/resume-failed.md`** — the four gates, written and reviewed: **44 checks in 7 slices**, the design a
+  resume as a NEW run of the same request that COPIES the failed run's kept rows into itself, in the one transaction
+  that creates it, so every reader keeps reading one run. The kind of a failure (`unavailable`, `unreadable`,
+  `provider-failed`, `crashed`; not `off-spec`, `engine`) is decided by class where the error is caught — five new
+  classes, every message unchanged; a keyframes job run again after a crash keeps every decided picture (S-048
+  superseded); a caller names pieces not to keep on a contract route with a free preview; the engine's own resume is
+  made in the failing transaction after its labels, fifteen minutes on, in the service only. **The gates are written, reviewed in eleven rounds and not yet approved** — round 10 would have approved all four; round 11's five findings are fixed; the one approving read opens `PROMPTS/054`, at the owner's word.
+- **S-161 to S-164** — twenty-two owner answers: sixteen in four rounds before the product gate, three after the first
+  review (the six picture calls stay shared; the script asks at its start about waiting runs; a caller may resume a run
+  it asked to cancel, the engine never), two after the third (a caller resumes provider kinds only; a request refused
+  as ours is `engine`), one after the ninth (I-18 and D-058 read per run).
+- **S-165** — the three reviews: P-011's caption question gets an exact comparison, `docs/features/caption-match.md`
+  (planned); nano-banana-2 and seedream leave the image registry, planned with the amended checks it moves; P-003
+  accepted for now. `docs/reel-pitfalls.md`'s short list follows.
+- **S-166** — step 4: the composed hold and diagram shots become features, `composed-hold.md` first, then
+  `diagram-shots.md` (both planned); words on screen from the narration and the criteria only; Chrome a machine
+  dependency like ffmpeg. `docs/research/hyperframes.md` §8 notes the answers.
+- **`PROMPTS/053`** — `parallel-shots`' gates (S-115), on session 51's figures; `resume-failed`'s build is 054.
+
+**Observed.**
+
+- **Eleven review rounds, by six reviewers** — 17, 4, 13, 5, 8, 2, 8, 1, 3, 0 and 5 findings. The early rounds found
+  real defects: an unnamed resume reopening a shot its failed run had degraded, and buying a repair; the engine's resume
+  planned from rows read before its own failing transaction had labelled them; the usual FAILED fal job judged
+  `engine`; a verified check (`reel-render`'s 40) turned red by a new context key; a resumed run buying after the reel's
+  first cut, against D-058 and I-18 (the owner: read per run). The later ones found smaller things. **Round 10 would
+  have approved all four; round 11, the fresh one S-160 gives the approving round, found five more.** The owner, after
+  hours of it: _"I think we are doing redundant checks uselessly"_ — so round 11's findings were fixed and the review
+  stopped. **The gates are written and not approved**: the one approving read opens `PROMPTS/054`, before any code.
+- **A named clip made again under its old id would be the same request**: the seed is the CRC-32 of the take id, and a
+  new run's clips job starts at attempt 1. The resumed run's jobs start at the failed run's attempts.
+- **The lesson, kept as a memory**: a fresh reviewer never reaches zero, so "review until approved" with "a fresh
+  reviewer for the approving round" is unbounded. After about three rounds, ask the owner.
+- **Agents**: a six-reader map (1.0 M tokens), `test-impact` (0.27 M), a fact workflow (0.34 M), eleven review rounds
+  (about 5 M). The owner answered 26 questions in eleven rounds.
+
+**Why.** The prompt's order, and S-160: one phase — gates and reviews — so the build is 054's.
+
+**Next.** `PROMPTS/053`, `parallel-shots`' gates — with at most three review rounds before asking the owner. Then
+054: `resume-failed`'s one approving read, then its build.
