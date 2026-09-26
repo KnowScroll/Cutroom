@@ -1,5 +1,5 @@
 import type { ImagePort, StillsSettings } from '@cutroom/contracts'
-import { recordGeneration, spentCents, type Db } from '@cutroom/domain'
+import { recordGeneration, reelSpentCents, type Db } from '@cutroom/domain'
 import { framingFor, readPictureId, type Placement } from '@cutroom/pipeline'
 import { recordingSpend } from './spend.ts'
 
@@ -7,8 +7,9 @@ import { recordingSpend } from './spend.ts'
  * The only image port the stills stage is handed (docs/features/reel-stills.md, Gate 2 "Spending
  * while pictures are made"; S-021, S-035, S-036): the port the worker was given, wrapped so that
  *
- * - BEFORE EACH CALL — planned or reserve — the chain's spend plus the image rate is compared with the
- *   per-reel cap, then with the caller's ceiling. A call that would pass either is not made: the
+ * - BEFORE EACH CALL — planned or reserve — the reel's spend plus the image rate is compared with the
+ *   per-reel cap, then with the caller's ceiling: the chain's, and for a resumed run the chain of the
+ *   run it resumes too — one reel, one cap, one ceiling (resume-failed, S-157, S-162). A call that would pass either is not made: the
  *   answer is `refused`, with the limit and that figure, and the stage stops (S-035). The cap is
  *   compared first, so a call passing both is told `reel` and the owner is asked (D-100).
  * - AS EACH CALL RETURNS, its `generation_receipt`, its cost added to the job row and the picture's
@@ -44,9 +45,10 @@ export function guardedImagePort(
         throw new Error(`picture '${request.pictureId}' opens no shot the placement holds (S-039)`)
       }
 
-      // SUM(cost_cents) over the chain, read again before every call (D-081, S-036), plus one more
-      // picture at the rate — rounded up, as the estimate it answers to is (S-053).
-      const estimateCents = Math.ceil(spentCents(db, job.runId) + job.rateCents)
+      // SUM(cost_cents) over the chain — and the chain of the run it resumes (S-162) — read again
+      // before every call (D-081, S-036), plus one more picture at the rate — rounded up, as the
+      // estimate it answers to is (S-053).
+      const estimateCents = Math.ceil(reelSpentCents(db, job.runId) + job.rateCents)
       if (estimateCents > job.capCents) return { kind: 'refused', limit: 'reel', estimateCents }
       if (estimateCents > job.ceilingCents) {
         return { kind: 'refused', limit: 'ceiling', estimateCents }

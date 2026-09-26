@@ -1,7 +1,7 @@
-import { and, count, eq, max, sql } from 'drizzle-orm'
+import { and, count, eq, isNotNull, max, sql } from 'drizzle-orm'
 import type { ImageReceipt, LostCall, PictureRecord } from '@cutroom/contracts'
 import type { Db } from './db.ts'
-import { generationReceipt, job, lostCall, picture } from './schema.ts'
+import { generationReceipt, job, lostCall, picture, run } from './schema.ts'
 import { pictureValues } from './pictures.ts'
 
 // What a run has spent, and what each image call cost (docs/features/reel-stills.md, Gate 2
@@ -11,7 +11,7 @@ import { pictureValues } from './pictures.ts'
  * The chain's spend: `SUM(cost_cents)` over every job row with this `correlation_id`, and over no
  * other (D-081). A run's `costCents` is this sum.
  */
-export function spentCents(db: Db, correlationId: string): number {
+export function spentCents(db: Pick<Db, 'select'>, correlationId: string): number {
   const row = db
     .select({ spent: sql<number>`COALESCE(SUM(${job.costCents}), 0)` })
     .from(job)
@@ -21,11 +21,27 @@ export function spentCents(db: Db, correlationId: string): number {
 }
 
 /**
- * The image calls a run has PAID FOR: its `generation_receipt` rows and its image `lost_call` rows,
- * every attempt's (D-027, S-048, S-142). The keyframes job reads it at the start of each attempt,
- * and the attempt's reserve is six less these and less the first calls no kept picture satisfies
- * (S-164) — so an attempt run again after its worker died pays for what the one before it made out
- * of what is left, a picture it kept counted once, and no run makes more than six.
+ * What the REEL has spent (docs/features/resume-failed.md, Gate 2 "Cost, the estimate and the
+ * ceiling"; S-157, S-162): the run's own spend and, for a run that resumes another, that run's too —
+ * one reel, one cap and one ceiling. What every guard compares before a call, and what a budget stop's
+ * question reports; a run's `costCents` stays its own `spentCents`. For a run that resumes nothing it
+ * is `spentCents`.
+ */
+export function reelSpentCents(db: Pick<Db, 'select'>, runId: string): number {
+  const row = db.select({ resumes: run.resumes }).from(run).where(eq(run.runId, runId)).get()
+  const own = spentCents(db, runId)
+  return row?.resumes === null || row?.resumes === undefined
+    ? own
+    : own + spentCents(db, row.resumes)
+}
+
+/**
+ * The image calls a run counts against its six: its `generation_receipt` rows and its image
+ * `lost_call` rows, every attempt's (D-027, S-048, S-142), and its pictures copied from the run it
+ * resumes, `kept_from` set, whose calls that run paid for (S-164). The keyframes job reads it at the
+ * start of each attempt, and the attempt's reserve is six less these and less the first calls no kept
+ * picture satisfies (S-164) — so an attempt run again after its worker died pays for what the one
+ * before it made out of what is left, a picture it kept counted once, and no run makes more than six.
  *
  * **A call that answered and made no usable picture counts here too**, since paid-failures: D-027
  * bounds what a run may SPEND at pictures, and two such calls in the first real reel counted for
@@ -43,7 +59,12 @@ export function imageCallCount(db: Db, runId: string): number {
     .from(lostCall)
     .where(and(eq(lostCall.runId, runId), eq(lostCall.port, 'image')))
     .get()
-  return (made?.n ?? 0) + (lost?.n ?? 0)
+  const copied = db
+    .select({ n: count() })
+    .from(picture)
+    .where(and(eq(picture.runId, runId), isNotNull(picture.keptFrom)))
+    .get()
+  return (made?.n ?? 0) + (lost?.n ?? 0) + (copied?.n ?? 0)
 }
 
 /**

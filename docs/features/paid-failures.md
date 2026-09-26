@@ -26,6 +26,13 @@ Gates: product APPROVED 2026-09-22 adversarial-reviewer · architecture APPROVED
 > are exactly what they are today. **It changes what is written down when a call goes wrong, and how long a run
 > survives a provider having a bad minute.**
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
+> (**S-164**). **`imageCallCount` is widened once more**: to its `generation_receipt` rows and image `lost_call` rows it
+> adds the run's pictures copied from the run it resumes (`kept_from` set) — S-061 as S-164 supersedes it. A lost call
+> of the failed run is not copied and is not counted in the resumed run's six; its money is, by the cap and the ceiling,
+> which compare the reel's spend (`reelSpentCents`). Check 6 (`paid-failures-record.test.ts:207-232`) writes no picture
+> row and stands as written.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
 > removed** (**S-163**). **`packages/contracts/src/failures.ts` gains five classes and the kind**: `OffSpec` and
 > `RefusedRequest` extend `Spent`, `StillUnavailable` extends `Unavailable`, `Unanswered` and `ProviderFailed` extend

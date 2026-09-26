@@ -1,5 +1,5 @@
 import type { NarrationAnswer, NarrationPort, RenderSettings } from '@cutroom/contracts'
-import { recordNarration, spentCents, type Db } from '@cutroom/domain'
+import { recordNarration, reelSpentCents, type Db } from '@cutroom/domain'
 import { readNarrationId } from '@cutroom/pipeline'
 import { recordingSpend } from './spend.ts'
 import { sentUntilAvailable } from './transient.ts'
@@ -9,8 +9,9 @@ import type { ClipsLimits } from './video-port.ts'
  * The only narration port the clips stage is handed (docs/features/reel-render.md, Gate 2
  * "Spending"; S-021, S-035, S-036, S-070): the port the worker was given, wrapped so that
  *
- * - BEFORE EACH SEND, the chain's spend plus the call's figure — the text's characters at the
- *   narration rate — is compared with the per-reel cap, then with the caller's ceiling. A call that
+ * - BEFORE EACH SEND, the reel's spend plus the call's figure — the text's characters at the
+ *   narration rate — is compared with the per-reel cap, then with the caller's ceiling: the chain's,
+ *   and for a resumed run the chain of the run it resumes too (resume-failed, S-157, S-162). A call that
  *   would pass either is not made: the answer is `refused`, with the limit and that figure, the
  *   request goes on the attempt's list of refused calls, and the stage stops (S-035). Exactly equal
  *   is made. A character is a Unicode code point (S-088).
@@ -46,12 +47,12 @@ export function guardedNarrationPort(
         `the narration call for ${request.narrationId}`,
         job.transient,
         async (): Promise<NarrationAnswer> => {
-          // SUM(cost_cents) over the chain, read again before every send (D-081, S-036, S-095), plus
-          // this narration's characters — code points, not a string's UTF-16 length (S-088) — at the
+          // SUM(cost_cents) over the chain — and the chain of the run it resumes (S-162) — read again
+          // before every send (D-081, S-036, S-095), plus this narration's characters — code points, not a string's UTF-16 length (S-088) — at the
           // rate, rounded up, as every guard's figure is (S-053, S-059).
           const characters = [...request.text].length
           const estimateCents = Math.ceil(
-            spentCents(db, job.runId) + characters * job.rateCentsPerCharacter,
+            reelSpentCents(db, job.runId) + characters * job.rateCentsPerCharacter,
           )
           const { capCents, ceilingCents, refused } = job.limits
           if (estimateCents > capCents || estimateCents > ceilingCents) {

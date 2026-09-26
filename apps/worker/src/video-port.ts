@@ -5,7 +5,7 @@ import type {
   VideoPort,
   VideoRequest,
 } from '@cutroom/contracts'
-import { recordClip, recordLostCall, spentCents, type Db } from '@cutroom/domain'
+import { recordClip, recordLostCall, reelSpentCents, type Db } from '@cutroom/domain'
 import { readTakeId, validateVideoRequest } from '@cutroom/pipeline'
 import { recordingSpend } from './spend.ts'
 import { sentUntilAvailable } from './transient.ts'
@@ -57,8 +57,9 @@ export function validatingVideoPort(video: VideoPort): VideoPort {
  * The port the worker was given, guarded (docs/features/reel-render.md, Gate 2 "Spending"; S-021,
  * S-035, S-036, S-071):
  *
- * - BEFORE EACH SEND, the chain's spend plus the call's figure — the requested seconds at the video
- *   rate — is compared with the per-reel cap, then with the caller's ceiling. A call that would pass
+ * - BEFORE EACH SEND, the reel's spend plus the call's figure — the requested seconds at the video
+ *   rate — is compared with the per-reel cap, then with the caller's ceiling: the chain's, and for a
+ *   resumed run the chain of the run it resumes too (resume-failed, S-157, S-162). A call that would pass
  *   either is not made: the answer is `refused`, with the limit and that figure, the request goes on
  *   the attempt's list of refused calls, and the stage stops (S-035). Exactly equal is made. The cap
  *   is compared first, so a call passing both is told `reel` and the owner is asked (D-100).
@@ -98,11 +99,11 @@ export function guardedVideoPort(
         `the video call for ${request.takeId}`,
         job.transient,
         async (): Promise<VideoAnswer> => {
-          // SUM(cost_cents) over the chain, read again before every send (D-081, S-036, S-095), plus
-          // this clip's requested seconds at the rate — rounded up, as every guard's figure is (S-053,
-          // S-059).
+          // SUM(cost_cents) over the chain — and the chain of the run it resumes (S-162) — read again
+          // before every send (D-081, S-036, S-095), plus this clip's requested seconds at the rate —
+          // rounded up, as every guard's figure is (S-053, S-059).
           const estimateCents = Math.ceil(
-            spentCents(db, job.runId) + request.durationSeconds * job.rateCents,
+            reelSpentCents(db, job.runId) + request.durationSeconds * job.rateCents,
           )
           const { capCents, ceilingCents, refused } = job.limits
           if (estimateCents > capCents || estimateCents > ceilingCents) {

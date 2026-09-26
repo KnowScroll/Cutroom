@@ -13,10 +13,17 @@ export {
   type RenderInputs,
 } from './clips.ts'
 export { closeDatabase, openDatabase, type Db } from './db.ts'
-export { imageCallCount, recordGeneration, recordLostCall, spentCents } from './ledger.ts'
+export {
+  imageCallCount,
+  recordGeneration,
+  recordLostCall,
+  reelSpentCents,
+  spentCents,
+} from './ledger.ts'
 export { REFUSED_ANSWER_CAP, kept, recordRefusedAnswer, redacted } from './refused.ts'
 export { readRecord, readStillsInputs, upsertPicture, type DegradedShot } from './pictures.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
+export { readResumeInputs, resumeRun } from './resume.ts'
 export {
   ASSEMBLE_JOB,
   CLIPS_JOB,

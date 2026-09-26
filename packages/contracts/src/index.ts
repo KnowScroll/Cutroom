@@ -47,6 +47,15 @@ export {
 export type { LanguageModelPort, ModelCall, ModelReceipt, ModelRole } from './model.ts'
 export { clipObservation, witnessObservation } from './observation.ts'
 export type { Refusals, WitnessRefusals } from './brands.ts'
+export type {
+  Piece,
+  ResumeAdmission,
+  ResumeBy,
+  ResumeInputs,
+  ResumePlan,
+  ResumePlanned,
+  ResumeRates,
+} from './resume.ts'
 export { ANSWER_REFUSALS, answerRefusal, refusalsOf, witnessRefusalsOf } from './refusals.ts'
 export type { RefusalRecorder, RefusedAnswer } from './refused.ts'
 export type {

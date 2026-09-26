@@ -20,9 +20,21 @@ export interface ClaimedJob {
 /** How long a claimed job is held before another claim may take it (D-002's lease). */
 export const DEFAULT_LEASE_MS = 60_000
 
+/**
+ * One queued job, due at `now`. `attempts` is where its claims start counting — 0, so the first claim
+ * is attempt 1, for every job but a resumed run's: its jobs start at the attempts of the run it resumes,
+ * so no id they make is one that run holds (docs/features/resume-failed.md, Gate 2 "Ids, seeds and
+ * attempts"; S-162).
+ */
 export function enqueue(
   tx: Writer,
-  entry: { kind: string; correlationId: string; payload: unknown; parentId?: number },
+  entry: {
+    kind: string
+    correlationId: string
+    payload: unknown
+    parentId?: number
+    attempts?: number
+  },
   now: Date,
 ): number {
   const row = tx
@@ -33,6 +45,7 @@ export function enqueue(
       payload: JSON.stringify(entry.payload),
       parentId: entry.parentId ?? null,
       state: 'queued',
+      attempts: entry.attempts ?? 0,
       runAt: now.toISOString(),
     })
     .returning({ id: job.id })

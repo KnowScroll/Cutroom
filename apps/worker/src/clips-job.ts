@@ -14,6 +14,7 @@ import {
   readRequest,
   readRun,
   readSelectedPlan,
+  reelSpentCents,
   spentCents,
   startStage,
   type ClaimedJob,
@@ -194,7 +195,8 @@ export async function runClipsJob(
                 characters: [...refused.request.text].length,
               },
         estimateCents: outcome.estimateCents,
-        spentCents: costCents,
+        // What the guard compared: the reel's spend, the run it resumes included (S-162).
+        spentCents: reelSpentCents(db, runId),
         narrations: outcome.narrations.length,
         clips: outcome.takes.length,
         ceilingCents,

@@ -10,6 +10,17 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
+> (**S-157**, **S-162**, **S-164**). **The video and narration guards compare the reel's spend** (`reelSpentCents`), and
+> a clips stop's question reports it as _"Spent"_; for a run that resumes nothing it is `spentCents`, so no figure in
+> `reel-render-spending` moves. **The clips stage refuses, before any call, a kept take made from another picture than
+> its shot's chosen one, or from words on a shot that has one** — an engine fault: the takedown and the carried
+> degradations make it unreachable, and no verified check hands the stage such a take
+> (`reel-takes-transient.test.ts:360` hands none). **A hold marks its take's receipt in whichever run holds it** — the
+> run, or the run it resumes for a kept take. `readClipsInputs`' kept rows include a resumed run's copies (its comment
+> at `clips.ts:404-408`), and a resumed run's clips and assemble jobs start their attempts at the failed run's, so no
+> take or render id repeats one; the render manifest's ledger stays the run's own receipts.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
 > removed** (**S-163**). **Gate 7's unparsable judge answer throws an `Unanswered`** (`gates/gate7.ts`), today's words.
 > **The clips and render stages' failed endings carry their kind**: each catch-all's from the class; the clips stage's

@@ -32,6 +32,16 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
+> (**S-157**, **S-162**, **S-164**). **The image guard compares the reel's spend** — `reelSpentCents`, the run's chain
+> and, for a resumed run, the chain of the run it resumes (D-081 and S-036 read across both) — and a stop's question
+> reports it as _"Spent"_; for a run that resumes nothing it is `spentCents`, so no guard figure in
+> `reel-stills-spending` moves, and a run's `costCents` stays its own. **`imageCallCount` counts a resumed run's copied
+> pictures** (`kept_from` set) beside its receipts and image lost calls, so a copied picture is an earlier call and
+> never a first call still to make. **`markDegraded` marks receipts in the run and in the run it resumes**: a kept
+> picture's receipt stays where it was paid for (S-058 as S-164 reads it). The keyframes job is otherwise unchanged: a
+> resumed run's copied pictures reach it through `readStillsInputs`, as an earlier attempt's do (Slice 2).
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 2 — the gates below are not edited, and no assertion is
 > removed** (**S-164**, superseding **S-048** in part). **A keyframes job run again keeps every picture an earlier
 > attempt decided** — accepted or failed, read back by `readStillsInputs` — and makes again only a picture whose

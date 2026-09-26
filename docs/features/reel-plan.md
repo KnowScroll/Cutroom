@@ -27,6 +27,16 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
+> (**S-157**, **S-162**). **A resume is a new run of the same request** (`resumeRun`, `packages/domain/src/resume.ts`),
+> made only by `resume-failed`'s own tests until its Slice 4 gives it a route: two runs then share one `requestId`, the
+> second naming the first in `run.resumes`, and its first job has no parent. **`enqueue` takes optional starting
+> attempts**, and `admitStills`, `advanceStills` and `advanceClips` pass, for a resumed run, the greatest attempts the
+> run it resumes reached at the next job's kind — 0 for every run that resumes nothing, so every verified job row reads
+> as it did (`reel-render-chain.test.ts:189-190`, `reel-render-advance.test.ts:116-117`). A resumed run's jobs therefore
+> make no id, and send no seed, that the run it resumes made (D-018). Lookup and replay still answer a request's first
+> run until Slice 4 answers the newest; no verified check makes a second run of one request.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
 > removed** (**S-163**). **Migration 0007** (`db/migrations/0007_resume_failed.sql`, drizzle-kit): the `run` table
 > gains `resumes`, `failure` and `resume_request`, and its unique index on `request_id` becomes partial, `WHERE

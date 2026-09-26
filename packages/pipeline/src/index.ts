@@ -40,6 +40,7 @@ export { repairBasis } from './plan/repair.ts'
 export { scorePlan } from './plan/score.ts'
 export { plannedImageCalls, rankSubjects } from './rank.ts'
 export { DEFAULT_RENDER_SETTINGS, cutReel, type CutOutcome } from './render/index.ts'
+export { admitResume, normalise, planResume, takedown, type Normalised } from './resume/index.ts'
 export {
   renderIdOf,
   renderManifest,

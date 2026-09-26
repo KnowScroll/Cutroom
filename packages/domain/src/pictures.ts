@@ -270,12 +270,23 @@ export interface DegradedShot {
 }
 
 /**
+ * The runs a run's pieces may hold their receipts in: the run, and the run it resumes, whose copied
+ * pieces' receipts stay where they were paid for (docs/features/resume-failed.md, Gate 2 "What is
+ * kept, and where"; S-162, S-164). A label is a fact about a piece, so it is written in whichever.
+ */
+export function receiptRuns(tx: Pick<Db, 'select'>, runId: string): string[] {
+  const row = tx.select({ resumes: run.resumes }).from(run).where(eq(run.runId, runId)).get()
+  return row?.resumes === null || row?.resumes === undefined ? [runId] : [runId, row.resumes]
+}
+
+/**
  * Three of a degraded shot's four labels, inside the transaction that ends the run (I-4, D-025):
  * its `degradation` row, the reason on its last failing picture, and every `generation_receipt` of
- * its pictures marked degraded. The fourth, its `degraded` event, is written with the events.
+ * its pictures marked degraded — in the run, or in the run it resumes for a picture copied from it
+ * (S-164). The fourth, its `degraded` event, is written with the events.
  */
 export function markDegraded(
-  tx: Pick<Db, 'insert' | 'update'>,
+  tx: Pick<Db, 'select' | 'insert' | 'update'>,
   runId: string,
   shot: DegradedShot,
 ): void {
@@ -291,7 +302,7 @@ export function markDegraded(
       .set({ degraded: true })
       .where(
         and(
-          eq(generationReceipt.runId, runId),
+          inArray(generationReceipt.runId, receiptRuns(tx, runId)),
           inArray(generationReceipt.pictureId, [...shot.pictureIds]),
         ),
       )

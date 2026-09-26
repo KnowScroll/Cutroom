@@ -19,7 +19,7 @@ import {
   type RunStatus,
 } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
-import { markChosen, markDegraded, type DegradedShot } from './pictures.ts'
+import { markChosen, markDegraded, receiptRuns, type DegradedShot } from './pictures.ts'
 import { completeJob, enqueue, type Writer } from './queue.ts'
 import {
   hold,
@@ -67,7 +67,8 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(value)
 }
 
-function append(tx: Writer, runId: string, body: EventBody, now: Date): RunEvent {
+/** Appends one event, numbered after the run's last, inside the caller's transaction. */
+export function append(tx: Writer, runId: string, body: EventBody, now: Date): RunEvent {
   const last = tx
     .select({ seq: max(runEvent.seq) })
     .from(runEvent)
@@ -241,6 +242,31 @@ function writePlans(tx: Writer, runId: string, plans: readonly PlanRow[]): void 
 }
 
 /**
+ * The greatest attempts any job of `kind` in run `runId`'s chain reached, or 0 when it has none.
+ */
+export function greatestAttempts(tx: Pick<Db, 'select'>, runId: string, kind: string): number {
+  const row = tx
+    .select({ attempts: max(job.attempts) })
+    .from(job)
+    .where(and(eq(job.correlationId, runId), eq(job.kind, kind)))
+    .get()
+  return row?.attempts ?? 0
+}
+
+/**
+ * Where a run's next job of `kind` starts counting its claims: 0 for a run that resumes nothing, and
+ * for a resumed run the attempts the run it resumes reached at that kind — so every id the job makes,
+ * `a<attempt>-…`, is new, and no take is sent the seed the failed run's was (docs/features/resume-failed.md,
+ * Gate 2 "Ids, seeds and attempts"; D-018, S-162).
+ */
+function startingAttempts(tx: Pick<Db, 'select'>, runId: string, kind: string): number {
+  const row = tx.select({ resumes: run.resumes }).from(run).where(eq(run.runId, runId)).get()
+  return row?.resumes === null || row?.resumes === undefined
+    ? 0
+    : greatestAttempts(tx, row.resumes, kind)
+}
+
+/**
  * A `stills` run whose pictures fit the caller's ceiling (S-030, S-035), in one transaction: the
  * plan rows, the events the plan stage ended with, the plan job marked done at cost 0, and the
  * chain's next row — one `reel.keyframes` job whose `correlation_id` is the run and whose
@@ -268,7 +294,13 @@ export function admitStills(
       completeJob(tx, jobId, 0)
       return enqueue(
         tx,
-        { kind: KEYFRAMES_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
+        {
+          kind: KEYFRAMES_JOB,
+          correlationId: runId,
+          payload: { runId },
+          parentId: jobId,
+          attempts: startingAttempts(tx, runId, KEYFRAMES_JOB),
+        },
         now,
       )
     },
@@ -410,7 +442,13 @@ export function advanceStills(
       completeJob(tx, jobId)
       return enqueue(
         tx,
-        { kind: CLIPS_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
+        {
+          kind: CLIPS_JOB,
+          correlationId: runId,
+          payload: { runId },
+          parentId: jobId,
+          attempts: startingAttempts(tx, runId, CLIPS_JOB),
+        },
         now,
       )
     },
@@ -423,7 +461,8 @@ export function advanceStills(
  * run, WHATEVER THE ENDING (I-4, S-058's form, S-098): its `still_hold` row — the attempt that decided
  * it is the clips job's, read off its row — the reason on its third take's row, beside that take's
  * verdicts, and the video receipt of each of its three takes marked degraded, whichever attempt made
- * it. The fourth, its `degraded` event, is among the events.
+ * it — in the run, or in the run it resumes for a take copied from it (S-164). The fourth, its
+ * `degraded` event, is among the events.
  */
 function markStillHeld(tx: Writer, runId: string, jobId: number, held: StillHold): void {
   const claimed = tx.select({ attempts: job.attempts }).from(job).where(eq(job.id, jobId)).get()
@@ -451,7 +490,12 @@ function markStillHeld(tx: Writer, runId: string, jobId: number, held: StillHold
     .run()
   tx.update(videoReceipt)
     .set({ degraded: true })
-    .where(and(eq(videoReceipt.runId, runId), inArray(videoReceipt.takeId, [...held.takeIds])))
+    .where(
+      and(
+        inArray(videoReceipt.runId, receiptRuns(tx, runId)),
+        inArray(videoReceipt.takeId, [...held.takeIds]),
+      ),
+    )
     .run()
 }
 
@@ -484,7 +528,13 @@ export function advanceClips(
       completeJob(tx, jobId)
       return enqueue(
         tx,
-        { kind: ASSEMBLE_JOB, correlationId: runId, payload: { runId }, parentId: jobId },
+        {
+          kind: ASSEMBLE_JOB,
+          correlationId: runId,
+          payload: { runId },
+          parentId: jobId,
+          attempts: startingAttempts(tx, runId, ASSEMBLE_JOB),
+        },
         now,
       )
     },
@@ -584,9 +634,15 @@ export function finishVideo(
             .set({ degradation: held.reason })
             .where(and(eq(take.runId, runId), eq(take.takeId, held.takeId)))
             .run()
+          // In the run that paid for it: this one, or the run it resumes for a kept take (S-164).
           tx.update(videoReceipt)
             .set({ degraded: true })
-            .where(and(eq(videoReceipt.runId, runId), eq(videoReceipt.takeId, held.takeId)))
+            .where(
+              and(
+                inArray(videoReceipt.runId, receiptRuns(tx, runId)),
+                eq(videoReceipt.takeId, held.takeId),
+              ),
+            )
             .run()
         }
         tx.update(render)

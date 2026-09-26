@@ -207,6 +207,23 @@ async function stage(
   const { runId, attempt, plan, request } = input
   const subjects = new Map(plan.subjects.map((s) => [s.id, s]))
 
+  // A kept take made from another picture than its shot's chosen one, or from words on a shot that
+  // has a chosen picture, is refused BEFORE ANY CALL, as an engine fault (resume-failed, S-164). The
+  // takedown and the carried degradations make it unreachable; this makes a planner bug cost nothing,
+  // where a render refused after the clips are paid for would cost them all.
+  for (const kept of input.kept.takes) {
+    const still = input.stills.find((s) => s.shotUnit === kept.shotUnit)
+    if (kept.mode === 'text-to-video' ? still === undefined : kept.pictureId === still?.pictureId) {
+      continue
+    }
+    const shotId = shotIdOf(kept.shotUnit)
+    throw new Error(
+      kept.mode === 'text-to-video'
+        ? `the kept take ${kept.takeId} of ${shotId} was made from words, and its shot has the chosen picture ${still?.pictureId} (S-164)`
+        : `the kept take ${kept.takeId} of ${shotId} was made from ${kept.pictureId}, not from its shot's chosen picture ${still?.pictureId ?? '— it has none'} (S-164)`,
+    )
+  }
+
   /** Replaces a narration's fields and hands the whole record to the recorder. */
   const narrated = async (index: number, fields: Partial<NarrationRecord>) => {
     const current = record.narrations[index]

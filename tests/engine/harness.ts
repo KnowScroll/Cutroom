@@ -9,12 +9,20 @@ import type {
   LanguageModelPort,
   MediaPort,
   NarrationPort,
+  Piece,
   PlanSettings,
   RenderSettings,
+  ResumeAdmission,
+  ResumePlan,
   StillsSettings,
   VideoPort,
 } from '@cutroom/contracts'
-import { DEFAULT_PLAN_SETTINGS, DEFAULT_RENDER_SETTINGS } from '@cutroom/pipeline'
+import {
+  DEFAULT_PLAN_SETTINGS,
+  DEFAULT_RENDER_SETTINGS,
+  admitResume,
+  planResume,
+} from '@cutroom/pipeline'
 import {
   DEFAULT_ARTIFACT_ROOT,
   fakeImage,
@@ -40,6 +48,14 @@ import {
   type FfmpegMedia,
 } from '@cutroom/providers'
 import { startWorker, type Worker } from '@cutroom/worker'
+import {
+  BUDGET_MD,
+  closeDatabase,
+  openDatabase,
+  readReelCapCents,
+  readResumeInputs,
+  resumeRun,
+} from '../../packages/domain/src/index.ts'
 import { REPO } from '../_repo.ts'
 import { client } from '../stand-in/client.ts'
 import type { WorkerProcessConfig } from './worker-process.ts'
@@ -96,6 +112,10 @@ export interface Engine {
   budgetPath: string | undefined
   /** Where the image stand-in writes its pictures: inside `dir`, or the stand-in's default. */
   artifactRoot: string
+  /** The planning settings the worker is handed, whose rates a resume is priced at (resume-failed). */
+  settings: PlanSettings
+  /** The render settings the worker is handed. */
+  renderSettings: RenderSettings
   api: Api
   http: ReturnType<typeof client>
   /** The stand-in the worker was handed, with every call it received. */
@@ -219,6 +239,8 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
     questionsPath,
     budgetPath,
     artifactRoot,
+    settings,
+    renderSettings,
     api,
     http: client(api.baseUrl),
     model: fakeModel(options.script ?? {}, { models: settings.models }),
@@ -436,5 +458,64 @@ export async function run(engine: Engine, request: unknown): Promise<Ran> {
     receipts: engine
       .query<{ role: string }>('SELECT role FROM model_receipt WHERE run_id = ? ORDER BY id', runId)
       .map((r) => ({ role: r.role })),
+  }
+}
+
+/** A run resumed by `resumed`: the new run, what was planned, and the figure admitted. */
+export interface Resumed {
+  runId: string
+  plan: ResumePlan
+  admission: Extract<ResumeAdmission, { admitted: true }>
+}
+
+/**
+ * Resumes a finished run THE WAY THE API WILL (docs/features/resume-failed.md, Slice 3): reads what it
+ * holds, plans the resume as its caller at the worker's own rates, admits it against the cap the
+ * worker reads and the request's ceiling, and makes the run in one immediate transaction — due at
+ * once unless `delayMs` says otherwise. Throws, naming why, if the plan or the admission refuses.
+ */
+export function resumed(
+  engine: Engine,
+  origin: string,
+  options: { remake?: readonly Piece[]; delayMs?: number; now?: Date } = {},
+): Resumed {
+  const db = openDatabase(engine.dbPath)
+  try {
+    const inputs = readResumeInputs(db, origin)
+    const planned = planResume(
+      inputs,
+      options.remake ?? [],
+      {
+        imageRateCents: engine.settings.imageRateCents,
+        videoRateCentsPerSecond: engine.settings.videoRateCentsPerSecond,
+        narrationRateCentsPerCharacter: engine.renderSettings.narrationRateCentsPerCharacter,
+      },
+      'caller',
+    )
+    if (planned.outcome !== 'planned') {
+      throw new Error(`the resume of run ${origin} was not planned: ${JSON.stringify(planned)}`)
+    }
+    const admission = admitResume(
+      inputs.spentCents,
+      planned.plan.estimateCents,
+      readReelCapCents(engine.budgetPath ?? BUDGET_MD),
+      inputs.request.options.budgetCents,
+    )
+    if (!admission.admitted) {
+      throw new Error(`the resume of run ${origin} was not admitted: ${JSON.stringify(admission)}`)
+    }
+    const now = options.now ?? new Date()
+    const runId = db.transaction(
+      (tx) =>
+        resumeRun(tx, origin, planned.plan, {
+          now,
+          delayMs: options.delayMs ?? 0,
+          resumeRequest: planned.plan.named,
+        }),
+      { behavior: 'immediate' },
+    )
+    return { runId, plan: planned.plan, admission }
+  } finally {
+    closeDatabase(db)
   }
 }

@@ -14,6 +14,7 @@ import {
   readRun,
   readSelectedPlan,
   readStillsInputs,
+  reelSpentCents,
   spentCents,
   startStage,
   type ClaimedJob,
@@ -109,8 +110,9 @@ export async function runKeyframesJob(
     return
   }
 
-  // The run's image calls before this attempt, counted from its receipts now, at the attempt's start,
-  // and every picture an earlier attempt decided: a job run again after its worker died keeps those
+  // The run's image calls before this attempt, counted now, at the attempt's start — its receipts, its
+  // image lost calls and its pictures copied from the run it resumes (S-164) — and every picture an
+  // earlier attempt decided, or a resume copied: a job run again after its worker died keeps those
   // and makes again only a picture whose checks were cut off, and what the attempts before it made
   // comes out of its reserve (S-048, S-164). The stage decides what that leaves (S-061).
   const earlierImageCalls = imageCallCount(db, runId)
@@ -221,7 +223,8 @@ export async function runKeyframesJob(
         runId,
         requestId: request.requestId,
         estimateCents: outcome.estimateCents,
-        spentCents: costCents,
+        // What the guard compared: the reel's spend, the run it resumes included (S-162).
+        spentCents: reelSpentCents(db, runId),
         pictures: outcome.pictures.length,
         ceilingCents,
         capCents,

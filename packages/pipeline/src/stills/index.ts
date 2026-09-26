@@ -75,7 +75,10 @@ export interface StillsInput {
   runId: string
   /** The keyframes job's attempt. */
   attempt: number
-  /** The run's image calls before this attempt: its receipts and image lost calls (S-048, S-142). */
+  /**
+   * The run's image calls before this attempt: its receipts and image lost calls (S-048, S-142), and
+   * its pictures copied from the run it resumes (S-164).
+   */
   earlierImageCalls: number
   request: SubmitRequest
   plan: Plan

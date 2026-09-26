@@ -402,7 +402,8 @@ export function readClipsInputs(db: Db, runId: string): ClipsInputs {
     .map((row) => Number(/^shot-(\d+)$/.exec(row.shotId)?.[1] ?? Number.NaN))
     .filter((unit) => Number.isInteger(unit))
   // What earlier attempts finished, every one's, in the order made (S-092). The clips job reads this
-  // before its stage makes anything, so every row here is an earlier attempt's: a narration it
+  // before its stage makes anything, so every row here is an earlier attempt's — or one copied from
+  // the run this one resumes, which is an earlier attempt's of that run (S-162): a narration it
   // measured and timed, and a take whose outcome it decided. A take a crash CUT OFF has no outcome,
   // so it is not kept — it is made again under the next attempt's id, counting against no cap.
   const kept = {

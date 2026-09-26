@@ -1007,7 +1007,7 @@ touches gains its amendment block in that slice.
       kept reasons, the carried degradation, the two failures' new words; `reserveOf`'s new formula; `seq`;
       `killedAgain`; the amended checks 48 and 49 of `reel-stills`. S-048 superseded. Amendment blocks: `reel-stills`,
       `three-pictures`. **Proves: 6 to 11.**
-- [ ] **Slice 3 — the resume, made by a test.** `readResumeInputs`, `planResume`, `admitResume`, `resumeRun`; starting
+- [x] **Slice 3 — the resume, made by a test.** `readResumeInputs`, `planResume`, `admitResume`, `resumeRun`; starting
       attempts; `reelSpentCents` in the guards and questions; `imageCallCount` counting copies; labels in two runs; the
       kept-take check. A test helper resumes a failed run the way the API will. Amendment blocks: `reel-render`,
       `reel-takes`, `reel-stills` (`guarded-image-port.ts`, `imageCallCount`, `markDegraded`), `paid-failures`
