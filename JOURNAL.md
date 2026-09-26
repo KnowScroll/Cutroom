@@ -6888,3 +6888,36 @@ each time, all nine steps green. The in-memory `seq` a stage gives a picture is 
 fresh context, never be cut in half.
 
 **Next.** `PROMPTS/057`: Slice 3 onwards, in the gates' order.
+
+## 2026-09-26 — session 57: `resume-failed`'s Slice 3 built — a failed run resumed by a test (PROMPTS/057)
+
+**Asked.** `PROMPTS/057`: the build from Slice 3, slice by slice, to the journey; stop at a slice boundary when the
+context grows heavy.
+
+**Slice 3 — the resume, made by a test** (`395dc40`). A resume is a new run of the same request that copies the failed
+run's kept rows into itself in the transaction that creates it. `planResume` (pure, `pipeline/src/resume/`) normalises
+the named pieces first, answers a run resumed already with the run that resumed it — `replayed` for its stored list,
+`resumed` otherwise — then applies the table of resumable endings, and plans: a run with no plan plans again keeping
+nothing; every other keeps what the takedown leaves and prices the first calls still to make, rounded up once.
+`readResumeInputs` and `resumeRun` (`domain/src/resume.ts`) read and copy; `admitResume` compares spent plus estimate
+with the cap, then the ceiling. Starting attempts through `enqueue`, `reelSpentCents` in every guard and stop question,
+`imageCallCount` counting copies, labels in two runs, and the clips stage's kept-take check. `resumed()` in the harness
+resumes a run the way the API will. Checks 12 to 25.
+
+**Observed.** The test-impact pass found nothing beyond what Gate 3 lists. The first run of the new file failed six
+engine checks on one cause, not the code: `node:sqlite` rows have no prototype, and a strict deep equality compares
+it — the file reads rows through a small `query` that spreads them. Check 16 then caught that copies were written in
+primary-key order rather than the origin's row order; every copy now follows the origin's `rowid`, so a copy reads back
+as its row did. Eleven deliberate breaks, each alone, each red where it should be (the commit names them), all restored.
+Full `check.mjs` green, tests 357 s.
+
+**Two choices inside the gates, neither between real alternatives.** `Piece` is a local type in `contracts` until Slice
+4's route defines the schema in `reel-contract` — adding the schema now would have left it outside `reel-contract`'s
+hand-listed checks 1, 2 and 5 for a slice. And check 18's origin fails at the barons' repair, not their picture, so
+the reserve it proves (6 − 3 copied − 1 unmade = 2) is observable: copies uncounted would give 5 and a second hall
+repair; counted twice, −1 and a failure before any call.
+
+**Why stop here.** About half the context was spent; Slice 4 is nine checks, five engine scenarios in check 33 alone,
+the API, the service and the stand-in. Started now it would likely be cut by a compaction inside the slice.
+
+**Next.** `PROMPTS/058`: Slice 4 onwards, in the gates' order.

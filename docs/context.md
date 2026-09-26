@@ -21,13 +21,13 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
-  **Stopped**: `one-subject` (S-149). **Gates approved, Slices 1 and 2 of 7 built**: `resume-failed` (S-161 to S-164, S-171). **Planned, gates not
+  **Stopped**: `one-subject` (S-149). **Gates approved, Slices 1 to 3 of 7 built**: `resume-failed` (S-161 to S-164, S-171). **Planned, gates not
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
 - **Next**: session 55 made both explainer reels — video game graphics at its fourth run (`d12931e1`), JoJo at its
   second (`a1b8f2ee`), 322¢ over six runs, every stop a brief cause healed in the criteria or claims (P-021 to P-025
-  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/057` — `resume-failed`'s build from Slice 3 (session 56 approved the gates and built Slices 1 and 2); then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
+  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/058` — `resume-failed`'s build from Slice 4 (session 56 approved the gates and built Slices 1 and 2, session 57 Slice 3); then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -37,7 +37,7 @@ git and the journal keep them.
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: the last full `check.mjs` green on `0f73e5d`, `resume-failed`'s Slice 2 (session 56); every later commit
+- **Checks**: the last full `check.mjs` green on `395dc40`, `resume-failed`'s Slice 3 (session 57); every later commit
   is documents, or names its own full run below. `check.mjs --changed` between steps (S-159).
 
 ## Runs
@@ -92,6 +92,19 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-26 · session 57
+
+- Slice 3, the resume made by a test (`395dc40`): `packages/contracts/src/resume.ts` — the resume's shapes, `Piece`
+  local until Slice 4; `packages/pipeline/src/resume/index.ts` — `normalise`, `takedown`, `planResume`,
+  `admitResume`; `packages/domain/src/resume.ts` — `readResumeInputs`, `resumeRun` (copies in the origin's row
+  order); `reelSpentCents` and `imageCallCount` counting copies (`ledger.ts`); `enqueue`'s starting attempts
+  (`queue.ts`, passed by `admitStills`, `advanceStills`, `advanceClips`); `receiptRuns` — labels in two runs
+  (`pictures.ts`, `runs.ts`); the three guards and both stop questions on the reel's spend (`apps/worker`); the
+  kept-take check (`pipeline/src/clips/index.ts`). `tests/resume-failed-resume.test.ts`, checks 12 to 25;
+  `resumed()` and `Engine.settings` in `tests/engine/harness.ts`. Amendment blocks: `reel-plan`, `reel-stills`,
+  `reel-render`, `reel-takes`, `paid-failures`.
+- `PROMPTS/057` and `PROMPTS/README.md` — the Run line. `PROMPTS/058` — new: Slice 4 onwards.
 
 ### 2026-09-26 · session 56
 

@@ -4,7 +4,7 @@
 - **Feature:** `resume-failed` (S-157, S-161 to S-164, S-171)
 - **Work:** Slices 3 to 7 in the gates' order, each committed after the full check; Slice 7 runs the journey.
 - **Written:** 2026-09-26, at the end of session 56, which approved the gates and built Slices 1 and 2.
-- **Run:** not yet
+- **Run:** session 57, 2026-09-26 — Slice 3 built (`395dc40`); stopped at its boundary, Slice 4 onwards in `PROMPTS/058`
 
 **Where things stand.** The four gates are APPROVED (2026-09-26, Gate review 12; S-171 decided with the owner in that
 round). Slice 1 — the kind: five failure classes, `failureKindOf`, `run.failure`, migration 0007 — is `e67ec6f`.
