@@ -106,7 +106,8 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - `DECISIONS.md` — **S-170**: `self-heal` is one harness around the run — make, check, heal, learn — with a rule book
   from failed runs; a learned rule binds once the owner approves it; the caller's criteria and claims healed in place
   only when the request opts in, never a sentence or a fact (D-096 superseded in part). `docs/features/self-heal.md` —
-  its title, what the owner added, four more faults, gates 3 and 6 widened.
+  its title, what the owner added, four more faults, gates 3 and 6 widened; then what the rule book teaches the prompts (no model is trained),
+  the baseline — sessions 53 to 55, 19 runs, 4 reels, 649¢ — and the target its journey is held to.
 
 ### 2026-09-26 · session 54, continued
 

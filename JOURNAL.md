@@ -6825,3 +6825,24 @@ weaken or remove one"_ is what a brief heal can break — P-022's own fix loosen
 and leaves the caller's check of a completed brief to the caller's side.
 
 **Next.** `PROMPTS/056`, unchanged. `self-heal`'s gates after `resume-failed`'s build, now against S-170.
+
+## 2026-09-26 — session 55, continued: what the rule book teaches the prompts, and the target `self-heal` is measured by
+
+**Asked.** The owner: the harness must be _"very sophisticated and no-bs, it will perform fixes and make the
+reliability go up right?"_, and _"it should be able to learn from mistakes, that is what the image model needs in
+future images so it fails less, the desscriptions, details"_ — yes to writing a measurable target into the plan.
+
+**Answered.** Yes, where it can act: of the 15 runs of sessions 53 to 55 that ended early, 7 were one request (answered
+by `resume-failed` and asking or looking again) and 8 the brief (three a brief check would have caught before spending;
+the rest the opt-in's in-place heals, S-170). Not the models' habits, the engine's own faults (P-021, P-023, P-024) or
+this machine's network. And no model is trained: what learns is what the engine asks for.
+
+**Done.** `docs/features/self-heal.md` — a section on what the rule book teaches the prompts (session 55's refusals as
+rules; a repair told what the witness saw, not only the gate's reason; a rule kept by its before-and-after refusal rate,
+tied to its subject kind and its model), the baseline (19 runs, 4 reels, 649¢, about 162¢ a reel) and the target its
+journey holds it to (one submission per reel for every fault the harness owns, a reel's cost near a clean run's); gate
+item 7, the measure.
+
+**Why.** A reviewer approves against a number, not a hope; the numbers are counted from `docs/context.md`'s Runs table.
+
+**Next.** `PROMPTS/056`, unchanged.

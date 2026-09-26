@@ -39,6 +39,26 @@ In session 55, after six runs made both explainer reels — every stop a brief c
   version. Every change recorded and returned with the brief as it completed. Without the opt-in, a proposal (S-169).
   This supersedes D-096 in part (S-170).
 
+## What the rule book teaches the prompts, and how it is measured
+
+The owner, later in session 55: the harness must be _"very sophisticated and no-bs"_ and _"learn from mistakes, that is
+what the image model needs in future images so it fails less, the descriptions, details"_.
+
+- **No model is trained.** What learns is what the engine asks for: the picture's, the clip's and the planner's prompts,
+  written from the rule book. From session 55's refusals alone — made objects unbranded, no badges, no labels on their
+  controls (P-017); a screen showing only its image, filling it; the sentences are heard, never drawn as text (P-021); one
+  whole thing named, not many (P-018); a tall or wide subject framed small, with space round it (P-002, P-012 — 45 of 94
+  picture reasons).
+- **A repair is told what the witness saw**, not only the gate's reason: _"TUF on the card's shroud"_, where today it
+  hears _"never-text is shown"_.
+- **A rule is kept by its numbers.** It names the kind of subject it covers and the model it was learned on, and carries
+  the refusal rate before and after it; a rule that does not lower refusals is withdrawn, and none binds until the owner
+  approves it (S-170).
+- **The feature is measured on real runs, against today's baseline.** Sessions 53 to 55: 19 runs made 4 reels, 649¢ —
+  about 162¢ a reel, against about 55¢ for a clean run; 15 runs ended early, 7 on one request (a network error, an answer
+  not JSON) and 8 on the brief. **The target its journey holds it to**: one submission per reel for every fault the
+  harness owns, and a reel's cost near one clean run's. A journey that does not show it is not done.
+
 ## What it would heal, from the runs so far
 
 Counted in `docs/research/refusals.md` (41 runs) and `docs/reel-pitfalls.md`:
@@ -70,7 +90,9 @@ Counted in `docs/research/refusals.md` (41 runs) and `docs/reel-pitfalls.md`:
 5. **How it relates to `resume-failed`**: a heal that resumes is a resumed run (S-157, S-161 to S-164).
 6. **The rule book**: where it lives, what a rule holds (its cause, its runs, its heal), how it is read by the brief
    check, the prompts and the harness, and how the owner approves one (S-170).
-7. **Which verified checks it moves**, found by `test-impact` first.
+7. **The measure**: which real briefs the journey runs, how many, and how the baseline above is counted, so the target
+   is a number a reviewer can hold the build to.
+8. **Which verified checks it moves**, found by `test-impact` first.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
