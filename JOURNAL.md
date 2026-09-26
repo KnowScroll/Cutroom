@@ -6661,3 +6661,135 @@ session 53 did at 055 — and its own close-out now names 057. `PROMPTS/054`, ru
 healed criteria so the next session does not pay for P-017 and P-018 again; the facts are the owner's as approved.
 
 **Next.** `PROMPTS/055`, once `queue.fal.run` resolves fast. Then `PROMPTS/056`, `resume-failed`.
+
+## 2026-09-26 — session 55: both explainer reels made — video game graphics at its fourth run, JoJo at its second (PROMPTS/055)
+
+**Asked.** `PROMPTS/055`: the two reels session 54 could not make — brief B as it last ran, then brief A as approved —
+each run started only once fal's host resolves under 2000 ms, every failure healed without asking until both complete;
+no code, no test, no `check.mjs` code run.
+
+**The lookup.** 11,058 ms at the start (P-020). Checked once a minute in the background; at the owner's _"now try the
+dns and see"_ it was 1,040 ms, then 17 ms (`fal.media` not found in 142 ms, `v3.fal.media` 599, `api.minimax.io` 61).
+Before each run after: 18, 51, 122, 90 and 73 ms. No network setting was touched.
+
+**Brief B, the video game graphics reel, word for word as it completed** (run `d12931e1`). `worldId`
+`cutroom-game-graphics`; style `style-game-graphics` v1, _"clean documentary footage, soft natural light, steady
+camera"_; claims c1 supporting, c2 supporting, c3 main, c4 main; `policy-3`.
+
+1. _In nineteen seventy two, Pong was two paddles and a ball._ — c1
+2. _By nineteen eighty five, Super Mario Bros drew whole worlds in pixels._ — c1
+3. _Then games moved into three dimensions, built from polygons._ — c2
+4. _In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit._ — c3
+5. _It lit and moved every triangle itself, freeing the main processor._ — c3
+6. _In twenty eighteen, Nvidia brought real time ray tracing to games._ — none
+7. _It follows each beam of light as it bounces through a scene._ — c4
+8. _Deep learning now fills in detail, so games look almost like film._ — c4
+
+Must show: `show-tv` _"an old unbranded television on a bare table, its screen showing only blocky pixel game
+graphics"_ (c1); `show-screen` _"an unbranded screen showing only simple low-polygon three-dimensional graphics"_ (c2);
+`show-card` _"an unbranded computer graphics card"_ (c3); `show-monitor` _"an unbranded modern monitor on a wide desk,
+its whole screen showing only a lifelike rendered forest lake"_ (c4). Never show, unchanged: `never-person` _"a
+recognisable real-world public figure"_, `never-text` _"written words or labels"_, `never-character` _"a recognisable
+character from a real video game, comic or anime"_. No sentence changed; sentence 6 lost its claim.
+
+**Brief A, JoJo's Bizarre Adventure, word for word as it completed** (run `a1b8f2ee`) — as approved but for one
+criterion. `worldId` `cutroom-jojo`; style `style-jojo` v1, _"clean documentary footage of real places and objects, rich
+natural colour, steady camera"_; claims c1 supporting, c2 supporting, c3 main, c4 main; `policy-3`.
+
+1. _JoJo's Bizarre Adventure is Hirohiko Araki's comic, running since nineteen eighty seven._ — none
+2. _Each part follows a new hero of the Joestar family, each called JoJo._ — none
+3. _In Victorian England, a stone mask turns Dio Brando into a vampire._ — c1
+4. _Jonathan Joestar fights him with the Ripple, breathing that carries the power of sunlight._ — c2
+5. _A century later, his descendant Jotaro defeats Dio in Egypt._ — c3
+6. _That part brings Stands, fighting spirits shaped by each person's will._ — none
+7. _Later parts move to Japan, Italy and Florida, until the universe resets._ — none
+8. _Part seven starts a new universe, telling the family story again._ — c4
+
+Must show: `show-mask` _"an ancient carved stone mask"_ (c1); `show-sun` _"the sun rising through morning mist"_ (c2);
+`show-pyramid` _"the Great Pyramid of Giza, seen from a distance"_ (c3; approved as `show-pyramids`, _"the pyramids of
+Giza, seen from a distance"_); `show-galaxy` _"a bright spiral galaxy"_ (c4). Never show: the same three as brief B.
+
+**The six runs**, one at a time (D-002), each `flux-2-pro/edit`, `English_Graceful_Lady`, header `pictures upToThree`,
+estimate 18–53¢, `spend 250`. Cents by our receipts; **322¢ in all**.
+
+- **`8475f26d` stopped at Gate 5, 71¢, 967.1 s** — brief B as it last ran. Plan 116.4 s, stills 287.8 s, video
+  562.3 s. Plan a (3.5) over b (2.5): [1, 2] television, [3, 4] screen and card, [5, 6] card and monitor, [7, 8]
+  monitor. Pictures, 36¢: shot 1's canonical `a` refused (the screen and card clipped, a _"GTX"_ badge), `b` accepted;
+  shot 2's derived picture and repair refused (the monitor clipped at the top, _"GTX"_ read as a card not unbranded,
+  lettering), made from words; **shot 0's first picture carried the narration as a misspelled subtitle** (P-021), its
+  repair the set's labels and magazines, made from words; shot 3 no picture. The witness's first answer on shot 0
+  lacked a position, was asked again and parsed. Clips, 35¢: shots 0 and 1 passed (22.8 s, 28.4 s); **shot 2's three
+  text-to-video takes** (24.0, 174.6, 255.4 s) were refused for lettering — signs in the rendered city, a taskbar's
+  _"Search"_, _"OOHWI"_, the card's side — and a shot made from words cannot be held (D-050). **Change 1** (P-017):
+  the television _"an old unbranded television alone on a bare table, its screen showing only…"_, the card _"a plain
+  black computer graphics card with no markings"_, the monitor _"on a wide desk, its whole screen showing only a
+  lifelike rendered forest lake"_ — no city, no desktop.
+- **`f44e960b` stopped at Gate 1, 15¢, 198.7 s.** Plan 66.5 s, plan a (3.5, tied with b), the same four units, its
+  subjects given ids of its own (`tv_old`, `screen_lowpoly`, `gpu_card`, `monitor_lifelike`). Shot 1's canonical `a`
+  and `b` were each refused _"must show "show-card" is not shown: a plain black computer graphics card with no
+  markings"_ and for lettering (_"DELL"_ on the bezel, _"TUF"_ on the card; in `a`, marks the witness called
+  illegible), the repair for the screen clipped: D-047. **Change 1 caused it** (P-022). **Change 2**: the card back to
+  _"an unbranded computer graphics card"_; the screen _"an unbranded screen showing only…"_; the television without
+  _"alone"_.
+- **`a5b76d45` stopped at Gate 5, 73¢, 929.9 s.** Plan 90.5 s, stills 251.2 s, video 587.1 s. Plan a (3.5) over b
+  (2.5): [1, 2] television, [3, 4] screen and card, [5, 6] card, [7, 8] monitor. Pictures, 30¢: shot 1's `a` refused
+  (the screen clipped and its count), `b` (the card clipped, a bezel logo), the repair accepted; the television refused
+  twice for its labels (_"TINT, COLOUR, BRIGHT"_, _"Zenougp"_, _"DC12V"_), made from words; **the monitor's forest lake
+  accepted at once**. Clips, 43¢: shot 0 passed; shot 1's first image-to-video take refused for lettering, its second
+  passed; **shot 2, the card alone over sentences 5 (c3) and 6 (c4), was held to c4's monitor too** — two takes
+  _"must show "show-monitor" is not shown"_, one also for lettering; the third's only fault was the monitor (P-008
+  recurred). **Change 3**: sentence 6 unclaimed.
+- **`d12931e1` COMPLETED, 58¢, 782.2 s** — plan 94.3 s, stills 269.4 s, clips, cut and Gate 7 418.2 s. Plan a (3.5)
+  over b (2.67): [1, 2] television, [3, 4] card and screen, [5, 6] monitor, [7, 8] monitor. Pictures, 30¢: shot 2's
+  canonical `a` refused (lettering), `b` (the monitor clipped), the repair accepted; the television refused twice for
+  lettering and `never-character`, made from words; shot 1's picture refused (the screen clipped, lettering), no reserve
+  slot, made from words. **Every clip passed at its first take**: 23.7, 28.5, 30.9 (image-to-video), 19.2 s. Gate 7
+  accepted.
+- **`8d233d6e` stopped at Gate 5, 52¢, 810.6 s** — brief A as approved. Plan 56.4 s, stills 138.1 s, video 614.6 s.
+  Plan a (3.0, tied with b): [1, 2] sun, [3, 4] mask, [5, 6] pyramids, [7, 8] galaxy. The sun and the mask accepted at
+  once and passed as image-to-video clips (32.0 s, 33.2 s); **the pyramids' picture, its repair and all three takes**
+  (29.2, 124.5, 226.1 s) were refused _"subject "pyramids" (Pyramids of Giza): the count seen does not match its
+  name"_ — the witness listed each pyramid, count 1 (P-018 recurred). No character or person drawn. **Change A1**:
+  `show-pyramid`, _"the Great Pyramid of Giza, seen from a distance"_.
+- **`a1b8f2ee` COMPLETED, 53¢, 2,448.5 s** — plan 66.2 s, stills 242.7 s, clips, cut and Gate 7 2,138.4 s, of which
+  **14.5 minutes between shot 0's clip and its witness** (11:45:18 to 11:59:48), no lost call, no refused answer, no
+  row saying where (P-024); the cut and Gate 7 166.7 s. Plan b (3.67) over a (3.0), six units: [1, 2] galaxy, [3, 4]
+  mask and sun, [5] Great Pyramid of Giza, [6] [7] [8] galaxy. Pictures, 25¢: the galaxy's `a` clipped, `b` accepted;
+  the mask and sun accepted (the witness asked twice); the pyramid refused once for lettering, its repair accepted.
+  **Every clip passed at its first take**: three from pictures (38.2, 61.0, 20.1 s), three from words (22.4, 42.0,
+  26.0 s). Gate 7 accepted, from 18 frames.
+
+**The reels.**
+
+- **Video game graphics**: `.artifacts/d12931e1-6f78-4911-85a1-a90346627c4e/a1-render.mp4`, 50.2 s, 768×1366. Reads
+  right: Pong's paddles and ball on an old television; low-poly hills and a polygon tree on a monitor, the card before
+  it; a forest lake in morning mist, then in clear reflection, for the light and ray tracing sentences. Does not: on
+  _"Super Mario Bros"_ the television shows a platformer of bricks, a pipe and small figures much like it — made from
+  words, passed by Gate 5 while both of that shot's pictures were refused for a character; the last two shots are both
+  a monitor and a lake; small desktop icons at one screen's edge.
+- **JoJo**: `.artifacts/a1b8f2ee-071d-47f1-bea0-44b216e15906/a1-render.mp4`, 52.5 s. Reads right: a carved stone mask
+  on a rock in a misty field at sunrise, for Victorian England and the Ripple's sunlight; the Great Pyramid alone in the
+  desert, for Egypt. Does not: **a spiral galaxy on four of six shots** — the opening, Stands, Japan, Italy and Florida,
+  and part seven — seven of twelve frames (P-025). No character, person or lettering.
+
+**Observed.**
+
+- **Lettering is still this reel's clipping**: 13 of the 17 pictures refused across brief B's four runs carried
+  `never-text`, and it stopped one run at Gate 5. What cleared it was the subject, not the adjective: a lake instead of
+  a city on the monitor. Marks the witness calls illegible are refused all the same (P-023).
+- **A qualifier in a must-show is part of what must be shown** (P-022): _"no markings"_ turned every badge into a
+  missing card and stopped a run in 3 minutes.
+- **A text-made shot is where a reel stops**: three of this session's four stopped runs ended on one's third take (D-050); the two
+  completed runs had every take pass at once.
+- **The owner asked whether failed pictures could be seen and remade.** Seen, yes, from the witness's rows and the
+  files; remade within a run, no — nothing makes a picture again once the stage is past, which is `resume-failed`'s
+  (S-157); the brief was changed instead.
+- **The owner asked whether a run uses Claude.** It does not: MiniMax plans, witnesses, reconciles, judges and speaks;
+  fal draws and films. This session's own tokens are its wakes — one per monitor event — so the monitors were narrowed
+  from verdicts to stages partway through.
+
+**Why.** The prompt's test of the engine as it stands. No engine code, gate, check or test changed (CLAUDE.md rules 1
+and 3); every change was the caller's criteria or claims, no fact. `scripts/real-reel.mjs` is put back as HEAD has it.
+
+**Next.** `PROMPTS/056` — `resume-failed`'s one approving read, then its build. P-021 (the narration drawn) and P-024
+(a wait with no row) wait for a feature; P-023 is the owner's to review.

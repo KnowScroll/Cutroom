@@ -21,14 +21,13 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
-  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 055**: `resume-failed` (S-161 to S-164). **Planned, gates not
+  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 056**: `resume-failed` (S-161 to S-164). **Planned, gates not
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `PROMPTS/055` — the two explainer reels again, brief B as it last ran, then JoJo, each run started only once
-  fal's host resolves fast: session 54 made five runs of the game graphics reel and none completed — one stop its brief
-  caused (P-017, P-018, fixed), then this machine's DNS stalling 11 s on fal's host (P-020), the owner's to fix. Then, in the owner's order — reliability before speed
-  (S-168, S-169): `PROMPTS/056` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
+- **Next**: session 55 made both explainer reels — video game graphics at its fourth run (`d12931e1`), JoJo at its
+  second (`a1b8f2ee`), 322¢ over six runs, every stop a brief cause healed in the criteria or claims (P-021 to P-025
+  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/056` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
   failed run with what the engine owns, never its code or gates, and the caller's brief only by proposal (D-096). Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
@@ -47,37 +46,43 @@ git and the journal keep them.
 Every real run in `data/cutroom.sqlite`, newest first, read from its `run` row; cents by our receipts. A run's detail
 comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 
-| run        | UTC date   | world           | ending               | ¢   | what ended it                                                           |
-| ---------- | ---------- | --------------- | -------------------- | --- | ----------------------------------------------------------------------- |
-| `fdff208b` | 2026-09-25 | game-graphics   | failed               | 0   | the first picture: fetch failed — this machine's DNS (P-020)            |
-| `1496bbb9` | 2026-09-25 | game-graphics   | failed               | 0   | the first picture: fetch failed — this machine's DNS (P-020)            |
-| `a469e36b` | 2026-09-25 | game-graphics   | failed               | 51  | the witness: fetch failed at 3 sends; a character drawn (P-019)         |
-| `cd9648c9` | 2026-09-25 | game-graphics   | failed               | 0   | the planner: fetch failed at 3 sends                                    |
-| `a1cb6cfb` | 2026-09-25 | game-graphics   | stopped              | 75  | Gate 5, shot 2's three takes: a plural id, lettering (P-018, P-017)     |
-| `098e97fd` | 2026-09-25 | honeybees       | completed            | 53  | the brief changed three times; shot 4 made from words (clipped flight)  |
-| `52c63f62` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a cluster seen close, clipped (P-015, P-002)        |
-| `9bc5821e` | 2026-09-25 | honeybees       | failed               | 5   | a made picture's file: fetch failed (P-013)                             |
-| `0ac13e84` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a Queen Bee subject no picture shows (P-016)        |
-| `9d0914dd` | 2026-09-25 | honeybees       | stopped              | 54  | Gate 7 said no: a shot made from words drew bees on a flower (P-015)    |
-| `d459f6f5` | 2026-09-25 | tsunamis        | completed            | 49  | the brief's second run; shot 4 one retake, lettering on the boat        |
-| `62b5a191` | 2026-09-25 | tsunamis        | failed               | 10  | the witness answered not JSON, never asked again (P-014)                |
-| `d4d6c562` | 2026-09-25 | honeybees       | failed               | 0   | a picture's status check: fetch failed (P-013)                          |
-| `74bb96a0` | 2026-09-24 | hurricanes      | completed            | 56  | first try; shot 4's picture refused twice, made from words (P-012)      |
-| `bf8f4444` | 2026-09-24 | volcanoes       | stopped              | 55  | Gate 7 said no to the caption question on a correct cut (P-011)         |
-| `bad736d1` | 2026-09-24 | volcanoes       | failed               | 8   | nano-banana-2 made 768×1376, not the frame (P-010)                      |
-| `9b23d24a` | 2026-09-24 | volcanoes       | failed               | 10  | fal's flux answered 504 on shot 4's picture (P-009)                     |
-| `124f1124` | 2026-09-24 | volcanoes       | failed               | 0   | fal's flux answered 504 on shot 0's picture (P-009)                     |
-| `05611ff9` | 2026-09-24 | black-holes     | completed            | 53  | the first black-holes reel                                              |
-| `af7447f0` | 2026-09-24 | black-holes     | stopped              | 60  | Gate 5, shot 4's three takes: one claim over two shots (P-008)          |
-| `12a097bf` | 2026-09-24 | black-holes     | stopped              | 45  | Gate 7 said no: repetition (P-006); a voice under it (P-007)            |
-| `c52d418a` | 2026-09-23 | black-holes     | failed               | 15  | the witness's count refused (P-004)                                     |
-| `c9f3df47` | 2026-09-23 | black-holes     | failed               | 10  | the witness answered a count as words (P-004)                           |
-| `879a27b7` | 2026-09-23 | black-holes     | stopped              | 53  | Gate 2, shot 2's three takes: clipped subject, dark end (P-002, P-003)  |
-| `ee63e617` | 2026-09-23 | black-holes     | failed               | 15  | MiniMax repeated a word in its timings (P-001); `resume-failed`'s cause |
-| `436564c1` | 2026-09-23 | first-real-reel | completed            | 228 |                                                                         |
-| `a08a9c9c` | 2026-09-23 | first-real-reel | stopped              | 231 | the budget                                                              |
-| `f895e76d` | 2026-09-23 | first-real-reel | completed            | 160 | the first completed real reel                                           |
-| 18 runs    | 09-21, 22  | first-real-reel | 14 failed, 4 stopped | 554 | the paid path's first contact — below                                   |
+| run        | UTC date   | world           | ending               | ¢   | what ended it                                                                           |
+| ---------- | ---------- | --------------- | -------------------- | --- | --------------------------------------------------------------------------------------- |
+| `a1b8f2ee` | 2026-09-26 | jojo            | completed            | 53  | a pyramid, not pyramids; a galaxy on four of six shots (P-025); a 14.5 min wait (P-024) |
+| `8d233d6e` | 2026-09-26 | jojo            | stopped              | 52  | Gate 5, shot 2's three takes: "Pyramids of Giza" counted one by one (P-018)             |
+| `d12931e1` | 2026-09-26 | game-graphics   | completed            | 58  | sentence 6 unclaimed; every take passed at once                                         |
+| `a5b76d45` | 2026-09-26 | game-graphics   | stopped              | 73  | Gate 5, shot 2's three takes: the card's shot held to c4's monitor (P-008)              |
+| `f44e960b` | 2026-09-26 | game-graphics   | stopped              | 15  | Gate 1 three times: "with no markings" read as required (P-022)                         |
+| `8475f26d` | 2026-09-26 | game-graphics   | stopped              | 71  | Gate 5, shot 2's three takes: lettering (P-017); the narration drawn (P-021)            |
+| `fdff208b` | 2026-09-25 | game-graphics   | failed               | 0   | the first picture: fetch failed — this machine's DNS (P-020)                            |
+| `1496bbb9` | 2026-09-25 | game-graphics   | failed               | 0   | the first picture: fetch failed — this machine's DNS (P-020)                            |
+| `a469e36b` | 2026-09-25 | game-graphics   | failed               | 51  | the witness: fetch failed at 3 sends; a character drawn (P-019)                         |
+| `cd9648c9` | 2026-09-25 | game-graphics   | failed               | 0   | the planner: fetch failed at 3 sends                                                    |
+| `a1cb6cfb` | 2026-09-25 | game-graphics   | stopped              | 75  | Gate 5, shot 2's three takes: a plural id, lettering (P-018, P-017)                     |
+| `098e97fd` | 2026-09-25 | honeybees       | completed            | 53  | the brief changed three times; shot 4 made from words (clipped flight)                  |
+| `52c63f62` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a cluster seen close, clipped (P-015, P-002)                        |
+| `9bc5821e` | 2026-09-25 | honeybees       | failed               | 5   | a made picture's file: fetch failed (P-013)                                             |
+| `0ac13e84` | 2026-09-25 | honeybees       | stopped              | 15  | Gate 1 three times: a Queen Bee subject no picture shows (P-016)                        |
+| `9d0914dd` | 2026-09-25 | honeybees       | stopped              | 54  | Gate 7 said no: a shot made from words drew bees on a flower (P-015)                    |
+| `d459f6f5` | 2026-09-25 | tsunamis        | completed            | 49  | the brief's second run; shot 4 one retake, lettering on the boat                        |
+| `62b5a191` | 2026-09-25 | tsunamis        | failed               | 10  | the witness answered not JSON, never asked again (P-014)                                |
+| `d4d6c562` | 2026-09-25 | honeybees       | failed               | 0   | a picture's status check: fetch failed (P-013)                                          |
+| `74bb96a0` | 2026-09-24 | hurricanes      | completed            | 56  | first try; shot 4's picture refused twice, made from words (P-012)                      |
+| `bf8f4444` | 2026-09-24 | volcanoes       | stopped              | 55  | Gate 7 said no to the caption question on a correct cut (P-011)                         |
+| `bad736d1` | 2026-09-24 | volcanoes       | failed               | 8   | nano-banana-2 made 768×1376, not the frame (P-010)                                      |
+| `9b23d24a` | 2026-09-24 | volcanoes       | failed               | 10  | fal's flux answered 504 on shot 4's picture (P-009)                                     |
+| `124f1124` | 2026-09-24 | volcanoes       | failed               | 0   | fal's flux answered 504 on shot 0's picture (P-009)                                     |
+| `05611ff9` | 2026-09-24 | black-holes     | completed            | 53  | the first black-holes reel                                                              |
+| `af7447f0` | 2026-09-24 | black-holes     | stopped              | 60  | Gate 5, shot 4's three takes: one claim over two shots (P-008)                          |
+| `12a097bf` | 2026-09-24 | black-holes     | stopped              | 45  | Gate 7 said no: repetition (P-006); a voice under it (P-007)                            |
+| `c52d418a` | 2026-09-23 | black-holes     | failed               | 15  | the witness's count refused (P-004)                                                     |
+| `c9f3df47` | 2026-09-23 | black-holes     | failed               | 10  | the witness answered a count as words (P-004)                                           |
+| `879a27b7` | 2026-09-23 | black-holes     | stopped              | 53  | Gate 2, shot 2's three takes: clipped subject, dark end (P-002, P-003)                  |
+| `ee63e617` | 2026-09-23 | black-holes     | failed               | 15  | MiniMax repeated a word in its timings (P-001); `resume-failed`'s cause                 |
+| `436564c1` | 2026-09-23 | first-real-reel | completed            | 228 |                                                                                         |
+| `a08a9c9c` | 2026-09-23 | first-real-reel | stopped              | 231 | the budget                                                                              |
+| `f895e76d` | 2026-09-23 | first-real-reel | completed            | 160 | the first completed real reel                                                           |
+| 18 runs    | 09-21, 22  | first-real-reel | 14 failed, 4 stopped | 554 | the paid path's first contact — below                                                   |
 
 The first 18, in the order made: `9cdadf20` MiniMax 401, `80c959ef` 402; `53710655` the plan's shape; `e1adc629` the
 reconciler 400, `00aa29ec` fenced JSON, `87227235` 180 s with no answer; `8f9c921e` and `f9507840` seedream's result
@@ -88,6 +93,17 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-26 · session 55
+
+- Both explainer reels made, six real runs, 322¢: brief B (game graphics) completed at its fourth run, `d12931e1`,
+  50.2 s; brief A (JoJo) at its second, `a1b8f2ee`, 52.5 s. The DNS lookup was 11 s at the start and under 1.1 s for
+  every run. The Runs table above; both briefs as they completed and every run in `JOURNAL.md`.
+- `docs/reel-pitfalls.md` — P-021 (the narration drawn as a subtitle), P-022 (a must-show's qualifier read as
+  required), P-023 (illegible marks refused as lettering), P-024 (a 14.5-minute wait no row explains), P-025 (a
+  recurring subject fills the unclaimed sentences); P-008 and P-018 recurred; their short-list rows, and P-020's state.
+- `docs/research/refusals.md` — counts and ledger to 52 runs.
+- `PROMPTS/055` and `PROMPTS/README.md` — the Run line. `scripts/real-reel.mjs` put back as HEAD has it.
 
 ### 2026-09-26 · session 54, continued
 

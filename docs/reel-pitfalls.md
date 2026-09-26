@@ -18,34 +18,113 @@ Kinds: **brief** — the brief's wording caused it, and the brief can avoid it; 
 Kept current as entries are added. **Fix** is work that is understood and waits for a feature's gates; **review** is a
 question to look at, or an owner's choice, before anything is built.
 
-| what                                                                                               | kind   | from         | state                                                                                                            |
-| -------------------------------------------------------------------------------------------------- | ------ | ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| **This machine's DNS times out on fal's IPv6 lookup**: 11 s, past fetch's 10 s, so "fetch failed"  | fix    | P-020        | the machine's DNS, the owner's; the engine: ask again on a connection error (P-013), `resume-failed`             |
-| **A sentence naming a real game put its character in the picture**: `never-character` refused it   | brief  | P-019        | brief-writing rule: where a work is named, the criterion names a scene without its characters                    |
-| **A plural criterion id became a subject's name**: `show-polygons` failed the count on one screen  | brief  | P-018        | brief-writing rule: a criterion's id is a singular noun for one whole thing                                      |
-| **Objects that carry lettering in life**: a card's brand, a bezel, a desktop, a city's signs       | brief  | P-017        | brief-writing rule: made objects unbranded, a screen shows only its image, a place seen from far                 |
-| **A sentence naming a thing hidden inside the subject**: the queen in the swarm, never shown       | brief  | P-016        | brief-writing rule: name nothing inside, behind or hidden by the subject                                         |
-| **A criterion naming no scene**: a shot made from words drew bees on a flower; Gate 7 said no      | brief  | P-015        | brief-writing rule: a criterion and its sentences name the scene, not only the creature                          |
-| **A witness answer that is not JSON is never asked again**: one stray brace failed the run         | fix    | P-014        | a feature, not yet planned: `askWitness` asks again on a `Spent` carrying `refused`, as `askStructured` does     |
-| **One status check's connection error failed the run**, with the picture's job already at fal      | fix    | P-013        | a feature, not yet planned: check again on a connection error; `resume-failed` keeps the plan                    |
-| **A tall subject clipped by the 9:16 frame**: a palm tree refused twice at Gate 1, made from words | brief  | P-012        | brief-writing rule: frame a tall subject small, or from a distance                                               |
-| **Gate 7's caption question, judged from 18 frames, 13 of them silent**: refused a correct cut     | fix    | P-011        | owner (S-165): an exact comparison, `caption-match`'s gates next; a caller may resume a Gate 7 stop once (S-161) |
-| **An admitted image model whose frame never passes D-028**: nano-banana-2 at 1K, 768×1376          | fix    | P-010        | owner (S-165): nano-banana-2 and seedream leave the registry, planned with their amended checks                  |
-| **fal's flux upstream answered 504**, and each run threw away its plan and pictures                | fix    | P-009        | `resume-failed` (S-157, S-161 to S-164): gates written, in review                                                |
-| **One claim over two shots, one criterion that fits only one**: its takes can never pass           | done   | P-008        | sentence 7 unclaimed; run 05611ff9 completed                                                                     |
-| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one               | done   | P-007        | `cut-rules`, verified: the clips are muted (S-158)                                                               |
-| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing              | done   | P-006        | `cut-rules`, verified (S-158)                                                                                    |
-| **Show the witness the shape the gate judges it by** — one copy, in contracts                      | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf                                                                      |
-| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused                | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed                                                                    |
-| **Keep the raw answer of a model whose answer did not parse**, so it can be read                   | done   | P-004        | `scripts/refused.mjs <run>`                                                                                      |
-| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed                 | fix    | all four     | gates written (S-161 to S-164), in review; a caller may name pieces to make again                                |
-| Does S-042 (an answer that does not parse fails the run) still hold for real providers?            | review | P-001, P-004 | answered: S-156 supersedes it in part                                                                            |
-| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?             | review | P-005        | `ask-again` Deferred 2                                                                                           |
-| A text-made shot has no still to fall back on, so its third failed take stops the reel             | done   | P-003        | owner (S-165): accepted, for now; a feature only if it recurs after the brief rules                              |
-| Clip prompts could ask for no fade to black; space scenes are mostly dark                          | review | P-003        | watch: fix only if it recurs after the brief                                                                     |
-| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness                 | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)                                                                 |
+| what                                                                                               | kind   | from         | state                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------- | ------ | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A recurring subject filled the unclaimed sentences**: a galaxy on four of six JoJo shots         | brief  | P-025        | brief-writing rule: an unclaimed sentence still shows a criterion; fewer of them, or a criterion per scene named                                                      |
+| **One clip's checks waited 14.5 minutes**, and no row says in which gate                           | review | P-024        | an event or timing per gate per clip; `parallel-shots` needs the same                                                                                                 |
+| **Marks the witness calls illegible are refused as lettering**                                     | review | P-023        | the owner's: whether `never-text` means words a viewer can read — a feature, never a weakened gate                                                                    |
+| **A qualifier in a must-show read as required**: "with no markings" made a badged card no card     | brief  | P-022        | brief-writing rule: a criterion says what must be shown; absence is `mustNotShow`'s                                                                                   |
+| **The image model wrote the narration on the picture**, as a misspelled subtitle                   | fix    | P-021        | a feature, not yet planned: the picture prompt says the sentences are heard, never drawn                                                                              |
+| **This machine's DNS times out on fal's IPv6 lookup**: 11 s, past fetch's 10 s, so "fetch failed"  | fix    | P-020        | the machine's DNS, the owner's: 11 s at session 55's start, then under 1.1 s for its eight runs; the engine: ask again on a connection error (P-013), `resume-failed` |
+| **A sentence naming a real game put its character in the picture**: `never-character` refused it   | brief  | P-019        | brief-writing rule: where a work is named, the criterion names a scene without its characters                                                                         |
+| **A plural criterion id became a subject's name**: `show-polygons` failed the count on one screen  | brief  | P-018        | brief-writing rule: a criterion's id is a singular noun for one whole thing; recurred with `show-pyramids` (session 55)                                               |
+| **Objects that carry lettering in life**: a card's brand, a bezel, a desktop, a city's signs       | brief  | P-017        | brief-writing rule: made objects unbranded, a screen shows only its image, a place seen from far                                                                      |
+| **A sentence naming a thing hidden inside the subject**: the queen in the swarm, never shown       | brief  | P-016        | brief-writing rule: name nothing inside, behind or hidden by the subject                                                                                              |
+| **A criterion naming no scene**: a shot made from words drew bees on a flower; Gate 7 said no      | brief  | P-015        | brief-writing rule: a criterion and its sentences name the scene, not only the creature                                                                               |
+| **A witness answer that is not JSON is never asked again**: one stray brace failed the run         | fix    | P-014        | a feature, not yet planned: `askWitness` asks again on a `Spent` carrying `refused`, as `askStructured` does                                                          |
+| **One status check's connection error failed the run**, with the picture's job already at fal      | fix    | P-013        | a feature, not yet planned: check again on a connection error; `resume-failed` keeps the plan                                                                         |
+| **A tall subject clipped by the 9:16 frame**: a palm tree refused twice at Gate 1, made from words | brief  | P-012        | brief-writing rule: frame a tall subject small, or from a distance                                                                                                    |
+| **Gate 7's caption question, judged from 18 frames, 13 of them silent**: refused a correct cut     | fix    | P-011        | owner (S-165): an exact comparison, `caption-match`'s gates next; a caller may resume a Gate 7 stop once (S-161)                                                      |
+| **An admitted image model whose frame never passes D-028**: nano-banana-2 at 1K, 768×1376          | fix    | P-010        | owner (S-165): nano-banana-2 and seedream leave the registry, planned with their amended checks                                                                       |
+| **fal's flux upstream answered 504**, and each run threw away its plan and pictures                | fix    | P-009        | `resume-failed` (S-157, S-161 to S-164): gates written, in review                                                                                                     |
+| **One claim over two shots, one criterion that fits only one**: its takes can never pass           | done   | P-008        | sentence 7 unclaimed; run 05611ff9 completed; recurred, sentence 6 of the game graphics reel unclaimed (session 55)                                                   |
+| **A voice under the narration**: Gate 3 has never heard a clip; H3 put speech in one               | done   | P-007        | `cut-rules`, verified: the clips are muted (S-158)                                                                                                                    |
+| **The repetition rule**: Gate 7 and the plan score refuse a reel that shows one thing              | done   | P-006        | `cut-rules`, verified (S-158)                                                                                                                                         |
+| **Show the witness the shape the gate judges it by** — one copy, in contracts                      | done   | P-004, P-005 | `ask-again`, verified; held on run 12a097bf                                                                                                                           |
+| **Ask again, told why**, when a witness, plan, score or reconcile answer is refused                | done   | P-001, P-004 | `ask-again`, verified; one second ask, parsed                                                                                                                         |
+| **Keep the raw answer of a model whose answer did not parse**, so it can be read                   | done   | P-004        | `scripts/refused.mjs <run>`                                                                                                                                           |
+| **`resume-failed`**: a failed run keeps what was fine and remakes only what failed                 | fix    | all four     | gates written (S-161 to S-164), in review; a caller may name pieces to make again                                                                                     |
+| Does S-042 (an answer that does not parse fails the run) still hold for real providers?            | review | P-001, P-004 | answered: S-156 supersedes it in part                                                                                                                                 |
+| Gate 1S's and Gate 7's adapter shapes are built per call — are they shown their rules?             | review | P-005        | `ask-again` Deferred 2                                                                                                                                                |
+| A text-made shot has no still to fall back on, so its third failed take stops the reel             | done   | P-003        | owner (S-165): accepted, for now; a feature only if it recurs after the brief rules                                                                                   |
+| Clip prompts could ask for no fade to black; space scenes are mostly dark                          | review | P-003        | watch: fix only if it recurs after the brief                                                                                                                          |
+| Brief-writing rules: compact subjects — in the SENTENCES too; no verbs of darkness                 | brief  | P-002, P-003 | P-002 recurred through sentence 5 (run 12a097bf)                                                                                                                      |
 
 ## Open
+
+### P-025 · brief · a recurring subject filled the unclaimed sentences — a galaxy on four of six shots
+
+- **Run** `a1b8f2ee…`, 2026-09-26 (session 55), JoJo, completed. Plan b, six units: [1, 2] galaxy, [3, 4] mask and
+  sun, [5] pyramid, then [6], [7] and [8] galaxy. Seven of the twelve frames of its contact sheet are a spiral galaxy,
+  among them the opening (_"JoJo's Bizarre Adventure is Hirohiko Araki's comic…"_), _"That part brings Stands…"_ and
+  _"Later parts move to Japan, Italy and Florida…"_. Gate 7 accepted the cut; repetition left it (S-158).
+- **Cause.** The brief. Four of its eight sentences carry no claim, and the planner gives an unclaimed unit a subject
+  it already has — here the one whose sentence is last. Leaving a sentence unclaimed (P-008's fix) says nothing about
+  what it shows.
+- **For good.** Brief-writing: an unclaimed sentence still gets a picture, of some criterion's subject, so a brief with
+  many unclaimed sentences shows its criteria again and again. A criterion per scene the narration names, or fewer
+  unclaimed sentences.
+
+### P-024 · provider or engine · one clip's checks waited 14.5 minutes, and nothing in the rows says where
+
+- **Run** `a1b8f2ee…`, 2026-09-26 (session 55), JoJo, completed in **2,448 s** where brief B's took 782. Shot 0's clip
+  has its receipt at 11:45:18 and the next receipt of any kind — its witness — at 11:59:48. No lost call, no refused
+  answer, no event between. Every later clip went from receipt to witness in 1.5 to 4 minutes; the lookups of fal's and
+  MiniMax's hosts were 71 and 92 ms at 12:04.
+- **Cause.** Not read: the rows keep a receipt per call and events per stage, so a wait inside Gates 2 to 5 of one
+  clip — the download, the probe, the scan, the frames, a witness call that hung and was sent again — leaves no trace.
+- **For good.** A review, then a feature if it recurs: an event, or a timing, per gate per clip. `parallel-shots`
+  (S-115) needs the same numbers.
+
+### P-023 · engine · marks the witness itself calls illegible are refused as lettering
+
+- **Runs** `f44e960b…` and `a5b76d45…`, 2026-09-26 (session 55), game graphics. Picture `a1-shot-1-a` of `f44e960b`
+  was refused for `never-text` while the witness wrote _"small logo/text appears on bottom-right of monitor bezel but is
+  not legible"_ and _"markings or text on the graphics card appear blurred and unreadable"_; takes of `a5b76d45` with
+  _"partially legible but too blurry to transcribe"_ and _"present but illegible"_ went the same way.
+- **Cause.** The gate reads any lettering as _"written words or labels"_, readable or not. Hardware carries marks in
+  life, and the image and video models draw them small.
+- **For good.** A review, the owner's: whether `never-text` means words a viewer can read. Never by weakening the gate
+  to get a reel through (CLAUDE.md rule 3); a changed reading is a feature with its gates.
+
+### P-022 · brief · a qualifier in a must-show criterion is read as required — "with no markings"
+
+- **Run** `f44e960b…`, 2026-09-26 (session 55), game graphics. **Stopped at Gate 1, 15¢**, 199 s. The card's
+  criterion had been changed to _"a plain black computer graphics card with no markings"_, and each of shot 1's three
+  canonical tries was refused: two _"must show "show-card" is not shown"_ for a badge (_"TUF"_), the repair for the
+  screen beside the card clipped. D-047 stopped the run.
+- **Cause.** The brief — the session's own change. The reconciler judges a must-show by all its words, so a card with a
+  badge is no card at all; the same as _"seen whole within the frame"_ in the hurricane brief (`scripts/real-reel.mjs`'
+  history).
+- **Done.** Back to _"an unbranded computer graphics card"_, which a picture passed in the run before and the run after.
+- **For good.** Brief-writing: a criterion says what must be in the picture; what must not be is `mustNotShow`'s.
+  "Unbranded" and "only" stay (P-017), since a badge is refused by `never-text` either way.
+
+### P-021 · engine · the image model wrote the narration on the picture, as a subtitle
+
+- **Run** `8475f26d…`, 2026-09-26 (session 55), game graphics. Shot 0's picture showed an old television with Pong, and
+  under it, in white: _"In nineteen serety tue, Pong was two paddles and a ball. By ginty five, Super Mario Bros drew
+  whole worlds in pixels."_ Refused for `never-text`; its repair was refused for the set's own labels.
+- **Cause.** The engine. Every sentence of a shot goes into its picture prompt under _"What is said over the shot"_
+  (P-019), and `flux-2-pro` drew them as a caption, misspelled. No brief can keep a sentence out of the prompt. One
+  picture in 30 this session.
+- **For good.** A feature: the picture prompt says the sentences are what is heard, never text to draw.
+
+### P-018 recurred · brief · "the pyramids of Giza", three pyramids counted one by one
+
+- **Run** `8d233d6e…`, 2026-09-26 (session 55), JoJo, brief A as approved. **Stopped at Gate 5, 52¢**, 811 s. The
+  plan named the subject _"Pyramids of Giza"_; the witness listed each pyramid on its own, count 1, and both pictures
+  and all three takes of shot 2 were refused _"the count seen does not match its name"_.
+- **Done.** `show-pyramids` became `show-pyramid`, _"the Great Pyramid of Giza, seen from a distance"_; no sentence
+  changed. The next run passed the pyramid's repair and its clip.
+
+### P-008 recurred · brief · a claim at a unit's edge made a card's shot answer for the monitor
+
+- **Run** `a5b76d45…`, 2026-09-26 (session 55), game graphics. **Stopped at Gate 5, 73¢**, 930 s. The plan joined
+  sentence 5 (c3, the card) and sentence 6 (c4) into a shot whose only subject was the card; each take was held to
+  c4's criterion too, and two of three were refused _"must show "show-monitor" is not shown"_. The third had no other
+  fault.
+- **Done.** Sentence 6 left unclaimed, as sentence 7 was for P-008; no sentence changed. The next run completed.
 
 ### P-020 · network · this machine's DNS times out on fal's IPv6 lookup, and every call to fal fails as "fetch failed"
 

@@ -7,7 +7,8 @@
   again until both complete; everything noted
 - **Written:** 2026-09-26, at the end of session 54, at the owner's word: _"give me a prompt for a new session to
   continue or to make the reels that we are supposed to make"_. `resume-failed` moved to `PROMPTS/056`.
-- **Run:** not yet
+- **Run:** 2026-09-26, session 55 — both reels made: brief B at its fourth run (`d12931e1`), JoJo at its second
+  (`a1b8f2ee`); six runs, 322¢
 
 **Where things stand.** Session 54 ran brief B five times and made no reel, 126¢. Its first run stopped at Gate 5 on
 two brief causes, both fixed in the criteria and no fact moved: the planner took the id `show-polygons` as a subject's
