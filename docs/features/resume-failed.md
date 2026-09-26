@@ -6,13 +6,14 @@ authority: plan
 # resume-failed — a run a provider failed is made again once, as a new run that keeps every piece already checked; and a caller may name pieces not to keep
 
 Status: planned
-Decisions: D-005, D-014, D-018, D-022, D-024, D-025, D-027, D-030, D-031, D-042, D-045, D-047, D-058, D-065, D-081,
-D-083, D-084, D-086, D-094, D-095, D-097, D-099, D-100, D-106, I-1, I-4, I-11, I-15, I-18, S-012, S-027, S-028, S-034,
+Decisions: D-005, D-014, D-018, D-022, D-024, D-025, D-027, D-030, D-031, D-042, D-045, D-047, D-048, D-058, D-065,
+D-081, D-083, D-084, D-086, D-094, D-095, D-097, D-099, D-100, D-106, I-1, I-4, I-11, I-15, I-18, S-012, S-026, S-027,
+S-028, S-034,
 S-035, S-036, S-037, S-039, S-043, S-046, S-048, S-055, S-058, S-059, S-061, S-063, S-066, S-069, S-070, S-071, S-073,
 S-090, S-092, S-093, S-096, S-098, S-099, S-110, S-111, S-113, S-116, S-122, S-124, S-140, S-142, S-143, S-145, S-147,
-S-150, S-151, S-153, S-155, S-156, S-157, S-160, S-161, S-162, S-163, S-164
+S-150, S-151, S-153, S-155, S-156, S-157, S-160, S-161, S-162, S-163, S-164, S-171
 Named only in the deferral list: D-023, S-115
-Gates: product pending · architecture pending · program-design pending · slices pending
+Gates: product APPROVED 2026-09-26 adversarial-reviewer · architecture APPROVED 2026-09-26 adversarial-reviewer · program-design APPROVED 2026-09-26 adversarial-reviewer · slices APPROVED 2026-09-26 adversarial-reviewer
 
 > **Created 2026-09-24 at the owner's request**, in session 48, after run `ee63e617…` failed. It had a plan accepted by
 > Gate 0 and three pictures accepted by Gate 1, then failed 6 s into the video stage, before any clip was bought:
@@ -89,7 +90,9 @@ a clip reused has to start the whole reel over.
   new plan is a new request.
 - **A named piece is made as if for its shot's first time**: a shot whose clip is named gets its three tries again; a
   shot whose picture is named gets its picture tries again, **as far as the reel's six picture tries allow** once the
-  pictures it keeps are counted. Pieces not named keep the tries they already used.
+  pictures it keeps are counted. The reel's first picture of its recurring subject, named, always gets its two tries;
+  if the six leave no room for its third and both fail, the new try stops there, as a reel does whose first picture
+  fails every try. Pieces not named keep the tries they already used.
 - **One new try in all**: a new try is never continued again, and the engine's and a person's are the same one.
 - **Money**: the reel's own limit and the caller's limit count both tries together. A new try that would cross either
   is not started; a person is shown the figures instead, and whenever a new try — the engine's or a person's — cannot
@@ -134,9 +137,9 @@ repairs or retries, as every estimate here does; the two limits bound the rest.
 | `packages/pipeline`      | `planResume` and `admitResume`, pure; the stills stage's kept input and its reserve; each stage's failed ending carries its kind                                                                               | reach for a port, do I/O, import an npm package but `zod` |
 | `packages/providers`     | four throw sites raise the new classes; the stand-ins' scripted throw may name a class (`as`), checked when the stand-in ports are built                                                                       | keep durable state                                        |
 | `packages/domain`        | migration 0007; `resumeRun`; `readResumeInputs`, `readStillsInputs`; `reelSpentCents`; `failure` written by `endRun`; lookup and replay answer the newest; labels reach the run it resumes; the planner's type | import the pipeline or providers                          |
-| `apps/worker`            | the kind carried to the run; the engine's own resume, behind a switch off by default; the keyframes job's kept input                                                                                           | import `packages/providers` (`worker-no-providers`)       |
-| `apps/api`               | the resume route, handed one function that plans and admits                                                                                                                                                    | call a provider                                           |
-| `apps/service`           | the switch on, `resumeDelayMs` 15 minutes, that function built and handed to the API                                                                                                                           | —                                                         |
+| `apps/worker`            | the kind carried to the run; the engine's own resume, behind a switch off by default; the keyframes job's kept input; `appendResumeQuestion` exported                                                          | import `packages/providers` (`worker-no-providers`)       |
+| `apps/api`               | the resume route, handed one service that plans, admits and asks the owner                                                                                                                                     | call a provider                                           |
+| `apps/service`           | the switch on, `resumeDelayMs` 15 minutes, that service built with the questions file and handed to the API                                                                                                    | —                                                         |
 
 **A RESUME IS A NEW RUN OF THE SAME REQUEST THAT COPIES THE FAILED RUN'S KEPT ROWS INTO ITSELF, IN THE ONE TRANSACTION
 THAT CREATES IT — SO EVERY STAGE, EVERY READER AND EVERY LABEL GOES ON READING ONE RUN'S ROWS, AND FINDS A KEPT PIECE
@@ -181,8 +184,11 @@ failureKindOf(error)
 ```
 
 Two kinds are set by a return, not a throw, at the place that knows: **`crashed`** by the stills stage's two reserve
-failures (`stills/index.ts:299-305`, `:357-363`), reachable only on a job run again after a crash (S-048, S-061); and
-**`unreadable`** by the clips stage's refused word timings (`clips/index.ts:287-306`, P-001), which never throws.
+failures (`stills/index.ts:299-305`, `:357-363`), reachable only on a job run again after a crash (S-048, S-061) —
+a resumed run's kept pictures and the first calls it still makes were made or placed within the failed run's six, so
+its reserve starts at 0 or more, and the one shortfall a resume reaches without a crash, a named canonical left no
+slot for its repair, is a stop for rule `gate-1`, not this failure (S-171); and **`unreadable`** by the clips stage's
+refused word timings (`clips/index.ts:287-306`, P-001), which never throws.
 
 **Five classes are new, beside `Spent` and `Unavailable`, each thrown where today a plain `Error` loses the fact, and
 each with its message character for character what it is today** (so every verified assertion on a failure's detail
@@ -349,22 +355,35 @@ builds it at `:209-214` with only `model`, `media`, `assembler` and `render`), a
 unavailable, or its answer unreadable — is resumable, so it gains them; it still gets no image, narration or video port
 (I-18, read per run as below: nothing is bought after a run's own assembly begins).
 
-**A caller's resume** is `POST /v1/runs/:runId/resume` (below). **The API is handed one function that plans and
-admits**, `ApiOptions.resume: ResumeService`, typed in `packages/domain` (which the API already imports) over shapes in
-`packages/contracts`: `(inputs, remake, capCents) => ResumeDecision`, answering `replayed` or `resumed` (naming the
-resuming run), `refused` (`not-resumable` or `invalid`, with its detail), `budget` (the four figures), or `admitted`
-(the plan, the estimate and the figures). A preview of a run already resumed answers as the call would — `resumed`, or
-`replayed` for its own list — and writes nothing. `apps/service`
-builds it from `planResume` and `admitResume` with the worker's own plan and render settings, so the preview, the call
-and the engine's resume are one planner and one rule, and the API imports neither the pipeline nor `contracts`
-(`apps/api/package.json` stays `domain` and `reel-contract`). The API reads `readResumeInputs`, reads the cap
-(`readReelCapCents`, `ApiOptions.budgetPath` defaulting to `BUDGET_MD`; the service hands it
-`settings.budgetPath`, the worker's own, so a caller's preview and admission read the cap the worker's guards read), and
-`settings.questionsPath`, so a resume CALL refused at the per-reel cap appends one question, as every refusal at the
-cap does (D-097, D-100; a preview writes nothing),
-calls the function, and for `admitted` calls
-`resumeRun` in one immediate transaction with no delay. An API started without the function answers the route `422
-refused`, reason `unsupported` — the contract's _"the engine is running but cannot yet"_ (`reel-contract.md:166-167`).
+**A caller's resume** is `POST /v1/runs/:runId/resume` (below). **The API is handed one service that plans, admits and
+asks the owner**, `ApiOptions.resume: ResumeService`, typed in `packages/domain` (which the API already imports) over
+shapes in `packages/contracts`, with two members. **`decide(inputs, remake, capCents) => ResumeDecision`** answers
+`replayed` or `resumed` (naming the resuming run), `refused` (`not-resumable` or `invalid`, with its detail), `budget`
+(the four figures and the normalised named pieces), or `admitted` (the plan, the estimate and the figures). A preview of a run already resumed answers
+as the call would — `resumed`, or `replayed` for its own list — and writes nothing. **`askOwner(question:
+ResumeQuestion, now: Date) => void`** appends the cap's question for a resume CALL refused at the per-reel cap, as every
+refusal at the cap does (D-097, D-100); a preview, and a refusal at the ceiling, never call it. `apps/service` builds
+both, in `resumeService({ planSettings, renderSettings, questionsPath })`: `decide` from `planResume` and `admitResume`
+with the worker's own plan and render settings, so the preview, the call and the engine's resume are one planner and
+one rule; `askOwner` from the worker's `appendResumeQuestion` bound to the `questionsPath` it is handed — **a required
+argument with no default**, so no API a test starts can append to this repository's `QUESTIONS.md`; `startService`
+hands it `settings.questionsPath`, the worker's own, and the engine harness its own temporary file. **The question
+writer stays in `apps/worker/src/questions.ts`**, beside the three it joins, one format and one file, exported from
+`@cutroom/worker`, which `apps/service` already imports (`settings.ts:31`, `service.ts:19`); the API imports neither the
+worker, the pipeline nor `contracts` (`apps/api/package.json` stays `domain` and `reel-contract`). Rejected: an
+`ApiOptions.questionsPath` defaulting as `budgetPath` does — a test's API would write the repository's file; the writer
+moved into `packages/domain` — three verified features' question code moved for one caller; and a second copy of the
+entry's form in the API. **`ResumeQuestion`** holds the failed run's id and request id, who asked (`'caller'` or
+`'engine'`), the normalised named pieces (none for the engine's), the resume's estimate, what the reel spent, the
+figure compared (the two added), the cap and the ceiling — all from `decide`'s `budget` answer — and the three rates, which `askOwner` adds, the service binding them with the path, since it prices with them; its entry is S-026's form, under the heading
+_"`<time>` — run `<runId>` not resumed: the resume would pass the per-reel cap"_, with `Request`, `Asked by`, `Named`,
+`Estimate`, `Spent`, `Per-reel cap`, `Ceiling` and `Rates` lines and a question asking whether the cap or the rates
+should change or the reel be asked for again as a new request. The API reads `readResumeInputs`, reads the cap
+(`readReelCapCents`, `ApiOptions.budgetPath` defaulting to `BUDGET_MD`; the service hands it `settings.budgetPath`, the
+worker's own, so a caller's preview and admission read the cap the worker's guards read), calls `decide`, for a call
+refused at the cap calls `askOwner`, and for `admitted` calls `resumeRun` in one immediate transaction with no delay.
+An API started without the service answers the route `422 refused`, reason `unsupported` — the contract's _"the engine
+is running but cannot yet"_ (`reel-contract.md:166-167`).
 
 ### What a resumed run's stages do with kept rows
 
@@ -404,6 +423,20 @@ unmade`, not the placement's calls, so the details become _"attempt N cannot mak
 the run made E before it and its placement makes U more, E+U in all (S-048)"_ and _"attempt N cannot repair the
 canonical picture of shot-S: no reserve slot is free, the run having made E image calls before it and its placement
 making U more of the 6 (S-048). …"_. Their run's kind is `crashed`.
+
+**A resumed run's canonical with no slot for its repair stops; it does not fail** (S-171, the owner, superseding D-047
+step 1 for a resumed run). A caller naming the canonical's still in a reel whose kept pictures — standalones and their
+repairs — hold the six but for the two candidates reaches the second failure's place with no crash: `earlier` is the
+copies, `unmade` the two candidates, the reserve 0. The candidates are made and checked as always; if either passes,
+nothing changes. If both fail, **in a run holding pictures copied from the run it resumes** — `readStillsInputs`
+answers `copiedPictures`, its picture rows with `kept_from` set, and the stage's input carries it — the stage ends
+`stopped-rule`, rule `gate-1`, with no repair call and _"the canonical picture of shot-S failed Gate 1 twice and no
+reserve slot is free for its repair: the run having made or kept E image calls before it and its placement making U
+more of the 6 (D-047, S-161, S-171). …"_, the two candidates' reasons after it as the three-failures stop gives them. No
+derived picture is attempted and nothing is made again, as D-047 step 3 says of a canonical with no survivor. **In a
+run holding no copied picture the second failure stands as above**, `crashed`. A stop has no `run.failure`, and a
+resumed run is never resumed again, so the ending is final; the preview's estimate counts the two candidates and no
+repair, as every estimate here counts no repair.
 
 **`picture.seq`** becomes the run's greatest `seq` plus one, taken in `recordGeneration`'s transaction, instead of its
 receipts counted plus one — the same number for every run without copied pictures, and after them for a run with.
@@ -621,6 +654,13 @@ placements — its code, not its checks). Gate 3 lists every check.
   fails"_ — which S-048 superseded _"for a restarted attempt only"_ — are read per run with the pictures it keeps, for a
   restarted attempt and a resumed run alike: a resumed run's receipts for one entry, with its kept pictures, carry at
   most three; the reel's two runs together carry at most the failed run's cut-off calls beyond that (S-164).
+- **D-047**'s step 1, _"**One informed repair call.** A single image call, not another best-of-2 pair. Its prompt
+  consumes **both** failure verdicts"_, and its step 3, _"**If it also fails, the reel fails.**"_, are read, for a
+  resumed run whose named canonical finds no reserve slot free — its kept pictures and its two candidates filling the
+  reel's six — as _"no repair call; both candidates failed, the run stops for rule `gate-1`"_ (S-171, the owner). D-047
+  was superseded before only _"for a restarted attempt"_ (S-048), which fails instead and still does. Everything else
+  D-047 says stands, a first run's repair above all: its placement leaves the canonical's slot, and it has first claim
+  (D-048).
 - **S-043**'s _"**The reserve is 6 − the placement's calls** — 2 for a placed canonical and 1 for each placed derived
   picture, a rank with no free shot left out (S-039) — less a restarted attempt's earlier calls (S-048)"_ becomes S-061's
   new formula below, `6 − earlier − unmade` (S-164).
@@ -671,7 +711,8 @@ packages/reel-contract/src/index.ts       the exports
 packages/pipeline/src/resume/index.ts     planResume, admitResume, takedown, normalise (new folder, entered through the index)
 packages/pipeline/src/stills/index.ts     the kept input; the ladder consults it; gate1Why and gate1Failure read kept
                                           pictures; the carried degradation; the two failures' new words; failure on
-                                          every failed ending
+                                          every failed ending; a resumed run's canonical with no repair slot stopped
+                                          for gate-1, by the input's copiedPictures (S-171, Slice 4)
 packages/pipeline/src/stills/ladder.ts    reserveOf(placements, earlier, kept)
 packages/pipeline/src/clips/index.ts      failure on every failed ending; the kept-take check
 packages/pipeline/src/render/index.ts     failure on its failed ending
@@ -687,14 +728,16 @@ packages/providers/src/ports.ts           StandInScripts' entries gain `as`; a v
 packages/domain/src/schema.ts             run.resumes, failure, resume_request; picture/narration/take.kept_from;
                                           the partial unique index; the comment at :16
 db/migrations/0007_resume_failed.sql      drizzle-kit, never typed by hand (S-012)
-packages/domain/src/resume.ts             readResumeInputs, resumeRun, the copy, the ResumeService type (new file)
+packages/domain/src/resume.ts             readResumeInputs, resumeRun, the copy, the ResumeService and ResumeQuestion
+                                          types (new file)
 packages/domain/src/runs.ts               endRun writes failure; the finishing functions take an optional resume(tx, now), run
                                           after the labels in a savepoint and before endRun; readRunByRequestId and submitRun answer the newest; statusOf's
                                           pointers; markStillHeld's labels in two runs
 packages/domain/src/queue.ts              enqueue's optional starting attempts, which admitStills, advanceStills and
                                           advanceClips pass for a resumed run
 packages/domain/src/ledger.ts             reelSpentCents; recordGeneration's seq; imageCallCount counts copies
-packages/domain/src/pictures.ts           readStillsInputs; markDegraded's labels in two runs; readRecord's keptFrom
+packages/domain/src/pictures.ts           readStillsInputs, and its copiedPictures (Slice 4); markDegraded's labels in
+                                          two runs; readRecord's keptFrom
 packages/domain/src/clips.ts              no query change; the comment at :404-407
 packages/domain/src/index.ts              the exports
 apps/worker/src/transient.ts              throws StillUnavailable
@@ -702,14 +745,19 @@ apps/worker/src/resume.ts                 the engine's resume: read, plan, admit
 apps/worker/src/plan-job.ts, keyframes-job.ts, clips-job.ts, assemble-job.ts   failure carried; ResumeContext; the
                                           engine's resume; the keyframes job reads readStillsInputs
 apps/worker/src/guarded-image-port.ts, video-port.ts, narration-port.ts   reelSpentCents
-apps/worker/src/questions.ts              appendResumeQuestion (cap refused; could not be made); the stop questions'
-                                          "Spent" from reelSpentCents
+apps/worker/src/questions.ts              appendResumeQuestion(path, ResumeQuestion, now): a resume refused at the
+                                          cap, asked by the caller or the engine (Slice 4); appendResumeUnmade(path,
+                                          runId, why, now): one line, the engine's resume could not be made (Slice 5);
+                                          the stop questions' "Spent" from reelSpentCents (Slice 3)
+apps/worker/src/index.ts                  appendResumeQuestion exported, for apps/service's askOwner
 apps/worker/src/worker.ts                 WorkerOptions.resume { delayMs } — absent is off; every context built with it
-apps/api/src/server.ts                    RESUME_ROUTE, the handler; ApiOptions.resume, budgetPath
-apps/service/src/settings.ts, service.ts  resume on, resumeDelayMs 900000; the ResumeService built and handed to
-                                          startApi (:101) with budgetPath: settings.budgetPath
-apps/service/src/index.ts                 resumeService({ planSettings, renderSettings }), the ResumeService's one
-                                          builder, taking the settings the worker prices with; waitingRuns(dbPath),
+apps/api/src/server.ts                    RESUME_ROUTE, the handler; ApiOptions.resume (decide, askOwner), budgetPath
+apps/service/src/settings.ts, service.ts  resume on, resumeDelayMs 900000; the ResumeService built with
+                                          questionsPath: settings.questionsPath and handed to startApi (:101) with
+                                          budgetPath: settings.budgetPath
+apps/service/src/index.ts                 resumeService({ planSettings, renderSettings, questionsPath }), the
+                                          ResumeService's one builder, taking the settings the worker prices with and
+                                          the questions file, required, no default; waitingRuns(dbPath),
                                           through a read-only connection, and cancelRuns(dbPath, runIds), for the
                                           owner's script
 scripts/_answers.mjs, _answers.d.mts     answers(input): pure, importing NOTHING — handed the whole redirected
@@ -727,8 +775,9 @@ tests/engine/restart.ts                   killedAgain(engine, killed, next): a f
 tests/engine/harness.ts, stills.ts, video.ts, plans.ts, service.ts   the resume switch; scripted classes; a helper that
                                           fails a run on purpose and resumes it the way the API does; startApi (:207,
                                           :312) handed @cutroom/service's resumeService built from the harness's own
-                                          plan and render settings, and the harness's budgetPath (:194-197), so the
-                                          API reads the same cap as its worker — never a second copy
+                                          plan and render settings and its questionsPath (:193), and the harness's
+                                          budgetPath (:194-197), so the API reads the same cap and writes the same
+                                          questions file as its worker — never a second copy
 tests/stand-in/client.ts                  the resume route in Route, EXPECTED and routeOf; a resume helper
 tests/stand-in/reel-engine-stand-in.ts    the resume route answering 422 unsupported, 404 for an unknown run
 tests/resume-failed-*.test.ts             the checks below
@@ -782,21 +831,21 @@ _The call — `tests/resume-failed-contract.test.ts`_
 
 26. `ResumeRequest and each arm of ResumeResponse carry contractVersion and Piece does not; each is strict; a Piece refuses a kind outside still, narration and clip and a shot not shaped shot-<n>; and RunStatus's resumes and resumedBy and the record's keptFrom are optional and absent on a run that resumes nothing` — D-106, S-034, S-162.
 27. `the preview names every piece made again in shot order with estimateCents — what the reel spent plus the resume's estimate, the figure compared with the limit — what the reel spent, the cap and the ceiling, and the limit it would cross; and it writes nothing — every table's rows, read through a second connection, and that connection's PRAGMA data_version are unchanged` — S-161.
-28. `the route resumes once, with 202 and the new run, a failed run of each resumable kind — its caller's cancel flag set or not — and a run stopped at gate-7; the same call again, its pieces reordered or repeated, replays it, and so does its preview, writing nothing; a different list, a run the engine resumed, a resume, an off-spec, engine or unknown-kind failure, every other ending and a running run are refused with the reason named; an unknown run is 404` — S-161, S-162, S-163.
-29. `a resume over the cap or the ceiling is refused with the limit, estimateCents — the figure compared, spent plus estimate — what the reel spent and both limits, and no run, job or row is made; a run of the same request with budgetCents one higher, failed the same way, is resumed; and a call refused at the per-reel cap appends one question to the questions file the service hands the API, a preview none, a refusal at the ceiling none` — D-100, D-097.
+28. `the route resumes once, with 202 and the new run, a failed run of each resumable kind — its caller's cancel flag set or not — and a run stopped at gate-7; the same call again, its pieces reordered or repeated, replays it, and so does its preview, writing nothing; a different list, a run the engine resumed, a resume, an off-spec, engine or unknown-kind failure, every other ending and a running run are refused with the reason named; an unknown run is 404; every run the route is called on has its run.failure and detail pinned before the call — each resumable run its kind, the off-spec run off-spec with the frame refusal's detail, the engine run engine, the unknown run null — so each refusal is for the kind the table names and never for a run that failed some other way` — S-161, S-162, S-163.
+29. `a resume over the cap or the ceiling is refused with the limit, estimateCents — the figure compared, spent plus estimate — what the reel spent and both limits, and no run, job or row is made; a run of the same request with budgetCents one higher, failed the same way, is resumed; and a call refused at the per-reel cap appends one question to the questions file the ResumeService was built with — its heading naming the failed run, asked by the caller, its named pieces, estimate, spend, cap, ceiling and rates — a preview none, a refusal at the ceiling none` — D-100, D-097.
 30. `lookup by requestId and a replayed submit answer the newest run of the request; the failed run's status names the run that resumed it and the resume's names the failed run` — S-162.
 31. `the record of a resumed run lists each kept picture and take with keptFrom the origin and each one it made without; used is true exactly for the takes its video shows, kept ones included` — S-162, S-093.
 32. `a resume after Gate 7's stop naming nothing makes the cut again and asks Gate 7 again with no image, narration or video call, using exactly one judge answer: the event verdict 7 accept, the run completed, its result's video the new cut` — S-161.
-33. `naming a clip makes that shot's takes afresh, numbered from 1 under the resumed run's attempt with its three takes, and keeps every other shot's clip; naming the canonical's still makes it and every derived picture again, their old calls not counted; and a named derived shot gets the repairs the six still allow once the kept pictures are counted` — S-161, D-014, D-027.
-34. `the service hands the API the ResumeService built from the worker's own settings, so the preview of a run stopped at gate-7 with a still named — a stop, which the service's own resume never takes, and a named piece, so the estimate is not 0 — gives estimateCents equal to the reel's spend plus planResume's estimate at those rates, and hands it the worker's budgetPath, so a preview's capCents equals a cap written to the file CUTROOM_BUDGET_PATH names; an API started without the service answers the route 422 unsupported` — S-162.
+33. `naming a clip makes that shot's takes afresh, numbered from 1 under the resumed run's attempt with its three takes, and keeps every other shot's clip; naming the canonical's still makes it and every derived picture again, their old calls not counted; and a named derived shot gets the repairs the six still allow once the kept pictures are counted; and in an upToThree plan of a canonical and two standalones, each standalone repaired, stopped at gate-7, naming the canonical's still makes its two candidates with the reserve at 0 — both scripted to fail, the run stops for rule gate-1 with no repair call, no derived or standalone picture made, run.failure null and S-171's detail pinned; one scripted to pass, it is chosen and the run completes; and with one standalone unrepaired, so one slot is free, both failing, the repair is made` — S-161, S-171, D-014, D-027, D-047.
+34. `the service hands the API the ResumeService built from the worker's own settings, so the preview of a run stopped at gate-7 with a still named — a stop, which the service's own resume never takes, and a named piece, so the estimate is not 0 — gives estimateCents equal to the reel's spend plus planResume's estimate at those rates, and hands it the worker's budgetPath, so a preview's capCents equals a cap written to the file CUTROOM_BUDGET_PATH names; builds it with the worker's questionsPath, so a resume call of that run over a cap written low appends its one question to the file CUTROOM_QUESTIONS_PATH names; an API started without the service answers the route 422 unsupported` — S-162, D-097.
 
 _The engine's own resume — `tests/resume-failed-engine.test.ts`_
 
-35. `with the switch on, a run failed unavailable, unreadable, provider-failed or crashed is resumed once, its resume written before its run.finished event in one transaction — a trigger the test adds on that event's insert records that the resume row already exists; with the switch off, the worker's default, none is` — S-163.
+35. `with the switch on, a run failed unavailable, unreadable, provider-failed or crashed is resumed once, its resume written before its run.finished event in one transaction — a trigger the test adds on that event's insert records that the resume row already exists; with the switch off, the worker's default, the same four failures — each run's run.failure its kind and its detail pinned, so each is one the switch would resume — are none resumed` — S-163.
 36. `the engine never resumes a run that resumes another or a run whose caller asked to cancel — each failed with a resumable kind in run.failure and its detail pinned, so only the rule refuses it — nor an off-spec or engine failure — the stand-in out of its script included — a stop, a refusal, a cancel or a completion; each run's own ending is asserted, and no run resumes it` — S-157, S-163.
 37. `the engine's resume that the cap cannot fit starts no run and appends one question naming the failed run and the four figures; one the ceiling cannot fit starts no run and writes nothing; each failed unavailable, its kind and detail pinned, and the same failure with a ceiling that fits is resumed` — D-100, D-097.
 38. `a resume the engine cannot make — a trigger the test adds makes its run insert raise, or its cap file cannot be read — leaves the failed run failed with its kind and detail, its job done, no resume row, no copied row, and one line in the questions file naming the run and why` — S-163.
-39. `the service turns the engine's resume on with a delay of 900000 ms by default and refuses a delay that is not a whole number of milliseconds at least 0; started with a stand-in script file failing a picture as unavailable and a short delay — CUTROOM_RESUME_DELAY_MS, SETTING_NAMES' new entry — it resumes that run — the resume's row exists, its resume_request null, its job's run_at the failed run's run.finished time plus the delay; the worker started without the option does not resume` — S-163, S-153, S-116.
+39. `the service turns the engine's resume on with a delay of 900000 ms by default and refuses a delay that is not a whole number of milliseconds at least 0; started with a stand-in script file failing a picture as unavailable and a short delay — CUTROOM_RESUME_DELAY_MS, SETTING_NAMES' new entry — it resumes that run — the resume's row exists, its resume_request null, its job's run_at the failed run's run.finished time plus the delay; the worker started without the option, the same script failing the same picture, leaves that run failed unavailable — its run.failure and detail pinned — and resumes nothing` — S-163, S-153, S-116.
 40. `the engine's own resume copies the failing transaction's labels: after a crash cuts off a picture, a second attempt degrades shot-1 for want of a slot and then fails unavailable on a later picture; the engine's resume, made in that transaction, keeps shot-1 degraded with its reason and no image call` — S-163, S-164.
 
 _The owner's script — `tests/paid-path-real-reel.test.ts`, which owns the script (paid-path's check 20)_
@@ -876,7 +925,7 @@ AssembleJobContext, Asked>`, `:235-237`), by the worker's source (the literal ha
   `['assembler', 'media', 'model', 'render']`, `:284-288`) and by `runAssembleJob`'s three arguments (`:276`). **Amended
   by exactly one key**: `Asked` and the expected literal gain `'resume'`, the argument count stays three, and its other
   half — no port that buys, `Bought` never, and the source scan for ports that buy — stands as written.
-- **`paid-path`, check 20's second test** (`tests/paid-path-real-reel.test.ts:78-100`, Slice 6) — **gains one
+- **`paid-path`, check 20's second test** (`tests/paid-path-real-reel.test.ts:75-97`, Slice 6) — **gains one
   assertion**: every local module the file imports reads no `child_process`, so the file that may name the spending
   script can never be handed a way to start it. It removes nothing.
 - **`reel-plan`, check 13** (`tests/reel-plan-service.test.ts:149-156`, Slice 4) — **red** the moment
@@ -923,7 +972,11 @@ with its speech receipt"_ and `:338`'s _"Written with its video receipt"_ — ea
 refusal"_ (Slice 1); `packages/domain/src/pictures.ts:263`'s `DegradedShot.pictureIds`, _"Every picture of the shot this
 attempt made"_, `:22-23` and `:110`, and `packages/pipeline/src/stills/index.ts:50`'s _"This attempt's pictures"_ (Slice
 2); `packages/reel-contract/src/record.ts:30` and `apps/api/src/server.ts:189` (Slice 4); `apps/worker/src/questions.ts:6-7`
-and `:17`, whose header says entries come only from a cap's refusals (Slice 5); `real-reel.mjs`' header and its
+and `:17`, whose header says entries are appended by the worker when its cap refuses a run or stops one — a caller's
+resume refused at the cap is appended through the service (Slice 4), and an engine's resume that could not be made is a
+line no cap wrote (Slice 5); `stills/index.ts:352-356`'s _"an attempt run again whose earlier calls left none fails
+before the call — a fault of the crash, not rule gate-1"_, true only of a run holding no copied picture (Slice 4,
+S-171); `real-reel.mjs`' header and its
 _"this run's own receipts"_ (Slice 6). Each feature whose code or tests a slice
 touches gains its amendment block in that slice.
 
@@ -961,13 +1014,16 @@ touches gains its amendment block in that slice.
       (`imageCallCount`'s lost calls, widened) and `reel-plan` (`enqueue`, `admitStills`, `advanceStills`,
       `advanceClips`). **Proves: 12 to 25.**
 - [ ] **Slice 4 — the call.** `reel-contract`'s route and schemas, version 1 amended; `RunStatus`'s pointers; the record's
-      `keptFrom`; the API's route handed the `ResumeService`; the service building it; lookup and replay the newest;
+      `keptFrom`; the API's route handed the `ResumeService`, `decide` and `askOwner`; the service building it with
+      the questions file, required; the worker's `appendResumeQuestion`, exported; lookup and replay the newest; a
+      resumed run's canonical with no repair slot stopped for `gate-1`, `readStillsInputs`' `copiedPictures` (S-171);
       the stand-in engine's answer and the stand-in client; the amended checks 1, 2, 5 and 18 of `reel-contract` and 13
-      of `reel-plan`. Amendment blocks: `reel-contract`, `reel-plan`, `reel-stills` (`readRecord`), `reel-takes` (the
-      record's takes, S-093) and `paid-path` (`apps/service`, its composition root). **Proves: 26 to 34.**
+      of `reel-plan`. Amendment blocks: `reel-contract`, `reel-plan`, `reel-stills` (`readRecord`, the canonical's stop
+      in a resumed run, S-171), `reel-takes` (the record's takes, S-093) and `paid-path` (`apps/service`, its
+      composition root). **Proves: 26 to 34.**
 - [ ] **Slice 5 — the engine's own resume.** The worker's switch, off by default; one `resume` key on every job's
       context; the amended check 40 of `reel-render`; the finishing functions' fixed order — labels, the resume's savepoint reading the rows as labelled,
-      then `endRun`; `appendResumeQuestion`; the service's switch and
+      then `endRun`; `appendResumeQuestion` asked by the engine, and `appendResumeUnmade`; the service's switch and
       `resumeDelayMs`. Amendment blocks: `paid-path`, `reel-plan` (`finishRun`, the plan job), `reel-stills`
       (`finishStills`, the keyframes job), `reel-render` and `reel-takes` (`finishVideo`, the clips and assemble jobs,
       the contexts in `worker.ts`). **Proves: 35 to 40.**
@@ -1213,3 +1269,26 @@ approving read opens `PROMPTS/056`, before any code. Every finding is fixed here
 5. **Slips.** **Fixed:** least confident decision 2; five more stale sentences; the quotes' bold copied as their
    sources have it; the root `package.json` cited, not S-063; check 29's positive control buildable; the delay's
    setting named, `CUTROOM_RESUME_DELAY_MS`.
+
+## Gate review 12 — 2026-09-26, a fresh reviewer; the approving read (`PROMPTS/056`)
+
+**3 findings; product approved, the other three NOT APPROVED.** Each is fixed here; the second went to the owner.
+
+1. **A caller's resume refused at the cap had no writer the API could reach.** The only writer is the worker's; the
+   API may import only `domain` and `reel-contract`; no path was handed; and the writer sat in Slice 5 while check 29
+   sat in Slice 4. **Fixed:** the `ResumeService` has two members, `decide` and `askOwner`; `apps/service` builds
+   `askOwner` from the worker's `appendResumeQuestion` bound to a questions path it must be handed, with no default,
+   so no test's API writes the repository's file; the entry's fields named; the writer in Slice 4, widened in Slice 5;
+   check 34 proves the service hands the worker's path; the stale header lines moved to Slice 4.
+2. **A named canonical in a resumed run could find no slot for its repair with no crash**, reaching S-048's failure
+   and labelled `crashed`; D-047 step 1 was overridden and not named, and Gate 2's _"reachable only on a job run again
+   after a crash"_ was false. **Fixed at the owner's answer (S-171):** the two candidates are made, and if both fail
+   the run stops for rule `gate-1` with no repair; D-047 steps 1 and 3 named in S-147's form; Gate 2's sentence
+   corrected; Gate 1's product line; check 33 gains the stop, a pass and a free slot; the code in Slice 4.
+3. **Checks 28, 35 and 39 stayed green if the run failed some other way.** **Fixed:** each pins the runs' `run.failure`
+   and detail, as checks 36 and 37 do. And a slip: check 20's second test is `:75-97`.
+
+**The fixes, read by the same reviewer through SendMessage: no findings; all four gates APPROVED 2026-09-26.** It named
+two slips, both tidied before the build: the architecture table's `apps/api`, `apps/service` and `apps/worker` rows
+still spoke of one function; and `decide`'s `budget` answer now carries the normalised named pieces, and `askOwner`
+adds the three rates, bound by the service with the path, since the API holds neither.

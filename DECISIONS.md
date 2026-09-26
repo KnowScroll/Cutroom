@@ -7447,3 +7447,42 @@ learning lives, _"Will it not be a harness that does the reel making and reel he
 _"Proposed, owner approves"_; brief heals _"When the caller opts in"_.
 
 ---
+
+## S-171 | 2026-09-26 | A resumed run's named canonical left no slot for its repair makes its two candidates, and stops for rule `gate-1` if both fail
+
+**Chose.** At the owner's answer to `resume-failed`'s approving read (session 56, finding 2). A caller may name the
+canonical's still of a run whose kept pictures — standalones and their repairs, under `upToThree` (S-150) — hold the
+reel's six but for the canonical's two candidates. The resumed run's reserve is then 0 (S-164's `6 − earlier −
+unmade`, S-161's shared six). The two candidates are made and checked as in any run; if either passes, nothing
+changes. **If both fail, the run stops for rule `gate-1`, with no repair call**, no derived or standalone picture
+attempted, and the detail _"the canonical picture of shot-S failed Gate 1 twice and no reserve slot is free for its
+repair: the run having made or kept E image calls before it and its placement making U more of the 6 (D-047, S-161,
+S-171). …"_, the candidates' reasons after it. The stage tells this case from S-048's by the run holding pictures
+copied from the run it resumes (`readStillsInputs`' `copiedPictures`); a run holding none still fails `crashed` (S-048,
+S-061). A resumed run is never resumed again, so the stop is final.
+
+**Why.** S-161 keeps the reel's six picture calls one bound across the failed run and its resume, and says a named
+shot starts its bounds afresh only as far as the six allow. A first run's placement always leaves the canonical's
+repair its slot, with first claim (D-048); a resume that keeps repairs made elsewhere in the reel can take it. The
+owner chose to try the two candidates — a likely pass is worth two pictures' cost — rather than refuse the resume at
+its preview. Labelling the stop `crashed` would have been false: no crash happened, and `self-heal` (S-170) will learn
+from the kind.
+
+**Rejected** (put to the owner). Refusing such a resume at its preview, free, and asking the caller to name the
+standalones' stills too — D-047 whole, but a canonical that would likely pass never tried. Trying and failing the run,
+relabelled — a new kind or branch for a run that can never be resumed, where a stop already says what happened.
+
+**Supersedes:** **D-047**, in part, for a resumed run whose named canonical finds no reserve slot free: its step 1,
+_"**One informed repair call.** A single image call, not another best-of-2 pair. Its prompt consumes **both** failure
+verdicts"_, and its step 3, _"**If it also fails, the reel fails.**"_, are read as _"no repair call; both candidates
+failed, the run stops for rule `gate-1`"_. S-048 superseded D-047 only _"for a restarted attempt"_, which fails
+instead, and still does. Everything else D-047 says stands, a first run's repair above all.
+
+**Caught by.** `resume-failed`'s check 33: both candidates scripted to fail stop the run for `gate-1` with no repair
+call, `run.failure` null and this detail pinned; one passing completes it; one slot free makes the repair. Its checks
+6 and 49b keep a run with no copied picture failing `crashed`.
+
+**Confirmed-by.** The owner, 2026-09-26, in session 56, asked whether to refuse at the preview, try and stop, or try
+and fail: _"Try, stop if both fail"_.
+
+---
