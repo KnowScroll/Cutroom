@@ -28,6 +28,13 @@ Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED
 > **What this feature is not.** It changes no gate, no check's threshold and no score. With the setting off, which is
 > the default, the engine does exactly what it does today and every verified test runs on that.
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 2 — the gates below are not edited, and no assertion is
+> removed** (**S-164**). **A restarted attempt's reserve counts first calls, not the placement's**: `reserveOf` is
+> 6 − earlier − the first calls no kept picture satisfies, so a standalone picture an earlier attempt decided is kept
+> and counted once, as an earlier call; a first attempt's reserve is the number it was. A standalone's kept failed
+> picture is told to its repair, and a kept repair takes no slot again. `placementCalls` and `plannedImageCallsFor`
+> are unchanged, and every check here holds as written.
+
 ## Gate 1 — Product (no technical language)
 
 **The problem.** The engine can make approved pictures and turn them into clips, and it can make a reel that its own

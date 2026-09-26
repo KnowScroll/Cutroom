@@ -147,7 +147,10 @@ export interface PictureRecord {
   prompt: string
   framing: Framing | null
   references: string[]
-  /** The run's image-call number, 1..6 (D-027, S-046). */
+  /**
+   * The run's picture number, its greatest plus one when the picture was made (D-027, S-046, S-164):
+   * 1..6 in a run that copies none; above 6 in a resumed run, whose copied pictures keep their numbers.
+   */
   seq: number
   gate1: {
     /** Null until technical fails or reconcile completes: a cut-off verdict decides nothing (D-041, D-042). */

@@ -147,9 +147,9 @@ export const modelReceipt = sqliteTable('model_receipt', {
 /**
  * One row per picture made, every attempt's (S-046) — or copied from the run this one resumes, with
  * `kept_from` naming that run, whose receipt stays there (S-164). A picture made here is written with
- * its image receipt, in the same transaction — its shot, subject, role, label, path, prompt, framing, references and `seq`, the
- * run's image-call number taken from the run's receipts there — and updated as each of its checks
- * completes. `chosen` and `degradation` are written when the run finishes.
+ * its image receipt, in the same transaction — its shot, subject, role, label, path, prompt,
+ * framing, references and `seq`, the run's picture number, its greatest plus one, taken there — and
+ * updated as each of its checks completes. `chosen` and `degradation` are written when the run finishes.
  */
 export const picture = sqliteTable(
   'picture',

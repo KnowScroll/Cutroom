@@ -139,9 +139,79 @@ export async function killedMidStills(
 }
 
 /**
+ * A FURTHER kill of the same run (resume-failed, S-164): a new worker process claims the keyframes job
+ * once the last claim's lease has run out, makes what its attempt makes, and is killed while its
+ * stand-in holds model call `next.holdAtCall` open — counted from this worker's first call, which is
+ * the witness of the first picture this attempt makes, the planner's calls being long done. `made` is
+ * every picture id the run's image calls have made by then, in order, every attempt's; the run's
+ * generation receipts must be exactly those. The job is running at one more attempt than before.
+ */
+export async function killedAgain(
+  engine: Engine,
+  killed: Killed,
+  next: { script: FakeScript; holdAtCall: number; made: readonly string[] },
+): Promise<Killed> {
+  const { runId } = killed
+  const crashed = engine.spawnWorker({
+    script: next.script,
+    holdAtCall: next.holdAtCall,
+    leaseMs: LEASE_MS,
+  })
+  try {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    await Promise.race([
+      crashed.held,
+      new Promise((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`the worker never held model call ${next.holdAtCall} again`)),
+          FINISH_MS,
+        )
+      }),
+    ]).finally(() => clearTimeout(timer))
+  } finally {
+    await crashed.kill()
+  }
+
+  const events = (await engine.http.events(runId)).json.events as Event[]
+  const generations = engine.query<{ id: number; picture_id: string; cost_cents: number }>(
+    'SELECT id, picture_id, cost_cents FROM generation_receipt WHERE run_id = ? ORDER BY id',
+    runId,
+  )
+  const receipts = engine.query<{ id: number; call: string; role: string; picture_ids: string }>(
+    'SELECT id, call, role, picture_ids FROM model_receipt WHERE run_id = ? ORDER BY id',
+    runId,
+  )
+  const jobs = jobsOf(engine, runId)
+  const keyframes = jobs.find((j) => j.kind === 'reel.keyframes')
+
+  // Every receipt so far, every attempt's; the stage started once and never finished; the job
+  // claimed once more, and no earlier than the last claim's lease ran out.
+  assert.deepEqual(
+    generations.map((g) => g.picture_id),
+    [...next.made],
+    'the attempts so far had not made the pictures the test holds them after',
+  )
+  assert.deepEqual(described(events), [...PLANNED, 'stage.started stills'])
+  assert.deepEqual(
+    jobs.map((j) => [j.kind, j.state, j.attempts]),
+    [
+      ['reel.plan', 'done', 1],
+      ['reel.keyframes', 'running', killed.before.keyframes.attempts + 1],
+    ],
+  )
+  assert.ok(keyframes !== undefined)
+  assert.ok(
+    String(keyframes.locked_at) >= String(killed.before.keyframes.lease_until),
+    `the job was claimed again at ${keyframes.locked_at}, before its lease ran out at ${killed.before.keyframes.lease_until}`,
+  )
+  return { runId, before: { events: described(events), generations, receipts, keyframes } }
+}
+
+/**
  * Stops the API and starts it again on the same file, starts a new worker whose stand-in answers
- * from `script`, and waits for the run to finish. The keyframes job must have been claimed a second
- * time, and no earlier than the first claim's lease ran out (D-002, S-027).
+ * from `script`, and waits for the run to finish. The keyframes job must have been claimed once more
+ * than the last kill left it — a second time after one kill, a fourth after three (resume-failed,
+ * `killedAgain`) — and no earlier than the last claim's lease ran out (D-002, S-027).
  */
 export async function takenUp(
   engine: Engine,
@@ -157,7 +227,12 @@ export async function takenUp(
     FINISH_MS,
   )
   const keyframes = jobsOf(engine, runId).find((j) => j.kind === 'reel.keyframes')
-  assert.equal(keyframes?.attempts, 2, 'the keyframes job was not run a second time')
+  const expected = killed.before.keyframes.attempts + 1
+  assert.equal(
+    keyframes?.attempts,
+    expected,
+    `the keyframes job was not run as attempt ${expected}`,
+  )
   assert.equal(keyframes?.state, 'done')
   assert.ok(
     String(keyframes?.locked_at) >= String(killed.before.keyframes.lease_until),

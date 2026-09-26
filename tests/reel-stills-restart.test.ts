@@ -13,17 +13,19 @@ import {
   type Pic,
 } from './engine/stills.ts'
 
-// reel-stills, Slice 5 — check 48 (docs/features/reel-stills.md): a restart (S-027, S-046, S-048).
-// A keyframes job whose worker was killed is claimed again when its lease runs out and run from the
-// start: every picture is made again and paid for again, under the new attempt's ids. The killed
-// attempt's pictures stay in the record with the checks they completed — no verdict outcome where
-// one was cut off, none chosen — and its receipts, files and cost stay, and are counted.
+// reel-stills, Slice 5 — check 48 (docs/features/reel-stills.md): a restart (S-027, S-046, S-048),
+// AMENDED BY resume-failed, Slice 2 (S-164). A keyframes job whose worker was killed is claimed again
+// when its lease runs out and picks up at the first step not done: every picture an earlier attempt
+// DECIDED is kept — no image call, no check, no receipt — and only a picture whose checks were cut
+// off is made again, and paid for again, under the new attempt's id. The killed attempt's pictures
+// stay in the record with the checks they completed — no verdict outcome where one was cut off — and
+// its receipts, files and cost stay, and are counted.
 //
 // In both runs the first worker is held at MODEL CALL 5: the planner's two calls, then candidate a's
 // witness (3) and reconcile (4), then candidate b's witness. So candidate a has been through all of
 // Gate 1, candidate b has been measured and read but never seen, and two image calls have returned.
 
-const [a] = THREE_RANKS_PICS as [Pic, Pic, Pic, Pic]
+const [a, b, barons, hall] = THREE_RANKS_PICS as [Pic, Pic, Pic, Pic]
 
 const GATE1 = ['technical', 'text', 'witness', 'reconcile']
 const accepted = (steps: readonly string[]) =>
@@ -31,7 +33,7 @@ const accepted = (steps: readonly string[]) =>
 
 // ---------------------------------------------------------------- 48
 
-test('48. after a worker is killed mid-stills and a new one started, the run completes; stage.started for stills appears once; the first attempts pictures are in the record under attempt-1 ids with the checks they completed, no verdict outcome where one was cut off, and none chosen, and the record lists every picture in seq order, attempt 1s before attempt 2s; its receipts and cost are kept', async () => {
+test('48. after a worker is killed mid-stills and a new one started, the run completes; stage.started for stills appears once; the first attempts pictures are in the record under attempt-1 ids with the checks they completed, no verdict outcome where one was cut off, the one it decided kept and chosen, and the record lists every picture in seq order, attempt 1s before attempt 2s; its receipts and cost are kept', async () => {
   // Candidate a of the FIRST attempt costs 7 — keyed by its whole id, so the second attempt's a
   // costs nothing, and 7 is what the first attempt spent.
   const engine = await startEngine({ worker: false, images: { 'a1-shot-0-a': { costCents: 7 } } })
@@ -51,7 +53,8 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       killed.runId,
     )
 
-    const ran = await takenUp(engine, killed, stillsScript(THREE_RANKS, THREE_RANKS_PICS))
+    // The finishing script leaves out the kept picture's answers: a is not looked at again (S-164).
+    const ran = await takenUp(engine, killed, stillsScript(THREE_RANKS, [b, barons, hall]))
     const pathOf = (id: string) => ran.pictures.find((p) => p.picture_id === id)?.path
 
     // The run completes, with the second attempt's pictures, and the first attempt's cost.
@@ -65,7 +68,8 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       until: 'stills',
       estimateCents: 220,
       stills: [
-        { pictureId: 'a2-shot-0-a', shotId: 'shot-0', path: pathOf('a2-shot-0-a') },
+        // The kept a1-shot-0-a: both candidates scored now, equal, and a tie goes to a (D-031).
+        { pictureId: 'a1-shot-0-a', shotId: 'shot-0', path: pathOf('a1-shot-0-a') },
         {
           pictureId: 'a2-shot-1-single',
           shotId: 'shot-1',
@@ -80,13 +84,39 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       degradations: [],
     })
 
-    // Every picture made again from the start, and paid for again (S-048).
+    // Only the picture whose checks were cut off is made again, and paid for again; the decided one
+    // is kept (S-164, superseding S-048's "every picture again").
     assert.deepEqual(
       engine.image.calls.map((c) => c.pictureId),
-      ['a2-shot-0-a', 'a2-shot-0-b', 'a2-shot-1-single', 'a2-shot-2-single'],
+      ['a2-shot-0-b', 'a2-shot-1-single', 'a2-shot-2-single'],
+    )
+    // No check of the kept picture was made again: every model receipt after the planner's names only
+    // the first attempt's a, then the second attempt's three, each looked at and then reconciled; and
+    // the sensors measured exactly those three.
+    assert.deepEqual(
+      ran.receipts
+        .filter((r) => r.role !== 'planner')
+        .map((r) => `${r.call} ${r.role} ${r.picture_ids.join()}`),
+      [
+        'observe witness a1-shot-0-a',
+        'structured reconciler a1-shot-0-a',
+        'observe witness a2-shot-0-b',
+        'structured reconciler a2-shot-0-b',
+        'observe witness a2-shot-1-single',
+        'structured reconciler a2-shot-1-single',
+        'observe witness a2-shot-2-single',
+        'structured reconciler a2-shot-2-single',
+      ],
+    )
+    assert.deepEqual(
+      engine.sensors.calls
+        .filter((c) => c.method === 'measure')
+        .map((c) => c.pictures[0]?.pictureId),
+      ['a2-shot-0-b', 'a2-shot-1-single', 'a2-shot-2-single'],
     )
 
-    // stage.started for stills once; only the finishing attempt's verdicts are events.
+    // stage.started for stills once; only the finishing attempt's verdicts are events — the first
+    // shot-0 verdict now the kept picture's, once.
     assert.deepEqual(described(ran.events), [
       ...PLANNED,
       'stage.started stills',
@@ -106,8 +136,8 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
     )
 
     // The record: every picture made, in seq order, attempt 1's before attempt 2's. Attempt 1's
-    // candidate a completed Gate 1; b was cut off after text, so it has two checks and no
-    // observation; neither is chosen.
+    // candidate a completed Gate 1, and is kept and chosen; b was cut off after text, so it has two
+    // checks and no observation, and is made again.
     assert.deepEqual(
       ran.record.pictures.map((p) => ({
         pictureId: p.pictureId,
@@ -120,7 +150,7 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
         {
           pictureId: 'a1-shot-0-a',
           shotId: 'shot-0',
-          chosen: false,
+          chosen: true,
           checks: accepted(GATE1),
           ids: ['obs-a1-shot-0-a', 'rec-a1-shot-0-a'],
         },
@@ -130,13 +160,6 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
           chosen: false,
           checks: accepted(['technical', 'text']),
           ids: [null, null],
-        },
-        {
-          pictureId: 'a2-shot-0-a',
-          shotId: 'shot-0',
-          chosen: true,
-          checks: accepted(GATE1),
-          ids: ['obs-a2-shot-0-a', 'rec-a2-shot-0-a'],
         },
         {
           pictureId: 'a2-shot-0-b',
@@ -166,10 +189,9 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       [
         ['a1-shot-0-a', 1, 1],
         ['a1-shot-0-b', 2, 1],
-        ['a2-shot-0-a', 3, 2],
-        ['a2-shot-0-b', 4, 2],
-        ['a2-shot-1-single', 5, 2],
-        ['a2-shot-2-single', 6, 2],
+        ['a2-shot-0-b', 3, 2],
+        ['a2-shot-1-single', 4, 2],
+        ['a2-shot-2-single', 5, 2],
       ],
     )
     // Cut off: b's verdict has its completed steps and no outcome; a's was decided.
@@ -190,7 +212,6 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       [
         ['a1-shot-0-a', 7],
         ['a1-shot-0-b', 0],
-        ['a2-shot-0-a', 0],
         ['a2-shot-0-b', 0],
         ['a2-shot-1-single', 0],
         ['a2-shot-2-single', 0],
@@ -237,12 +258,12 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       'the second attempt wrote over the first attempts file',
     )
 
-    // A picture's seq is the receipts', written once with its receipt; the recorder rewrites only
-    // what its checks found (S-055). Counted from the earlier attempt's calls, the stage's own number
-    // agrees with the receipts' on this run, so the run alone cannot tell a recorder that rewrites
-    // seq from one that does not (S-063). Handed the second attempt's first picture numbered as a
-    // stage told of no earlier call would number it — 1 — the recorder leaves the row at 3.
-    const second = ran.pictures.find((p) => p.picture_id === 'a2-shot-0-a')
+    // A picture's seq is written once with its receipt, the run's greatest plus one; the recorder
+    // rewrites only what its checks found (S-055, S-164). The stage's own number agrees with the
+    // row's on this run, so the run alone cannot tell a recorder that rewrites seq from one that does
+    // not (S-063). Handed the second attempt's first picture numbered as a stage told of no earlier
+    // call would number it — 1 — the recorder leaves the row at 3.
+    const second = ran.pictures.find((p) => p.picture_id === 'a2-shot-0-b')
     assert.ok(second !== undefined)
     const db = openDatabase(engine.dbPath)
     try {
@@ -281,10 +302,9 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
       [
         ['a1-shot-0-a', 1],
         ['a1-shot-0-b', 2],
-        ['a2-shot-0-a', 3],
-        ['a2-shot-0-b', 4],
-        ['a2-shot-1-single', 5],
-        ['a2-shot-2-single', 6],
+        ['a2-shot-0-b', 3],
+        ['a2-shot-1-single', 4],
+        ['a2-shot-2-single', 5],
       ],
       'the recorder rewrote a pictures seq',
     )
@@ -293,10 +313,11 @@ test('48. after a worker is killed mid-stills and a new one started, the run com
   }
 })
 
-test('48. when the first attempts scripted cost leaves the second attempts next call above the ceiling, the run stops for budget', async () => {
+test('48. when the first attempts scripted cost leaves the second attempts next call above the ceiling, the run stops for budget, its kept pictures verdict its one event', async () => {
   // A ceiling of 100. The first attempt's candidate b costs 90 — its call was made at 0 + 15 — and
-  // the worker is killed before its next call. The second attempt's first call would be 90 + 15 =
-  // 105: the guard counts what the first attempt spent (S-036, S-048), so it is not made.
+  // the worker is killed before its next call. The second attempt keeps a, so its first call is b's,
+  // made again: 90 + 15 = 105. The guard counts what the first attempt spent (S-036, S-048), so it is
+  // not made.
   const engine = await startEngine({ worker: false, images: { 'a1-shot-0-b': { costCents: 90 } } })
   try {
     const killed = await killedMidStills(engine, stillsRequest('r48-budget', 100), {
@@ -334,6 +355,8 @@ test('48. when the first attempts scripted cost leaves the second attempts next 
     assert.deepEqual(described(ran.events), [
       ...PLANNED,
       'stage.started stills',
+      // The kept a's verdict, when the ladder reached it — before b's call was refused (S-164).
+      'verdict 1 shot-0 accept',
       'run.finished stopped',
     ])
     assert.deepEqual(

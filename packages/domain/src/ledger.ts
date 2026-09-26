@@ -1,4 +1,4 @@
-import { and, count, eq, sql } from 'drizzle-orm'
+import { and, count, eq, max, sql } from 'drizzle-orm'
 import type { ImageReceipt, LostCall, PictureRecord } from '@cutroom/contracts'
 import type { Db } from './db.ts'
 import { generationReceipt, job, lostCall, picture } from './schema.ts'
@@ -23,9 +23,9 @@ export function spentCents(db: Db, correlationId: string): number {
 /**
  * The image calls a run has PAID FOR: its `generation_receipt` rows and its image `lost_call` rows,
  * every attempt's (D-027, S-048, S-142). The keyframes job reads it at the start of each attempt,
- * and the attempt's reserve is six less these and less the placement's calls — so an attempt run
- * again after its worker died pays for what the one before it made out of what is left, and no run
- * makes more than six.
+ * and the attempt's reserve is six less these and less the first calls no kept picture satisfies
+ * (S-164) — so an attempt run again after its worker died pays for what the one before it made out
+ * of what is left, a picture it kept counted once, and no run makes more than six.
  *
  * **A call that answered and made no usable picture counts here too**, since paid-failures: D-027
  * bounds what a run may SPEND at pictures, and two such calls in the first real reel counted for
@@ -85,8 +85,11 @@ export function recordLostCall(
 /**
  * One image call that returned, in one immediate transaction (S-036, S-046): its
  * `generation_receipt` with the rate applied (D-028); its cost added to the running job row's
- * `cost_cents`; and the picture's row, made and not yet checked, whose `seq` — the run's image-call
- * number — is taken from the run's receipts here, so the number and the receipt cannot disagree.
+ * `cost_cents`; and the picture's row, made and not yet checked, whose `seq` — the run's picture
+ * number — is the run's greatest `seq` plus one, taken here, so two pictures cannot share one. It is
+ * the receipts counted plus one for every run whose every picture has its receipt here; a picture
+ * with none — one copied from the run this one resumes — keeps its number, and the next follows it
+ * (S-164, superseding S-055's "the run's receipt count plus one").
  */
 export function recordGeneration(
   db: Db,
@@ -104,12 +107,12 @@ export function recordGeneration(
   const { jobId, runId, receipt } = entry
   db.transaction(
     (tx) => {
-      const made = tx
-        .select({ n: count() })
-        .from(generationReceipt)
-        .where(eq(generationReceipt.runId, runId))
+      const greatest = tx
+        .select({ seq: max(picture.seq) })
+        .from(picture)
+        .where(eq(picture.runId, runId))
         .get()
-      const seq = (made?.n ?? 0) + 1
+      const seq = (greatest?.seq ?? 0) + 1
       tx.insert(generationReceipt)
         .values({
           runId,

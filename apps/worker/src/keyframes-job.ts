@@ -13,6 +13,7 @@ import {
   readRequest,
   readRun,
   readSelectedPlan,
+  readStillsInputs,
   spentCents,
   startStage,
   type ClaimedJob,
@@ -52,8 +53,9 @@ export interface KeyframesJobContext {
 
 /**
  * Every shot the stage degraded, in the order its ladders reached them, with the picture carrying
- * the reason and every picture of it this attempt made — so all four labels can be written (I-4,
- * S-058).
+ * the reason and every picture of it the deciding attempt used, made or kept — so all four labels
+ * can be written (I-4, S-058, S-164). A picture a crash cut off was used by no ladder, and is not
+ * among them (S-063).
  */
 function degradedShots(outcome: StillsOutcome): DegradedShot[] {
   return outcome.degradations.map((d) => {
@@ -107,12 +109,14 @@ export async function runKeyframesJob(
     return
   }
 
-  // The run's image calls before this attempt, counted from its receipts now, at the attempt's start:
-  // a job run again after its worker died makes every picture again, and what the attempts before
-  // it made comes out of its reserve (S-048). The stage decides what that leaves (S-061).
+  // The run's image calls before this attempt, counted from its receipts now, at the attempt's start,
+  // and every picture an earlier attempt decided: a job run again after its worker died keeps those
+  // and makes again only a picture whose checks were cut off, and what the attempts before it made
+  // comes out of its reserve (S-048, S-164). The stage decides what that leaves (S-061).
   const earlierImageCalls = imageCallCount(db, runId)
+  const kept = readStillsInputs(db, runId)
   const outcome = await makeStills(
-    { runId, attempt: job.attempts, earlierImageCalls, request, plan },
+    { runId, attempt: job.attempts, earlierImageCalls, request, plan, kept },
     {
       image: guardedImagePort(context.image, db, {
         jobId: job.id,

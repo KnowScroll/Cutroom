@@ -32,6 +32,22 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 2 — the gates below are not edited, and no assertion is
+> removed** (**S-164**, superseding **S-048** in part). **A keyframes job run again keeps every picture an earlier
+> attempt decided** — accepted or failed, read back by `readStillsInputs` — and makes again only a picture whose
+> checks were cut off: no call, no check and no receipt for a kept picture, its verdicts events once, the canonical best
+> of two (two kept survivors ranked by their stored totals), a kept failed picture's stored reasons told to its repair,
+> a kept repair counted and taking no slot again, a kept degradation ending its shot. **The reserve is 6 − earlier −
+> unmade** (`reserveOf(placements, earlier, kept)`), and S-061's two details read _"its placement makes U more, E+U in
+> all"_ and _"its placement making U more of the 6"_. **`seq` is the run's greatest plus one**, the same number
+> wherever no picture is copied. **Check 48 is amended** as `resume-failed`'s Gate 3 works it: its crash point kept,
+> the second attempt's calls `a2-shot-0-b`, `a2-shot-1-single`, `a2-shot-2-single`, the kept `a1-shot-0-a`
+> chosen, five generations, the seqs 1 to 5, and — added — the model receipts and the sensors' measures of the second
+> attempt; its budget case gains the kept picture's verdict event. **Check 49 is amended**: each test keeps its first
+> kill and kills the same run again at call 1 of each further attempt (`killedAgain`, `tests/engine/restart.ts`),
+> so the new formula is the one reached; each failure also asserts `run.failure` `crashed`. `takenUp` reads the
+> attempt it expects.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
 > removed** (**S-163**). **Gate 1S's unparsable judge answer throws an `Unanswered`** (`gates/gate1s.ts`), today's
 > words. **The stills stage's failed ending carries its kind**: the catch-all's from the thrown thing's class, S-061's

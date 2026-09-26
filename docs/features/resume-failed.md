@@ -1003,7 +1003,7 @@ touches gains its amendment block in that slice.
       failed ending), `reel-render` (`gate7.ts`, the render's and the clips stage's failed endings), `reel-takes`
       (`transient.ts`) and `paid-path` (`fal/image.ts`, `fal/queue.ts`, `ffmpeg/sensors.ts`,
       `minimax/narration.ts`). **Proves: 1 to 5.**
-- [ ] **Slice 2 — what a crash keeps.** `readStillsInputs`; the stills stage's kept input, the ladder consulting it, the
+- [x] **Slice 2 — what a crash keeps.** `readStillsInputs`; the stills stage's kept input, the ladder consulting it, the
       kept reasons, the carried degradation, the two failures' new words; `reserveOf`'s new formula; `seq`;
       `killedAgain`; the amended checks 48 and 49 of `reel-stills`. S-048 superseded. Amendment blocks: `reel-stills`,
       `three-pictures`. **Proves: 6 to 11.**

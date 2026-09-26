@@ -20,7 +20,8 @@ import {
 // The pictures of a run and their record (docs/features/reel-stills.md, Gate 2 "Storage" and "How a
 // stills run ends"; S-046). A picture's row is written with its image receipt (ledger.ts) and
 // updated here as each of its checks completes, so the record holds every picture made — every
-// attempt's — with each check it reached, whatever ends the run.
+// attempt's — with each check it reached, whatever ends the run. A later attempt reads back the ones
+// whose Gate 1 decided and keeps them (readStillsInputs, S-164).
 
 /** A picture's whole row, from its record. */
 export function pictureValues(runId: string, p: PictureRecord): typeof picture.$inferInsert {
@@ -107,7 +108,8 @@ export function upsertPicture(db: Db, runId: string, p: PictureRecord): void {
 type Check = RunRecord['pictures'][number]['checks'][number]
 
 /**
- * A run's record as the contract gives it: one entry per picture made, every attempt, in `seq`
+ * A run's record as the contract gives it: one entry per picture the run holds — made, every
+ * attempt's, or kept by a later attempt, which is the same row — in `seq`
  * order; `observationId` and `reconciliationId` where those rows exist; a check for each completed
  * Gate 1 step and for Gate 1S; one entry per take made, every attempt's, in the order made, with a
  * check for each gate it completed (S-093); and every degradation — the stills stage's, then the shots
@@ -260,7 +262,10 @@ export interface DegradedShot {
   reason: string
   /** The shot's last failing picture, which carries the reason. */
   lastPictureId: string
-  /** Every picture of the shot this attempt made: each one's generation_receipt is marked. */
+  /**
+   * Every picture of the shot the deciding attempt used, made or kept: each one's generation_receipt
+   * is marked (S-058, S-164). A picture a crash cut off was used by no ladder, and is not among them.
+   */
   pictureIds: readonly string[]
 }
 
@@ -306,4 +311,82 @@ export function markChosen(
       .where(and(eq(picture.runId, runId), eq(picture.pictureId, pictureId)))
       .run()
   }
+}
+
+/**
+ * Every picture of a run whose Gate 1 DECIDED — accepted or failed — as the stills stage reads it
+ * back, in the order made, with every check it completed: its measure, words, Gate 1 steps, its
+ * observation and reconciliation from their own rows, its score, its Gate 1S verdict and its
+ * degradation (docs/features/resume-failed.md; S-164). A picture whose checks were cut off is not
+ * among them: it is made again. `chosen` is false on every one; the stage decides it again.
+ */
+export function readStillsInputs(db: Db, runId: string): PictureRecord[] {
+  const json = <T>(text: string | null): T | null =>
+    text === null ? null : (JSON.parse(text) as T)
+  const observations = new Map(
+    db
+      .select({ pictureId: observation.pictureId, observation: observation.observation })
+      .from(observation)
+      .where(eq(observation.runId, runId))
+      .all()
+      .map((r) => [r.pictureId, r.observation]),
+  )
+  const reconciliations = new Map(
+    db
+      .select({
+        pictureId: reconciliation.pictureId,
+        answer: reconciliation.answer,
+        failed: reconciliation.failed,
+      })
+      .from(reconciliation)
+      .where(eq(reconciliation.runId, runId))
+      .all()
+      .map((r) => [r.pictureId, r]),
+  )
+  return db
+    .select()
+    .from(picture)
+    .where(eq(picture.runId, runId))
+    .orderBy(asc(picture.seq))
+    .all()
+    .flatMap((row): PictureRecord[] => {
+      const gate1 = json<NonNullable<PictureRecord['gate1']>>(row.gate1)
+      if (gate1 === null || gate1.outcome === null) return []
+      const reconciled = reconciliations.get(row.pictureId)
+      return [
+        {
+          pictureId: row.pictureId,
+          attempt: row.attempt,
+          shotUnit: row.shotUnit,
+          subjectId: row.subjectId,
+          role: row.role,
+          label: row.label,
+          path: row.path,
+          prompt: row.prompt,
+          framing: row.framing as PictureRecord['framing'],
+          references: JSON.parse(row.referenceIds) as string[],
+          seq: row.seq,
+          gate1,
+          measure: json<NonNullable<PictureRecord['measure']>>(row.measure),
+          text: json<string[]>(row.words),
+          observation: json<NonNullable<PictureRecord['observation']>>(
+            observations.get(row.pictureId) ?? null,
+          ),
+          reconciliation:
+            reconciled === undefined
+              ? null
+              : {
+                  ...(JSON.parse(reconciled.answer) as Omit<
+                    NonNullable<PictureRecord['reconciliation']>,
+                    'failed'
+                  >),
+                  failed: JSON.parse(reconciled.failed) as string[],
+                },
+          score: json<NonNullable<PictureRecord['score']>>(row.score),
+          gate1s: json<NonNullable<PictureRecord['gate1s']>>(row.gate1s),
+          degradation: row.degradation,
+          chosen: false,
+        },
+      ]
+    })
 }
