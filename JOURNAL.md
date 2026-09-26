@@ -6846,3 +6846,45 @@ item 7, the measure.
 **Why.** A reviewer approves against a number, not a hope; the numbers are counted from `docs/context.md`'s Runs table.
 
 **Next.** `PROMPTS/056`, unchanged.
+
+## 2026-09-26 — session 56: `resume-failed` approved, and its Slices 1 and 2 built (PROMPTS/056)
+
+**Asked.** `PROMPTS/056`: one approving read of `resume-failed`'s four gates, its findings fixed, then the build from
+Slice 1, each slice committed after the full check; stop at a slice boundary when the context grows heavy.
+
+**The approving read.** A fresh reviewer approved the product gate and found three things, each fixed in the file and
+read again by the same reviewer, who approved all four (`a38edf5`, Gate review 12):
+
+1. A caller's resume refused at the per-reel cap had no writer the API could reach — the only writer is the worker's,
+   and the API may import only `domain` and `reel-contract`. Now the `ResumeService` is `decide` and `askOwner`, and
+   `apps/service` binds the worker's `appendResumeQuestion` to a questions path it must be handed, with no default, so
+   no test's API can write the repository's `QUESTIONS.md`. The writer moved to Slice 4, beside check 29.
+2. A named canonical in a resumed run could find no slot for its repair with no crash — kept standalones and their
+   repairs filling the six — and would have failed labelled `crashed`. **Put to the owner** (refuse at the preview; try
+   and stop; try and fail): _"Try, stop if both fail"_ — **S-171**, superseding D-047 steps 1 and 3 for that case.
+3. Checks 28, 35 and 39 would stay green if their runs failed some other way; each now pins `run.failure` and detail.
+
+**Slice 1 — the kind** (`e67ec6f`). Five classes beside `Spent` and `Unavailable`, each thrown where a plain Error lost
+the fact, messages unchanged — read off the code before the change by a scratch script and typed into check 2 by
+hand. `failureKindOf` by class. Each stage's failed ending carries `failure`; migration 0007 (drizzle-kit, no table
+rebuild: the unique on `request_id` was an index); `endRun` writes `run.failure`; the finishing functions take a
+`RunEnding`, under which a failed result without its kind does not compile — the type found all seven sites at once.
+The stand-ins' `as` shares one helper, `fake/thrown.ts` (a file Gate 3 does not list). Checks 1 to 5; breaks: OffSpec
+after Spent, `endRun` not writing, the stand-in ignoring `as` — each red where it should be, the two unscripted cases
+of check 4 green.
+
+**Slice 2 — what a crash keeps** (`0f73e5d`). `readStillsInputs`; the ladder consults kept pictures at every step;
+`reserveOf(placements, earlier, kept)`; `seq` the run's greatest plus one. Checks 8 to 10 run the stage in-process —
+`planReel` for the plan, a first attempt to the end, a second handed some of its decided pictures — so no process is
+killed for them; checks 6 and 7 and the amended 48 and 49 go through the worker, 49 with up to three kills
+(`killedAgain`). Every figure in 48 and 49 came out as Gate 3 worked it by hand. Breaks: no adoption, the old reserve,
+seq counted — each red.
+
+**Observed.** Both test-impact passes found nothing beyond what the gates list. The full check took about seven minutes
+each time, all nine steps green. The in-memory `seq` a stage gives a picture is its own copy; the row's is taken in
+`recordGeneration`, so the stage keeps no second counter.
+
+**Why stop here.** Slice 3 is the largest — fourteen checks, the resume made end to end — and should start with a
+fresh context, never be cut in half.
+
+**Next.** `PROMPTS/057`: Slice 3 onwards, in the gates' order.

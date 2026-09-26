@@ -9,7 +9,7 @@
   writes them. Written as 053, renumbered 054 when the owner put two test reels first (`PROMPTS/053`), and 055 when
   the owner put two explainer reels first (`PROMPTS/054`), and 056 when session 54 ended before either reel was made
   and the owner asked for them again (`PROMPTS/055`).
-- **Run:** not yet
+- **Run:** session 56, 2026-09-26 — gates approved (round 12, S-171); Slices 1 and 2 built (`e67ec6f`, `0f73e5d`)
 
 **Where things stand.** Session 52 wrote `resume-failed`'s four gates — 44 checks in 7 slices — on twenty-two owner
 answers (S-161 to S-164) and took them through eleven review rounds. Round 10 would have approved all four; round 11, a

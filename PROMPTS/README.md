@@ -46,7 +46,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 053 | [053-two-test-reels.md](053-two-test-reels.md)                                         | —               | two reels, no code touched     | 2026-09-25 | session 53 |
 | 054 | [054-two-explainer-reels.md](054-two-explainer-reels.md)                               | —               | two explainer reels, healed    | 2026-09-25 | session 54 |
 | 055 | [055-explainer-reels-again.md](055-explainer-reels-again.md)                           | —               | the two reels again, DNS first | 2026-09-26 | session 55 |
-| 056 | [056-resume-failed-approve-then-build.md](056-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | not yet    |
+| 056 | [056-resume-failed-approve-then-build.md](056-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | session 56 |
+| 057 | [057-resume-failed-build-from-slice-3.md](057-resume-failed-build-from-slice-3.md)     | `resume-failed` | the build from Slice 3         | 2026-09-26 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

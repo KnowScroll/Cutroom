@@ -21,13 +21,13 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
-  **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 056**: `resume-failed` (S-161 to S-164). **Planned, gates not
+  **Stopped**: `one-subject` (S-149). **Gates approved, Slices 1 and 2 of 7 built**: `resume-failed` (S-161 to S-164, S-171). **Planned, gates not
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
 - **Next**: session 55 made both explainer reels — video game graphics at its fourth run (`d12931e1`), JoJo at its
   second (`a1b8f2ee`), 322¢ over six runs, every stop a brief cause healed in the criteria or claims (P-021 to P-025
-  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/056` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
+  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/057` — `resume-failed`'s build from Slice 3 (session 56 approved the gates and built Slices 1 and 2); then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -37,8 +37,8 @@ git and the journal keep them.
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: the last full `check.mjs` green on session 52's session-start hook commit; every later commit is
-  documents, or names its own full run below. `check.mjs --changed` between steps (S-159).
+- **Checks**: the last full `check.mjs` green on `0f73e5d`, `resume-failed`'s Slice 2 (session 56); every later commit
+  is documents, or names its own full run below. `check.mjs --changed` between steps (S-159).
 
 ## Runs
 
@@ -92,6 +92,23 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-26 · session 56
+
+- `docs/features/resume-failed.md` — the approving read, Gate review 12: three findings fixed, all four gates
+  APPROVED 2026-09-26 (`a38edf5`). `DECISIONS.md` — **S-171**: a resumed run's named canonical with no slot for its
+  repair makes its two candidates and stops for `gate-1` if both fail (the owner; D-047 steps 1 and 3 superseded
+  for that case).
+- Slice 1, the kind (`e67ec6f`): `packages/contracts/src/failures.ts` — five classes and `failureKindOf`; throw
+  sites in `fal/image.ts`, `fal/queue.ts`, `minimax/narration.ts`, `ffmpeg/sensors.ts`, `gates/witness.ts`,
+  `gate1s.ts`, `gate7.ts`, `apps/worker/src/transient.ts`; stand-ins' `as` (`fake/thrown.ts`); each stage's failed
+  ending's `failure`; `db/migrations/0007_resume_failed.sql`; `endRun` and `RunEnding` (`domain/src/runs.ts`).
+  `tests/resume-failed-kinds.test.ts`, checks 1 to 5; fixture `minimax-t2a-rejected`. Eight amendment blocks.
+- Slice 2, what a crash keeps (`0f73e5d`): `readStillsInputs` (`domain/src/pictures.ts`); the stills ladder's kept
+  input (`pipeline/src/stills/index.ts`); `reserveOf(placements, earlier, kept)` (`ladder.ts`); `seq` the greatest
+  plus one (`ledger.ts`). `tests/resume-failed-stills.test.ts`, checks 6 to 11; `reel-stills` checks 48 and 49
+  amended; `killedAgain` (`tests/engine/restart.ts`). Amendment blocks: `reel-stills`, `three-pictures`.
+- `PROMPTS/056` and `PROMPTS/README.md` — the Run line. `PROMPTS/057` — new: Slice 3 onwards.
 
 ### 2026-09-26 · session 55
 
@@ -185,12 +202,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - `scripts/real-reel.mjs` — the hurricane brief (`ba1be17`); run `74bb96a0` completed.
 - `docs/research/hyperframes.md` — both session-51 reels: timings, tokens, nineteen rules. `docs/reel-pitfalls.md` —
   P-012. `PROMPTS/052` — written from 051 (`099af7f`).
-
-### 2026-09-24 · session 50
-
-- `scripts/real-reel.mjs` — the volcano brief (`497182b`); runs `124f1124` to `bf8f4444`.
-- `docs/reel-pitfalls.md` — P-009 to P-011 (`e143cea`). `docs/research/hyperframes.md` — the hybrid reel, §4 F and
-  §4 C (`3338cc2`, `728a29a`).
 
 ## Where to look
 
