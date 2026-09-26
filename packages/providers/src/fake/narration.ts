@@ -3,6 +3,7 @@ import { dirname } from 'node:path'
 import type { NarrationPort, NarrationRequest, WordTiming } from '@cutroom/contracts'
 import { DEFAULT_ARTIFACT_ROOT, artifactPath } from '../artifacts.ts'
 import { entryFor } from './key.ts'
+import { checkedFailures, scriptedThrow, type StandInFailure } from './thrown.ts'
 
 // The stand-in NarrationPort (docs/features/reel-render.md, Gate 2 "The ports"; S-070). It is the
 // only narration port the engine has: it runs on this machine, reads no secret, reaches no network
@@ -29,6 +30,11 @@ export interface FakeNarrationEntry {
   costCents?: number
   /** The call throws this message instead of making anything. */
   throws?: string
+  /**
+   * The class the throw is, as a real adapter's would be — its message then that class's for
+   * `throws` — or a plain Error when absent (resume-failed, S-163).
+   */
+  as?: StandInFailure
   /**
    * The first this-many sends of the narration id are answered `unavailable` — a provider failing
    * for a moment — and the next is answered as the rest of the entry says (reel-takes, S-096).
@@ -73,6 +79,7 @@ export function fakeNarration(
   script: FakeNarrationScript,
   options: { artifactRoot?: string } = {},
 ): FakeNarration {
+  checkedFailures('the stand-in narration port', Object.entries(script))
   const root = options.artifactRoot ?? DEFAULT_ARTIFACT_ROOT
   const calls: NarrationRequest[] = []
   /** How many times each narration id has been sent. */
@@ -90,7 +97,13 @@ export function fakeNarration(
           detail: `the stand-in narration port is unavailable for ${request.narrationId}, send ${send} of the ${entry.transient} it was scripted to answer so`,
         }
       }
-      if (entry.throws !== undefined) throw new Error(entry.throws)
+      if (entry.throws !== undefined) {
+        throw scriptedThrow(entry.throws, entry.as, {
+          port: 'speech',
+          model: FAKE_NARRATION_MODEL,
+          costCents: entry.costCents ?? 0,
+        })
+      }
       const path = artifactPath(
         root,
         { runId: request.runId, id: request.narrationId, what: 'narrationId' },

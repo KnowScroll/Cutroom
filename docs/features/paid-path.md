@@ -31,6 +31,15 @@ Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED
 > default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its
 > own rate.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **Four throw sites raise the new classes, each message unchanged**: fal's frame refusal an
+> `OffSpec` (`fal/image.ts`, still a `Spent`); a job fal reports FAILED a `ProviderFailed` in both shapes — its result
+> read answering 200 and answering an error (`fal/queue.ts`, whose `FalFault` comment and FAILED-branch comment now say
+> so); MiniMax's narration answering 200 with a non-transient `base_resp` status a `RefusedRequest`
+> (`minimax/narration.ts`, still a `Spent`; the 400 and 401 fail before the answer and stay plain); and the text step's
+> unparsable reading an `Unanswered` (`ffmpeg/sensors.ts`). Checks 12, 16, 9 and 19 assert by message and hold. **One
+> fixture is added**, `tests/fixtures/wire/minimax-t2a-rejected.json`, which check 21 reads as it reads every one.
+>
 > **Amended by `ask-again` on 2026-09-24, Slice 5 — no gate below is edited, and no assertion is removed**
 > (**S-156**). **`scripts/real-reel.mjs` prints how many answers a model wrote that could not be read** — the count only,
 > since it prints nothing a provider handed back but figures — and names `scripts/refused.mjs` for the words.

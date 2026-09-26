@@ -10,6 +10,13 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **The spent transient counter throws a `StillUnavailable`** (`apps/worker/src/transient.ts`), an
+> `Unavailable` with the counter's own sentence unchanged, so its run's kind is `unavailable`. Nothing above the counter
+> sends an `Unavailable` again — `retryingModelPort` wraps the adapter, not itself — so the sends stay
+> `maxAttempts` in all (`resume-failed`'s check 3). Check 11 asserts the message (`reel-takes-transient.test.ts:238,
+262`), and it holds.
+>
 > **Amended by `cut-rules` on 2026-09-24, Slice 3 — the gates below are not edited; S-158 retires one assertion's
 > premise, and the check keeps the rest** (**S-158**). **A reel's only sound is its narration**, so **check 18**'s
 > _"shot 0's span holds both"_ becomes: shot 0's clip file above −30 dB at 220 Hz, and the reel's 220 Hz band there at

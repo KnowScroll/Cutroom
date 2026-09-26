@@ -18,6 +18,7 @@ import {
   startStage,
   type ClaimedJob,
   type Db,
+  type RunEnding,
 } from '@cutroom/domain'
 import { makeClips, readTakeId } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
@@ -85,6 +86,8 @@ export async function runClipsJob(
       runId,
       jobId: job.id,
       result: { ...finished, costCents: spentCents(db, runId), status: 'failed', detail },
+      // A job-level fault, not a provider's: `engine` (S-163).
+      failure: 'engine',
     })
     return
   }
@@ -136,18 +139,20 @@ export async function runClipsJob(
 
   // Any other ending finishes the run, keeping this job's cost as its calls added it (S-081).
   const costCents = spentCents(db, runId)
-  const ended = (result: RunResult) =>
-    finishVideo(db, { runId, jobId: job.id, events: outcome.events, stillHolds, result })
+  const ended = (ending: RunEnding) =>
+    finishVideo(db, { runId, jobId: job.id, events: outcome.events, stillHolds, ...ending })
 
   if (outcome.kind === 'stopped-rule') {
     ended({
-      ...finished,
-      costCents,
-      status: 'stopped',
-      reason: 'rule',
-      rule: outcome.rule,
-      step: 'video',
-      detail: outcome.detail,
+      result: {
+        ...finished,
+        costCents,
+        status: 'stopped',
+        reason: 'rule',
+        rule: outcome.rule,
+        step: 'video',
+        detail: outcome.detail,
+      },
     })
     return
   }
@@ -155,14 +160,16 @@ export async function runClipsJob(
   if (outcome.kind === 'stopped-budget') {
     // A call was refused, so it was not made: what was spent is what the guard read (S-059).
     ended({
-      ...finished,
-      costCents,
-      status: 'stopped',
-      reason: 'budget',
-      limit: outcome.limit,
-      estimateCents: outcome.estimateCents,
-      ceilingCents,
-      capCents,
+      result: {
+        ...finished,
+        costCents,
+        status: 'stopped',
+        reason: 'budget',
+        limit: outcome.limit,
+        estimateCents: outcome.estimateCents,
+        ceilingCents,
+        capCents,
+      },
     })
     // The engine's own cap fired, so the owner is asked, naming the call that was not made — after
     // the run is finished (D-100, S-026, S-035, S-087). A stop at the caller's ceiling is returned,
@@ -201,5 +208,8 @@ export async function runClipsJob(
     return
   }
 
-  ended({ ...finished, costCents, status: 'failed', detail: outcome.detail })
+  ended({
+    result: { ...finished, costCents, status: 'failed', detail: outcome.detail },
+    failure: outcome.failure,
+  })
 }

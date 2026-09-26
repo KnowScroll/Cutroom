@@ -996,7 +996,7 @@ touches gains its amendment block in that slice.
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the kind.** The five classes and `failureKindOf`; the throw sites; the stand-ins' `as`, checked
+- [x] **Slice 1 — the kind.** The five classes and `failureKindOf`; the throw sites; the stand-ins' `as`, checked
       where the stand-in ports are built; each stage's failed ending carries `failure`; migration 0007 with every column of this feature
       (unused until their slices) and the partial index; `endRun` writes `failure`. Amendment blocks: `paid-failures`,
       `ask-again`, `second-ask`, `reel-plan`, and — for the code this slice touches — `reel-stills` (`gate1s.ts`, the stills stage's

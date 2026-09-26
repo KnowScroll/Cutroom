@@ -122,6 +122,7 @@ export {
   type FakeNarrationEntry,
   type FakeNarrationScript,
 } from './fake/narration.ts'
+export { STAND_IN_FAILURES, type StandInFailure } from './fake/thrown.ts'
 export {
   fakeSensors,
   type FakeSensorCall,

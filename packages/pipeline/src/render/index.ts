@@ -1,4 +1,6 @@
+import { failureKindOf } from '@cutroom/contracts'
 import type {
+  FailureKind,
   AssembledFile,
   AssemblerPort,
   CutVerdict,
@@ -74,7 +76,8 @@ export type CutOutcome = CutRecord &
   (
     | { kind: 'completed' }
     | { kind: 'stopped-rule'; rule: 'gate-7'; detail: string }
-    | { kind: 'failed'; detail: string }
+    // The kind of the failure, decided where the error was caught, from its class (S-163).
+    | { kind: 'failed'; detail: string; failure: FailureKind }
   )
 
 export interface CutPorts {
@@ -145,6 +148,7 @@ export async function cutReel(
       return {
         ...snapshot(),
         kind: 'failed',
+        failure: 'engine',
         detail: `the assembled file ${renderManifest.renderId} differs from its render manifest: ${differing.join('; ')}`,
       }
     }
@@ -182,6 +186,11 @@ export async function cutReel(
     }
     return { ...snapshot(), kind: 'completed' }
   } catch (error) {
-    return { ...snapshot(), kind: 'failed', detail: messageOf(error) }
+    return {
+      ...snapshot(),
+      kind: 'failed',
+      detail: messageOf(error),
+      failure: failureKindOf(error),
+    }
   }
 }

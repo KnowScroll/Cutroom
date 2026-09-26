@@ -18,6 +18,7 @@ import {
   type ClaimedJob,
   type Db,
   type DegradedShot,
+  type RunEnding,
 } from '@cutroom/domain'
 import { makeStills, placePictures, shotIdOf, type StillsOutcome } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
@@ -101,7 +102,8 @@ export async function runKeyframesJob(
       status: 'failed',
       detail,
     }
-    finishStills(db, { runId, jobId: job.id, result })
+    // A job-level fault, not a provider's: `engine` (S-163).
+    finishStills(db, { runId, jobId: job.id, result, failure: 'engine' })
     return
   }
 
@@ -177,32 +179,36 @@ export async function runKeyframesJob(
 
   // A stage that did not complete has no `stage.finished`, and nothing is chosen (S-025's rule,
   // S-046, S-055): its events are the verdicts and degradations reached.
-  const ended = (result: RunResult) =>
-    finishStills(db, { runId, jobId: job.id, degraded, events: outcome.events, result })
+  const ended = (ending: RunEnding) =>
+    finishStills(db, { runId, jobId: job.id, degraded, events: outcome.events, ...ending })
 
   if (outcome.kind === 'stopped-rule') {
     ended({
-      ...finished,
-      costCents,
-      status: 'stopped',
-      reason: 'rule',
-      rule: outcome.rule,
-      step: 'stills',
-      detail: outcome.detail,
+      result: {
+        ...finished,
+        costCents,
+        status: 'stopped',
+        reason: 'rule',
+        rule: outcome.rule,
+        step: 'stills',
+        detail: outcome.detail,
+      },
     })
     return
   }
 
   if (outcome.kind === 'stopped-budget') {
     ended({
-      ...finished,
-      costCents,
-      status: 'stopped',
-      reason: 'budget',
-      limit: outcome.limit,
-      estimateCents: outcome.estimateCents,
-      ceilingCents,
-      capCents,
+      result: {
+        ...finished,
+        costCents,
+        status: 'stopped',
+        reason: 'budget',
+        limit: outcome.limit,
+        estimateCents: outcome.estimateCents,
+        ceilingCents,
+        capCents,
+      },
     })
     // The engine's own cap fired, so the owner is asked — after the run is finished (D-100, S-026,
     // S-035). A stop at the caller's ceiling is returned, not written.
@@ -228,5 +234,8 @@ export async function runKeyframesJob(
     return
   }
 
-  ended({ ...finished, costCents, status: 'failed', detail: outcome.detail })
+  ended({
+    result: { ...finished, costCents, status: 'failed', detail: outcome.detail },
+    failure: outcome.failure,
+  })
 }

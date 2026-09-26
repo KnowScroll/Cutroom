@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 import {
+  Unanswered,
   witnessRefusalsOf,
   type RefusalRecorder,
   type RefusedAnswer,
@@ -58,5 +59,6 @@ export async function askWitness<C extends object, T>(
   const again = witnessRefusalsOf(second.value, schema)
   if (again === null) return schema.parse(second.value)
   await refusals.keep(kept(id, 2, again, second.value))
-  throw new Error(`the witness's answer for ${id} is not ${noun}: ${again.join('; ')}`)
+  // Refused at its last ask: an `Unanswered`, today's words (S-163).
+  throw new Unanswered(`the witness's answer for ${id} is not ${noun}: ${again.join('; ')}`)
 }

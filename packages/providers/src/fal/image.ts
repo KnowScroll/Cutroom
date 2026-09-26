@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { z } from 'zod'
-import type { ImageAnswer, ImagePort } from '@cutroom/contracts'
+import { OffSpec, type ImageAnswer, type ImagePort } from '@cutroom/contracts'
 import { artifactPath } from '../artifacts.ts'
 import { Spent, messageOf } from '../transient.ts'
 import { PICTURE_EXTENSION, pictureFrame } from './frame.ts'
@@ -233,7 +233,8 @@ export function falImage(options: FalImageOptions): ImagePort {
         frame: entry.frame,
         references: request.references.map(() => entry.frame),
       })
-      const spent = (detail: string) => new Spent({ port: 'image', model: slug, costCents, detail })
+      const lost = (detail: string) => ({ port: 'image' as const, model: slug, costCents, detail })
+      const spent = (detail: string) => new Spent(lost(detail))
 
       let result: z.infer<typeof produced>
       try {
@@ -273,8 +274,10 @@ export function falImage(options: FalImageOptions): ImagePort {
       }
       const refused = frameRefusal(frame, slug)
       // Thrown BEFORE the file is written, so a picture that failed its frame is not left under
-      // the artifact root for anything to pick up.
-      if (refused !== undefined) throw spent(refused)
+      // the artifact root for anything to pick up. An `OffSpec`, still a `Spent`: its lost call is
+      // written as any other's, and its run's kind is `off-spec`, which no resume makes again —
+      // the same entry would make the same frame (P-010, S-163).
+      if (refused !== undefined) throw new OffSpec(lost(refused))
 
       const path = artifactPath(
         options.artifactRoot,

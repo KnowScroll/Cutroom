@@ -1,4 +1,6 @@
+import { failureKindOf } from '@cutroom/contracts'
 import type {
+  FailureKind,
   Framing,
   ImageAnswer,
   ImagePort,
@@ -62,7 +64,8 @@ export type StillsOutcome = StillsRecord &
         Extract<ImageAnswer, { kind: 'refused' }>,
         'limit' | 'estimateCents'
       >)
-    | { kind: 'failed'; detail: string }
+    // The kind of the failure, decided where the error was caught, from its class (S-163).
+    | { kind: 'failed'; detail: string; failure: FailureKind }
   )
 
 export interface StillsInput {
@@ -124,14 +127,19 @@ export async function makeStills(
     const ended = await stage(input, ports, settings, record)
     return { ...snapshot(), ...ended }
   } catch (error) {
-    return { ...snapshot(), kind: 'failed', detail: messageOf(error) }
+    return {
+      ...snapshot(),
+      kind: 'failed',
+      detail: messageOf(error),
+      failure: failureKindOf(error),
+    }
   }
 }
 
 type Ending =
   | { kind: 'completed' }
   | { kind: 'stopped-rule'; rule: 'gate-1'; detail: string }
-  | { kind: 'failed'; detail: string }
+  | { kind: 'failed'; detail: string; failure: FailureKind }
   | ({ kind: 'stopped-budget' } & Pick<Refused, 'limit' | 'estimateCents'>)
 
 async function stage(
@@ -298,8 +306,10 @@ async function stage(
   let slots = reserveOf(placements, input.earlierImageCalls)
   if (slots < 0) {
     const calls = placementCalls(placements)
+    // Reachable only on a job run again after a crash, so its run's kind is `crashed` (S-163).
     return {
       kind: 'failed',
+      failure: 'crashed',
       detail: `attempt ${input.attempt} cannot make its pictures within ${IMAGE_CALLS} image calls: the run made ${input.earlierImageCalls} before it and its placement makes ${calls}, ${input.earlierImageCalls + calls} in all (S-048)`,
     }
   }
@@ -358,6 +368,7 @@ async function stage(
         const why = candidates.map(gate1Why).join('. ')
         return {
           kind: 'failed',
+          failure: 'crashed',
           detail: `attempt ${input.attempt} cannot repair the canonical picture of ${shotIdOf(canonical.shotUnit)}: no reserve slot is free, the run having made ${input.earlierImageCalls} image calls before it and its placement making ${placementCalls(placements)} of the ${IMAGE_CALLS} (S-048). ${why}`,
         }
       }

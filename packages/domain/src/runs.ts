@@ -3,6 +3,7 @@ import { and, asc, eq, gt, inArray, max, sql } from 'drizzle-orm'
 import type {
   AssembledFile,
   CutVerdict,
+  FailureKind,
   Gate0Verdict,
   MediaProbe,
   ModelReceipt,
@@ -275,13 +276,30 @@ export function admitStills(
   )
 }
 
-/** A run's ending, written inside whichever transaction ends it: `run.finished`, its state and result. */
-function endRun(tx: Writer, runId: string, result: RunResult, now: Date): void {
+/**
+ * How a run ends: its result, and — for a failed one, and only then — the kind of its failure, which
+ * the engine and a caller judge a resume by (docs/features/resume-failed.md; S-163). A failed result
+ * without its kind does not compile, so no finishing path can forget one; the kind is never in the
+ * result, which a caller reads unchanged (S-157).
+ */
+export type RunEnding =
+  | { result: Exclude<RunResult, { status: 'failed' }>; failure?: never }
+  | { result: Extract<RunResult, { status: 'failed' }>; failure: FailureKind }
+
+/**
+ * A run's ending, written inside whichever transaction ends it: `run.finished`, its state and result,
+ * then a failed run's kind in `run.failure` (S-163).
+ */
+function endRun(tx: Writer, runId: string, ending: RunEnding, now: Date): void {
+  const { result } = ending
   append(tx, runId, { type: 'run.finished', status: result.status }, now)
   tx.update(run)
     .set({ state: 'finished', result: JSON.stringify(result) })
     .where(eq(run.runId, runId))
     .run()
+  if (ending.failure !== undefined) {
+    tx.update(run).set({ failure: ending.failure }).where(eq(run.runId, runId)).run()
+  }
 }
 
 /**
@@ -294,10 +312,9 @@ export function finishRun(
   finish: {
     runId: string
     jobId: number
-    result: RunResult
     plans?: readonly PlanRow[]
     events?: readonly EventBody[]
-  },
+  } & RunEnding,
   now: Date = new Date(),
 ): void {
   const { runId, jobId, result } = finish
@@ -305,7 +322,7 @@ export function finishRun(
     (tx) => {
       writePlans(tx, runId, finish.plans ?? [])
       for (const event of finish.events ?? []) append(tx, runId, event, now)
-      endRun(tx, runId, result, now)
+      endRun(tx, runId, finish, now)
       completeJob(tx, jobId, result.costCents)
     },
     { behavior: 'immediate' },
@@ -350,14 +367,14 @@ function endStills(tx: Writer, runId: string, ending: StillsEnding, now: Date): 
  */
 export function finishStills(
   db: Db,
-  finish: StillsEnding & { runId: string; jobId: number; result: RunResult },
+  finish: StillsEnding & { runId: string; jobId: number } & RunEnding,
   now: Date = new Date(),
 ): void {
-  const { runId, jobId, result } = finish
+  const { runId, jobId } = finish
   db.transaction(
     (tx) => {
       endStills(tx, runId, finish, now)
-      endRun(tx, runId, result, now)
+      endRun(tx, runId, finish, now)
       completeJob(tx, jobId)
     },
     { behavior: 'immediate' },
@@ -540,15 +557,14 @@ export function finishVideo(
   f: {
     runId: string
     jobId: number
-    result: RunResult
     events?: readonly EventBody[]
     render?: RenderEnding
     /** The clips job's held shots, in the order the ladders reached them (S-098). */
     stillHolds?: readonly StillHold[]
-  },
+  } & RunEnding,
   now: Date = new Date(),
 ): void {
-  const { runId, jobId, result } = f
+  const { runId, jobId } = f
   db.transaction(
     (tx) => {
       for (const held of f.stillHolds ?? []) markStillHeld(tx, runId, jobId, held)
@@ -585,7 +601,7 @@ export function finishVideo(
           .run()
       }
       for (const event of f.events ?? []) append(tx, runId, event, now)
-      endRun(tx, runId, result, now)
+      endRun(tx, runId, f, now)
       completeJob(tx, jobId)
     },
     { behavior: 'immediate' },

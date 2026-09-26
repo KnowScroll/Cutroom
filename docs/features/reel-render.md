@@ -10,6 +10,15 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **Gate 7's unparsable judge answer throws an `Unanswered`** (`gates/gate7.ts`), today's words.
+> **The clips and render stages' failed endings carry their kind**: each catch-all's from the class; the clips stage's
+> refused word timings `unreadable` (P-001), its unreadable held picture and the render's file differing from its
+> manifest `engine`; `finishVideo` takes a `RunEnding`; the clips job's cap and inputs, the assemble job's manifest
+> and a cut with no file are `engine`. `narration` and `take` gain `kept_from`, null until a resume copies a row. The
+> failed result's keys (`reel-render-faults.test.ts:261-268`) hold. The stand-in video and narration ports' scripted
+> throw may name its class (`as`), as the image port's may.
+>
 > **Amended by `cut-rules` on 2026-09-24, Slice 3 — the gates below are not edited; S-158 RETIRES the duck's
 > assertions, and every assertion that still holds is kept** (**S-158**). **A reel's only sound is its narration**: the
 > assembler mixes no clip's sound — every clip shot's sound is the silence a held shot has had since S-097 — because

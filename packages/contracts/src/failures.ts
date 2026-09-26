@@ -1,6 +1,7 @@
-// HOW A CALL THAT REACHED A PROVIDER FAILS (docs/features/paid-failures.md, Gate 2; S-096, S-142).
+// HOW A CALL THAT REACHED A PROVIDER FAILS (docs/features/paid-failures.md, Gate 2; S-096, S-142),
+// AND WHAT KIND OF FAILURE A RUN ENDED ON (docs/features/resume-failed.md, Gate 2; S-163).
 //
-// Two classes, and they are here — not in `packages/providers`, where the adapters that throw them
+// The classes are here — not in `packages/providers`, where the adapters that throw them
 // live — for one reason: `worker-no-providers` forbids `apps/worker` importing that package
 // (S-038), and the worker is the only place that knows both a stage and a table. A name the
 // adapter throws and the worker catches has to come from a package both sides already import.
@@ -10,7 +11,7 @@
 // imports nothing internal and already holds runtime values beside its types, so this costs no new
 // package and no new rule.
 //
-// Both are CLASSES, never a shape and never a message. S-096 rejected "a thrown error carrying a
+// Every one is a CLASS, never a shape and never a message. S-096 rejected "a thrown error carrying a
 // marker" because a thrown bug of the same shape would have been treated as the real thing; a
 // class nothing else constructs cannot be produced by accident, and no code reads a message to
 // decide what happened.
@@ -104,4 +105,97 @@ export class Unavailable extends Error {
 /** Whether one thrown thing is the transient answer. A class, never a shape or a message. */
 export function isUnavailable(error: unknown): error is Unavailable {
   return error instanceof Unavailable
+}
+
+// ---------------------------------------------------------------- the kind (S-163)
+//
+// Five classes more, each thrown where a plain Error used to lose the fact, and EACH WITH ITS MESSAGE
+// CHARACTER FOR CHARACTER WHAT IT WAS — so every verified assertion on a failure's detail holds
+// (docs/features/resume-failed.md, Gate 2 "Which endings are resumed, and who judges").
+
+/**
+ * The provider made something that is not what this engine may use at all: fal's picture whose frame
+ * the entry refuses (P-010). A `Spent` still, so its lost call is written as before (S-142); its kind
+ * is `off-spec`, which no resume makes again, because the same entry would make the same frame.
+ */
+export class OffSpec extends Spent {
+  constructor(receipt: LostCall) {
+    super(receipt)
+    this.name = 'OffSpec'
+  }
+}
+
+/**
+ * The provider answered that it refused OUR request — MiniMax's narration answering 200 with a
+ * non-transient `base_resp` status: a key, a balance, a parameter. A `Spent` still, because the
+ * adapter had its answer (S-142); its kind is `engine`, as the model adapter's same case is: a
+ * request that was wrong is wrong the second time (S-096, S-163).
+ */
+export class RefusedRequest extends Spent {
+  constructor(receipt: LostCall) {
+    super(receipt)
+    this.name = 'RefusedRequest'
+  }
+}
+
+/**
+ * A model answer a GATE refused at its last ask: the witness's second refusal, Gate 1S's and Gate 7's
+ * judge answers that do not parse, and the text step's reading that is not text. Its kind is
+ * `unreadable`, as a `Spent` answer's is: asking again in a new run could change it (S-156, S-163).
+ */
+export class Unanswered extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'Unanswered'
+  }
+}
+
+/**
+ * A job fal ACCEPTED AND THEN REPORTED FAILED — both of the FAILED branch's shapes, its result read
+ * answering 200 and answering an error. Not an `Unavailable`: nothing sends it again inside the run,
+ * as nothing did before. Its kind is `provider-failed`, which a resume may make again.
+ */
+export class ProviderFailed extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ProviderFailed'
+  }
+}
+
+/**
+ * The transient counter spent: a call answered `unavailable` at every one of its sends (S-096, I-11).
+ * An `Unavailable` — the provider made nothing — thrown by the counter itself, outside its own loop,
+ * so nothing sends it again; its message is the counter's own sentence, not `Unavailable`'s form.
+ */
+export class StillUnavailable extends Unavailable {
+  constructor(message: string) {
+    super(message)
+    // `Unavailable` prefixes its detail; the counter's sentence already names the call and the sends.
+    this.message = message
+    this.name = 'StillUnavailable'
+  }
+}
+
+/**
+ * What a failed run's `run.failure` holds (S-163). Four are resumable, by the engine with its switch
+ * on or by a caller asking: `unavailable`, `unreadable`, `provider-failed` and `crashed`. `off-spec`
+ * and `engine` never are.
+ */
+export type FailureKind =
+  'unavailable' | 'unreadable' | 'provider-failed' | 'crashed' | 'off-spec' | 'engine'
+
+/**
+ * The kind of one thrown thing, by its CLASS alone — never its message (S-096's rejection of a
+ * marker). `OffSpec` and `RefusedRequest` are checked before `Spent`, because each IS one; everything
+ * that is none of these — a plain Error, a ZodError, a string, fs, ffmpeg, a 4xx, the stand-in out of
+ * its script — is `engine`. `crashed` is never thrown: the stills stage returns it where it knows it.
+ */
+export function failureKindOf(error: unknown): FailureKind {
+  if (error instanceof OffSpec) return 'off-spec'
+  if (error instanceof RefusedRequest) return 'engine'
+  if (error instanceof Spent) return 'unreadable'
+  if (error instanceof Unanswered) return 'unreadable'
+  if (error instanceof Unavailable) return 'unavailable'
+  if (error instanceof ProviderFailed) return 'provider-failed'
+  return 'engine'
 }

@@ -23,6 +23,11 @@ Gates: product APPROVED 2026-09-23 adversarial-reviewer · architecture APPROVED
 > asked the same thing, the same way, a second time. It does not touch any adapter, and every gate's verdict on an
 > answer that parses is exactly what it is today.
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **The witness's second refusal throws an `Unanswered`** (`gates/witness.ts`), an `Error` with
+> today's words, so its run's kind is `unreadable`. Every check here asserts the message (`second-ask-gate.test.ts`),
+> and it is unchanged.
+>
 > **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
 > (**S-156**). **The second ask is TOLD WHY**: a new object, the first ask's keys and `refused` — the first answer's
 > issues under the witness's own schema, as a `WitnessRefusals` only `witnessRefusalsOf` can build — where S-147

@@ -1,8 +1,9 @@
-import type {
-  LanguageModelPort,
-  PictureRecord,
-  PictureRef,
-  PictureSensorPort,
+import {
+  Unanswered,
+  type LanguageModelPort,
+  type PictureRecord,
+  type PictureRef,
+  type PictureSensorPort,
 } from '@cutroom/contracts'
 import { compareAnswer } from '../stills/prompts.ts'
 
@@ -45,7 +46,8 @@ export async function gate1s(
   })
   const parsed = compareAnswer(pair.shared).safeParse(value)
   if (!parsed.success) {
-    throw new Error(
+    // The judge's answer at its one ask, unusable: an `Unanswered` (S-163).
+    throw new Unanswered(
       `the judge's answer for ${derived.pictureId} does not name every shared subject once: ${parsed.error.issues
         .map((i) => i.message)
         .join('; ')}`,

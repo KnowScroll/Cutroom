@@ -1,4 +1,10 @@
-import type { Gate0Verdict, LanguageModelPort, Plan, PlanSettings } from '@cutroom/contracts'
+import {
+  failureKindOf,
+  type Gate0Verdict,
+  type LanguageModelPort,
+  type Plan,
+  type PlanSettings,
+} from '@cutroom/contracts'
 import {
   admitStills,
   finishRun,
@@ -112,9 +118,15 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
     planned = await plan(db, runId, job.id, context)
   } catch (error) {
     // A thrown call or a refused answer is a fault: the run fails with why, and every receipt of a
-    // call that returned is already written.
+    // call that returned is already written. The plan stage has no catch of its own, so its kind is
+    // decided here, from the thrown thing's class (S-163) — a cap that cannot be read is `engine`.
     const detail = error instanceof Error ? error.message : String(error)
-    finishRun(db, { runId, jobId: job.id, result: { ...finished, status: 'failed', detail } })
+    finishRun(db, {
+      runId,
+      jobId: job.id,
+      result: { ...finished, status: 'failed', detail },
+      failure: failureKindOf(error),
+    })
     return
   }
   const { request, capCents, outcome } = planned

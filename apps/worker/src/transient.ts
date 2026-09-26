@@ -1,6 +1,6 @@
 import { performance } from 'node:perf_hooks'
 import { setTimeout as sleep } from 'node:timers/promises'
-import type { RenderSettings } from '@cutroom/contracts'
+import { StillUnavailable, type RenderSettings } from '@cutroom/contracts'
 
 /**
  * Waits at least `ms` by the monotonic clock. A timer alone can end short of it: libuv counts a timer
@@ -23,9 +23,11 @@ async function atLeast(ms: number): Promise<void> {
  * an `unavailable` answer: the caller records only the answer it returns, with the number of
  * `unavailable` answers before it — the transient counter, which is never the take counter.
  *
- * Still `unavailable` at the last send, it THROWS, naming the call, the sends and I-11, so the stage
- * fails the run as it fails on any thrown call (S-046), with no row, no receipt and no take. A call
- * that throws is a fault, not a transient error: the throw passes through, and nothing is sent again.
+ * Still `unavailable` at the last send, it THROWS A `StillUnavailable`, naming the call, the sends and
+ * I-11, so the stage fails the run as it fails on any thrown call (S-046), with no row, no receipt and
+ * no take, and the run's kind is `unavailable` (S-163). It is thrown here, outside the loop, and
+ * nothing above the counter sends an `Unavailable` again. A call that throws is a fault, not a
+ * transient error: the throw passes through, and nothing is sent again.
  *
  * The wait holds the worker, which runs one job at a time (D-002; reel-takes' known limit 12).
  */
@@ -42,7 +44,7 @@ export async function sentUntilAvailable<A extends { kind: string }>(
     }
     if (sent >= transient.maxAttempts) {
       const { detail } = answer as unknown as { detail: string }
-      throw new Error(
+      throw new StillUnavailable(
         `${call} was answered unavailable at each of its ${sent} sends, the last saying "${detail}": a provider's transient errors have their own counter, and it is spent, so nothing was made and no take is counted (I-11, S-096)`,
       )
     }

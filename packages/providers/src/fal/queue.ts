@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ProviderFailed } from '@cutroom/contracts'
 import { Unavailable, transientStatus } from '../transient.ts'
 
 // WHAT THE FAL ADAPTERS SHARE (S-114, S-124): the two base URLs, the authorisation header, the
@@ -67,7 +68,11 @@ export const DEFAULT_FAL_TIMEOUT_MS = 120_000
 /** How long between polls. The spike's own 3 seconds; a test sets it to nothing. */
 export const DEFAULT_FAL_POLL_MS = 3_000
 
-/** A fault: the provider will answer a second send the same way, so the run fails (S-096). */
+/**
+ * A fault: the request was wrong — a 4xx outside the FAILED branch, a body that is not the wire — so a
+ * second send would be answered the same way, and the run fails `engine` (S-096, S-163). A job fal
+ * accepted and then reported FAILED is not one of these: it is a `ProviderFailed` (resume-failed).
+ */
 export class FalFault extends Error {}
 
 /** What a submit answers. `status_url` and `response_url` are recorded and never followed. */
@@ -205,10 +210,11 @@ export interface QueueResult {
  * the caller asked for — the image adapter's edit call and the video adapter's clip.
  *
  * **A queued job is neither a failure nor a transient**: it is the queue working, and the adapter
- * waits. **A job fal ACCEPTED AND THEN FAILED is a fault**, carrying the provider's own message —
- * the provider did work and refused the result, and sending the same request again would buy the
- * same refusal. The waiting is bounded by `waitMs`, after which the provider is unavailable,
- * because a job still queued is one that has made nothing yet.
+ * waits. **A job fal ACCEPTED AND THEN FAILED is a `ProviderFailed`**, carrying the provider's own
+ * message — the provider did work and refused the result. Nothing sends it again inside the run, as
+ * nothing did before; a new run may, which is why it is its own class and not a fault (S-163). The
+ * waiting is bounded by `waitMs`, after which the provider is unavailable, because a job still queued
+ * is one that has made nothing yet.
  */
 export async function runQueued(run: QueueRun): Promise<QueueResult> {
   const started = Date.now()
@@ -256,17 +262,25 @@ export async function runQueued(run: QueueRun): Promise<QueueResult> {
 
     if (status.status === 'FAILED') {
       // The result endpoint carries what went wrong, and it answers a non-200 for a failed job —
-      // so the fault `send` throws already holds the provider's message. A result that answers
-      // 200 anyway is a job that failed and then did not say why, which is still a fault.
-      const detail = await (
-        await send(request, `${run.what}`, {
-          method: 'GET',
-          key: run.key,
-          timeoutMs: run.timeoutMs,
-          fetch: run.fetch,
-        })
-      ).text()
-      throw new FalFault(`${run.what} was accepted and then failed: ${summary(detail)}`)
+      // so the fault `send` throws already holds the provider's message, and it becomes a
+      // `ProviderFailed` with that message unchanged. A result that answers 200 anyway is a job that
+      // failed and then did not say why, which is the same failure. A transient answer to the read
+      // stays `Unavailable`, as `send` classified it (S-163).
+      let detail: string
+      try {
+        detail = await (
+          await send(request, `${run.what}`, {
+            method: 'GET',
+            key: run.key,
+            timeoutMs: run.timeoutMs,
+            fetch: run.fetch,
+          })
+        ).text()
+      } catch (error) {
+        if (error instanceof FalFault) throw new ProviderFailed(error.message)
+        throw error
+      }
+      throw new ProviderFailed(`${run.what} was accepted and then failed: ${summary(detail)}`)
     }
 
     if (Date.now() - started >= run.waitMs) {

@@ -85,6 +85,8 @@ export async function runAssembleJob(
         status: 'failed',
         detail: `the render manifest could not be built: ${messageOf(error)}`,
       },
+      // Rows that cannot make a manifest are the engine's fault, never a provider's (S-163).
+      failure: 'engine',
     })
     return
   }
@@ -203,5 +205,6 @@ export async function runAssembleJob(
       status: 'failed',
       detail: outcome.kind === 'failed' ? outcome.detail : 'the cut completed with no file',
     },
+    failure: outcome.kind === 'failed' ? outcome.failure : 'engine',
   })
 }

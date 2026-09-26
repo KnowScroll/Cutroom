@@ -33,6 +33,11 @@ Gates: product APPROVED 2026-09-24 adversarial-reviewer · architecture APPROVED
 > and nothing is translated into a value inside it. It asks no model a third time. It does not ask the narration again
 > (P-001) — the owner kept that to one call — but it keeps the timings it could not read.
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **The witness's second refusal throws an `Unanswered`** (`gates/witness.ts`), an `Error` with
+> today's words, character for character, so a failed run's kind is `unreadable`. Check 17 asserts the message and
+> the two refusals kept; both hold. No refused answer is read by any engine code (S-156 stands).
+
 ## Gate 1 — Product (no technical language)
 
 **The problem.** A reel is made by asking models for things in a fixed shape: a plan, a score for each plan, a

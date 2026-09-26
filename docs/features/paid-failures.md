@@ -26,6 +26,16 @@ Gates: product APPROVED 2026-09-22 adversarial-reviewer · architecture APPROVED
 > are exactly what they are today. **It changes what is written down when a call goes wrong, and how long a run
 > survives a provider having a bad minute.**
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **`packages/contracts/src/failures.ts` gains five classes and the kind**: `OffSpec` and
+> `RefusedRequest` extend `Spent`, `StillUnavailable` extends `Unavailable`, `Unanswered` and `ProviderFailed` extend
+> `Error`, each thrown where a plain Error used to lose the fact and each with its message unchanged; `failureKindOf`
+> decides a failed run's kind from the class alone. `Spent` and `Unavailable` mean what they meant: an `OffSpec` or a
+> `RefusedRequest` is a `Spent`, so `recordingSpend` writes its lost call exactly as before, and a `StillUnavailable`
+> is thrown by the counter itself, which nothing above re-sends. The file's header, _"Two classes"_ and _"Both are
+> CLASSES"_, now speaks of all of them. Every check here asserts a failure by its message (`paid-failures-retry.test.ts:120-129`),
+> and every message is the same.
+>
 > **Amended by `ask-again` on 2026-09-24 — the gates below are not edited, and no assertion is removed**
 > (**S-156**). **`LostCall` gains two optional fields**: `answer`, the model's text when the adapter held one and
 > could not use it, and `refused`, why the ANSWER was refused when that is its fault. Its doc comment's _"never holds a

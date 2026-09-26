@@ -4,6 +4,7 @@ import { crc32, deflateSync } from 'node:zlib'
 import type { ImagePort, ImageRequest } from '@cutroom/contracts'
 import { DEFAULT_ARTIFACT_ROOT, artifactPath } from '../artifacts.ts'
 import { entryFor } from './key.ts'
+import { checkedFailures, scriptedThrow, type StandInFailure } from './thrown.ts'
 
 // The stand-in ImagePort (docs/features/reel-stills.md, Gate 2 "Making a picture" and "The
 // stand-ins"). It is the only image port the engine has: it runs on this machine, reads no secret,
@@ -23,6 +24,11 @@ export interface FakeImageEntry {
   costCents?: number
   /** The call throws this message instead of making anything. */
   throws?: string
+  /**
+   * The class the throw is, as a real adapter's would be — its message then that class's for
+   * `throws` — or a plain Error when absent (resume-failed, S-163).
+   */
+  as?: StandInFailure
   /**
    * A 2-PIXEL BORDER of another colour around the picture (S-097): what a check measures a held
    * shot's slow push by. Two of the stand-in's 90 pixels, because a push to 1.1 takes about 4.1
@@ -96,6 +102,7 @@ export function fakeImage(
   script: FakeImageScript,
   options: { artifactRoot?: string; acceptsReferences?: boolean } = {},
 ): FakeImage {
+  checkedFailures('the stand-in image port', Object.entries(script))
   const root = options.artifactRoot ?? DEFAULT_ARTIFACT_ROOT
   const calls: ImageRequest[] = []
   return {
@@ -104,7 +111,13 @@ export function fakeImage(
     async generate(request) {
       calls.push(request)
       const entry = entryFor(script, request.pictureId) ?? {}
-      if (entry.throws !== undefined) throw new Error(entry.throws)
+      if (entry.throws !== undefined) {
+        throw scriptedThrow(entry.throws, entry.as, {
+          port: 'image',
+          model: FAKE_IMAGE_MODEL,
+          costCents: entry.costCents ?? 0,
+        })
+      }
       const path = artifactPath(
         root,
         { runId: request.runId, id: request.pictureId, what: 'pictureId' },

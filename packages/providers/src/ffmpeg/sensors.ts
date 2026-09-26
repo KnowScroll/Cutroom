@@ -1,4 +1,9 @@
-import type { PictureMeasure, PictureRef, PictureSensorPort } from '@cutroom/contracts'
+import {
+  Unanswered,
+  type PictureMeasure,
+  type PictureRef,
+  type PictureSensorPort,
+} from '@cutroom/contracts'
 import { visibleText } from '../text.ts'
 import type { FfmpegTools, SensorFilter } from './tools.ts'
 
@@ -164,11 +169,12 @@ export function ffmpegSensors(
       // ONE call, and the strings it answers are this port's answer (check 19). Nothing is caught
       // here: a call that failed — refused, unreachable, or answering something that is not this
       // shape — must fail the step, because a text step that cannot fail is a gate that cannot
-      // fail (S-112).
+      // fail (S-112). An answer that arrives and is not this shape is an `Unanswered`: a new run's
+      // ask could read it (S-163).
       const answer = await read(picture)
       const parsed = visibleText.safeParse(answer)
       if (!parsed.success) {
-        throw new Error(
+        throw new Unanswered(
           `the text step's answer for ${picture.pictureId} is not readable text: ` +
             parsed.error.issues
               .map((i) => `${i.path.join('.') || '(answer)'}: ${i.message}`)

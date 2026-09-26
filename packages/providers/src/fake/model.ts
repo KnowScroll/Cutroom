@@ -8,6 +8,7 @@ import {
   type ModelRole,
   type PictureRef,
 } from '@cutroom/contracts'
+import { checkedFailures, scriptedThrow, type StandInFailure } from './thrown.ts'
 
 // The stand-in LanguageModelPort (docs/features/reel-plan.md, Gate 2 "The model port and the
 // stand-in"; docs/features/reel-stills.md and reel-render.md, Gate 2 "The stand-ins"). It is the
@@ -22,8 +23,11 @@ import {
 // to see what actually reached the model — the type alone cannot prove a brief never got to the
 // witness, because a value passed as an argument compiles against a variable (S-037).
 
-/** One scripted answer: a value to parse under the call's schema, or an error to throw. */
-export type FakeAnswer = { value: unknown } | { throws: string }
+/**
+ * One scripted answer: a value to parse under the call's schema, or an error to throw — a plain Error,
+ * or the class `as` names, its message then that class's for `throws` (resume-failed, S-163).
+ */
+export type FakeAnswer = { value: unknown } | { throws: string; as?: StandInFailure }
 
 /**
  * The answers for each role, in the order that role's calls arrive. `witness` answers `observe`,
@@ -71,6 +75,12 @@ export function fakeModel(
   const compareCalls: FakeCompareCall[] = []
   const judgeCutCalls: FakeJudgeCutCall[] = []
   const readTextCalls: FakeReadTextCall[] = []
+  for (const [role, answers] of Object.entries(script)) {
+    checkedFailures(
+      'the stand-in model',
+      (answers ?? []).map((answer, i) => [`${role} ${i + 1}`, answer] as const),
+    )
+  }
   const answered: Record<ModelRole, number> = { planner: 0, reconciler: 0, witness: 0, judge: 0 }
 
   /** The next scripted answer for a role, or the error a missing one deserves. */
@@ -81,7 +91,13 @@ export function fakeModel(
     if (entry === undefined) {
       throw new Error(`the stand-in's script has no answer for ${role} call ${index + 1}`)
     }
-    if ('throws' in entry) throw new Error(entry.throws)
+    if ('throws' in entry) {
+      throw scriptedThrow(entry.throws, entry.as, {
+        port: 'model',
+        model: options.models[role],
+        costCents: 0,
+      })
+    }
     return entry
   }
 

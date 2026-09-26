@@ -27,6 +27,16 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **Migration 0007** (`db/migrations/0007_resume_failed.sql`, drizzle-kit): the `run` table
+> gains `resumes`, `failure` and `resume_request`, and its unique index on `request_id` becomes partial, `WHERE
+resumes IS NULL`, with `resumes` unique — so `schema.ts`' _"One run per requestId"_ reads _"one run per requestId,
+> and its one resume"_. No run resumes another until `resume-failed`'s Slice 3, so every request still has one run and
+> replay and lookup are unchanged. **`endRun` writes a failed run's kind to `run.failure`**; `finishRun` takes a
+> `RunEnding`, under which a failed result without its kind does not compile, and the plan job's catch decides the kind
+> from the thrown thing's class (`failureKindOf`; a cap that cannot be read is `engine`). **The failed result does
+> not change** — `reel-plan-endings.test.ts:385-396` holds as written.
+>
 > **Amended by `cut-rules` on 2026-09-24 — the gates below are not edited** (**S-158**). **The plan score asks three
 > closed questions, not four**: the fourth — _"Does every shot show something that no other shot has already shown?"_ —
 > is gone, and with it the term `distinct` and its weight, because it marked down every plan whose subject recurs

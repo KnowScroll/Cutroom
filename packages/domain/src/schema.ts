@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import {
   type AnySQLiteColumn,
   foreignKey,
@@ -13,20 +14,49 @@ import {
 // "Storage"). SQLite through Drizzle (D-001); every time is an ISO 8601 UTC string, and every JSON
 // value is stored as text.
 
-/** One run per requestId. The request is kept as received and as a canonical JSON value. */
-export const run = sqliteTable('run', {
-  runId: text('run_id').primaryKey(),
-  requestId: text('request_id').notNull().unique(),
-  /** The body exactly as it arrived. */
-  request: text('request').notNull(),
-  /** The parsed request with keys sorted at every depth, so content — not key order — compares. */
-  requestCanonical: text('request_canonical').notNull(),
-  state: text('state', { enum: ['running', 'finished'] }).notNull(),
-  /** A `RunResult`, once finished. */
-  result: text('result'),
-  cancelRequested: integer('cancel_requested', { mode: 'boolean' }).notNull().default(false),
-  createdAt: text('created_at').notNull(),
-})
+/**
+ * One run per requestId, and its one resume (docs/features/resume-failed.md; S-162): a request's
+ * first run is unique by its requestId, and a run that resumes another carries the same requestId
+ * and names the run it resumes, which no second run may. The request is kept as received and as a
+ * canonical JSON value.
+ */
+export const run = sqliteTable(
+  'run',
+  {
+    runId: text('run_id').primaryKey(),
+    requestId: text('request_id').notNull(),
+    /** The body exactly as it arrived. */
+    request: text('request').notNull(),
+    /** The parsed request with keys sorted at every depth, so content — not key order — compares. */
+    requestCanonical: text('request_canonical').notNull(),
+    state: text('state', { enum: ['running', 'finished'] }).notNull(),
+    /** A `RunResult`, once finished. */
+    result: text('result'),
+    cancelRequested: integer('cancel_requested', { mode: 'boolean' }).notNull().default(false),
+    createdAt: text('created_at').notNull(),
+    /** The run this one resumes, or null for a request's first run (S-162). */
+    resumes: text('resumes'),
+    /**
+     * A failed run's kind, written with its result (S-163): what the engine judges a resume by. Null
+     * for every other ending, and for a run failed before this column existed — unknown, so never
+     * resumed.
+     */
+    failure: text('failure', {
+      enum: ['unavailable', 'unreadable', 'provider-failed', 'crashed', 'off-spec', 'engine'],
+    }),
+    /**
+     * The caller's normalised list of pieces not to keep, as canonical JSON, on a run a caller's
+     * resume made; null on one the engine's made, and on a first run (S-161, S-162).
+     */
+    resumeRequest: text('resume_request'),
+  },
+  (t) => [
+    uniqueIndex('run_request_id_unique')
+      .on(t.requestId)
+      .where(sql`resumes IS NULL`),
+    uniqueIndex('run_resumes_unique').on(t.resumes),
+  ],
+)
 
 /** Append-only. Numbered from 1 per run, in the transaction that writes the event. */
 export const runEvent = sqliteTable(
@@ -115,8 +145,9 @@ export const modelReceipt = sqliteTable('model_receipt', {
 })
 
 /**
- * One row per picture made, every attempt's (S-046). Written with its image receipt, in the same
- * transaction — its shot, subject, role, label, path, prompt, framing, references and `seq`, the
+ * One row per picture made, every attempt's (S-046) — or copied from the run this one resumes, with
+ * `kept_from` naming that run, whose receipt stays there (S-164). A picture made here is written with
+ * its image receipt, in the same transaction — its shot, subject, role, label, path, prompt, framing, references and `seq`, the
  * run's image-call number taken from the run's receipts there — and updated as each of its checks
  * completes. `chosen` and `degradation` are written when the run finishes.
  */
@@ -151,6 +182,8 @@ export const picture = sqliteTable(
     gate1s: text('gate1s'),
     degradation: text('degradation'),
     chosen: integer('chosen', { mode: 'boolean' }).notNull().default(false),
+    /** The run this picture was copied from, its receipt there; null for one made here (S-164). */
+    keptFrom: text('kept_from'),
   },
   (t) => [
     primaryKey({ columns: [t.runId, t.pictureId] }),
@@ -290,11 +323,14 @@ export const degradation = sqliteTable(
 // ---------------------------------------------------------------- reel-render
 //
 // docs/features/reel-render.md, Gate 2 "Storage". Every narration and take made — every attempt's —
-// is a row, written with its receipt and updated as each measure and gate completes (S-070, S-071,
+// is a row (and one copied from the run a resumed run resumes, `kept_from` set, S-162), a made one written with its receipt and updated as each measure and gate completes (S-070, S-071,
 // S-072). The render and hold tables arrived in the same migration (Slice 3); the assemble job writes
 // them (Slice 4): a render row before the assembler is called, and its holds with the job's ending.
 
-/** One row per narration made, written with its speech receipt (S-070). */
+/**
+ * One row per narration made, written with its speech receipt (S-070) — or copied from the run this
+ * one resumes, `kept_from` naming it, its receipt there (S-162).
+ */
 export const narration = sqliteTable(
   'narration',
   {
@@ -312,6 +348,8 @@ export const narration = sqliteTable(
     words: text('words'),
     /** JSON: the file's measure, once taken (I-17). */
     probe: text('probe'),
+    /** The run this narration was copied from; null for one made here (S-162). */
+    keptFrom: text('kept_from'),
   },
   (t) => [primaryKey({ columns: [t.runId, t.narrationId] })],
 )
@@ -335,7 +373,8 @@ export const speechReceipt = sqliteTable('speech_receipt', {
 })
 
 /**
- * One row per take made, every attempt's (S-071, S-072). Written with its video receipt — what it is
+ * One row per take made, every attempt's (S-071, S-072) — or copied from the run this one resumes,
+ * `kept_from` naming it, its receipt there (S-162). A take made here is written with its video receipt — what it is
  * and what was asked for — and updated as each measure and gate completes. Its degradation is a
  * hold's reason, written with the assemble job's ending (S-073), or — on a held shot's third take — a
  * still-hold's, written with the clips job's (S-098).
@@ -374,6 +413,8 @@ export const take = sqliteTable(
     outcome: text('outcome', { enum: ['accept', 'fail'] }),
     /** A hold's reason (S-073), or a still-hold's on a held shot's third take (S-098). */
     degradation: text('degradation'),
+    /** The run this take was copied from; null for one made here (S-162). */
+    keptFrom: text('kept_from'),
   },
   (t) => [primaryKey({ columns: [t.runId, t.takeId] })],
 )

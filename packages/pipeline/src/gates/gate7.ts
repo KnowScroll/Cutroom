@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import type { CutVerdict, LanguageModelPort, PictureRef } from '@cutroom/contracts'
+import {
+  Unanswered,
+  type CutVerdict,
+  type LanguageModelPort,
+  type PictureRef,
+} from '@cutroom/contracts'
 
 // Gate 7 (docs/features/reel-render.md, Gate 2 "Gate 7"; S-074, D-058, D-064). The assembled file,
 // judged once: ONE `judgeCut` call, role judge, temperature 0, given each shot in timeline order with
@@ -66,7 +71,8 @@ export async function gate7(
   })
   const parsed = cutAnswer(questions).safeParse(value)
   if (!parsed.success) {
-    throw new Error(
+    // The judge's answer at its one ask, unusable: an `Unanswered` (S-163).
+    throw new Unanswered(
       `the judge's answer on the cut does not name every question once: ${parsed.error.issues
         .map((i) => i.message)
         .join('; ')}`,

@@ -1,7 +1,12 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import { z } from 'zod'
-import type { NarrationAnswer, NarrationPort, WordTiming } from '@cutroom/contracts'
+import {
+  RefusedRequest,
+  type NarrationAnswer,
+  type NarrationPort,
+  type WordTiming,
+} from '@cutroom/contracts'
 import { artifactPath } from '../artifacts.ts'
 import { Spent, messageOf, transientStatus } from '../transient.ts'
 import { baseOf, baseResp, summary, transientCode } from './wire.ts'
@@ -219,6 +224,13 @@ class Fault extends Error {}
 /** A transient, carried out of the send and turned into the port's own `unavailable` arm. */
 class Transient extends Error {}
 
+/**
+ * The provider answering that it refused OUR request — a non-transient `base_resp` status under 200:
+ * a key, a balance, a parameter. It has answered, so the call has spent, and it leaves as a
+ * `RefusedRequest`, whose run's kind is `engine`, not `unreadable` (resume-failed, S-163).
+ */
+class Rejected extends Fault {}
+
 // ---------------------------------------------------------------- the adapter
 
 export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPort {
@@ -325,7 +337,7 @@ export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPor
         if (status !== undefined && status.status_code !== 0) {
           const detail = `${what} was refused by the provider: ${status.status_code} ${status.status_msg}`
           if (transientCode(status.status_code)) throw new Transient(detail)
-          throw new Fault(detail)
+          throw new Rejected(detail)
         }
 
         const hex = body.data?.audio
@@ -394,12 +406,15 @@ export function minimaxNarration(options: MinimaxNarrationOptions): NarrationPor
         // the same reason the receipt does — T2A is plan-covered — and it is the ROW that matters:
         // a call that happened, on the record, with a figure that can be corrected later.
         if (answered) {
-          throw new Spent({
-            port: 'speech',
+          const lost = {
+            port: 'speech' as const,
             model,
             costCents: NARRATION_LOST_CENTS,
             detail: messageOf(error),
-          })
+          }
+          // Refused as ours, the same row with the class that says so; anything else it said that
+          // we could not use is `unreadable` (S-163).
+          throw error instanceof Rejected ? new RefusedRequest(lost) : new Spent(lost)
         }
         throw error
       }

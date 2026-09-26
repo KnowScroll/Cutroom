@@ -1,4 +1,6 @@
+import { failureKindOf } from '@cutroom/contracts'
 import type {
+  FailureKind,
   ClipRef,
   ClipsRecorder,
   RefusalRecorder,
@@ -81,7 +83,8 @@ type Ending =
   | { kind: 'completed' }
   | { kind: 'stopped-rule'; rule: 'gate-2' | 'gate-3' | 'gate-5'; detail: string }
   | ({ kind: 'stopped-budget' } & Pick<Refused, 'limit' | 'estimateCents'>)
-  | { kind: 'failed'; detail: string }
+  // The kind of the failure, decided where the error was caught, from its class (S-163).
+  | { kind: 'failed'; detail: string; failure: FailureKind }
 
 export type ClipsOutcome = ClipsRecord & Ending
 
@@ -186,7 +189,12 @@ export async function makeClips(
     const ended = await stage(input, ports, settings, record)
     return { ...snapshot(), ...ended }
   } catch (error) {
-    return { ...snapshot(), kind: 'failed', detail: messageOf(error) }
+    return {
+      ...snapshot(),
+      kind: 'failed',
+      detail: messageOf(error),
+      failure: failureKindOf(error),
+    }
   }
 }
 
@@ -300,8 +308,11 @@ async function stage(
           reasons,
           answer: JSON.stringify(spoken.timings) ?? String(spoken.timings),
         })
+        // An answer the provider gave that cannot be used, returned rather than thrown: its run's
+        // kind is `unreadable`, and a new run may ask again (P-001, S-163).
         return {
           kind: 'failed',
+          failure: 'unreadable',
           detail: `the word timings of ${narrationId} do not parse: ${reasons.join('; ')}`,
         }
       }
@@ -454,6 +465,7 @@ async function stage(
       if (unreadable !== null) {
         return {
           kind: 'failed',
+          failure: 'engine',
           detail: `${shotIdOf(unit)} is to be held on its approved picture ${still.pictureId}, which did not probe as a readable picture: ${unreadable} (D-055, S-097, S-103)`,
         }
       }

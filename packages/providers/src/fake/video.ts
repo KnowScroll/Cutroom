@@ -5,6 +5,7 @@ import type { VideoPort, VideoRequest } from '@cutroom/contracts'
 import { DEFAULT_ARTIFACT_ROOT, artifactPath } from '../artifacts.ts'
 import type { FfmpegTools } from '../ffmpeg/tools.ts'
 import { entryFor } from './key.ts'
+import { checkedFailures, scriptedThrow, type StandInFailure } from './thrown.ts'
 
 // The stand-in VideoPort (docs/features/reel-render.md, Gate 2 "Clips"; S-071, S-075). It is the only
 // video port the engine has: it runs on this machine, reads no secret, reaches no network and costs
@@ -47,6 +48,11 @@ export interface FakeVideoEntry {
   expandedPrompt?: string
   /** The call throws this message instead of making anything. */
   throws?: string
+  /**
+   * The class the throw is, as a real adapter's would be — its message then that class's for
+   * `throws` — or a plain Error when absent (resume-failed, S-163).
+   */
+  as?: StandInFailure
   /**
    * The first this-many sends of the take id are answered `unavailable` — a provider failing for a
    * moment — and the next is answered as the rest of the entry says (reel-takes, S-096).
@@ -96,6 +102,7 @@ export function fakeVideo(
   script: FakeVideoScript,
   options: { artifactRoot?: string } = {},
 ): FakeVideo {
+  checkedFailures('the stand-in video port', Object.entries(script))
   const root = options.artifactRoot ?? DEFAULT_ARTIFACT_ROOT
   const calls: VideoRequest[] = []
   /** How many times each take id has been sent. */
@@ -113,7 +120,13 @@ export function fakeVideo(
           detail: `the stand-in video port is unavailable for ${request.takeId}, send ${send} of the ${entry.transient} it was scripted to answer so`,
         }
       }
-      if (entry.throws !== undefined) throw new Error(entry.throws)
+      if (entry.throws !== undefined) {
+        throw scriptedThrow(entry.throws, entry.as, {
+          port: 'video',
+          model: FAKE_VIDEO_MODEL,
+          costCents: entry.costCents ?? 0,
+        })
+      }
       const path = artifactPath(
         root,
         { runId: request.runId, id: request.takeId, what: 'takeId' },

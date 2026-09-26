@@ -1,0 +1,12 @@
+{
+  "note": "T2A answering HTTP 200 with a non-transient base_resp status: MiniMax reports its own outcome even under 200, and 1004 is its documented code for a request it refuses as the caller's (the key). The adapter has set `answered` before this check, so the failure is a Spent — its lost call written (S-142) — and the class is RefusedRequest, so its run's kind is engine, not unreadable: a request that was wrong is wrong the second time (resume-failed, S-163). DOCUMENTED SHAPE: the same base_resp as the 401 fixture, under 200.",
+  "provider": "minimax",
+  "call": "t2a",
+  "case": "rejected",
+  "request": { "method": "POST", "path": "/v1/t2a_v2" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/json" },
+    "body": { "base_resp": { "status_code": 1004, "status_msg": "invalid api key" } }
+  }
+}

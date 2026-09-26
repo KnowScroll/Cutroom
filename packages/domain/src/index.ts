@@ -43,6 +43,7 @@ export {
   type HeldShot,
   type PlanRow,
   type RenderEnding,
+  type RunEnding,
   type Stage,
   type StoredRun,
   type Submitted,

@@ -32,6 +32,14 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-163**). **Gate 1S's unparsable judge answer throws an `Unanswered`** (`gates/gate1s.ts`), today's
+> words. **The stills stage's failed ending carries its kind**: the catch-all's from the thrown thing's class, S-061's
+> two reserve failures `crashed`; `finishStills` takes a `RunEnding`; the keyframes job's unreadable cap is `engine`.
+> `picture` gains `kept_from`, null on every row until a resume copies one. The failed result's keys
+> (`reel-stills-faults.test.ts:57-65`) hold. The stand-in image port's scripted throw may name its class (`as`); without
+> one it throws a plain Error as before, and a class outside the six refuses to build the stand-in.
+>
 > **Amended by `cut-rules` on 2026-09-24, Slice 1 — the gates below are not edited, and no assertion is removed**
 > (**S-158**). The plan score asks three questions where it asked four, so this feature's admission check's
 > `forkOfTwo()` scripts three answers a plan — its only `no` is still the third, so plan b still wins. This
