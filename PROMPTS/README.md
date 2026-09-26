@@ -45,7 +45,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 052 | [052-resume-failed-gates-then-reviews.md](052-resume-failed-gates-then-reviews.md)     | `resume-failed` | gates, then the reviews        | 2026-09-25 | session 52 |
 | 053 | [053-two-test-reels.md](053-two-test-reels.md)                                         | —               | two reels, no code touched     | 2026-09-25 | session 53 |
 | 054 | [054-two-explainer-reels.md](054-two-explainer-reels.md)                               | —               | two explainer reels, healed    | 2026-09-25 | session 54 |
-| 055 | [055-resume-failed-approve-then-build.md](055-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | not yet    |
+| 055 | [055-explainer-reels-again.md](055-explainer-reels-again.md)                           | —               | the two reels again, DNS first | 2026-09-26 | not yet    |
+| 056 | [056-resume-failed-approve-then-build.md](056-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
@@ -60,4 +61,5 @@ date, then rewritten before it ran, at the owner's word, for time: `check.mjs --
 read and build when the owner put reliability before speed (S-168). The `parallel-shots` text is at commit `b15d203`,
 carried to the session that writes those gates. Then the owner put two test reels first: they are 053, and
 `resume-failed` moved to 054, as committed at `b1ffcfd`. In session 53 the owner put two explainer reels first — video game graphics and JoJo's Bizarre
-Adventure, their briefs approved — so they are 054, and `resume-failed` moved to 055.
+Adventure, their briefs approved — so they are 054, and `resume-failed` moved to 055. Session 54 made neither — one stop its brief caused, then this
+machine's DNS (P-020) — and the owner asked for them again: they are 055, and `resume-failed` moved to 056.

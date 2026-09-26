@@ -25,10 +25,10 @@ git and the journal keep them.
   written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `PROMPTS/054` again, in a new session — session 54 made five runs of the game graphics reel and none
-  completed: one stop its brief caused (P-017, P-018, fixed), then this machine's DNS stalling 11 s on fal's host (P-020);
-  JoJo never ran. Run once fal's host resolves fast. Then, in the owner's order — reliability before speed
-  (S-168, S-169): `PROMPTS/055` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
+- **Next**: `PROMPTS/055` — the two explainer reels again, brief B as it last ran, then JoJo, each run started only once
+  fal's host resolves fast: session 54 made five runs of the game graphics reel and none completed — one stop its brief
+  caused (P-017, P-018, fixed), then this machine's DNS stalling 11 s on fal's host (P-020), the owner's to fix. Then, in the owner's order — reliability before speed
+  (S-168, S-169): `PROMPTS/056` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
   failed run with what the engine owns, never its code or gates, and the caller's brief only by proposal (D-096). Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
@@ -88,6 +88,12 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-26 · session 54, continued
+
+- `PROMPTS/055` — new: the two explainer reels again, brief B as it last ran and brief A as approved, a DNS lookup
+  checked before every run (P-020). `resume-failed` renumbered 056 (`PROMPTS/056`, its feature file's pointer).
+  `PROMPTS/README.md` — the rows and a note.
 
 ### 2026-09-26 · session 54
 

@@ -6633,3 +6633,31 @@ fix; the engine's part is P-013's (ask again on a connection error) and `resume-
 well under a second (`node -e "const s=Date.now();require('dns').lookup('queue.fal.run',()=>console.log(Date.now()-s))"`).
 If the television's picture keeps drawing a character or words, P-019's rule is the change. Then `PROMPTS/055`,
 `resume-failed`.
+
+## 2026-09-26 — session 54, continued: `PROMPTS/055`, the two explainer reels again, after a DNS check
+
+**Asked.** The owner: _"give me a prompt for a new session to continue or to make the reels that we are supposed to
+make"_.
+
+**Done.** **`PROMPTS/055`** — the two reels `PROMPTS/054` asked for: brief B word for word as it last ran (the
+criteria after change 1, no sentence changed), then brief A as approved, never run. What differs from 054, each from
+session 54's runs:
+
+- **The lookup of fal's host is checked before every run** (P-020), and a run starts only under 2000 ms. Over it, the
+  session checks once a minute for 30 minutes and then stops and tells the owner; it never touches the machine's
+  network. Session 54 spent two runs learning what one command answers in 11 s. The file asks the owner to fix the DNS
+  before pasting.
+- **A network error is followed by the lookup, then a rerun**, and the three-times stop counts only failures while the
+  lookup is fast, so the machine's DNS cannot be mistaken for a provider's fault, or the reverse.
+- **A count that does not match a name, and a character or a person drawn, are named as brief causes** (P-018, P-019),
+  and the rule for names spoken in a sentence is the criterion first, the sentence's wording second, never the fact.
+- The pitfalls to read include P-017 to P-020, and session 54's runs are read by heading.
+
+`resume-failed` is renumbered **056** — the file, its header and its pointer in `docs/features/resume-failed.md`, as
+session 53 did at 055 — and its own close-out now names 057. `PROMPTS/054`, run, keeps its text; its last line naming
+055 is history, and `PROMPTS/README.md`'s note says why.
+
+**Why.** CLAUDE.md § Prompts: the next session's prompt is written in `PROMPTS/` and committed. Brief B carries its
+healed criteria so the next session does not pay for P-017 and P-018 again; the facts are the owner's as approved.
+
+**Next.** `PROMPTS/055`, once `queue.fal.run` resolves fast. Then `PROMPTS/056`, `resume-failed`.

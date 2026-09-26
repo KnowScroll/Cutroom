@@ -1,13 +1,14 @@
-# 055 — `resume-failed`: one approving read of its gates, then its build, slice by slice
+# 056 — `resume-failed`: one approving read of its gates, then its build, slice by slice
 
-- **For:** session 55
+- **For:** session 56
 - **Feature:** `resume-failed` (S-157, S-161 to S-164)
 - **Work:** one fresh approving read of the four gates — its findings fixed, not another open round — then the build
   from Slice 1, each slice committed after the full check.
 - **Written:** 2026-09-25, at the end of session 52, when the owner put `resume-failed` ahead of `parallel-shots`
   (S-168). This file held `parallel-shots`' gates until then; that text is at `b15d203`, carried to the session that
   writes them. Written as 053, renumbered 054 when the owner put two test reels first (`PROMPTS/053`), and 055 when
-  the owner put two explainer reels first (`PROMPTS/054`).
+  the owner put two explainer reels first (`PROMPTS/054`), and 056 when session 54 ended before either reel was made
+  and the owner asked for them again (`PROMPTS/055`).
 - **Run:** not yet
 
 **Where things stand.** Session 52 wrote `resume-failed`'s four gates — 44 checks in 7 slices — on twenty-two owner
@@ -47,6 +48,6 @@ How to work:
 - Never change a check or a test to reach green. Never raise the 250c ceiling. Never print a key or read .env.
 - No absolute path in any committed file (D-086).
 - Close out with a JOURNAL.md entry and docs/context.md's entry for this session (S-160), this prompt's Run line set
-  here and in PROMPTS/README.md (S-065), and PROMPTS/055 — the next slice of resume-failed, or, when Slice 7's journey
+  here and in PROMPTS/README.md (S-065), and PROMPTS/057 — the next slice of resume-failed, or, when Slice 7's journey
   has passed, caption-match's gates (S-165, S-168).
 ```
