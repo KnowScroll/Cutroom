@@ -22,17 +22,18 @@ git and the journal keep them.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
   **Stopped**: `one-subject` (S-149). **Gates approved, Slices 1 to 3 of 7 built**: `resume-failed` (S-161 to S-164, S-171). **Planned, gates not
-  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
+  written**: `cutroom-sdk` (S-173, no file yet), `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
 - **Next**: session 55 made both explainer reels — video game graphics at its fourth run (`d12931e1`), JoJo at its
   second (`a1b8f2ee`), 322¢ over six runs, every stop a brief cause healed in the criteria or claims (P-021 to P-025
-  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/058` — `resume-failed`'s build from Slice 4 (session 56 approved the gates and built Slices 1 and 2, session 57 Slice 3); then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
+  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/058` — `resume-failed`'s build from Slice 4 (session 56 approved the gates and built Slices 1 and 2, session 57 Slice 3), each slice now built by one `slice-builder` agent (S-172); then `cutroom-sdk`'s gates (S-173); then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
-- **Parked by the owner**: how KnowScroll uses the engine — an `@cutroom/sdk` package that starts the service, or an
-  in-process library against D-098. Nothing decided; the journal's session 52 (S-167) entry has the options.
+- **KnowScroll and the engine** (S-173, settled session 57): the engine stays its own process (D-098); KnowScroll
+  calls it through `@cutroom/sdk`, which connects to it, or starts the service as a child when none answers. D-099 in
+  part superseded: two packages may be depended on from outside.
 - **Reviews answered** (S-165): P-011's caption question gets an exact comparison (`caption-match`); P-010's two
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
@@ -104,7 +105,11 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   kept-take check (`pipeline/src/clips/index.ts`). `tests/resume-failed-resume.test.ts`, checks 12 to 25;
   `resumed()` and `Engine.settings` in `tests/engine/harness.ts`. Amendment blocks: `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-failures`.
-- `PROMPTS/057` and `PROMPTS/README.md` — the Run line. `PROMPTS/058` — new: Slice 4 onwards.
+- `PROMPTS/057` and `PROMPTS/README.md` — the Run line. `PROMPTS/058` — new: Slice 4 onwards, each slice by a builder.
+- `DECISIONS.md` — **S-172**: one `slice-builder` agent (Opus, `.claude/agents/slice-builder.md`) builds each slice;
+  the main session briefs, reads the diff, runs the full check and commits; `CLAUDE.md`'s agent list gains it.
+  **S-173**: KnowScroll calls the engine through `@cutroom/sdk` — connect, or start when none answers — `cutroom-sdk`
+  next after `resume-failed`, before `self-heal` (D-099 superseded in part).
 
 ### 2026-09-26 · session 56
 

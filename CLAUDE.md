@@ -86,7 +86,7 @@ forget, because an unreferenced package is one nothing typechecks.
 
 ## Subagents, and the model each one runs on
 
-`.claude/agents/` holds the four this repository uses most. Each one names its own model, chosen by what a wrong
+`.claude/agents/` holds the five this repository uses most. Each one names its own model, chosen by what a wrong
 answer costs. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10, Haiku $1/$5. No agent here uses Fable
 ($10/$50).
 
@@ -97,8 +97,11 @@ answer costs. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10, Haiku $
 - **`check-runner`** — `haiku`. Runs `check.mjs`, one test file, a drift proof or a named journey, and returns the
   verdict and the decisive lines — never the whole stream.
 - **`run-reader`** — `haiku`. Reads a real run's rows from the database, read-only, after it finishes or fails.
+- **`slice-builder`** — `opus`. Builds ONE slice of an approved feature — tests, code, deliberate breaks — and hands
+  back a report and an uncommitted diff (S-172). One at a time; the main session runs the full check and commits.
 
-None of them edits code. The reviewer's one allowed edit is the `Gates:` line of the file it approves.
+Only `slice-builder` edits code, within the slice it is handed, and it never commits. The reviewer's one allowed edit
+is the `Gates:` line of the file it approves.
 
 **What re-reads a whole context is what costs** (S-160): every call of this session and of each agent reads its
 context again. `check.mjs` runs no model. Four standing rules:

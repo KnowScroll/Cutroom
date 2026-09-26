@@ -7486,3 +7486,73 @@ call, `run.failure` null and this detail pinned; one passing completes it; one s
 and fail: _"Try, stop if both fail"_.
 
 ---
+
+## S-172 | 2026-09-26 | A feature's slice is built by one `slice-builder` agent with a fresh context; the main session hands it the facts, reads its diff, runs the full check and commits — so one session builds several slices
+
+**Chose.** At the owner's asking, after session 57 built one slice and stopped: _"Can the next session not finish
+multiple slices instead of 1 only?"_ — answered _"Builder agent per slice"_. A new agent, `.claude/agents/slice-builder.md`,
+on Opus, builds ONE slice of a feature whose gates are approved: its tests first, then its code, one deliberate break per
+property seen red and restored, its amendment blocks, its test file and `check.mjs --changed` green. It never commits,
+never runs the journey and never decides a choice the gates leave open — it stops and reports it. The main session,
+per slice: the test-impact pass, a brief of facts and one test of done (S-160 rule 3), the builder's diff read, the full
+`check.mjs` through `check-runner`, the Gate 4 tick and one commit. Slices run one after another, never at once: each
+builds on the last one's commit.
+
+**Why.** Session 57 spent about half of a 1 M context on one slice: every file the slice touches read in full, and a
+1,400-line test file written — and the prompt forbids a compaction inside a slice, so it stopped at the boundary with
+four slices left. A builder's context is its own and ends with its slice; the main session keeps only briefs, reports
+and diffs, so three or four slices fit in one session. The tokens a slice costs are about what they were: the reading
+and writing move from the main context to the builder's.
+
+**Rejected** (put to the owner). **The owner typing `/compact` at each slice boundary** — S-160 already allows it and
+nothing is built, but it needs the owner present at every boundary. **Both** — builders for the big slices and the small
+ones done directly — two ways to build one feature's slices where one does.
+
+**Supersedes:** S-160's `CLAUDE.md` line _"None of them edit code"_ — now _"only `slice-builder` edits code, within the
+slice it is handed, and never commits"_. S-160's rules stand: a builder is handed facts and one test of done, and is
+never run beside another.
+
+**Caught by.** The main session's own steps: no slice is committed before `check-runner` reports the full `check.mjs`
+green on the builder's diff, and the journal entry names each slice's builder report — its breaks and the checks each
+turned red.
+
+**Confirmed-by.** The owner, 2026-09-26, session 57.
+
+---
+
+## S-173 | 2026-09-26 | Cutroom stays its own process, and KnowScroll calls it through an `@cutroom/sdk` package that connects to the engine, or starts it when none is running
+
+**Chose.** The owner, 2026-09-26, settling what session 52 parked: _"cutroom will be a package running in its own
+process but knowscroll calls it like an sdk"_ — session 52's option A. **The engine runs as its own process, reached
+over loopback HTTP, as D-098 chose, and KnowScroll never loads it.** A new package, **`@cutroom/sdk`**, is what KnowScroll
+calls: typed functions over the contract's routes — submit, follow, result, record, cancel, resume — validated by
+`@cutroom/reel-contract`'s schemas, and a launcher. **It connects to the engine at its URL; when nothing answers there, it
+starts the service as a child process and stops the child it started when its caller closes it** (the owner's answer,
+over always starting a child and over connecting only). It imports only `@cutroom/reel-contract` and Node's built-ins —
+no provider, no pipeline, no database. A feature of its own, `cutroom-sdk`, planned here with four gates; **its gates come
+right after `resume-failed`'s journey, before `self-heal`'s** (the owner's answer).
+
+**Why.** KnowScroll calls a function and gets a typed answer, as a library would give it, while the engine keeps its own
+process, database, ffmpeg and provider clients (D-088, D-098's reasons). Connecting first keeps S-113's one worker when
+two callers are running; starting the service when none answers means KnowScroll never has to manage the engine by hand.
+The SDK is small, and KnowScroll can use the engine sooner, so it goes ahead of `self-heal`.
+
+**Rejected.** **An in-process library** (session 52's option B) — reverses D-098 and loads the engine's dependencies into
+KnowScroll's worker. **The SDK always starting its own child** — two callers would start two engines on one database, and
+S-113 wants one worker. **Connecting only** — the engine would need starting by hand or by a system service before any
+call. **The SDK after `self-heal`, or at the end of the queue.**
+
+**Supersedes:** **D-099**, in part: _"Exactly one engine package may be a dependency from outside it:
+`@cutroom/reel-contract`"_ becomes _"two: `@cutroom/reel-contract`, and `@cutroom/sdk`, which imports only it"_; and its
+`Confirmed-by` _"no `@cutroom/*` package other than `@cutroom/reel-contract`"_ reads _"… other than `@cutroom/reel-contract`
+and `@cutroom/sdk`"_. **D-098** stands: _"KnowScroll never loads engine code"_ is read as _"never loads the engine"_ — the
+SDK is a client and a launcher of it, holding none of its code. How KnowScroll obtains either package stays the
+orchestrator's concern (D-098). **S-168**'s order gains `cutroom-sdk` between `resume-failed` and `self-heal`.
+
+**Caught by.** `cutroom-sdk`'s gates name them; at least a boundary rule that `packages/sdk` imports nothing internal but
+`@cutroom/reel-contract`, and a check that the SDK connected to a running engine starts no second one.
+
+**Confirmed-by.** The owner, 2026-09-26, session 57: the statement above, then _"Connect, start if absent"_ and _"After
+resume-failed"_.
+
+---

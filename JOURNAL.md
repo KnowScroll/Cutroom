@@ -6921,3 +6921,23 @@ repair; counted twice, −1 and a failure before any call.
 the API, the service and the stand-in. Started now it would likely be cut by a compaction inside the slice.
 
 **Next.** `PROMPTS/058`: Slice 4 onwards, in the gates' order.
+
+## 2026-09-26 — session 57, continued: a builder agent per slice (S-172), and KnowScroll's SDK (S-173)
+
+**Asked.** The owner, after the close-out: _"Can the next session not finish multiple slices instead of 1 only? And
+cutroom will be a package running in its own process but knowscroll calls it like an sdk"_.
+
+**Several slices a session — S-172.** Session 57 stopped after one slice because one slice spent about half the context
+and the prompt forbids a compaction inside a slice. Put to the owner: a builder agent per slice, the owner typing
+`/compact` at each boundary, or both. _"Builder agent per slice"_: `.claude/agents/slice-builder.md`, on Opus, builds one
+slice — tests, code, breaks, amendment blocks — and never commits; the main session briefs it, reads its diff, runs the
+full check and commits. `CLAUDE.md`'s agent list gains it, and its _"None of them edits code"_ now names the one that does.
+`PROMPTS/058` rewritten to build each slice that way and go on after each commit.
+
+**KnowScroll and the engine — S-173.** The owner's words are session 52's option A. D-098 stands — its own process, over
+loopback — and D-099 is superseded in part: `@cutroom/sdk` joins `@cutroom/reel-contract` as a package KnowScroll may
+depend on. Two details put to the owner: the SDK _"Connect, start if absent"_ — over always starting a child (two
+engines, against S-113's one worker) and connecting only; and `cutroom-sdk`'s gates _"After resume-failed"_, ahead of
+`self-heal`. No file for the feature yet; its gates are written in the session after `resume-failed`'s journey.
+
+**Next.** Unchanged in order: `PROMPTS/058`, now several slices a session; then `cutroom-sdk`'s gates.
