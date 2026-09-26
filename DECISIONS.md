@@ -7391,3 +7391,59 @@ would need D-096 superseded.
 for healing and fixing. SO that can be another feature"_, and its place: _"Right after resume-failed"_.
 
 ---
+
+## S-170 | 2026-09-26 | `self-heal` is one harness around the run — make, check, heal, learn — with a rule book of what failed runs taught, a learned rule binding only once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in
+
+**Chose.** At the owner's word, after session 55's six real runs, every stop a brief cause healed by hand:
+
+- **`self-heal` is a harness around the whole run**, not a step after it. The engine makes each piece as it does now;
+  the gates judge it as they do now; when a gate refuses a piece or a call fails, **the harness reads why from the
+  run's own rows and chooses the next move** — ask again, look again, resume (`resume-failed`), plan again, ask for a
+  picture again with its framing named, give a shot made from words a picture — and the piece is made and judged
+  again, inside the caller's ceiling (D-014, D-100). The gates stay code the harness cannot change (CLAUDE.md rule 3).
+- **Learning from failed runs is the harness's own, not a separate feature: a rule book.** Each cause read and each
+  heal that worked is written as a rule with the runs it came from — what `docs/reel-pitfalls.md` holds today by hand.
+  The rule book feeds three places: **a check of the brief before anything is spent** (a plural id, a qualifier in a
+  must-show, a claim at a unit's edge, many unclaimed sentences, a named character — P-008, P-018, P-019, P-022,
+  P-025); **the planner's and the picture's prompts** (unbranded, a subject framed small, the narration never drawn —
+  P-012, P-017, P-021); and **the harness's first choice of heal**.
+- **A learned rule binds only once the owner approves it.** The harness writes it as a proposal with its runs; until
+  approved it changes nothing a later run does. The rules already paid for in `docs/reel-pitfalls.md` are its first
+  entries, approved by being there.
+- **The caller's criteria and claims are healed in place only when the request opts in** — a field of the request,
+  named at the product gate (`heal: 'apply'` in the owner's reading). Opted in, the harness may change a criterion's
+  wording or id, and which claims a sentence carries — what session 55 changed by hand — **never a sentence's text, a
+  fact, a `mustNotShow`, the style or the policy version**. Every change is recorded with why, and the result returns
+  the brief as it completed. Not opted in, a change to the brief is a proposal in the result, as S-169 said.
+
+**Supersedes:** **D-096**, in part, and only under the opt-in: the engine receives the criteria _"as given"_ and _"may
+never weaken or remove one"_ — a request that opts in allows the harness to reword a must-show and to move a claim off a
+sentence, both of which can loosen what was asked (P-022's heal did). Everything else D-096 says stands: no source, no
+claim text and no truth state crosses. **S-169**, in part: _"the caller's narration and criteria only by proposal"_
+holds for a request that does not opt in; its _"left open"_ question of applying a proposal is answered here.
+
+**Why.** Session 55 made both reels in six runs and 322¢, and every stop — lettering, a qualifier read as required, a
+claim at a unit's edge, a plural name — was answered by the caller's criteria or claims, never by the engine. S-169's
+healer, held to proposals, would have stopped at each one and waited. The owner asked for the engine's reliability _"to
+the most"_, and for the healer and learning from failed runs to be one harness. A rule learned from one run can be
+wrong for every other reel, so it waits for approval; a heal inside one run cannot spread, so it does not.
+
+**Rejected** (put to the owner). Learning as its own feature after `self-heal` — the owner: _"Will it not be a harness
+that does the reel making and reel healing and checking?"_. A learned rule binding at once, and a rule binding only
+after holding on a number of runs. Brief heals always applied — every caller's brief could drift without asking — and
+brief heals never applied, D-096 as it stands, under which a brief-caused stop still stops.
+
+**Left open, for `self-heal`'s product gate**: the opt-in's name and shape; how KnowScroll's epistemic layer reads a
+completed brief whose criteria were reworded or whose claims moved, and whether it may refuse the reel (the steering
+repository's to decide, on its side); where the rule book lives (a table, a file) and how the owner approves a rule;
+which model heals, what it is shown, and how many heals a run may take.
+
+**Caught by.** `docs/features/self-heal.md`, every gate pending, and its product gate's review against D-096 and this
+entry; `docs/context.md`'s **Next**; nothing in code.
+
+**Confirmed-by.** The owner, 2026-09-26, in session 55: _"We need to fix the reliability of the engine and reel
+generation to the most. Remember our self healijng harness idea and continious learning from failed runs"_; asked where
+learning lives, _"Will it not be a harness that does the reel making and reel healing and checking?"_; a learned rule
+_"Proposed, owner approves"_; brief heals _"When the caller opts in"_.
+
+---

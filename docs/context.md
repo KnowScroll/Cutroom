@@ -22,13 +22,12 @@ git and the journal keep them.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`.
   **Stopped**: `one-subject` (S-149). **Gates written, approval read due in 056**: `resume-failed` (S-161 to S-164). **Planned, gates not
-  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169), `video-edits`,
+  written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
 - **Next**: session 55 made both explainer reels — video game graphics at its fourth run (`d12931e1`), JoJo at its
   second (`a1b8f2ee`), 322¢ over six runs, every stop a brief cause healed in the criteria or claims (P-021 to P-025
-  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/056` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — a model inside the engine that heals a
-  failed run with what the engine owns, never its code or gates, and the caller's brief only by proposal (D-096). Session 53's two reels completed, and its engine findings wait for a feature:
+  new). In the owner's order — reliability before speed (S-168, S-169): `PROMPTS/056` — `resume-failed`'s one approving read, then its build, slice by slice; then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -104,6 +103,10 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   recurring subject fills the unclaimed sentences); P-008 and P-018 recurred; their short-list rows, and P-020's state.
 - `docs/research/refusals.md` — counts and ledger to 52 runs.
 - `PROMPTS/055` and `PROMPTS/README.md` — the Run line. `scripts/real-reel.mjs` put back as HEAD has it.
+- `DECISIONS.md` — **S-170**: `self-heal` is one harness around the run — make, check, heal, learn — with a rule book
+  from failed runs; a learned rule binds once the owner approves it; the caller's criteria and claims healed in place
+  only when the request opts in, never a sentence or a fact (D-096 superseded in part). `docs/features/self-heal.md` —
+  its title, what the owner added, four more faults, gates 3 and 6 widened.
 
 ### 2026-09-26 · session 54, continued
 

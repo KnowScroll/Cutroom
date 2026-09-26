@@ -6793,3 +6793,35 @@ and 3); every change was the caller's criteria or claims, no fact. `scripts/real
 
 **Next.** `PROMPTS/056` — `resume-failed`'s one approving read, then its build. P-021 (the narration drawn) and P-024
 (a wait with no row) wait for a feature; P-023 is the owner's to review.
+
+## 2026-09-26 — session 55, continued: `self-heal` becomes one harness that makes, checks, heals and learns (S-170)
+
+**Asked.** The owner, after the two reels: _"what will the next session do? We need to fix the reliability of the
+engine and reel generation to the most. Remember our self healijng harness idea and continious learning from failed
+runs"_.
+
+**Answered.** The next session is still `PROMPTS/056` — `resume-failed`'s approving read and build — because every heal
+that keeps what passed is a resumed run. Then `self-heal`'s gates. Put to the owner, three choices:
+
+- **Where learning from failed runs lives.** Offered: inside `self-heal`, or its own feature. The owner: _"Will it not
+  be a harness that does the reel making and reel healing and checking?"_ — one harness around the whole run, whose
+  memory is a rule book of causes and the heals that worked.
+- **When a learned rule binds.** _"Proposed, owner approves"_ — over binding at once, and warning-only until it held on
+  some runs.
+- **Whether the harness may change the caller's brief itself**, as session 55 did by hand every time a run stopped.
+  _"When the caller opts in"_ — over always, and proposals only (D-096 as it stood).
+
+**Done.** **S-170** in `DECISIONS.md`: the harness; the rule book feeding a brief check before anything is spent, the
+planner's and picture's prompts, and the harness's first heal; a learned rule binding once approved; criteria wording,
+ids and claim placement healed in place only under the request's opt-in — never a sentence's text, a fact, a
+`mustNotShow`, the style or the policy version — each change recorded and the completed brief returned. It supersedes
+D-096 in part, only under the opt-in, and S-169's _"only by proposal"_ for a request that opts in. Left open for the
+product gate: the opt-in's shape, how KnowScroll's side reads a reworded brief (the steering repository's), where the
+rule book lives and how a rule is approved. `docs/features/self-heal.md` — its title, what the owner added, the faults
+session 55 met, gates 3 and 6 widened. `docs/context.md` — the Next line and this session's entry.
+
+**Why.** CLAUDE.md rule 2: a choice between real alternatives is written, with what was rejected. D-096's _"may never
+weaken or remove one"_ is what a brief heal can break — P-022's own fix loosened a criterion — so the entry names that,
+and leaves the caller's check of a completed brief to the caller's side.
+
+**Next.** `PROMPTS/056`, unchanged. `self-heal`'s gates after `resume-failed`'s build, now against S-170.
