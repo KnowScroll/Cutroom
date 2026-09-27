@@ -1031,7 +1031,7 @@ touches gains its amendment block in that slice.
       the confirmation and the follow; the start's question on waiting runs, through `@cutroom/service`'s
       `waitingRuns` and `cancelRuns`; input read once; the amended check 20 of `paid-path`.
       Amendment block: `paid-path`. **Proves: 41, 42, 43.**
-- [ ] **Slice 7 — the journey.** Check 44; this feature's journey, and `reel-contract`'s, `reel-plan`'s,
+- [x] **Slice 7 — the journey.** Check 44; this feature's journey, and `reel-contract`'s, `reel-plan`'s,
       `reel-stills`', `reel-render`'s, `reel-takes`', `paid-failures`', `ask-again`'s, `second-ask`'s, `paid-path`'s and
       `three-pictures`' again (S-099's form). **Proves: 44.**
 
