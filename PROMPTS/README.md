@@ -49,7 +49,9 @@ its `JOURNAL.md` entry says it did (S-065).
 | 056 | [056-resume-failed-approve-then-build.md](056-resume-failed-approve-then-build.md)     | `resume-failed` | approve, then build            | 2026-09-25 | session 56 |
 | 057 | [057-resume-failed-build-from-slice-3.md](057-resume-failed-build-from-slice-3.md)     | `resume-failed` | the build from Slice 3         | 2026-09-26 | session 57 |
 | 058 | [058-resume-failed-build-from-slice-4.md](058-resume-failed-build-from-slice-4.md)     | `resume-failed` | the build from Slice 4         | 2026-09-26 | session 58 |
-| 059 | [059-resume-failed-build-from-slice-5.md](059-resume-failed-build-from-slice-5.md)     | `resume-failed` | the build from Slice 5         | 2026-09-27 | not yet    |
+| 059 | [059-resume-failed-build-from-slice-5.md](059-resume-failed-build-from-slice-5.md)     | `resume-failed` | the build from Slice 5         | 2026-09-27 | session 59 |
+| 060 | [060-resume-failed-slice-6.md](060-resume-failed-slice-6.md)                           | `resume-failed` | Slice 6, the owner's script    | 2026-09-27 | session 60 |
+| 061 | [061-resume-failed-slice-7.md](061-resume-failed-slice-7.md)                           | `resume-failed` | Slice 7, the journey           | 2026-09-27 | not yet    |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

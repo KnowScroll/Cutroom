@@ -16,6 +16,10 @@
     "@cutroom/domain": "workspace:*",
     "@cutroom/pipeline": "workspace:*",
     "@cutroom/providers": "workspace:*",
-    "@cutroom/worker": "workspace:*"
+    "@cutroom/worker": "workspace:*",
+    "better-sqlite3": "^13.0.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0"
   }
 }

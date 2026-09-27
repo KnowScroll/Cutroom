@@ -26,6 +26,30 @@ Supersedes, through the entries it rests on: D-005 for this engine's model layer
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
 Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
+> **Amended by `resume-failed` on 2026-09-27, Slice 6 — the gates below are not edited, and no assertion is removed**
+> (**S-162**, **S-163**). **The owner's script and the helpers behind it.** One `post(path, body)` helper
+> holds the sole `method: 'POST'` spelling in `scripts/real-reel.mjs`; `makeReel` owns the one `/v1/runs`
+> post and `resumeReel` owns the two `/v1/runs/<id>/resume` posts — a literal `{ preview: true }` for the
+> free preview and a body with no `preview` key for the paid resume. The preview prints every
+> normalised piece and the four resume figures, and a second confirmation gate compares the printed
+> figure before the paid post. `--resume <runId>` and `--remake <kind[:shot],…>` are the only flags.
+> Before `startService`, the script reads the runs still waiting with a queued or running job through
+> `@cutroom/service`'s `waitingRuns(dbPath)` — read-only, missing file answers `[]`, present file
+> reports every running run and writes nothing — and on the default answer cancels each through
+> `cancelRuns(dbPath, runIds)`, which changes only `cancel_requested` on the named runs. Every
+> answer the script reads comes from `scripts/_answers.mjs`'s pure, import-free `answers(input)`;
+> the answers module and its declaration do not name the spending script, paid-path check 20's
+> third test reads every other script in the folder for it. **Paid-path check 20 is amended** to
+> the new shape — the `confirmed` and `submitted` markers are re-pointed, the new-reel gate is
+> the `!== confirmation(ceiling)` site, the SUBMIT is the `post('/v1/runs', ...)` call, and the
+> assertion gains the new shape (one `method:` inside `function post(`, one `post('/v1/runs', ...)`,
+> one preview post with the literal `{ preview: true }`, one resume post without `preview`, no other
+> `post(` call, one `createInterface`, two `!== confirmation(` gates — the second comparing
+> `confirmation(figure)` — and `makeReel`/`resumeReel` each holding one path). **Paid-path check 20's
+> second test gains** an assertion that every local module the file imports reads no
+> `child_process`. `tests/paid-path-real-reel.test.ts` keeps every original assertion (S-111, S-110,
+> S-128, S-108).
+>
 > **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
 > (**S-163**, in **S-153**'s form). **The service turns the engine's own resume on; the worker's default stays off.**
 > `startService` hands `startWorker` `resume: { delayMs: settings.resumeDelayMs }` (`apps/service/src/service.ts`), and

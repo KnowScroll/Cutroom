@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -85,6 +85,32 @@ test('20. this file only READS the script: it starts no process and imports noth
     "check 20's own file imports something that could run the script, or an adapter",
   )
 
+  // AMENDED BY resume-failed, Slice 6 (S-163): the file that names the spending script can never
+  // be handed a way to start it. Every LOCAL MODULE — a path starting with `./` or `../` — is read
+  // for `child_process`, because a local module that imports `child_process` is one the test could
+  // be tricked into importing and would then have a way to spend. The specifier is resolved
+  // relative to this file's directory, not the repository root.
+  const ownDir = join(REPO, 'tests')
+  const importRe = /from\s+['"]([^'"]+)['"]/
+  const localImports = imports
+    .map((line) => (importRe.test(line) ? line.match(importRe)?.[1] : undefined))
+    .filter((specifier): specifier is string => specifier !== undefined)
+    .filter((specifier) => specifier.startsWith('./') || specifier.startsWith('../'))
+  for (const specifier of localImports) {
+    const candidates = [
+      join(ownDir, specifier),
+      join(ownDir, `${specifier}.ts`),
+      join(ownDir, specifier, 'index.ts'),
+    ]
+    const resolved = candidates.find((p) => existsSync(p))
+    assert.ok(resolved !== undefined, `could not resolve ${specifier}`)
+    const source = readFileSync(resolved, 'utf8')
+    assert.ok(
+      !/\b(child_process|node:child_process)\b/.test(source),
+      `check 20 imports ${specifier}, which imports child_process — a path to start the script`,
+    )
+  }
+
   // And no call site starts a process, however it was imported.
   assert.deepEqual(
     [...own.matchAll(/\b(spawn|spawnSync|execFile|execFileSync|exec|fork)\s*\(/g)].map((m) => m[0]),
@@ -127,10 +153,15 @@ test('20. the script that spends exists, waits for a confirmation before it subm
       .filter((i) => !/^\s*(\/\/|\*|\/\*)/.test(source.slice(source.lastIndexOf('\n', i) + 1, i)))
     return found[0] ?? -1
   }
+  // AMENDED BY resume-failed, Slice 6 (S-162, S-163): with one `post()` helper, `confirmed` is
+  // re-pointed to the reel's own gate — the one comparing `confirmation(ceiling)` — and
+  // `submitted` to the SUBMIT call site. The order check keeps "the estimate is printed, then the
+  // gate, then the submit" — but the gate is now a piece of code rather than a stream read, and
+  // the submit is a single `post('/v1/runs', ...)` rather than a `fetch` literal.
   const computed = at('corners(settings.planSettings)')
   const printed = at('${low.cents}c to ${high.cents}c')
-  const confirmed = at('createInterface({ input: process.stdin })')
-  const submitted = at("method: 'POST'")
+  const confirmed = at('!== confirmation(ceiling)')
+  const submitted = at("post('/v1/runs', request(requestId, ceiling))")
   assert.ok(computed > 0, 'the script computes no estimate')
   assert.ok(printed > 0, 'the script prints no estimate')
   assert.ok(confirmed > 0, 'the script waits for no confirmation')
@@ -139,14 +170,236 @@ test('20. the script that spends exists, waits for a confirmation before it subm
   assert.ok(printed < confirmed, 'the script confirms before it has printed the estimate')
   assert.ok(confirmed < submitted, 'the script submits before it has been confirmed')
 
+  // Exactly one POST, and it lives inside `function post(`. The slice keeps paid-path check 20's
+  // "the script makes more than one POST" rule honest: a second `method: 'POST'` outside the
+  // helper's body is a second POST site, and one run is one reel (S-110). Comments don't count —
+  // a comment can name the substring `method: 'POST'` to describe the rule (as the slice's header
+  // does) without being a POST site. The `at()` filter above is the same one.
+  const postPositions = [...source.matchAll(/method:\s*'POST'/g)]
+    .map((m) => m.index ?? -1)
+    .filter((i) => !/^\s*(\/\/|\*|\/\*)/.test(source.slice(source.lastIndexOf('\n', i) + 1, i)))
+  assert.equal(
+    postPositions.length,
+    1,
+    `the script has ${postPositions.length} method: 'POST' tokens; one POST per reel (S-110)`,
+  )
+  const postStart = source.indexOf('function post(')
+  assert.ok(postStart > 0, 'the script does not name its POST helper')
+  // Find the END of `function post(...)` by scanning forward — every `function post(` is closed by
+  // a matching `}` at column 1, which a single-purpose helper reaches on the line that ends it.
+  const postEnd = source.indexOf('\n}\n', postStart)
+  assert.ok(postEnd > postStart, 'the POST helper is not a function')
+  assert.ok(
+    postPositions[0] !== undefined && postPositions[0] > postStart && postPositions[0] < postEnd,
+    "`method: 'POST'` lives outside `function post(` — every POST goes through the helper",
+  )
+
+  // The SUBMIT is the one `post('/v1/runs', ...)` call. `request(requestId, ceiling)` is the body's
+  // shape — `requestId` and `ceiling` are the two arguments admission sees (S-110).
+  assert.equal(
+    source.split("post('/v1/runs', request(requestId, ceiling))").length - 1,
+    1,
+    'the script submits through one call only',
+  )
+
+  // The PREVIEW is a literal `{ preview: true }` body, posted once, to a resume route (S-162).
+  // The slice keeps the preview post count exactly one.
+  const previewPositions = [
+    ...source.matchAll(/post\(`\/v1\/runs\/\$\{runId\}\/resume`,\s*\{\s*preview:\s*true\s*\}\)/g),
+  ].map((m) => m.index ?? -1)
+  assert.equal(
+    previewPositions.length,
+    1,
+    `the script posts ${previewPositions.length} preview requests; one preview per resume`,
+  )
+  // The literal `{ preview: true }` appears exactly once. Built objects would elude this assertion
+  // because the substring would not appear verbatim.
+  assert.equal(
+    source.split('{ preview: true }').length - 1,
+    1,
+    '`{ preview: true }` is not a literal; spread or build makes it a variable body',
+  )
+
+  // The RESUME body has NO `preview` key. The same resume route, two call sites — the PREVIEW
+  // (with `preview: true`) and the paid RESUME (without). The slice forbids a `preview:` token on
+  // the resume call site — a `preview: true` on the paid body would put the request back in
+  // preview mode, and the engine would never write a new run.
+  const resumePosts = [
+    ...source.matchAll(/post\(`\/v1\/runs\/\$\{runId\}\/resume`,\s*([\s\S]*?)\)/g),
+  ]
+  assert.equal(
+    resumePosts.length,
+    2,
+    `the script has ${resumePosts.length} resume posts; one preview and one paid`,
+  )
+  // Exactly one of the two resume posts has `preview: true` (the PREVIEW); exactly one has none
+  // (the RESUME). Together they name the two halves of the route.
+  const previewBodies = resumePosts.filter((m) => /\bpreview\s*:/.test(m[1] ?? ''))
+  const paidBodies = resumePosts.filter((m) => !/\bpreview\s*:/.test(m[1] ?? ''))
+  assert.equal(previewBodies.length, 1, 'the script has no preview post; one preview per resume')
+  assert.equal(paidBodies.length, 1, 'the script has no paid resume post; one paid post per resume')
+
+  // Exactly three calls of `post(`. The slice forbids a fourth — a `post(...)` that is not the
+  // SUBMIT, the PREVIEW or the RESUME is a way to spend the script cannot reach. Comments and the
+  // helper's own definition don't count (the same way the original check treated `method: 'POST'`):
+  // the slice's own header describes the rule, and `function post(` is the helper, not a call.
+  // The line-before-the-match regex `/^\s*(\/\/|\*|\/\*)/` is the original check's: a `*` at the
+  // start of the line is a doc comment, and the match is named in prose, not at a call site.
+  const postCalls = [...source.matchAll(/\bpost\s*\(/g)]
+    .map((m) => m.index ?? -1)
+    .filter((i) => {
+      const lineStart = source.lastIndexOf('\n', i) + 1
+      const lineEnd = source.indexOf('\n', i)
+      const line = source.slice(lineStart, lineEnd === -1 ? source.length : lineEnd)
+      if (/^\s*(\/\/|\*|\/\*)/.test(line)) return false
+      if (/^\s*function\s+post\s*\(/.test(line)) return false
+      return true
+    })
+  assert.equal(
+    postCalls.length,
+    3,
+    `the script has ${postCalls.length} calls of post(); only the SUBMIT, PREVIEW and RESUME go through it`,
+  )
+
+  // One `createInterface` lives in the script's text — the half that reads terminal input into
+  // the string `answers()` splits (S-163). A second would be a second reader; a second
+  // `readFileSync(0, ...)` would too. Neither is the slice's design.
+  const createInterfaceCount = [...source.matchAll(/\bcreateInterface\s*\(/g)]
+    .map((m) => m.index ?? -1)
+    .filter((i) => {
+      const lineStart = source.lastIndexOf('\n', i) + 1
+      const lineEnd = source.indexOf('\n', i)
+      const line = source.slice(lineStart, lineEnd === -1 ? source.length : lineEnd)
+      return !/^\s*(\/\/|\*|\/\*)/.test(line)
+    }).length
+  assert.equal(
+    createInterfaceCount,
+    1,
+    `the script has ${createInterfaceCount} createInterface calls; one terminal reader is what answers() splits`,
+  )
+
+  // Two `!== confirmation(` gates, and the second compares the figure the preview printed —
+  // `estimateCents`, the figure the engine compares with the limit (D-097, D-100, S-162). The
+  // amendment re-points the FIRST marker to the new-reel gate (above); the second is the resume
+  // gate, which is `confirmation(figure)` where `figure = Number(preview.estimateCents)`.
+  const gates = [...source.matchAll(/!==\s*confirmation\s*\(/g)]
+  assert.equal(
+    gates.length,
+    2,
+    `the script has ${gates.length} !== confirmation() gates; the new reel and the resume each have one`,
+  )
+  // The preview-printed figure must be passed to the resume gate. A `figure` variable assigned
+  // from the preview and used in `confirmation(figure)` is what makes the gate exit before any
+  // paid post.
+  assert.match(
+    source,
+    /Number\(preview\.estimateCents\)/,
+    'the resume gate does not compare the figure the preview printed',
+  )
+  assert.match(
+    source,
+    /confirmation\s*\(\s*figure\s*\)/,
+    'the resume gate does not call confirmation(figure)',
+  )
+
+  // Source order: [corners, range, gate, SUBMIT] precedes [PREVIEW, gate, RESUME] (or vice versa).
+  // The slice keeps both orders legal so a future rewrite does not break the test by moving the
+  // new-reel block above the resume block, or the resume block above the new-reel block. The
+  // shapes are:
+  //   corners   — `corners(settings.planSettings)` (the compute call)
+  //   range     — `${low.cents}c to ${high.cents}c` (the printed estimate range)
+  //   gate      — `!== confirmation(ceiling)` (the new-reel gate, re-pointed above)
+  //   SUBMIT    — `post('/v1/runs', request(requestId, ceiling))` (re-pointed above)
+  //   PREVIEW   — `post(\`/v1/runs/${runId}/resume\`, { preview: true })`
+  //   gate (2)  — the resume gate, `!== confirmation(figure)` — at the position right before RESUME
+  //   RESUME    — `post(\`/v1/runs/${runId}/resume\`, { contractVersion: 1, ... })`
+  const previewAt = source.indexOf('preview: true')
+  // The resume body opens a brace right after `resume\`,` — whitespace flexible.
+  const resumeAt = /resume`,\s*\{\s*contractVersion:\s*1,\s*\.\.\./.test(source)
+    ? source.search(/resume`,\s*\{\s*contractVersion:\s*1,\s*\.\.\./)
+    : -1
+  assert.ok(previewAt > 0, 'the script does not post a preview')
+  assert.ok(resumeAt > previewAt, 'the script posts the resume before the preview')
+
+  // makeReel and resumeReel each hold ONE PATH — the route string `post()` is given. A script
+  // that calls `post('/v1/runs', ...)` from `resumeReel` has crossed the routes, and the slice
+  // forbids it. We slice the source at the function bodies and count `post(...)` calls inside.
+  // The closing brace is the one at column 1 — every nested `}` ends an inner block, and the
+  // outer function ends with `\n}\n` (or `\n}` at EOF).
+  const sliceFunction = (open: string): string => {
+    const start = source.indexOf(open)
+    assert.ok(start > 0, `the script does not name ${open}`)
+    // Walk forward counting braces. Skip braces in strings, template literals, and comments.
+    let depth = 0
+    let inString: string | null = null
+    let i = start
+    while (i < source.length) {
+      const ch = source[i]
+      const prev = i > 0 ? source[i - 1] : ''
+      // Skip escapes in strings
+      if (inString !== null) {
+        if (ch === '\\' && prev !== '\\') {
+          i += 2
+          continue
+        }
+        if (ch === inString) inString = null
+        i++
+        continue
+      }
+      if (ch === '/' && source[i + 1] === '/') {
+        // line comment
+        const nl = source.indexOf('\n', i)
+        i = nl === -1 ? source.length : nl
+        continue
+      }
+      if (ch === '/' && source[i + 1] === '*') {
+        // block comment
+        const end = source.indexOf('*/', i + 2)
+        i = end === -1 ? source.length : end + 2
+        continue
+      }
+      if (ch === '"' || ch === "'" || ch === '`') {
+        inString = ch
+        i++
+        continue
+      }
+      if (ch === '{') depth++
+      else if (ch === '}') {
+        depth--
+        if (depth === 0) return source.slice(start, i + 1)
+      }
+      i++
+    }
+    throw new Error(`${open} has no closing brace`)
+  }
+  const makeReelBody = sliceFunction('async function makeReel(')
+  const resumeReelBody = sliceFunction('async function resumeReel(')
+  assert.equal(
+    [...makeReelBody.matchAll(/\bpost\s*\(/g)].length,
+    1,
+    'makeReel calls post() more than once; only the SUBMIT goes through it',
+  )
+  assert.match(makeReelBody, /post\(['"`]\/v1\/runs['"`]/)
+  assert.doesNotMatch(
+    makeReelBody,
+    /\/resume/,
+    'makeReel calls the resume route; only resumeReel does',
+  )
+  assert.equal(
+    [...resumeReelBody.matchAll(/\bpost\s*\(/g)].length,
+    2,
+    'resumeReel calls post() the wrong number of times; PREVIEW and RESUME go through it',
+  )
+  assert.doesNotMatch(
+    resumeReelBody,
+    /post\(['"`]\/v1\/runs['"`]/,
+    'resumeReel calls the submit route; only makeReel does',
+  )
+  assert.match(resumeReelBody, /\/resume/)
+
   // Exactly one submit, and THE BODY IT SUBMITS carries the ceiling. `/budgetCents/` over the
   // whole file is satisfied by the parameter's own name, which is how a break that dropped it
   // from the request's options first went uncaught.
-  assert.equal(
-    source.split("method: 'POST'").length - 1,
-    1,
-    'the script makes more than one POST, and one run is one reel (S-110)',
-  )
   assert.match(
     source,
     /options:\s*\{[^}]*\bbudgetCents\b[^}]*\}/,

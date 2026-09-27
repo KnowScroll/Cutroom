@@ -5,7 +5,7 @@
 - **Work:** Slices 5 to 7 in the gates' order, each built by one `slice-builder` agent (S-172) and committed after the
   full check; Slice 7 runs the journey.
 - **Written:** 2026-09-27, at the end of session 58, which built Slice 4 and stopped at its boundary at the owner's word.
-- **Run:** not yet
+- **Run:** session 59 — Slice 5 built and committed; Slices 6 and 7 remain
 
 **Where things stand.** The four gates are APPROVED (Gate review 12). Slices 1 (`e67ec6f`), 2 (`0f73e5d`), 3
 (`395dc40`) and 4 are built, each after a full `check.mjs` green. Slice 4 made the call: `reel-contract`'s

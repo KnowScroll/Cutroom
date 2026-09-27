@@ -3,13 +3,15 @@
  * ONE REAL REEL, MADE BY HAND, AND WHAT IT SPENT (S-111, docs/features/paid-path.md, check 20).
  *
  *   node --experimental-strip-types --no-warnings scripts/real-reel.mjs
+ *   node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume <runId>
+ *   node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume <runId> --remake still:shot-1
  *
  * THIS IS THE ONLY THING IN THIS REPOSITORY THAT SPENDS MONEY, and it is run by a person and by
  * nothing else. No test file names it and no step of `scripts/check.mjs` names it — check 20 is
  * what holds that, because a script that spends and could be reached by a suite is a suite that
  * spends (S-111, and four verified features' Gate 1).
  *
- * WHAT IT DOES, IN ORDER:
+ * WHAT IT DOES, IN ORDER, WHEN SUBMITTING A NEW REEL:
  *
  *  1. Reads the settings a service would read, with every port told to be REAL, and PRINTS THE
  *     ESTIMATE — computed from `estimate()`, the same function admission uses, over the corners
@@ -17,22 +19,51 @@
  *  2. WAITS. Nothing is started, no key is read into a port and nothing is submitted until the
  *     ceiling is typed back on standard input. Typing the figure back is what makes a confirmation
  *     impossible to give by accident, and it proves the estimate was read.
- *  3. Starts the engine — the same `startService` `apps/service`'s own program starts — submits
- *     ONE request under the ceiling, and follows its events.
- *  4. Prints WHAT IT SPENT: every receipt, its rate and its cost, the totals by kind, and the
+ *  3. Before `startService` reads the runs the engine would otherwise claim, the script asks which
+ *     of them to leave alone and which to cancel, through `@cutroom/service`'s `waitingRuns` and
+ *     `cancelRuns` — the read-only observation is a `better-sqlite3` connection the service opens
+ *     for the script (S-163).
+ *  4. Starts the engine — the same `startService` `apps/service`'s own program starts — submits
+ *     ONE request under the ceiling through `makeReel`, and follows its events.
+ *  5. While polling, reads `resumedBy` on every status check; when the engine has made a successor
+ *     for the followed run, the script names the wait, follows the new run, and keeps the service
+ *     alive until that final run ends. The engine's resume lands inside the engine (Slice 5).
+ *  6. Prints WHAT IT SPENT: every receipt, its rate and its cost, the totals by kind, and the
  *     latency of the whole run and of each clip, which is the figure `parallel-shots` cannot be
  *     planned without (S-115).
+ *
+ * WHAT IT DOES, IN ORDER, WHEN RESUMING (`--resume <runId>`):
+ *
+ *  1. Reads the settings a service would read and asks the same waiting-runs question.
+ *  2. Posts a free PREVIEW through `resumeReel`: a literal `{ contractVersion: 1, preview: true }`,
+ *     prints every normalised piece and the resume's four figures, and asks for the figure the
+ *     preview printed. A wrong answer exits before any paid post.
+ *  3. Posts the RESUME through `resumeReel`: no `preview` key, with the `--remake` pieces the
+ *     caller named.
+ *  4. Polls the new run's status, follows `resumedBy` as above, and prints what it spent.
  *
  * WHAT IT NEVER DOES. It reads no key — the environment file is loaded and handed on whole, and
  * `packages/providers` is the only thing that looks inside it (S-109) — and it prints no key, no
  * environment variable's value and nothing a provider handed back but the figures above (D-022).
- * It submits exactly ONE request, and if it is run again it makes a second reel and spends again.
+ * Every input it reads, including redirected input, comes from `scripts/_answers.mjs`'s `answers`
+ * — paid-path's check 20 reads its source and asserts the script asks nothing any other way
+ * (`tests/resume-failed-script.test.ts` check 42). One `post(path, body)` owns the sole
+ * `method: 'POST'`; `makeReel` owns the one `/v1/runs` post and `resumeReel` owns the two resume
+ * posts.
  */
 import { readFileSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 import { DatabaseSync } from 'node:sqlite'
 import { estimate, plannedImageCalls } from '@cutroom/pipeline'
-import { DEFAULT_ENV_FILE, loadEnvFile, readSettings, startService } from '@cutroom/service'
+import {
+  DEFAULT_ENV_FILE,
+  cancelRuns,
+  loadEnvFile,
+  readSettings,
+  startService,
+  waitingRuns,
+} from '@cutroom/service'
+import { answers } from './_answers.mjs'
 import { REPO, bold, dim, green, red } from './_lib.mjs'
 
 // ---------------------------------------------------------------- the ceiling, and the request
@@ -254,6 +285,20 @@ if (!Number.isInteger(ceiling) || ceiling < 1 || ceiling > CEILING_CENTS) {
   process.exit(2)
 }
 
+const resumeRunId = flag('resume')
+const remakeArg = flag('remake')
+
+// --remake <kind[:shot],…>  —  comma-separated `kind` or `kind:shot-<n>` pieces
+const remakePieces =
+  remakeArg === undefined
+    ? []
+    : remakeArg.split(',').map((entry) => {
+        const trimmed = entry.trim()
+        const colon = trimmed.indexOf(':')
+        if (colon === -1) return { kind: trimmed }
+        return { kind: trimmed.slice(0, colon), shot: trimmed.slice(colon + 1) }
+      })
+
 // THE ENVIRONMENT, LOADED AND HANDED ON WHOLE. Nothing here looks inside it: the key names are
 // `packages/providers`' business and this file names none (S-109, the twentieth rule's key scan).
 // A variable already exported wins over the file, as `apps/service`'s own program has it.
@@ -288,86 +333,202 @@ const settings = (() => {
   }
 })()
 
-const rows = corners(settings.planSettings)
-const low = rows[0]
-const high = rows[rows.length - 1]
-
-console.log(`\n${bold('one real reel')}\n`)
-console.log(
-  `  image      ${settings.falImageSlug} at ${settings.planSettings.imageRateCents}c a call`,
-)
-console.log(`  video      ${settings.planSettings.videoRateCentsPerSecond}c a second, 768P (D-007)`)
-console.log(`  voice      ${settings.renderSettings.voice}`)
-console.log(`  pictures   ${settings.planSettings.pictures} (S-150)`)
-console.log(
-  `  providers  ${Object.entries(settings.providers)
-    .map(([p, a]) => `${p}=${a}`)
-    .join(' ')}`,
-)
-console.log(`  artifacts  ${settings.artifactRoot}`)
-console.log(`  database   ${settings.dbPath}`)
-console.log(`\n${bold('what it would cost')}  — estimate(), over the shapes Gate 0 admits\n`)
-for (const row of rows) {
-  console.log(
-    `  ${String(row.seconds).padStart(2)} s  ${row.calls} image calls   ${String(row.cents).padStart(4)}c`,
-  )
-}
-console.log(`\n  range      ${low.cents}c to ${high.cents}c`)
-console.log(`  ceiling    ${ceiling}c  — the run is refused at admission above this (D-100)`)
-console.log(
-  `  cap        BUDGET.md's per-reel cap, unchanged and checked before this one (D-014)\n`,
-)
-
-if (high.cents > ceiling) {
-  console.error(
-    `${red('the estimate can exceed the ceiling')}: a legal plan of ${high.seconds} s with ` +
-      `${high.calls} image calls is ${high.cents}c against a ceiling of ${ceiling}c, so a run ` +
-      `could be refused at admission after nothing had been bought. Nothing was submitted.\n`,
-  )
-  process.exit(1)
-}
-
-// ---------------------------------------------------------------- the confirmation
-
-process.stdout.write(`  type ${bold(confirmation(ceiling))} to make it, or anything else to stop: `)
+// ---------------------------------------------------------------- the input, read once
 
 /**
- * The line a person supplies, read the way the shell they are in actually supplies it.
+ * THE INPUT, READ ONCE. A terminal is read with `readline` and a person typing one line must not
+ * be made to signal end-of-file to be heard; a redirected file is read synchronously, because
+ * `createInterface({ input: process.stdin })` over a redirected stream emits `close` before it
+ * ever emits `line` — the line is lost (`tests/_lib.mjs`'s notes, the measured failure of
+ * 2026-09-21). `readFileSync(0)` does not go through the stream and cannot lose the line.
  *
- * **A TERMINAL is read with `readline`**, because a person typing one line must not be made to
- * signal end-of-file to be heard.
- *
- * **ANYTHING ELSE IS READ SYNCHRONOUSLY FROM FD 0**, and the reason is a measurement rather than a
- * preference. Measured here on 2026-09-21: in an ESM script with a top-level `await`,
- * `createInterface({ input: process.stdin })` over a REDIRECTED FILE emits `close` before it ever
- * emits `line` — the line is lost, with no delay and no other reader involved, and the script
- * refuses a confirmation that was given. The same read in a first-tick `node -e` works, which is
- * what made it look like the shell's fault. `readFileSync(0)` does not go through the stream at
- * all, so it cannot lose the line whatever the module graph does.
- *
- * Neither branch weakens what a confirmation IS: the figure, typed, and read only after the
- * estimate above has been computed and printed.
+ * Every answer the script reads is one line of this single read, handed out in source order by
+ * `_answers.mjs`'s `answers(input)`. Paid-path check 20's second test holds no test file may
+ * import `child_process` or a model client — and `_answers.mjs` and its declaration import
+ * nothing, so the file that may name the script cannot be handed a way to start it
+ * (`tests/resume-failed-script.test.ts` check 42).
  */
-const answer = process.stdin.isTTY
+const redirectedInput = process.stdin.isTTY
   ? await new Promise((resolve) => {
+      const lines = []
       const rl = createInterface({ input: process.stdin })
-      rl.once('line', (line) => {
-        rl.close()
-        resolve(line.trim())
+      rl.on('line', (line) => {
+        lines.push(line)
       })
-      rl.once('close', () => resolve(''))
+      rl.on('close', () => resolve(lines.join('\n')))
     })
   : (() => {
       try {
-        return (readFileSync(0, 'utf8').split(/\r?\n/)[0] ?? '').trim()
+        return readFileSync(0, 'utf8')
       } catch {
         return ''
       }
     })()
 
-if (answer !== confirmation(ceiling)) {
-  console.log(`\n${dim('nothing was submitted, and nothing was spent.')}\n`)
-  process.exit(0)
+const line = answers(redirectedInput)
+
+// ---------------------------------------------------------------- waiting runs
+
+/**
+ * BEFORE `startService`, the runs still waiting are read once, through a read-only connection
+ * `@cutroom/service`'s `waitingRuns` opens for this purpose (S-163). A run whose caller asked to
+ * cancel is already flagged, so a follow-up that would otherwise claim it skips it; a run that is
+ * still running for a different reason is named and asked about, because the engine would claim
+ * it as soon as the service starts. The default answer cancels each.
+ */
+const waiting = resumeRunId === undefined ? waitingRuns(settings.dbPath) : []
+if (waiting.length > 0) {
+  console.log(
+    `\n${bold('runs still waiting')}  — the engine would claim each as soon as the service starts\n`,
+  )
+  for (const wait of waiting) {
+    console.log(`  ${wait.runId}`)
+  }
+  process.stdout.write(
+    `\n  type ${bold('leave')} to leave them running, or anything else to cancel them before the service starts: `,
+  )
+  const leaveAnswer = line.next()
+  if (leaveAnswer !== 'leave') {
+    cancelRuns(
+      settings.dbPath,
+      waiting.map((w) => w.runId),
+    )
+    console.log(
+      `  ${green('cancelled')}  ${waiting.length} run${waiting.length === 1 ? '' : 's'}\n`,
+    )
+  } else {
+    console.log(`  ${dim('left as they were')}\n`)
+  }
+}
+
+// ---------------------------------------------------------------- the new-reel confirmation
+
+const rows = corners(settings.planSettings)
+const low = rows[0]
+const high = rows[rows.length - 1]
+
+if (resumeRunId === undefined) {
+  console.log(`\n${bold('one real reel')}\n`)
+  console.log(
+    `  image      ${settings.falImageSlug} at ${settings.planSettings.imageRateCents}c a call`,
+  )
+  console.log(
+    `  video      ${settings.planSettings.videoRateCentsPerSecond}c a second, 768P (D-007)`,
+  )
+  console.log(`  voice      ${settings.renderSettings.voice}`)
+  console.log(`  pictures   ${settings.planSettings.pictures} (S-150)`)
+  console.log(
+    `  providers  ${Object.entries(settings.providers)
+      .map(([p, a]) => `${p}=${a}`)
+      .join(' ')}`,
+  )
+  console.log(`  artifacts  ${settings.artifactRoot}`)
+  console.log(`  database   ${settings.dbPath}`)
+  console.log(`\n${bold('what it would cost')}  — estimate(), over the shapes Gate 0 admits\n`)
+  for (const row of rows) {
+    console.log(
+      `  ${String(row.seconds).padStart(2)} s  ${row.calls} image calls   ${String(row.cents).padStart(4)}c`,
+    )
+  }
+  console.log(`\n  range      ${low.cents}c to ${high.cents}c`)
+  console.log(`  ceiling    ${ceiling}c  — the run is refused at admission above this (D-100)`)
+  console.log(
+    `  cap        BUDGET.md's per-reel cap, unchanged and checked before this one (D-014)\n`,
+  )
+
+  if (high.cents > ceiling) {
+    console.error(
+      `${red('the estimate can exceed the ceiling')}: a legal plan of ${high.seconds} s with ` +
+        `${high.calls} image calls is ${high.cents}c against a ceiling of ${ceiling}c, so a run ` +
+        `could be refused at admission after nothing had been bought. Nothing was submitted.\n`,
+    )
+    process.exit(1)
+  }
+
+  // The NEW-REEL GATE — comparing the ceiling the estimate just printed.
+  process.stdout.write(
+    `  type ${bold(confirmation(ceiling))} to make it, or anything else to stop: `,
+  )
+  const newAnswer = line.next()
+  if (newAnswer !== confirmation(ceiling)) {
+    console.log(`\n${dim('nothing was submitted, and nothing was spent.')}\n`)
+    process.exit(0)
+  }
+}
+
+// ---------------------------------------------------------------- makeReel / resumeReel
+
+/**
+ * The one POST helper. Owning the only `method: 'POST'` is what keeps paid-path check 20 able to
+ * say `method: 'POST'` appears once, inside this body (the helper itself is the method's
+ * definition, so its `confirmed < submitted` rule moves to the reel's own gates).
+ */
+function post(path, body) {
+  return fetch(`${service.baseUrl}${path}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
+/**
+ * `makeReel` submits a new reel. The one `/v1/runs` post.
+ */
+async function makeReel(requestId, ceiling) {
+  const submitted = await post('/v1/runs', request(requestId, ceiling))
+  const accepted = await submitted.json()
+  if (submitted.status !== 202) {
+    throw new Error(`the engine answered ${submitted.status}: ${JSON.stringify(accepted)}`)
+  }
+  return { runId: String(accepted.runId) }
+}
+
+/**
+ * `resumeReel` posts a free preview of a failed run, prints the figures, asks for the printed
+ * figure, and — on the right answer — posts the paid resume. The two `/v1/runs/<id>/resume`
+ * posts. The preview body is the literal `{ contractVersion: 1, preview: true }`; the paid body
+ * has no `preview` key.
+ */
+async function resumeReel(runId, pieces) {
+  // PREVIEW
+  const previewRes = await post(`/v1/runs/${runId}/resume`, { preview: true })
+  const preview = await previewRes.json()
+  if (previewRes.status !== 200) {
+    throw new Error(`the engine answered ${previewRes.status}: ${JSON.stringify(preview)}`)
+  }
+  const figure = Number(preview.estimateCents)
+  console.log(`\n${bold(`resume of ${runId}`)}\n`)
+  console.log(`  estimate   ${preview.estimateCents}c`)
+  console.log(`  spent      ${preview.spentCents}c`)
+  console.log(`  cap        ${preview.capCents}c`)
+  console.log(`  ceiling    ${preview.ceilingCents}c`)
+  if (preview.limit !== undefined) console.log(`  limit      ${preview.limit}`)
+  console.log(`\n${bold('pieces made again')}\n`)
+  if ((preview.remake ?? []).length === 0) {
+    console.log(`  (none named — every piece the run checked is kept)`)
+  } else {
+    for (const piece of preview.remake) {
+      console.log(`  ${piece.kind}${piece.shot === undefined ? '' : ` ${piece.shot}`}`)
+    }
+  }
+  process.stdout.write(
+    `\n  type ${bold(confirmation(figure))} to make it, or anything else to stop: `,
+  )
+  const answer = (line.next() ?? '').trim()
+  if (answer !== confirmation(figure)) {
+    console.log(`\n${dim('nothing was submitted, and nothing was spent.')}\n`)
+    process.exit(0)
+  }
+  // RESUME
+  const resumeRes = await post(`/v1/runs/${runId}/resume`, {
+    contractVersion: 1,
+    ...(pieces.length === 0 ? {} : { remake: pieces }),
+  })
+  const accepted = await resumeRes.json()
+  if (resumeRes.status !== 202) {
+    throw new Error(`the engine answered ${resumeRes.status}: ${JSON.stringify(accepted)}`)
+  }
+  return { runId: String(accepted.runId), resumed: runId }
 }
 
 // ---------------------------------------------------------------- one reel
@@ -376,21 +537,19 @@ const requestId = `real-reel-${new Date().toISOString().replace(/[-:.]/g, '').sl
 const service = await startService(settings)
 const started = Date.now()
 let runId
+let followMessage = ''
 try {
   console.log(`\n  listening  ${service.baseUrl}`)
-  console.log(`  request    ${requestId}\n`)
-
-  const submitted = await fetch(`${service.baseUrl}/v1/runs`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(request(requestId, ceiling)),
-  })
-  const accepted = await submitted.json()
-  if (submitted.status !== 202) {
-    throw new Error(`the engine answered ${submitted.status}: ${JSON.stringify(accepted)}`)
+  if (resumeRunId !== undefined) {
+    console.log(`  resume     ${resumeRunId}\n`)
+    const made = await resumeReel(resumeRunId, remakePieces)
+    runId = made.runId
+    console.log(`  ${green('submitted')}  run ${runId} (resumes ${made.resumed})\n`)
+  } else {
+    const made = await makeReel(requestId, ceiling)
+    runId = made.runId
+    console.log(`  ${green('submitted')}  run ${runId}\n`)
   }
-  runId = accepted.runId
-  console.log(`  ${green('submitted')}  run ${runId}\n`)
 
   // Its events as they arrive, so a run that is going wrong is visible while it is going wrong.
   let since = 0
@@ -409,8 +568,18 @@ try {
       console.log(`  ${dim(`${secs.padStart(7)}s`)}  ${what.trim()}`)
     }
     since = page.nextSince
-    const { state } = await (await fetch(`${service.baseUrl}/v1/runs/${runId}`)).json()
-    if (state === 'finished') break
+    const status = await (await fetch(`${service.baseUrl}/v1/runs/${runId}`)).json()
+    // The engine's resume is the engine's; the script follows the run it names — without that, a
+    // long wait (S-163's fifteen minutes) leaves a person staring at a screen until a run ends
+    // they are not watching (S-110, S-162).
+    if (status.resumedBy !== undefined && status.resumedBy !== runId) {
+      followMessage = `  the engine has resumed ${runId}; following ${status.resumedBy}\n`
+      console.log(`\n${dim(followMessage.trimEnd())}\n`)
+      runId = status.resumedBy
+      since = 0
+      continue
+    }
+    if (status.state === 'finished') break
     await new Promise((resolve) => setTimeout(resolve, 2000))
   }
 
@@ -438,7 +607,7 @@ try {
 const db = new DatabaseSync(settings.dbPath)
 const rowsOf = (sql) => db.prepare(sql).all(runId)
 
-console.log(`${bold('what it spent')}  — this run's own receipts (D-084, S-036)\n`)
+console.log(`${bold('what it spent')}  — the followed run's own receipts (D-084, S-036)\n`)
 
 const kinds = [
   [

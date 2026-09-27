@@ -1,4 +1,5 @@
 export { loadEnvFile } from './env-file.ts'
+export { cancelRuns, waitingRuns, type WaitingRun } from './waiting-runs.ts'
 export { resumeService, startService, type Service } from './service.ts'
 export {
   CLIPS_A_JOB,

@@ -1027,7 +1027,7 @@ touches gains its amendment block in that slice.
       `resumeDelayMs`. Amendment blocks: `paid-path`, `reel-plan` (`finishRun`, the plan job), `reel-stills`
       (`finishStills`, the keyframes job), `reel-render` and `reel-takes` (`finishVideo`, the clips and assemble jobs,
       the contexts in `worker.ts`). **Proves: 35 to 40.**
-- [ ] **Slice 6 — the owner's script.** One `post()`; `makeReel` and `resumeReel`; `--resume`, `--remake`, the preview,
+- [x] **Slice 6 — the owner's script.** One `post()`; `makeReel` and `resumeReel`; `--resume`, `--remake`, the preview,
       the confirmation and the follow; the start's question on waiting runs, through `@cutroom/service`'s
       `waitingRuns` and `cancelRuns`; input read once; the amended check 20 of `paid-path`.
       Amendment block: `paid-path`. **Proves: 41, 42, 43.**

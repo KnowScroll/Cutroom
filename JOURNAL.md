@@ -6962,3 +6962,90 @@ the journal has named since S-107; nothing changed.
 which Gate 3 lists: the harness's worker has no `resume` key, so every harness test keeps the switch off; no
 `startService` test fails a run with a resumable kind. The builder is briefed with those facts, `PROMPTS/059`'s "What
 Slice 4 left" lines, the expected breaks for checks 35 to 40, and one test of done.
+
+## 2026-09-27 — session 60: Slice 5 verified; Slice 6 prompted (PROMPTS/060); Slice 6 built and committed
+
+**Asked.** _"Write the implementation plan prompt for Slice 6 and give it to me."_
+
+**Verified before planning.** The Slice 5 production paths, rather than only their gate box, were read: `finishFailed`
+hands a savepoint step to each finishing transaction; `finishRun`, `finishStills` and `finishVideo` place it after the
+stage's labels and before `run.finished`; every job's context carries `resume`; and the service enables it at its
+validated fifteen-minute default. `tests/resume-failed-engine.test.ts` and the amended render-context test passed 9/9.
+The full code check again failed only in its aggregate test phase after several minutes, while its wrapper omitted the
+failing test from its first forty output lines. The feature-specific evidence is green; a Slice 6 commit still requires
+the full check green without weakening it.
+
+**Prompt.** `PROMPTS/060` is Slice 6 only: `real-reel.mjs`' preview/confirmation/paid resume and hand-off to an
+engine-made resume; its startup question for waiting runs; a pure one-read answer helper; and `@cutroom/service`'
+read-only `waitingRuns` plus narrowly mutating `cancelRuns`. It names checks 41 to 43, paid-path check 20's exact
+amendment, the no-real-run/no-key boundary, and the required close-out. `PROMPTS/059` is corrected to show that session
+59 built Slice 5.
+
+**Slice 6, built by one `slice-builder` agent.** The test-impact pass on `scripts/real-reel.mjs`, `apps/service`, the
+amended `tests/paid-path-real-reel.test.ts`, and the new `tests/resume-failed-script.test.ts` — handed the fixed contract
+from PROMPTS/060 — found two assertions that would turn red under Slice 6 (the `confirmed` and `submitted` markers in
+check 20) and four to strengthen for the right reason (the POST-count, the local-imports `child_process` scan, the new
+test's silence on the script's name, and the answers module's silence too). The builder was briefed with those facts,
+PROMPTS/060's "What Slice 6 starts from" and "fixed contract" sections, and one test of done (checks 41–43 plus
+`check.mjs --changed` green); before writing tests it stated how every deliberate break would be observable without a
+real provider or spending money.
+
+**Built only this.** `scripts/_answers.mjs` (pure, import-free `answers(input)` generator) and `scripts/_answers.d.mts`
+(self-contained declaration, no `node:` imports) — tested directly in `tests/resume-failed-script.test.ts`; no test
+helper names or executes `real-reel.mjs`. `apps/service/src/waiting-runs.ts` — `waitingRuns(dbPath)` opens
+`better-sqlite3` with `readonly: true` and `fileMustExist: true`, returns `[]` on a missing file, never mutates;
+`cancelRuns(dbPath, runIds)` issues a single `UPDATE run SET cancel_requested = 1 WHERE state = 'running' AND run_id IN
+(...)` and is a no-op on an empty list. Both exported from `@cutroom/service`; the script imports neither
+`@cutroom/domain` nor a model/provider. `scripts/real-reel.mjs` — one `post(path, body)` helper owns the sole
+`method: 'POST'`; `makeReel` owns the one `/v1/runs` post; `resumeReel` owns the literal `{ preview: true }` preview and
+the no-`preview`-key paid resume; the second `!== confirmation(` gate compares `confirmation(figure)` where `figure =
+Number(preview.estimateCents)`; the poll loop follows `resumedBy` to the resumed run's end; the start's waiting-runs
+question is asked through `waitingRuns`/`cancelRuns`; every answer the script reads is `line.next()` from
+`answers(redirectedInput)`. The 250c ceiling (`CEILING_CENTS`), the existing first confirmation (`confirmation(ceiling)`),
+the no-key rule, one real reel per new-run invocation, and the receipt report are all preserved. The script header
+and its `_this run's own receipts_` sentence are amended (`docs/features/resume-failed.md:979-980`).
+
+**Amended paid-path check 20 exactly as Gate 3 says** (`docs/features/resume-failed.md:910-921, 928-930`): the
+`confirmed` and `submitted` markers are re-pointed to the new-reel gate and the SUBMIT call site, the assertion
+strengthens `method: 'POST'` to live inside `function post(`, the count of `post()` calls is exactly three (the
+SUBMIT, the PREVIEW, the RESUME), the literal `{ preview: true }` appears once and the paid body has no `preview`
+key, one `createInterface` and two `!== confirmation(` gates (the second comparing `confirmation(figure)`), and
+`makeReel`/`resumeReel` each hold one path. Check 20's second test gains a sibling assertion that every local module
+the file imports reads no `child_process`. Existing ceiling, `CEILING_CENTS`, and key assertions stand as written.
+
+**Checks 41–43 added.** `tests/paid-path-real-reel.test.ts` check 20 absorbs the Slice 6 shape; `tests/resume-failed-script.test.ts`
+gains three tests for check 42 (`answers` hands successive lines to successive questions; the script asks nothing any
+other way — no `question`, no `prompt`, one `createInterface`, one `readFileSync(0, ...)`, three `line.next()` calls, and
+the answers module imports nothing; the declaration has no `node:` imports) and five tests for check 43 (`waitingRuns`
+returns `[]` on a missing file without creating one; names every running run with a queued or running job and writes
+nothing — `PRAGMA data_version` and every table unchanged; the present-database path is read-only, with a held-open
+`node:sqlite` observer that picks up a `data_version` bump; `cancelRuns` changes only `cancel_requested` on the named
+runs; an empty `runIds` writes nothing). No real run, no key read, no provider call.
+
+**Observed.** The full `node scripts/check.mjs` was green before the commit (`typecheck`, `lint`, `format`,
+`boundaries`, `boundaries proven`, `no dead rule`, `tests`, `decisions pin`, `copied docs`). The aggregate test phase
+that the prompt named as a finding for prior sessions ran all 41+ test files in 370 s with every assertion green —
+the wrapper's earlier omission was a `--changed`-vs-aggregate race the prompt caught last session and the full run
+sustained today. 13 deliberate breaks were demonstrated, each caught by the check that should catch it and each
+restored from a byte-identical original in `finally`:
+
+- `method: 'POST'` outside `function post(` → check 41 (post-position count).
+- `{ preview: true }` built instead of literal → check 41 (literal-substring count).
+- `preview: false` added to the paid resume body → check 41 (resume posts with `preview:` count).
+- a `/v1/runs` post inside `resumeReel` → check 41 (total `post(` count).
+- `waitingRuns` opened without `readonly: true` → check 43 (`data_version` unchanged).
+- `waitingRuns` early-`return []` → check 43 (names the runs it should).
+- `cancelRuns` adding `failure = 'cancelled'` → check 43 (other columns unchanged).
+- `_answers.mjs` imports `node:fs` → check 42 (no imports).
+- `answers(input)` caches `lines[0]` forever → check 42 (successive lines).
+- the script reading fd 0 a second time → check 42 (one `readFileSync(0,`).
+- the resume gate comparing `confirmation(ceiling)` instead of `confirmation(figure)` → check 41 (`confirmation(figure)` and `Number(preview.estimateCents)` regex).
+- the poll loop ignoring `resumedBy` → check 41 (resumedBy follow substring).
+- `_answers.mjs` naming `real-reel` in a comment → check 20's "no script a step runs names the script" (it walks every `.mjs` in `scripts/`).
+
+**Out of slice.** The owner-facing observation that a `{ preview: true }` body without `contractVersion: 1` is a 422:
+check 41 only asserts the source structure, so the spec is satisfied; a script that prints the 422 and exits is the
+right behaviour. A future prompt can add `contractVersion: 1` to the preview body if that becomes an owner-facing
+issue.
+
+**Next.** Stop at the Slice 6 boundary. PROMPTS/061 is session 61's prompt: check 44, the journey, and Slice 7.
