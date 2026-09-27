@@ -94,6 +94,24 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-09-27 · session 59
+
+- Slice 4, the call (`7315af0`) — built by session 58, which left it uncommitted and wrote no entry here; read, checked
+  and committed this session. `packages/reel-contract/src/resume.ts` — `Piece`, `ResumeRequest`, `ResumeResponse`;
+  `POST /v1/runs/:runId/resume` (`routes.ts`, `apps/api/src/server.ts`, handed `ResumeService` and `budgetPath`, both
+  optional); `RunStatus.resumes`/`resumedBy`, the record's `keptFrom`; lookup and replay answer the newest run
+  (`domain/src/runs.ts`); `resumeService(...)` (`apps/service/src/service.ts`); `appendResumeQuestion`
+  (`apps/worker/src/questions.ts`); S-171's stop by `copiedPictures` (`pictures.ts`, `stills/index.ts`); the stand-in
+  engine and client. `tests/resume-failed-contract.test.ts`, checks 26 to 34.
+- Slice 5, the engine's own resume: `finishRun`/`finishStills`/`finishVideo` take an optional `resume(tx, now)`, run
+  after the labels in `SAVEPOINT resume`, before `endRun` (`domain/src/runs.ts`, `ResumeStep`, `ResumeStepped`);
+  `apps/worker/src/resume.ts` — `ResumeContext`, `finishFailed`, `resumeRates`; every job's failed stage ending through
+  `finishFailed`; `WorkerOptions.resume`, off by default; `appendResumeUnmade` (`questions.ts`); the service's switch
+  and `CUTROOM_RESUME_DELAY_MS`, 900000 (`apps/service/src/settings.ts`, `service.ts`); `EngineOptions.resume`
+  (`tests/engine/harness.ts`). `tests/resume-failed-engine.test.ts`, checks 35 to 40; `reel-render` check 40 amended.
+- `DECISIONS.md` — **S-174**: every job context's `resume` key required, `ResumeContext | undefined`; one rates
+  mapping, `resumeRates`, exported from `@cutroom/worker` and used by the service.
+
 ### 2026-09-26 · session 57
 
 - Slice 3, the resume made by a test (`395dc40`): `packages/contracts/src/resume.ts` — the resume's shapes, `Piece`

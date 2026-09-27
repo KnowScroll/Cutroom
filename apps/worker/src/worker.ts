@@ -35,6 +35,7 @@ import { runKeyframesJob, type KeyframesJobContext } from './keyframes-job.ts'
 import { retryingModelPort } from './model-port.ts'
 import { runPlanJob, type PlanJobContext } from './plan-job.ts'
 import { QUESTIONS_MD } from './questions.ts'
+import type { ResumeContext } from './resume.ts'
 
 // The runner's loop: claim a due job, run it, and poll again (D-002). Jobs are run one at a time.
 // Every kind of the chain is claimed by the one worker, oldest row first, so a reel's job is always
@@ -98,6 +99,13 @@ export interface WorkerOptions {
   media: MediaPort
   /** The only way the worker assembles a video (S-073), made ready the same way. */
   assembler: AssemblerPort
+  /**
+   * The engine's own resume of a run a provider's fault fails (docs/features/resume-failed.md; S-163):
+   * made in the transaction that fails the run, due `delayMs` after it. ABSENT IS OFF — the worker's
+   * own default is no resume at all, so every test that does not ask for one still proves that a
+   * provider's fault fails a run. The service turns it on, fifteen minutes on.
+   */
+  resume?: { delayMs: number }
 }
 
 /**
@@ -180,11 +188,20 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
   const pollMs = options.pollMs ?? 500
   const leaseMs = options.leaseMs ?? DEFAULT_LEASE_MS
   const settings = options.settings ?? DEFAULT_PLAN_SETTINGS
+  const budgetPath = options.budgetPath ?? BUDGET_MD
+  const questionsPath = options.questionsPath ?? QUESTIONS_MD
+  // The engine's own resume: ONE key on every job's context, written even when off, so each job fails
+  // a run the same way and a check reading a context's keys sees it (S-163). Off unless asked for.
+  const resume: ResumeContext | undefined =
+    options.resume === undefined
+      ? undefined
+      : { delayMs: options.resume.delayMs, settings, render, budgetPath, questionsPath }
   const context: PlanJobContext = {
     model,
     settings,
-    budgetPath: options.budgetPath ?? BUDGET_MD,
-    questionsPath: options.questionsPath ?? QUESTIONS_MD,
+    budgetPath,
+    questionsPath,
+    resume,
   }
   const keyframes: KeyframesJobContext = {
     model,
@@ -192,8 +209,9 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     sensors: options.sensors,
     settings,
     stills,
-    budgetPath: context.budgetPath,
-    questionsPath: context.questionsPath,
+    budgetPath,
+    questionsPath,
+    resume,
   }
   const clips: ClipsJobContext = {
     model,
@@ -202,15 +220,19 @@ export async function startWorker(options: WorkerOptions): Promise<Worker> {
     media: options.media,
     settings,
     render,
-    budgetPath: context.budgetPath,
-    questionsPath: context.questionsPath,
+    budgetPath,
+    questionsPath,
+    resume,
   }
-  // No image, narration or video port: nothing can be bought once assembly begins (I-18, S-069).
+  // No image, narration or video port: nothing can be bought once assembly begins (I-18, S-069). Its
+  // resume carries settings and two files, never a port: a Gate 7 failure resumed is a new run, which
+  // buys only before its own first assembly (I-18 read per run, S-161, S-163).
   const assemble: AssembleJobContext = {
     model,
     media: options.media,
     assembler: options.assembler,
     render,
+    resume,
   }
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | undefined

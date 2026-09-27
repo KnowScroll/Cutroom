@@ -7556,3 +7556,35 @@ orchestrator's concern (D-098). **S-168**'s order gains `cutroom-sdk` between `r
 resume-failed"_.
 
 ---
+
+## S-174 | 2026-09-27 | Every job context's `resume` key is required, typed `ResumeContext | undefined`; and a resume's rates are mapped from settings in one place, the worker's `resumeRates`
+
+**Chose.** The owner, 2026-09-27, on two things `resume-failed`'s Slice 5 builder reported that the gates do not
+settle. **Every job context — plan, keyframes, clips, assemble — declares `resume: ResumeContext | undefined`**, a key
+each is written with, `undefined` meaning off, in place of Gate 2's `resume?: ResumeContext`. **And the three rates a
+resume is priced at are mapped from the plan and render settings once**, by `resumeRates(settings, render)` in
+`apps/worker/src/resume.ts`, exported from `@cutroom/worker`: the engine's own resume prices with it, and the service's
+`resumeService` builds its `decide` with it.
+
+**Why.** `reel-render`'s check 40, which Gate 3 says stands but for one key, maps the assemble context's keys to the
+ports that buy (`Bought`), and a homomorphic mapped type keeps a key's `?`, so an optional key maps to `undefined`, not
+`never` — Gate 2's spelling turns that half red. One spelling on all four contexts is what Gate 2's _"one key on every
+job's context, written even when off"_ means; `worker.ts` is the only place a context is built. And Gate 2's _"the
+preview, the call and the engine's resume are one planner and one rule"_ is only true if the rates they are handed are
+one mapping: two copies can drift, and a caller's preview would then promise a figure the engine's resume does not
+compare.
+
+**Rejected.** **Required on the assemble context only** (the builder's diff) — two spellings of one key, for no check's
+sake. **`-?` in check 40's mapped type** — edits a verified check's standing half. **The mapping written twice**, in the
+worker and the service — checks 34 and 37 each pin their own side, so a drift between the two would stay green.
+
+**Supersedes:** nothing decided; it settles Gate 2's spelling of the key (`resume-failed.md`, "Every job's context gains
+ONE key") and where the rates mapping lives.
+
+**Caught by.** The compiler: a context literal without `resume` does not typecheck, and check 40's `keys` and `Bought`
+halves read the assemble context. The service builds its rates only through `resumeRates` — the import is the check a
+reviewer reads; no test compares two mappings, because there is one.
+
+**Confirmed-by.** The owner, 2026-09-27, session 59: _"All four required"_ and _"One, exported from worker"_.
+
+---

@@ -206,6 +206,12 @@ export interface EngineOptions {
   wrapMedia?: (media: MediaPort) => MediaPort
   /** Wraps the assembler the worker is handed — how a test changes the file an assembly leaves. */
   wrapAssembler?: (assembler: AssemblerPort) => AssemblerPort
+  /**
+   * The engine's own resume, switched on for every worker this engine starts in this process, due
+   * `delayMs` after a failure (resume-failed, S-163). Absent: off, the worker's own default — as every
+   * verified test runs. A worker spawned in a process of its own never has it: it is killed.
+   */
+  resume?: { delayMs: number }
 }
 
 export async function startEngine(options: EngineOptions): Promise<Engine> {
@@ -275,6 +281,7 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
         questionsPath,
         ...(budgetPath === undefined ? {} : { budgetPath }),
         ...(options.stillsSettings === undefined ? {} : { stillsSettings: options.stillsSettings }),
+        ...(options.resume === undefined ? {} : { resume: options.resume }),
       })
       return worker
     },

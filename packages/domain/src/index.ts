@@ -50,6 +50,8 @@ export {
   type HeldShot,
   type PlanRow,
   type RenderEnding,
+  type ResumeStep,
+  type ResumeStepped,
   type RunEnding,
   type Stage,
   type StoredRun,

@@ -26,6 +26,7 @@ import {
 import { cutReel, renderManifest, shotIdOf } from '@cutroom/pipeline'
 import { CONTRACT_VERSION, type RunResult } from '@cutroom/reel-contract'
 import { recordingPort } from './recording-port.ts'
+import { finishFailed, type FailedEnding, type ResumeContext } from './resume.ts'
 
 // The `reel.assemble` job (docs/features/reel-render.md, Gate 2 "The chain", "The render manifest",
 // "How a video run ends" and "Cancel, and a restart"): the chain's fourth and last row, created only
@@ -35,7 +36,8 @@ import { recordingPort } from './recording-port.ts'
 // `cutReel`: the one pass, the output measured, the frame strip and Gate 7 (S-073, S-074).
 //
 // IT IS HANDED NO IMAGE, NARRATION OR VIDEO PORT: nothing can be bought once assembly begins, because
-// the job that assembles holds no port that buys, and no job follows it (I-18).
+// the job that assembles holds no port that buys, and no job of its run follows it (I-18, read per
+// run: the engine's resume of a run it fails is a new run, S-161, S-163).
 
 export interface AssembleJobContext {
   /** The ports the worker was handed; it never constructs one (S-021, S-075). */
@@ -43,6 +45,13 @@ export interface AssembleJobContext {
   media: MediaPort
   assembler: AssemblerPort
   render: RenderSettings
+  /**
+   * The engine's own resume of a run this job fails; `undefined` is off (S-163). It carries the
+   * settings the resume is priced at, the cap file and the questions file — never a port. A key every
+   * context is written with, never an optional one (S-174): reel-render's check 40 maps this context's
+   * keys to the ports that buy, and an optional key maps to `undefined` rather than to nothing.
+   */
+  resume: ResumeContext | undefined
 }
 
 const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
@@ -194,11 +203,10 @@ export async function runAssembleJob(
     return
   }
 
-  finishVideo(db, {
-    runId,
-    jobId: job.id,
-    render,
-    events,
+  // Failed: with the switch on, a provider's fault — Gate 7's judge unavailable, or its answer
+  // unreadable — is resumed in the same transaction, after the render's labels (resume.ts; S-163). The
+  // resume is a new run, which buys only before its own first assembly (I-18, read per run).
+  const failed: FailedEnding = {
     result: {
       ...finished,
       costCents,
@@ -206,5 +214,8 @@ export async function runAssembleJob(
       detail: outcome.kind === 'failed' ? outcome.detail : 'the cut completed with no file',
     },
     failure: outcome.kind === 'failed' ? outcome.failure : 'engine',
-  })
+  }
+  finishFailed(context.resume, runId, failed, (resume) =>
+    finishVideo(db, { runId, jobId: job.id, render, events, ...failed, resume }),
+  )
 }

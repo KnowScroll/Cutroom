@@ -7,10 +7,12 @@ import type { ResumeQuestion } from '@cutroom/domain'
 // Gate 2 "Spending"; docs/features/resume-failed.md, Gate 2 "How a resume is planned, admitted and
 // made"; D-014, D-097, D-100). The engine writes one only when its own per-reel cap refuses a run,
 // stops one, or refuses a resume — a refusal or a stop at the caller's ceiling is returned, not
-// written — and only to its own file. The worker appends the first two; a caller's resume refused at
-// the cap is appended through the service the API is handed, which binds this file's writer to the
-// worker's own path (S-162). The entry's form, and why it is appended after the run is finished, are
-// S-026; a stop's entry is S-035's, and a stop in the clips stage names the call it refused (S-087).
+// written — and only to its own file. The worker appends the first two, and the engine's own resume
+// refused at the cap; a caller's resume refused at the cap is appended through the service the API is
+// handed, which binds this file's writer to the worker's own path (S-162). The entry's form, and why
+// it is appended after the run is finished, are S-026; a stop's entry is S-035's, and a stop in the
+// clips stage names the call it refused (S-087). One more thing is written here that no cap wrote: a
+// line naming a failed run whose engine's resume could not be made, and why (S-163).
 
 /** The default questions file: `QUESTIONS.md` at this repository's root (D-097). A setting. */
 export const QUESTIONS_MD = fileURLToPath(new URL('../../../QUESTIONS.md', import.meta.url))
@@ -18,8 +20,9 @@ export const QUESTIONS_MD = fileURLToPath(new URL('../../../QUESTIONS.md', impor
 const HEADER = [
   '# Questions from the engine',
   '',
-  'Appended by the engine when its per-reel cap refuses a run, stops one or refuses a resume (D-014, D-097, D-100).',
-  'One entry per refusal, newest at the bottom. Nothing here is read back by the engine.',
+  'Appended by the engine when its per-reel cap refuses a run, stops one or refuses a resume (D-014, D-097, D-100),',
+  'and when its own resume of a failed run could not be made (S-163). One entry per refusal and one line per resume',
+  'not made, newest at the bottom. Nothing here is read back by the engine.',
   '',
 ].join('\n')
 
@@ -185,11 +188,12 @@ export function appendClipsStopQuestion(
 }
 
 /**
- * Appends one entry for a resume refused at the per-reel cap — a caller's call now, and the engine's
- * own resume once it asks — in S-026's form under a heading of its own (D-097, D-100, S-162): the
- * failed run and its request, who asked, the pieces named, the resume's estimate beside what the reel
- * spent and the figure compared, both limits and the rates it was priced at. The file, with its
- * header, is created on the first write. A preview, and a refusal at the ceiling, are never written.
+ * Appends one entry for a resume refused at the per-reel cap — a caller's call, or the engine's own
+ * resume after the transaction that failed the run — in S-026's form under a heading of its own
+ * (D-097, D-100, S-162, S-163): the failed run and its request, who asked, the pieces named — none for
+ * the engine's — the resume's estimate beside what the reel spent and the figure compared, both limits
+ * and the rates it was priced at. The file, with its header, is created on the first write. A preview,
+ * and a refusal at the ceiling, are never written.
  */
 export function appendResumeQuestion(
   path: string,
@@ -219,4 +223,26 @@ export function appendResumeQuestion(
     '',
   ].join('\n')
   appendFileSync(path, entry)
+}
+
+/**
+ * Appends ONE LINE for the engine's own resume that could not be made (docs/features/resume-failed.md,
+ * Gate 2 "How a resume is planned, admitted and made"; S-163): the failed run, and why — the reason
+ * its savepoint was rolled back for, a cap file that could not be read among them. No cap wrote it and
+ * it asks nothing: the run failed as it would have without the resume, and this is where the owner
+ * finds that no resume followed. The file, with its header, is created on the first write.
+ */
+export function appendResumeUnmade(
+  path: string,
+  runId: string,
+  why: string,
+  now: Date = new Date(),
+): void {
+  ensureFile(path)
+  // One line, whatever the reason's own line breaks.
+  const reason = why.replace(/\s+/g, ' ').trim()
+  appendFileSync(
+    path,
+    `\n## ${now.toISOString()} — run ${runId} not resumed: the engine's resume could not be made: ${reason}\n`,
+  )
 }

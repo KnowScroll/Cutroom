@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import type { AddressInfo } from 'node:net'
 import { dirname } from 'node:path'
 import { startApi, type Api } from '@cutroom/api'
-import type { PlanSettings, RenderSettings, ResumeRates } from '@cutroom/contracts'
+import type { PlanSettings, RenderSettings } from '@cutroom/contracts'
 import { closeDatabase, openDatabase, type ResumeService } from '@cutroom/domain'
 import { DEFAULT_PLAN_SETTINGS, admitResume, planResume } from '@cutroom/pipeline'
 import {
@@ -17,7 +17,7 @@ import {
   type PortOptions,
   type StandInScripts,
 } from '@cutroom/providers'
-import { appendResumeQuestion, startWorker, type Worker } from '@cutroom/worker'
+import { appendResumeQuestion, resumeRates, startWorker, type Worker } from '@cutroom/worker'
 import type { ServiceSettings } from './settings.ts'
 
 // THE COMPOSITION ROOT (docs/features/paid-path.md, Gate 2). `startApi` and `startWorker` are
@@ -30,7 +30,7 @@ import type { ServiceSettings } from './settings.ts'
 // a stage or a runner from reaching for an adapter that spends (S-021, S-038). Nothing imports
 // this app, and it holds no pipeline logic: it names adapters and hands them over — and binds the
 // resume's planner to the worker's own settings and questions file for the API, which may import
-// neither the pipeline nor the worker (S-162).
+// neither the pipeline nor the worker (S-162), and turns the worker's own resume on (S-163).
 
 export interface Service {
   baseUrl: string
@@ -55,11 +55,8 @@ export function resumeService(options: {
   renderSettings: RenderSettings
   questionsPath: string
 }): ResumeService {
-  const rates: ResumeRates = {
-    imageRateCents: options.planSettings.imageRateCents,
-    videoRateCentsPerSecond: options.planSettings.videoRateCentsPerSecond,
-    narrationRateCentsPerCharacter: options.renderSettings.narrationRateCentsPerCharacter,
-  }
+  // The worker's own mapping, so a caller's resume and the engine's are priced alike (S-174).
+  const rates = resumeRates(options.planSettings, options.renderSettings)
   return {
     decide(inputs, remake, capCents) {
       const planned = planResume(inputs, remake, rates, 'caller')
@@ -177,6 +174,10 @@ export async function startService(settings: ServiceSettings): Promise<Service> 
       // D-008): a real run names it, and the default is the `'stand-in'` every verified feature
       // runs on (S-128).
       renderSettings: settings.renderSettings,
+      // THE ENGINE'S OWN RESUME IS ON HERE, and off in the worker's own default (S-163, in S-153's
+      // form): a run a provider's fault fails is resumed once, in the transaction that fails it, due
+      // `resumeDelayMs` after the failure — fifteen minutes unless the setting says otherwise.
+      resume: { delayMs: settings.resumeDelayMs },
       ...ports,
     })
   } catch (error) {

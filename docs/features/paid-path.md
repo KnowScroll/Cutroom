@@ -26,6 +26,18 @@ Supersedes, through the entries it rests on: D-005 for this engine's model layer
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
 Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
+> **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
+> (**S-163**, in **S-153**'s form). **The service turns the engine's own resume on; the worker's default stays off.**
+> `startService` hands `startWorker` `resume: { delayMs: settings.resumeDelayMs }` (`apps/service/src/service.ts`), and
+> `readSettings` reads **`CUTROOM_RESUME_DELAY_MS`** — `SETTING_NAMES.resumeDelayMs` — as 900000 ms, fifteen minutes,
+> when absent, refusing anything but a whole number of at least 0 before anything is built
+> (`apps/service/src/settings.ts`, `DEFAULT_RESUME_DELAY_MS`). A run a provider's fault fails in the service is resumed
+> once, in the transaction that fails it, due that long after its `run.finished`; one over the per-reel cap asks the
+> owner, one that could not be made is one line in the questions file (`resume-failed` check 39). `resumeService`
+> prices a caller's resume with the worker's `resumeRates`, the one mapping the engine's own resume prices with
+> (S-174). No verified `startService` test fails a run with a resumable kind, so none sees a resume; no port, other
+> setting or banner line changes.
+>
 > **Amended on 2026-09-23 by S-155 — no gate below is edited.** fal's video rate is **0.5¢ a second** in the real
 > adapter (`H3_TURBO.rateCentsPerSecond`), at least 16× the most fal billed a second of clip (S-154); the pipeline's
 > default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its

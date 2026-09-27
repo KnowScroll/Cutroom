@@ -32,6 +32,16 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
+> (**S-163**, **S-164**). **`finishStills` takes the engine's own resume**, run after `endStills` — the chosen flags,
+> every degraded shot's labels and the stage's events — and before `run.finished`, in a savepoint
+> (`packages/domain/src/runs.ts`): so a picture the resume copies carries the degradation the failing attempt just
+> wrote, and the resumed run keeps that shot degraded with its reason and no image call, whatever its reserve now holds
+> (`resume-failed` check 40). **The keyframes job's failed ending goes through `finishFailed`**
+> (`apps/worker/src/resume.ts`), and `KeyframesJobContext` gains the one key `resume`; its stopped and completed endings
+> do not change. With the switch off — the worker's default, and every verified test — every stills ending reads as
+> it did.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
 > (**S-162**, **S-171**, superseding **D-047** steps 1 and 3 for one case). **A resumed run's canonical with no reserve
 > slot for its repair stops; it does not fail.** `readStillsInputs` answers `{ kept, copiedPictures }` —

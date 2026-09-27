@@ -10,6 +10,15 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
+> (**S-098**, **S-163**). **A clips job's failed ending writes its still-holds' labels, then the engine's own resume,
+> then `run.finished`** (`finishVideo`, `packages/domain/src/runs.ts`), in one transaction: a resume copies each
+> decided take as that transaction left it — its degradation reset on the copy, as every copy's is — and its resumed run
+> holds the shot again from its kept takes with no call (`resume-failed` check 22). **The clips job's failed ending goes
+> through `finishFailed`** (`apps/worker/src/resume.ts`), and `ClipsJobContext` gains the one key `resume`, written by
+> `worker.ts` even when off. With the switch off — the worker's default, and every verified test — every clips ending
+> reads as it did.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
 > (**S-093**, **S-162**). **The record's takes carry `keptFrom`** (`readRecord`, `packages/domain/src/pictures.ts`): a
 > take copied into a resumed run names the run it came from, and a take the run made carries none — the key absent,

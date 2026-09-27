@@ -28,6 +28,7 @@ import {
 import { CONTRACT_VERSION, type SubmitRequest } from '@cutroom/reel-contract'
 import { appendBudgetQuestion } from './questions.ts'
 import { recordingPort } from './recording-port.ts'
+import { finishFailed, type FailedEnding, type ResumeContext } from './resume.ts'
 
 // The `reel.plan` job (docs/features/reel-plan.md, Gate 2 "How a run goes"). It reads the cap once,
 // runs `planReel` against a port that records every receipt, and finishes the run in one transaction
@@ -41,6 +42,11 @@ export interface PlanJobContext {
   budgetPath: string
   /** The questions file a per-reel cap refusal is appended to (D-097, D-100). */
   questionsPath: string
+  /**
+   * The engine's own resume of a run this job fails; `undefined` is off (S-163). A key every context is
+   * written with, never an optional one (S-174).
+   */
+  resume: ResumeContext | undefined
 }
 
 interface Planned {
@@ -120,13 +126,16 @@ export async function runPlanJob(db: Db, job: ClaimedJob, context: PlanJobContex
     // A thrown call or a refused answer is a fault: the run fails with why, and every receipt of a
     // call that returned is already written. The plan stage has no catch of its own, so its kind is
     // decided here, from the thrown thing's class (S-163) — a cap that cannot be read is `engine`.
+    // With the switch on, a provider's fault is resumed in the same transaction: planned again,
+    // keeping nothing (resume.ts).
     const detail = error instanceof Error ? error.message : String(error)
-    finishRun(db, {
-      runId,
-      jobId: job.id,
+    const ending: FailedEnding = {
       result: { ...finished, status: 'failed', detail },
       failure: failureKindOf(error),
-    })
+    }
+    finishFailed(context.resume, runId, ending, (resume) =>
+      finishRun(db, { runId, jobId: job.id, ...ending, resume }),
+    )
     return
   }
   const { request, capCents, outcome } = planned

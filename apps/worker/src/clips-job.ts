@@ -28,6 +28,7 @@ import { refusalRecorder } from './refusal-recorder.ts'
 import { guardedNarrationPort } from './narration-port.ts'
 import { appendClipsStopQuestion } from './questions.ts'
 import { recordingPort } from './recording-port.ts'
+import { finishFailed, type FailedEnding, type ResumeContext } from './resume.ts'
 import { guardedVideoPort, validatingVideoPort, type ClipsLimits } from './video-port.ts'
 
 // The `reel.clips` job (docs/features/reel-render.md, Gate 2 "The chain", "How a video run ends" and
@@ -51,6 +52,11 @@ export interface ClipsJobContext {
   budgetPath: string
   /** The questions file a stop at the per-reel cap is appended to (D-097, D-100). */
   questionsPath: string
+  /**
+   * The engine's own resume of a run this job fails; `undefined` is off (S-163). A key every context is
+   * written with, never an optional one (S-174).
+   */
+  resume: ResumeContext | undefined
 }
 
 export async function runClipsJob(
@@ -210,8 +216,20 @@ export async function runClipsJob(
     return
   }
 
-  ended({
+  // Failed: with the switch on, a provider's fault is resumed in the same transaction, after the held
+  // shots' labels (resume.ts; S-163).
+  const failed: FailedEnding = {
     result: { ...finished, costCents, status: 'failed', detail: outcome.detail },
     failure: outcome.failure,
-  })
+  }
+  finishFailed(context.resume, runId, failed, (resume) =>
+    finishVideo(db, {
+      runId,
+      jobId: job.id,
+      events: outcome.events,
+      stillHolds,
+      ...failed,
+      resume,
+    }),
+  )
 }

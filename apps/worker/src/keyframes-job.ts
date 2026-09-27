@@ -29,6 +29,7 @@ import { appendBudgetStopQuestion } from './questions.ts'
 import { stillsRecorder } from './recorder.ts'
 import { refusalRecorder } from './refusal-recorder.ts'
 import { recordingPort } from './recording-port.ts'
+import { finishFailed, type FailedEnding, type ResumeContext } from './resume.ts'
 
 // The `reel.keyframes` job (docs/features/reel-stills.md, Gate 2 "How a run goes" and "How a stills
 // run ends"): the chain's second row, created only for an admitted `stills` or `video` run (D-081,
@@ -50,6 +51,11 @@ export interface KeyframesJobContext {
   budgetPath: string
   /** The questions file a stop at the per-reel cap is appended to (D-097, D-100). */
   questionsPath: string
+  /**
+   * The engine's own resume of a run this job fails; `undefined` is off (S-163). A key every context is
+   * written with, never an optional one (S-174).
+   */
+  resume: ResumeContext | undefined
 }
 
 /**
@@ -241,8 +247,20 @@ export async function runKeyframesJob(
     return
   }
 
-  ended({
+  // Failed: with the switch on, a provider's fault is resumed in the same transaction, after the
+  // degradations are labelled, so a picture it copies carries its shot's (resume.ts; S-163, S-164).
+  const failed: FailedEnding = {
     result: { ...finished, costCents, status: 'failed', detail: outcome.detail },
     failure: outcome.failure,
-  })
+  }
+  finishFailed(context.resume, runId, failed, (resume) =>
+    finishStills(db, {
+      runId,
+      jobId: job.id,
+      degraded,
+      events: outcome.events,
+      ...failed,
+      resume,
+    }),
+  )
 }

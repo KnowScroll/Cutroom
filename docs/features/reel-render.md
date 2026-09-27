@@ -10,6 +10,22 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed;
+> check 40 is amended by exactly one key** (**S-161**, **S-163**). **`AssembleJobContext` gains one key, `resume`**:
+> the engine's own resume of a run the job fails — its delay, the worker's plan and render settings its rates come
+> from, the cap file and the questions file, never a port — written by `worker.ts` as a plain property even when off.
+> It is typed `ResumeContext | undefined` and not optional: check 40 maps the context's keys to the ports that buy, and
+> an optional key maps to `undefined`, not to nothing — spelt so on every job's context (S-174). **Check 40**
+> (`reel-render-completed.test.ts`) is amended by that key alone: `Asked` and the expected literal gain `'resume'`; the
+> argument count stays three, and its other half — no port that buys, `Bought` never, the source scan for ports that
+> buy — stands as written. **`finishVideo` takes the
+> engine's resume**, run after the holds' labels, the render row, the still-holds and the events and before
+> `run.finished`, in a savepoint (`packages/domain/src/runs.ts`). **The clips and assemble jobs' failed endings go
+> through `finishFailed`** (`apps/worker/src/resume.ts`): a Gate 7 failure — the judge unavailable, or its answer
+> unreadable — is resumable, and its resume is a new run, which buys only before its own first assembly (I-18 read per
+> run, S-161); the context comment in `worker.ts` and the assemble job's header say so. With the switch off — the
+> worker's default, and every verified test — every video ending reads as it did.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
 > (**S-157**, **S-162**, **S-164**). **The video and narration guards compare the reel's spend** (`reelSpentCents`), and
 > a clips stop's question reports it as _"Spent"_; for a run that resumes nothing it is `spentCents`, so no figure in

@@ -27,6 +27,18 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
+> (**S-163**). **`finishRun` takes the engine's own resume**: an optional `resume(tx, now)` it runs after the plan rows
+> and events and before `run.finished`, inside `SAVEPOINT resume` — released when the step answers, rolled back to
+> when it throws — with `now` the one `run.finished` is stamped with, and it answers what the step came to
+> (`packages/domain/src/runs.ts`); handed none, it writes exactly what it wrote before. **The plan job's failed ending
+> goes through `finishFailed`** (`apps/worker/src/resume.ts`): with the worker's switch on (`WorkerOptions.resume`,
+> absent by default; `PlanJobContext.resume`, which `worker.ts` writes even when off), a provider's fault in the plan
+> stage is resumed in that transaction by planning again, keeping nothing; the cap is read before the transaction,
+> and one that cannot be read is a resume that could not be made — one line in the questions file — never a job
+> buried. The harness hands its worker the switch only when a test asks (`tests/engine/harness.ts`), so every
+> verified plan run ends as it did.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
 > (**S-161**, **S-162**). **The API serves `POST /v1/runs/:runId/resume`** (`apps/api/src/server.ts`), handed a
 > `ResumeService` (`ApiOptions.resume`, typed in `packages/domain/src/resume.ts`) and the worker's cap file

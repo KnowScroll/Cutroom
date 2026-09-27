@@ -1021,7 +1021,7 @@ touches gains its amendment block in that slice.
       of `reel-plan`. Amendment blocks: `reel-contract`, `reel-plan`, `reel-stills` (`readRecord`, the canonical's stop
       in a resumed run, S-171), `reel-takes` (the record's takes, S-093) and `paid-path` (`apps/service`, its
       composition root). **Proves: 26 to 34.**
-- [ ] **Slice 5 — the engine's own resume.** The worker's switch, off by default; one `resume` key on every job's
+- [x] **Slice 5 — the engine's own resume.** The worker's switch, off by default; one `resume` key on every job's
       context; the amended check 40 of `reel-render`; the finishing functions' fixed order — labels, the resume's savepoint reading the rows as labelled,
       then `endRun`; `appendResumeQuestion` asked by the engine, and `appendResumeUnmade`; the service's switch and
       `resumeDelayMs`. Amendment blocks: `paid-path`, `reel-plan` (`finishRun`, the plan job), `reel-stills`

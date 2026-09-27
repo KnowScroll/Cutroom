@@ -6941,3 +6941,24 @@ engines, against S-113's one worker) and connecting only; and `cutroom-sdk`'s ga
 `self-heal`. No file for the feature yet; its gates are written in the session after `resume-failed`'s journey.
 
 **Next.** Unchanged in order: `PROMPTS/058`, now several slices a session; then `cutroom-sdk`'s gates.
+
+## 2026-09-27 — session 59: `resume-failed`'s Slice 4 committed, and Slice 5 handed to a builder (PROMPTS/059)
+
+**Asked.** `PROMPTS/059`: the build from Slice 5, slice by slice, each by one `slice-builder` agent, to the journey.
+
+**Found at the start: Slice 4 was not committed.** `PROMPTS/058`'s Run line, written by session 58, says Slice 4 was
+"built and committed"; it was built and left in the working tree — 31 files, `tests/resume-failed-contract.test.ts` and
+`packages/reel-contract/src/resume.ts` untracked, the Gate 4 box unticked, no journal or `docs/context.md` entry for
+session 58. No other session was running. This session read the diff against Gate 4's Slice 4 box (every part present,
+the five amendment blocks written), ran the full `check.mjs` through the check-runner, ticked the box and committed it
+(`7315af0`). The builder's breaks lived only in session 58's context; the commit names B31, the one `PROMPTS/059`
+records, and says the rest were not recorded.
+
+**Observed.** The first full run lost `reel-render`'s check 50 at its 300 s bound — the suite shared the machine with
+the test-impact agent; the file alone passed in 110 s and the rerun was all green (tests 410 s). The same marginal check
+the journal has named since S-107; nothing changed.
+
+**Slice 5.** The test-impact pass, handed Slice 5's five changes, found nothing red beyond `reel-render`'s check 40,
+which Gate 3 lists: the harness's worker has no `resume` key, so every harness test keeps the switch off; no
+`startService` test fails a run with a resumable kind. The builder is briefed with those facts, `PROMPTS/059`'s "What
+Slice 4 left" lines, the expected breaks for checks 35 to 40, and one test of done.

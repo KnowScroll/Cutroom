@@ -226,13 +226,15 @@ const parsed = (file: string) =>
   ts.createSourceFile(file, readFileSync(join(REPO, file), 'utf8'), ts.ScriptTarget.Latest, true)
 
 test("40. the assemble job's context holds no image, narration or video port", () => {
-  // By the compiler: the context's keys are exactly these four, and none is a port that buys.
+  // By the compiler: the context's keys are exactly these five, and none is a port that buys. The
+  // fifth, `resume`, is the engine's own resume of a run the job fails — settings and two files, never
+  // a port (resume-failed, Slice 5, S-163).
   const errors = errorsIn(
     join(REPO, 'tests'),
     `
     import type { ImagePort, NarrationPort, VideoPort } from '@cutroom/contracts'
     import type { AssembleJobContext } from '../apps/worker/src/assemble-job.ts'
-    type Asked = 'model' | 'media' | 'assembler' | 'render'
+    type Asked = 'model' | 'media' | 'assembler' | 'render' | 'resume'
     type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
     export const keys: Same<keyof AssembleJobContext, Asked> = true
     type Buys = ImagePort | NarrationPort | VideoPort
@@ -252,7 +254,7 @@ test("40. the assemble job's context holds no image, narration or video port", (
     assert.ok(!new RegExp(`\\b${port}\\b`).test(text.replace(/\/\/.*$/gm, '')), `it names ${port}`)
   }
 
-  // And the worker hands it exactly that context: the object it passes has those four keys.
+  // And the worker hands it exactly that context: the object it passes has those five keys.
   const source = parsed(WORKER)
   let handed: string | undefined
   const literals = new Map<string, string[]>()
@@ -282,7 +284,7 @@ test("40. the assemble job's context holds no image, narration or video port", (
   assert.ok(handed !== undefined, 'the worker never calls runAssembleJob')
   assert.deepEqual(
     [...(literals.get(handed) ?? [])].sort(),
-    ['assembler', 'media', 'model', 'render'],
+    ['assembler', 'media', 'model', 'render', 'resume'],
     'the context the worker hands the assemble job holds something else',
   )
 })

@@ -97,7 +97,15 @@ export const SETTING_NAMES = {
   falImageModel: 'CUTROOM_FAL_IMAGE_MODEL',
   narrationVoice: 'CUTROOM_NARRATION_VOICE',
   pictures: 'CUTROOM_PICTURES',
+  resumeDelayMs: 'CUTROOM_RESUME_DELAY_MS',
 } as const
+
+/**
+ * How long after a provider's fault fails a run the engine's own resume of it is due: fifteen minutes,
+ * one outage's measure (P-009) — an immediate resume would meet the same outage and spend the one
+ * resume on it (S-163). A setting, so the next outage can move it.
+ */
+export const DEFAULT_RESUME_DELAY_MS = 900_000
 
 /** `CUTROOM_PROVIDER_MODEL`, `_IMAGE`, `_SENSOR`, `_VIDEO`, `_NARRATION` (S-108). */
 export const providerSetting = (port: ProviderPort) => `CUTROOM_PROVIDER_${port.toUpperCase()}`
@@ -135,6 +143,12 @@ export interface ServiceSettings {
    * default moves (D-014, I-1).
    */
   planSettings: PlanSettings
+  /**
+   * How long after a failure the engine's own resume is due (S-163). The service's worker ALWAYS
+   * resumes — the switch is on here and off in the worker's own default — so this is its one setting:
+   * a whole number of milliseconds, at least 0, fifteen minutes when absent.
+   */
+  resumeDelayMs: number
   /** The environment the ports are built from — where `packages/providers` reads a key (S-109). */
   env: Env
 }
@@ -268,6 +282,8 @@ export function readSettings(env: Env): ServiceSettings {
     falImageSlug,
     planSettings,
     renderSettings,
+    // Refused here, before anything is built, unless a whole number of at least 0 (S-075's form).
+    resumeDelayMs: whole(env, SETTING_NAMES.resumeDelayMs, DEFAULT_RESUME_DELAY_MS, 0),
     env,
   }
 }

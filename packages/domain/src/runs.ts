@@ -344,6 +344,59 @@ export type RunEnding =
   | { result: Extract<RunResult, { status: 'failed' }>; failure: FailureKind }
 
 /**
+ * The engine's own resume of the run a finishing transaction fails (docs/features/resume-failed.md,
+ * Gate 2 "How a resume is planned, admitted and made"; S-163). It is handed the transaction after the
+ * stage's labels and events are written, and the finishing function's own `now` — the time
+ * `run.finished` is stamped with — and reads, plans, admits and makes the resume, or throws. Its answer
+ * is the finishing function's to hand back; the worker builds it, and writes what it asks for after
+ * the transaction.
+ */
+export type ResumeStep<T> = (tx: Writer, now: Date) => T
+
+/** What a resume step came to: its answer, or — its savepoint rolled back — why it could not be made. */
+export type ResumeStepped<T> = { answered: T } | { unmade: string }
+
+/**
+ * Step 2 of a finishing transaction: `step` inside `SAVEPOINT resume`, released when it answers and
+ * rolled back to when it throws, so a resume that cannot be made leaves no row of its own and never
+ * stops the run from failing (S-163).
+ */
+function resumeStep<T>(
+  tx: Writer & Pick<Db, 'run'>,
+  step: ResumeStep<T>,
+  now: Date,
+): ResumeStepped<T> {
+  tx.run(sql`SAVEPOINT resume`)
+  try {
+    const answered = step(tx, now)
+    tx.run(sql`RELEASE resume`)
+    return { answered }
+  } catch (error) {
+    tx.run(sql`ROLLBACK TO resume`)
+    tx.run(sql`RELEASE resume`)
+    return { unmade: error instanceof Error ? error.message : String(error) }
+  }
+}
+
+/**
+ * Steps 2 and 3 of every transaction that finishes a run, after step 1's labels and events and before
+ * step 4's job done (docs/features/resume-failed.md, Gate 2 "How a resume is planned, admitted and
+ * made"; S-163): the engine's resume when one is handed in, from the rows as step 1 left them, then the
+ * run's ending. So a resume's row exists before `run.finished` is appended, and a caller polling the
+ * failed run never sees it finished without the run that resumed it.
+ */
+function resumedAndEnded<T>(
+  tx: Writer & Pick<Db, 'run'>,
+  runId: string,
+  finish: RunEnding & { resume?: ResumeStep<T> | undefined },
+  now: Date,
+): ResumeStepped<T> | undefined {
+  const stepped = finish.resume === undefined ? undefined : resumeStep(tx, finish.resume, now)
+  endRun(tx, runId, finish, now)
+  return stepped
+}
+
+/**
  * A run's ending, written inside whichever transaction ends it: `run.finished`, its state and result,
  * then a failed run's kind in `run.failure` (S-163).
  */
@@ -362,25 +415,28 @@ function endRun(tx: Writer, runId: string, ending: RunEnding, now: Date): void {
 /**
  * Finishes a run in one transaction: its plans, the events before the end, its `run.finished`
  * event, its result, and its job marked done — so a job interrupted before this leaves no
- * half-finished run behind.
+ * half-finished run behind. Handed the engine's resume, it makes it between the events and
+ * `run.finished`, in a savepoint, and answers what it came to (resume-failed, S-163).
  */
-export function finishRun(
+export function finishRun<T = never>(
   db: Db,
   finish: {
     runId: string
     jobId: number
     plans?: readonly PlanRow[]
     events?: readonly EventBody[]
+    resume?: ResumeStep<T> | undefined
   } & RunEnding,
   now: Date = new Date(),
-): void {
+): ResumeStepped<T> | undefined {
   const { runId, jobId, result } = finish
-  db.transaction(
+  return db.transaction(
     (tx) => {
       writePlans(tx, runId, finish.plans ?? [])
       for (const event of finish.events ?? []) append(tx, runId, event, now)
-      endRun(tx, runId, finish, now)
+      const stepped = resumedAndEnded(tx, runId, finish, now)
       completeJob(tx, jobId, result.costCents)
+      return stepped
     },
     { behavior: 'immediate' },
   )
@@ -420,19 +476,26 @@ function endStills(tx: Writer, runId: string, ending: StillsEnding, now: Date): 
  * Ends a run at its stills stage, in one immediate transaction (S-046): the approved pictures marked
  * chosen, every degraded shot's labels (S-058), the events the stage's checks produced, `run.finished`,
  * the result, and the keyframes job done — its cost left as its image calls added it (S-036), never
- * overwritten with the result's.
+ * overwritten with the result's. Handed the engine's resume, it makes it after the labels — so a
+ * picture it copies carries the degradation this transaction wrote — and before `run.finished`
+ * (resume-failed, S-163, S-164).
  */
-export function finishStills(
+export function finishStills<T = never>(
   db: Db,
-  finish: StillsEnding & { runId: string; jobId: number } & RunEnding,
+  finish: StillsEnding & {
+    runId: string
+    jobId: number
+    resume?: ResumeStep<T> | undefined
+  } & RunEnding,
   now: Date = new Date(),
-): void {
+): ResumeStepped<T> | undefined {
   const { runId, jobId } = finish
-  db.transaction(
+  return db.transaction(
     (tx) => {
       endStills(tx, runId, finish, now)
-      endRun(tx, runId, finish, now)
+      const stepped = resumedAndEnded(tx, runId, finish, now)
       completeJob(tx, jobId)
+      return stepped
     },
     { behavior: 'immediate' },
   )
@@ -626,8 +689,11 @@ export interface RenderEnding {
  *
  * From the clips job it also writes each held shot's labels, WHATEVER THE ENDING (S-098): a still-hold
  * decided before the run stopped or failed is a fact about its shot, as a degradation is (S-058).
+ *
+ * Handed the engine's resume, it makes it after every label and event and before `run.finished`, in
+ * a savepoint, and answers what it came to (resume-failed, S-163).
  */
-export function finishVideo(
+export function finishVideo<T = never>(
   db: Db,
   f: {
     runId: string
@@ -636,11 +702,12 @@ export function finishVideo(
     render?: RenderEnding
     /** The clips job's held shots, in the order the ladders reached them (S-098). */
     stillHolds?: readonly StillHold[]
+    resume?: ResumeStep<T> | undefined
   } & RunEnding,
   now: Date = new Date(),
-): void {
+): ResumeStepped<T> | undefined {
   const { runId, jobId } = f
-  db.transaction(
+  return db.transaction(
     (tx) => {
       for (const held of f.stillHolds ?? []) markStillHeld(tx, runId, jobId, held)
       if (f.render !== undefined) {
@@ -682,8 +749,9 @@ export function finishVideo(
           .run()
       }
       for (const event of f.events ?? []) append(tx, runId, event, now)
-      endRun(tx, runId, f, now)
+      const stepped = resumedAndEnded(tx, runId, f, now)
       completeJob(tx, jobId)
+      return stepped
     },
     { behavior: 'immediate' },
   )
