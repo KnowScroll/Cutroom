@@ -1,28 +1,38 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import {
+  BUDGET_MD,
   closeDatabase,
   eventsAfter,
   openDatabase,
   readRecord,
+  readReelCapCents,
+  readResumeInputs,
   readRun,
   readRunByRequestId,
   requestCancel,
+  resumeRun,
   submitRun,
   type Db,
+  type ResumeService,
 } from '@cutroom/domain'
 import {
   CONTRACT_VERSION,
+  ResumeRequest,
   SubmitRequest,
   type ErrorResponse,
   type EventsPage,
+  type ResumeResponse,
   type RunRecord,
   type SubmitResponse,
 } from '@cutroom/reel-contract'
 
 // The engine's service: the contract's routes (packages/reel-contract/src/routes.ts) over plain
-// HTTP (D-098). It stores what it is asked and reads what the worker wrote. It never calls a
-// provider (D-005).
+// HTTP (D-098) — submitting, following, cancelling and, since resume-failed, resuming a failed run.
+// It stores what it is asked and reads what the worker wrote; handed a ResumeService, it makes a
+// resume by copying the failed run's kept rows into a new run (S-162). What a resume keeps, what it
+// costs and whether it is admitted are the service's to decide: this app plans nothing, holds no
+// rate and never calls a provider (D-005).
 
 /**
  * Loopback only, with no authentication — Phase 1's assumption, recorded as such in D-098. Not a
@@ -35,6 +45,14 @@ export interface ApiOptions {
   dbPath: string
   /** 0, the default, takes any free port. */
   port?: number
+  /**
+   * What plans, admits and asks the owner about a caller's resume, built by `apps/service` from the
+   * worker's own settings and questions file (S-161, S-162). Absent: the resume route answers `422`,
+   * reason `unsupported` — the contract's "the engine is running but cannot yet".
+   */
+  resume?: ResumeService
+  /** The cap file a resume is admitted against — the worker's own. Defaults to BUDGET.md (D-097). */
+  budgetPath?: string
 }
 
 export interface Api {
@@ -134,19 +152,148 @@ function submit(db: Db, text: string): [number, SubmitResponse] {
   ]
 }
 
+type ResumeRefusal = Extract<ResumeResponse, { outcome: 'refused'; detail: string }>
+
+const refuseResume = (
+  runId: string,
+  reason: ResumeRefusal['reason'],
+  detail: string,
+): ResumeRefusal => ({ contractVersion: V, outcome: 'refused', runId, reason, detail })
+
+/**
+ * A caller's resume of a run (docs/features/resume-failed.md, Gate 2 "How a resume is planned,
+ * admitted and made"; S-161, S-162). The run first — an unknown one is 404, as on every route of a
+ * run — then validity, version and schema, and only then what this engine can do: with no service,
+ * 422 unsupported. The service decides against the cap the worker reads. A preview answers as the
+ * call would and writes nothing; a call admitted makes the run in one immediate transaction, read and
+ * decided inside it, due at once; a call refused at the per-reel cap asks the owner once, after it.
+ */
+function resume(
+  db: Db,
+  options: ApiOptions,
+  runId: string,
+  text: string,
+): [number, ResumeResponse | ErrorResponse] {
+  if (readRun(db, runId) === undefined) return [404, notFound('no such run')]
+  let body: unknown
+  try {
+    body = JSON.parse(text)
+  } catch {
+    return [422, refuseResume(runId, 'invalid', 'the body is not JSON')]
+  }
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+    return [422, refuseResume(runId, 'invalid', 'the body is not a JSON object')]
+  }
+  const fields = body as Record<string, unknown>
+  if ('contractVersion' in fields && fields.contractVersion !== V) {
+    const detail = `contractVersion ${String(fields.contractVersion)} is not supported`
+    return [422, refuseResume(runId, 'version', detail)]
+  }
+  const parsed = ResumeRequest.safeParse(body)
+  if (!parsed.success) {
+    const detail = parsed.error.issues
+      .map((i) => `${i.path.join('.') || '(body)'}: ${i.message}`)
+      .join('; ')
+    return [422, refuseResume(runId, 'invalid', detail)]
+  }
+  const service = options.resume
+  if (service === undefined) {
+    const detail = 'this engine was started with no resume service, so it resumes no run yet'
+    return [422, refuseResume(runId, 'unsupported', detail)]
+  }
+
+  const remake = parsed.data.remake ?? []
+  const preview = parsed.data.preview === true
+  const capCents = readReelCapCents(options.budgetPath ?? BUDGET_MD)
+  const now = new Date()
+  const decide = (reader: Pick<Db, 'select'>) => {
+    const inputs = readResumeInputs(reader, runId)
+    return {
+      requestId: inputs.request.requestId,
+      decided: service.decide(inputs, remake, capCents),
+    }
+  }
+  // A preview reads through the connection and opens no transaction: it writes nothing (S-161).
+  const { requestId, decided, made } = preview
+    ? { ...decide(db), made: undefined }
+    : db.transaction(
+        (tx) => {
+          const answer = decide(tx)
+          const madeId =
+            answer.decided.outcome === 'admitted'
+              ? resumeRun(tx, runId, answer.decided.plan, {
+                  now,
+                  delayMs: 0,
+                  resumeRequest: answer.decided.plan.named,
+                })
+              : undefined
+          return { ...answer, made: madeId }
+        },
+        { behavior: 'immediate' },
+      )
+
+  if (decided.outcome === 'replayed') {
+    const replayed = {
+      outcome: 'accepted',
+      runId: decided.runId,
+      resumes: runId,
+      replayed: true,
+    } as const
+    return [202, { contractVersion: V, ...replayed }]
+  }
+  if (decided.outcome === 'resumed') return [409, refuseResume(runId, 'resumed', decided.detail)]
+  if (decided.outcome === 'refused') {
+    const code = decided.reason === 'invalid' ? 422 : 409
+    return [code, refuseResume(runId, decided.reason, decided.detail)]
+  }
+  const { plan, estimateCents, spentCents, ceilingCents } = decided
+  const figures = { estimateCents, spentCents, capCents: decided.capCents, ceilingCents }
+  if (preview) {
+    const limit = decided.outcome === 'budget' ? { limit: decided.limit } : {}
+    const answer = { outcome: 'preview', runId, remake: plan.remade, ...figures, ...limit } as const
+    return [200, { contractVersion: V, ...answer }]
+  }
+  if (decided.outcome === 'budget') {
+    // Every refusal at the per-reel cap asks the owner; one at the caller's ceiling is returned only
+    // (D-097, D-100). Asked after the transaction, which wrote nothing.
+    if (decided.limit === 'reel') {
+      const named = plan.named
+      const asked = { runId, requestId, by: 'caller', named, ...figures } as const
+      service.askOwner({ ...asked, resumeEstimateCents: plan.estimateCents }, now)
+    }
+    const refused = { outcome: 'refused', runId, reason: 'budget', limit: decided.limit } as const
+    return [409, { contractVersion: V, ...refused, ...figures }]
+  }
+  if (made === undefined) throw new Error(`the resume of run ${runId} was admitted and not made`)
+  const accepted = { outcome: 'accepted', runId: made, resumes: runId, replayed: false } as const
+  return [202, { contractVersion: V, ...accepted }]
+}
+
 const RUN_ROUTE = /^\/v1\/runs\/([^/]+)$/
 const RUN_SUB_ROUTE = /^\/v1\/runs\/([^/]+)\/(events|result|record)$/
 const CANCEL_ROUTE = /^\/v1\/runs\/([^/]+)\/cancel$/
+const RESUME_ROUTE = /^\/v1\/runs\/([^/]+)\/resume$/
 const WHOLE_NUMBER = /^\d+$/
 
-async function handle(db: Db, req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handle(
+  db: Db,
+  options: ApiOptions,
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
   const url = new URL(req.url ?? '/', `http://${LOOPBACK}`)
   const byId = RUN_ROUTE.exec(url.pathname)
   const sub = RUN_SUB_ROUTE.exec(url.pathname)
   const cancel = CANCEL_ROUTE.exec(url.pathname)
+  const resumeOf = RESUME_ROUTE.exec(url.pathname)
 
   if (req.method === 'POST' && url.pathname === '/v1/runs') {
     const [code, body] = submit(db, await readBody(req))
+    return send(res, code, body)
+  }
+  if (req.method === 'POST' && resumeOf !== null) {
+    const runId = decodeURIComponent(resumeOf[1] as string)
+    const [code, body] = resume(db, options, runId, await readBody(req))
     return send(res, code, body)
   }
   if (req.method === 'POST' && cancel !== null) {
@@ -186,7 +333,8 @@ async function handle(db: Db, req: IncomingMessage, res: ServerResponse): Promis
 
     if (found.result === undefined) return send(res, 409, found.status)
     if (sub[2] === 'result') return send(res, 200, found.result)
-    // Every picture made, every attempt's, in seq order, with each check it reached (S-046).
+    // Every picture made, every attempt's, in seq order, with each check it reached (S-046) — and in
+    // a resumed run every picture and take copied into it, each naming the run it came from (S-162).
     const record: RunRecord = { contractVersion: V, runId, ...readRecord(db, runId) }
     return send(res, 200, record)
   }
@@ -202,7 +350,7 @@ export async function startApi(options: ApiOptions): Promise<Api> {
   const db = openDatabase(options.dbPath)
 
   const server = createServer((req, res) => {
-    handle(db, req, res).catch((error: unknown) => {
+    handle(db, options, req, res).catch((error: unknown) => {
       const detail = error instanceof Error ? error.message : String(error)
       send(res, 500, { contractVersion: V, error: 'internal', detail } satisfies ErrorResponse)
     })

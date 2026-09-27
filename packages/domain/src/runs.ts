@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { and, asc, eq, gt, inArray, max, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gt, inArray, max, sql } from 'drizzle-orm'
 import type {
   AssembledFile,
   CutVerdict,
@@ -90,8 +90,9 @@ export type Submitted =
 
 /**
  * Stores a valid request as a run with one `reel.plan` job (D-081, D-083) and its `run.accepted`
- * event — or, for a requestId already used, compares content: equal is the stored run, replayed;
- * different is a conflict. Validity is the caller's to check first.
+ * event — or, for a requestId already used, compares content: equal is the request's NEWEST run,
+ * replayed — its resume, when it has one, so the caller's name for the reel reaches its current run
+ * (S-162); different is a conflict. Validity is the caller's to check first.
  */
 export function submitRun(
   db: Db,
@@ -106,6 +107,8 @@ export function submitRun(
         .select({ runId: run.runId, requestCanonical: run.requestCanonical })
         .from(run)
         .where(eq(run.requestId, request.requestId))
+        .orderBy(desc(sql`rowid`))
+        .limit(1)
         .get()
       if (existing !== undefined) {
         const outcome = existing.requestCanonical === canonical ? 'replayed' : 'conflict'
@@ -131,11 +134,24 @@ export function submitRun(
   )
 }
 
-function statusOf(db: Db, row: { runId: string; requestId: string; state: string }): RunStatus {
+/**
+ * A run's status. Its two pointers are read from the rows each time (S-162): `resumes` from its own
+ * row, and `resumedBy` from the run that names it — never stored in its row, result or events, which a
+ * resume does not change. Each is absent, not null, on a run it does not apply to.
+ */
+function statusOf(
+  db: Db,
+  row: { runId: string; requestId: string; state: string; resumes: string | null },
+): RunStatus {
   const last = db
     .select({ seq: max(runEvent.seq) })
     .from(runEvent)
     .where(eq(runEvent.runId, row.runId))
+    .get()
+  const resumedBy = db
+    .select({ runId: run.runId })
+    .from(run)
+    .where(eq(run.resumes, row.runId))
     .get()
   return {
     contractVersion: CONTRACT_VERSION,
@@ -143,6 +159,8 @@ function statusOf(db: Db, row: { runId: string; requestId: string; state: string
     requestId: row.requestId,
     state: row.state === 'finished' ? 'finished' : 'running',
     lastSeq: last?.seq ?? 0,
+    ...(row.resumes === null ? {} : { resumes: row.resumes }),
+    ...(resumedBy === undefined ? {} : { resumedBy: resumedBy.runId }),
   }
 }
 
@@ -161,8 +179,15 @@ export function readRun(db: Db, runId: string): StoredRun | undefined {
   }
 }
 
+/** A request's NEWEST run: its resume, when it has one (S-162). */
 export function readRunByRequestId(db: Db, requestId: string): StoredRun | undefined {
-  const row = db.select({ runId: run.runId }).from(run).where(eq(run.requestId, requestId)).get()
+  const row = db
+    .select({ runId: run.runId })
+    .from(run)
+    .where(eq(run.requestId, requestId))
+    .orderBy(desc(sql`rowid`))
+    .limit(1)
+    .get()
   return row === undefined ? undefined : readRun(db, row.runId)
 }
 

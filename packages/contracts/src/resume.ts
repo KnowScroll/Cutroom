@@ -1,4 +1,4 @@
-import type { RunResult, SubmitRequest } from '@cutroom/reel-contract'
+import type { Piece, RunResult, SubmitRequest } from '@cutroom/reel-contract'
 import type { Plan } from './cinematic.ts'
 import type { FailureKind } from './failures.ts'
 
@@ -10,14 +10,10 @@ import type { FailureKind } from './failures.ts'
 
 /**
  * One piece a caller names not to keep: a shot's still, narration or clip, or — with no shot — that
- * piece of every shot that has one (S-161). The caller's own shape arrives with the contract's route
- * (Slice 4), and this is that shape.
+ * piece of every shot that has one (S-161). The caller's own shape, declared once, by the contract's
+ * route (`@cutroom/reel-contract`), and named here for every package that plans a resume.
  */
-export interface Piece {
-  kind: 'still' | 'narration' | 'clip'
-  /** `shot-<n>`. */
-  shot?: string
-}
+export type { Piece }
 
 /** Who asks for a resume: the run's caller, or the engine itself after a provider's fault (S-163). */
 export type ResumeBy = 'caller' | 'engine'
@@ -100,3 +96,24 @@ export type ResumePlanned =
 export type ResumeAdmission =
   | { admitted: true; estimateCents: number }
   | { admitted: false; limit: 'reel' | 'ceiling'; estimateCents: number }
+
+/**
+ * What a resume is admitted on (D-097, D-100): the figure compared — what the reel has spent plus the
+ * resume's estimate — what the reel has spent, the per-reel cap and the caller's ceiling.
+ */
+export interface ResumeFigures {
+  estimateCents: number
+  spentCents: number
+  capCents: number
+  ceilingCents: number
+}
+
+/**
+ * A caller's resume decided: `planResume`'s answer when no plan is made, else the plan with the
+ * figures it was admitted on, or the limit it would pass (S-161, S-162). `budget`'s plan carries the
+ * normalised named pieces the owner's question names, and what the preview lists.
+ */
+export type ResumeDecision =
+  | Exclude<ResumePlanned, { outcome: 'planned' }>
+  | ({ outcome: 'budget'; plan: ResumePlan; limit: 'reel' | 'ceiling' } & ResumeFigures)
+  | ({ outcome: 'admitted'; plan: ResumePlan } & ResumeFigures)

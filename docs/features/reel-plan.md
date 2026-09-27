@@ -27,6 +27,23 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
+> (**S-161**, **S-162**). **The API serves `POST /v1/runs/:runId/resume`** (`apps/api/src/server.ts`), handed a
+> `ResumeService` (`ApiOptions.resume`, typed in `packages/domain/src/resume.ts`) and the worker's cap file
+> (`ApiOptions.budgetPath`, `BUDGET.md` by default), both optional: an unknown run is 404, then the body's version and
+> schema are checked, then an API with no service answers `422` `unsupported`. A preview reads and writes nothing; a
+> call admitted is made by `resumeRun` in one immediate transaction that reads and decides inside it, due at once; a
+> call refused at the per-reel cap asks the owner through the service. The API still imports only `domain` and
+> `reel-contract`, and plans nothing. **`readRunByRequestId` and `submitRun`'s replay answer the request's newest
+> run**, and **`RunStatus` carries `resumes` and `resumedBy`, read from the rows each time** (`statusOf`), each absent
+> on a run it does not apply to — so every verified status, lookup and replay, made by a request's one run, reads as it
+> did (`reel-plan-restart`, check 46). **Check 13** (`reel-plan-service.test.ts`) is amended by addition: the stand-in
+> client's `EXPECTED` gains the route, so the real engine produces its 200, 202, 404 and 422 on a third engine whose run
+> fails at its planner, unavailable at each send; its 409 on this engine's own run, failed when the stand-in's script
+> ran out; and its 500 in the dropped-tables block like every other route's. **The harness hands `startApi` the
+> service's `resumeService`** (`tests/engine/harness.ts`), built from the harness's own plan and render settings and
+> questions file, and its `budgetPath` when a test wrote one, so the API prices, admits and asks as its worker does.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
 > (**S-157**, **S-162**). **A resume is a new run of the same request** (`resumeRun`, `packages/domain/src/resume.ts`),
 > made only by `resume-failed`'s own tests until its Slice 4 gives it a route: two runs then share one `requestId`, the

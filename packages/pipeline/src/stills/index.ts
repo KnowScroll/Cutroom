@@ -89,6 +89,14 @@ export interface StillsInput {
    * ladder reaches it. Empty on a first attempt, so nothing changes there.
    */
   kept: readonly PictureRecord[]
+  /**
+   * The run's pictures copied from the run it resumes (S-162): 0 for every run that resumes nothing.
+   * A canonical whose two candidates both fail with no reserve slot free for its repair STOPS for rule
+   * `gate-1` in a run holding any — a caller named it in a reel whose kept pictures hold the six —
+   * and FAILS `crashed` in a run holding none, where only crashes can have taken the slot (S-171,
+   * S-048).
+   */
+  copiedPictures: number
 }
 
 export interface StillsPorts {
@@ -464,12 +472,24 @@ async function stage(
     } else {
       // No survivor: ONE repair, told both candidates' reasons, with candidate a's framing and no
       // reference (D-047). It runs before anything else takes a slot, so it has first claim (D-048). A
-      // first attempt's reserve is at least two, so it always finds one; an attempt run again whose
-      // earlier calls left none fails before the call — a fault of the crash, not rule gate-1, which
-      // is for a repair that was made and failed (S-048, S-061). A repair an earlier attempt made and
-      // decided is kept, and takes no slot: its call is in `earlier` already (S-164).
+      // first attempt's reserve is at least two, so it always finds one. With none free, in a run
+      // holding pictures copied from the run it resumes, the run STOPS for rule gate-1 with no repair:
+      // a caller named this canonical in a reel whose kept pictures hold the six, and a resumed run is
+      // never resumed again (S-171, superseding D-047 steps 1 and 3 for that case). In a run holding
+      // none, an attempt run again whose earlier calls left none fails before the call — a fault of
+      // the crash, not rule gate-1, which is for a repair that was made and failed (S-048, S-061). A
+      // repair an earlier attempt made and decided is kept, and takes no slot: its call is in
+      // `earlier` already (S-164).
       let repair = adopt(canonical, 'repair')
       if (repair === undefined) {
+        if (slots <= 0 && input.copiedPictures > 0) {
+          const why = candidates.map(gate1Why).join('. ')
+          return {
+            kind: 'stopped-rule',
+            rule: 'gate-1',
+            detail: `the canonical picture of ${shotIdOf(canonical.shotUnit)} failed Gate 1 twice and no reserve slot is free for its repair: the run having made or kept ${input.earlierImageCalls} image calls before it and its placement making ${unmade} more of the ${IMAGE_CALLS} (D-047, S-161, S-171). ${why}`,
+          }
+        }
         if (slots <= 0) {
           const why = candidates.map(gate1Why).join('. ')
           return {

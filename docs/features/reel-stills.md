@@ -32,6 +32,19 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
+> (**S-162**, **S-171**, superseding **D-047** steps 1 and 3 for one case). **A resumed run's canonical with no reserve
+> slot for its repair stops; it does not fail.** `readStillsInputs` answers `{ kept, copiedPictures }` —
+> `copiedPictures` the run's picture rows with `kept_from` set — and the stills stage's input carries it
+> (`StillsInput.copiedPictures`, 0 for every run that resumes nothing). When both canonical candidates fail with no slot
+> free, a run holding copied pictures ends `stopped-rule`, rule `gate-1`, with no repair call, no `run.failure` and
+> _"the canonical picture of shot-S failed Gate 1 twice and no reserve slot is free for its repair: the run having made
+> or kept E image calls before it and its placement making U more of the 6 (D-047, S-161, S-171). …"_, the two
+> candidates' reasons after it; a run holding none fails `crashed` in S-048's words as before, so check 49b
+> (`reel-stills-restart-reserve.test.ts`) stands exactly as written. The comment at the canonical's repair names both
+> cases (`packages/pipeline/src/stills/index.ts`). **`readRecord`'s pictures carry `keptFrom`** on a picture copied
+> from the run it resumes, and none on any other (`reel-contract`'s block), so every verified record reads as it did.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
 > (**S-157**, **S-162**, **S-164**). **The image guard compares the reel's spend** — `reelSpentCents`, the run's chain
 > and, for a resumed run, the chain of the run it resumes (D-081 and S-036 read across both) — and a stop's question

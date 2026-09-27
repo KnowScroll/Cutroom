@@ -1,6 +1,15 @@
 import { randomUUID } from 'node:crypto'
 import { and, asc, eq, inArray, isNotNull, sql } from 'drizzle-orm'
-import type { Gate0Verdict, Piece, Plan, ResumeInputs, ResumePlan } from '@cutroom/contracts'
+import type {
+  Gate0Verdict,
+  Piece,
+  Plan,
+  ResumeBy,
+  ResumeDecision,
+  ResumeInputs,
+  ResumePlan,
+  ResumeRates,
+} from '@cutroom/contracts'
 import { SubmitRequest, type RunResult } from '@cutroom/reel-contract'
 import type { Db } from './db.ts'
 import { reelSpentCents } from './ledger.ts'
@@ -34,6 +43,44 @@ import {
 //
 // This file reads and writes; what to keep, and whether the resume is admitted, is the pipeline's
 // `planResume` and `admitResume`, which this package never imports.
+
+/**
+ * What a resume refused at the per-reel cap asks the owner (D-097, D-100, S-026's form): the failed
+ * run and its request, who asked, the pieces named — normalised; none for the engine's — the resume's
+ * own estimate, what the reel has spent, the figure compared (the two added), both limits, and the
+ * rates the resume was priced at.
+ */
+export interface ResumeQuestion {
+  runId: string
+  requestId: string
+  by: ResumeBy
+  named: Piece[]
+  /** The resume's own first calls, priced: no repair, no retry, no reserve (S-035, S-161). */
+  resumeEstimateCents: number
+  spentCents: number
+  /** The figure compared with the cap: what the reel has spent plus the resume's estimate. */
+  estimateCents: number
+  capCents: number
+  ceilingCents: number
+  rates: ResumeRates
+}
+
+/**
+ * What the API is handed to plan, admit and ask about a caller's resume (docs/features/resume-failed.md,
+ * Gate 2 "How a resume is planned, admitted and made"; S-161, S-162). Built by `apps/service` from the
+ * pipeline's planner and the worker's own settings and questions file, so a caller's preview, a
+ * caller's call and the engine's own resume are one planner and one rule — and the API, which imports
+ * neither the pipeline nor the worker, holds neither a rate nor a path.
+ */
+export interface ResumeService {
+  /** Plans a caller's resume of the run `inputs` holds and admits it against `capCents`. Pure. */
+  decide(inputs: ResumeInputs, remake: readonly Piece[], capCents: number): ResumeDecision
+  /**
+   * Appends the cap's question for a resume CALL refused at the per-reel cap, the rates added by the
+   * service, which prices with them. A preview, and a refusal at the ceiling, never ask (D-097, D-100).
+   */
+  askOwner(question: Omit<ResumeQuestion, 'rates'>, now: Date): void
+}
 
 const parsed = <T>(text: string | null): T | null =>
   text === null ? null : (JSON.parse(text) as T)

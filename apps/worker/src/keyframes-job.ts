@@ -116,9 +116,9 @@ export async function runKeyframesJob(
   // and makes again only a picture whose checks were cut off, and what the attempts before it made
   // comes out of its reserve (S-048, S-164). The stage decides what that leaves (S-061).
   const earlierImageCalls = imageCallCount(db, runId)
-  const kept = readStillsInputs(db, runId)
+  const { kept, copiedPictures } = readStillsInputs(db, runId)
   const outcome = await makeStills(
-    { runId, attempt: job.attempts, earlierImageCalls, request, plan, kept },
+    { runId, attempt: job.attempts, earlierImageCalls, request, plan, kept, copiedPictures },
     {
       image: guardedImagePort(context.image, db, {
         jobId: job.id,

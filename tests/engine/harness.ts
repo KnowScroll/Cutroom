@@ -47,6 +47,7 @@ import {
   type FfmpegAssembler,
   type FfmpegMedia,
 } from '@cutroom/providers'
+import { resumeService } from '@cutroom/service'
 import { startWorker, type Worker } from '@cutroom/worker'
 import {
   BUDGET_MD,
@@ -224,7 +225,15 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
   const imageOptions = options.artifactRoot === null ? {} : { artifactRoot }
   const renderSettings = options.renderSettings ?? TEST_RENDER_SETTINGS
   const tools = ffmpegTools()
-  const api = await startApi({ dbPath })
+  // The API a caller resumes through: handed the ResumeService @cutroom/service builds, from this
+  // engine's own plan and render settings and its questions file, and the worker's cap file — so the
+  // API prices, admits and asks exactly as its worker would, and never a second copy (resume-failed).
+  const apiOptions = {
+    dbPath,
+    resume: resumeService({ planSettings: settings, renderSettings, questionsPath }),
+    ...(budgetPath === undefined ? {} : { budgetPath }),
+  }
+  const api = await startApi(apiOptions)
   let worker: Worker | undefined
   const children: Array<ReturnType<typeof spawn>> = []
   const wrap = options.wrapModel ?? ((model: LanguageModelPort) => model)
@@ -331,7 +340,7 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       await worker?.stop()
       worker = undefined
       await engine.api.stop()
-      engine.api = await startApi({ dbPath })
+      engine.api = await startApi(apiOptions)
       engine.http = client(engine.api.baseUrl)
       engine.model = fakeModel(script ?? {}, { models: settings.models })
       engine.image = fakeImage(options.images ?? {}, imageOptions)

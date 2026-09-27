@@ -10,6 +10,13 @@ Decisions: D-001, D-005, D-014, D-015, D-018, D-020, D-024, D-025, D-027, D-028,
 Named only in the deferral list: D-002, D-037, S-032
 Gates: product APPROVED 2026-09-19 adversarial-reviewer · architecture APPROVED 2026-09-19 adversarial-reviewer · program-design APPROVED 2026-09-19 adversarial-reviewer · slices APPROVED 2026-09-19 adversarial-reviewer
 
+> **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
+> (**S-093**, **S-162**). **The record's takes carry `keptFrom`** (`readRecord`, `packages/domain/src/pictures.ts`): a
+> take copied into a resumed run names the run it came from, and a take the run made carries none — the key absent,
+> never null — so every verified record of a run that resumes nothing reads as it did. A resumed run lists its copied
+> takes first, in the order the run it resumes made them, then its own; `used` is true exactly for the takes its video
+> shows, kept ones included (`resume-failed` check 31).
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 3 — the gates below are not edited, and no assertion is removed**
 > (**S-162**, **S-164**). **A still-hold marks its takes' receipts in whichever run holds them** — `markStillHeld`
 > updates `video_receipt` by `run_id IN (run, resumes)` — so a resumed run that holds a shot again from three kept

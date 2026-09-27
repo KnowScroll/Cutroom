@@ -23,7 +23,7 @@ export {
 export { REFUSED_ANSWER_CAP, kept, recordRefusedAnswer, redacted } from './refused.ts'
 export { readRecord, readStillsInputs, upsertPicture, type DegradedShot } from './pictures.ts'
 export { DEFAULT_LEASE_MS, buryJob, claimJob, type ClaimedJob } from './queue.ts'
-export { readResumeInputs, resumeRun } from './resume.ts'
+export { readResumeInputs, resumeRun, type ResumeQuestion, type ResumeService } from './resume.ts'
 export {
   ASSEMBLE_JOB,
   CLIPS_JOB,

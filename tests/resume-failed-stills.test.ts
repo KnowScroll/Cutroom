@@ -253,6 +253,8 @@ async function attempt(
       request: base.request,
       plan: base.plan,
       kept: given.kept ?? [],
+      // No picture copied from another run: a crash's restart (S-171's stop is check 33's).
+      copiedPictures: 0,
     },
     {
       image,

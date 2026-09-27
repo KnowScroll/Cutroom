@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import {
   ErrorResponse,
   EventsPage,
+  ResumeResponse,
   RunRecord,
   RunResult,
   RunStatus,
@@ -14,7 +15,8 @@ import {
 
 type Schema = { safeParse(x: unknown): { success: boolean } }
 
-export type Route = 'submit' | 'lookup' | 'status' | 'events' | 'result' | 'record' | 'cancel'
+export type Route =
+  'submit' | 'lookup' | 'status' | 'events' | 'result' | 'record' | 'cancel' | 'resume'
 
 /** The contract's route table: which schema each status code's body must parse under. */
 export const EXPECTED: Record<Route, Record<number, Schema>> = {
@@ -25,13 +27,22 @@ export const EXPECTED: Record<Route, Record<number, Schema>> = {
   result: { 200: RunResult, 404: ErrorResponse, 409: RunStatus, 500: ErrorResponse },
   record: { 200: RunRecord, 404: ErrorResponse, 409: RunStatus, 500: ErrorResponse },
   cancel: { 200: RunStatus, 404: ErrorResponse, 500: ErrorResponse },
+  // A failed run made again (resume-failed; S-161, S-162).
+  resume: {
+    200: ResumeResponse,
+    202: ResumeResponse,
+    404: ErrorResponse,
+    409: ResumeResponse,
+    422: ResumeResponse,
+    500: ErrorResponse,
+  },
 }
 
 function routeOf(method: string, path: string): Route {
   const pathname = path.split('?')[0] as string
   if (method === 'POST' && pathname === '/v1/runs') return 'submit'
   if (method === 'GET' && pathname === '/v1/runs') return 'lookup'
-  const sub = /^\/v1\/runs\/[^/]+(?:\/(events|result|record|cancel))?$/.exec(pathname)
+  const sub = /^\/v1\/runs\/[^/]+(?:\/(events|result|record|cancel|resume))?$/.exec(pathname)
   assert.ok(sub, `no contract route for ${method} ${path}`)
   if (sub[1] === undefined) return 'status'
   return sub[1] as Route
@@ -71,5 +82,8 @@ export function client(baseUrl: string) {
     result: (runId: string) => call('GET', `/v1/runs/${runId}/result`),
     record: (runId: string) => call('GET', `/v1/runs/${runId}/record`),
     cancel: (runId: string) => call('POST', `/v1/runs/${runId}/cancel`),
+    /** A resume of `runId`: the body given, carrying the contract's version unless it names its own. */
+    resume: (runId: string, body: Record<string, unknown> = {}) =>
+      call('POST', `/v1/runs/${runId}/resume`, { contractVersion: 1, ...body }),
   }
 }

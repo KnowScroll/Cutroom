@@ -1013,7 +1013,7 @@ touches gains its amendment block in that slice.
       `reel-takes`, `reel-stills` (`guarded-image-port.ts`, `imageCallCount`, `markDegraded`), `paid-failures`
       (`imageCallCount`'s lost calls, widened) and `reel-plan` (`enqueue`, `admitStills`, `advanceStills`,
       `advanceClips`). **Proves: 12 to 25.**
-- [ ] **Slice 4 — the call.** `reel-contract`'s route and schemas, version 1 amended; `RunStatus`'s pointers; the record's
+- [x] **Slice 4 — the call.** `reel-contract`'s route and schemas, version 1 amended; `RunStatus`'s pointers; the record's
       `keptFrom`; the API's route handed the `ResumeService`, `decide` and `askOwner`; the service building it with
       the questions file, required; the worker's `appendResumeQuestion`, exported; lookup and replay the newest; a
       resumed run's canonical with no repair slot stopped for `gate-1`, `readStillsInputs`' `copiedPictures` (S-171);

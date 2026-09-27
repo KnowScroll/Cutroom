@@ -124,6 +124,22 @@ test("18. every event's at is ISO 8601 in UTC", async () => {
   }
 })
 
+// Since resume-failed's Slice 4 (S-161, S-162): the resume route is served, and every body it
+// answers parses under the schema the contract gives that status — which ./stand-in/client.ts checks.
+// The stand-in never resumes: a known run is refused as unsupported, and an unknown one is 404.
+test('18. every body the stand-in serves on the resume route parses under its schema: a resume of a known run parses as refused, reason unsupported, its runId the run; of an unknown one, 404 not-found', async () => {
+  const runId = await accepted('r18-resume')
+  service.runToEnd(runId)
+  const known = await api.resume(runId, { remake: [{ kind: 'still', shot: 'shot-0' }] })
+  assert.equal(known.status, 422)
+  assert.equal(known.json.outcome, 'refused')
+  assert.equal(known.json.reason, 'unsupported')
+  assert.equal(known.json.runId, runId)
+  const unknown = await api.resume('no-such-run')
+  assert.equal(unknown.status, 404)
+  assert.equal(unknown.json.error, 'not-found')
+})
+
 // ---------------------------------------------------------------- 19
 
 test('19. result and record before the run finishes are 409 with RunStatus', async () => {

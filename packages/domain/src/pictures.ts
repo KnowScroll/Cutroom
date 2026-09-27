@@ -155,6 +155,8 @@ export function readRecord(
         pictureId: row.pictureId,
         shotId: `shot-${row.shotUnit}`,
         chosen: row.chosen,
+        // A picture copied from the run this one resumes names it; absent on every other (S-162).
+        ...(row.keptFrom === null ? {} : { keptFrom: row.keptFrom }),
         ...(observed.has(row.pictureId) ? { observationId: observationId(row.pictureId) } : {}),
         ...(reconciled.has(row.pictureId)
           ? { reconciliationId: reconciliationId(row.pictureId) }
@@ -198,7 +200,8 @@ export function readRecord(
           .all()
 
   // The takes (S-093): every take made, every attempt's — a take cut off inside its gates too — in
-  // the order their rows were written, which is the order made. `used` is true exactly for the takes
+  // the order their rows were written, which is the order made; in a resumed run, the takes copied
+  // from the run it resumes first, each naming that run in `keptFrom` (S-162). `used` is true exactly for the takes
   // a COMPLETED run's video shows: those its latest render manifest names, as `chosen` is written
   // only for a completed stills stage (S-055). A run that stopped or failed after a render was made —
   // at Gate 7, say — shows a caller no video, so it used no take.
@@ -234,6 +237,7 @@ export function readRecord(
       shotUnit: take.shotUnit,
       number: take.number,
       verdicts: take.verdicts,
+      keptFrom: take.keptFrom,
     })
     .from(take)
     .where(eq(take.runId, runId))
@@ -244,6 +248,7 @@ export function readRecord(
       shotId: `shot-${row.shotUnit}`,
       number: row.number,
       used: used.has(row.takeId),
+      ...(row.keptFrom === null ? {} : { keptFrom: row.keptFrom }),
       ...(takeSeen.has(row.takeId) ? { observationId: observationId(row.takeId) } : {}),
       ...(takeReconciled.has(row.takeId) ? { reconciliationId: reconciliationId(row.takeId) } : {}),
       checks: (JSON.parse(row.verdicts) as TakeVerdict[]).map((v) => ({
@@ -330,8 +335,15 @@ export function markChosen(
  * observation and reconciliation from their own rows, its score, its Gate 1S verdict and its
  * degradation (docs/features/resume-failed.md; S-164). A picture whose checks were cut off is not
  * among them: it is made again. `chosen` is false on every one; the stage decides it again.
+ *
+ * And `copiedPictures`, the run's picture rows copied from the run it resumes (`kept_from` set):
+ * what tells a resumed run's canonical left no slot for its repair — which stops for rule `gate-1` —
+ * from a crash's, which fails (S-171, S-048).
  */
-export function readStillsInputs(db: Db, runId: string): PictureRecord[] {
+export function readStillsInputs(
+  db: Db,
+  runId: string,
+): { kept: PictureRecord[]; copiedPictures: number } {
   const json = <T>(text: string | null): T | null =>
     text === null ? null : (JSON.parse(text) as T)
   const observations = new Map(
@@ -354,50 +366,51 @@ export function readStillsInputs(db: Db, runId: string): PictureRecord[] {
       .all()
       .map((r) => [r.pictureId, r]),
   )
-  return db
+  const rows = db
     .select()
     .from(picture)
     .where(eq(picture.runId, runId))
     .orderBy(asc(picture.seq))
     .all()
-    .flatMap((row): PictureRecord[] => {
-      const gate1 = json<NonNullable<PictureRecord['gate1']>>(row.gate1)
-      if (gate1 === null || gate1.outcome === null) return []
-      const reconciled = reconciliations.get(row.pictureId)
-      return [
-        {
-          pictureId: row.pictureId,
-          attempt: row.attempt,
-          shotUnit: row.shotUnit,
-          subjectId: row.subjectId,
-          role: row.role,
-          label: row.label,
-          path: row.path,
-          prompt: row.prompt,
-          framing: row.framing as PictureRecord['framing'],
-          references: JSON.parse(row.referenceIds) as string[],
-          seq: row.seq,
-          gate1,
-          measure: json<NonNullable<PictureRecord['measure']>>(row.measure),
-          text: json<string[]>(row.words),
-          observation: json<NonNullable<PictureRecord['observation']>>(
-            observations.get(row.pictureId) ?? null,
-          ),
-          reconciliation:
-            reconciled === undefined
-              ? null
-              : {
-                  ...(JSON.parse(reconciled.answer) as Omit<
-                    NonNullable<PictureRecord['reconciliation']>,
-                    'failed'
-                  >),
-                  failed: JSON.parse(reconciled.failed) as string[],
-                },
-          score: json<NonNullable<PictureRecord['score']>>(row.score),
-          gate1s: json<NonNullable<PictureRecord['gate1s']>>(row.gate1s),
-          degradation: row.degradation,
-          chosen: false,
-        },
-      ]
-    })
+  const kept = rows.flatMap((row): PictureRecord[] => {
+    const gate1 = json<NonNullable<PictureRecord['gate1']>>(row.gate1)
+    if (gate1 === null || gate1.outcome === null) return []
+    const reconciled = reconciliations.get(row.pictureId)
+    return [
+      {
+        pictureId: row.pictureId,
+        attempt: row.attempt,
+        shotUnit: row.shotUnit,
+        subjectId: row.subjectId,
+        role: row.role,
+        label: row.label,
+        path: row.path,
+        prompt: row.prompt,
+        framing: row.framing as PictureRecord['framing'],
+        references: JSON.parse(row.referenceIds) as string[],
+        seq: row.seq,
+        gate1,
+        measure: json<NonNullable<PictureRecord['measure']>>(row.measure),
+        text: json<string[]>(row.words),
+        observation: json<NonNullable<PictureRecord['observation']>>(
+          observations.get(row.pictureId) ?? null,
+        ),
+        reconciliation:
+          reconciled === undefined
+            ? null
+            : {
+                ...(JSON.parse(reconciled.answer) as Omit<
+                  NonNullable<PictureRecord['reconciliation']>,
+                  'failed'
+                >),
+                failed: JSON.parse(reconciled.failed) as string[],
+              },
+        score: json<NonNullable<PictureRecord['score']>>(row.score),
+        gate1s: json<NonNullable<PictureRecord['gate1s']>>(row.gate1s),
+        degradation: row.degradation,
+        chosen: false,
+      },
+    ]
+  })
+  return { kept, copiedPictures: rows.filter((row) => row.keptFrom !== null).length }
 }

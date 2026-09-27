@@ -26,6 +26,26 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > (D-096), and returns the video without a sources card (D-101). This file is reviewed here and moves to
 > the engine repository once approved (D-105).
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 4, in version 1 — the gates below are not edited, and no
+> assertion is removed** (**S-161**, **S-162**, in S-034's form). **A new route, `POST /v1/runs/:runId/resume`**
+> (`packages/reel-contract/src/resume.ts`, `routes.ts`): a strict `ResumeRequest` — `contractVersion`, an optional
+> `remake` of pieces, an optional `preview: true` — answered by a `ResumeResponse` of four strict arms: `preview` (200:
+> the pieces made again in shot order, `estimateCents` — what the reel spent plus the resume's estimate, the figure
+> compared — `spentCents`, `capCents`, `ceilingCents`, and `limit` when one would be crossed); `accepted` (202: the
+> new `runId`, the run it `resumes`, `replayed`); `refused` with a detail (409 `not-resumable` or `resumed`; 422
+> `version`, `invalid` or `unsupported`); and `refused` for `budget` (409, D-100's figures and `spentCents`). 404 and
+> 500 are `ErrorResponse`. **`Piece` is nested** — `kind` `still`, `narration` or `clip`, and an optional `shot` shaped
+> `shot-<n>` — and carries no version (D-106). **`RunStatus` gains `resumes?` and `resumedBy?`, and each picture and
+> take of `RunRecord` gains `keptFrom?`**, each absent — never null — on a run it does not apply to. `CONTRACT_VERSION`
+> stays `1`: no caller exists for a bump to protect. **Checks 1, 2 and 5** (`reel-contract-shapes.test.ts`) gain
+> `ResumeRequest` and each arm of `ResumeResponse` in `MESSAGES` and `Piece` in `NESTED`, each with a valid example,
+> `RunStatus` examples carrying each pointer and a resumed `RunRecord` carrying `keptFrom`; their assertions are as
+> written. **Check 18** (`reel-contract-following.test.ts`) gains a test: the stand-in, which never resumes
+> (`resume-failed`'s Deferred 6), answers a resume of a known run `422` `refused`, reason `unsupported`, its `runId` the
+> run, and of an unknown one `404 not-found` — each body parsed by the stand-in client, whose `Route`, `EXPECTED` and
+> `routeOf` gain the route. **Lookup by `requestId`, and a replayed submit, answer the request's newest run** — its
+> resume, when it has one (S-162); every request here has one run, so checks 13 and 27 read as they did.
+>
 > **Amended by `reel-stills` on 2026-09-16, in version 1 — the gates below are not edited.** Two
 > things changed under decisions written for that feature, and are read there:
 >

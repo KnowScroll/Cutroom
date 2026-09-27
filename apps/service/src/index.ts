@@ -1,5 +1,5 @@
 export { loadEnvFile } from './env-file.ts'
-export { startService, type Service } from './service.ts'
+export { resumeService, startService, type Service } from './service.ts'
 export {
   CLIPS_A_JOB,
   DEFAULT_API_PORT,

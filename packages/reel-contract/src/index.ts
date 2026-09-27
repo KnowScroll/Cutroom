@@ -24,5 +24,6 @@ export {
   VideoRef,
 } from './responses.ts'
 export { RunRecord } from './record.ts'
+export { Piece, ResumeRequest, ResumeResponse } from './resume.ts'
 export { ErrorResponse } from './errors.ts'
 export type { Routes } from './routes.ts'

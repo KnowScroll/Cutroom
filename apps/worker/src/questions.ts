@@ -1,12 +1,16 @@
 import { appendFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import type { ResumeQuestion } from '@cutroom/domain'
 
 // Writing a question (docs/features/reel-plan.md, Gate 2 "Selection, repair and how a run ends";
 // docs/features/reel-stills.md, Gate 2 "Spending while pictures are made"; docs/features/reel-render.md,
-// Gate 2 "Spending"; D-014, D-097, D-100). The engine writes one only when its own per-reel cap refuses
-// a run or stops one — a refusal or a stop at the caller's ceiling is returned, not written — and only
-// to its own file. The entry's form, and why it is appended after the run is finished, are S-026; a
-// stop's entry is S-035's, and a stop in the clips stage names the call it refused (S-087).
+// Gate 2 "Spending"; docs/features/resume-failed.md, Gate 2 "How a resume is planned, admitted and
+// made"; D-014, D-097, D-100). The engine writes one only when its own per-reel cap refuses a run,
+// stops one, or refuses a resume — a refusal or a stop at the caller's ceiling is returned, not
+// written — and only to its own file. The worker appends the first two; a caller's resume refused at
+// the cap is appended through the service the API is handed, which binds this file's writer to the
+// worker's own path (S-162). The entry's form, and why it is appended after the run is finished, are
+// S-026; a stop's entry is S-035's, and a stop in the clips stage names the call it refused (S-087).
 
 /** The default questions file: `QUESTIONS.md` at this repository's root (D-097). A setting. */
 export const QUESTIONS_MD = fileURLToPath(new URL('../../../QUESTIONS.md', import.meta.url))
@@ -14,7 +18,7 @@ export const QUESTIONS_MD = fileURLToPath(new URL('../../../QUESTIONS.md', impor
 const HEADER = [
   '# Questions from the engine',
   '',
-  "Appended by the engine's worker when its per-reel cap refuses a run (D-014, D-097, D-100).",
+  'Appended by the engine when its per-reel cap refuses a run, stops one or refuses a resume (D-014, D-097, D-100).',
   'One entry per refusal, newest at the bottom. Nothing here is read back by the engine.',
   '',
 ].join('\n')
@@ -175,6 +179,43 @@ export function appendClipsStopQuestion(
     `- **Rates:** ${question.imageRateCents} cents an image, ${question.videoRateCentsPerSecond} cents a second of video, ${question.narrationRateCentsPerCharacter} cents a character of narration`,
     '',
     "**Question.** Making this reel's narration and clips would have passed the per-reel cap: a call cost more than its rate, or the clips asked for more seconds than the plan's estimate counted. Should the cap or the rates change?",
+    '',
+  ].join('\n')
+  appendFileSync(path, entry)
+}
+
+/**
+ * Appends one entry for a resume refused at the per-reel cap — a caller's call now, and the engine's
+ * own resume once it asks — in S-026's form under a heading of its own (D-097, D-100, S-162): the
+ * failed run and its request, who asked, the pieces named, the resume's estimate beside what the reel
+ * spent and the figure compared, both limits and the rates it was priced at. The file, with its
+ * header, is created on the first write. A preview, and a refusal at the ceiling, are never written.
+ */
+export function appendResumeQuestion(
+  path: string,
+  question: ResumeQuestion,
+  now: Date = new Date(),
+): void {
+  ensureFile(path)
+  const { rates } = question
+  const named =
+    question.named.length === 0
+      ? 'none: every piece the run checked is kept'
+      : question.named.map((p) => `${p.kind} ${p.shot ?? 'of every shot'}`).join(', ')
+  const entry = [
+    '',
+    `## ${now.toISOString()} — run ${question.runId} not resumed: the resume would pass the per-reel cap`,
+    '',
+    `- **Request:** \`${question.requestId}\``,
+    `- **Asked by:** the ${question.by}`,
+    `- **Named:** ${named}`,
+    `- **Estimate:** ${question.estimateCents} cents, what the reel spent and the resume's own ${question.resumeEstimateCents} cents`,
+    `- **Spent:** ${question.spentCents} cents over the whole reel`,
+    `- **Per-reel cap:** ${question.capCents} cents, the \`Per reel, all-in\` row of BUDGET.md`,
+    `- **Ceiling:** ${question.ceilingCents} cents, the caller's`,
+    `- **Rates:** ${rates.imageRateCents} cents an image, ${rates.videoRateCentsPerSecond} cents a second of video, ${rates.narrationRateCentsPerCharacter} cents a character of narration`,
+    '',
+    '**Question.** Making this failed run again, keeping what it checked, would pass the per-reel cap. Should the cap or the rates change, or should the reel be asked for again as a new request?',
     '',
   ].join('\n')
   appendFileSync(path, entry)

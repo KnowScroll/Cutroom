@@ -2,8 +2,9 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import type { AddressInfo } from 'node:net'
 import { dirname } from 'node:path'
 import { startApi, type Api } from '@cutroom/api'
-import { closeDatabase, openDatabase } from '@cutroom/domain'
-import { DEFAULT_PLAN_SETTINGS } from '@cutroom/pipeline'
+import type { PlanSettings, RenderSettings, ResumeRates } from '@cutroom/contracts'
+import { closeDatabase, openDatabase, type ResumeService } from '@cutroom/domain'
+import { DEFAULT_PLAN_SETTINGS, admitResume, planResume } from '@cutroom/pipeline'
 import {
   ffmpegAssembler,
   ffmpegMedia,
@@ -16,7 +17,7 @@ import {
   type PortOptions,
   type StandInScripts,
 } from '@cutroom/providers'
-import { startWorker, type Worker } from '@cutroom/worker'
+import { appendResumeQuestion, startWorker, type Worker } from '@cutroom/worker'
 import type { ServiceSettings } from './settings.ts'
 
 // THE COMPOSITION ROOT (docs/features/paid-path.md, Gate 2). `startApi` and `startWorker` are
@@ -27,7 +28,9 @@ import type { ServiceSettings } from './settings.ts'
 // It is an app of its own because it MUST import `packages/providers`, and `api-no-providers` and
 // `worker-no-providers` forbid the two apps that exist from doing it — which is the rule that keeps
 // a stage or a runner from reaching for an adapter that spends (S-021, S-038). Nothing imports
-// this app, and it holds no pipeline logic: it names adapters and hands them over.
+// this app, and it holds no pipeline logic: it names adapters and hands them over — and binds the
+// resume's planner to the worker's own settings and questions file for the API, which may import
+// neither the pipeline nor the worker (S-162).
 
 export interface Service {
   baseUrl: string
@@ -37,6 +40,47 @@ export interface Service {
   stopped: Promise<void>
   /** Closes the API and stops the worker after the job in hand. Safe to call twice. */
   stop(): Promise<void>
+}
+
+/**
+ * The ResumeService the API is handed (docs/features/resume-failed.md, Gate 2 "How a resume is
+ * planned, admitted and made"; S-161, S-162) — its one builder. `decide` plans a caller's resume with
+ * the pipeline's one planner at the rates the worker prices with, from `planSettings` and
+ * `renderSettings`, and admits it by the one rule every guard keeps; `askOwner` appends the cap's
+ * question with the worker's own writer to `questionsPath`. The path is REQUIRED, with no default, so
+ * no API a test starts can append to this repository's QUESTIONS.md.
+ */
+export function resumeService(options: {
+  planSettings: PlanSettings
+  renderSettings: RenderSettings
+  questionsPath: string
+}): ResumeService {
+  const rates: ResumeRates = {
+    imageRateCents: options.planSettings.imageRateCents,
+    videoRateCentsPerSecond: options.planSettings.videoRateCentsPerSecond,
+    narrationRateCentsPerCharacter: options.renderSettings.narrationRateCentsPerCharacter,
+  }
+  return {
+    decide(inputs, remake, capCents) {
+      const planned = planResume(inputs, remake, rates, 'caller')
+      if (planned.outcome !== 'planned') return planned
+      const { plan } = planned
+      const ceilingCents = inputs.request.options.budgetCents
+      const admission = admitResume(inputs.spentCents, plan.estimateCents, capCents, ceilingCents)
+      const figures = {
+        estimateCents: admission.estimateCents,
+        spentCents: inputs.spentCents,
+        capCents,
+        ceilingCents,
+      }
+      return admission.admitted
+        ? { outcome: 'admitted', plan, ...figures }
+        : { outcome: 'budget', plan, limit: admission.limit, ...figures }
+    },
+    askOwner(question, now) {
+      appendResumeQuestion(options.questionsPath, { ...question, rates }, now)
+    },
+  }
 }
 
 /** What the stand-ins answer from, read from the file the script setting names (S-116). */
@@ -98,7 +142,19 @@ export async function startService(settings: ServiceSettings): Promise<Service> 
   mkdirSync(dirname(settings.dbPath), { recursive: true })
   closeDatabase(openDatabase(settings.dbPath))
 
-  const api: Api = await startApi({ dbPath: settings.dbPath, port: settings.apiPort })
+  // The API is handed the ResumeService built from the worker's own settings and questions file, and
+  // the worker's cap file, so a caller's preview and admission price at the worker's rates, read the
+  // cap its guards read, and ask the owner where the worker asks (S-161, S-162, D-097).
+  const api: Api = await startApi({
+    dbPath: settings.dbPath,
+    port: settings.apiPort,
+    resume: resumeService({
+      planSettings: settings.planSettings,
+      renderSettings: settings.renderSettings,
+      questionsPath: settings.questionsPath,
+    }),
+    budgetPath: settings.budgetPath,
+  })
 
   // EXACTLY ONE WORKER (S-113). With one poller no second claim exists to take a job whose lease
   // ran out while it was still alive — which on a real run would pay a second time for the take in

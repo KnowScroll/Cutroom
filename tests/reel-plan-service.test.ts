@@ -4,6 +4,7 @@ import { networkInterfaces } from 'node:os'
 import { after, before, test } from 'node:test'
 import { EXPECTED, type Reply, type Route } from './stand-in/client.ts'
 import { finished, startEngine, type Engine } from './engine/harness.ts'
+import { stillsRequest } from './engine/stills.ts'
 import { validRequest } from './stand-in/fixtures.ts'
 
 // reel-plan, Slice 1 — the service itself (docs/features/reel-plan.md, checks 12 and 13): where it
@@ -126,6 +127,26 @@ test('13. every body the service sends on every route parses under its @cutroom/
   hit('cancel', await http.cancel(runId), 200)
   hit('cancel', await http.cancel('no-such-run'), 404)
 
+  // resume (resume-failed, Slice 4; S-161, S-162): a run failed at its planner by a provider's fault
+  // — unavailable at each of its three sends — on a third engine, whose script this run alone reads;
+  // and this engine's own run, failed when its stand-in ran out of script, a fault of the engine's.
+  const busy = { throws: 'the model answered 529', as: 'unavailable' } as const
+  const failing = await startEngine({ worker: true, script: { planner: [busy, busy, busy] } })
+  try {
+    const failed = await failing.http.submit(stillsRequest('r13-resume'))
+    const failedId = String(failed.json.runId)
+    await finished(failing, failedId)
+    const resume = (body: Record<string, unknown>) => failing.http.resume(failedId, body)
+    hit('resume', await resume({ preview: true }), 200)
+    hit('resume', await resume({}), 202)
+    hit('resume', await resume({ remake: [{ kind: 'still', shot: 'shot-0' }] }), 422)
+    hit('resume', await resume({ contractVersion: 2 }), 422)
+    hit('resume', await failing.http.resume('no-such-run'), 404)
+  } finally {
+    await failing.stop()
+  }
+  hit('resume', await http.resume(runId), 409)
+
   // 500 on every route: a second engine whose tables are removed underneath it, so every read and
   // write the service makes fails inside the engine, not in the request.
   const broken = await startEngine({ worker: false })
@@ -142,6 +163,7 @@ test('13. every body the service sends on every route parses under its @cutroom/
     hit('result', await broken.http.result(doomedId), 500)
     hit('record', await broken.http.record(doomedId), 500)
     hit('cancel', await broken.http.cancel(doomedId), 500)
+    hit('resume', await broken.http.resume(doomedId), 500)
   } finally {
     await broken.stop()
   }

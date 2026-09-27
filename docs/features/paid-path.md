@@ -31,6 +31,19 @@ Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED
 > default stays 4¢. **Check 15 reads the new figures** — five seconds cost 3¢ — and still proves an entry prices by its
 > own rate.
 >
+> **Amended by `resume-failed` on 2026-09-26, Slice 4 — the gates below are not edited, and no assertion is removed**
+> (**S-161**, **S-162**, **D-097**). **The composition root builds the `ResumeService` the API is handed**
+> (`apps/service/src/service.ts`, exported from `@cutroom/service` as
+> `resumeService({ planSettings, renderSettings, questionsPath })`): `decide` plans a caller's resume with the
+> pipeline's `planResume` at the worker's own rates and admits it with `admitResume`; `askOwner` appends the cap's
+> question through the worker's `appendResumeQuestion` (`apps/worker/src/questions.ts`, exported from
+> `@cutroom/worker`) to the questions file it is handed — required, with no default, so no API a test starts writes
+> this repository's `QUESTIONS.md`. `startService` hands `startApi` that
+> service, built from `settings.planSettings`, `settings.renderSettings` and `settings.questionsPath`, and
+> `budgetPath: settings.budgetPath`, so a caller's preview and admission price at the worker's rates, read the cap its
+> guards read, and ask where it asks (`resume-failed` check 34). No port, setting or startup refusal changes, and the
+> app gains no dependency.
+>
 > **Amended by `resume-failed` on 2026-09-26, Slice 1 — the gates below are not edited, and no assertion is
 > removed** (**S-163**). **Four throw sites raise the new classes, each message unchanged**: fal's frame refusal an
 > `OffSpec` (`fal/image.ts`, still a `Spent`); a job fal reports FAILED a `ProviderFailed` in both shapes — its result

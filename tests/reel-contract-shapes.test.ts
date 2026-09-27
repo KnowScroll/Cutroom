@@ -11,6 +11,9 @@ import {
   ErrorResponse,
   EventsPage,
   NarrationSentence,
+  Piece,
+  ResumeRequest,
+  ResumeResponse,
   RunEvent,
   RunOptions,
   RunRecord,
@@ -91,7 +94,26 @@ const MESSAGES = {
   ],
   RunStatus: [
     RunStatus,
-    [{ contractVersion: V, runId: 'run-1', requestId: 'req-1', state: 'running', lastSeq: 3 }],
+    [
+      { contractVersion: V, runId: 'run-1', requestId: 'req-1', state: 'running', lastSeq: 3 },
+      // Since resume-failed's Slice 4 (S-162): a run that resumes another, and one resumed.
+      {
+        contractVersion: V,
+        runId: 'run-2',
+        requestId: 'req-1',
+        state: 'running',
+        lastSeq: 1,
+        resumes: 'run-1',
+      },
+      {
+        contractVersion: V,
+        runId: 'run-1',
+        requestId: 'req-1',
+        state: 'finished',
+        lastSeq: 9,
+        resumedBy: 'run-2',
+      },
+    ],
   ],
   EventsPage: [
     EventsPage,
@@ -158,6 +180,111 @@ const MESSAGES = {
         takes: [],
         degradations: [],
       },
+      // A resumed run's record, since resume-failed's Slice 4 (S-162): a picture and a take copied
+      // from the run it resumes name it, and a take it made does not.
+      {
+        contractVersion: V,
+        runId: 'run-2',
+        pictures: [
+          {
+            pictureId: 'p1',
+            shotId: 's1',
+            chosen: true,
+            keptFrom: 'run-1',
+            checks: [{ gate: '1', step: 'witness', outcome: 'accept' }],
+          },
+        ],
+        takes: [
+          {
+            takeId: 't1',
+            shotId: 's1',
+            number: 1,
+            used: true,
+            keptFrom: 'run-1',
+            checks: [{ gate: '2', outcome: 'accept' }],
+          },
+          { takeId: 't2', shotId: 's2', number: 1, used: true, checks: [] },
+        ],
+        degradations: [],
+      },
+    ],
+  ],
+  // The resume route's request and each arm of its answer (resume-failed, S-161, S-162).
+  ResumeRequest: [
+    ResumeRequest,
+    [
+      { contractVersion: V },
+      {
+        contractVersion: V,
+        remake: [{ kind: 'still', shot: 'shot-0' }, { kind: 'clip' }],
+        preview: true,
+      },
+    ],
+  ],
+  'ResumeResponse preview': [
+    ResumeResponse,
+    [
+      {
+        contractVersion: V,
+        outcome: 'preview',
+        runId: 'run-1',
+        remake: [
+          { kind: 'still', shot: 'shot-0' },
+          { kind: 'clip', shot: 'shot-0' },
+        ],
+        estimateCents: 205,
+        spentCents: 15,
+        capCents: 300,
+        ceilingCents: 300,
+      },
+      {
+        contractVersion: V,
+        outcome: 'preview',
+        runId: 'run-1',
+        remake: [],
+        estimateCents: 320,
+        spentCents: 15,
+        capCents: 300,
+        ceilingCents: 300,
+        limit: 'reel',
+      },
+    ],
+  ],
+  'ResumeResponse accepted': [
+    ResumeResponse,
+    [
+      {
+        contractVersion: V,
+        outcome: 'accepted',
+        runId: 'run-2',
+        resumes: 'run-1',
+        replayed: false,
+      },
+    ],
+  ],
+  'ResumeResponse refused': [
+    ResumeResponse,
+    [
+      {
+        contractVersion: V,
+        outcome: 'refused',
+        runId: 'run-1',
+        reason: 'not-resumable',
+        detail: 'it completed',
+      },
+    ],
+  ],
+  'ResumeResponse refused for budget': [
+    ResumeResponse,
+    [
+      {
+        contractVersion: V,
+        outcome: 'refused',
+        runId: 'run-1',
+        reason: 'budget',
+        ...figures,
+        spentCents: 15,
+      },
     ],
   ],
   ErrorResponse: [ErrorResponse, [{ contractVersion: V, error: 'not-found', detail: 'no run' }]],
@@ -175,6 +302,7 @@ const NESTED = {
   StillRef: [StillRef, still],
   VideoRef: [VideoRef, { path: 'C:/v.mp4' }],
   Degradation: [Degradation, { shotId: 's1', reason: 'r' }],
+  Piece: [Piece, { kind: 'still', shot: 'shot-0' }],
 } as const
 
 type Schema = { safeParse(x: unknown): { success: boolean; data?: unknown } }

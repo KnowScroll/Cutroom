@@ -10,6 +10,7 @@ import {
   type EventsPage,
   type RunRecord,
   type RunResult,
+  type ResumeResponse,
   type RunStatus,
   type SubmitResponse,
 } from '@cutroom/reel-contract'
@@ -24,6 +25,9 @@ import {
  *
  * Runs do not progress on their own. A test moves one forward with `advance` or `runToEnd`, which
  * is what lets a test observe a run mid-way.
+ *
+ * It never resumes a run (resume-failed, Deferred 6): the resume route answers `422`, reason
+ * `unsupported`, as an engine with no resume service does, and `404` for a run it does not hold.
  */
 
 export type Until = 'plan' | 'stills' | 'video'
@@ -122,6 +126,7 @@ async function readBody(req: IncomingMessage): Promise<string> {
 const RUN_ROUTE = /^\/v1\/runs\/([^/]+)$/
 const RUN_SUB_ROUTE = /^\/v1\/runs\/([^/]+)\/(events|result|record)$/
 const CANCEL_ROUTE = /^\/v1\/runs\/([^/]+)\/cancel$/
+const RESUME_ROUTE = /^\/v1\/runs\/([^/]+)\/resume$/
 const WHOLE_NUMBER = /^\d+$/
 
 export async function startStandIn(options: StandInOptions): Promise<StandIn> {
@@ -519,6 +524,7 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
     const byId = RUN_ROUTE.exec(url.pathname)
     const sub = RUN_SUB_ROUTE.exec(url.pathname)
     const cancel = CANCEL_ROUTE.exec(url.pathname)
+    const resume = RESUME_ROUTE.exec(url.pathname)
 
     if (failNext) {
       failNext = false
@@ -534,6 +540,18 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
     if (req.method === 'POST' && url.pathname === '/v1/runs') {
       const [code, body] = submit(await readBody(req))
       return send(res, code, body)
+    }
+    if (req.method === 'POST' && resume !== null) {
+      const runId = decodeURIComponent(resume[1] as string)
+      if (status(runId) === undefined) return send(res, 404, notFound('no such run'))
+      const refused: ResumeResponse = {
+        contractVersion: V,
+        outcome: 'refused',
+        runId,
+        reason: 'unsupported',
+        detail: 'the stand-in never resumes a run',
+      }
+      return send(res, 422, refused)
     }
     if (req.method === 'GET' && url.pathname === '/v1/runs') {
       const requestId = url.searchParams.get('requestId')

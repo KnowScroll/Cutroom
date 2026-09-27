@@ -51,6 +51,8 @@ export type {
   Piece,
   ResumeAdmission,
   ResumeBy,
+  ResumeDecision,
+  ResumeFigures,
   ResumeInputs,
   ResumePlan,
   ResumePlanned,

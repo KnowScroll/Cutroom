@@ -6,7 +6,7 @@
   full check; Slice 7 runs the journey.
 - **Written:** 2026-09-26, at the end of session 57, which built Slice 3; amended the same session for S-172 (a builder
   agent per slice, so one session builds several) and S-173 (`cutroom-sdk` next after `resume-failed`).
-- **Run:** not yet
+- **Run:** session 58, 2026-09-26 to 27 — Slice 4 built and committed; stopped at its boundary at the owner's word
 
 **Where things stand.** The four gates are APPROVED (Gate review 12). Slices 1 (`e67ec6f`), 2 (`0f73e5d`) and 3
 (`395dc40`) are built, each after a full `check.mjs` green. Slice 3 made the resume end to end by a test:

@@ -1,6 +1,7 @@
 import type { ErrorResponse } from './errors.ts'
 import type { RunRecord } from './record.ts'
 import type { SubmitRequest } from './request.ts'
+import type { ResumeRequest, ResumeResponse } from './resume.ts'
 import type { EventsPage, RunResult, RunStatus, SubmitResponse } from './responses.ts'
 
 // What to call, and what comes back — as types only. The engine is reached over HTTP on the
@@ -33,5 +34,17 @@ export type Routes = {
   }
   'POST /v1/runs/:runId/cancel': {
     responses: { 200: RunStatus; 404: ErrorResponse; 500: ErrorResponse }
+  }
+  /** A failed run made again once, keeping every piece already checked (S-161, S-162). */
+  'POST /v1/runs/:runId/resume': {
+    body: ResumeRequest
+    responses: {
+      200: ResumeResponse
+      202: ResumeResponse
+      404: ErrorResponse
+      409: ResumeResponse
+      422: ResumeResponse
+      500: ErrorResponse
+    }
   }
 }
