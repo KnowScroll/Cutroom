@@ -108,7 +108,7 @@ The journey, not the tick, is the proof that verifies the feature.
 
 Only after resume-failed's journey PASS, run these journeys serially in this exact order:
 
-~~~
+```
 reel-contract
 reel-plan
 reel-stills
@@ -119,7 +119,7 @@ ask-again
 second-ask
 paid-path
 three-pictures
-~~~
+```
 
 For each: confirm a clean tree; run node scripts/journey.mjs <slug> once; inspect its generated
 Evidence, Status and Divergence; and commit that exact journey result before starting the next.
