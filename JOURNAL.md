@@ -7049,3 +7049,15 @@ right behaviour. A future prompt can add `contractVersion: 1` to the preview bod
 issue.
 
 **Next.** Stop at the Slice 6 boundary. PROMPTS/061 is session 61's prompt: check 44, the journey, and Slice 7.
+
+## 2026-09-27 — session 60, continued: Slice 7 prompt repaired before it runs
+
+**Asked.** _"Check the next session prompt, verify if its good and not missing things, it should be a proper thought our plan."_ Then: _"yes fix the prompt for the next session into that executable plan. End to end proper"_
+
+**Finding.** The first `PROMPTS/061` was not executable. Gate 3 assigns check 44, the PATH-only `resume-failed` child, to Slice 7, but no `tests/resume-failed-secrets.test.ts` existed; the prompt said it added no test. It told the session to run `journey.mjs` while Slice 7 was unticked, although the runner refuses every unticked slice and does not tick one itself. It named ten S-099 re-verification journeys without the clean-tree and per-result commit sequence each needs. The current aggregate test failure also supersedes its historical green-baseline claim: the wrapper reported no failing test.
+
+**Changed.** `PROMPTS/061-resume-failed-slice-7.md` now makes that failure a hard preflight; specifies check 44 and its S-028 form; requires a green full check, tick and commit before the own journey; names the own journey and every affected-feature journey, serially with a clean tree and one result commit each; and ends with Journal/context/prompt-index documentation plus `check.mjs --changed`. Its scope stays closed: no new resume behaviour, paid run or gate change. `docs/context.md` now names six built slices, that preflight finding, and the repaired prompt.
+
+**Not run.** No tests were run in this prompt-only session, at the owner's instruction. The `git diff --check` review is clean.
+
+**Next.** Session 61 follows the repaired PROMPTS/061: make the aggregate-test failure legible and green first; then check 44, Slice 7, its journey and the ten required re-journeys. A failure stops there; a complete PASS makes `cutroom-sdk`'s gates next.
