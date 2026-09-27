@@ -4,7 +4,7 @@
 - **Feature:** resume-failed (S-157, S-161 to S-164, S-171 to S-174)
 - **Work:** build check 44, then complete Slice 7's journey and every required re-verification journey (S-016, S-028, S-099). Stop at the feature boundary.
 - **Written:** 2026-09-27; revised before session 61 because the earlier plan could neither build check 44 nor start the journey.
-- **Run:** not yet
+- **Run:** 2026-09-28 (session 61) — Slice 7 built and verified (`aa9a9f4`); five of ten S-099 re-journeys PASS, `paid-failures` FAIL on the load-sensitive reel-render-secrets transient; remaining five held for a less loaded machine.
 
 ## Purpose
 
