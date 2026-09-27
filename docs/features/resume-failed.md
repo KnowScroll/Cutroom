@@ -5,7 +5,7 @@ authority: plan
 
 # resume-failed — a run a provider failed is made again once, as a new run that keeps every piece already checked; and a caller may name pieces not to keep
 
-Status: planned
+Status: verified
 Decisions: D-005, D-014, D-018, D-022, D-024, D-025, D-027, D-030, D-031, D-042, D-045, D-047, D-048, D-058, D-065,
 D-081, D-083, D-084, D-086, D-094, D-095, D-097, D-099, D-100, D-106, I-1, I-4, I-11, I-15, I-18, S-012, S-026, S-027,
 S-028, S-034,
@@ -1050,6 +1050,8 @@ Every check appears in exactly one slice: 5 + 6 + 14 + 9 + 6 + 3 + 1 = 44.
 5. **The reel's cap and ceiling count the failed run and its resume together, and each run reports its own spend.**
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-09-28 journey=PASS at aa9a9f4 — every check green; 54 tests in tests/resume-failed-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
