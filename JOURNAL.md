@@ -7242,3 +7242,53 @@ files, route shapes, tests, deliberate breaks, stop conditions and acceptance cr
 
 **Next.** Execute Slice 0 from PROMPTS/063 and stop for its impact review. If it finds no new product choice, execute
 only Slice 1, prove it, tick and commit it, then stop at that slice boundary.
+
+## 2026-09-28 — session 63, continued: `cutroom-sdk` Slice 0 impact record, committed (`12dfc16`)
+
+**Asked.** Run PROMPTS/063's Slice 0: write the impact and baseline record into `docs/features/cutroom-sdk.md`
+immediately before Gate 4, classify every affected file, and stop for review before any runtime change.
+
+**Changed.** One file: `docs/features/cutroom-sdk.md` gains a `## Slice 0 impact record` section between Gate 3
+and Gate 4. Prettier fixed two artefacts (a `,` after `path` lost in table-cell wrapping, a doubled `/` in the
+acceptance checklist). No other file changed.
+
+**Verified.**
+
+- `decisions.mjs`: pin current, 0 commits unpushed.
+- The document scans: `tests/line-endings.test.ts`, `tests/no-absolute-paths.test.ts`, `tests/feature-files.test.ts`
+  and `tests/context-file.test.ts` — all 7 cases pass; the new section preserves front matter, the `Gates:` line
+  on one physical line (S-141), the moved-from note and the `Status: planned` line.
+- `node scripts/docs-check.mjs`: 3 design documents identical to the steering repository.
+
+**What the record found.** four call sites of `startApi(`, exactly three are callers:
+
+1. `apps/service/src/service.ts:145` — `startService` — full `{ dbPath, port, resume, budgetPath }` — amend.
+2. `tests/engine/harness.ts:242` and `:350` — `startEngine` initial and after `restart()` — amend.
+3. `tests/resume-failed-contract.test.ts:1325` — bare `{ dbPath }` — amend. The bare caller is the one a required
+   `ready` getter turns into a TypeScript error; the test will be amended to supply `ready: () => true`.
+
+No new `packages/sdk`, no rule added, no `pathNot` widened, no migration, no provider, no key read. The readiness
+route is a one-line `if` branch in `apps/api/src/server.ts` plus a required `ready: () => boolean` getter on
+`ApiOptions`. `tests/stand-in/client.ts` adds `ready` to its `Route` union, `EXPECTED` table and `routeOf`
+because `tests/reel-plan-service.test.ts`'s check 13 (comprehensive route coverage) already exercises every other
+route through that helper — making the amend unconditional, not "only if used".
+
+**Verified feature tests Slice 1 can turn red.** exactly two, both in `tests/reel-plan-service.test.ts`'s check 13:
+the comprehensive route-coverage assertion (lines 66–179) and its `DROP TABLE` 500-block (lines 152–169). The
+client amend without the engine-side assertion line still does not catch a missing readiness route — the engine
+must be probed in the same test. Every other verified test is unaffected and reasoned out by exclusion in the
+record.
+
+**Re-journeys.** exactly two: `reel-contract` (contract V1 amendment, new schema and route) and `reel-plan`
+(route-coverage assertion amend in its check 13). No other verified feature's journey is forced to rerun by
+Slice 1 alone, with file-level evidence per feature in the record. Slice 2's boundary rules and `packages/sdk`
+may force additional reruns — the prompt says to re-evaluate in every later slice; the Slice 2 builder inherits
+that rule.
+
+**Committed.** `12dfc16`, one file (`docs/features/cutroom-sdk.md`, +71 lines). Pre-Prettier fixes added two
+acceptance-criteria word changes, the table cell lost a `,` after `path`, and the heading strip doubled a
+`/` in `SDK / /launcher`; both fixed and re-formatted before commit. `git status` clean afterwards; `node
+scripts/check.mjs --code` not run a second time, per the prompt's "do not run a second full check" line.
+
+**Why.** CLAUDE.md rule 5: a journal entry before finishing. Slice 0 is a record-only commit, so the entry is
+short — its body is in the file it added, not in the journal. Slice 1 will be the next entry, when it runs.
