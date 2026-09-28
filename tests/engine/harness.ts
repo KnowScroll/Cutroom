@@ -234,13 +234,17 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
   // The API a caller resumes through: handed the ResumeService @cutroom/service builds, from this
   // engine's own plan and render settings and its questions file, and the worker's cap file — so the
   // API prices, admits and asks exactly as its worker would, and never a second copy (resume-failed).
+  // Readiness (cutroom-sdk, S-173): the API begins listening before the worker is up; the `ready`
+  // getter below reads the live `worker` binding, declared BEFORE `startApi` so the closure captures
+  // it. Tests probe `GET /v1/ready` and observe 503 until they call `startWorker()`, then 200.
+  let worker: Worker | undefined
   const apiOptions = {
     dbPath,
     resume: resumeService({ planSettings: settings, renderSettings, questionsPath }),
     ...(budgetPath === undefined ? {} : { budgetPath }),
+    ready: () => worker !== undefined,
   }
   const api = await startApi(apiOptions)
-  let worker: Worker | undefined
   const children: Array<ReturnType<typeof spawn>> = []
   const wrap = options.wrapModel ?? ((model: LanguageModelPort) => model)
   const wrapVideo = options.wrapVideo ?? ((video: VideoPort) => video)
@@ -344,8 +348,12 @@ export async function startEngine(options: EngineOptions): Promise<Engine> {
       }
     },
     async restart({ script }) {
-      await worker?.stop()
+      // `worker = undefined` is set BEFORE `worker.stop()` resolves, so the readiness getter
+      // answers 503 the instant restart begins — there is no window where a probe could see
+      // `worker !== undefined` while the worker is on its way down (cutroom-sdk, S-173).
+      const stopping = worker
       worker = undefined
+      await stopping?.stop()
       await engine.api.stop()
       engine.api = await startApi(apiOptions)
       engine.http = client(engine.api.baseUrl)

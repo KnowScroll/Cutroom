@@ -18,6 +18,7 @@ import {
 } from '@cutroom/domain'
 import {
   CONTRACT_VERSION,
+  ReadyResponse,
   ResumeRequest,
   SubmitRequest,
   type ErrorResponse,
@@ -53,6 +54,14 @@ export interface ApiOptions {
   resume?: ResumeService
   /** The cap file a resume is admitted against — the worker's own. Defaults to BUDGET.md (D-097). */
   budgetPath?: string
+  /**
+   * Live readiness: `true` only after the sole worker has completed startup, `false` before
+   * (cutroom-sdk, S-173). The API calls this getter exactly once per `GET /v1/ready` request,
+   * captures the result, and uses the captured value for both status and body — so a getter whose
+   * answer changes between calls cannot return 503 with `ready: true` or 200 with `ready: false`.
+   * Required.
+   */
+  ready: () => boolean
 }
 
 export interface Api {
@@ -287,6 +296,18 @@ async function handle(
   const cancel = CANCEL_ROUTE.exec(url.pathname)
   const resumeOf = RESUME_ROUTE.exec(url.pathname)
 
+  // Readiness, before run-route handling: a getter called once per request, the captured boolean
+  // driving both status and body (cutroom-sdk, S-173). No request body, no path/query segment, no
+  // settings read, no row written - and no read of `db` either. The `ReadyResponse` parse on the
+  // body is a type guard for the static type, not a runtime check; the strict Zod schema in
+  // `packages/reel-contract/src/ready.ts` is the runtime validation, owned by the consumer.
+  if (req.method === 'GET' && url.pathname === '/v1/ready') {
+    const ready = options.ready()
+    const body: ReadyResponse = ready
+      ? { contractVersion: V, ready: true }
+      : { contractVersion: V, ready: false }
+    return send(res, ready ? 200 : 503, body)
+  }
   if (req.method === 'POST' && url.pathname === '/v1/runs') {
     const [code, body] = submit(db, await readBody(req))
     return send(res, code, body)

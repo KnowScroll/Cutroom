@@ -142,6 +142,12 @@ export async function startService(settings: ServiceSettings): Promise<Service> 
   // The API is handed the ResumeService built from the worker's own settings and questions file, and
   // the worker's cap file, so a caller's preview and admission price at the worker's rates, read the
   // cap its guards read, and ask the owner where the worker asks (S-161, S-162, D-097).
+  // Readiness (cutroom-sdk, S-173): the API begins listening before the worker is up, so a
+  // `GET /v1/ready` probe must read a getter, not a stored boolean held by the API. The flag is
+  // false here, before `startWorker`, and flipped to true only after the awaited `startWorker`
+  // resolves. A worker-start failure leaves it false and the API stopped, by the existing catch
+  // below.
+  let ready = false
   const api: Api = await startApi({
     dbPath: settings.dbPath,
     port: settings.apiPort,
@@ -151,6 +157,7 @@ export async function startService(settings: ServiceSettings): Promise<Service> 
       questionsPath: settings.questionsPath,
     }),
     budgetPath: settings.budgetPath,
+    ready: () => ready,
   })
 
   // EXACTLY ONE WORKER (S-113). With one poller no second claim exists to take a job whose lease
@@ -180,8 +187,10 @@ export async function startService(settings: ServiceSettings): Promise<Service> 
       resume: { delayMs: settings.resumeDelayMs },
       ...ports,
     })
+    ready = true
   } catch (error) {
-    // A worker that refuses must not leave the API listening: the process would never exit.
+    // A worker that refuses must not leave the API listening: the process would never exit, and a
+    // readiness getter held false is no listener at all.
     await api.stop()
     throw error
   }

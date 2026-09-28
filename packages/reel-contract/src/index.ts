@@ -1,5 +1,5 @@
 // The public surface of the reel engine's contract (docs/features/reel-contract.md).
-// Types, schemas and the version — nothing else (D-094).
+// Types, schemas and the version - nothing else (D-094).
 
 export { CONTRACT_VERSION, ContractVersion } from './version.ts'
 export {
@@ -14,6 +14,7 @@ export {
   SubmitRequest,
 } from './request.ts'
 export { ResultStatus, RunEvent } from './events.ts'
+export { ReadyResponse } from './ready.ts'
 export {
   Degradation,
   EventsPage,

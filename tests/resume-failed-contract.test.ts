@@ -1322,7 +1322,10 @@ test("34. the service hands the API the ResumeService built from the worker's ow
     }
 
     // An API with no service: the route is known, the run is known, and it cannot yet.
-    const bare = await startApi({ dbPath: service.dbPath })
+    // `ready: () => true` is a compile-support amend for cutroom-sdk Slice 1 (S-173): the run
+    // it queries has already finished and the engine's own worker has stopped, so readiness is
+    // immaterial to what this test proves (a bare API's resume route is `422 unsupported`).
+    const bare = await startApi({ dbPath: service.dbPath, ready: () => true })
     try {
       const [row] = query<{ run_id: string }>(service, 'SELECT run_id FROM run')
       const reply = await client(bare.baseUrl).resume(String(row?.run_id), {})

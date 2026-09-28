@@ -54,7 +54,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 061 | [061-resume-failed-slice-7.md](061-resume-failed-slice-7.md)                           | `resume-failed` | Slice 7, the journey           | 2026-09-27 | session 61               |
 | 062 | [062-resume-failed-held-rejourneys.md](062-resume-failed-held-rejourneys.md)           | `resume-failed` | finish the held re-journeys    | 2026-09-28 | session 62               |
 | 063 | [063-cutroom-sdk-slices-0-1.md](063-cutroom-sdk-slices-0-1.md)                         | `cutroom-sdk`   | Slice 0 impact, Slice 1 ready  | 2026-09-28 | session 63, Slice 0 only |
-| 064 | [064-cutroom-sdk-slice-1.md](064-cutroom-sdk-slice-1.md)                               | `cutroom-sdk`   | correct Slice 0, then Slice 1  | 2026-09-28 | not run                  |
+| 064 | [064-cutroom-sdk-slice-1.md](064-cutroom-sdk-slice-1.md)                               | `cutroom-sdk`   | correct Slice 0, then Slice 1  | 2026-09-28 | session 64               |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

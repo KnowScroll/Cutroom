@@ -346,6 +346,11 @@ Each slice follows the approved builder arrangement: tests first, deliberate bre
 diff review, full check, then one commit. A failure is recorded and stops the session. No slice begins before
 the previous slice's full check is green.
 
+### Slices built (newest first; ticked here after their full check is green)
+
+- [x] **Slice 1 — readiness contract.** `packages/reel-contract/src/ready.ts` exporting `ReadyResponse = z.union([ReadyTrue, ReadyFalse])`; the route entry `GET /v1/ready` with `{200, 503} -> ReadyResponse, 500 -> ErrorResponse`; re-export from the package index; `apps/api/src/server.ts` matches `/v1/ready` before run-route handling and captures `const ready = options.ready()` once; `apps/service/src/service.ts` flips `let ready = false` to `true` only after the awaited `startWorker` resolves; `tests/engine/harness.ts` declares the worker binding before `startApi` and passes `ready: () => worker !== undefined`, with `worker = undefined` set before replacement API startup and before awaited worker stop; `tests/resume-failed-contract.test.ts:1325` carries the compile-support `ready: () => true`; the new `tests/cutroom-sdk-readiness.test.ts` owns the shape checks, the route-coverage `satisfies Routes['GET /v1/ready']` literal, the direct-API no-write proofs, the single-getter evaluation proof, the throwing-getter 500 proof and the harness lifecycle proofs. **Proves:** both strict bodies parse and are rejected on extra/missing/wrong-version/non-boolean `ready`; the route entry has exactly 200/503/500; a direct `startApi` answers 503/false before the flip, 200/true after, writes no `run`/`run_event` row, and a getter that toggles each call cannot return 503/true or 200/false; a throwing getter returns a schema-valid 500; an engine with a worker reads 200, restarts to 503 before `startWorker`, then 200; `stopWorker` flips to 503 without restarting the API.
+      `node scripts/check.mjs --code` PASS at this commit (test step 1413 s, every other step green).
+
 ## Adversarial review — 2026-09-28
 
 All four gates are approved. The review first found four coupled gaps: creator ownership was inconsistent with
