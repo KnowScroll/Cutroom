@@ -264,6 +264,7 @@ Every check appears in exactly one slice: 5 + 3 + 1 = 9.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-28 journey=PASS at 9f93d72 — every check green; 9 tests in tests/second-ask-*.test.ts pass
 - 2026-09-24 journey=PASS at df535bc — every check green; 9 tests in tests/second-ask-*.test.ts pass
 - 2026-09-23 journey=PASS at cd89df7 — every check green; 9 tests in tests/second-ask-*.test.ts pass
 
