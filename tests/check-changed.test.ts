@@ -1,15 +1,14 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
 import { REPO } from './_repo.ts'
 
-// S-159: `check.mjs --changed` chooses its checks by the paths that differ from HEAD. A change
-// made wholly of documents runs the formatting, the scans and the authority; anything else runs
-// every check. What must never happen is a change of code, or of a path the mode does not know,
-// choosing less than the full run — that is a green that tested nothing.
+// S-177: documents choose their own small checks. A code slice must name its approved tests with
+// `--slice`; a checker/configuration/unknown diff fails closed to the full suite. What must never
+// happen is a code change quietly selecting no tests.
 //
 // Each case is a scratch repository holding this repository's own `check.mjs` and `_lib.mjs`,
 // asked with `--dry-run`, which prints what it would run and runs none of it. "Every check" is
@@ -71,61 +70,80 @@ function dryRun(dir: string, ...flags: string[]) {
   return { run: labels('would run'), skipped: labels('skipped'), out: r.stdout }
 }
 
-/** Every step of the full run, as the full run's own dry run prints them. */
-function everything(dir: string): string[] {
-  const full = dryRun(dir)
-  // Asserted before it is compared with: two empty lists are equal, and a dry run that printed
-  // nothing would make every case below pass.
-  for (const label of ['typecheck', 'lint', 'format', 'boundaries proven', 'tests']) {
-    assert.ok(full.run.includes(label), `the full run's dry run does not name ${label}`)
-  }
-  for (const label of ['decisions pin', 'copied docs']) {
-    assert.ok(full.run.includes(label), `the full run's dry run does not name ${label}`)
-  }
-  assert.deepEqual(full.skipped, [], 'the full run skips a check')
-  return full.run
+function assertNeedsSlice(dir: string, what: string) {
+  const r = spawnSync(process.execPath, ['scripts/check.mjs', '--changed', '--dry-run'], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: { ...process.env, NO_COLOR: '1' },
+  })
+  assert.notEqual(r.status, 0, `${what} was accepted without named tests`)
+  assert.match(`${r.stdout}${r.stderr}`, /--slice/, `${what} did not explain the targeted mode`)
 }
 
-function assertEveryCheck(dir: string, what: string) {
-  const all = everything(dir)
-  const chosen = dryRun(dir, '--changed')
-  assert.deepEqual(chosen.run, all, `${what} did not choose every check:\n${chosen.out}`)
-  assert.deepEqual(chosen.skipped, [], `${what} skipped a check:\n${chosen.out}`)
-}
-
-test('S-159. a change under packages/ chooses every check the full run has', () => {
+test('S-177. a change under packages/ must name slice tests instead of silently running none', () => {
   const dir = scratch()
   write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 2\n')
-  assertEveryCheck(dir, 'a change under packages/')
+  assertNeedsSlice(dir, 'a change under packages/')
+  const chosen = dryRun(dir, '--slice', 'tests/stage.test.ts')
+  assert.ok(chosen.run.includes('slice tests'), `slice test was not selected:\n${chosen.out}`)
+  assert.ok(chosen.skipped.includes('tests'), `the aggregate suite was not skipped:\n${chosen.out}`)
 })
 
-test('S-159. a change under tests/ chooses every check the full run has', () => {
+test('S-177. every changed test file must be named by --slice', () => {
   const dir = scratch()
   write(dir, 'tests/stage.test.ts', "import { test } from 'node:test'\ntest('x', () => {})\n")
-  assertEveryCheck(dir, 'a change under tests/')
+  assertNeedsSlice(dir, 'a change under tests/')
+  const selected = dryRun(dir, '--slice', 'tests/stage.test.ts')
+  assert.ok(selected.run.includes('slice tests'), `changed test was not selected:\n${selected.out}`)
+  const omitted = spawnSync(
+    process.execPath,
+    ['scripts/check.mjs', '--slice', 'tests/missing.test.ts'],
+    {
+      cwd: dir,
+      encoding: 'utf8',
+      env: { ...process.env, NO_COLOR: '1' },
+    },
+  )
+  assert.notEqual(omitted.status, 0, 'a changed test omitted from --slice was accepted')
 })
 
-test('S-159. a path the mode does not recognise chooses every check, beside documents or alone', () => {
+test('S-177. an unknown path fails closed, beside documents or alone', () => {
   const dir = scratch()
   write(dir, 'stray.bin', 'other bytes\n')
-  assertEveryCheck(dir, 'an unrecognised path')
+  assertNeedsSlice(dir, 'an unrecognised path')
 
   write(dir, 'JOURNAL.md', '# Journal\n\nan entry\n')
-  assertEveryCheck(dir, 'an unrecognised path beside a document')
+  assertNeedsSlice(dir, 'an unrecognised path beside a document')
 })
 
-test('S-159. an untracked file is a change: a new file under packages/ chooses every check', () => {
+test('S-177. checker and workspace tooling changes fail closed to the full suite', () => {
+  const dir = scratch()
+  write(dir, 'scripts/check.mjs', `${readFileSync(join(REPO, 'scripts', 'check.mjs'), 'utf8')}\n`)
+  const result = spawnSync(
+    process.execPath,
+    ['scripts/check.mjs', '--slice', 'tests/stage.test.ts'],
+    {
+      cwd: dir,
+      encoding: 'utf8',
+      env: { ...process.env, NO_COLOR: '1' },
+    },
+  )
+  assert.notEqual(result.status, 0, 'a checker change was accepted for targeted verification')
+  assert.match(`${result.stdout}${result.stderr}`, /full check/)
+})
+
+test('S-177. an untracked source file still requires named tests', () => {
   const dir = scratch()
   write(dir, 'packages/pipeline/src/new-stage.ts', 'export const next = 1\n')
-  assertEveryCheck(dir, 'an untracked file under packages/')
+  assertNeedsSlice(dir, 'an untracked file under packages/')
 })
 
-test('S-159. code moved under docs/ is seen as both its paths, and chooses every check', () => {
+test('S-177. code moved under docs/ is seen as both paths and requires named tests', () => {
   const dir = scratch()
   // A rename is listed by its new name alone unless renames are turned off, and this one's new
   // name is a document.
   git(dir, 'mv', 'packages/pipeline/src/stage.ts', 'docs/stage.md')
-  assertEveryCheck(dir, 'a rename from packages/ into docs/')
+  assertNeedsSlice(dir, 'a rename from packages/ into docs/')
 })
 
 test('S-159. a change of documents only chooses the formatting, the scans and the authority, and no check of code', () => {
@@ -134,7 +152,7 @@ test('S-159. a change of documents only chooses the formatting, the scans and th
   write(dir, 'JOURNAL.md', '# Journal\n\nan entry\n')
   write(dir, 'PROMPTS/052-next.md', '# 052\n')
 
-  const all = everything(dir)
+  const all = dryRun(dir).run
   const chosen = dryRun(dir, '--changed')
   assert.deepEqual(
     [...chosen.run].sort(),
@@ -151,7 +169,7 @@ test('S-159. a change of documents only chooses the formatting, the scans and th
   )
 })
 
-test('S-159. --changed does not take --code', () => {
+test('S-177. modes cannot be combined', () => {
   const dir = scratch()
   const r = spawnSync(process.execPath, ['scripts/check.mjs', '--changed', '--code'], {
     cwd: dir,
@@ -159,5 +177,5 @@ test('S-159. --changed does not take --code', () => {
     env: { ...process.env, NO_COLOR: '1' },
   })
   assert.notEqual(r.status, 0, 'check.mjs --changed --code was accepted')
-  assert.match(r.stderr, /--changed chooses its own checks/)
+  assert.match(r.stderr, /choose one mode/)
 })

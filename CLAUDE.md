@@ -98,7 +98,8 @@ answer costs. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10, Haiku $
   verdict and the decisive lines — never the whole stream.
 - **`run-reader`** — `haiku`. Reads a real run's rows from the database, read-only, after it finishes or fails.
 - **`slice-builder`** — `opus`. Builds ONE slice of an approved feature — tests, code, deliberate breaks — and hands
-  back a report and an uncommitted diff (S-172). One at a time; the main session runs the full check and commits.
+  back a report and an uncommitted diff (S-172, S-177). One at a time; the main session runs the approved targeted
+  check and commits its tree-bound evidence, reserving the full suite for integrity boundaries.
 
 Only `slice-builder` edits code, within the slice it is handed, and it never commits. The reviewer's one allowed edit
 is the `Gates:` line of the file it approves.
@@ -146,18 +147,26 @@ entry there beside its journal entry**; `tests/context-file.test.ts` is red when
 ## Before claiming anything is done
 
 ```bash
-node scripts/check.mjs            # every check: before committing code, and inside every journey
-node scripts/check.mjs --changed  # between steps: what the paths changed since HEAD can turn red
+node scripts/verification-status.mjs             # reuse only evidence bound to HEAD's exact tree
+node scripts/check.mjs --slice tests/<feature>-*.test.ts  # static checks plus an approved ordinary slice
+node scripts/check.mjs                            # full suite: tooling, broad diffs and journeys
+node scripts/check.mjs --changed                  # document-only work
 ```
 
 Seven code checks plus two about the authority. `--code` runs only the first seven. A red
 `decisions pin` is not yours to fix by editing anything here.
 
-**`--changed` is enough between steps** (S-159): documents alone — Markdown under `docs/` or `PROMPTS/`, the journal,
-the decisions, this file — run the formatting, the two authority checks and the four scans that read files other than
-code (S-160 added `context-file`), in about 13 s; one path of code, or one it does not recognise, runs everything. `--dry-run` says which and why.
-**The full run is required before committing code, and before a feature's journey**: `--changed` trusts HEAD, and
-that rule is what keeps HEAD green.
+**`--changed` is enough for documents** (S-159, superseded in part by S-177): Markdown under `docs/` or `PROMPTS/`,
+the journal, decisions and this file run formatting, authority and the four file scans. A code diff cannot use it:
+it must name every approved affected test through `--slice`, or use the full run. `--slice` always runs typecheck,
+lint, format and all boundary checks, then only its named test files; it rejects an unlisted changed test, an unknown
+path, and verification infrastructure. `--dry-run` says which checks would run and why.
+
+**The full run is reserved for integrity boundaries**: a change to checking/journey/boundary tooling, workspace or
+dependency configuration, an unclassified or broad diff, and every feature journey. An ordinary slice commits only
+after its targeted run passes. Its commit carries `Verification: targeted` (or `full`), `Verification-Tree`, and for
+targeted evidence `Verification-Tests`; `verification-status.mjs` refuses a stale tree. This keeps a clean later
+session from rerunning a suite that already passed for the same commit without accepting evidence for changed code.
 
 **A feature in `docs/features/` is verified only by its journey** (S-016), run after its last slice is
 committed:

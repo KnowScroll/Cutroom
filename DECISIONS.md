@@ -7634,3 +7634,44 @@ cannot disappear from `--changed`.
 **Confirmed-by.** The owner, 2026-09-28: _"Okay do it and then write the slice 0 and slice 1 implementation plan"_.
 
 ---
+
+## S-177 | 2026-09-29 | Ordinary code slices run explicit affected tests, static checks and boundary proofs; full suites are commit-tree evidence for integrity boundaries and journeys, not repeated startup ritual
+
+**Chose.** A normal approved slice runs `node scripts/check.mjs --slice <affected-test...>`: whole-project
+typecheck, lint and format; every boundary check and proof; authority checks; and exactly the named test files from
+its impact review. It cannot run with no test, an unlisted changed test, an unknown path, or a checker/journey/boundary
+tool change. Those fail closed and require `node scripts/check.mjs`, as do workspace/dependency changes, broad diffs
+and every feature journey. Each code commit records `Verification: targeted` or `Verification: full`, its exact
+`Verification-Tree`, and targeted test paths. `verification-status.mjs` checks the HEAD tree against that record, so a
+clean later session reuses completed evidence instead of rerunning it.
+
+`JOURNAL.md` becomes a compact operational index. Detailed entries through session 64 are retained byte-for-byte under
+`docs/history/`; new entries state the decision, evidence reference and next action, while feature evidence, commit
+messages and verification trailers keep the detail.
+
+**Why.** The full suite's serial test phase is about twenty-four minutes on this machine. Slice 1 already had a full
+green run recorded for its exact commit, yet a review restarted it solely because the old preflight rule said to. The
+cost delayed work without adding confidence. Static checks and boundary proofs are cheap; explicit affected tests and
+fail-closed selection retain the proof that matters for a small slice, while full runs remain where their broad signal
+is justified.
+
+**Rejected.** **No test selection, only trust a journal sentence** — prose can name the wrong tree. **Import-graph test
+selection** — it misses path-reading tests and makes the selection mechanism harder to prove than an approved impact
+list. **A full suite for every code commit or startup** — repeats known evidence and makes short slices take hours.
+**Targeted runs for verification tooling, dependency/workspace changes or journeys** — those alter the proof surface
+or combine features, so only the full suite is adequate. **Deleting old journal detail** — loses reasoning; it is moved
+to a named archive instead.
+
+**Supersedes:** **S-159**, in part: its document-only mode stands, but its rule that every code path selects the full
+suite and that code commits require that suite is replaced. **S-172**, in part: the main session runs the approved
+targeted check for an ordinary slice, not automatically a full one. **S-176** stands whenever a full suite is required.
+
+**Caught by.** `tests/check-changed.test.ts` proves code cannot silently select no tests, changed test files must be
+named, documents retain their small check set, and unknown paths fail closed. `tests/verification-status.test.ts`
+proves evidence is accepted only for HEAD's exact tree and targeted evidence names tests. The stop hook rejects
+uncommitted source or a HEAD commit without valid evidence.
+
+**Confirmed-by.** The owner, 2026-09-29: build and ship fast, but reliably; retain important history, target ordinary
+slice checks, and reserve full suites for big objectives.
+
+---

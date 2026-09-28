@@ -4,14 +4,16 @@
  *
  *   node scripts/check.mjs            everything
  *   node scripts/check.mjs --code     only the checks about the code in this repo
- *   node scripts/check.mjs --changed  only what the paths changed since HEAD can turn red (S-159)
+ *   node scripts/check.mjs --changed  document checks, or explain why code needs --slice
+ *   node scripts/check.mjs --slice <test...>  static checks plus approved tests for one code slice
  *   node scripts/check.mjs --changed --dry-run   which checks, and why; runs none of them
  *
  * Tools are invoked as `node <path-to-bin>` rather than through pnpm, because pnpm is not on
  * this machine's PATH (§8 of the bootstrap prompt). corepack is how pnpm itself is run:
  *   corepack pnpm install
  */
-import { join } from 'node:path'
+import { existsSync } from 'node:fs'
+import { join, relative, resolve } from 'node:path'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
 
 const node = process.execPath
@@ -46,13 +48,12 @@ const AUTHORITY = [
   ['copied docs', node, ['scripts/docs-check.mjs']],
 ]
 
-// ---------------------------------------------------------------- --changed (S-159)
+// ---------------------------------------------------------------- --changed / --slice (S-177)
 //
 // Every path that differs from HEAD — staged or not, and untracked unless git ignores it — is a
-// document, code, or a path this list does not know. Only a change made wholly of documents runs
-// less than everything, and what it runs is what a document can turn red: the formatting, the
-// tests that read files other than code, and the authority. One path of code, or one unknown
-// path, runs every check. It trusts HEAD: code is committed only after the full run.
+// document, code, or a path this list does not know. Documents run what a document can turn red.
+// Code must name the tests its approved impact review owns through `--slice`; unknown paths and
+// verification infrastructure fail closed to the full run.
 
 const DOCUMENT = [
   /^docs\/.+\.md$/,
@@ -65,6 +66,7 @@ const CODE_PATH = [
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig(\.[a-z]+)?\.json)$/,
   /^(eslint\.config\.mjs|drizzle\.config\.ts|\.prettierrc\.json|\.prettierignore)$/,
   /^(\.dependency-cruiser\.cjs|\.gitattributes|\.gitignore|\.editorconfig|\.npmrc)$/,
+  /^\.claude\/(hooks\/.+\.sh|settings\.json)$/,
 ]
 
 /** The four tests that read files other than code; the whole suite runs them too. */
@@ -104,20 +106,73 @@ function changedPaths() {
 function choose() {
   const paths = changedPaths()
   if (paths === null) {
-    return { steps: [...CODE, ...AUTHORITY], paths: [], why: 'git could not list what changed' }
+    return { steps: undefined, paths: [], why: 'git could not list what changed' }
   }
   const first = paths.find((path) => kind(path) !== 'document')
-  if (first !== undefined) {
-    return { steps: [...CODE, ...AUTHORITY], paths, why: `a path of ${kind(first)}: ${first}` }
-  }
+  if (first !== undefined)
+    return { steps: undefined, paths, why: `a path of ${kind(first)}: ${first}` }
   const why = paths.length === 0 ? 'nothing differs from HEAD' : 'documents only'
   return { steps: DOCUMENTS_ONLY, paths, why }
 }
 
 const changed = process.argv.includes('--changed')
-if (changed && process.argv.includes('--code')) {
-  console.error(`\n${red('FAIL')}  --changed chooses its own checks; it does not take --code\n`)
+const sliceAt = process.argv.indexOf('--slice')
+const slice = sliceAt >= 0
+const sliceTests = slice
+  ? process.argv.slice(sliceAt + 1).filter((arg) => !arg.startsWith('--'))
+  : []
+if (
+  (changed && process.argv.includes('--code')) ||
+  (changed && slice) ||
+  (slice && process.argv.includes('--code'))
+) {
+  console.error(`\n${red('FAIL')}  choose one mode: --changed, --code, or --slice <test...>\n`)
   process.exit(2)
+}
+
+// Changing the checker or its proof is a broad change by definition: it must run the full suite.
+const VERIFY_INFRASTRUCTURE = new Set([
+  'scripts/check.mjs',
+  'scripts/verification-status.mjs',
+  'scripts/drift.mjs',
+  'scripts/journey.mjs',
+  'tests/check-changed.test.ts',
+  'tests/verification-status.test.ts',
+])
+const FULL_ONLY = [
+  /^scripts\//,
+  /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig(\.[a-z]+)?\.json)$/,
+  /^(eslint\.config\.mjs|drizzle\.config\.ts|\.prettierrc\.json|\.prettierignore)$/,
+  /^(\.dependency-cruiser\.cjs|\.gitattributes|\.gitignore|\.editorconfig|\.npmrc)$/,
+  /^\.claude\//,
+]
+
+function validateSlice() {
+  const paths = changedPaths()
+  if (paths === null || paths.length === 0) return 'a slice needs a visible code diff from HEAD'
+  const nonDocuments = paths.filter((path) => kind(path) !== 'document')
+  if (nonDocuments.length === 0) return 'a documents-only change uses --changed, not --slice'
+  const infrastructure = nonDocuments.find((path) => VERIFY_INFRASTRUCTURE.has(path))
+  if (infrastructure !== undefined)
+    return `${infrastructure} changes verification infrastructure; run the full check`
+  const fullOnly = nonDocuments.find((path) => FULL_ONLY.some((rule) => rule.test(path)))
+  if (fullOnly !== undefined)
+    return `${fullOnly} changes tooling or workspace configuration; run the full check`
+  const unknown = nonDocuments.find((path) => kind(path) === 'unknown')
+  if (unknown !== undefined)
+    return `${unknown} is not classified for targeted verification; run the full check`
+  if (sliceTests.length === 0) return 'a code slice must name at least one approved .test.ts file'
+  for (const test of sliceTests) {
+    const absolute = resolve(REPO, test)
+    const inside = !relative(REPO, absolute).startsWith('..')
+    if (!inside || !/^(tests|packages|apps)\/.+\.test\.ts$/.test(test) || !existsSync(absolute)) {
+      return `${test} is not an existing in-repository .test.ts file`
+    }
+  }
+  const selected = new Set(sliceTests)
+  const changedTest = nonDocuments.find((path) => path.endsWith('.test.ts') && !selected.has(path))
+  if (changedTest !== undefined) return `${changedTest} changed but is not named by --slice`
+  return undefined
 }
 
 let steps = process.argv.includes('--code') ? CODE : [...CODE, ...AUTHORITY]
@@ -126,6 +181,13 @@ let partial = false
 console.log('')
 if (changed) {
   const choice = choose()
+  if (choice.steps === undefined) {
+    console.error(`\n${red('FAIL')}  --changed cannot choose tests for ${choice.why}.`)
+    console.error(
+      `      Use --slice <approved affected .test.ts files>, or run the full check for broad/tooling work.\n`,
+    )
+    process.exit(2)
+  }
   steps = choice.steps
   partial = steps === DOCUMENTS_ONLY
   console.log(`  --changed: ${choice.paths.length} path(s) differ from HEAD`)
@@ -133,6 +195,24 @@ if (changed) {
     console.log(dim(`    ${kind(path).padEnd(9)} ${path}`))
   if (choice.paths.length > 30) console.log(dim(`    and ${choice.paths.length - 30} more`))
   console.log(`  ${partial ? 'the checks a document can fail' : 'every check'}: ${choice.why}\n`)
+}
+
+if (slice) {
+  const problem = validateSlice()
+  if (problem !== undefined) {
+    console.error(`\n${red('FAIL')}  ${problem}\n`)
+    process.exit(2)
+  }
+  steps = [
+    ...CODE.filter(([label]) => label !== 'tests'),
+    [
+      'slice tests',
+      node,
+      ['--experimental-strip-types', '--test', '--test-concurrency=1', ...sliceTests],
+    ],
+    ...AUTHORITY,
+  ]
+  console.log(`  --slice: ${sliceTests.join(', ')}\n`)
 }
 
 if (process.argv.includes('--dry-run')) {

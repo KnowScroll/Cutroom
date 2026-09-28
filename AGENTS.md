@@ -20,7 +20,7 @@ consumer of Cutroom's core, which does not exist yet.
 node scripts/decisions.mjs       # can you see the current decisions? if not, stop and say so
 node scripts/drift.mjs           # are the boundaries intact?
 tail -40 JOURNAL.md              # what the last session did, and why
-node scripts/check.mjs --code    # is the repository green before you touch it?
+node scripts/verification-status.mjs  # does HEAD have evidence for this exact committed tree?
 ```
 
 If `decisions.mjs` reports unpushed commits in the steering repository, **the authority is newer
@@ -47,10 +47,14 @@ file, or from a summary.
 
 ## What "verified" may mean here
 
-Only: the checks pass, and you ran them. `node scripts/check.mjs` prints what passed and what did
-not. Do not report a step as done because it "should" pass, and do not summarise a failure as a
-warning. A green typecheck proves nothing about whether the product works — that proof belongs to
-a journey, and journeys for these features run here once their gates are approved.
+Only: the checks named by the approved slice pass for its exact Git tree, and the commit records
+them in `Verification` trailers. `node scripts/verification-status.mjs` verifies that binding; it
+does not rerun a completed suite. Use `node scripts/check.mjs --slice <affected-test...>` for an
+ordinary code slice, and the full `node scripts/check.mjs` for verification tooling, workspace or
+boundary changes, a broad/unclassified diff, and feature journeys. Do not report a step as done
+because it "should" pass, and do not summarise a failure as a warning. A green typecheck proves
+nothing about whether the product works — that proof belongs to a journey, once its gates are
+approved.
 
 ## Boundaries, stated once
 

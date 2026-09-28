@@ -7,8 +7,8 @@ authority: a digest for agents, not a plan — every line names its source, and 
 
 **What an agent reads before anything else** (S-160): where things stand, every real run and what stopped it, and what
 changed where — so no agent looks round the repository to learn it. Open a source only for the line you need, by the
-name it gives: `grep -n '^## S-160' DECISIONS.md`, never the whole file. `DECISIONS.md` is 6,800 lines and `JOURNAL.md`
-6,200; this file stays under 300 (`tests/context-file.test.ts`).
+name it gives: `grep -n '^## S-177' DECISIONS.md`, never the whole file. `DECISIONS.md` is the authority; the compact
+`JOURNAL.md` links to historical detail under `docs/history/`; this file stays under 300 (`tests/context-file.test.ts`).
 
 **Kept by every session**: its entry under Changes — newest first, the same session as `JOURNAL.md`'s newest entry,
 or the check is red — and any row or line below its work made untrue. Changes older than ten sessions are dropped;
@@ -26,7 +26,13 @@ git and the journal keep them.
   **Planned, gates not written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `cutroom-sdk`'s four gates are approved and Slice 0 is committed, but its impact record contradicts itself about `reel-plan`, database-independent readiness and `resume-failed`'s direct `startApi` caller. `PROMPTS/064-cutroom-sdk-slice-1.md` first corrects that record in a documentation-only commit, then builds only Slice 1's strict readiness contract. S-175 settles the later launcher: KnowScroll supplies an explicit program and argument vector; the SDK never assumes this source checkout. No SDK package exists. Then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
+- **Next**: `cutroom-sdk`'s four gates are approved, Slice 0 is corrected, and Slice 1’s strict readiness contract is
+  committed at `127adc5`; no SDK package exists yet. Slice 2 is the package boundary and typed routes. S-175 settles
+  the later launcher: KnowScroll supplies an explicit program and argument vector; the SDK never assumes this source
+  checkout. Then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of
+  what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims
+  healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates.
+  Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -37,7 +43,10 @@ git and the journal keep them.
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: Slice 7's `aa9a9f4` recorded a full green check; the same load-sensitive transient that hit the reel-render-secrets check 50 child at its 300 s bound (sessions 41, 56, 59, 60) recurred in `paid-failures`'s re-journey at `f6e2a75`, with the test phase taking 708 s and the child still at 300494 ms. Session 63's independent direct aggregate captured the exact recurrence: `tests/reel-render-secrets.test.ts` check 50's PATH-only child was killed at 300222 ms; its own child was still running, not reporting a failed journey assertion, and the aggregate was 605/606 in 460.705 s. S-176 serialises only the aggregate outer runner and preserves each nested child and its existing bound; the first full preflight with it was green, tests 1476.701 s. `node scripts/check.mjs --changed` runs between document-only steps (S-159), never in place of the full check; session 62's full preflight was fully green (407 s) on a quiet machine and every held re-journey's own `check.mjs` ran green.
+- **Checks**: Slice 1’s `127adc5` recorded a full green check (tests 1413 s). S-177 now binds verification to the exact
+  commit tree: ordinary slices run static/boundary checks plus named affected tests; full suites remain for checker,
+  boundary, workspace/dependency and journey work. The known PATH-only child transient remains a full-suite signal;
+  S-176’s serial aggregate and existing child bounds stand.
 
 ## Runs
 
@@ -91,6 +100,16 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-29 · session 65
+
+- **S-177** replaces repeated full-suite startup/ordinary-slice checks with commit-tree-bound verification evidence.
+  `check.mjs --slice` runs static checks, boundary proofs and the approved affected tests, refusing unlisted changed
+  tests, unknown paths and verification infrastructure; the latter, workspace/dependency changes and journeys remain
+  full-suite work. `verification-status.mjs` validates the current commit’s trailers without rerunning a prior result.
+- `JOURNAL.md` is now a short operational index; sessions 01–64 are preserved byte-for-byte in
+  `docs/history/JOURNAL-through-session-64.md`. The stop gate now requires a committed source tree with valid evidence
+  instead of starting the aggregate suite again. Slice 1’s readiness test now asserts exactly one getter call per probe.
 
 ### 2026-09-28 · session 64
 

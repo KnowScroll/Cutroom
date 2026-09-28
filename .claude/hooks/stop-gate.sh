@@ -5,8 +5,8 @@
 #   1. JOURNAL.md changed this session. A session that leaves no journal entry is a session
 #      whose reasoning is lost the moment the context resets — and the reasoning is the part
 #      git history cannot reconstruct.
-#   2. If any source file changed this session, the code checks must pass. "Done" with a red
-#      typecheck is the failure this whole setup exists to make impossible.
+#   2. Source work is committed with verification evidence for its exact tree. The checker itself
+#      decides whether that evidence was targeted or full (S-177); the hook never reruns a suite.
 cd "$(dirname "$0")/../.." || exit 0
 
 TODAY="$(date +%Y-%m-%d)"
@@ -23,16 +23,14 @@ else
   [ -f JOURNAL.md ] || PROBLEMS="${PROBLEMS}  - JOURNAL.md does not exist.\n"
 fi
 
-# --- 2. did source change? then the code checks must be green ---
-# Only the code checks (--code): the authority checks talk to another repository and can be
-# red for reasons this session cannot fix, which would make the gate unpassable rather than
-# informative.
+# --- 2. source must be committed; HEAD must carry evidence for its exact tree ---
 CHANGED_SOURCE="$(git status --porcelain -- packages apps tests scripts 2>/dev/null)"
 if [ -n "$CHANGED_SOURCE" ]; then
-  if ! OUTPUT="$(node scripts/check.mjs --code 2>&1)"; then
-    PROBLEMS="${PROBLEMS}  - source files changed and 'node scripts/check.mjs --code' is red:\n"
-    PROBLEMS="${PROBLEMS}$(printf '%s' "$OUTPUT" | tail -n 25 | sed 's/^/      /')\n"
-  fi
+  PROBLEMS="${PROBLEMS}  - source files are still uncommitted. Run the approved --slice or full check, commit its Verification trailers, then stop.\n"
+fi
+if ! OUTPUT="$(node scripts/verification-status.mjs 2>&1)"; then
+  PROBLEMS="${PROBLEMS}  - HEAD has no valid commit-tree verification evidence:\n"
+  PROBLEMS="${PROBLEMS}$(printf '%s' "$OUTPUT" | tail -n 25 | sed 's/^/      /')\n"
 fi
 
 if [ -n "$PROBLEMS" ]; then

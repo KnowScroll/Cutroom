@@ -204,6 +204,7 @@ test('4. a getter that changes its answer between calls cannot return 503/true o
       `call ${i + 1}: status ${status} but ready=${String(json.ready)}`,
     )
     assert.equal(json.contractVersion, V)
+    assert.equal(calls, i + 1, `request ${i + 1} called the readiness getter ${calls} times`)
   }
 })
 
