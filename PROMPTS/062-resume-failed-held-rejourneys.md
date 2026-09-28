@@ -4,7 +4,7 @@
 - **Feature:** `resume-failed` compatibility verification (S-016, S-028, S-099)
 - **Work:** finish the five re-journeys held by session 61, serially and with one committed result per journey; stop at the feature boundary
 - **Written:** 2026-09-28, after an independent read and diagnostic rerun of session 61's failure
-- **Run:** not yet
+- **Run:** 2026-09-28 (session 62) — all five journeys PASS (`cfbb453`, `9f93d72`, `bc4c35d`, `5d4faa7`, `50e1ffc`); the ten affected-feature re-journeys required by Slice 7 are complete
 
 ## Purpose
 

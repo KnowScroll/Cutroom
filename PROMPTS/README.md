@@ -52,7 +52,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 059 | [059-resume-failed-build-from-slice-5.md](059-resume-failed-build-from-slice-5.md)     | `resume-failed` | the build from Slice 5         | 2026-09-27 | session 59 |
 | 060 | [060-resume-failed-slice-6.md](060-resume-failed-slice-6.md)                           | `resume-failed` | Slice 6, the owner's script    | 2026-09-27 | session 60 |
 | 061 | [061-resume-failed-slice-7.md](061-resume-failed-slice-7.md)                           | `resume-failed` | Slice 7, the journey           | 2026-09-27 | session 61 |
-| 062 | [062-resume-failed-held-rejourneys.md](062-resume-failed-held-rejourneys.md)           | `resume-failed` | finish the held re-journeys    | 2026-09-28 | not yet    |
+| 062 | [062-resume-failed-held-rejourneys.md](062-resume-failed-held-rejourneys.md)           | `resume-failed` | finish the held re-journeys    | 2026-09-28 | session 62 |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

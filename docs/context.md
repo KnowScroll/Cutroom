@@ -26,7 +26,7 @@ git and the journal keep them.
   written**: `cutroom-sdk` (S-173, no file yet), `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `cutroom-sdk`'s gates, after `resume-failed`'s journey and the amended features' re-journeys. Five of the ten amended features (`reel-contract`, `reel-plan`, `reel-stills`, `reel-render`, `reel-takes`) re-journeyed PASS; `paid-failures` re-journeyed FAIL — the failing check is the long-acknowledged reel-render-secrets load-sensitive transient (sessions 41, 56, 59, 60), which the system recorded as the test phase of `node scripts/check.mjs` failing after 708 s, with the child hitting its 300 s bound. The five P-PASS journeys are committed; the FAIL is committed with the finding, and the remaining five journeys (`ask-again`, `second-ask`, `paid-path`, `three-pictures`, the unpaid `paid-failures` rerun) are held for a session with a less loaded machine. Reliability before speed (S-168, S-169): `cutroom-sdk` next, then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
+- **Next**: `cutroom-sdk`'s gates. All ten of `resume-failed`'s affected-feature re-journeys are complete: `reel-contract`, `reel-plan`, `reel-stills`, `reel-render`, `reel-takes` (session 61), `paid-failures`, `ask-again`, `second-ask`, `paid-path`, `three-pictures` (sessions 61 and 62). Reliability before speed (S-168, S-169): `cutroom-sdk` next, then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -37,7 +37,7 @@ git and the journal keep them.
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: Slice 7's `aa9a9f4` recorded a full green check; the same load-sensitive transient that hit the reel-render-secrets check 50 child at its 300 s bound (sessions 41, 56, 59, 60) recurred in `paid-failures`'s re-journey at `f6e2a75`, with the test phase taking 708 s and the child still at 300494 ms. `node scripts/check.mjs --changed` runs between document-only steps (S-159), never in place of the full check.
+- **Checks**: Slice 7's `aa9a9f4` recorded a full green check; the same load-sensitive transient that hit the reel-render-secrets check 50 child at its 300 s bound (sessions 41, 56, 59, 60) recurred in `paid-failures`'s re-journey at `f6e2a75`, with the test phase taking 708 s and the child still at 300494 ms. `node scripts/check.mjs --changed` runs between document-only steps (S-159), never in place of the full check; session 62's full preflight was fully green (407 s) on a quiet machine and every held re-journey's own `check.mjs` ran green.
 
 ## Runs
 
@@ -91,6 +91,10 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-28 · session 62
+
+- `PROMPTS/062` run; all five held re-journeys PASS in the order the prompt named. The full `node scripts/check.mjs --code` preflight was fully green (typecheck 715 ms, lint 26 s, format 14 s, boundaries 1.3 s, boundary proofs 3.8 s, no dead rule 68 ms, tests 408 s) on commit `51212ed`, with no diagnostic rerun needed. Five re-journeys, each from a clean tree, each one result commit: `paid-failures` 17 tests (`cfbb453`), `ask-again` 23 (`9f93d72`), `second-ask` 9 (`bc4c35d`), `paid-path` 120 (`5d4faa7`), `three-pictures` 12 (`50e1ffc`). Every Evidence line names its input commit, its own tests passed, and Divergence is `none` for all five. With session 61's five (`8904d9a`, `860b7f7`, `8f67bf4`, `a86ca4c`, `f6e2a75`), all ten S-099 affected-feature re-journeys required by `resume-failed`'s Slice 7 are complete. Session 61's `paid-failures` FAIL at `cbffbc5` is the prior newest evidence line, now second; the load-sensitive reel-render-secrets transient did not recur. No implementation, gate, test, timeout or concurrency was changed; the prompt's session boundary was kept.
 
 ### 2026-09-28 · session 61, continued
 

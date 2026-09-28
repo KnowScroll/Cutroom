@@ -7094,3 +7094,36 @@ issue.
 **Changed.** `PROMPTS/062-resume-failed-held-rejourneys.md` is the closed execution plan: a genuinely green full preflight, then `paid-failures`, `ask-again`, `second-ask`, `paid-path` and `three-pictures` serially, one generated result commit per journey. A FAIL is committed and stops the session. Targeted green is never substituted for the full check; no test, bound, concurrency or gate may be weakened. The prompt finishes Journal/context/prompt bookkeeping and stops at the feature boundary. `PROMPTS/README.md` indexes it; `docs/context.md` records the audit and plan.
 
 **Next.** Run `PROMPTS/062` in session 62 when the machine is quiet enough for its full preflight. Complete the five held re-journeys or stop at the first committed FAIL; begin nothing after them in that session.
+
+---
+
+## 2026-09-28 — session 62, all five held re-journeys PASS
+
+**Asked.** `PROMPTS/062-resume-failed-held-rejourneys.md`: a fully green `check.mjs --code` preflight, then `paid-failures`, `ask-again`, `second-ask`, `paid-path` and `three-pictures` serially, each from a clean tree and each generated result committed before the next. A FAIL is committed and stops the session; no check, timeout, concurrency or gate is weakened. Stop at the feature boundary.
+
+**Preflight.** `node scripts/decisions.mjs`: pin current at `e05e9f0`, 115 decisions, 0 unpushed. `node scripts/drift.mjs`: 143 modules, 0 boundary violations, 0 key-shaped environment reads outside `packages/providers/src`. The full `node scripts/check.mjs --code` ran green on commit `51212ed` in **407 s** — typecheck 715 ms, lint 26.0 s, format 14.0 s, boundaries 1.3 s, boundaries proven 3.8 s, no dead rule 68 ms, tests 407.6 s. Every gate green; no diagnostic rerun was needed.
+
+**Journeys.** Five re-journeys, each its own commit, each input commit the prior journey's commit (or `51212ed` for the first):
+
+- `paid-failures` (`cfbb453`) — 17 tests, PASS.
+- `ask-again` (`9f93d72`) — 23 tests, PASS.
+- `second-ask` (`bc4c35d`) — 9 tests, PASS.
+- `paid-path` (`5d4faa7`) — 120 tests, PASS.
+- `three-pictures` (`50e1ffc`) — 12 tests, PASS.
+
+Each Evidence line names its input commit, its own tests passed, and Divergence is `none`. Session 61's `paid-failures` FAIL at `cbffbc5` is the prior newest line, now second in the file; the load-sensitive reel-render-secrets transient did not recur on this machine during this session.
+
+**Why stop here.** With these five, all ten S-099 affected-feature re-journeys required by `resume-failed`'s Slice 7 are committed and PASS:
+
+- `reel-contract` 42 (`8904d9a`), `reel-plan` 50 (`860b7f7`), `reel-stills` 63 (`8f67bf4`), `reel-render` 106 (`a86ca4c`), `reel-takes` 66 (`f6e2a75`) — session 61.
+- `paid-failures` 17 (`cfbb453`), `ask-again` 23 (`9f93d72`), `second-ask` 9 (`bc4c35d`), `paid-path` 120 (`5d4faa7`), `three-pictures` 12 (`50e1ffc`) — session 62.
+
+No implementation, new feature plan, gate, decision, provider call, paid run, secret, real reel, test rewrite, timeout change or push belongs to this session. The prompt's session boundary was kept.
+
+**Observed.** The five re-journeys' own `check.mjs` runs each cleared the suite in roughly 380–410 s — within session 61's measured 374–426 s envelope on a quiet machine, against the 708 s the loaded run paid for `paid-failures` in session 61. **The transient is structural, not a Slice 7 defect, and it did not fire when the suite was not loaded by preceding journeys.** `docs/context-file.test.ts`'s rule that the journal entry's session and the context file's newest change's session match held.
+
+**Why stop here, more fully.** Slice 7's journey is at `45b758f`; all ten S-099 re-journeys are at their own commits; `paid-failures`'s `cbffbc5` is the finding the prompt's preflight rule names, recorded and not rewritten. The five here are added above it, each in turn, in `docs/features/<slug>.md` Evidence/Divergence as the script wrote them.
+
+**Changed.** `docs/features/paid-failures.md`, `docs/features/ask-again.md`, `docs/features/second-ask.md`, `docs/features/paid-path.md`, `docs/features/three-pictures.md` — each one's Evidence line and Divergence, appended by `scripts/journey.mjs` and unchanged by hand. `PROMPTS/062-resume-failed-held-rejourneys.md` — Run line set to session 62. `PROMPTS/README.md` — row 062 set to session 62. `docs/context.md` — "Where things stand"'s Next line rewritten to record the five PASSes and remove the held-journey finding; "Checks" line records the session 62 preflight; a session 62 entry at the top of Changes.
+
+**Next.** `cutroom-sdk`'s gates (S-173) next, on the same quiet machine.
