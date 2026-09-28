@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\" \"packages/**/*.test.ts\" \"apps/**/*.test.ts\"",
+    "test": "node --experimental-strip-types --test --test-concurrency=1 \"tests/**/*.test.ts\" \"packages/**/*.test.ts\" \"apps/**/*.test.ts\"",
     "drift": "node scripts/drift.mjs",
     "drift:prove": "node scripts/drift.mjs --prove",
     "decisions": "node scripts/decisions.mjs",

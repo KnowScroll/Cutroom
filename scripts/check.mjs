@@ -30,6 +30,10 @@ const CODE = [
     [
       '--experimental-strip-types',
       '--test',
+      // Some PATH-only journey checks run their own bounded, parallel child suites. Running the
+      // outer suite serially preserves every check while preventing nested ffmpeg/SQLite workers
+      // from competing for the same machine and turning a load timeout into a false aggregate red.
+      '--test-concurrency=1',
       'tests/**/*.test.ts',
       'packages/**/*.test.ts',
       'apps/**/*.test.ts',
@@ -165,7 +169,10 @@ if (failures.length === 0) {
 
 for (const [label, output, argv] of failures) {
   console.log(`\n${red(bold(`--- ${label} ---`))}\n`)
-  console.log(output.split('\n').slice(0, 40).join('\n'))
+  const lines = output.split('\n')
+  const start = Math.max(0, lines.length - 80)
+  if (start > 0) console.log(dim(`  (${start} earlier output line(s) omitted)\n`))
+  console.log(lines.slice(start).join('\n'))
   console.log(dim(`\n  rerun: node ${argv.slice(1).join(' ')}`))
 }
 console.log(`\n${red(bold(`${failures.length} check(s) failed`))}\n`)

@@ -7588,3 +7588,49 @@ reviewer reads; no test compares two mappings, because there is one.
 **Confirmed-by.** The owner, 2026-09-27, session 59: _"All four required"_ and _"One, exported from worker"_.
 
 ---
+
+## S-175 | 2026-09-28 | `@cutroom/sdk` requires an explicit engine launcher from KnowScroll; it never assumes this repository's source entrypoint
+
+**Chose.** The owner confirmed the `cutroom-sdk` gate draft's recommendation: **when its loopback readiness probe finds no engine, the SDK starts only the explicit program and argument vector its KnowScroll caller supplies.** It invokes that vector without a shell, waits for the same fixed URL to report ready, and stops only the child it started when its handle closes. There is no default that names `apps/service/src/main.ts`, no source-checkout discovery, and no second port.
+
+**Why.** D-098 and S-173 deliberately leave how KnowScroll obtains the engine and its packages to the orchestrator. A source-tree default would make a published SDK depend on this repository's layout, TypeScript loader and working directory; it would be a hidden cross-repository distribution decision. An explicit launcher keeps delivery with KnowScroll while the SDK owns only the connect/start-if-absent/owned-close behavior S-173 chose.
+
+**Rejected.** **Hard-coding the source entrypoint** — works only from this checkout and silently turns an internal path into an external API. **A shell command string** — lets arguments and paths become shell syntax, where the SDK needs a literal program and vector. **Picking another port after one is occupied** — permits two services and violates S-113's one-worker reason. **Connecting only** — leaves the owner starting the engine by hand, which S-173 rejected.
+
+**Caught by.** `cutroom-sdk`'s launcher checks: an absent engine starts only the supplied program; no launcher is invoked when a ready engine answers; a port-race loser joins the fixed-port winner rather than another port; and `close()` writes the stdin stop protocol only to the child handle it owns. Its boundary checks reject a source-entrypoint literal or `node:child_process` outside the launcher.
+
+**Confirmed-by.** The owner, 2026-09-28: _"yes thats good"_ to the explicit launcher contract.
+
+---
+
+## S-176 | 2026-09-28 | The aggregate test runner is serial; nested PATH-only journey children keep their own measured concurrency and 300-second bound
+
+**Chose.** `scripts/check.mjs` and the ordinary `npm test` command run the repository's outer Node test
+runner with **`--test-concurrency=1`**. Every test file still runs, including every PATH-only secrets
+journey; each journey child keeps the concurrency and timeout already measured and ratified for that
+journey (for reel-render check 50, four files at a time and 300 seconds). On a failed check, the runner
+prints the final 80 output lines rather than the first 40, so Node's final failing subtest and summary are
+visible.
+
+**Why.** The outer runner's default parallelism overlaps full test work with a PATH-only journey check
+that deliberately starts its own parallel child suite. The result is contention among nested SQLite,
+ffmpeg and worker processes: the child is killed at its unchanged 300-second bound despite its assertions
+otherwise passing. Serializing the outer scheduler removes that accidental overlap without dropping a
+file, relaxing an assertion, widening a bound or changing child isolation. The fuller failure tail makes a
+real future red diagnosable from the one required command.
+
+**Rejected.** **Increasing check 50's timeout** — turns resource contention into a longer wait and weakens
+the known bound. **Reducing its child concurrency** — reopens the feature's measured resource decision
+instead of preventing the outer runner from competing with it. **Skipping or quarantining the secrets
+journey** — removes the proof that tests cannot see credentials. **Keeping parallel outer execution and
+printing only the first 40 lines** — repeats the opaque aggregate failure that blocked the SDK's pre-code
+gate.
+
+**Caught by.** A full `node scripts/check.mjs --code` run: it must execute every test and complete green;
+on a deliberate test failure, the final test output names the failing subtest. `tests/check-changed.test.ts`
+still compares every code-path check selection to the full runner's own dry run, so the serial test step
+cannot disappear from `--changed`.
+
+**Confirmed-by.** The owner, 2026-09-28: _"Okay do it and then write the slice 0 and slice 1 implementation plan"_.
+
+---
