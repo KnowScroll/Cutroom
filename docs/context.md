@@ -22,11 +22,11 @@ git and the journal keep them.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`,
   `resume-failed` (S-161 to S-164, S-171 to S-174).
-  **Stopped**: `one-subject` (S-149). **Planned, gates not
-  written**: `cutroom-sdk` (S-173; four drafts, not approved), `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
+  **Stopped**: `one-subject` (S-149). **Planned, gates approved**: `cutroom-sdk` (S-173, S-175).
+  **Planned, gates not written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `cutroom-sdk`'s four gates are approved; its pre-code full preflight is green after S-176 serialised the outer test runner without changing nested secrets checks. `PROMPTS/063-cutroom-sdk-slices-0-1.md` is the implementation plan: first write Slice 0's exact impact/re-journey record, then build only Slice 1's strict readiness contract. S-175 settles the launcher: KnowScroll supplies an explicit program and argument vector; the SDK never assumes this source checkout. The approved gates expose every current Contract V1 amendment — criterion typing, record takes, and resume/lineage — and require one ready engine under the fixed loopback port; no SDK package exists. Then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
+- **Next**: `cutroom-sdk`'s four gates are approved and Slice 0 is committed, but its impact record contradicts itself about `reel-plan`, database-independent readiness and `resume-failed`'s direct `startApi` caller. `PROMPTS/064-cutroom-sdk-slice-1.md` first corrects that record in a documentation-only commit, then builds only Slice 1's strict readiness contract. S-175 settles the later launcher: KnowScroll supplies an explicit program and argument vector; the SDK never assumes this source checkout. No SDK package exists. Then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates. Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
   Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
@@ -91,6 +91,21 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-28 · session 64
+
+- Read Slice 0 against the approved readiness gate and current tests. It is not safe to begin Slice 1 from the
+  committed record: its table assigns readiness to a new dedicated test and leaves `reel-plan` unchanged, while
+  its later section requires two `reel-plan` amendments; one of those wrongly makes an in-memory readiness route
+  return 500 when unrelated database tables are dropped. It also names the required
+  `tests/resume-failed-contract.test.ts` caller change, then claims no `resume-failed` file references the new
+  option. The exact Slice 4 re-journey list is therefore not established.
+- `PROMPTS/064-cutroom-sdk-slice-1.md` — the corrected handoff. First repair and separately commit Slice 0's
+  impact record; then one builder adds the strict readiness schema/route, single-read getter, service/harness
+  lifecycle and dedicated no-write/500 tests. It leaves `reel-plan`'s route matrix alone and stops before Slice 2.
+  `PROMPTS/063` now records that session 63 ran Slice 0 only; the prompt index gains 064.
+- Current-HEAD startup evidence: decisions current (115, none unpushed), drift green (143 modules), and
+  `node scripts/check.mjs --code` fully green; its serial test step took 2,065,804 ms.
 
 ### 2026-09-28 · session 63
 

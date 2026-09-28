@@ -4,7 +4,7 @@
 - **Feature:** `cutroom-sdk` (S-173, S-175, S-176)
 - **Work:** complete Slice 0's written impact record, then build only Slice 1's readiness contract
 - **Written:** 2026-09-28, after all four gates were adversarially approved and the pre-code full check passed
-- **Run:** not yet run
+- **Run:** 2026-09-28 (session 63) — Slice 0 only; Slice 1 was not run
 
 ## Starting fact — do not repeat the preflight in this plan
 

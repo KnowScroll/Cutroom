@@ -7292,3 +7292,37 @@ scripts/check.mjs --code` not run a second time, per the prompt's "do not run a 
 
 **Why.** CLAUDE.md rule 5: a journal entry before finishing. Slice 0 is a record-only commit, so the entry is
 short — its body is in the file it added, not in the journal. Slice 1 will be the next entry, when it runs.
+
+---
+
+## 2026-09-28 — session 64, Slice 0's readiness impact record is not yet safe to implement
+
+**Asked.** Decide whether `cutroom-sdk` Slice 1 can run after Slice 0, and provide its implementation plan and
+prompt.
+
+**Observed.** The authority and repository are green: `decisions.mjs` read 115 decisions with none unpushed;
+`drift.mjs` reported 143 modules and no violation; and `node scripts/check.mjs --code` passed typecheck, lint,
+format, boundaries, the boundary proof, the dead-rule audit and all tests. The serial test step took 2,065,804 ms.
+
+The blocker is the committed Slice 0 record itself. Its disposition table says the new
+`tests/cutroom-sdk-readiness.test.ts` owns the route and `tests/reel-plan-service.test.ts` is not amended; its
+later affected-test section requires two amendments to that same verified test. The second would assert 500 for
+readiness after dropping run tables, contradicting the approved gate's in-memory, no-database route. The caller
+inventory correctly names a required `tests/resume-failed-contract.test.ts` change, but the re-journey section
+later says no `resume-failed` file references `ApiOptions.ready`. It also schedules the re-journeys after Slice 1,
+while Gate 4 assigns them to Slice 4. A ticked checklist does not make those statements compatible.
+
+**Changed.** `PROMPTS/064-cutroom-sdk-slice-1.md` is the corrected handoff: first repair Slice 0 in a separate
+documentation commit, then build the dedicated readiness contract test-first. The 500 arm is tested with a
+throwing readiness getter, not a broken database; the handler reads the getter once; the old `reel-plan` route
+matrix stays unchanged; and the exact `resume-failed` compatibility classification is resolved before code.
+`PROMPTS/063` and its index row now say session 63 ran Slice 0 only. `docs/context.md` records the finding and
+points Next at prompt 064.
+
+**Why.** Gates before code, and nothing weakened to reach green. Implementing either half of a contradictory
+impact record would make a silent choice about verified tests and re-journeys. The approved architecture already
+settles database independence; the feature-amendment precedent must settle the remaining exact journey list in
+the record before the builder receives it.
+
+**Next.** Run `PROMPTS/064`: correct and commit the Slice 0 record first. If that yields one evidenced re-journey
+list, build only Slice 1, run its targeted test and the full code check, commit it alone, and stop before Slice 2.
