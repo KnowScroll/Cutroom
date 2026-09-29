@@ -37,7 +37,7 @@ reports 146 modules, 0 boundary violations, 0 key-shaped reads outside providers
 
 **Exact affected tests.** `tests/cutroom-sdk-launcher.test.ts` (new, 16 tests sole owner), `tests/cutroom-sdk-routes.test.ts` (regression owner), `tests/cutroom-sdk-readiness.test.ts` (regression owner), `tests/boundaries.test.ts` (boundary proof owner). No other test touched.
 
-**Verification.** `Verification: full`, `Verification-Tree: <exact committed tree>` (run `node scripts/verification-status.mjs` after commit), `Verification-Tests: tests/cutroom-sdk-launcher.test.ts tests/cutroom-sdk-routes.test.ts tests/cutroom-sdk-readiness.test.ts tests/boundaries.test.ts`.
+**Verification.** `Verification: full`, `Verification-Tree: b238d7ed32e647d39a60a4c02d9329b5a71b724b` (verified: `node scripts/verification-status.mjs` passes), `Verification-Tests: tests/cutroom-sdk-launcher.test.ts tests/cutroom-sdk-routes.test.ts tests/cutroom-sdk-readiness.test.ts tests/boundaries.test.ts`.
 
 **Next.** Slice 4 (journey and re-journeys) is unstarted. Do not begin it in this session.
 
