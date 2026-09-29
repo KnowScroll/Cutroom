@@ -9,7 +9,15 @@ import {
   SubmitRequest,
 } from '@cutroom/reel-contract'
 import { afterEach, test } from 'node:test'
-import { createCutroom, type Cutroom, type SdkApiError, type SdkProtocolError } from '@cutroom/sdk'
+import {
+  createCutroom,
+  type CreateCutroomOptions,
+  type Cutroom,
+  type SdkApiError,
+  type SdkConnectionError,
+  type SdkError,
+  type SdkProtocolError,
+} from '@cutroom/sdk'
 import type { AddressInfo } from 'node:net'
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http'
 
@@ -270,21 +278,33 @@ async function newClient(): Promise<Cutroom> {
 // ---------------------------------------------------------------- 1. public surface
 
 test('1. the public entry exports every method, every error type, and the handle interface', () => {
-  // A typed import alone is a compile-time check that the public surface is intact. The
-  // runtime assertions below pin the slice's required exports and reject any future drift
-  // that drops an error field, an error kind, or an error stage.
+  // Compile-time check that the public surface is intact. Every required public export is
+  // named in the literal type below; removing any of them makes this file stop compiling,
+  // which is what the public-surface proof requires. The runtime assertions then pin the
+  // error kinds/stages the contract promises and reject any future drift that drops an
+  // error field, an error kind, or an error stage.
   const api: {
     createCutroom: typeof createCutroom
+    options: CreateCutroomOptions
+    handle: Cutroom
     SdkApiError: SdkApiError['kind']
     SdkProtocolError: SdkProtocolError['stage']
+    SdkConnectionError: SdkConnectionError['stage']
+    SdkError: SdkError['kind']
   } = {
     createCutroom,
+    options: {},
+    handle: undefined as unknown as Cutroom,
     SdkApiError: 'api',
     SdkProtocolError: 'request',
+    SdkConnectionError: 'connect',
+    SdkError: 'protocol',
   }
   assert.equal(typeof api.createCutroom, 'function')
   assert.equal(api.SdkApiError, 'api')
   assert.equal(api.SdkProtocolError, 'request')
+  assert.equal(api.SdkConnectionError, 'connect')
+  assert.equal(api.SdkError, 'protocol')
 })
 
 test('1. invalid SubmitRequest fails at the schema boundary and sends zero calls', async () => {
@@ -887,6 +907,103 @@ test('6. [::1] is accepted as a loopback host (IPv6 literal)', async () => {
   } finally {
     await c.close()
     await ipv6StandIn.stop()
+  }
+})
+
+test('6. an explicit default HTTP port (`:80`) is accepted and used', async () => {
+  // WHATWG URL strips the default port from `URL.port` — `http://127.0.0.1:80` parses to
+  // `URL.port === ''` — so a naïve loopback check that only inspects the parsed URL
+  // would reject an explicit, well-formed :80 origin. The SDK must read the original
+  // URL authority to decide whether a port was written.
+  //
+  // The stand-in listens on an ephemeral port, but a permitted origin containing that
+  // port spelled twice (with the explicit-port 80 first, then with the real one) is
+  // accepted at construction time without making a request. We only assert the
+  // synchronous acceptance — there is no listener bound to port 80 here.
+  const customStandIn = new StandIn()
+  await customStandIn.start()
+  const port = (customStandIn.server.address() as AddressInfo).port
+  const accepted: string[] = ['http://127.0.0.1:80', 'http://[::1]:80', `http://127.0.0.1:${port}`]
+  try {
+    for (const input of accepted) {
+      // Construction must not throw — that's the only thing the prompt asks for here.
+      const c = await createCutroom({ baseUrl: input })
+      await c.close()
+    }
+  } finally {
+    await customStandIn.stop()
+  }
+})
+
+test('6. an origin whose port was not written at all is rejected', async () => {
+  // The mirror of the previous test: an http://127.0.0.1 or http://[::1] with NO port
+  // anywhere in the authority must still be rejected, because the loopback discipline
+  // asks the caller to name the port. WHATWG parses both to `URL.port === ''`, and the
+  // SDK must distinguish that from an explicit :80 by reading the original string.
+  const cases: Array<[string, string]> = [
+    ['http://127.0.0.1', 'no port for IPv4 loopback'],
+    ['http://[::1]', 'no port for bracketed IPv6 loopback'],
+    ['http://localhost', 'no port for hostname loopback'],
+  ]
+  for (const [bad, label] of cases) {
+    await assert.rejects(
+      createCutroom({ baseUrl: bad }),
+      (err: unknown) => err instanceof TypeError,
+      `${label}: ${JSON.stringify(bad)} was accepted`,
+    )
+  }
+})
+
+test('6. loopback confinement across redirects: a 3xx response is an SdkProtocolError, not followed', async () => {
+  // The configured loopback server answers with a 307 redirect to a SECOND server, on a
+  // different origin. The SDK must throw SdkProtocolError with the original 3xx status
+  // and must not contact the second server — a request to an attacker-controlled peer
+  // would let it read the request body, and that is the confinement gap the rule closes.
+  //
+  // The chosen route is `POST /v1/runs/:runId/resume` because it carries a JSON body: a
+  // successful follow-through would forward the body to the second server, which is
+  // exactly the leak this test prevents. The body here is a syntactically valid
+  // `ResumeRequest`, so the schema check passes and the request reaches fetch.
+  const secondServer = createServer((_req, res) => {
+    // If this ever fires, the SDK followed the redirect and the test is failing.
+    res.statusCode = 200
+    res.setHeader('content-type', 'application/json')
+    res.end(JSON.stringify({ contractVersion: V, outcome: 'never' }))
+  })
+  let secondHits = 0
+  secondServer.on('request', () => {
+    secondHits += 1
+  })
+  await new Promise<void>((resolveListen) => {
+    secondServer.listen(0, '127.0.0.1', () => resolveListen())
+  })
+  const secondAddress = secondServer.address() as AddressInfo
+  const secondUrl = `http://127.0.0.1:${secondAddress.port}/`
+
+  const firstServer = createServer((_req, res) => {
+    res.statusCode = 307
+    res.setHeader('location', secondUrl)
+    res.end()
+  })
+  await new Promise<void>((resolveListen) => {
+    firstServer.listen(0, '127.0.0.1', () => resolveListen())
+  })
+  const firstAddress = firstServer.address() as AddressInfo
+  const firstUrl = `http://127.0.0.1:${firstAddress.port}/`
+
+  const c = await createCutroom({ baseUrl: firstUrl })
+  try {
+    const err = await c
+      .resume('run-1', makeResumeRequest())
+      .catch((e: unknown) => e as SdkProtocolError)
+    assert.equal((err as SdkProtocolError).kind, 'protocol')
+    assert.equal((err as SdkProtocolError).stage, 'request')
+    assert.equal((err as SdkProtocolError).status, 307)
+    assert.equal(secondHits, 0, 'SDK followed a redirect and contacted a peer outside its loopback')
+  } finally {
+    await c.close()
+    await new Promise<void>((r) => firstServer.close(() => r()))
+    await new Promise<void>((r) => secondServer.close(() => r()))
   }
 })
 

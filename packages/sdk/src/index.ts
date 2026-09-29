@@ -140,7 +140,12 @@ function normaliseLoopbackOrigin(raw: string): string {
   if (!isLoopback) {
     throw new TypeError(`baseUrl host ${JSON.stringify(host)} is not a loopback host`)
   }
-  if (parsed.port === '') {
+  // WHATWG strips the scheme's default port from `URL.port`: `http://127.0.0.1:80` parses
+  // to `URL.port === ''`, indistinguishable from `http://127.0.0.1` with no port. The
+  // loopback discipline requires a written port, so inspect the original authority. A
+  // malformed port (non-numeric or out of range) is also caught here, because `new URL`
+  // throws first — `explicitPortOf` therefore agrees with the parser on what is malformed.
+  if (!hasExplicitPort(raw)) {
     throw new TypeError('baseUrl must include an explicit port')
   }
   if (parsed.pathname !== '/' && parsed.pathname !== '') {
@@ -152,10 +157,57 @@ function normaliseLoopbackOrigin(raw: string): string {
   if (parsed.hash !== '') {
     throw new TypeError(`baseUrl must not carry a fragment; received ${parsed.hash}`)
   }
+  // `parsed.host` already omits the default port for `http:`, so `http://127.0.0.1:80`
+  // canonicalises to `http://127.0.0.1/` and a fetch from that URL still uses port 80.
   return `${parsed.protocol}//${parsed.host}/`
 }
 
+/**
+ * Whether the authority in a raw URL string carries an explicit port — IPv4/hostname with
+ * `:digits`, bracketed IPv6 with `]:digits`. Anything else (no colon, non-digit suffix,
+ * bracketed form without a closing bracket) is treated as "no explicit port" or
+ * "malformed", matching what `new URL` accepts and what the loopback discipline allows.
+ *
+ * `new URL` has already validated the port by the time this is called for an input that
+ * parsed successfully, so a non-numeric port in the authority would have thrown above.
+ */
+function hasExplicitPort(raw: string): boolean {
+  const schemeEnd = raw.indexOf('://')
+  if (schemeEnd === -1) return false
+  let after = raw.slice(schemeEnd + 3)
+  // Strip a userinfo component if present (already forbidden, but the port still lives
+  // past the `@`).
+  const at = after.lastIndexOf('@')
+  if (at !== -1) after = after.slice(at + 1)
+  const pathStart = after.search(/[/?#]/)
+  const authority = pathStart === -1 ? after : after.slice(0, pathStart)
+  if (authority.startsWith('[')) {
+    const close = authority.indexOf(']')
+    if (close === -1) return false
+    return /:\d+$/.test(authority.slice(close + 1))
+  }
+  return /:\d+$/.test(authority)
+}
+
 // ---------------------------------------------------------------- implementation
+
+/**
+ * One private request helper so every route uses the same loopback confinement. A 3xx
+ * response is unexpected for every route the contract defines; treating it as a SdkProtocolError
+ * (rather than following the redirect) is what keeps the SDK on its configured origin and
+ * stops a request body from being forwarded to a peer outside the loopback. No retry, no
+ * readiness probe, no launcher work — only the redirect guard lives here.
+ */
+async function sendRequest(
+  url: string,
+  init: { method?: string; headers?: Record<string, string>; body?: string },
+): Promise<Response> {
+  const res = await fetch(url, { ...init, redirect: 'manual' })
+  if (res.status >= 300 && res.status < 400) {
+    throw new SdkProtocolErrorImpl('request', res.status)
+  }
+  return res
+}
 
 /**
  * Construct a `Cutroom` handle that owns no process and stores no readiness state. The Slice 2
@@ -176,7 +228,7 @@ function makeHandle(baseUrl: string): Cutroom {
       assertOpen()
       const parsed = SubmitRequest.safeParse(request)
       if (!parsed.success) throw new SdkProtocolErrorImpl('request')
-      const res = await fetch(`${baseUrl}v1/runs`, {
+      const res = await sendRequest(`${baseUrl}v1/runs`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(parsed.data),
@@ -185,14 +237,15 @@ function makeHandle(baseUrl: string): Cutroom {
     },
     async find(requestId) {
       assertOpen()
-      const res = await fetch(`${baseUrl}v1/runs?requestId=${encodeURIComponent(requestId)}`, {
-        method: 'GET',
-      })
+      const res = await sendRequest(
+        `${baseUrl}v1/runs?requestId=${encodeURIComponent(requestId)}`,
+        { method: 'GET' },
+      )
       return handleRouteResponse(res, 'find') as Promise<RunStatus>
     },
     async status(runId) {
       assertOpen()
-      const res = await fetch(`${baseUrl}v1/runs/${encodeURIComponent(runId)}`, {
+      const res = await sendRequest(`${baseUrl}v1/runs/${encodeURIComponent(runId)}`, {
         method: 'GET',
       })
       return handleRouteResponse(res, 'status') as Promise<RunStatus>
@@ -200,28 +253,31 @@ function makeHandle(baseUrl: string): Cutroom {
     async follow(runId, since) {
       assertOpen()
       const query = since === undefined ? '' : `?since=${encodeURIComponent(String(since))}`
-      const res = await fetch(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/events${query}`, {
-        method: 'GET',
-      })
+      const res = await sendRequest(
+        `${baseUrl}v1/runs/${encodeURIComponent(runId)}/events${query}`,
+        {
+          method: 'GET',
+        },
+      )
       return handleRouteResponse(res, 'follow') as Promise<EventsPage>
     },
     async result(runId) {
       assertOpen()
-      const res = await fetch(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/result`, {
+      const res = await sendRequest(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/result`, {
         method: 'GET',
       })
       return handleRouteResponse(res, 'result') as Promise<RunResult | RunStatus>
     },
     async record(runId) {
       assertOpen()
-      const res = await fetch(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/record`, {
+      const res = await sendRequest(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/record`, {
         method: 'GET',
       })
       return handleRouteResponse(res, 'record') as Promise<RunRecord | RunStatus>
     },
     async cancel(runId) {
       assertOpen()
-      const res = await fetch(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/cancel`, {
+      const res = await sendRequest(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/cancel`, {
         method: 'POST',
       })
       return handleRouteResponse(res, 'cancel') as Promise<RunStatus>
@@ -230,7 +286,7 @@ function makeHandle(baseUrl: string): Cutroom {
       assertOpen()
       const parsed = ResumeRequest.safeParse(request)
       if (!parsed.success) throw new SdkProtocolErrorImpl('request')
-      const res = await fetch(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/resume`, {
+      const res = await sendRequest(`${baseUrl}v1/runs/${encodeURIComponent(runId)}/resume`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(parsed.data),

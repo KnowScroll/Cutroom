@@ -1,53 +1,56 @@
 # JOURNAL
 
-The operational journal stays short. Sessions 01–64, including their full reasoning and raw verification notes, are
-preserved byte-for-byte in [the historical journal](docs/history/JOURNAL-through-session-64.md). Read that archive only
-by its session heading. New entries state the decision, commit/evidence reference and next action; feature files,
-commit messages and verification trailers carry the durable detail (S-177).
+The operational journal stays short. Sessions 01–64, including their full reasoning and raw verification notes,
+are preserved byte-for-byte in [the historical journal](docs/history/JOURNAL-through-session-64.md). Read that
+archive only by its session heading. New entries state the decision, commit/evidence reference and next action;
+feature files, commit messages and verification trailers carry the durable detail (S-177).
 
-## 2026-09-29 — session 67, cutroom-sdk Slice 2 built and verified
+## 2026-09-29 — session 68, cutroom-sdk Slice 2 review corrections committed
 
-**Changed.** Created `packages/sdk` (the typed local client and its single `src/index.ts` exporting `createCutroom`, the `Cutroom` interface, and the three stable error shapes — `SdkApiError`, `SdkProtocolError`, `SdkConnectionError`); added the `sdk-no-engine-internals` boundary rule in `.dependency-cruiser.cjs` with five relative-path and three by-name prove cases in `scripts/drift.mjs`; added `packages/sdk` to `PACKAGE_FOLDERS`, the legal `@cutroom/reel-contract` by-name case, and per-package stubs in `scripts/drift.mjs` `build()` so relative imports resolve inside the probe; referenced `packages/sdk` from the root `tsconfig.json` and declared it as a workspace link in `package.json`. Created the new behavior owner `tests/cutroom-sdk-routes.test.ts` (30 tests) and ticked Slice 2 in `docs/features/cutroom-sdk.md`. Updated three existing drift rule-count pin tests (`tests/paid-path-keys.test.ts`, `tests/reel-render-rules.test.ts`, `tests/reel-stills-rules.test.ts`) from `20 rules proven to fire` to `21`, recording that cutroom-sdk's Slice 2 added the twenty-first rule alongside the twentieth keys-only-in-providers pin those tests keep cross-feature consistent.
+**Findings.** A review of Slice 2 found three outstanding findings that the original slice did not address,
+plus one housekeeping gap: (1) every `fetch` call lacked an explicit `redirect: 'manual'`, so a 3xx response
+would have been followed — a redirect from the configured loopback could forward a request body to a peer
+outside it; (2) the public-surface test in `tests/cutroom-sdk-routes.test.ts` only typed `SdkApiError` and
+`SdkProtocolError`, not `CreateCutroomOptions`, `Cutroom`, `SdkConnectionError`, or `SdkError`, so removing any
+of those exports would not have failed compilation; (3) `normaliseLoopbackOrigin` rejected an explicit
+`http://127.0.0.1:80` and `http://[::1]:80` because WHATWG strips the scheme's default port from `URL.port`,
+so an explicit default port was indistinguishable from no port at all; (4) `PROMPTS/065-cutroom-sdk-slice-2.md`
+was untracked even though session 66's journal entry claimed it was added.
 
-**Observed.** Every step green on `node scripts/check.mjs`: typecheck (1.9 s), lint (5.6 s), format (13.0 s), boundaries (1.3 s), boundaries proven (3.8 s), no dead rule (67 ms), tests (1,455,704 ms — 650 tests, 644 + 6 already counted by the rule-count pin tests that this slice updates; the 6 failures during the first run were exactly the three rule-count pin tests above and the cross-file agreement check, all fixed by the same `20` → `21` update), decisions pin (221 ms), copied docs (72 ms). Slice 1's targeted evidence at `98930f8` stays valid because this slice does not touch its files. The eight deliberate breaks (request validation-before-fetch, runId encoding, 409-as-error misread, ErrorResponse parsing skipped, wrong-schema JSON swallowed, https:// URL allowed, closed-flag ignored, and the forbidden `import { tables } from '../../domain/src/index.ts'`) each took exactly one named test red and the boundary case tripped `drift` with `sdk-no-engine-internals  packages/sdk/src/index.ts -> packages/domain/src/index.ts` before restore.
+**Changed.** Added one private `sendRequest` helper in `packages/sdk/src/index.ts` that every route now uses;
+it passes `redirect: 'manual'` and throws `SdkProtocolError { stage: 'request', status: <3xx> }` for any
+redirect. Added `hasExplicitPort(raw)` to inspect the original URL authority, accepting `http://127.0.0.1:80`
+and `http://[::1]:80` while keeping `http://127.0.0.1` and `http://[::1]` rejected (the canonical origin
+`parsed.host` still omits the default port for `http:`, and requests still use it correctly). Updated test `1`
+to import and reference all six required public types in a typed literal — removing any export fails
+compilation. Added three new tests owning each finding: `6. loopback confinement across redirects` (POST with a
+JSON body proves the body cannot be forwarded by a redirect), `6. an explicit default HTTP port (:80) is
+accepted and used`, and `6. an origin whose port was not written at all is rejected`. Preserved the existing
+`'http://127.0.0.1' / 'missing port'` case in the invalid-URL test, so the port-80 acceptance does not weaken
+the no-port rejection. Added a `Review corrections (2026-09-29)` paragraph to Slice 2's feature entry in
+`docs/features/cutroom-sdk.md`. Staged and committed `PROMPTS/065-cutroom-sdk-slice-2.md` with its contents
+unchanged.
 
-**Why.** The Slice 2 prompt recorded the rule-count change as something the prompt itself authorizes ("If another test changes, add it to this command and record why in the feature entry and `Verification` trailer"). The pin tests are verified feature tests that hard-code a printed number for cross-feature consistency; the number is updated, the rationale comment is rewritten to name the new rule, and the affected tests are added to the slice command. The slice changes the workspace solution (new package reference), the root TypeScript project references, and the boundary configuration — which is why the targeted `check.mjs --slice` is refused and the full check runs once at the end, per the prompt's standing rule.
+**Observed.** `node scripts/check.mjs --slice tests/cutroom-sdk-routes.test.ts tests/workspace.test.ts
+tests/boundaries.test.ts` green at this commit: typecheck 2.2 s, lint 5.4 s, format 12.6 s, boundaries 1.3 s,
+boundaries proven 3.7 s, no dead rule 65 ms, slice tests 6.1 s (54 subtests: 33 in the SDK routes test, 5
+boundaries, 4 pin tests in reel-render/reel-stills/paid-path, 12 workspace and rule-count pin tests; all
+green), decisions pin 188 ms, copied docs 65 ms. The full test file expanded from 30 to 33 tests, all 33
+green. `node scripts/drift.mjs`, `--prove`, and `--audit` all green; the rule count and audit remain
+unchanged. The redirect test uses two local HTTP servers: the configured loopback returns a 307 to the
+second, and the test asserts the SDK throws `SdkProtocolError { kind: 'protocol', stage: 'request',
+status: 307 }` and the second server receives zero requests. The POST route is `resume`, which carries a
+JSON body, so a successful follow would forward that body — a leak the test would prevent.
 
-**Next.** Commit Slice 2 alone with `Verification: full`, `Verification-Tree: <exact tree>`, `Verification-Tests: tests/cutroom-sdk-routes.test.ts tests/workspace.test.ts tests/boundaries.test.ts tests/paid-path-keys.test.ts tests/reel-render-rules.test.ts tests/reel-stills-rules.test.ts`; run `node scripts/verification-status.mjs` against the committed tree. Slice 3 (launcher lifecycle) is a separate session.
+**Why.** The four findings are scope-bound: they correct Slice 2's behavior without changing any feature
+boundary, rule, env var, port, launcher, or child-process shape. A targeted `--slice` is appropriate because
+every changed path is well-classified (no infrastructure, no `FULL_ONLY`, no unknown); a document-only run
+is not, because the production code and its test file also changed. The 33 SDK-route tests already exercise
+every route and every error type, and the boundaries, workspace, and rule-count pin tests prove the
+configuration the slice introduced — no other test was touched. The corrections match the Slice 2 prompt's
+standing rule that `JOURNAL.md` reflects what was actually committed: a journal entry that names a file as
+added but never staged it is the gap this commit closes.
 
-## 2026-09-29 — session 66, Slice 2 SDK handoff made test-explicit
-
-**Changed.** Added `PROMPTS/065-cutroom-sdk-slice-2.md`, the implementation handoff for the SDK package and typed
-route-client slice.
-
-**Observed.** Slice 1 is complete and its current-tree targeted verification is recorded at `98930f8`. Its readiness
-test and compile-support amendment remain read-only in Slice 2. Slice 2 creates one new behavior owner,
-`tests/cutroom-sdk-routes.test.ts`; existing `tests/workspace.test.ts` and `tests/boundaries.test.ts` prove its
-workspace/package and resolved-path rule changes. This is a full-check slice only at the end because it changes the
-workspace solution and boundary enforcement; S-177 does not require a redundant historical full-suite preflight.
-
-**Why.** The next builder needs an exact test inventory, route/error behavior, scope boundary, and verification command
-before implementation starts, rather than re-opening Slice 1's evidence or guessing what the suite owns.
-
-**Next.** Build `cutroom-sdk` Slice 2 from `PROMPTS/065-cutroom-sdk-slice-2.md`; after its verified commit, start
-Slice 3 only in a separate session.
-
-## 2026-09-29 — session 65, verification made commit-bound and targeted
-
-**Changed.** Replaced automatic aggregate verification for ordinary code slices with explicit `check.mjs --slice`
-tests, added commit-tree verification evidence, compacted this journal and archived sessions 01–64, and tightened
-Slice 1’s readiness getter test to assert the exact call count.
-
-**Observed.** Slice 1 already recorded a full green run at `127adc5`; rerunning it during review consumed time without
-adding evidence. This migration's required full run completed its tests green in 2,654,890 ms; its only initial red was
-Prettier on five newly edited files. After formatting, typecheck, lint, format, boundary proof, authority and the four
-focused policy/Slice 1 test files were green. The aggregate phase is approximately 44 minutes on this machine, while
-typecheck and boundary proofs are seconds.
-
-**Why.** Fast feedback must not mean untested code. A slice names its approved affected tests; an unlisted changed test,
-unknown path, or verification-tool change fails closed to a full check. A commit trailer binds completed evidence to the
-exact Git tree, so a clean later session can reuse it safely.
-
-**Next.** Commit and push this policy migration with its focused final-tree evidence and the recorded aggregate-test
-pass. Future ordinary slices use the targeted command recorded in their commit trailer; feature journeys and
-verification infrastructure still use the full suite.
+**Next.** Commit the corrections alone with `Verification: targeted`, `Verification-Tree: <exact tree>`,
+`Verification-Tests: tests/cutroom-sdk-routes.test.ts tests/workspace.test.ts tests/boundaries.test.ts`;
+run `node scripts/verification-status.mjs` against the committed tree; do not begin Slice 3.
