@@ -47,3 +47,17 @@ tree the trailers bind. Exact affected tests: `tests/cutroom-sdk-launcher.test.t
 the appended archive entry below.
 
 **Next.** Stop after the correction is evidence-bound. Slice 4's journey and re-journeys remain unstarted.
+
+## 2026-09-29 — session 71, `cutroom-sdk` Slice 4 execution planned
+
+**Decision.** S-178 makes the final slice explicit and fixes the only valid evidence order: tick the evidence-only
+Slice 4 in a clean documentation commit; run the generated no-provider `cutroom-sdk` journey; then, only on PASS,
+run and commit the one exact compatibility re-journey, `reel-contract`. Its in-built full check is the Gate 4 final
+proof, so no third aggregate run is added. The Slice 0 impact record remains decisive: only `reel-contract` had its
+public contract evidence amended; Slice 2 and Slice 3 changed SDK-owned code, tests and rules only.
+
+**Evidence.** `node scripts/verification-status.mjs` reports `ae0599a` has full verification for its exact tree.
+No test command ran: the owner asked to reuse the already completed Slice 3 evidence rather than rerun it as startup.
+
+**Next.** Run `PROMPTS/072-cutroom-sdk-slice-4.md`. A journey is Slice 4's required proof and therefore cannot be
+substituted with the reused Slice 3 result; on its first FAIL, commit the generated finding and stop.

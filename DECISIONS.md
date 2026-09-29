@@ -7675,3 +7675,34 @@ uncommitted source or a HEAD commit without valid evidence.
 slice checks, and reserve full suites for big objectives.
 
 ---
+
+## S-178 | 2026-09-29 | `cutroom-sdk` Slice 4 is one SDK journey followed by `reel-contract` alone; the final re-journey supplies the final full-check proof
+
+**Chose.** Slice 4 completes in this serial order: a clean documentation-only commit ticks its explicit Slice 4
+entry; `node scripts/journey.mjs cutroom-sdk` creates the SDK evidence; on PASS, that generated result is committed;
+then, from a clean tree, `node scripts/journey.mjs reel-contract` re-verifies the sole affected verified feature and
+its generated result is committed. The full repository check inside that final journey is Gate 4's final full-green
+proof. No extra aggregate check runs after it.
+
+**Why.** The approved Slice 0 impact record names `reel-contract` alone: `ReadyResponse` and the added route extend
+its public contract, whereas `reel-plan` stayed read-only and `resume-failed`'s one caller edit was compile support,
+not evidence rewritten. Slice 2 and Slice 3 add SDK-owned code, tests and dependency rules; they do not amend another
+verified feature's evidence. `journey.mjs` already runs the full repository check, rejects a dirty tree, and writes the
+only legitimate Evidence, Divergence and Status result. Running it serially preserves the input commit each evidence
+line names; its final invocation supplies the full check the approved gate asks for.
+
+**Rejected.** **Re-journeying every feature touched by the aggregate suite** — confuses execution with an amended
+feature and turns an evidenced exact list into a guess. **Skipping `reel-contract` because its prior journey is green**
+— leaves the Version 1 public-contract amendment without its required compatibility proof. **A standalone aggregate
+check after the final re-journey** — repeats the exact full check that journey already ran, with no new tree to judge.
+**Marking the SDK verified by hand or before its journey** — bypasses S-016's generated evidence.
+
+**Caught by.** `scripts/journey.mjs` refuses an unticked slice, a dirty tree, missing feature tests, or unapproved
+gates; it writes a FAIL and stops the status transition when either its full check or feature tests fail. The feature's
+Slice 0 impact record and the `reel-contract` Evidence line expose an omitted or widened re-journey. A clean tree and
+the two generated commits bind the serial order.
+
+**Confirmed-by.** The owner, 2026-09-29: verify the completed Slice 3 evidence and move to Slice 4's plan,
+decisions and completion work without rerunning Slice 3 as a startup ritual.
+
+---

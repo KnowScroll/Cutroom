@@ -26,11 +26,10 @@ git and the journal keep them.
   **Planned, gates not written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `cutroom-sdk`'s four gates are approved. Slices 1 and 2 are complete; Slice 2's review corrections are
-  committed at `45b9de9`. `PROMPTS/069-cutroom-sdk-slice-3.md` is next: the explicit launcher, bounded readiness,
-  fixed-port race joining and creator-owned stdin shutdown. S-175 settles the launcher: KnowScroll supplies an
-  explicit program and argument vector; the SDK never assumes this source checkout. Then comes Slice 4's no-provider
-  journey and its exact re-journeys, followed by `self-heal`'s gates — one harness around the run that makes, checks,
+- **Next**: `cutroom-sdk`'s four gates are approved. Slices 1–3 are complete; Slice 3's full evidence is bound to
+  `ae0599a`. `PROMPTS/072-cutroom-sdk-slice-4.md` is next: tick the explicit evidence-only Slice 4, run the
+  no-provider SDK journey, then re-journey `reel-contract` alone. S-175 settles the launcher: KnowScroll supplies an
+  explicit program and argument vector; the SDK never assumes this source checkout. Then come `self-heal`'s gates — one harness around the run that makes, checks,
   heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and
   the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part);
   never the engine's code or gates.
@@ -102,6 +101,14 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-29 · session 71
+
+- `cutroom-sdk` Slice 4 is now explicit and planned, not silently absent from the journey gate. S-178 fixes its
+  evidence sequence: a clean tick commit, the no-provider SDK journey, then `reel-contract` alone, serially. The
+  final re-journey's full check is the final Gate 4 proof; there is no duplicate aggregate run. `PROMPTS/072` records
+  the executable stop-on-FAIL sequence. Slice 3's `ae0599a` verification was read through
+  `verification-status.mjs`; no test command ran in this planning session.
 
 ### 2026-09-29 · session 70
 
