@@ -112,11 +112,13 @@ test('4. drift itself reads the repository for key-shaped reads, and finds none 
   )
 })
 
-test('4. drift, drift --prove and drift --audit pass, and the rule count is twenty', () => {
+test('4. drift, drift --prove and drift --audit pass, and the rule count is twenty-one', () => {
+  // cutroom-sdk's Slice 2 added a twenty-first rule, sdk-no-engine-internals, alongside the
+  // twentieth this slice keeps added (keys-only-in-providers, S-109, S-119, S-120).
   assert.equal(prove.status, 0, prove.out)
   assert.doesNotMatch(prove.out, /SILENT/, prove.out)
   assert.doesNotMatch(prove.out, /EAGER/, prove.out)
-  assert.match(prove.out, /20 rules proven to fire/, prove.out)
+  assert.match(prove.out, /21 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)
@@ -124,14 +126,15 @@ test('4. drift, drift --prove and drift --audit pass, and the rule count is twen
   assert.match(audit.out, /live\s+keys-only-in-providers/, audit.out)
 })
 
-test("4. reel-stills' check 3 counts twenty, and so does reel-render's check 2", () => {
+test("4. reel-stills' check 3 counts twenty-one, and so does reel-render's check 2", () => {
   // Gate 2 names reel-stills' check 3. reel-render's check 2 pins the same printed line (S-078's
   // own words), and the feature's list of what it changes in verified features did not say so —
   // the miss S-049 found in S-047 and S-078 found in S-077, a third time (S-120). Both are here,
   // so a slice that updates one and leaves the other fails this check rather than the suite.
+  // cutroom-sdk's Slice 2 added the twenty-first rule, sdk-no-engine-internals.
   for (const file of ['reel-stills-rules.test.ts', 'reel-render-rules.test.ts']) {
     const source = readFileSync(join(REPO, 'tests', file), 'utf8')
-    assert.match(source, /20 rules proven to fire/, `${file} does not count twenty`)
-    assert.doesNotMatch(source, /19 rules proven to fire/, `${file} still counts nineteen`)
+    assert.match(source, /21 rules proven to fire/, `${file} does not count twenty-one`)
+    assert.doesNotMatch(source, /20 rules proven to fire/, `${file} still counts twenty`)
   }
 })

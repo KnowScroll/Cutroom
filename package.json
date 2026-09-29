@@ -28,6 +28,7 @@
     "@cutroom/providers": "workspace:*",
     "@cutroom/service": "workspace:*",
     "@cutroom/reel-contract": "workspace:*",
+    "@cutroom/sdk": "workspace:*",
     "@cutroom/worker": "workspace:*",
     "@eslint/js": "^9.38.0",
     "@types/node": "^22.15.0",

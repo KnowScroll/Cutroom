@@ -23,6 +23,9 @@ importers:
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:packages/reel-contract
+      '@cutroom/sdk':
+        specifier: workspace:*
+        version: link:packages/sdk
       '@cutroom/service':
         specifier: workspace:*
         version: link:apps/service
@@ -166,6 +169,12 @@ importers:
       zod:
         specifier: ^4.6.5
         version: 4.6.5
+
+  packages/sdk:
+    dependencies:
+      '@cutroom/reel-contract':
+        specifier: workspace:*
+        version: link:../reel-contract
 
 packages:
 

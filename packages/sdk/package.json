@@ -1,0 +1,16 @@
+{
+  "name": "@cutroom/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The typed local client for the reel engine. Validates input and every response, makes loopback HTTP calls, and never imports an engine package other than @cutroom/reel-contract (S-173, S-175; docs/features/cutroom-sdk.md).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@cutroom/reel-contract": "workspace:*"
+  }
+}

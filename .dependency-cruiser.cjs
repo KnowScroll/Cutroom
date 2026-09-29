@@ -155,6 +155,24 @@ module.exports = {
       to: { path: '^(apps|packages)/(?!reel-contract/)' },
     },
     {
+      // cutroom-sdk, Slice 2: the typed local client imports only @cutroom/reel-contract and
+      // Node built-ins (S-173, S-175; docs/features/cutroom-sdk.md Gate 2). It must not reach
+      // into providers, pipeline, domain, the API, the service, the worker, the contracts
+      // package, or any other internal path. The `(?!sdk/|reel-contract/)` lookahead allows
+      // the package's own files (so files inside `packages/sdk` may import each other) and
+      // its one permitted dependency.
+      name: 'sdk-no-engine-internals',
+      severity: 'error',
+      comment:
+        'cutroom-sdk, Slice 2: @cutroom/sdk is a client and a launcher, not a facade that ' +
+        're-exports engine code. It may import only @cutroom/reel-contract and Node built-ins ' +
+        '(S-173, S-175). Reaching into providers, pipeline, domain, the API, the service, the ' +
+        'worker, contracts, or any other internal path would couple the SDK to engine internals ' +
+        'and turn a package boundary into a back door.',
+      from: { path: '^packages/sdk/' },
+      to: { path: '^(apps|packages)/(?!sdk/|reel-contract/)' },
+    },
+    {
       name: 'no-reaching-into-internals',
       severity: 'error',
       comment:

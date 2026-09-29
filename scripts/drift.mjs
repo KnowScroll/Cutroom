@@ -302,6 +302,29 @@ const CASES = [
     'packages/pipeline/src/plan/deep.ts',
     '../split/internal/cut.ts',
   ],
+
+  // cutroom-sdk, Slice 2: the typed local client may import only @cutroom/reel-contract and
+  // Node built-ins (S-173). Reaching into any other internal package must fail this rule.
+  // Each case uses a distinct file in packages/sdk/src/, because every case shares the
+  // package's only public entry, and a single file overwritten five times would leave only
+  // the last import in the graph (cutroom-sdk, Slice 2).
+  ['sdk-no-engine-internals', 'packages/sdk/src/reaches-domain.ts', '../../domain/src/index.ts'],
+  [
+    'sdk-no-engine-internals',
+    'packages/sdk/src/reaches-providers.ts',
+    '../../providers/src/index.ts',
+  ],
+  [
+    'sdk-no-engine-internals',
+    'packages/sdk/src/reaches-pipeline.ts',
+    '../../pipeline/src/index.ts',
+  ],
+  ['sdk-no-engine-internals', 'packages/sdk/src/reaches-api.ts', '../../../apps/api/src/index.ts'],
+  [
+    'sdk-no-engine-internals',
+    'packages/sdk/src/reaches-contracts.ts',
+    '../../contracts/src/index.ts',
+  ],
 ]
 
 const EXTRA_FILES = [
@@ -368,6 +391,12 @@ const BY_NAME_CASES = [
   // catches a client that is not installed. If a subpath export is ever added, the resolved path
   // is the rule's other alternation and it still fires.
   ['keys-only-in-providers', 'apps/worker', '@cutroom/providers/env', 'no such subpath'],
+
+  // cutroom-sdk, Slice 2: by package name, the import real code writes. The legal case below
+  // proves the same name resolving through @cutroom/reel-contract stays clean.
+  ['sdk-no-engine-internals', 'packages/sdk', '@cutroom/domain'],
+  ['sdk-no-engine-internals', 'packages/sdk', '@cutroom/api'],
+  ['sdk-no-engine-internals', 'packages/sdk', '@cutroom/contracts'],
 ]
 
 /**
@@ -385,11 +414,14 @@ const BY_NAME_LEGAL = [
   ['packages/domain', 'drizzle-orm'],
   ['packages/providers', 'ai'],
   ['packages/providers', '@ai-sdk/openai'],
+  // cutroom-sdk, Slice 2: the one permitted workspace import.
+  ['packages/sdk', '@cutroom/reel-contract'],
 ]
 
 const PACKAGE_FOLDERS = [
   'packages/contracts',
   'packages/reel-contract',
+  'packages/sdk',
   'packages/domain',
   'packages/pipeline',
   'packages/providers',
@@ -548,6 +580,15 @@ function build(dir, files) {
     const full = join(dir, path)
     mkdirSync(join(full, '..'), { recursive: true })
     writeFileSync(full, `${body}\n`, 'utf8')
+  }
+  // Every package stub so a relative import to another package's index.ts resolves inside the
+  // probe, the way by-name cases resolve through a workspace link. Without these, an import
+  // like `../../domain/src/index.ts` is left unresolved and a forbidden-import case looks
+  // silent — even though the resolver never had a target to find (cutroom-sdk, Slice 2).
+  for (const folder of PACKAGE_FOLDERS) {
+    const stub = join(dir, folder, 'src', 'index.ts')
+    mkdirSync(join(stub, '..'), { recursive: true })
+    if (!existsSync(stub)) writeFileSync(stub, 'export const x = 1\n', 'utf8')
   }
   // dependency-cruiser needs nothing else here, but a tsconfig keeps its TypeScript reader quiet.
   const tsconfig = '{ "compilerOptions": { "allowImportingTsExtensions": true, "noEmit": true } }'
