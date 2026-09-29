@@ -110,9 +110,10 @@ test('2. drift, drift:prove and drift --audit pass', () => {
   assert.doesNotMatch(prove.out, /SILENT/, prove.out)
   assert.doesNotMatch(prove.out, /EAGER/, prove.out)
   // paid-path's Slice 2 added a twentieth rule, keys-only-in-providers (S-109, S-119, S-120).
-  // cutroom-sdk's Slice 2 added the twenty-first, sdk-no-engine-internals (S-173, S-175). The
-  // count stays exact here for the same reason it does in reel-stills' check 3 (S-078).
-  assert.match(prove.out, /21 rules proven to fire/, prove.out)
+  // cutroom-sdk's Slice 2 added the twenty-first, sdk-no-engine-internals (S-173, S-175), and
+  // Slice 3 adds sdk-processes-only-launcher as the twenty-second. The count stays exact here for
+  // the same reason it does in reel-stills' check 3 (S-078).
+  assert.match(prove.out, /22 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)

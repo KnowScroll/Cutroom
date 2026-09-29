@@ -325,6 +325,12 @@ const CASES = [
     'packages/sdk/src/reaches-contracts.ts',
     '../../contracts/src/index.ts',
   ],
+
+  // cutroom-sdk, Slice 3: sdk-processes-only-launcher — only launcher.ts may import
+  // node:child_process. Each case uses a distinct file in packages/sdk/src/ for the same
+  // reason as the sdk-no-engine-internals cases above.
+  ['sdk-processes-only-launcher', 'packages/sdk/src/index.ts', 'node:child_process'],
+  ['sdk-processes-only-launcher', 'packages/sdk/src/spawns-in-index.ts', 'child_process'],
 ]
 
 const EXTRA_FILES = [
@@ -572,6 +578,12 @@ const LEGAL = [
     'packages/pipeline/src/gates/index.ts',
     "import type { Port } from '../../../contracts/src/index.ts'\nexport type Gate = Port",
   ],
+
+  // cutroom-sdk, Slice 3: the only place node:child_process is legal inside the SDK.
+  [
+    'packages/sdk/src/launcher.ts',
+    "import { spawn } from 'node:child_process'\nexport const launch = () => spawn('node')",
+  ],
 ]
 
 function build(dir, files) {
@@ -677,9 +689,10 @@ function prove() {
   } else {
     for (const edge of clean.edges) {
       const label = `${edge.from} -> ${edge.specifier}`
-      overeager += reportLegal(clean, edge.from, edge.specifier, label, (to) =>
-        /^(apps|packages)\//.test(to),
-      )
+      overeager += reportLegal(clean, edge.from, edge.specifier, label, (to) => {
+        if (edge.from === 'packages/sdk/src/launcher.ts') return to === 'child_process'
+        return /^(apps|packages)\//.test(to)
+      })
     }
     for (const v of clean.violations) {
       if (clean.edges.some((e) => e.from === v.from && e.resolved === v.to)) continue

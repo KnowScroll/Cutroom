@@ -122,6 +122,16 @@ class StandIn {
   }
 
   private async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    // Slice 3 construction probes readiness before returning a route-capable handle. Keep this
+    // handshake outside the Slice 2 FIFO and request log so every existing route assertion still
+    // owns exactly one route request.
+    if (req.method === 'GET' && req.url === '/v1/ready') {
+      res.statusCode = 200
+      res.setHeader('content-type', 'application/json')
+      res.end(JSON.stringify({ contractVersion: V, ready: true }))
+      return
+    }
+
     const chunks: Buffer[] = []
     for await (const chunk of req) chunks.push(chunk as Buffer)
     const raw = Buffer.concat(chunks).toString('utf8')
@@ -760,9 +770,13 @@ test('5. malformed JSON body becomes SdkProtocolError carrying no body, with the
   // The shared StandIn JSON.stringifies every scripted body, so a literal non-JSON value
   // ends up as a JSON string the schema then rejects (the wrong-schema case). To send
   // bytes the SDK cannot parse, spin up a separate raw server that writes non-JSON.
-  const rawServer = createServer((_req, res) => {
+  const rawServer = createServer((req, res) => {
     res.statusCode = 200
     res.setHeader('content-type', 'application/json')
+    if (req.url === '/v1/ready') {
+      res.end(JSON.stringify({ contractVersion: V, ready: true }))
+      return
+    }
     res.end('this is not JSON')
   })
   await new Promise<void>((resolveListen) => {
@@ -910,25 +924,26 @@ test('6. [::1] is accepted as a loopback host (IPv6 literal)', async () => {
   }
 })
 
-test('6. an explicit default HTTP port (`:80`) is accepted and used', async () => {
+test('6. an explicit default HTTP port (`:80`) is accepted as an origin', async () => {
   // WHATWG URL strips the default port from `URL.port` — `http://127.0.0.1:80` parses to
   // `URL.port === ''` — so a naïve loopback check that only inspects the parsed URL
   // would reject an explicit, well-formed :80 origin. The SDK must read the original
   // URL authority to decide whether a port was written.
   //
-  // The stand-in listens on an ephemeral port, but a permitted origin containing that
-  // port spelled twice (with the explicit-port 80 first, then with the real one) is
-  // accepted at construction time without making a request. We only assert the
-  // synchronous acceptance — there is no listener bound to port 80 here.
+  // There is deliberately no listener on port 80. Reaching a connection/readiness outcome,
+  // rather than TypeError input validation, proves the explicit default port was retained as
+  // caller input. The ephemeral case additionally proves an accepted origin is usable.
   const customStandIn = new StandIn()
   await customStandIn.start()
   const port = (customStandIn.server.address() as AddressInfo).port
   const accepted: string[] = ['http://127.0.0.1:80', 'http://[::1]:80', `http://127.0.0.1:${port}`]
   try {
     for (const input of accepted) {
-      // Construction must not throw — that's the only thing the prompt asks for here.
-      const c = await createCutroom({ baseUrl: input })
-      await c.close()
+      const result = await createCutroom({ baseUrl: input }).catch((error: unknown) => error)
+      assert.equal(result instanceof TypeError, false, `${input} failed explicit-port validation`)
+      if (typeof result === 'object' && result !== null && 'close' in result) {
+        await (result as Cutroom).close()
+      }
     }
   } finally {
     await customStandIn.stop()
@@ -980,7 +995,13 @@ test('6. loopback confinement across redirects: a 3xx response is an SdkProtocol
   const secondAddress = secondServer.address() as AddressInfo
   const secondUrl = `http://127.0.0.1:${secondAddress.port}/`
 
-  const firstServer = createServer((_req, res) => {
+  const firstServer = createServer((req, res) => {
+    if (req.url === '/v1/ready') {
+      res.statusCode = 200
+      res.setHeader('content-type', 'application/json')
+      res.end(JSON.stringify({ contractVersion: V, ready: true }))
+      return
+    }
     res.statusCode = 307
     res.setHeader('location', secondUrl)
     res.end()

@@ -87,7 +87,7 @@ module.exports = {
         'private implementation of the SDK launcher (docs/features/cutroom-sdk.md Slice 3).',
       from: {
         path: '^(packages|apps)/',
-        pathNot: '^packages/providers/|packages/sdk/src/launcher\\.ts$',
+        pathNot: '^packages/providers/|^packages/sdk/src/launcher\\.ts$',
       },
       to: { dependencyTypes: ['core'], path: '^(node:)?child_process$' },
     },
@@ -176,6 +176,17 @@ module.exports = {
         'and turn a package boundary into a back door.',
       from: { path: '^packages/sdk/' },
       to: { path: '^(apps|packages)/(?!sdk/|reel-contract/)' },
+    },
+    {
+      name: 'sdk-processes-only-launcher',
+      severity: 'error',
+      comment:
+        'cutroom-sdk, Slice 3: only the private launcher module may import node:child_process. ' +
+        'Every other SDK source file is a client only and must not spawn processes (S-173, S-175, ' +
+        'PROMPTS/069). This rule is the explicit enforcement that the feature document requires; ' +
+        'the exception in processes-only-in-providers is not sufficient proof on its own.',
+      from: { path: '^packages/sdk/', pathNot: '^packages/sdk/src/launcher\\.ts$' },
+      to: { dependencyTypes: ['core'], path: '^(node:)?child_process$' },
     },
     {
       name: 'no-reaching-into-internals',

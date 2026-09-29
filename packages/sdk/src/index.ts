@@ -249,7 +249,7 @@ async function checkReadiness(
 
   while (Date.now() < deadline) {
     try {
-      const res = await fetch(`${baseUrl}/v1/ready`, {
+      const res = await fetch(readinessUrl(baseUrl), {
         signal: AbortSignal.timeout(pollIntervalMs),
         redirect: 'manual',
       })
@@ -262,15 +262,19 @@ async function checkReadiness(
       }
 
       if (res.status === 200) {
+        // 200 is valid only with strict { contractVersion: 1, ready: true }.
+        // A 200 with ready:false, extra key, wrong version, or malformed JSON is protocol-error.
         const parsed = ReadyResponse.safeParse(json)
-        if (parsed.success) {
+        if (parsed.success && (parsed.data as { ready: boolean }).ready === true) {
           return 'ready'
         }
         return 'protocol-error'
       } else if (res.status === 503) {
-        // Recognized non-ready Cutroom peer — keep polling
+        // 503 is valid only with strict { contractVersion: 1, ready: false }.
+        // A 503 with ready:true, extra key, wrong version, or malformed JSON is protocol-error.
+        // Only a recognised 503/false is eligible for bounded polling.
         const parsed = ReadyResponse.safeParse(json)
-        if (!parsed.success) {
+        if (!parsed.success || (parsed.data as { ready: boolean }).ready !== false) {
           return 'protocol-error'
         }
         const remaining = deadline - Date.now()
@@ -309,9 +313,9 @@ async function startOwnedEngine(
 
   // Extract the port from the baseUrl
   const port = extractPort(normalizedBase)
-  // Spread process.env so the child gets the full environment (needed on Windows for PATH, etc.),
-  // then override CUTROOM_API_PORT with the actual port.
-  const env = { ...process.env, CUTROOM_API_PORT: String(port) }
+  // The private launcher inherits the caller's ordinary environment and applies this one
+  // SDK-owned override. The SDK does not inspect or log individual environment values.
+  const env = { CUTROOM_API_PORT: String(port) }
 
   const launcherOptions: LauncherOptions = {
     command: options.launcher.command,
@@ -323,6 +327,14 @@ async function startOwnedEngine(
 
   // Launch the child
   const { child, waitForExit } = launchChild(launcherOptions)
+  const protocolFailure = async (): Promise<{ ok: false; error: SdkProtocolError }> => {
+    try {
+      await stopChild(child)
+    } catch {
+      // Preserve the protocol failure; cleanup is best-effort after construction fails.
+    }
+    return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+  }
 
   // Wait for the child to become ready
   const deadline = Date.now() + options.readyTimeoutMs
@@ -330,16 +342,19 @@ async function startOwnedEngine(
 
   // Start monitoring child exit
   let childExited = false
+  let childFailed = false
   let childExitCode = 0
   waitForExit()
     .then((code) => {
       childExited = true
       childExitCode = code
     })
-    .catch(() => {})
+    .catch(() => {
+      childFailed = true
+    })
 
   while (Date.now() < deadline) {
-    if (childExited) {
+    if (childExited || childFailed) {
       // Child exited before ready — check if there's now a valid engine at the port (winner)
       const probeResult = await probeConnection(normalizedBase)
       if (probeResult === null) {
@@ -359,7 +374,7 @@ async function startOwnedEngine(
     }
 
     try {
-      const res = await fetch(`${normalizedBase}/v1/ready`, {
+      const res = await fetch(readinessUrl(normalizedBase), {
         signal: AbortSignal.timeout(pollIntervalMs),
         redirect: 'manual',
       })
@@ -368,12 +383,14 @@ async function startOwnedEngine(
       try {
         json = JSON.parse(text)
       } catch {
-        return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+        return protocolFailure()
       }
 
       if (res.status === 200) {
+        // 200 is valid only with strict { contractVersion: 1, ready: true }.
+        // A 200 with ready:false, extra key, wrong version, or malformed JSON is protocol-error.
         const parsed = ReadyResponse.safeParse(json)
-        if (parsed.success) {
+        if (parsed.success && (parsed.data as { ready: boolean }).ready === true) {
           // Ready!
           return {
             ok: true,
@@ -382,16 +399,18 @@ async function startOwnedEngine(
             waitForExit,
           }
         }
-        return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+        return protocolFailure()
       } else if (res.status === 503) {
+        // 503 is valid only with strict { contractVersion: 1, ready: false }.
+        // A 503 with ready:true, extra key, wrong version, or malformed JSON is protocol-error.
         const parsed = ReadyResponse.safeParse(json)
-        if (!parsed.success) {
-          return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+        if (!parsed.success || (parsed.data as { ready: boolean }).ready !== false) {
+          return protocolFailure()
         }
-        // Non-ready, keep polling
+        // Recognised non-ready peer — keep polling
         await sleep(Math.min(pollIntervalMs, deadline - Date.now()))
       } else {
-        return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+        return protocolFailure()
       }
     } catch {
       // Connection error — keep polling
@@ -400,7 +419,7 @@ async function startOwnedEngine(
   }
 
   // Deadline expired
-  if (childExited) {
+  if (childExited || childFailed) {
     return { ok: false, error: new SdkConnectionErrorImpl('start') }
   }
   // Timeout waiting for readiness — stop the child
@@ -414,13 +433,9 @@ async function startOwnedEngine(
 
 /** Extract the port number from a baseUrl like 'http://127.0.0.1:8787/'. */
 function extractPort(baseUrl: string): number {
-  try {
-    const u = new URL(baseUrl)
-    return Number(u.port)
-  } catch {
-    // If URL parsing fails, fall back to default
-    return 8787
-  }
+  const port = explicitPort(baseUrl)
+  if (port === undefined) throw new TypeError('normalised baseUrl lost its explicit port')
+  return Number(port)
 }
 
 function sleep(ms: number): Promise<void> {
@@ -458,7 +473,8 @@ function normaliseLoopbackOrigin(raw: string): string {
   if (!isLoopback) {
     throw new TypeError(`baseUrl host ${JSON.stringify(host)} is not a loopback host`)
   }
-  if (!hasExplicitPort(raw)) {
+  const port = explicitPort(raw)
+  if (port === undefined) {
     throw new TypeError('baseUrl must include an explicit port')
   }
   if (parsed.pathname !== '/' && parsed.pathname !== '') {
@@ -470,15 +486,15 @@ function normaliseLoopbackOrigin(raw: string): string {
   if (parsed.hash !== '') {
     throw new TypeError(`baseUrl must not carry a fragment; received ${parsed.hash}`)
   }
-  return `${parsed.protocol}//${parsed.host}/`
+  return `${parsed.protocol}//${parsed.hostname}:${Number(port)}/`
 }
 
 /**
  * Whether the authority in a raw URL string carries an explicit port.
  */
-function hasExplicitPort(raw: string): boolean {
+function explicitPort(raw: string): string | undefined {
   const schemeEnd = raw.indexOf('://')
-  if (schemeEnd === -1) return false
+  if (schemeEnd === -1) return undefined
   let after = raw.slice(schemeEnd + 3)
   const at = after.lastIndexOf('@')
   if (at !== -1) after = after.slice(at + 1)
@@ -486,10 +502,14 @@ function hasExplicitPort(raw: string): boolean {
   const authority = pathStart === -1 ? after : after.slice(0, pathStart)
   if (authority.startsWith('[')) {
     const close = authority.indexOf(']')
-    if (close === -1) return false
-    return /:\d+$/.test(authority.slice(close + 1))
+    if (close === -1) return undefined
+    return /^:(\d+)$/.exec(authority.slice(close + 1))?.[1]
   }
-  return /:\d+$/.test(authority)
+  return /:(\d+)$/.exec(authority)?.[1]
+}
+
+function readinessUrl(baseUrl: string): string {
+  return new URL('/v1/ready', baseUrl).toString()
 }
 
 // ---------------------------------------------------------------- handle

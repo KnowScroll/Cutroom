@@ -96,6 +96,8 @@ export function launchChild(options: LauncherOptions): LaunchResult {
 
   const child = spawn(command, args, {
     stdio: ['pipe', 'ignore', 'ignore'],
+    // Inherit the caller's ordinary environment and add only caller-supplied overrides.
+    // The launcher never inspects or logs individual values (Gate 2, S-175).
     env: { ...process.env, ...env },
     shell: false,
   })
@@ -184,22 +186,26 @@ export async function waitForReadiness(
 
   // Start a background task to monitor child exit
   let childExited = false
+  let childFailed = false
   options
     .waitForExit()
     .then(() => {
       childExited = true
     })
-    .catch(() => {})
+    .catch(() => {
+      childFailed = true
+    })
 
   while (Date.now() < deadline) {
     // Check if child exited
-    if (childExited) {
+    if (childExited || childFailed) {
       return { kind: 'child-exit' as LaunchFailureKind, stage: 'start' as const, cause: undefined }
     }
 
     try {
-      const res = await fetch(`${baseUrl}/v1/ready`, {
+      const res = await fetch(readinessUrl(baseUrl), {
         signal: AbortSignal.timeout(pollIntervalMs),
+        redirect: 'manual',
       })
       const text = await res.text()
       let json: unknown
@@ -211,8 +217,10 @@ export async function waitForReadiness(
       }
 
       if (res.status === 200) {
+        // 200 is valid only with strict { contractVersion: 1, ready: true }.
+        // A 200 with ready:false, extra key, wrong version, or malformed JSON is protocol-error.
         const parsed = ReadyResponse.safeParse(json)
-        if (parsed.success) {
+        if (parsed.success && (parsed.data as { ready: boolean }).ready === true) {
           // Ready!
           return {
             child,
@@ -220,16 +228,16 @@ export async function waitForReadiness(
             waitForExit: options.waitForExit,
           }
         }
-        // Valid JSON but wrong schema
         return { kind: 'protocol-error' as LaunchFailureKind, stage: 'ready' as const }
       } else if (res.status === 503) {
-        // Not ready yet, keep polling
+        // 503 is valid only with strict { contractVersion: 1, ready: false }.
+        // A 503 with ready:true, extra key, wrong version, or malformed JSON is protocol-error.
+        // Only a recognised 503/false is eligible for bounded polling.
         const parsed = ReadyResponse.safeParse(json)
-        if (!parsed.success) {
-          // 503 with invalid body - protocol error
+        if (!parsed.success || (parsed.data as { ready: boolean }).ready !== false) {
           return { kind: 'protocol-error' as LaunchFailureKind, stage: 'ready' as const }
         }
-        // Valid 503, keep polling
+        // Recognised non-ready Cutroom peer — keep polling
         await sleep(pollIntervalMs)
       } else {
         // Unexpected status
@@ -245,7 +253,7 @@ export async function waitForReadiness(
   }
 
   // Deadline expired
-  if (childExited) {
+  if (childExited || childFailed) {
     return { kind: 'child-exit' as LaunchFailureKind, stage: 'start' as const, cause: undefined }
   }
   return { kind: 'timeout' as LaunchFailureKind, stage: 'ready' as const }
@@ -257,7 +265,7 @@ export async function waitForReadiness(
  */
 export async function probeConnection(baseUrl: string): Promise<'refused' | 'timeout' | null> {
   try {
-    await fetch(`${baseUrl}/v1/ready`, {
+    await fetch(readinessUrl(baseUrl), {
       signal: AbortSignal.timeout(500),
       redirect: 'manual',
     })
@@ -281,4 +289,8 @@ export async function probeConnection(baseUrl: string): Promise<'refused' | 'tim
  */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function readinessUrl(baseUrl: string): string {
+  return new URL('/v1/ready', baseUrl).toString()
 }

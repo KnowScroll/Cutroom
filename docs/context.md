@@ -103,6 +103,16 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-09-29 · session 70
+
+- `cutroom-sdk` Slice 3 corrective evidence — the missing boundary rule, strict readiness, explicit-port handling,
+  ordinary-environment inheritance, route-stand-in readiness handshake, and effect-based launcher tests are all
+  proven by `node scripts/check.mjs` at this commit. Trailer `Verification: full`, `Verification-Tree` is the tree
+  the trailers bind. Affected tests: `tests/cutroom-sdk-launcher.test.ts`, `tests/cutroom-sdk-routes.test.ts`,
+  `tests/cutroom-sdk-readiness.test.ts`, `tests/boundaries.test.ts`, `tests/paid-path-keys.test.ts`,
+  `tests/reel-render-rules.test.ts`, `tests/reel-stills-rules.test.ts`. Slice 4's journey and re-journeys remain
+  unstarted.
+
 ### 2026-09-29 · session 68
 
 - `cutroom-sdk` Slice 2 review corrections (`45b9de9`) — every SDK fetch now uses `redirect: 'manual'`, so a 3xx
