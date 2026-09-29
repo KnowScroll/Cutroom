@@ -82,8 +82,13 @@ module.exports = {
         'one place an adapter lives. A process started by the worker, the API or the domain is a ' +
         'spawn behind no port — the shape S-021 recorded as uncaught for an import — and the worker ' +
         'is the one place that knows both a stage and a table. pipeline-no-io already forbids it in ' +
-        'the pipeline; this forbids it everywhere else but providers, under either of its names.',
-      from: { path: '^(packages|apps)/', pathNot: '^packages/providers/' },
+        'the pipeline; this forbids it everywhere else but providers, under either of its names. ' +
+        'Exception: packages/sdk/src/launcher.ts is the one file that may start a process, as the ' +
+        'private implementation of the SDK launcher (docs/features/cutroom-sdk.md Slice 3).',
+      from: {
+        path: '^(packages|apps)/',
+        pathNot: '^packages/providers/|packages/sdk/src/launcher\\.ts$',
+      },
       to: { dependencyTypes: ['core'], path: '^(node:)?child_process$' },
     },
     {

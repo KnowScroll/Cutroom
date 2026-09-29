@@ -9,13 +9,19 @@ import {
   SubmitRequest,
   SubmitResponse,
 } from '@cutroom/reel-contract'
+import {
+  launchChild,
+  probeConnection,
+  stopChild,
+  type ChildProcess,
+  type LauncherOptions,
+} from './launcher.ts'
+import { ReadyResponse } from '@cutroom/reel-contract'
 
-// The typed local client for the reel engine (docs/features/cutroom-sdk.md, Gate 2 / Slice 2).
+// The typed local client for the reel engine (docs/features/cutroom-sdk.md, Gate 2 / Slice 3).
 //
-// Slice 2 is client/package work only: validate input before fetch, validate every response after
-// it, normalise loopback URLs, encode path segments and query values, and turn the contract's
-// defined refusals into ordinary return values. No child process, no readiness probe, no port
-// race, no launcher: those are Slice 3.
+// Slice 3 adds the launcher lifecycle: probe for an existing engine, start one if absent,
+// poll for readiness, handle the fixed-port race, and own the lifecycle of a spawned child.
 
 // ---------------------------------------------------------------- errors
 
@@ -41,21 +47,25 @@ export type SdkProtocolError = {
 }
 
 /**
- * The stable shape for a connection refusal, a child error or a readiness deadline. Slice 2
- * exports it; the launcher/connection-retry behavior that throws it is Slice 3 (S-175,
- * docs/features/cutroom-sdk.md Gate 2).
+ * The stable shape for a connection refusal, a child error or a readiness deadline.
+ * `SdkConnectionError` is thrown when: no listener and no launcher (stage 'connect');
+ * child error or exit with no eligible winner (stage 'start'); timeout while waiting
+ * for a non-ready peer or a port-race winner (stage 'ready'); failure while closing
+ * the owned child (stage 'close').
  */
 export type SdkConnectionError = {
   kind: 'connection'
   stage: 'connect' | 'start' | 'ready' | 'close'
 }
 
-/** Every error the SDK throws in Slice 2. */
+/** Every error the SDK throws. */
 export type SdkError = SdkApiError | SdkProtocolError | SdkConnectionError
 
 // ---------------------------------------------------------------- handle
 
-/** The configuration `createCutroom` accepts in Slice 2. */
+/**
+ * The configuration `createCutroom` accepts. Slice 3 adds launcher and timeout options.
+ */
 export type CreateCutroomOptions = {
   /**
    * The engine's loopback HTTP origin, with an explicit port. Defaults to
@@ -63,6 +73,25 @@ export type CreateCutroomOptions = {
    * fragments, and a missing port are rejected before any request is made (S-173, D-098).
    */
   baseUrl?: string
+  /**
+   * The program and argument vector to start when no engine is listening at `baseUrl`.
+   * When absent and no engine is found, construction throws `SdkConnectionError` at stage
+   * 'connect'. When present, the SDK spawns this program with `shell: false`, injects the
+   * normalised origin's port as `CUTROOM_API_PORT`, waits for the engine's readiness
+   * acknowledgement, and returns a handle that owns that child (S-175).
+   */
+  launcher?: {
+    /** The program to execute. */
+    command: string
+    /** The arguments to pass. */
+    args: readonly string[]
+  }
+  /**
+   * Milliseconds to wait for readiness when starting an owned engine or polling a 503 peer.
+   * Must be a positive whole number. Defaults to 30000. A non-positive, non-integer, or
+   * non-finite value throws `TypeError` at construction before any probe or spawn.
+   */
+  readyTimeoutMs?: number
 }
 
 export interface Cutroom {
@@ -91,25 +120,314 @@ export interface Cutroom {
    */
   resume(runId: string, request: ResumeRequest): Promise<ResumeResponse>
   /**
-   * Local and safe in Slice 2: starts no process, sends no signal. After `close()`, any
-   * further method call rejects with `SdkProtocolError { stage: 'request' }` and no HTTP
-   * request is made.
+   * Close the handle. If the SDK owns a child process (it started one with the launcher),
+   * `close()` writes `stop` on the child's stdin and waits for its exit. If the handle joined
+   * an existing engine, `close()` is local only and the engine continues running.
+   * After `close()`, any further method call rejects with `SdkProtocolError { stage: 'request' }`
+   * and no HTTP request is made. `close()` is idempotent.
    */
   close(): Promise<void>
 }
 
 export async function createCutroom(options: CreateCutroomOptions): Promise<Cutroom> {
-  // Implementation lives below — see `_createCutroom` for the body that handles the Slice 2
-  // scope. Throwing here would make `createCutroom` a non-async function whose return value
-  // is a rejected one; the test inventory calls for an async signature either way.
   return _createCutroom(options)
 }
 
+// ---------------------------------------------------------------- private state
+
+type HandleState =
+  | { status: 'probing'; baseUrl: string; options: ResolvedOptions }
+  | { status: 'joined'; baseUrl: string }
+  | {
+      status: 'owned'
+      baseUrl: string
+      child: ChildProcess
+      stop: () => Promise<void>
+      waitForExit: () => Promise<number>
+    }
+  | { status: 'closed' }
+
+/** Normalised options with defaults applied. */
+interface ResolvedOptions {
+  baseUrl: string
+  launcher?: { command: string; args: readonly string[] }
+  readyTimeoutMs: number
+}
+
 async function _createCutroom(options: CreateCutroomOptions): Promise<Cutroom> {
+  // Step 1: normalise and validate baseUrl
   const baseUrl = options.baseUrl === undefined ? 'http://127.0.0.1:8787' : options.baseUrl
   const origin = normaliseLoopbackOrigin(baseUrl)
-  return makeHandle(origin)
+
+  // Step 2: validate timeout before any probe or spawn
+  const readyTimeoutMs = options.readyTimeoutMs
+  if (readyTimeoutMs !== undefined) {
+    if (
+      !Number.isFinite(readyTimeoutMs) ||
+      !Number.isInteger(readyTimeoutMs) ||
+      readyTimeoutMs <= 0
+    ) {
+      throw new TypeError(
+        `readyTimeoutMs must be a positive whole number; received ${JSON.stringify(readyTimeoutMs)}`,
+      )
+    }
+  }
+  const timeoutMs = readyTimeoutMs ?? 30_000
+
+  const resolvedOptions: ResolvedOptions = {
+    baseUrl: origin,
+    launcher: options.launcher,
+    readyTimeoutMs: timeoutMs,
+  }
+
+  // Step 3: probe for existing engine
+  const connectionResult = await probeConnection(origin)
+
+  if (connectionResult === null) {
+    // Something is listening — check if it's a valid Cutroom readiness endpoint
+    const readyResult = await checkReadiness(origin, timeoutMs)
+    if (readyResult === 'not-ready') {
+      // A listener exists and was polled until the deadline — timeout at 'ready' stage
+      throw new SdkConnectionErrorImpl('ready')
+    }
+    if (readyResult === 'protocol-error') {
+      throw new SdkProtocolErrorImpl('ready')
+    }
+    // Valid ready response — join it
+    return makeHandle(origin, { status: 'joined', baseUrl: origin })
+  }
+
+  // No listener found
+  if (connectionResult === 'refused') {
+    if (!options.launcher) {
+      // No listener and no launcher — fail at connect stage
+      throw new SdkConnectionErrorImpl('connect')
+    }
+    // Start the owned child
+    const ownedResult = await startOwnedEngine(origin, resolvedOptions)
+    if (!ownedResult.ok) {
+      throw ownedResult.error
+    }
+    return makeHandle(origin, {
+      status: 'owned',
+      baseUrl: origin,
+      child: ownedResult.child,
+      stop: ownedResult.stop,
+      waitForExit: ownedResult.waitForExit,
+    })
+  }
+
+  // Connection timed out (unlikely for loopback, but possible)
+  if (!options.launcher) {
+    throw new SdkConnectionErrorImpl('connect')
+  }
+  const ownedResult = await startOwnedEngine(origin, resolvedOptions)
+  if (!ownedResult.ok) {
+    throw ownedResult.error
+  }
+  return makeHandle(origin, {
+    status: 'owned',
+    baseUrl: origin,
+    child: ownedResult.child,
+    stop: ownedResult.stop,
+    waitForExit: ownedResult.waitForExit,
+  })
 }
+
+// ---------------------------------------------------------------- ownership and readiness
+
+/**
+ * Check if the listener at baseUrl is a valid Cutroom readiness endpoint.
+ * Returns 'ready', 'not-ready', or 'protocol-error'.
+ */
+async function checkReadiness(
+  baseUrl: string,
+  timeoutMs: number,
+): Promise<'ready' | 'not-ready' | 'protocol-error'> {
+  const deadline = Date.now() + timeoutMs
+  const pollIntervalMs = 100
+
+  while (Date.now() < deadline) {
+    try {
+      const res = await fetch(`${baseUrl}/v1/ready`, {
+        signal: AbortSignal.timeout(pollIntervalMs),
+        redirect: 'manual',
+      })
+      const text = await res.text()
+      let json: unknown
+      try {
+        json = JSON.parse(text)
+      } catch {
+        return 'protocol-error'
+      }
+
+      if (res.status === 200) {
+        const parsed = ReadyResponse.safeParse(json)
+        if (parsed.success) {
+          return 'ready'
+        }
+        return 'protocol-error'
+      } else if (res.status === 503) {
+        // Recognized non-ready Cutroom peer — keep polling
+        const parsed = ReadyResponse.safeParse(json)
+        if (!parsed.success) {
+          return 'protocol-error'
+        }
+        const remaining = deadline - Date.now()
+        await sleep(Math.min(pollIntervalMs, Math.max(0, remaining)))
+      } else {
+        // Unexpected status
+        return 'protocol-error'
+      }
+    } catch {
+      // Connection error — keep polling
+      const remaining = deadline - Date.now()
+      await sleep(Math.min(pollIntervalMs, Math.max(0, remaining)))
+    }
+  }
+  return 'not-ready'
+}
+
+/** Start an owned engine using the configured launcher. */
+async function startOwnedEngine(
+  baseUrl: string,
+  options: ResolvedOptions,
+): Promise<
+  | {
+      ok: true
+      child: ChildProcess
+      stop: () => Promise<void>
+      waitForExit: () => Promise<number>
+    }
+  | { ok: false; error: SdkConnectionError | SdkProtocolError }
+> {
+  // Normalize baseUrl to avoid double-slashes when appending paths
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
+  if (!options.launcher) {
+    return { ok: false, error: new SdkConnectionErrorImpl('connect') }
+  }
+
+  // Extract the port from the baseUrl
+  const port = extractPort(normalizedBase)
+  // Spread process.env so the child gets the full environment (needed on Windows for PATH, etc.),
+  // then override CUTROOM_API_PORT with the actual port.
+  const env = { ...process.env, CUTROOM_API_PORT: String(port) }
+
+  const launcherOptions: LauncherOptions = {
+    command: options.launcher.command,
+    args: options.launcher.args,
+    env,
+    baseUrl,
+    timeoutMs: options.readyTimeoutMs,
+  }
+
+  // Launch the child
+  const { child, waitForExit } = launchChild(launcherOptions)
+
+  // Wait for the child to become ready
+  const deadline = Date.now() + options.readyTimeoutMs
+  const pollIntervalMs = 100
+
+  // Start monitoring child exit
+  let childExited = false
+  let childExitCode = 0
+  waitForExit()
+    .then((code) => {
+      childExited = true
+      childExitCode = code
+    })
+    .catch(() => {})
+
+  while (Date.now() < deadline) {
+    if (childExited) {
+      // Child exited before ready — check if there's now a valid engine at the port (winner)
+      const probeResult = await probeConnection(normalizedBase)
+      if (probeResult === null) {
+        // Something is now listening — could be the winner
+        const readyResult = await checkReadiness(normalizedBase, Math.max(deadline - Date.now(), 0))
+        if (readyResult === 'ready') {
+          // There's now a valid engine — join it
+          return {
+            ok: true,
+            child,
+            stop: async () => {},
+            waitForExit: async () => childExitCode,
+          }
+        }
+      }
+      return { ok: false, error: new SdkConnectionErrorImpl('start') }
+    }
+
+    try {
+      const res = await fetch(`${normalizedBase}/v1/ready`, {
+        signal: AbortSignal.timeout(pollIntervalMs),
+        redirect: 'manual',
+      })
+      const text = await res.text()
+      let json: unknown
+      try {
+        json = JSON.parse(text)
+      } catch {
+        return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+      }
+
+      if (res.status === 200) {
+        const parsed = ReadyResponse.safeParse(json)
+        if (parsed.success) {
+          // Ready!
+          return {
+            ok: true,
+            child,
+            stop: () => stopChild(child),
+            waitForExit,
+          }
+        }
+        return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+      } else if (res.status === 503) {
+        const parsed = ReadyResponse.safeParse(json)
+        if (!parsed.success) {
+          return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+        }
+        // Non-ready, keep polling
+        await sleep(Math.min(pollIntervalMs, deadline - Date.now()))
+      } else {
+        return { ok: false, error: new SdkProtocolErrorImpl('ready') }
+      }
+    } catch {
+      // Connection error — keep polling
+      await sleep(Math.min(pollIntervalMs, deadline - Date.now()))
+    }
+  }
+
+  // Deadline expired
+  if (childExited) {
+    return { ok: false, error: new SdkConnectionErrorImpl('start') }
+  }
+  // Timeout waiting for readiness — stop the child
+  try {
+    await stopChild(child)
+  } catch {
+    // Ignore stop errors
+  }
+  return { ok: false, error: new SdkConnectionErrorImpl('ready') }
+}
+
+/** Extract the port number from a baseUrl like 'http://127.0.0.1:8787/'. */
+function extractPort(baseUrl: string): number {
+  try {
+    const u = new URL(baseUrl)
+    return Number(u.port)
+  } catch {
+    // If URL parsing fails, fall back to default
+    return 8787
+  }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, Math.max(0, ms)))
+}
+
+// ---------------------------------------------------------------- URL normalisation
 
 /**
  * Reject every URL that is not a loopback HTTP origin with an explicit port and no path, query
@@ -140,11 +458,6 @@ function normaliseLoopbackOrigin(raw: string): string {
   if (!isLoopback) {
     throw new TypeError(`baseUrl host ${JSON.stringify(host)} is not a loopback host`)
   }
-  // WHATWG strips the scheme's default port from `URL.port`: `http://127.0.0.1:80` parses
-  // to `URL.port === ''`, indistinguishable from `http://127.0.0.1` with no port. The
-  // loopback discipline requires a written port, so inspect the original authority. A
-  // malformed port (non-numeric or out of range) is also caught here, because `new URL`
-  // throws first — `explicitPortOf` therefore agrees with the parser on what is malformed.
   if (!hasExplicitPort(raw)) {
     throw new TypeError('baseUrl must include an explicit port')
   }
@@ -157,26 +470,16 @@ function normaliseLoopbackOrigin(raw: string): string {
   if (parsed.hash !== '') {
     throw new TypeError(`baseUrl must not carry a fragment; received ${parsed.hash}`)
   }
-  // `parsed.host` already omits the default port for `http:`, so `http://127.0.0.1:80`
-  // canonicalises to `http://127.0.0.1/` and a fetch from that URL still uses port 80.
   return `${parsed.protocol}//${parsed.host}/`
 }
 
 /**
- * Whether the authority in a raw URL string carries an explicit port — IPv4/hostname with
- * `:digits`, bracketed IPv6 with `]:digits`. Anything else (no colon, non-digit suffix,
- * bracketed form without a closing bracket) is treated as "no explicit port" or
- * "malformed", matching what `new URL` accepts and what the loopback discipline allows.
- *
- * `new URL` has already validated the port by the time this is called for an input that
- * parsed successfully, so a non-numeric port in the authority would have thrown above.
+ * Whether the authority in a raw URL string carries an explicit port.
  */
 function hasExplicitPort(raw: string): boolean {
   const schemeEnd = raw.indexOf('://')
   if (schemeEnd === -1) return false
   let after = raw.slice(schemeEnd + 3)
-  // Strip a userinfo component if present (already forbidden, but the port still lives
-  // past the `@`).
   const at = after.lastIndexOf('@')
   if (at !== -1) after = after.slice(at + 1)
   const pathStart = after.search(/[/?#]/)
@@ -189,38 +492,32 @@ function hasExplicitPort(raw: string): boolean {
   return /:\d+$/.test(authority)
 }
 
-// ---------------------------------------------------------------- implementation
+// ---------------------------------------------------------------- handle
 
 /**
- * One private request helper so every route uses the same loopback confinement. A 3xx
- * response is unexpected for every route the contract defines; treating it as a SdkProtocolError
- * (rather than following the redirect) is what keeps the SDK on its configured origin and
- * stops a request body from being forwarded to a peer outside the loopback. No retry, no
- * readiness probe, no launcher work — only the redirect guard lives here.
+ * Construct a `Cutroom` handle. The `state` tracks whether the SDK owns a child process.
+ * `close()` behaves differently for joined vs owned handles.
  */
-async function sendRequest(
-  url: string,
-  init: { method?: string; headers?: Record<string, string>; body?: string },
-): Promise<Response> {
-  const res = await fetch(url, { ...init, redirect: 'manual' })
-  if (res.status >= 300 && res.status < 400) {
-    throw new SdkProtocolErrorImpl('request', res.status)
-  }
-  return res
-}
-
-/**
- * Construct a `Cutroom` handle that owns no process and stores no readiness state. The Slice 2
- * shape is the smallest one that exercises every route and every error type. `close()` flips a
- * flag, and every method reads it before validating or fetching.
- */
-function makeHandle(baseUrl: string): Cutroom {
+function makeHandle(baseUrl: string, state: HandleState): Cutroom {
   let closed = false
 
   function assertOpen(): void {
     if (closed) {
       throw new SdkProtocolErrorImpl('request')
     }
+  }
+
+  async function close(): Promise<void> {
+    if (closed) return
+    closed = true
+    if (state.status === 'owned') {
+      try {
+        await state.stop()
+      } catch {
+        throw new SdkConnectionErrorImpl('close')
+      }
+    }
+    // For 'joined' state, close is purely local — no process to stop
   }
 
   return {
@@ -255,9 +552,7 @@ function makeHandle(baseUrl: string): Cutroom {
       const query = since === undefined ? '' : `?since=${encodeURIComponent(String(since))}`
       const res = await sendRequest(
         `${baseUrl}v1/runs/${encodeURIComponent(runId)}/events${query}`,
-        {
-          method: 'GET',
-        },
+        { method: 'GET' },
       )
       return handleRouteResponse(res, 'follow') as Promise<EventsPage>
     },
@@ -293,15 +588,28 @@ function makeHandle(baseUrl: string): Cutroom {
       })
       return handleRouteResponse(res, 'resume') as Promise<ResumeResponse>
     },
-    async close() {
-      closed = true
-    },
+    close,
   }
+}
+
+// ---------------------------------------------------------------- request helper
+
+/**
+ * One private request helper so every route uses the same loopback confinement.
+ */
+async function sendRequest(
+  url: string,
+  init: { method?: string; headers?: Record<string, string>; body?: string },
+): Promise<Response> {
+  const res = await fetch(url, { ...init, redirect: 'manual' })
+  if (res.status >= 300 && res.status < 400) {
+    throw new SdkProtocolErrorImpl('request', res.status)
+  }
+  return res
 }
 
 // ---------------------------------------------------------------- dispatch
 
-/** Each route's success-and-defined-refusal schema, indexed by status. */
 type RouteSchemas = {
   submit: { 202: typeof SubmitResponse; 409: typeof SubmitResponse; 422: typeof SubmitResponse }
   find: { 200: typeof RunStatus }
@@ -338,7 +646,6 @@ async function handleRouteResponse<R extends RouteName>(res: Response, route: R)
     { safeParse: (x: unknown) => { success: boolean; data?: unknown } }
   >
 
-  // Parse the body once, even when an error path will use it.
   const text = await res.text()
   let body: unknown
   try {
@@ -347,7 +654,6 @@ async function handleRouteResponse<R extends RouteName>(res: Response, route: R)
     throw new SdkProtocolErrorImpl('request', status)
   }
 
-  // Schema-valid 400, 404 or 500 ErrorResponse bodies → SdkApiError.
   if (status === 400 || status === 404 || status === 500) {
     const parsed = ErrorResponse.safeParse(body)
     if (parsed.success) {
@@ -356,7 +662,6 @@ async function handleRouteResponse<R extends RouteName>(res: Response, route: R)
     throw new SdkProtocolErrorImpl('request', status)
   }
 
-  // A status defined by the route, with its expected body schema.
   const schema = schemas[status]
   if (schema !== undefined) {
     const parsed = schema.safeParse(body)
@@ -364,7 +669,6 @@ async function handleRouteResponse<R extends RouteName>(res: Response, route: R)
     throw new SdkProtocolErrorImpl('request', status)
   }
 
-  // Anything else is unexpected.
   throw new SdkProtocolErrorImpl('request', status)
 }
 
@@ -389,5 +693,14 @@ class SdkProtocolErrorImpl extends Error implements SdkProtocolError {
     super(`sdk protocol error: stage=${stage}${status === undefined ? '' : ` status=${status}`}`)
     this.stage = stage
     this.status = status
+  }
+}
+
+class SdkConnectionErrorImpl extends Error implements SdkConnectionError {
+  readonly kind = 'connection' as const
+  readonly stage: 'connect' | 'start' | 'ready' | 'close'
+  constructor(stage: 'connect' | 'start' | 'ready' | 'close') {
+    super(`sdk connection error: stage=${stage}`)
+    this.stage = stage
   }
 }

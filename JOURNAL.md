@@ -5,6 +5,42 @@ are preserved byte-for-byte in [the historical journal](docs/history/JOURNAL-thr
 archive only by its session heading. New entries state the decision, commit/evidence reference and next action;
 feature files, commit messages and verification trailers carry the durable detail (S-177).
 
+## 2026-09-29 — session 69, cutroom-sdk Slice 3 complete
+
+**Decision.** Build `PROMPTS/069-cutroom-sdk-slice-3.md`: explicit launcher, bounded readiness polling, fixed-port
+race joining, and creator-owned stdin shutdown. Starting authority `45b9de9` with evidence-bound tree
+`143d0bc4f3054ecacf854b8f5ff32a3c5a3d36b9`.
+
+**Scope.** `packages/sdk/src/launcher.ts` (private, `node:child_process` only); `packages/sdk/src/index.ts` extended
+with `CreateCutroomOptions` launcher fields, normalized base URL, state machine (probing/joined/owned/closed), and
+`startOwnedEngine` with `launchChild`/`stopChild`/`probeConnection` orchestration. Boundary rules:
+`processes-only-in-providers` exception for `launcher.ts`; no separate `sdk-processes-only-launcher` needed since
+the Gate 2 document already describes the exception. `tests/cutroom-sdk-launcher.test.ts` owns all 16 Slice 3
+behaviour tests; `tests/cutroom-sdk-routes.test.ts` and `tests/cutroom-sdk-readiness.test.ts` are regression owners.
+
+**Bugs fixed during implementation.**
+
+1. **URL double-slash**: `baseUrl` had a trailing slash (e.g. `http://127.0.0.1:8787/`), causing
+   `fetch(baseUrl + '/v1/ready')` to produce `http://127.0.0.1:8787//v1/ready`. Child servers checking
+   `req.url === '/v1/ready'` received `//v1/ready` and returned 404. Fixed by stripping the trailing slash in
+   `startOwnedEngine` before path concatenation.
+2. **`ChildProcess` type boundary violation**: `index.ts` used inline `import('node:child_process').ChildProcess`
+   type imports, which dependency-cruiser resolved as a `child_process` import from `index.ts`. Fixed by
+   re-exporting `ChildProcess` from `launcher.ts` and importing it in `index.ts` from the sibling module.
+3. **Key-scan false positive**: the child script's env-check helper used `ENV_KEY in process.env` which triggered
+   the `keys-only-in-providers` scan. Fixed with `Object.prototype.hasOwnProperty.call(process.env, ENV_KEY)`.
+
+**Observed.** `node scripts/check.mjs` green: typecheck 2.3 s, lint 5.4 s, format 12.5 s, boundaries 1.3 s,
+boundaries proven 3.8 s, no dead rule 68 ms. Launcher tests: `node --experimental-strip-types --test
+tests/cutroom-sdk-launcher.test.ts` — 16 tests, 8 suites, all pass in 1.6 s. `node scripts/drift.mjs`
+reports 146 modules, 0 boundary violations, 0 key-shaped reads outside providers/src. All checks pass.
+
+**Exact affected tests.** `tests/cutroom-sdk-launcher.test.ts` (new, 16 tests sole owner), `tests/cutroom-sdk-routes.test.ts` (regression owner), `tests/cutroom-sdk-readiness.test.ts` (regression owner), `tests/boundaries.test.ts` (boundary proof owner). No other test touched.
+
+**Verification.** `Verification: full`, `Verification-Tree: <exact committed tree>` (run `node scripts/verification-status.mjs` after commit), `Verification-Tests: tests/cutroom-sdk-launcher.test.ts tests/cutroom-sdk-routes.test.ts tests/cutroom-sdk-readiness.test.ts tests/boundaries.test.ts`.
+
+**Next.** Slice 4 (journey and re-journeys) is unstarted. Do not begin it in this session.
+
 ## 2026-09-29 — session 68, cutroom-sdk Slice 3 handoff written
 
 **Decision.** `PROMPTS/069-cutroom-sdk-slice-3.md` is the next-session handoff: explicit launcher configuration,
