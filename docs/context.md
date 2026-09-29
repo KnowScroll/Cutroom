@@ -26,12 +26,14 @@ git and the journal keep them.
   **Planned, gates not written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `cutroom-sdk`'s four gates are approved, Slice 0 is corrected, and Slice 1’s strict readiness contract is
-  committed at `127adc5`; no SDK package exists yet. Slice 2 is the package boundary and typed routes. S-175 settles
-  the later launcher: KnowScroll supplies an explicit program and argument vector; the SDK never assumes this source
-  checkout. Then `self-heal`'s gates — one harness around the run that makes, checks, heals and learns: a rule book of
-  what failed runs taught, each learned rule binding once the owner approves it, and the caller's criteria and claims
-  healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's code or gates.
+- **Next**: `cutroom-sdk`'s four gates are approved. Slices 1 and 2 are complete; Slice 2's review corrections are
+  committed at `45b9de9`. `PROMPTS/069-cutroom-sdk-slice-3.md` is next: the explicit launcher, bounded readiness,
+  fixed-port race joining and creator-owned stdin shutdown. S-175 settles the launcher: KnowScroll supplies an
+  explicit program and argument vector; the SDK never assumes this source checkout. Then comes Slice 4's no-provider
+  journey and its exact re-journeys, followed by `self-heal`'s gates — one harness around the run that makes, checks,
+  heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and
+  the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part);
+  never the engine's code or gates.
   Session 53's two reels completed, and its engine findings wait for a feature:
   a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
   never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
@@ -100,6 +102,18 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-29 · session 68
+
+- `cutroom-sdk` Slice 2 review corrections (`45b9de9`) — every SDK fetch now uses `redirect: 'manual'`, so a 3xx
+  response becomes a request-stage protocol error before a loopback request body can be forwarded; the public-surface
+  test references all six exported SDK types; explicit `:80` loopback origins are accepted while no-port origins remain
+  rejected. Its targeted evidence binds tree `143d0bc4f3054ecacf854b8f5ff32a3c5a3d36b9` to the route, workspace and
+  boundary tests.
+- `PROMPTS/069-cutroom-sdk-slice-3.md` — the next-session launcher-lifecycle handoff. It keeps child-process access
+  in one private SDK module, uses stand-in-only integration tests, proves the launcher-only boundary by resolved path,
+  and requires a final full check because the boundary configuration and its proof script change. `PROMPTS/065` now
+  names its completed session and the prompt index has the Slice 2 and Slice 3 rows.
 
 ### 2026-09-29 · session 65
 

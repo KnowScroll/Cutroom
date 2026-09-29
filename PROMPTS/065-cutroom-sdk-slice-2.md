@@ -4,6 +4,7 @@
 - **Feature:** `cutroom-sdk` (S-173, S-175, S-176, S-177)
 - **Work:** Slice 2 only — the public `@cutroom/sdk` package, strict typed routes, and its import boundary
 - **Written:** 2026-09-29, after Slice 1 and the verification-policy migration were committed and evidence-bound
+- **Run:** session 66, 2026-09-29 — Slice 2 committed as `4f98698`; its scope-bound review corrections followed in `45b9de9`
 
 ## Starting facts — do not repeat historical work
 

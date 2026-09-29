@@ -5,6 +5,20 @@ are preserved byte-for-byte in [the historical journal](docs/history/JOURNAL-thr
 archive only by its session heading. New entries state the decision, commit/evidence reference and next action;
 feature files, commit messages and verification trailers carry the durable detail (S-177).
 
+## 2026-09-29 — session 68, cutroom-sdk Slice 3 handoff written
+
+**Decision.** `PROMPTS/069-cutroom-sdk-slice-3.md` is the next-session handoff: explicit launcher configuration,
+bounded strict readiness polling, fixed-port race joining, and creator-owned stdin shutdown only. It starts from
+Slice 2 correction commit `45b9de9`, whose tree `143d0bc4f3054ecacf854b8f5ff32a3c5a3d36b9` has valid targeted
+evidence.
+
+**Scope and evidence.** The prompt confines `node:child_process` to a private SDK launcher module, requires
+resolved-path proof for the launcher exception and companion rule, uses stand-in-only child-process tests, and
+requires a final full `node scripts/check.mjs` because it changes boundary configuration and proof tooling. It also
+repairs the prompt index: the already-run Slice 2 handoff now has its `Run` line and README row.
+
+**Next.** Session 69 runs `PROMPTS/069-cutroom-sdk-slice-3.md`; it must not begin Slice 4's journey or re-journeys.
+
 ## 2026-09-29 — session 68, cutroom-sdk Slice 2 review corrections committed
 
 **Findings.** A review of Slice 2 found three outstanding findings that the original slice did not address,
