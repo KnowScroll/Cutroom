@@ -126,6 +126,13 @@ let next = text.replace(
   (_, heading, earlier) => `${heading}\n${evidence}\n${earlier.trim() ? earlier : '\n'}`,
 )
 next = next.replace(/^(## Divergence[^\n]*\n)[\s\S]*?(?=^## |(?![\s\S]))/m, `$1\n${divergence}\n\n`)
+// The Divergence replacement above writes a trailing blank line when Divergence is the file's last
+// section (so the file ends with `\n\n`). Prettier rejects that — every other Markdown file in the
+// repository ends with a single newline — and that was the source of the prompt-073 re-journey FAIL:
+// the SDK journey wrote evidence to `docs/features/cutroom-sdk.md`, whose last section is
+// Divergence, and the next `check.mjs` run failed on `prettier --check`. Trim the file to exactly one
+// trailing newline so the journey preserves the format invariant no matter where Divergence lives.
+next = next.replace(/\n+$/, '\n')
 if (passed) next = next.replace(/^Status:.*$/m, 'Status: verified')
 writeFileSync(featurePath, crlf ? next.replace(/\n/g, '\r\n') : next)
 

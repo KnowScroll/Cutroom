@@ -139,6 +139,41 @@ test("a pass keeps the file's CRLF line endings", () => {
   assert.match(text, /^Status: verified\r$/m)
 })
 
+test("a pass leaves exactly one trailing newline when Divergence is the file's last section", () => {
+  // Regression for the prompt-073 re-journey FAIL: when Divergence is the last section in the feature
+  // file (as in `docs/features/cutroom-sdk.md`), the journey's Divergence replacement would otherwise
+  // append `\n\n`, leaving a trailing blank line that `prettier --check` rejects. The journey must
+  // preserve the file's format invariant no matter where Divergence lives.
+  const lastSection = feature().replace(/\n## Pending human decisions\n\nNone\.\n$/, '\n')
+  assert.ok(
+    lastSection.endsWith('none\n\n'),
+    `the fixture must end after Divergence: ${JSON.stringify(lastSection.slice(-20))}`,
+  )
+  const { dir } = repo({ text: lastSection })
+  assert.equal(journey(dir).status, 0)
+  const text = read(dir)
+  assert.match(text, /^Status: verified$/m)
+  assert.ok(
+    text.endsWith('none\n'),
+    `the file must end with one trailing newline: ${JSON.stringify(text.slice(-10))}`,
+  )
+  assert.ok(!text.endsWith('none\n\n'), 'a trailing blank line would fail prettier --check')
+})
+
+test("a FAIL leaves exactly one trailing newline when Divergence is the file's last section", () => {
+  // Same invariant under FAIL: the Divergence replacement must not leave a trailing blank line.
+  const lastSection = feature().replace(/\n## Pending human decisions\n\nNone\.\n$/, '\n')
+  const { dir } = repo({ text: lastSection, check: CHECK_FAILS })
+  assert.equal(journey(dir).status, 1)
+  const text = read(dir)
+  assert.match(text, /^Status: planned$/m)
+  assert.ok(
+    text.endsWith('failed\n'),
+    `the file must end with one trailing newline: ${JSON.stringify(text.slice(-15))}`,
+  )
+  assert.ok(!text.endsWith('failed\n\n'), 'a trailing blank line would fail prettier --check')
+})
+
 // ---------------------------------------------------------------- failing
 
 test('a red check is a FAIL: Status unchanged, Divergence names the failing check, evidence says so', () => {

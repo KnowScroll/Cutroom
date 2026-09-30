@@ -105,6 +105,15 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-09-30 · session 76
+
+- S-181 records the future `reel-series` feature: one topic-level brief plus a positive integer `n` produces
+  exactly `n` ordered, individually complete reels, planned together and made serially. Neither variants of one
+  brief nor fragments of a long reel; the public API, gates and queue order remain unwritten.
+- `docs/features/reel-series.md` is the recorded feature stub, with the future success criteria, edge cases
+  the gates must cover and the open questions for gate review. No implementation, boundary or check change
+  is added.
+
 ### 2026-09-30 · session 75
 
 - Resolution A of `PROMPTS/073-cutroom-sdk-format-finding.md` ran end to end. `prettier --write` removed the
