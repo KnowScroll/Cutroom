@@ -571,11 +571,11 @@ A third pass confirmed no finding remains. The four gates are APPROVED.
       each deliberate break, and proves the artifact contents are deterministic. Full
       `node scripts/check.mjs` is green. ✅ 2026-09-30 at `af5611b` (consumer proof + six
       breaks) and `94afd45` (shell launcher + close-export breaks)
-- [ ] **Slice 4 — journey and re-journeys.** Tick this slice in a clean documentation-only
+- [x] **Slice 4 — journey and re-journeys.** Tick this slice in a clean documentation-only
       preparation commit; run `node scripts/journey.mjs cutroom-sdk-package` exactly once;
       on PASS, commit the generated evidence alone; run the impact report's exact
       affected re-journeys from clean trees, reviewed but not widened before the impact
-      report. Stop on the first generated FAIL.
+      report. Stop on the first generated FAIL. ✅ 2026-09-30 (preparation tick at 652b438)
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
