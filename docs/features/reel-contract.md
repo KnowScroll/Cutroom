@@ -476,6 +476,7 @@ _Behaviour — against the stand-in_
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-10-01 journey=PASS at 7c648d2 — every check green; 42 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-30 journey=PASS at 6a95a8d — every check green; 42 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-30 journey=FAIL at 3226321 — the check 'format' failed
 - 2026-09-30 journey=FAIL at 5bd079c — the check 'format' failed
