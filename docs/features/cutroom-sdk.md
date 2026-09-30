@@ -6,7 +6,7 @@ authority: plan
 # cutroom-sdk — a typed local client that connects to one Cutroom engine, or starts the one it owns
 
 Status: planned
-Gates: product approved · architecture approved · program-design approved · slices approved
+Gates: product APPROVED · architecture APPROVED · program-design APPROVED · slices APPROVED
 
 > **Created 2026-09-28 at the owner's request** (S-173), after `resume-failed`'s journey and its ten
 > affected-feature re-journeys completed. S-173 chose the outcome: KnowScroll calls `@cutroom/sdk`; the
