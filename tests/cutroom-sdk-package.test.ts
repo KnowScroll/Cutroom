@@ -257,6 +257,7 @@ describe('each archive contains only the declared files', () => {
 // ---------------------------------------------------------------- consumer proof
 
 import {
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   realpathSync,
@@ -768,6 +769,224 @@ describe('the package guards catch each deliberate break', () => {
       real.includes(REPO),
       `the symlink resolved to ${real}, which is in the Cutroom checkout; the guard the test owns is "no resolved path contains REPO"`,
     )
+  })
+
+  test('break: a `cmd`-style shell launcher is rejected because the SDK uses shell: false', () => {
+    // Write a portable fixture that acts as a minimal Cutroom readiness stand-in
+    // under `process.execPath`. The fixture binds to the configured port and
+    // answers strict `{ contractVersion: 1, ready: true }`.
+    const consumer = installFreshConsumer()
+    const fixtureDir = join(consumer, 'fixture')
+    mkdirSync(fixtureDir, { recursive: true })
+    const fixture = join(fixtureDir, 'stand-in.mjs')
+    const fixtureBody = [
+      "import { createServer } from 'node:http'",
+      'const PORT = Number(process.env.CUTROOM_API_PORT)',
+      `const READY_TRUE = ${JSON.stringify({ contractVersion: 1, ready: true })}`,
+      'const server = createServer((req, res) => {',
+      "  if (req.url === '/v1/ready') {",
+      "    res.writeHead(200, {'Content-Type': 'application/json'})",
+      '    res.end(JSON.stringify(READY_TRUE))',
+      '    return',
+      '  }',
+      '  res.writeHead(404); res.end()',
+      '})',
+      "server.listen(PORT, '127.0.0.1', () => process.stdout.write('READY:' + PORT + '\\n'))",
+      "process.stdin.setEncoding('utf8')",
+      "process.stdin.on('data', (chunk) => { if (/^\\s*stop\\s*$/m.test(chunk)) server.close(() => process.exit(0)) })",
+      '',
+    ].join('\n')
+    writeFileSync(fixture, fixtureBody, 'utf8')
+
+    // Ask the OS for a free port. The SDK probes that port (it fails),
+    // then starts the launcher with `CUTROOM_API_PORT=<port>` so the
+    // fixture binds to the right one.
+    const freePortScript = join(consumer, 'free-port.mjs')
+    writeFileSync(
+      freePortScript,
+      [
+        "import { createServer } from 'node:http'",
+        'const s = createServer()',
+        "s.listen(0, '127.0.0.1', () => {",
+        '  const port = s.address().port',
+        '  s.close(() => process.stdout.write(String(port)))',
+        '})',
+        '',
+      ].join('\n'),
+      'utf8',
+    )
+    const freePortResult = spawnSync(process.execPath, [freePortScript], { encoding: 'utf8' })
+    const port = Number(freePortResult.stdout.trim())
+    assert.ok(
+      Number.isInteger(port) && port > 0,
+      `free port lookup must succeed: ${freePortResult.stdout}`,
+    )
+
+    // The launcher contract from docs/features/cutroom-sdk-package.md is
+    // `process.execPath + a JavaScript fixture file`. Pass the fixture path
+    // as the program and an argument vector that would not parse under any
+    // shell. The SDK must succeed.
+    const successScript = join(consumer, 'launcher-happy.mjs')
+    writeFileSync(
+      successScript,
+      [
+        "import { createCutroom } from '@cutroom/sdk'",
+        `const command = ${JSON.stringify(process.execPath)}`,
+        `const fixture = ${JSON.stringify(fixture)}`,
+        `const args = [${JSON.stringify(fixture)}, '--port-from-env', 'no ; shell here']`,
+        `const baseUrl = ${JSON.stringify(`http://127.0.0.1:${port}`)}`,
+        'try {',
+        '  const client = await createCutroom({ baseUrl, launcher: { command, args }, readyTimeoutMs: 5000 })',
+        '  await client.close()',
+        '  console.log("OK")',
+        '} catch (e) {',
+        '  console.log("SDK_ERROR:" + (e.kind ?? "?") + ":" + (e.stage ?? "?") + ":" + (e.message ?? "?"))',
+        '  process.exit(1)',
+        '}',
+        '',
+      ].join('\n'),
+      'utf8',
+    )
+    const happy = spawnSync(process.execPath, [successScript], {
+      cwd: consumer,
+      env: { ...process.env, NO_COLOR: '1' },
+      encoding: 'utf8',
+      timeout: 15000,
+    })
+    assert.equal(
+      happy.status,
+      0,
+      `launcher happy-path must succeed with shell: false; got:\n${happy.stdout}\n${happy.stderr}`,
+    )
+    assert.match(happy.stdout, /OK/, 'launcher happy-path printed OK')
+    // Now break it: replace `process.execPath` with the literal string
+    // "cmd" — a Windows shell launcher. The SDK must NOT silently run a
+    // shell; either the start fails or the start uses `shell: false` and
+    // fails to find a literal "cmd" binary in PATH (the runtime never
+    // has one on this machine because we did not install cmd as a
+    // child of this process).
+    const breakScript = join(consumer, 'launcher-cmd.mjs')
+    writeFileSync(
+      breakScript,
+      [
+        "import { createCutroom } from '@cutroom/sdk'",
+        `const command = ${JSON.stringify('cmd')}`,
+        `const args = ['/c', 'echo hi']`,
+        `const baseUrl = ${JSON.stringify(`http://127.0.0.1:${port}`)}`,
+        'try {',
+        '  await createCutroom({ baseUrl, launcher: { command, args }, readyTimeoutMs: 1000 })',
+        '  console.log("UNEXPECTED OK")',
+        '} catch (e) {',
+        '  console.log("SDK_ERROR:" + (e.kind ?? "?") + ":" + (e.stage ?? "?") + ":" + (e.message ?? "?"))',
+        '}',
+        '',
+      ].join('\n'),
+      'utf8',
+    )
+    const broken = spawnSync(process.execPath, [breakScript], {
+      cwd: consumer,
+      env: { ...process.env, NO_COLOR: '1' },
+      encoding: 'utf8',
+      timeout: 15000,
+    })
+    assert.match(
+      broken.stdout,
+      /SDK_ERROR/,
+      `shell launcher "cmd" must be refused; got:\n${broken.stdout}\n${broken.stderr}`,
+    )
+  })
+
+  test('break: removing a public export (close) from the staged SDK makes the consumer typecheck fail', () => {
+    // The staged SDK's `exports` map points at `./dist/index.js`. To remove
+    // one public export, rewrite both the staged `dist/index.js` and
+    // `dist/index.d.ts` to drop the `close` member, repack, and assert
+    // that a consumer typecheck importing `close` fails.
+    const stagedDir = join(STAGING, 'sdk')
+    const tarball = SDK_TARBALL
+    const originalTarball = readFileSync(tarball)
+    const originalIndexJs = readFileSync(join(stagedDir, 'dist', 'index.js'), 'utf8')
+    const originalIndexDts = readFileSync(join(stagedDir, 'dist', 'index.d.ts'), 'utf8')
+    const brokenIndexJs = originalIndexJs.replace(
+      /^(\s*)close,\s*$/m,
+      '$1// close removed for the deliberate break',
+    )
+    const brokenIndexDts = originalIndexDts.replace(
+      /^\s*close\(\): Promise<void>;?\s*$/m,
+      '// close removed for the deliberate break',
+    )
+    assert.notEqual(brokenIndexJs, originalIndexJs, 'the .js regex must replace the close member')
+    assert.notEqual(
+      brokenIndexDts,
+      originalIndexDts,
+      'the .d.ts regex must replace the close declaration',
+    )
+    writeFileSync(join(stagedDir, 'dist', 'index.js'), brokenIndexJs, 'utf8')
+    writeFileSync(join(stagedDir, 'dist', 'index.d.ts'), brokenIndexDts, 'utf8')
+    const script = resolve(
+      dirname(process.execPath),
+      'node_modules',
+      'corepack',
+      'dist',
+      'corepack.js',
+    )
+    const pack = spawnSync(
+      process.execPath,
+      [script, 'pnpm', 'pack', '--pack-destination', STAGING],
+      {
+        cwd: stagedDir,
+        env: { ...process.env, NO_COLOR: '1' },
+        encoding: 'utf8',
+      },
+    )
+    if (pack.status !== 0) {
+      throw new Error(`pnpm pack failed during deliberate break: ${pack.stdout}\n${pack.stderr}`)
+    }
+    try {
+      const consumer = installFreshConsumer()
+      const tsconfig = {
+        compilerOptions: {
+          target: 'ES2023',
+          module: 'nodenext',
+          moduleResolution: 'nodenext',
+          strict: true,
+          noEmit: true,
+          skipLibCheck: true,
+        },
+        include: ['main.ts'],
+      }
+      writeFileSync(
+        join(consumer, 'tsconfig.json'),
+        `${JSON.stringify(tsconfig, null, 2)}\n`,
+        'utf8',
+      )
+      writeFileSync(
+        join(consumer, 'main.ts'),
+        [
+          "import { createCutroom, type Cutroom } from '@cutroom/sdk'",
+          'async function run(c: Cutroom) {',
+          '  await c.close()',
+          '}',
+          'void [createCutroom, run]',
+          '',
+        ].join('\n'),
+        'utf8',
+      )
+      const tscPath = resolve(REPO, 'node_modules', 'typescript', 'bin', 'tsc')
+      const result = spawnSync(process.execPath, [tscPath, '--noEmit'], {
+        cwd: consumer,
+        env: { ...process.env, NO_COLOR: '1' },
+        encoding: 'utf8',
+      })
+      assert.notEqual(
+        result.status,
+        0,
+        `tsc --noEmit should fail when close is removed from the staged SDK; instead it succeeded:\n${result.stdout}\n${result.stderr}`,
+      )
+    } finally {
+      writeFileSync(join(stagedDir, 'dist', 'index.js'), originalIndexJs, 'utf8')
+      writeFileSync(join(stagedDir, 'dist', 'index.d.ts'), originalIndexDts, 'utf8')
+      writeFileSync(tarball, originalTarball)
+    }
   })
 })
 
