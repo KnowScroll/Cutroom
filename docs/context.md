@@ -28,15 +28,18 @@ git and the journal keep them.
   `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). First run
-  `PROMPTS/073-cutroom-sdk-format-finding.md` resolution A: format the two pre-existing Markdown failures plus the
-  unrun prompt itself, bind a fresh full check to the new tree, and rerun the SDK and `reel-contract` journeys to
-  PASS. Then run `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`: approve the minimal package gates, build portable
-  installable `@cutroom/sdk` and `@cutroom/reel-contract` artifacts, and prove them from a temporary external consumer.
-  No KnowScroll file, engine package, installer, registry publication or deployment work belongs to Cutroom. SDK v1
-  is complete when the consumer-neutral package journey and exact affected re-journeys PASS. Then come `self-heal`,
-  session 53's P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and
-  `parallel-shots`' gates from `b15d203`.
+- **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). Resolution A of
+  `PROMPTS/073-cutroom-sdk-format-finding.md` ran: prettier --write the three Markdown files, full preflight at `48a6746`
+  (tree `85cd3ec2`, `Verification: full`); SDK journey PASS at `3226321`; `reel-contract` re-journey FAIL on format at
+  `647c5e6` — the SDK journey's own trailing-newline modification to `docs/features/cutroom-sdk.md` reintroduces the
+  violation. The next session decides between resolution B (`docs/features/*.md` into `.prettierignore` with a written
+  reason, after which both journeys can PASS), a fix to `scripts/journey.mjs` so the writer leaves the file format-clean
+  (resolution A's missing pre-condition), or another outcome the owner names. Then run `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`:
+  approve the minimal package gates, build portable installable `@cutroom/sdk` and `@cutroom/reel-contract` artifacts,
+  and prove them from a temporary external consumer. No KnowScroll file, engine package, installer, registry publication
+  or deployment work belongs to Cutroom. SDK v1 is complete when the consumer-neutral package journey and exact affected
+  re-journeys PASS. Then come `self-heal`, session 53's P-013/P-014 findings, `caption-match`, `composed-hold`,
+  `diagram-shots`, `code-reels`, and `parallel-shots`' gates from `b15d203`.
 - **KnowScroll and the engine** (S-173, settled session 57): the engine stays its own process (D-098); KnowScroll
   calls it through `@cutroom/sdk`, which connects to it, or starts the service as a child when none answers. D-099 in
   part superseded: two packages may be depended on from outside.
@@ -101,6 +104,19 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-30 · session 75
+
+- Resolution A of `PROMPTS/073-cutroom-sdk-format-finding.md` ran end to end. `prettier --write` removed the
+  pre-existing format failures from `docs/features/cutroom-sdk.md`, `docs/context.md`, and `PROMPTS/073-cutroom-sdk-format-finding.md`;
+  the formatting commit `48a6746` carries a full-green `check.mjs` evidence (`Verification: full`, tree
+  `85cd3ec2`). The SDK journey at `48a6746` PASS at `3226321`. The `reel-contract` re-journey at `3226321`
+  FAILed on `format` at `647c5e6` — the same divergence session 72 caught at `3b50714`, now legible: the SDK
+  journey's own modification to `docs/features/cutroom-sdk.md` appended an evidence line and a trailing blank
+  line, and `prettier --check` rejects that file. The session stops per Slice 4's wording; no check, journey,
+  timeout, test or boundary rule was changed. The owner decides between widening `.prettierignore` (resolution B),
+  fixing `scripts/journey.mjs` so the writer leaves the file format-clean (resolution A's missing pre-condition),
+  or another outcome; prompt 074 then runs after that.
 
 ### 2026-09-30 · session 74
 
@@ -175,106 +191,6 @@ journey PASS at 18e9a48`. The `reel-contract` re-journey FAILed on `format` at `
 - `JOURNAL.md` is now a short operational index; sessions 01–64 are preserved byte-for-byte in
   `docs/history/JOURNAL-through-session-64.md`. The stop gate now requires a committed source tree with valid evidence
   instead of starting the aggregate suite again. Slice 1’s readiness test now asserts exactly one getter call per probe.
-
-### 2026-09-28 · session 64
-
-- Read Slice 0 against the approved readiness gate and current tests. It is not safe to begin Slice 1 from the
-  committed record: its table assigns readiness to a new dedicated test and leaves `reel-plan` unchanged, while
-  its later section requires two `reel-plan` amendments; one of those wrongly makes an in-memory readiness route
-  return 500 when unrelated database tables are dropped. It also names the required
-  `tests/resume-failed-contract.test.ts` caller change, then claims no `resume-failed` file references the new
-  option. The exact Slice 4 re-journey list is therefore not established.
-- `PROMPTS/064-cutroom-sdk-slice-1.md` — the corrected handoff. First repair and separately commit Slice 0's
-  impact record; then one builder adds the strict readiness schema/route, single-read getter, service/harness
-  lifecycle and dedicated no-write/500 tests. It leaves `reel-plan`'s route matrix alone and stops before Slice 2.
-  `PROMPTS/063` now records that session 63 ran Slice 0 only; the prompt index gains 064.
-- Current-HEAD startup evidence: decisions current (115, none unpushed), drift green (143 modules), and
-  `node scripts/check.mjs --code` fully green; its serial test step took 2,065,804 ms.
-
-### 2026-09-28 · session 63
-
-- `docs/features/cutroom-sdk.md` — all four S-173 gates are **approved by adversarial review**. The Contract V1 audit finds three post-original-package additions the SDK must expose: required `Criterion.type`/presence-only `mustNotShow` (`reel-stills`); required `RunRecord.takes` (`reel-takes`); and `resume-failed`'s `Piece`, `ResumeRequest`, all `ResumeResponse` arms, resume route, `RunStatus.resumes`/`resumedBy`, and record `keptFrom`. The approved plan maps all eight current routes, validates both directions, defines strict `GET /v1/ready` 200/503 bodies and joins an already-booting peer rather than launching another child, fixes creator-owned close, and limits `packages/sdk` to the contract and Node built-ins. No implementation exists.
-- `DECISIONS.md` — S-175 records the owner's answer: KnowScroll supplies an explicit program-and-argument launcher when it expects the SDK to start an absent service. The SDK has no source-entrypoint default, invokes no shell, stays on the fixed loopback port, and stops only its own child. Adversarial review closed its readiness, ownership, error-shape and boundary gaps; the genuinely green full preflight remains the sole pre-code blocker.
-- **Checks observed**: `node scripts/decisions.mjs --fetch` found the steering pin current (`e05e9f0`, 115 decisions, none unpushed); `drift.mjs` was green (143 modules, no violations). A new full `check.mjs --code` passed typecheck, lint, format, boundaries, proofs and audit, then failed tests after 462.506 s; its wrapper omitted the failing TAP line. This is a pre-code finding, not an SDK defect.
-- **Failure identified**: the direct aggregate test command, with full TAP held outside the repository, found the sole failure: `reel-render-secrets.test.ts` check 50. Its child runs every other reel-render test with PATH only and `--test-concurrency=4`; under the aggregate's concurrent load, it remained running at its unchanged 300 s timeout (`300222.044 ms`). Its parent then asserts `suite.status === 0` and fails. The aggregate summary was 605 pass / 1 fail, 606 total, 460705.398 ms. This is the prior load-sensitive transient, now identified rather than attributed to the SDK.
-- **Preflight re-run**: at the owner's request, one `node scripts/check.mjs --code` re-run passed typecheck, lint, format, boundaries, boundary proof and dead-rule audit, but its aggregate tests failed after 458.053 s. The wrapper again retained only its first TAP lines, all passing, and supplied no test identity. No retry, timeout, test or code change followed. The green pre-code gate remains unmet, so no Slice 1 implementation plan was written.
-- **Reliability repair and preflight**: S-176 makes the aggregate test runner serial while preserving every nested PATH-only journey's own concurrency, assertions and 300-second bound; failed-command output now retains the final 80 lines. The verified `node scripts/check.mjs --code` was fully green: its tests step took 1,476,701 ms. `PROMPTS/063-cutroom-sdk-slices-0-1.md` now gives a no-duplicate-preflight execution plan for Slice 0's precise impact record and Slice 1's readiness contract. No SDK source exists.
-
-### 2026-09-28 · session 62
-
-- `PROMPTS/062` run; all five held re-journeys PASS in the order the prompt named. The full `node scripts/check.mjs --code` preflight was fully green (typecheck 715 ms, lint 26 s, format 14 s, boundaries 1.3 s, boundary proofs 3.8 s, no dead rule 68 ms, tests 408 s) on commit `51212ed`, with no diagnostic rerun needed. Five re-journeys, each from a clean tree, each one result commit: `paid-failures` 17 tests (`cfbb453`), `ask-again` 23 (`9f93d72`), `second-ask` 9 (`bc4c35d`), `paid-path` 120 (`5d4faa7`), `three-pictures` 12 (`50e1ffc`). Every Evidence line names its input commit, its own tests passed, and Divergence is `none` for all five. With session 61's five (`8904d9a`, `860b7f7`, `8f67bf4`, `a86ca4c`, `f6e2a75`), all ten S-099 affected-feature re-journeys required by `resume-failed`'s Slice 7 are complete. Session 61's `paid-failures` FAIL at `cbffbc5` is the prior newest evidence line, now second; the load-sensitive reel-render-secrets transient did not recur. No implementation, gate, test, timeout or concurrency was changed; the prompt's session boundary was kept.
-
-### 2026-09-28 · session 61, continued
-
-- `PROMPTS/062-resume-failed-held-rejourneys.md` — the execution plan for the five re-journeys session 61 held after `paid-failures` recorded its full-check FAIL: a fully green `check.mjs --code` preflight, then `paid-failures`, `ask-again`, `second-ask`, `paid-path` and `three-pictures` serially, each from a clean tree and each generated result committed before the next. A FAIL is committed and stops the session; no check, timeout or concurrency is weakened. The independent audit reproduced the load finding with full TAP: 604/606 aggregate tests passed; `resume-failed` check 44 passed in 277.135 s; `reel-render` check 50 and `reel-takes` check 26 each hit its existing 300 s bound. Run alone and serially, those two passed in 231.349 s and 155.879 s. The prompt starts no later work and stops after the five journeys and their records.
-
-### 2026-09-28 · session 61
-
-- Slice 7 built (`aa9a9f4`): `tests/resume-failed-secrets.test.ts` — check 44, the PATH-only journey child, in S-028's form; the roll call is checks 1–40 then 43 (41 and 42 live in paid-path's `paid-path-real-reel.test.ts`, the only file allowed to name the script that spends). Concurrency 2 (the closest established PATH-only test, second-ask's check 9 and three-pictures' check 13); bound 600 s with S-107's headroom reasoning. The probe runs `process.execPath -e 'process.stdout.write(...)'` in the same bare environment, the canaries `sk-canary-not-a-real-key` and `fal-canary-not-a-real-key` are set here, asserted present, then looked for in the probe's output. The file is named to break three ways — inherit `process.env`, omit a feature test, drop the self-exclusion — and restored byte-for-byte in `finally` each time. `docs/features/resume-failed.md` Slice 7 ticked; the prompt's prompt fence (`~~~`) reformatted to the project's ` ``` ` style as one `prettier --write` cleanup of session 60's `1faf095`. Five of the ten S-099 amended features' re-journeys PASS — `reel-contract` 42 tests (`8904d9a`), `reel-plan` 50 (`860b7f7`), `reel-stills` 63 (`8f67bf4`), `reel-render` 106 (`a86ca4c`), `reel-takes` 66 (`f6e2a75`) — each its own commit. `paid-failures` re-journeyed FAIL at `cbffbc5`: the test phase of `node scripts/check.mjs` hit the same load-sensitive transient the journal has named since session 41 — `tests/reel-render-secrets.test.ts`'s check 50 child timed out at 300494 ms (its 300 s bound) with 605/606 tests passing. The feature itself is correct: it passes alone in 101 s and in the prior `check.mjs --code` runs that session 61 ran (each `tests` phase 374–409 s, all green). Per the prompt, the five PASS journeys are committed, the FAIL is committed as the finding, and the remaining five journeys (`ask-again`, `second-ask`, `paid-path`, `three-pictures`, the unpaid `paid-failures` rerun) are held for a session with a less loaded machine — `cutroom-sdk`'s gates (S-173) come next when that machine is free.
-- **Checks**: `node scripts/check.mjs` ran green (typecheck, lint, format, boundaries, boundary proofs, no dead rule, tests, decisions pin, copied docs) on commit `aa9a9f4` (409 s) and on the prior four working-tree snapshots. The format check caught the prompt's `~~~` fences and was tidied; the tests phase reproduced the reel-render-secrets transient in two consecutive runs (`374 s green`, `415 s green`, `426 s green` then `708 s FAIL`) — the four successful runs were before any other shell work, the failing run after `node scripts/journey.mjs` had just run five features back-to-back.
-
-### 2026-09-27 · session 60, continued
-
-- `PROMPTS/061` — repaired before session 61: it now names the missing `resume-failed` check 44 file, treats the unnamed aggregate-test failure as a hard preflight, ticks and commits Slice 7 before `journey.mjs` can run, and gives all ten S-099 re-verification journeys a serial clean-tree/one-commit-per-result order. It also names the Journal, context and prompt-index finish work. No test was run in this documentation correction.
-
-### 2026-09-27 · session 60
-
-- `PROMPTS/060` — the implementation prompt for `resume-failed` Slice 6: the real-reel preview and paid resume flow, one-read answers, waiting-run cancellation before the service starts, and service-owned `waitingRuns`/`cancelRuns`; checks 41 to 43 and paid-path check 20's amendment. `PROMPTS/059` and the prompt index record that session 59 built Slice 5.
-- Verified Slice 5 from its production paths, not only its feature record: checks 35 to 40 plus the amended `reel-render` context checks passed, 9/9. The aggregate code check again reached its test phase then failed without the wrapper identifying the test; the prompt requires that finding to be resolved without weakening a check before Slice 6 commits.
-- Slice 6, the owner's script — built by one `slice-builder` agent (S-172) and committed after the full `check.mjs` green (the wrapper's earlier omission did not recur today; 41+ test files ran green in 370 s). `scripts/_answers.mjs` (pure, import-free `answers(input)`) and `scripts/_answers.d.mts`; `apps/service/src/waiting-runs.ts` — `waitingRuns` reads through a `better-sqlite3` connection opened `readonly: true, fileMustExist: true` and never mutates; `cancelRuns` is one `UPDATE run SET cancel_requested = 1 WHERE state = 'running' AND run_id IN (...)`; both exported from `@cutroom/service`. `scripts/real-reel.mjs` — one `post(path, body)` helper owns the sole `method: 'POST'`; `makeReel` owns the one `/v1/runs` post; `resumeReel` owns the literal `{ preview: true }` preview and the no-`preview`-key paid resume; the second `!== confirmation(` gate compares `confirmation(figure)` from `Number(preview.estimateCents)`; the poll loop follows `resumedBy` to the resumed run's end; the start's waiting-runs question is asked through the service helpers; every answer is `line.next()` from `answers(redirectedInput)`. `tests/paid-path-real-reel.test.ts` check 20 absorbs the Slice 6 shape (markers re-pointed, `method: 'POST'` inside `function post(`, three `post()` calls, one literal `{ preview: true }`, no `preview` on the paid body, two `!== confirmation(` gates, `makeReel`/`resumeReel` each holding one path) and gains a sibling assertion that every local module the file imports reads no `child_process`. `tests/resume-failed-script.test.ts` — checks 42 (three `answers` tests) and 43 (five `waitingRuns`/`cancelRuns` tests). `docs/features/paid-path.md` Slice 6 amendment block (newest first); `docs/features/resume-failed.md` Slice 6 ticked. 13 deliberate breaks demonstrated, each caught by the check meant to catch it.
-- **Checks**: the full `check.mjs` green on this commit — the aggregate test phase that was a finding for sessions 58 and 59 ran green today (no wrapper omission, no marginal test).
-
-### 2026-09-27 · session 59
-
-- Slice 4, the call (`7315af0`) — built by session 58, which left it uncommitted and wrote no entry here; read, checked
-  and committed this session. `packages/reel-contract/src/resume.ts` — `Piece`, `ResumeRequest`, `ResumeResponse`;
-  `POST /v1/runs/:runId/resume` (`routes.ts`, `apps/api/src/server.ts`, handed `ResumeService` and `budgetPath`, both
-  optional); `RunStatus.resumes`/`resumedBy`, the record's `keptFrom`; lookup and replay answer the newest run
-  (`domain/src/runs.ts`); `resumeService(...)` (`apps/service/src/service.ts`); `appendResumeQuestion`
-  (`apps/worker/src/questions.ts`); S-171's stop by `copiedPictures` (`pictures.ts`, `stills/index.ts`); the stand-in
-  engine and client. `tests/resume-failed-contract.test.ts`, checks 26 to 34.
-- Slice 5, the engine's own resume: `finishRun`/`finishStills`/`finishVideo` take an optional `resume(tx, now)`, run
-  after the labels in `SAVEPOINT resume`, before `endRun` (`domain/src/runs.ts`, `ResumeStep`, `ResumeStepped`);
-  `apps/worker/src/resume.ts` — `ResumeContext`, `finishFailed`, `resumeRates`; every job's failed stage ending through
-  `finishFailed`; `WorkerOptions.resume`, off by default; `appendResumeUnmade` (`questions.ts`); the service's switch
-  and `CUTROOM_RESUME_DELAY_MS`, 900000 (`apps/service/src/settings.ts`, `service.ts`); `EngineOptions.resume`
-  (`tests/engine/harness.ts`). `tests/resume-failed-engine.test.ts`, checks 35 to 40; `reel-render` check 40 amended.
-- `DECISIONS.md` — **S-174**: every job context's `resume` key required, `ResumeContext | undefined`; one rates
-  mapping, `resumeRates`, exported from `@cutroom/worker` and used by the service.
-
-### 2026-09-26 · session 57
-
-- Slice 3, the resume made by a test (`395dc40`): `packages/contracts/src/resume.ts` — the resume's shapes, `Piece`
-  local until Slice 4; `packages/pipeline/src/resume/index.ts` — `normalise`, `takedown`, `planResume`,
-  `admitResume`; `packages/domain/src/resume.ts` — `readResumeInputs`, `resumeRun` (copies in the origin's row
-  order); `reelSpentCents` and `imageCallCount` counting copies (`ledger.ts`); `enqueue`'s starting attempts
-  (`queue.ts`, passed by `admitStills`, `advanceStills`, `advanceClips`); `receiptRuns` — labels in two runs
-  (`pictures.ts`, `runs.ts`); the three guards and both stop questions on the reel's spend (`apps/worker`); the
-  kept-take check (`pipeline/src/clips/index.ts`). `tests/resume-failed-resume.test.ts`, checks 12 to 25;
-  `resumed()` and `Engine.settings` in `tests/engine/harness.ts`. Amendment blocks: `reel-plan`, `reel-stills`,
-  `reel-render`, `reel-takes`, `paid-failures`.
-- `PROMPTS/057` and `PROMPTS/README.md` — the Run line. `PROMPTS/058` — new: Slice 4 onwards, each slice by a builder.
-- `DECISIONS.md` — **S-172**: one `slice-builder` agent (Opus, `.claude/agents/slice-builder.md`) builds each slice;
-  the main session briefs, reads the diff, runs the full check and commits; `CLAUDE.md`'s agent list gains it.
-  **S-173**: KnowScroll calls the engine through `@cutroom/sdk` — connect, or start when none answers — `cutroom-sdk`
-  next after `resume-failed`, before `self-heal` (D-099 superseded in part).
-
-### 2026-09-26 · session 56
-
-- `docs/features/resume-failed.md` — the approving read, Gate review 12: three findings fixed, all four gates
-  APPROVED 2026-09-26 (`a38edf5`). `DECISIONS.md` — **S-171**: a resumed run's named canonical with no slot for its
-  repair makes its two candidates and stops for `gate-1` if both fail (the owner; D-047 steps 1 and 3 superseded
-  for that case).
-- Slice 1, the kind (`e67ec6f`): `packages/contracts/src/failures.ts` — five classes and `failureKindOf`; throw
-  sites in `fal/image.ts`, `fal/queue.ts`, `minimax/narration.ts`, `ffmpeg/sensors.ts`, `gates/witness.ts`,
-  `gate1s.ts`, `gate7.ts`, `apps/worker/src/transient.ts`; stand-ins' `as` (`fake/thrown.ts`); each stage's failed
-  ending's `failure`; `db/migrations/0007_resume_failed.sql`; `endRun` and `RunEnding` (`domain/src/runs.ts`).
-  `tests/resume-failed-kinds.test.ts`, checks 1 to 5; fixture `minimax-t2a-rejected`. Eight amendment blocks.
-- Slice 2, what a crash keeps (`0f73e5d`): `readStillsInputs` (`domain/src/pictures.ts`); the stills ladder's kept
-  input (`pipeline/src/stills/index.ts`); `reserveOf(placements, earlier, kept)` (`ladder.ts`); `seq` the greatest
-  plus one (`ledger.ts`). `tests/resume-failed-stills.test.ts`, checks 6 to 11; `reel-stills` checks 48 and 49
-  amended; `killedAgain` (`tests/engine/restart.ts`). Amendment blocks: `reel-stills`, `three-pictures`.
-- `PROMPTS/056` and `PROMPTS/README.md` — the Run line. `PROMPTS/057` — new: Slice 3 onwards.
 
 ## Where to look
 

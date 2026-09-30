@@ -66,10 +66,6 @@ reported green because the violation is pre-existing. The FAIL is committed as
 The owner decides whether the file is reformatted (and its new tree given a fresh full preflight per S-177),
 `.prettierignore` is widened, or the SDK status is amended by hand.
 
-## 2026-09-30 — session 72, handoff
-
-**Decision.** The owner asked what is next; prompt 073 carries the three format resolutions and starts no work.
-
 ## 2026-09-30 — session 73, SDK v1 delivery planning handoff
 
 **Decision.** S-179 kept installable SDK v1 ahead of `self-heal`; prompt 074 initially over-scoped consumer integration.
@@ -77,3 +73,7 @@ The owner decides whether the file is reformatted (and its new tree given a fres
 ## 2026-09-30 — session 74, SDK package boundary corrected
 
 **Decision.** S-180 makes SDK v1 consumer-neutral: Cutroom proves installable SDK/contract artifacts and owns no downstream integration or engine delivery. **Next.** Run prompt 073 A, then prompt 074 through package journey/re-journeys; stop before `self-heal`.
+
+## 2026-09-30 — session 75, prompt 073 resolution A — SDK PASS, re-journey FAIL on format
+
+**Decision.** Run resolution A exactly: prettier the failing Markdown, full `check.mjs` with `Verification: full`, then the two journeys from clean trees in Slice 4 order. **Outcome.** `48a6746` (full green, tree `85cd3ec2`); SDK journey PASS at `3226321`; `reel-contract` re-journey FAIL on format at `647c5e6` — the SDK journey itself appends a trailing blank line to `docs/features/cutroom-sdk.md`, which `prettier --check` rejects; no reel-contract test failed. **Decision.** Stop per Slice 4; nothing weakened.
