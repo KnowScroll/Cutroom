@@ -68,12 +68,12 @@ The owner decides whether the file is reformatted (and its new tree given a fres
 
 ## 2026-09-30 — session 72, handoff
 
-**Decision.** The owner asked "What is next?" without naming the resolution. Per sessions 24/26/50, this
-session writes the next prompt and starts no resolution. The three options are in
-`PROMPTS/073-cutroom-sdk-format-finding.md`; the next session picks one and runs only that one.
+**Decision.** The owner asked what is next; prompt 073 carries the three format resolutions and starts no work.
 
 ## 2026-09-30 — session 73, SDK v1 delivery planning handoff
 
-**Decision.** S-179 keeps a Linux-delivered, separate-process SDK v1 ahead of `self-heal`; exact delivery remains a gate decision.
+**Decision.** S-179 kept installable SDK v1 ahead of `self-heal`; prompt 074 initially over-scoped consumer integration.
 
-**Next.** Run prompt 073 A to restore full-green evidence; then run prompt 074's linked gates and stop before code.
+## 2026-09-30 — session 74, SDK package boundary corrected
+
+**Decision.** S-180 makes SDK v1 consumer-neutral: Cutroom proves installable SDK/contract artifacts and owns no downstream integration or engine delivery. **Next.** Run prompt 073 A, then prompt 074 through package journey/re-journeys; stop before `self-heal`.

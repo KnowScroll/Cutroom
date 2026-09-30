@@ -7740,3 +7740,40 @@ exports and unresolved `workspace:*` in shipped manifests.
 usable"_, followed by _"it will be on a linux machine dont lock it to windows only."_
 
 ---
+
+## S-180 | 2026-09-30 | SDK v1 ends at a portable consumer-neutral package; consumers own integration and engine delivery
+
+**Chose.** Cutroom completes SDK v1 by producing and proving installable, versioned npm-format artifacts for
+`@cutroom/sdk` and its public `@cutroom/reel-contract` dependency. The proof installs those artifacts into a fresh
+temporary Node project outside this workspace and exercises the existing SDK contract without resolving back into
+Cutroom source. **Cutroom does not integrate KnowScroll or any other consumer, package the engine, choose a deployment
+machine, publish to a registry, or own installation and rollback.** Every consumer supplies the engine URL and, when
+it wants start-if-absent behavior, the literal program and argument vector S-175 already requires.
+
+**Why.** The SDK's behavior slices are complete. What remains on Cutroom's side is to close the recorded format
+finding and turn the current private `0.0.0`, `.ts`-exporting, `workspace:*` packages into artifacts an unrelated
+project can actually install and run. A neutral package proof establishes that without coupling Cutroom to one caller
+or turning SDK completion into an engine/deployment project.
+
+**Rejected.** **KnowScroll integration as Cutroom work** — KnowScroll owns its adapter and orchestration. **A packaged
+engine, OS installer, active-version manager or rollback system** — consumers decide how they obtain and run the
+separate engine. **Linux-only, Windows-only or macOS-only SDK code** — the SDK package uses portable Node/ESM APIs and
+an explicit consumer-supplied command/vector; no OS-specific shell or path belongs in it. **Calling workspace source
+complete** — an unrelated consumer cannot install `private`, `workspace:*`, `.ts` runtime exports as a normal package.
+**Registry publication** — installable artifacts can be proved without choosing where a later consumer publishes or
+stores them.
+
+**Supersedes:** **S-179**, on requiring a Linux-delivered KnowScroll integration, an engine release, installer and
+rollback before SDK completion. S-179's ordering stands: SDK package completion remains before `self-heal`.
+
+**Caught by.** A package-owner test builds both artifacts, inspects their exact files and normalized manifests, and
+installs them into a temporary non-workspace consumer. Plain Node, without a TypeScript loader or source link, imports
+the SDK; a consumer typecheck sees every public type; stand-ins prove join/start, every route, errors, fixed-port race
+and close ownership. Tests reject OS-specific commands, source-checkout resolution, absolute paths, `private`,
+`0.0.0`, `workspace:*`, public `.ts` runtime exports, missing declarations, engine/provider/database code, secrets,
+media and committed build output.
+
+**Confirmed-by.** The owner, 2026-09-30: _"We just want it to be complete ... we will not integrate with knowscroll
+itself ... We just have to make the sdk and thats all we dont care who use it. It should work."_
+
+---

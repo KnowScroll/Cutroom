@@ -28,15 +28,14 @@ git and the journal keep them.
   `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: finish SDK v1 before `self-heal` (S-179). First run
+- **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). First run
   `PROMPTS/073-cutroom-sdk-format-finding.md` resolution A: format the two pre-existing Markdown failures plus the
   unrun prompt itself, bind a fresh full check to the new tree, and rerun the SDK and `reel-contract` journeys to
-  PASS. Then run
-  `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`: plan and adversarially approve the linked Cutroom release and
-  KnowScroll integration gates for Linux, with no Windows-only or source-checkout assumption and no implementation
-  before approval. Build prompts follow only after both gate sets pass review. SDK v1 is complete only when a clean
-  Linux install proves KnowScroll using the packaged SDK to join or start one separate Cutroom process. Then come
-  `self-heal`, session 53's P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and
+  PASS. Then run `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`: approve the minimal package gates, build portable
+  installable `@cutroom/sdk` and `@cutroom/reel-contract` artifacts, and prove them from a temporary external consumer.
+  No KnowScroll file, engine package, installer, registry publication or deployment work belongs to Cutroom. SDK v1
+  is complete when the consumer-neutral package journey and exact affected re-journeys PASS. Then come `self-heal`,
+  session 53's P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and
   `parallel-shots`' gates from `b15d203`.
 - **KnowScroll and the engine** (S-173, settled session 57): the engine stays its own process (D-098); KnowScroll
   calls it through `@cutroom/sdk`, which connects to it, or starts the service as a child when none answers. D-099 in
@@ -102,6 +101,13 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-30 · session 74
+
+- S-180 corrects S-179's scope: Cutroom ships and proves portable consumer-neutral SDK/contract packages; consumers
+  own KnowScroll or any other integration, engine installation and launcher configuration. The unrun prompt 074 now
+  approves minimal package gates, builds the artifacts and proves a clean external installation; it contains no
+  consumer edit, engine bundle, registry publication, OS installer, activation or rollback work.
 
 ### 2026-09-30 · session 73
 
@@ -269,22 +275,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   plus one (`ledger.ts`). `tests/resume-failed-stills.test.ts`, checks 6 to 11; `reel-stills` checks 48 and 49
   amended; `killedAgain` (`tests/engine/restart.ts`). Amendment blocks: `reel-stills`, `three-pictures`.
 - `PROMPTS/056` and `PROMPTS/README.md` — the Run line. `PROMPTS/057` — new: Slice 3 onwards.
-
-### 2026-09-26 · session 55
-
-- Both explainer reels made, six real runs, 322¢: brief B (game graphics) completed at its fourth run, `d12931e1`,
-  50.2 s; brief A (JoJo) at its second, `a1b8f2ee`, 52.5 s. The DNS lookup was 11 s at the start and under 1.1 s for
-  every run. The Runs table above; both briefs as they completed and every run in `JOURNAL.md`.
-- `docs/reel-pitfalls.md` — P-021 (the narration drawn as a subtitle), P-022 (a must-show's qualifier read as
-  required), P-023 (illegible marks refused as lettering), P-024 (a 14.5-minute wait no row explains), P-025 (a
-  recurring subject fills the unclaimed sentences); P-008 and P-018 recurred; their short-list rows, and P-020's state.
-- `docs/research/refusals.md` — counts and ledger to 52 runs.
-- `PROMPTS/055` and `PROMPTS/README.md` — the Run line. `scripts/real-reel.mjs` put back as HEAD has it.
-- `DECISIONS.md` — **S-170**: `self-heal` is one harness around the run — make, check, heal, learn — with a rule book
-  from failed runs; a learned rule binds once the owner approves it; the caller's criteria and claims healed in place
-  only when the request opts in, never a sentence or a fact (D-096 superseded in part). `docs/features/self-heal.md` —
-  its title, what the owner added, four more faults, gates 3 and 6 widened; then what the rule book teaches the prompts (no model is trained),
-  the baseline — sessions 53 to 55, 19 runs, 4 reels, 649¢ — and the target its journey is held to.
 
 ## Where to look
 

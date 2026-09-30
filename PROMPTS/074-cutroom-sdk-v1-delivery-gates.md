@@ -1,123 +1,78 @@
-# 074 — `cutroom-sdk-v1`: Linux delivery and KnowScroll integration gates
+# 074 — `cutroom-sdk-package`: finish the portable SDK package
 
-- **For:** the planning session after prompt 073 resolution A completes green
-- **Feature:** `cutroom-sdk-v1` (D-098, D-115; S-173, S-175, S-177, S-179)
-- **Work:** plan and adversarially review the Linux release, installation, launcher, and cross-repository proof; no implementation
-- **Written:** 2026-09-30, after the owner required SDK v1 to be usable by KnowScroll before `self-heal` and corrected the deployment target to Linux
+- **For:** the execution session after prompt 073 resolution A completes green
+- **Feature:** `cutroom-sdk-package` (D-098, D-115; S-173, S-175, S-177, S-180)
+- **Work:** approve the minimal packaging gates, build installable SDK/contract artifacts, prove them from an external consumer, and run the affected journeys
+- **Written:** 2026-09-30; rewritten before run after the owner clarified that Cutroom ships the SDK only and consumers own every integration
 - **Run:** not yet run
 
 ```text
-Plan `cutroom-sdk-v1` only. The objective is not merely an SDK source package that passes
-isolated tests: it is a versioned Linux release that KnowScroll can install and use to call a
-separate Cutroom engine process. Do not implement packaging, compilation, installation,
-KnowScroll integration, a launcher, or a journey in this session. Gates before code.
+Finish the Cutroom SDK package. Cutroom's responsibility ends with a portable, installable,
+consumer-neutral `@cutroom/sdk` package and its `@cutroom/reel-contract` dependency. Do not edit
+KnowScroll, package the Cutroom engine, write an installer, choose a deployment machine, publish
+to a registry, or start `self-heal`. A consumer supplies its own engine URL and, when it wants
+start-if-absent behavior, its own literal launcher command and argument vector as S-175 requires.
 
-Prerequisite and stop boundary
+Prerequisite and startup
 
-1. Follow Cutroom's startup order exactly: `node scripts/decisions.mjs --fetch`, `node
+1. Follow the repository startup order exactly: `node scripts/decisions.mjs --fetch`, `node
    scripts/drift.mjs`, the last 40 lines of `JOURNAL.md`, and `node
    scripts/verification-status.mjs`. Stop if the steering authority is newer.
-2. Prompt 073 resolution A must already have completed: the two Markdown files were formatted,
-   the new tree received a green full check, and fresh `cutroom-sdk` and `reel-contract`
-   journeys both PASSed from clean trees. If that exact evidence does not exist, stop and report
-   that prompt 073 A is the only next work. Do not substitute resolution B or C, rerun a journey
-   as startup, or weaken a check.
-3. Read Cutroom's `AGENTS.md` / `CLAUDE.md`, `docs/context.md`, S-173, S-175, S-177 and S-179,
-   `docs/features/cutroom-sdk.md`, both public package manifests and tsconfigs,
-   `packages/sdk/src/index.ts`, `packages/sdk/src/launcher.ts`, the service entry/settings,
-   workspace configuration, generated-path rules, and the SDK tests. Inventory every runtime
-   dependency needed outside this source checkout, including Node, native modules, ffmpeg,
-   database migrations, configured artifact paths, and provider configuration. Read; do not
-   infer.
-4. Read KnowScroll's `CLAUDE.md` and then `steering/STATE.md` before any other KnowScroll file.
-   Recite the state in your own words. The local state observed while this prompt was written
-   reported an old commit and uncommitted files even though Git was clean at a newer commit; use
-   KnowScroll's own `pnpm state` ritual to reconcile that before planning and record what changed.
-   Read D-098, D-099 and D-115, `steering/SYSTEM.md`, the worker/API package manifests, workspace
-   configuration, and every current reel submission/job contract. Do not edit implementation.
+2. Prompt 073 resolution A must already have completed. Require exact evidence that the formatting
+   correction received a green full check and fresh `cutroom-sdk` and `reel-contract` journeys
+   both PASSed from clean trees. If it has not, stop: prompt 073 A is the only next work. Do not
+   substitute resolution B/C or rerun old evidence as startup.
+3. Read `AGENTS.md` / `CLAUDE.md`, `docs/context.md`, S-173, S-175, S-177 and S-180,
+   `docs/features/cutroom-sdk.md`, the SDK and contract manifests/tsconfigs/source, root workspace
+   and TypeScript configuration, package-related checks, SDK tests, `.gitignore`, and the journey
+   reader. Inspect emitted JavaScript/import behavior with the installed TypeScript version; do
+   not guess how `.ts` specifiers, declarations or workspace dependencies are rewritten.
 
-Authority and feature ownership
+Scope and non-goals
 
-5. Create two linked planning files, because D-115 assigns the two sides to different
-   authorities:
+4. The completed deliverables are standard npm-format package artifacts for:
 
-   - Cutroom: `docs/features/cutroom-sdk-v1.md` owns compiled/versioned SDK and contract
-     artifacts, the separately runnable engine release, the launcher contract, runtime
-     prerequisites, release verification, and rollback.
-   - KnowScroll: `steering/features/cutroom-integration.md` owns obtaining the release,
-     configuring its location without a machine-specific committed absolute path, constructing
-     `createCutroom`, submitting/following/reading/cancelling/resuming runs, lifecycle ownership,
-     and the KnowScroll-side journey.
+   - `@cutroom/reel-contract`: ESM JavaScript, declarations, public schemas/types and its runtime
+     `zod` dependency;
+   - `@cutroom/sdk`: ESM JavaScript, declarations, the existing public surface, and an ordinary
+     versioned dependency on `@cutroom/reel-contract`.
 
-   Each file has its own status, decisions, Gates 1–4, slices, Evidence and Divergence. Neither
-   feature may claim the other repository's work. Cross-link exact compatible versions and the
-   final joint acceptance journey.
+   The artifacts must be installable by an otherwise unrelated Node project. Their installed
+   manifests contain no `private: true`, `workspace:*`, source-checkout path, absolute path or
+   public `.ts` export. Their runtime contains no engine code, provider, database, ffmpeg, media,
+   secret, migration or generated state. Build/pack output goes to one configured gitignored
+   repository-relative directory and is never committed.
+5. Explicit non-goals: no KnowScroll adapter or file; no engine executable/bundle; no registry
+   publication or credentials; no operating-system installer/service; no release activation,
+   update or rollback manager; no dashboard; no new HTTP route; no database/schema change; no
+   provider call; no paid reel. Consumers decide where the engine lives and how they obtain and
+   configure it.
 
-Owner decisions required before gate approval
+Gate phase — approve before implementation
 
-6. Put each choice between alternatives in the authority that owns it, with Chose, Why,
-   Rejected, Caught-by and Confirmed-by. Ask the owner concise questions and do not invent an
-   answer. At minimum settle:
+6. Create `docs/features/cutroom-sdk-package.md` with the repository's required front matter,
+   `Status: planned`, one `Gates:` line, slices, Evidence and Divergence. Write all four gates,
+   review them adversarially, apply every finding, review again, and mark them APPROVED only when
+   no finding remains. No implementation file may exist before that approval.
+7. The gate document must contain the following implementation-ready sections:
 
-   - **Delivery channel.** Recommend a versioned local release for the one Linux machine, made of
-     immutable installable artifacts with checksums. Compare it with a private package registry,
-     a public registry, and a Git/source-checkout dependency. A source checkout, `workspace:*`,
-     or a sibling-repository path is not a v1 release.
-   - **Linux support matrix.** Name the distribution family, CPU architecture and minimum Node
-     version actually supported. The design must contain no PowerShell, `.cmd`, drive-letter,
-     backslash-path, Windows service, or Windows-only packaging assumption. Do not claim all
-     Linux distributions if only one is proved.
-   - **Installation owner and location.** Decide what installs/upgrades Cutroom, where immutable
-     releases live, how KnowScroll discovers the active release through configuration, and which
-     process owns rollback. Never commit a machine-specific absolute path.
-   - **Release/version compatibility.** Decide the v1 version identifiers for SDK, contract and
-     engine, the compatibility check at readiness, lock/checksum behavior, upgrade order, and
-     what happens when versions disagree.
-   - **Runtime prerequisites.** Decide whether Node, ffmpeg and native runtime dependencies are
-     bundled or host prerequisites, and how their exact versions are checked before a paid run.
-   - **Secrets and generated state.** Decide how the separate engine receives provider secrets
-     without KnowScroll or the SDK reading/logging them, and where its database, media and other
-     generated artifacts live under configured, gitignored paths.
+   **Feature summary (five sentences maximum).** The SDK behavior is already built and verified;
+   this feature turns its two public workspace packages into portable artifacts an unrelated
+   Node consumer can install and execute without Cutroom's source checkout or TypeScript loader.
 
-Required Gate 1 — Product
+   **Goals.** Reproducible build/pack command; compiled ESM and `.d.ts`; versioned compatible
+   manifests; clean external installation; runtime and type consumption; existing SDK behavior
+   unchanged; package contents and provenance inspectable.
 
-7. Write a feature summary of at most five sentences, the user-visible outcome and explicit
-   non-goals. Define deterministic numbered flows for:
+   **User flows (numbered and deterministic).** Build both artifacts; inspect them; install them
+   into a fresh temporary consumer outside the repository; import `@cutroom/sdk` with plain Node;
+   typecheck public use; join a ready stand-in; launch a consumer-supplied stand-in with
+   `process.execPath` and a JavaScript fixture; call every public method; close joined and owned
+   handles; reject an incompatible/malformed peer; rebuild and prove deterministic contents
+   except for explicitly named archive metadata.
 
-   1. clean Linux installation;
-   2. KnowScroll joining an already-ready engine;
-   3. KnowScroll starting an absent engine through the SDK's explicit command/vector;
-   4. submit, find/status, follow, result, record, cancel and resume;
-   5. creator-owned close and a joined handle's non-owning close;
-   6. upgrade and rollback;
-   7. missing artifact, bad checksum, missing prerequisite, incompatible version, failed child,
-      readiness timeout, malformed response and provider-secret absence.
-
-   The primary acceptance statement is: from a clean supported Linux host, KnowScroll installs
-   pinned v1 artifacts, starts with no Cutroom process, obtains a typed SDK handle, starts exactly
-   one separate engine, completes a no-provider acceptance run through the public methods, reads
-   its record/result, and closes only the process it created. A second flow proves joining an
-   existing engine starts and stops nothing.
-
-Required Gate 2 — Architecture
-
-8. Define the artifact graph and boundaries. At minimum account for:
-
-   - compiled ESM JavaScript and `.d.ts` for `@cutroom/reel-contract` and `@cutroom/sdk`;
-   - no public export that points at `.ts` source and no unresolved `workspace:*` in an installed
-     artifact;
-   - a separately runnable compiled Cutroom engine release whose stable entry is supplied to the
-     SDK as a literal command and argument vector with `shell: false`;
-   - the engine, not KnowScroll, owning providers, database, ffmpeg and generated media;
-   - the SDK importing only the public contract and Node built-ins;
-   - reproducible artifact contents, version metadata and checksums;
-   - atomic active-version selection and rollback without overwriting the previous release;
-   - no committed absolute path and no reliance on either repository's source-tree layout.
-
-   State why the chosen build/package technologies fit Node 22+ ESM and native dependencies.
-   Name every new or changed package, script, config, boundary rule and generated directory.
-
-9. Include strict interfaces. For every HTTP API used, use this exact schema:
+   **API definitions.** State that no API is added or changed. List the existing readiness and
+   run route families the SDK consumes using this strict shape for each:
 
    - Name:
    - Type: REST
@@ -130,78 +85,92 @@ Required Gate 2 — Architecture
    - Idempotency:
    - Rate Limits:
 
-   Reuse the existing readiness and run routes; do not invent a second engine protocol merely for
-   packaging. Define a strict release manifest schema containing artifact name, semantic version,
-   contract version, supported platform/architecture, minimum Node version, entry point,
-   dependency/prerequisite versions and SHA-256 checksums. Define the launcher configuration
-   schema and the KnowScroll configuration boundary. If no data table changes, say explicitly:
-   `New tables: none; modified tables: none; migrations: none`, and explain why installation
-   state belongs outside the product database.
+   **Data model.** Write exactly: `New tables: none; modified tables: none; migrations: none` and
+   explain that packaging creates no product state.
 
-10. Specify state transitions for release installation and SDK lifecycle. Installation must cover
-    absent -> staged -> verified -> active, failure back to absent/previous active, and rollback.
-    SDK lifecycle must preserve probing -> joined or owned -> closed, including the fixed-port race.
+   **State transitions.** Preserve the existing SDK lifecycle only: constructing -> probing ->
+   joined or owned -> closed, including readiness polling and the fixed-port race. Package build
+   state is source -> compiled staging -> validated artifact; any failure abandons staging and
+   produces no accepted artifact.
 
-Required Gate 3 — Program design and failures
+   **Edge cases.** Wrong/missing package version; unresolved workspace dependency; `.ts` export;
+   missing declaration; CommonJS consumer requesting unsupported CJS; incompatible Node version;
+   archive containing files not explicitly allowed; package import resolving into the Cutroom
+   checkout; consumer-supplied launcher missing/failing; malformed readiness; redirect; timeout;
+   two callers; close ownership. Give each an exact result and catcher.
 
-11. Define modules and one owner for each responsibility: compiler/builder, package manifest
-    rewriter, release assembler, checksum verifier, installer/activator, engine entry, SDK client,
-    KnowScroll adapter and acceptance harness. No module may silently combine package creation,
-    installation and activation.
-12. Enumerate edge cases and exact outcomes: partial install, checksum mismatch, interrupted
-    activation, stale active pointer, wrong CPU architecture, wrong Node/native ABI, missing
-    ffmpeg, unwritable configured directories, occupied port by a non-Cutroom peer, ready=false,
-    contract mismatch, two KnowScroll callers, early engine exit, SIGTERM/normal shutdown,
-    invalid request, malformed response, and restart after a crashed owner.
-13. Define security and privacy: release integrity, least-privilege file permissions, no shell
-    command string, loopback only, no secret in argv/manifest/log/error, no media/database/release
-    artifact committed, and no provider key readable by KnowScroll or SDK code.
-14. Define operations and observability without adding a dashboard: structured lifecycle/release
-    events with no secrets, version and readiness diagnostics, retained install/rollback receipts,
-    and a concise Linux runbook. State expected load (five users, one machine), readiness bound,
-    availability expectation and disk cleanup policy.
+   **Security/operations.** No secret, media, database, environment snapshot, absolute path or
+   source map with a source-tree path in either archive. The SDK remains loopback-only, uses
+   `shell: false`, and logs no consumer command, arguments or environment. There is no runtime
+   telemetry or update service.
 
-Required Gate 4 — Slices and proof
+   **Portability.** Package code uses Node/ESM and Node process APIs only, contains no native
+   dependency and makes no Windows, Linux or macOS path/shell assumption. Tests use
+   `process.execPath`, temporary directories and path/URL APIs, never `cmd`, PowerShell, bash,
+   drive letters, `/tmp`, `/bin`, or hard-coded separators. Claim package portability by this
+   boundary; do not claim a separately supplied engine or consumer launcher was packaged.
 
-15. Write a dependency-ordered slice plan. It must begin with impact/baseline and end with a
-    generated joint acceptance result. Separate at least:
+   **Non-functional requirements.** Node support follows the repository's declared minimum;
+   packing is offline after dependencies are installed; the installed SDK adds no network call
+   except its explicit loopback requests; creation is deterministic and leaves a clean tree;
+   expected load is unchanged because packaging adds no runtime service.
 
-    - artifact and compatibility contract;
-    - compiled public packages;
-    - compiled engine release and runtime-prerequisite checks;
-    - installer/activation/rollback;
-    - KnowScroll adapter and configuration;
-    - Linux cross-repository acceptance journey;
-    - final Cutroom and affected-feature re-journeys.
+   **Implementation handoff.** Exact files/bounded directories, build technology and rationale,
+   affected-test inventory, deliberate breaks, verification commands, journey impact and stop
+   conditions for each slice.
 
-   For every slice name exact files or bounded directories, tests written red first, deliberate
-   breaks, boundary proof, verification command, commit/evidence rule and stop condition. Re-run
-   test impact after each slice; never guess a re-journey list in advance.
-16. The Linux acceptance harness must start from a clean temporary install root outside both
-    source trees and must use produced artifacts, not workspace links. It proves checksums, package
-    import/type surface, absent-engine launch, existing-engine join, fixed-port race, every SDK
-    method against a no-provider stand-in or deterministic engine fixture, creator-owned close,
-    non-owning close, incompatible-version refusal and rollback. It must fail if an installed file
-    resolves into either source checkout.
-17. Define rollout: build immutable candidate, verify in a clean Linux environment, activate one
-    version, integrate pinned KnowScroll configuration, run the joint journey, then retain the
-    prior version for rollback. No paid provider call belongs to packaging proof. A later optional
-    real-reel smoke may run only under its existing budget and secret rules.
+8. Gate review rejects: a KnowScroll-specific file/type; engine packaging; OS-specific commands;
+   a source checkout/link as the acceptance consumer; `private`, `0.0.0`, `workspace:*` or `.ts`
+   exports in shipped manifests; committed build artifacts; duplicated contract schemas;
+   bundling `zod` without an explicit choice; CJS without a proven need; registry publication; or
+   a package test that imports workspace source instead of the installed artifact.
 
-Adversarial review and output
+Implementation phase — only after all gates are approved
 
-18. Review both gate files adversarially against their own repository rules and against each
-    other. Reject approval for any source-checkout dependency, Windows-only assumption,
-    `workspace:*` leakage, TypeScript export in installed packages, shell launcher, unversioned
-    artifact, unverified checksum, bundled secret, committed absolute path, in-process engine,
-    second worker, hand-written evidence, or acceptance test that runs against source instead of
-    installed artifacts.
-19. Apply review corrections to the gate documents, review again, and mark gates approved only
-    when no finding remains. Update each repository's decisions, context/state inputs and journal
-    under its own rules. Run document-only checks only; no implementation or feature journey.
-20. Finish with a clean tree in each repository and write the next implementation prompt for
-    Slice 0/1 only. That prompt must not exist until both linked gate sets are approved. Stop;
-    do not begin the build, `self-heal`, or another feature.
+9. Implement tests first. Add one package-owner test (prefer
+   `tests/cutroom-sdk-package.test.ts`) that initially fails against current workspace-only
+   manifests. It builds and inspects both archives, then creates a fresh temporary consumer
+   outside the checkout and installs them with a normal package-manager operation. The consumer
+   is not a Cutroom workspace and fails if resolution or a source map reaches the checkout.
+10. Choose the smallest build design the approved gates support. Prefer TypeScript's compiler and
+    a staging manifest over a new bundler unless inspection proves it cannot emit correct ESM and
+    declarations. Keep workspace development working; ordinary tests must not depend on stale
+    `dist`. One repository command builds/packs both packages in dependency order and cleans stale
+    staging before use.
+11. Archive tests assert exact allowed files, package names and v1 versions; ESM exports point to
+    `.js`; declaration exports point to `.d.ts`; the SDK declares the compatible contract version;
+    the contract declares `zod`; neither archive contains `workspace:*`, `private: true`, `.ts`
+    runtime source, tests, docs, secrets, media, database, absolute paths or internal packages.
+12. The installed-consumer proof uses plain `node`, with no `tsx`, TypeScript stripping, loader,
+    workspace link or repository `NODE_PATH`. It imports every runtime export, typechecks every
+    public type, runs route behavior through a stand-in, and exercises the launcher using
+    `process.execPath` plus a JavaScript fixture. Cover join, start, readiness, fixed-port race,
+    all public methods, both close ownership paths and stable typed errors. No real engine,
+    provider, database, ffmpeg, media or secret.
+13. Prove the test with deliberate breaks, each restored: restore a `.ts` export; leave
+    `workspace:*`; omit the contract archive; remove one `.d.ts`; add an absolute/source path;
+    resolve the consumer import to workspace source; use a shell launcher; and remove one public
+    export. Record the exact assertion each turns red.
+14. Update workspace/package checks and boundaries only where the approved package contract
+    requires it. Do not weaken existing SDK boundaries. Build output stays ignored and is removed
+    before the final clean-tree check.
+
+Evidence and completion
+
+15. Package/workspace/build behavior requires the full `node scripts/check.mjs`, not `--slice`.
+    Record `Verification: full`, exact tree and affected tests in commit trailers per S-177.
+16. Run `node scripts/journey.mjs cutroom-sdk-package` from a clean tree exactly once. On PASS,
+    commit generated evidence alone. Then run the impact report's exact affected journeys from
+    clean trees; review `cutroom-sdk` and `reel-contract`, but do not guess or widen the list before
+    impact review. Stop and commit the first generated FAIL.
+17. SDK v1 is complete from Cutroom's side only when prompt 073 A's evidence chain is green; both
+    artifacts build from a clean checkout; the external consumer installs, imports, typechecks and
+    exercises them without Cutroom source resolution; package and exact affected journeys PASS;
+    artifacts are absent from Git; and the tree is clean.
+18. Update `docs/context.md`, `JOURNAL.md` and this prompt's Run line; run the document-only check;
+    commit the close-out and stop. Do not integrate a consumer, publish packages, package the
+    engine, or start `self-heal`. Report the reproducible build/pack command and verified artifact
+    names so any consumer can take over.
 ```
 
 ## Run
