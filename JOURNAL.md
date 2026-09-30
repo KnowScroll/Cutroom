@@ -5,33 +5,13 @@ are preserved byte-for-byte in [the historical journal](docs/history/JOURNAL-thr
 archive only by its session heading. New entries state the decision, commit/evidence reference and next action;
 feature files, commit messages and verification trailers carry the durable detail (S-177).
 
-## 2026-09-29 — session 68, `cutroom-sdk` Slice 2 review corrections committed
+## 2026-09-29 — sessions 68–70, `cutroom-sdk` Slices 2–3 completed
 
-**Decision.** Correct three review findings and one housekeeping gap from Slice 2: explicit `redirect: 'manual'`
-on every SDK fetch; the public-surface test references all six exported SDK types; `normaliseLoopbackOrigin`
-accepts explicit `:80` while still rejecting no-port origins; `PROMPTS/065` is staged and committed. Full reasoning
-and observed numbers live in the appended archive entry below.
+**Decision.** Correct Slice 2's redirect, public-surface and explicit-port findings, then build Slice 3's explicit
+launcher, bounded readiness, fixed-port race joining and creator-owned shutdown. The final correction changed
+runtime and boundary behavior, so its exact tree received fresh full evidence. Full reasoning is in the archive.
 
-**Next.** Commit the corrections alone with `Verification: targeted`, run `verification-status.mjs`; no Slice 3.
-
-## 2026-09-29 — session 69, `cutroom-sdk` Slice 3 complete
-
-**Decision.** Build `PROMPTS/069-cutroom-sdk-slice-3.md`: explicit launcher, bounded readiness polling, fixed-port
-race joining, and creator-owned stdin shutdown. Starting authority `45b9de9` (tree `143d0bc…`). Full reasoning in
-the archive.
-
-**Next.** Slice 4 (journey and re-journeys) is unstarted. Do not begin it in this session.
-
-## 2026-09-29 — session 70, `cutroom-sdk` Slice 3 corrective evidence
-
-**Decision.** Repair the incomplete Slice 3 correction on top of `3ee3ffc` without beginning Slice 4. The prior
-`416c977` verification remains valid for its own tree; this correction requires new full evidence because it changes
-runtime behavior, boundary configuration, and `drift --prove`.
-
-**Evidence.** `node scripts/check.mjs` green at this commit; trailer `Verification: full`, `Verification-Tree` is the
-tree the trailers bind. Affected tests named in the commit. Full reasoning and observed numbers live in the archive.
-
-**Next.** Stop after the correction is evidence-bound. Slice 4's journey and re-journeys remain unstarted.
+**Evidence.** `node scripts/check.mjs` green; commit trailers bind the full verification tree. **Next.** Slice 4.
 
 ## 2026-09-29 — session 71, `cutroom-sdk` Slice 4 execution planned
 
@@ -77,3 +57,9 @@ The owner decides whether the file is reformatted (and its new tree given a fres
 ## 2026-09-30 — session 75, prompt 073 resolution A — SDK PASS, re-journey FAIL on format
 
 **Decision.** Run resolution A exactly: prettier the failing Markdown, full `check.mjs` with `Verification: full`, then the two journeys from clean trees in Slice 4 order. **Outcome.** `48a6746` (full green, tree `85cd3ec2`); SDK journey PASS at `3226321`; `reel-contract` re-journey FAIL on format at `647c5e6` — the SDK journey itself appends a trailing blank line to `docs/features/cutroom-sdk.md`, which `prettier --check` rejects; no reel-contract test failed. **Decision.** Stop per Slice 4; nothing weakened.
+
+## 2026-09-30 — session 76, future `reel-series` recorded
+
+**Decision.** S-181 and `docs/features/reel-series.md` record one topic brief plus `n` as an ordered editorial arc
+of `n` distinct, complete reels, planned together and made serially. It is neither variants nor split fragments;
+its gates, API and queue order remain unwritten. **Next.** Finish SDK v1 before scheduling future feature gates.

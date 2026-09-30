@@ -7777,3 +7777,37 @@ media and committed build output.
 itself ... We just have to make the sdk and thats all we dont care who use it. It should work."_
 
 ---
+
+## S-181 | 2026-09-30 | A topic brief and count create an ordered series of distinct reels
+
+**Chose.** A future `reel-series` feature accepts one topic-level brief and a positive integer `n`. Before making
+media, it designs exactly `n` ordered reel briefs that form one editorial arc. Each entry has its own angle and is a
+complete reel in its own right; the entries are neither duplicates nor arbitrary fragments of one long reel. After
+the series plan is accepted, Cutroom makes those reels serially, in playlist order, by invoking the existing
+single-reel workflow once for each entry. The feature's gates will decide its public API, plan-approval point,
+failure and resume behavior, limits, storage and result shape; this decision adds no implementation or queue order.
+
+**Why.** A subject such as CPUs can support a sequence — origins, major advances, then the present — whose value
+comes from progression across episodes. Asking the ordinary single-reel workflow for the same brief three times
+would produce variants rather than a deliberate series, while splitting one reel would leave fragments that do not
+stand alone. Planning the whole arc first makes order and distinctness explicit; executing it serially preserves the
+owner's requested episode order and avoids silently turning this into concurrency work.
+
+**Rejected.** **`n` takes or variants of the same brief** — repetition is not a series. **One long reel cut into `n`
+pieces** — the requested outputs are individually coherent reels, not incomplete chapters produced by chopping.
+**`n` unrelated prompts sharing only a keyword** — they need a planned progression. **Parallel batch generation** —
+that is a throughput concern, while this feature explicitly makes the ordered episodes serially. **Changing the
+current single-reel SDK request now** — the gates must first decide whether series orchestration belongs in the
+public engine/SDK contract or above the existing per-reel operation.
+
+**Caught by.** The future journey submits a CPU topic with `n = 3` and requires a series plan containing exactly
+three ordered, semantically distinct, individually complete reel briefs whose sequence forms a reviewable arc. It
+rejects zero, negative and out-of-policy counts; detects duplicate or merely segmented entries; proves no second
+reel starts while the previous one is active; and returns stable series and per-reel identities in playlist order.
+Contract, persistence, interruption, partial-result, resume and first-failure checks are written only after the four
+gates settle their behavior.
+
+**Confirmed-by.** The owner, 2026-09-30: _"cutroom users will give a brief and a number n"_ and Cutroom will make
+_"n reels with that topic"_ as _"a playlist of serial order"_, not _"3 reels on the same brief expanded"_.
+
+---
