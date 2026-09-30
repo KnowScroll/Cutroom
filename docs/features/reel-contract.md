@@ -476,6 +476,7 @@ _Behaviour — against the stand-in_
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-30 journey=FAIL at 5bd079c — the check 'format' failed
 - 2026-09-28 journey=PASS at 45b758f — every check green; 42 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-22 journey=PASS at cd18a22 — every check green; 41 tests in tests/reel-contract-*.test.ts pass
 - 2026-09-22 journey=PASS at 24a79ed — every check green; 41 tests in tests/reel-contract-*.test.ts pass
@@ -487,7 +488,7 @@ _Behaviour — against the stand-in_
 
 ## Divergence (the first broken boundary, or "none")
 
-none
+the check 'format' failed
 
 ## Pending human decisions
 
