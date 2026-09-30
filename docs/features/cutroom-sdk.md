@@ -380,10 +380,11 @@ SDK's contract is the explicit `launcher` option, not this repository's source l
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-10-01 journey=FAIL at 3a202b0 — the check 'tests' failed
 - 2026-09-30 journey=PASS at 1c7c77d — every check green; 65 tests in tests/cutroom-sdk-*.test.ts pass
 - 2026-09-30 journey=PASS at 48a6746 — every check green; 65 tests in tests/cutroom-sdk-*.test.ts pass
 - 2026-09-30 journey=PASS at 18e9a48 — every check green; 65 tests in tests/cutroom-sdk-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
-none
+the check 'tests' failed
