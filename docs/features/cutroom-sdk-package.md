@@ -5,7 +5,7 @@ authority: plan
 
 # cutroom-sdk-package — portable installable SDK and contract artifacts a consumer can install without Cutroom's source
 
-Status: planned
+Status: verified
 Gates: product APPROVED 2026-09-30 adversarial-reviewer · architecture APPROVED 2026-09-30 adversarial-reviewer · program-design APPROVED 2026-09-30 adversarial-reviewer · slices APPROVED 2026-09-30 adversarial-reviewer
 
 > **Created 2026-09-30 in this repository at the owner's request** (S-180). This finishes SDK v1 on
@@ -579,4 +579,8 @@ A third pass confirmed no finding remains. The four gates are APPROVED.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-10-01 journey=PASS at 2e66370 — every check green; 19 tests in tests/cutroom-sdk-package-*.test.ts pass
+
 ## Divergence (the first broken boundary, or "none")
+
+none
