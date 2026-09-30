@@ -61,3 +61,17 @@ No test command ran: the owner asked to reuse the already completed Slice 3 evid
 
 **Next.** Run `PROMPTS/072-cutroom-sdk-slice-4.md`. A journey is Slice 4's required proof and therefore cannot be
 substituted with the reused Slice 3 result; on its first FAIL, commit the generated finding and stop.
+
+## 2026-09-29 — session 72, `cutroom-sdk` Slice 4 executed
+
+**Decision.** Tick Slice 4 in a clean documentation-only preparation commit, run `node scripts/journey.mjs cutroom-sdk`,
+commit its generated result, then run `node scripts/journey.mjs reel-contract` once from a clean tree and commit that
+result. Startup: `decisions.mjs` (pin `e05e9f0`, 115, 0 unpushed); `drift.mjs` (146 modules, 0 violations); HEAD
+`092b271`, base `ae0599a` Slice 3 corrective full; Slice 3 evidence read and not re-run.
+
+**Evidence.** `node scripts/check.mjs --changed` on the preparation tree (tick in `docs/features/cutroom-sdk.md` line
+360, this entry, `docs/context.md` session-72 row, `PROMPTS/README.md` Run line for prompt 072). A document-only check
+is not the journey's evidence.
+
+**Next.** Run `node scripts/journey.mjs cutroom-sdk` exactly once, then on PASS
+`node scripts/journey.mjs reel-contract` exactly once. Stop on the first journey FAIL.

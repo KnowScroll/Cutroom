@@ -102,6 +102,18 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-09-29 · session 72
+
+- `cutroom-sdk` Slice 4 is now eligible for judgment. The Slice 4 checkbox in `docs/features/cutroom-sdk.md` (line 360)
+  is ticked; nothing else in the feature file, no source, test, contract, boundary rule, provider, database, media,
+  secret or runtime behaviour was changed. `JOURNAL.md` records the session-72 decision and evidence references;
+  `PROMPTS/README.md` updates the Run line for prompt 072. `node scripts/check.mjs --changed` ran green on the
+  documentation-only preparation tree (this session's date / commit / next are above). Slice 3's full evidence at
+  `ae0599a` was read through `verification-status.mjs` and not re-run; the document-only check is not the journey.
+- HEAD began at `092b271` (4 commits ahead of `origin/main`); the preparation tick commit is made before the SDK
+  journey runs. On its PASS the generated SDK result is committed, then `node scripts/journey.mjs reel-contract`
+  runs once from a clean tree as the sole compatibility re-journey. Slice 4 stops on the first journey FAIL.
+
 ### 2026-09-29 · session 71
 
 - `cutroom-sdk` Slice 4 is now explicit and planned, not silently absent from the journey gate. S-178 fixes its
@@ -263,17 +275,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - `PROMPTS/055` — new: the two explainer reels again, brief B as it last ran and brief A as approved, a DNS lookup
   checked before every run (P-020). `resume-failed` renumbered 056 (`PROMPTS/056`, its feature file's pointer).
   `PROMPTS/README.md` — the rows and a note.
-
-### 2026-09-26 · session 54
-
-- Five real runs of the game graphics reel, none completed, 126¢: `a1cb6cfb` stopped at Gate 5 (a plural criterion id
-  as a subject's name; lettering on hardware), then four failed on the network — the last two read to this machine's DNS,
-  which takes 11 s on fal's IPv6 lookup against fetch's 10 s. JoJo never ran. The Runs table above; every run and brief
-  B as it last ran in `JOURNAL.md`.
-- `docs/reel-pitfalls.md` — P-017 to P-020 (lettering on objects that carry it; a plural id; a named game's character;
-  the DNS) and their short-list rows. `docs/research/refusals.md` — counts and ledger to 46 runs; the first
-  image-to-video takes refused.
-- `PROMPTS/054` and `PROMPTS/README.md` — the Run line. `scripts/real-reel.mjs` put back as HEAD has it.
 
 ## Where to look
 

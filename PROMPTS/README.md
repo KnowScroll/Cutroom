@@ -57,7 +57,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 064 | [064-cutroom-sdk-slice-1.md](064-cutroom-sdk-slice-1.md)                               | `cutroom-sdk`   | correct Slice 0, then Slice 1  | 2026-09-28 | session 64               |
 | 065 | [065-cutroom-sdk-slice-2.md](065-cutroom-sdk-slice-2.md)                               | `cutroom-sdk`   | Slice 2                        | 2026-09-29 | session 66               |
 | 069 | [069-cutroom-sdk-slice-3.md](069-cutroom-sdk-slice-3.md)                               | `cutroom-sdk`   | Slice 3                        | 2026-09-29 | session 69               |
-| 072 | [072-cutroom-sdk-slice-4.md](072-cutroom-sdk-slice-4.md)                               | `cutroom-sdk`   | Slice 4 journey                | 2026-09-29 | not yet run              |
+| 072 | [072-cutroom-sdk-slice-4.md](072-cutroom-sdk-slice-4.md)                               | `cutroom-sdk`   | Slice 4 journey                | 2026-09-29 | session 72               |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
