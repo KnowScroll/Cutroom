@@ -30,11 +30,15 @@ git and the journal keep them.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
 - **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). The
   `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
-  the `reel-contract` re-journey at `6a95a8d` PASSed at `c15b2d4`. Next run `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`:
-  approve the minimal package gates, build portable installable `@cutroom/sdk` and `@cutroom/reel-contract` artifacts,
-  and prove them from a temporary external consumer. No KnowScroll file, engine package, installer, registry publication
-  or deployment work belongs to Cutroom. SDK v1 is complete when the consumer-neutral package journey and exact affected
-  re-journeys PASS. Then come `self-heal`, session 53's P-013/P-014 findings, `caption-match`, `composed-hold`,
+  the `reel-contract` re-journey at `6a95a8d` PASSed at `c15b2d4`. **`PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`
+  is complete**: the `cutroom-sdk-package` journey PASSed at `2e66370` (every check green, 19 tests in
+  `tests/cutroom-sdk-package-*.test.ts`); the `cutroom-sdk` re-journey at `5acba17` PASSed at `7c648d2`
+  (84 tests after the package-owner test joined the `cutroom-sdk-*` glob; one transient FAIL was recorded
+  per Slice 4 / S-178 and then superseded); the `reel-contract` re-journey at `7c648d2` PASSed at
+  `6001657` (42 tests, no change). Reproducible build: `node scripts/package-sdk.mjs`; verified
+  artifacts: `.package-staging/cutroom-reel-contract-1.0.0.tgz` and `.package-staging/cutroom-sdk-1.0.0.tgz`.
+  No KnowScroll file, engine package, installer, registry publication or deployment work belongs to Cutroom.
+  Then come `self-heal`, session 53's P-013/P-014 findings, `caption-match`, `composed-hold`,
   `diagram-shots`, `code-reels`, and `parallel-shots`' gates from `b15d203`.
 - **KnowScroll and the engine** (S-173, settled session 57): the engine stays its own process (D-098); KnowScroll
   calls it through `@cutroom/sdk`, which connects to it, or starts the service as a child when none answers. D-099 in
@@ -100,6 +104,16 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-01 · session 78
+
+- `docs/features/cutroom-sdk-package.md` records the four-gate approval of the consumer-neutral portable SDK and contract packaging feature (S-180); the prompt's rejection criteria are applied one by one in the Adversarial review section. Every implementation file (the gate doc, `scripts/package-sdk.mjs`, each `tsconfig.build.json`, the package-owner test) follows.
+- `scripts/package-sdk.mjs` wipes `.package-staging/`, runs each package's `tsconfig.build.json` with `--allowImportingTsExtensions --rewriteRelativeImportExtensions`, writes a staged manifest (real version `1.0.0`, no `private`, no `workspace:*`, ESM `.js` exports, versioned `@cutroom/reel-contract` dep), and packs via `corepack pnpm` invoked through Node directly (no shell). Source-tree `packages/{sdk,reel-contract}/package.json` are unchanged — the workspace keeps `private: true`, `workspace:*`, `0.0.0`, `.ts` exports.
+- `.gitignore` gains `.package-staging/` (D-086 form, one configured path, gitignored default).
+- `tests/cutroom-sdk-package-build.test.ts` (pluralized so the journey glob matches) builds the artifacts first, inspects every archive entry and staged manifest field, then installs both tarballs into a fresh `mkdtempSync(os.tmpdir(), …)` consumer outside the workspace with `pnpm.overrides` pointing at the contract tarball and `--ignore-workspace --prefer-offline`, exercises plain-Node import, typechecks public types with `tsc --noEmit`, and runs the launcher through `process.execPath` plus a JavaScript fixture that binds to a free port and answers strict `{ contractVersion: 1, ready: true }`. Eight deliberate-break tests cover `.ts` runtime export, `workspace:*`, omitted contract archive, removed `.d.ts`, absolute path, workspace-source symlink, `cmd` shell launcher, and removed public export (`close`); each restores before the next runs.
+- `tests/cutroom-sdk-*.test.ts` now also matches `tests/cutroom-sdk-package-build.test.ts`, so the cutroom-sdk journey now exercises 84 tests (65 prior in routes, launcher, and readiness, plus the 19 from the package-owner test).
+- Journey: `cutroom-sdk-package` at `2e66370` PASS (every check green, 19 tests, `Verification: full`); `cutroom-sdk` re-journey at `5acba17` PASS (84 tests, one transient FAIL at `3a202b0` recorded per Slice 4 / S-178 in `docs/features/cutroom-sdk.md`'s Evidence before passing on the second run); `reel-contract` re-journey at `7c648d2` PASS (42 tests, no change).
+- SDK v1 is complete on Cutroom's side per S-180: reproducible build `node scripts/package-sdk.mjs` produces `.package-staging/cutroom-reel-contract-1.0.0.tgz` and `.package-staging/cutroom-sdk-1.0.0.tgz`; any consumer can install them and exercise the SDK contract. Per S-180, no KnowScroll integration, engine package, registry publication, OS installer, release manager, telemetry or update service is added. `self-heal` is the next queue item (S-168).
 
 ### 2026-09-30 · session 77
 

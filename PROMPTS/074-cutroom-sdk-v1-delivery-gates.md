@@ -175,4 +175,4 @@ Evidence and completion
 
 ## Run
 
-not yet run
+session 78, 2026-10-01 — all four gates APPROVED (`95017c9`); staged manifests, tsconfig.build.json, scripts/package-sdk.mjs, .gitignore .package-staging/, tests/cutroom-sdk-package-build.test.ts (artifact inspection, fresh-consumer proof, eight deliberate breaks); journey PASS at `2e66370` (every check green, 19 tests); re-journeys `cutroom-sdk` and `reel-contract` PASS at `5acba17`/`7c648d2` (the cutroom-sdk re-journey reported one transient FAIL at `3a202b0` before passing on a second run, recorded in evidence per Slice 4 / S-178); final tree clean; reproducible build command is `node scripts/package-sdk.mjs`; verified artifact names are `.package-staging/cutroom-reel-contract-1.0.0.tgz` and `.package-staging/cutroom-sdk-1.0.0.tgz`.
