@@ -543,7 +543,7 @@ A third pass confirmed no finding remains. The four gates are APPROVED.
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — package owner test and gates.** Add `docs/features/cutroom-sdk-package.md`
+- [x] **Slice 1 — package owner test and gates.** Add `docs/features/cutroom-sdk-package.md`
       with the four gates approved by an adversarial reviewer. Add
       `tests/cutroom-sdk-package.test.ts` that initially fails against the current
       workspace-only state (private manifests, `workspace:*` deps, `.ts` exports, no
@@ -553,13 +553,15 @@ A third pass confirmed no finding remains. The four gates are APPROVED.
       call is `node scripts/package-sdk.mjs`; until that script is added, the test fails
       with `ENOENT`. The next failing assertion documents the missing manifests inside
       the (non-existent) tarballs. `scripts/check.mjs --changed` stays green on the
-      documentation/test-only commit.
-- [ ] **Slice 2 — staged manifests and build/pack script.** Add `scripts/package-sdk.mjs`,
+      documentation/test-only commit. ✅ 2026-09-30 at `95017c9` (gates); `2b77329` (test
+      stub + build script)
+- [x] **Slice 2 — staged manifests and build/pack script.** Add `scripts/package-sdk.mjs`,
       each `tsconfig.build.json`, the `.package-staging/` gitignore entry, and the
       staged manifests. The build script produces both tarballs; the archive-inspection
       tests in the package test pass; the deliberate-break tests still turn exactly
       one assertion red. Full `node scripts/check.mjs` is green for the workspace.
-- [ ] **Slice 3 — external consumer proof.** The package test creates a fresh temp
+      ✅ 2026-09-30 at `2b77329`
+- [x] **Slice 3 — external consumer proof.** The package test creates a fresh temp
       consumer outside the checkout, installs both tarballs via `pnpm install` against
       `file:` deps, exercises every public SDK method through plain `node`, typechecks
       the consumer with the installed declarations, runs the launcher through
@@ -567,7 +569,8 @@ A third pass confirmed no finding remains. The four gates are APPROVED.
       fixed-port race (referenced; the existing Slice 3 evidence owns the live race),
       all public methods, both close ownership paths and stable typed errors, restores
       each deliberate break, and proves the artifact contents are deterministic. Full
-      `node scripts/check.mjs` is green.
+      `node scripts/check.mjs` is green. ✅ 2026-09-30 at `af5611b` (consumer proof + six
+      breaks) and `94afd45` (shell launcher + close-export breaks)
 - [ ] **Slice 4 — journey and re-journeys.** Tick this slice in a clean documentation-only
       preparation commit; run `node scripts/journey.mjs cutroom-sdk-package` exactly once;
       on PASS, commit the generated evidence alone; run the impact report's exact
