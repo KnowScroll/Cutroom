@@ -9,28 +9,24 @@ feature files, commit messages and verification trailers carry the durable detai
 
 **Decision.** Correct three review findings and one housekeeping gap from Slice 2: explicit `redirect: 'manual'`
 on every SDK fetch; the public-surface test references all six exported SDK types; `normaliseLoopbackOrigin`
-accepts explicit `:80` while still rejecting no-port origins; `PROMPTS/065` is staged and committed. Full reasoning,
-four finding bullets, observed numbers and amended-test list live in the appended archive entry below.
+accepts explicit `:80` while still rejecting no-port origins; `PROMPTS/065` is staged and committed. Full reasoning
+and observed numbers live in the appended archive entry below.
 
-**Next.** Commit the corrections alone with `Verification: targeted`, `Verification-Tree: <exact tree>`,
-`Verification-Tests: tests/cutroom-sdk-routes.test.ts tests/workspace.test.ts tests/boundaries.test.ts`;
-run `node scripts/verification-status.mjs` against the committed tree; do not begin Slice 3.
+**Next.** Commit the corrections alone with `Verification: targeted`, run `verification-status.mjs`; no Slice 3.
 
 ## 2026-09-29 — session 68, `cutroom-sdk` Slice 3 handoff written
 
 **Decision.** `PROMPTS/069-cutroom-sdk-slice-3.md` is the next-session handoff: explicit launcher configuration,
-bounded strict readiness polling, fixed-port race joining, and creator-owned stdin shutdown only. It starts from
-Slice 2 correction commit `45b9de9`, whose tree `143d0bc4f3054ecacf854b8f5ff32a3c5a3d36b9` has valid targeted evidence.
-Full reasoning lives in the appended archive entry below.
+bounded strict readiness polling, fixed-port race joining, and creator-owned stdin shutdown only. Starts from
+`45b9de9` (tree `143d0bc…`, targeted evidence). Full reasoning in the archive.
 
-**Next.** Session 69 runs `PROMPTS/069-cutroom-sdk-slice-3.md`; it must not begin Slice 4's journey or re-journeys.
+**Next.** Session 69 runs `PROMPTS/069-cutroom-sdk-slice-3.md`; no Slice 4.
 
 ## 2026-09-29 — session 69, `cutroom-sdk` Slice 3 complete
 
 **Decision.** Build `PROMPTS/069-cutroom-sdk-slice-3.md`: explicit launcher, bounded readiness polling, fixed-port
-race joining, and creator-owned stdin shutdown. Starting authority `45b9de9` with evidence-bound tree
-`143d0bc4f3054ecacf854b8f5ff32a3c5a3d36b9`. Full reasoning, three implementation bugs and observed numbers live in
-the appended archive entry below.
+race joining, and creator-owned stdin shutdown. Starting authority `45b9de9` (tree `143d0bc…`). Full reasoning in
+the archive.
 
 **Next.** Slice 4 (journey and re-journeys) is unstarted. Do not begin it in this session.
 
@@ -41,10 +37,7 @@ the appended archive entry below.
 runtime behavior, boundary configuration, and `drift --prove`.
 
 **Evidence.** `node scripts/check.mjs` green at this commit; trailer `Verification: full`, `Verification-Tree` is the
-tree the trailers bind. Exact affected tests: `tests/cutroom-sdk-launcher.test.ts`, `tests/cutroom-sdk-routes.test.ts`,
-`tests/cutroom-sdk-readiness.test.ts`, `tests/boundaries.test.ts`, `tests/paid-path-keys.test.ts`,
-`tests/reel-render-rules.test.ts`, `tests/reel-stills-rules.test.ts`. Full reasoning and observed numbers live in
-the appended archive entry below.
+tree the trailers bind. Affected tests named in the commit. Full reasoning and observed numbers live in the archive.
 
 **Next.** Stop after the correction is evidence-bound. Slice 4's journey and re-journeys remain unstarted.
 
@@ -59,19 +52,24 @@ public contract evidence amended; Slice 2 and Slice 3 changed SDK-owned code, te
 **Evidence.** `node scripts/verification-status.mjs` reports `ae0599a` has full verification for its exact tree.
 No test command ran: the owner asked to reuse the already completed Slice 3 evidence rather than rerun it as startup.
 
-**Next.** Run `PROMPTS/072-cutroom-sdk-slice-4.md`. A journey is Slice 4's required proof and therefore cannot be
-substituted with the reused Slice 3 result; on its first FAIL, commit the generated finding and stop.
+**Next.** Run `PROMPTS/072-cutroom-sdk-slice-4.md`; on its first FAIL, commit the generated finding and stop.
 
-## 2026-09-29 — session 72, `cutroom-sdk` Slice 4 executed
+## 2026-09-30 — session 72, `cutroom-sdk` Slice 4 executed — SDK PASS, re-journey FAIL
 
-**Decision.** Tick Slice 4 in a clean documentation-only preparation commit, run `node scripts/journey.mjs cutroom-sdk`,
-commit its generated result, then run `node scripts/journey.mjs reel-contract` once from a clean tree and commit that
-result. Startup: `decisions.mjs` (pin `e05e9f0`, 115, 0 unpushed); `drift.mjs` (146 modules, 0 violations); HEAD
-`092b271`, base `ae0599a` Slice 3 corrective full; Slice 3 evidence read and not re-run.
+**Decision.** Tick Slice 4 in a clean documentation-only preparation commit, run the SDK journey, then the one
+`reel-contract` re-journey. Startup: `decisions.mjs` (pin `e05e9f0`, 115, 0 unpushed); `drift.mjs` (146 modules,
+0 violations); HEAD `092b271`; Slice 3 evidence at `ae0599a` read and not re-run.
 
-**Evidence.** `node scripts/check.mjs --changed` on the preparation tree (tick in `docs/features/cutroom-sdk.md` line
-360, this entry, `docs/context.md` session-72 row, `PROMPTS/README.md` Run line for prompt 072). A document-only check
-is not the journey's evidence.
+**Outcome.** The SDK journey first refused on a `Gates:` case mismatch (`approved` vs the reader's `APPROVED`);
+preparation commit `18e9a8` upper-cased that line without changing gate state. The SDK journey then PASS at
+`18e9a48`: every check green, 65 tests in `tests/cutroom-sdk-*.test.ts` pass, Status flipped to `verified`
+(`5bd079c docs(cutroom-sdk): journey PASS at 18e9a48`). The `reel-contract` re-journey at `5bd079c` FAILed on
+`format`: `prettier --check .` reports `docs/features/cutroom-sdk.md` as the sole failing file. The file fails
+prettier at the S-176 baseline `019d2a9` (its first version) and at every slice commit since — the SDK journey
+reported green because the violation is pre-existing. The FAIL is committed as
+`3b50714 docs(reel-contract): re-journey FAIL at 5bd079c`.
 
-**Next.** Run `node scripts/journey.mjs cutroom-sdk` exactly once, then on PASS
-`node scripts/journey.mjs reel-contract` exactly once. Stop on the first journey FAIL.
+**Decision.** Stop on this FAIL per its wording. The pre-existing prettier finding is a property of
+`docs/features/cutroom-sdk.md`, not of `reel-contract`. No re-run, no re-journey, no check/timeout/test amendment.
+The owner decides whether the file is reformatted (and its new tree given a fresh full preflight per S-177),
+`.prettierignore` is widened, or the SDK status is amended by hand.

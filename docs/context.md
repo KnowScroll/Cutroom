@@ -102,17 +102,24 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
-### 2026-09-29 · session 72
+### 2026-09-30 · session 72
 
-- `cutroom-sdk` Slice 4 is now eligible for judgment. The Slice 4 checkbox in `docs/features/cutroom-sdk.md` (line 360)
-  is ticked; nothing else in the feature file, no source, test, contract, boundary rule, provider, database, media,
-  secret or runtime behaviour was changed. `JOURNAL.md` records the session-72 decision and evidence references;
-  `PROMPTS/README.md` updates the Run line for prompt 072. `node scripts/check.mjs --changed` ran green on the
-  documentation-only preparation tree (this session's date / commit / next are above). Slice 3's full evidence at
-  `ae0599a` was read through `verification-status.mjs` and not re-run; the document-only check is not the journey.
-- HEAD began at `092b271` (4 commits ahead of `origin/main`); the preparation tick commit is made before the SDK
-  journey runs. On its PASS the generated SDK result is committed, then `node scripts/journey.mjs reel-contract`
-  runs once from a clean tree as the sole compatibility re-journey. Slice 4 stops on the first journey FAIL.
+- `cutroom-sdk` Slice 4 ran end to end. The SDK journey PASS at `18e9a48` (every check green, 65 tests in
+  `tests/cutroom-sdk-*.test.ts` pass, Status flipped to `verified`); committed as `5bd079c docs(cutroom-sdk):
+  journey PASS at 18e9a48`. The `reel-contract` re-journey FAILed on `format` at `5bd079c`: `prettier --check .`
+  reports `docs/features/cutroom-sdk.md` as the sole failing file. That file fails prettier at the S-176 baseline
+  `019d2a9` (its first version) and at every slice commit since — the violation is pre-existing and the SDK
+  journey reported green because it was the first invocation of that exact post-tick tree. The FAIL is committed
+  as `3b50714 docs(reel-contract): re-journey FAIL at 5bd079c`. Per its wording, the session stops on first FAIL:
+  no re-run, no re-journey, no check/timeout/test amendment. The owner decides whether the file is reformatted
+  (and its new tree given a fresh full preflight per S-177), `.prettierignore` is widened, or the SDK status is
+  amended by hand.
+- Pre-session, the session 72 row began as the Slice 4 preparation tick only: the checkbox in
+  `docs/features/cutroom-sdk.md` (line 360) was flipped, no source/test/contract/boundary/provider/database/media/
+  secret/runtime was changed, `JOURNAL.md` gained the session-72 entry, `PROMPTS/README.md` updated the Run line
+  for prompt 072, and `node scripts/check.mjs --changed` ran green on the document-only tree. The `Gates:` line
+  case (`approved` vs `APPROVED`) was corrected in a separate preparation commit `18e9a8` to match the journey
+  reader; no gate state changed.
 
 ### 2026-09-29 · session 71
 
