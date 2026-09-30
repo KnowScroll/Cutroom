@@ -7706,3 +7706,37 @@ the two generated commits bind the serial order.
 decisions and completion work without rerunning Slice 3 as a startup ritual.
 
 ---
+
+## S-179 | 2026-09-30 | SDK v1 means a Linux-delivered KnowScroll integration, and it finishes before `self-heal`
+
+**Chose.** `cutroom-sdk` is not finished for the product queue merely because its source journey reports PASS. Before
+`self-heal` or any later feature begins, **SDK v1 must be packaged, installed by KnowScroll and proved against a
+separate Cutroom engine process on Linux**. Cutroom owns the versioned public packages, engine release and launcher
+contract; KnowScroll owns how its orchestrator obtains the release, supplies the explicit command/vector and calls the
+SDK. The delivery channel, exact Linux support matrix and installation/rollback mechanism remain gate decisions; they
+are not smuggled into this ordering decision.
+
+**Why.** The owner wants the SDK to be usable, not only present as private `0.0.0` workspace source. Today both public
+packages export `.ts`, are `private`, and use `workspace:*`; those facts are valid inside Cutroom but do not constitute
+a release another repository can install. S-173 already requires a separate engine process, and S-175 deliberately
+requires KnowScroll to supply a stable launcher instead of relying on Cutroom's source layout. Closing delivery now
+turns that contract into the integration it was created for before unrelated feature work resumes.
+
+**Rejected.** **Calling the current workspace package v1** — KnowScroll cannot install it independently. **A
+Windows-only release or launcher** — the owner corrected the deployment target to Linux; drive letters, `.cmd`,
+PowerShell and Windows service assumptions do not prove that target. **A source-checkout or sibling-path dependency**
+— violates S-175's release boundary and makes a checkout layout part of the API. **Starting `self-heal` first** —
+leaves the SDK's product purpose unfinished while adding unrelated scope. **Choosing a registry or installer here** —
+that needs product, architecture, program-design and slice gates with explicit alternatives and catchers.
+
+**Caught by.** The linked Cutroom and KnowScroll gate reviews, followed by a Linux acceptance journey from a clean
+temporary install root, must prove that installed compiled artifacts resolve nowhere into either source checkout;
+KnowScroll imports the pinned SDK; the SDK joins or starts exactly one separate engine with `shell: false`; all public
+operations work through the loopback contract; ownership-safe close, version mismatch and rollback behave as planned;
+and no Windows-only path or command appears in the release. Package tests reject `private`, `0.0.0`, `.ts` public
+exports and unresolved `workspace:*` in shipped manifests.
+
+**Confirmed-by.** The owner, 2026-09-30: _"We will move on to self heal and other features after sdk v1 is made and
+usable"_, followed by _"it will be on a linux machine dont lock it to windows only."_
+
+---

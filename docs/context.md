@@ -28,18 +28,16 @@ git and the journal keep them.
   `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: the `cutroom-sdk` Slice 4 re-journey FAIL on `format` is a property of
-  `docs/features/cutroom-sdk.md` and `docs/context.md` — both fail `prettier --check` since the S-176
-  baseline `019d2a9`. The owner decides between three resolutions, each named in
-  `PROMPTS/073-cutroom-sdk-format-finding.md`: (a) `prettier --write` the two files and run a fresh full
-  preflight per S-177 (most strict); (b) widen `.prettierignore` with a written reason (cheapest); (c)
-  amend the SDK status by hand or by a smaller follow-up journey after the format is fixed. No session-72
-  work follows the FAIL. After that is settled, `self-heal`'s gates — one harness around the run that makes,
-  checks, heals and learns, each learned rule binding once the owner approves it, the caller's criteria and
-  claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's
-  code or gates. Then session 53's two engine findings (P-013, P-014), then `caption-match`'s gates and build
-  with the S-165 registry change, then `composed-hold`, `diagram-shots`, `code-reels`, then `parallel-shots`'
-  gates from the prompt at `b15d203`.
+- **Next**: finish SDK v1 before `self-heal` (S-179). First run
+  `PROMPTS/073-cutroom-sdk-format-finding.md` resolution A: format the two pre-existing Markdown failures plus the
+  unrun prompt itself, bind a fresh full check to the new tree, and rerun the SDK and `reel-contract` journeys to
+  PASS. Then run
+  `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`: plan and adversarially approve the linked Cutroom release and
+  KnowScroll integration gates for Linux, with no Windows-only or source-checkout assumption and no implementation
+  before approval. Build prompts follow only after both gate sets pass review. SDK v1 is complete only when a clean
+  Linux install proves KnowScroll using the packaged SDK to join or start one separate Cutroom process. Then come
+  `self-heal`, session 53's P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and
+  `parallel-shots`' gates from `b15d203`.
 - **KnowScroll and the engine** (S-173, settled session 57): the engine stays its own process (D-098); KnowScroll
   calls it through `@cutroom/sdk`, which connects to it, or starts the service as a child when none answers. D-099 in
   part superseded: two packages may be depended on from outside.
@@ -104,6 +102,14 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-30 · session 73
+
+- S-179 extends the SDK-first queue through an actually installable v1: Linux is the deployment target; Windows-only
+  and source-checkout delivery are rejected; `self-heal` waits. `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md` plans
+  linked Cutroom-release and KnowScroll-integration gates after prompt 073 resolution A restores full-green evidence.
+  No packaging or integration implementation began. The document check also found the unrun prompt 073 itself needs
+  Prettier, so its resolution-A command now names three files rather than leaving its own formatting failure behind.
 
 ### 2026-09-30 · session 72
 

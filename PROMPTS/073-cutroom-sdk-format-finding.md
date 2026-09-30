@@ -5,6 +5,8 @@
 - **Work:** the owner decides between the three resolutions named below, then the next session runs only that one
 - **Written:** 2026-09-30, after Slice 4 was committed at `f05db7f` with the SDK journey PASS at `18e9a48`
   (`5bd079c`) and the `reel-contract` re-journey FAIL at `5bd079c` (`3b50714`)
+- **Amended before run:** session 73 added this prompt itself to resolution A's format command after the document
+  check proved the unrun prompt was a third Prettier failure; the original two-file journey finding is unchanged
 - **Run:** not yet run
 
 ```text
@@ -20,9 +22,11 @@ asks "which one?" picks one, runs only that one, commits its result, and stops.
 
 2. Read `PROMPTS/072-cutroom-sdk-slice-4.md`'s stop-on-FAIL rule and confirm Slice 4 left
    exactly one finding: the `prettier --check` failure on `docs/features/cutroom-sdk.md`
-   (and `docs/context.md`, both failing since the S-176 baseline `019d2a9`). The finding is a
-   property of those two files; it is not a `reel-contract` defect, not a `cutroom-sdk` test
-   defect, not a journey reader defect, not a drift / boundary / authority failure.
+   (and `docs/context.md`, both failing since the S-176 baseline `019d2a9`). The later handoff
+   commit added this unrun prompt, and the session-73 document check proved this prompt also
+   needs Prettier formatting. That third file does not change the original journey finding.
+   None is a `reel-contract` defect, a `cutroom-sdk` test defect, a journey reader defect, or a
+   drift / boundary / authority failure.
 
 3. Pick exactly one of the three resolutions named in `docs/context.md` "Where things stand —
    Next" and recorded in `JOURNAL.md` session 72, FINAL action. Each begins from `f05db7f`
@@ -30,9 +34,10 @@ asks "which one?" picks one, runs only that one, commits its result, and stops.
 
    A. **`prettier --write` and full preflight on the new tree.** Run `node
       node_modules/prettier/bin/prettier.cjs --write docs/features/cutroom-sdk.md
-      docs/context.md`. The diff is pure formatting. Then, with the new tree, run
-      `node scripts/check.mjs` (full suite, not `--changed`). If green, commit the
-      formatting diff alone as `style: prettier-write cutroom-sdk and context` and add
+      docs/context.md PROMPTS/073-cutroom-sdk-format-finding.md`. The diff is pure formatting.
+      Then, with the new tree, run `node scripts/check.mjs` (full suite, not `--changed`).
+      If green, commit the formatting diff alone as `style: prettier-write cutroom-sdk context
+      and prompt 073` and add
       `Verification: full`, `Verification-Tree: <exact tree>`, and the affected tests
       named in `f05db7f`'s journal entry (the SDK tests and the reel-contract tests
       covered by the Slice 4 re-journey list). On the new tree, re-run the SDK journey
