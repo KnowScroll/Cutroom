@@ -22,19 +22,15 @@ git and the journal keep them.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`,
   `resume-failed` (S-161 to S-164, S-171 to S-174). `cutroom-sdk` carries `Status: verified` from its Slice 4
-  journey at `18e9a48` (`5bd079c`); its Slice 4 sole compatibility re-journey at `5bd079c` FAILed on `format`
-  (`3b50714`). The re-journey list is closed on file; the FAIL has not weakened any check, timeout, test or rule.
-  **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `caption-match` (S-165), `composed-hold`,
-  `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
+  journey at `1c7c77d` (`6a95a8d`); its sole compatibility re-journey at `6a95a8d` PASSed at `c15b2d4` after the
+  journey writer's format invariant was repaired in `1c7c77d`. The re-journey list is closed on file; nothing has
+  been weakened. **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `caption-match` (S-165),
+  `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). Resolution A of
-  `PROMPTS/073-cutroom-sdk-format-finding.md` ran: prettier --write the three Markdown files, full preflight at `48a6746`
-  (tree `85cd3ec2`, `Verification: full`); SDK journey PASS at `3226321`; `reel-contract` re-journey FAIL on format at
-  `647c5e6` — the SDK journey's own trailing-newline modification to `docs/features/cutroom-sdk.md` reintroduces the
-  violation. The next session decides between resolution B (`docs/features/*.md` into `.prettierignore` with a written
-  reason, after which both journeys can PASS), a fix to `scripts/journey.mjs` so the writer leaves the file format-clean
-  (resolution A's missing pre-condition), or another outcome the owner names. Then run `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`:
+- **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). The
+  `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
+  the `reel-contract` re-journey at `6a95a8d` PASSed at `c15b2d4`. Next run `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`:
   approve the minimal package gates, build portable installable `@cutroom/sdk` and `@cutroom/reel-contract` artifacts,
   and prove them from a temporary external consumer. No KnowScroll file, engine package, installer, registry publication
   or deployment work belongs to Cutroom. SDK v1 is complete when the consumer-neutral package journey and exact affected
@@ -104,6 +100,22 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-09-30 · session 77
+
+- Repaired `scripts/journey.mjs` so the writer leaves every feature file format-clean: the Divergence
+  replacement now trims to a single trailing newline, no matter where Divergence lives. Without this fix the
+  journey appended a trailing blank line to any feature whose last section is Divergence (as in
+  `docs/features/cutroom-sdk.md`), which `prettier --check` rejects. Two regression cases in
+  `tests/journey.test.ts` cover the PASS and FAIL paths.
+- The interrupted prompt-073-A PASS chain is now complete: `fix(journey): preserve the file's format
+invariant; complete the PASS chain` at `1c7c77d` (full preflight, tree `35d3382…`); SDK journey PASS at
+  `6a95a8d`; `reel-contract` re-journey PASS at `c15b2d4` — every check green, 42 tests in
+  `tests/reel-contract-*.test.ts` pass, Divergence reset to `none`, both feature files format-clean. The same
+  writer fix keeps subsequent runs green.
+- `docs/features/cutroom-sdk.md` was prettier-formatted at `1c7c77d` (the trailing-blank-line shape the journey
+  would write, applied once by hand so the commit's tree carries `Verification: full`); the SDK journey then
+  wrote a real evidence line on a clean file.
 
 ### 2026-09-30 · session 76
 

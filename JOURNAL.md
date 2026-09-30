@@ -63,3 +63,9 @@ The owner decides whether the file is reformatted (and its new tree given a fres
 **Decision.** S-181 and `docs/features/reel-series.md` record one topic brief plus `n` as an ordered editorial arc
 of `n` distinct, complete reels, planned together and made serially. It is neither variants nor split fragments;
 its gates, API and queue order remain unwritten. **Next.** Finish SDK v1 before scheduling future feature gates.
+
+## 2026-09-30 — session 77, journey writer repaired; SDK/contract PASS chain complete
+
+**Decision.** Repair `scripts/journey.mjs`'s format invariant (the Divergence replacement left a trailing blank line when Divergence was the file's last section, breaking `prettier --check` on `docs/features/cutroom-sdk.md`), and complete the interrupted prompt-073-A PASS chain.
+**Outcome.** `1c7c77d` (full green, tree `35d3382…`); SDK journey PASS at `6a95a8d`; `reel-contract` re-journey PASS at `c15b2d4` — every check green, 42 tests in `tests/reel-contract-*.test.ts` pass, Divergence back to `none`, both feature files format-clean. The same writer fix keeps subsequent runs green.
+**Decision.** Stop per Slice 4 / S-178; nothing weakened.

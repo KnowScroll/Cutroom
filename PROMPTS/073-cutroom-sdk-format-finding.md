@@ -79,3 +79,5 @@ asks "which one?" picks one, runs only that one, commits its result, and stops.
 ## Run
 
 2026-09-30 · session 75 — resolution A. `style: prettier-write cutroom-sdk context and prompt 073` at `48a6746` (full preflight, tree `85cd3ec2`). SDK journey at `48a6746` PASS at `3226321`. `reel-contract` re-journey at `3226321` FAIL on format at `647c5e6`; the same divergence session 72 caught at `3b50714`, now legible as the SDK journey's own trailing-newline modification to `docs/features/cutroom-sdk.md`. Session stops per Slice 4's wording; no check, journey, timeout or boundary rule was changed.
+
+2026-09-30 · session 77 — repair and complete the chain. `fix(journey): preserve the file's format invariant; complete the PASS chain` at `1c7c77d` (full preflight, tree `35d3382…`) trims the journey's Divergence replacement to a single trailing newline. SDK journey at `1c7c77d` PASS at `6a95a8d`; `reel-contract` re-journey at `6a95a8d` PASS at `c15b2d4` — every check green, 42 tests in `tests/reel-contract-*.test.ts` pass, Divergence reset to `none`. Session stops per Slice 4 / S-178.
