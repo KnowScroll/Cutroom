@@ -41,6 +41,8 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+# cutroom-sdk-package: the build/pack staging directory (PROMPTS/074)
+.package-staging/
 
 # OS / editor
 .DS_Store
