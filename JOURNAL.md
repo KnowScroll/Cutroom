@@ -14,14 +14,6 @@ and observed numbers live in the appended archive entry below.
 
 **Next.** Commit the corrections alone with `Verification: targeted`, run `verification-status.mjs`; no Slice 3.
 
-## 2026-09-29 — session 68, `cutroom-sdk` Slice 3 handoff written
-
-**Decision.** `PROMPTS/069-cutroom-sdk-slice-3.md` is the next-session handoff: explicit launcher configuration,
-bounded strict readiness polling, fixed-port race joining, and creator-owned stdin shutdown only. Starts from
-`45b9de9` (tree `143d0bc…`, targeted evidence). Full reasoning in the archive.
-
-**Next.** Session 69 runs `PROMPTS/069-cutroom-sdk-slice-3.md`; no Slice 4.
-
 ## 2026-09-29 — session 69, `cutroom-sdk` Slice 3 complete
 
 **Decision.** Build `PROMPTS/069-cutroom-sdk-slice-3.md`: explicit launcher, bounded readiness polling, fixed-port
@@ -73,3 +65,9 @@ reported green because the violation is pre-existing. The FAIL is committed as
 `docs/features/cutroom-sdk.md`, not of `reel-contract`. No re-run, no re-journey, no check/timeout/test amendment.
 The owner decides whether the file is reformatted (and its new tree given a fresh full preflight per S-177),
 `.prettierignore` is widened, or the SDK status is amended by hand.
+
+## 2026-09-30 — session 72, handoff
+
+**Decision.** The owner asked "What is next?" without naming the resolution. Per sessions 24/26/50, this
+session writes the next prompt and starts no resolution. The three options are in
+`PROMPTS/073-cutroom-sdk-format-finding.md`; the next session picks one and runs only that one.

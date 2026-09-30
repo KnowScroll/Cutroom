@@ -21,22 +21,25 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`,
-  `resume-failed` (S-161 to S-164, S-171 to S-174).
-  **Stopped**: `one-subject` (S-149). **Planned, gates approved**: `cutroom-sdk` (S-173, S-175).
-  **Planned, gates not written**: `caption-match` (S-165), `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
+  `resume-failed` (S-161 to S-164, S-171 to S-174). `cutroom-sdk` carries `Status: verified` from its Slice 4
+  journey at `18e9a48` (`5bd079c`); its Slice 4 sole compatibility re-journey at `5bd079c` FAILed on `format`
+  (`3b50714`). The re-journey list is closed on file; the FAIL has not weakened any check, timeout, test or rule.
+  **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `caption-match` (S-165), `composed-hold`,
+  `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `cutroom-sdk`'s four gates are approved. Slices 1–3 are complete; Slice 3's full evidence is bound to
-  `ae0599a`. `PROMPTS/072-cutroom-sdk-slice-4.md` is next: tick the explicit evidence-only Slice 4, run the
-  no-provider SDK journey, then re-journey `reel-contract` alone. S-175 settles the launcher: KnowScroll supplies an
-  explicit program and argument vector; the SDK never assumes this source checkout. Then come `self-heal`'s gates — one harness around the run that makes, checks,
-  heals and learns: a rule book of what failed runs taught, each learned rule binding once the owner approves it, and
-  the caller's criteria and claims healed in place only when the request opts in (S-170, superseding D-096 in part);
-  never the engine's code or gates.
-  Session 53's two reels completed, and its engine findings wait for a feature:
-  a network error on a picture's status check or file ends the run (P-013), and a witness answer that is not JSON is
-  never asked again (P-014). Then `caption-match`'s gates and build, with the registry change S-165 decided.
-  Then `composed-hold`, `diagram-shots`, `code-reels`. Then `parallel-shots`' gates, from the prompt at `b15d203`.
+- **Next**: the `cutroom-sdk` Slice 4 re-journey FAIL on `format` is a property of
+  `docs/features/cutroom-sdk.md` and `docs/context.md` — both fail `prettier --check` since the S-176
+  baseline `019d2a9`. The owner decides between three resolutions, each named in
+  `PROMPTS/073-cutroom-sdk-format-finding.md`: (a) `prettier --write` the two files and run a fresh full
+  preflight per S-177 (most strict); (b) widen `.prettierignore` with a written reason (cheapest); (c)
+  amend the SDK status by hand or by a smaller follow-up journey after the format is fixed. No session-72
+  work follows the FAIL. After that is settled, `self-heal`'s gates — one harness around the run that makes,
+  checks, heals and learns, each learned rule binding once the owner approves it, the caller's criteria and
+  claims healed in place only when the request opts in (S-170, superseding D-096 in part); never the engine's
+  code or gates. Then session 53's two engine findings (P-013, P-014), then `caption-match`'s gates and build
+  with the S-165 registry change, then `composed-hold`, `diagram-shots`, `code-reels`, then `parallel-shots`'
+  gates from the prompt at `b15d203`.
 - **KnowScroll and the engine** (S-173, settled session 57): the engine stays its own process (D-098); KnowScroll
   calls it through `@cutroom/sdk`, which connects to it, or starts the service as a child when none answers. D-099 in
   part superseded: two packages may be depended on from outside.
@@ -276,12 +279,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   only when the request opts in, never a sentence or a fact (D-096 superseded in part). `docs/features/self-heal.md` —
   its title, what the owner added, four more faults, gates 3 and 6 widened; then what the rule book teaches the prompts (no model is trained),
   the baseline — sessions 53 to 55, 19 runs, 4 reels, 649¢ — and the target its journey is held to.
-
-### 2026-09-26 · session 54, continued
-
-- `PROMPTS/055` — new: the two explainer reels again, brief B as it last ran and brief A as approved, a DNS lookup
-  checked before every run (P-020). `resume-failed` renumbered 056 (`PROMPTS/056`, its feature file's pointer).
-  `PROMPTS/README.md` — the rows and a note.
 
 ## Where to look
 
