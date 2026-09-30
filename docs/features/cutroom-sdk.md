@@ -5,7 +5,7 @@ authority: plan
 
 # cutroom-sdk — a typed local client that connects to one Cutroom engine, or starts the one it owns
 
-Status: planned
+Status: verified
 Gates: product APPROVED · architecture APPROVED · program-design APPROVED · slices APPROVED
 
 > **Created 2026-09-28 at the owner's request** (S-173), after `resume-failed`'s journey and its ten
@@ -380,6 +380,9 @@ SDK's contract is the explicit `launcher` option, not this repository's source l
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
 
+- 2026-09-30 journey=PASS at 18e9a48 — every check green; 65 tests in tests/cutroom-sdk-*.test.ts pass
+
 ## Divergence (the first broken boundary, or "none")
 
 none
+
