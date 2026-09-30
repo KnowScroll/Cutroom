@@ -121,7 +121,7 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 - `cutroom-sdk` Slice 4 ran end to end. The SDK journey PASS at `18e9a48` (every check green, 65 tests in
   `tests/cutroom-sdk-*.test.ts` pass, Status flipped to `verified`); committed as `5bd079c docs(cutroom-sdk):
-  journey PASS at 18e9a48`. The `reel-contract` re-journey FAILed on `format` at `5bd079c`: `prettier --check .`
+journey PASS at 18e9a48`. The `reel-contract` re-journey FAILed on `format` at `5bd079c`: `prettier --check .`
   reports `docs/features/cutroom-sdk.md` as the sole failing file. That file fails prettier at the S-176 baseline
   `019d2a9` (its first version) and at every slice commit since — the violation is pre-existing and the SDK
   journey reported green because it was the first invocation of that exact post-tick tree. The FAIL is committed
