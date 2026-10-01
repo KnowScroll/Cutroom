@@ -40,19 +40,20 @@ packages/providers   adapters behind the ports, including stand-ins. No durable 
 packages/domain      tables, migrations, the job queue, the budget ledger.
 apps/worker          the runner. The only place that knows both a stage and a table.
 apps/api             submitting work, reading records. Never calls a provider.
+apps/service         the composition root and runnable loopback service.
+packages/reel-contract  the caller-facing schemas, types and route contract.
+packages/sdk         the typed local client; no engine internals.
 ```
 
-A seventh package, `packages/reel-contract`, is the caller-facing contract (D-094). `reel-plan` has
-given every package source by its Slice 3; **the only `LanguageModelPort` is the stand-in** in
-`packages/providers/src/fake/`, and the worker is handed it rather than choosing one (S-021). The
-same holds for **the only `ImagePort` and `PictureSensorPort`**, since `reel-stills`' Slice 3 (S-038):
-the image stand-in writes real PNGs under one artifact root, `.artifacts/` by default (D-086, D-087).
-And for **the only `VideoPort` and `NarrationPort`**, since `reel-render`'s Slice 3: stand-ins writing
-real MP4s (through ffmpeg) and WAVs under the same root. **The one real adapter is ffmpeg on this
-machine** — the `MediaPort` and the `AssemblerPort` in `packages/providers/src/ffmpeg/` — which costs
-nothing, reads no secret and reaches no network; a worker awaits both ports' `ready()` before it opens
-its database, and refuses to start without the tools (S-075).
-**Nineteen** boundary rules are enforced on the real dependency graph, and
+`packages/reel-contract` is the caller-facing contract (D-094), and `packages/sdk` is its typed
+loopback client (S-173, S-175, S-180). `packages/providers` now contains both stand-ins and the
+verified paid adapters: MiniMax model and narration, fal image and video, the local picture sensor,
+and ffmpeg media/assembly. Which implementation each port receives is a service setting; the worker
+is handed ports and never chooses or constructs one. Stand-ins write real PNG, MP4 and WAV files
+under one artifact root, `.artifacts/` by default (D-086, D-087), while paid adapters are reached
+only by a manually confirmed paid run or an explicitly configured service. A worker awaits the
+local tools' `ready()` before it opens its database and refuses to start without them (S-075).
+**Twenty-two** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
 or any legal import is reported or fails to resolve. The load-bearing ones: **pipeline imports no
@@ -60,10 +61,12 @@ domain, no providers, no app, no I/O at all, and no npm package but `zod`**. A s
 port; it never reaches for one. **Nothing outside `providers` imports a model client** (`ai`,
 `@ai-sdk/*`), and **nothing under `apps/worker` imports `packages/providers`** — the worker is
 handed its ports, so it cannot construct an adapter that spends (`worker-no-providers`, S-038).
-**Nothing outside `providers` imports `child_process`** — a process is started only behind a port
-(`processes-only-in-providers`, S-075).
+**Nothing outside `providers` imports `child_process` except
+`packages/sdk/src/launcher.ts`**; an independent SDK rule makes that the only SDK exception
+(`processes-only-in-providers`, `sdk-processes-only-launcher`, S-075, S-175). Key-shaped
+environment reads likewise stay in providers, apart from non-secret service settings.
 
-**Three of the nineteen are between two folders of one package**, and they are the reason this is
+**Three of the twenty-two are between two folders of one package**, and they are the reason this is
 dependency-cruiser rather than a script matching import text. It resolves every import to a file
 path, so `'../split/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
 `split-imports-only-itself`, `split-imported-only-by-plan`, `split-entered-through-its-index` —

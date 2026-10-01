@@ -1,91 +1,141 @@
 # Cutroom
 
-The **reel creation engine** for [KnowScroll](https://github.com/Legend101Zz/Knowscroll-v2) — a
-personal anti-doomscroll app for its owner and about four friends. Short vertical videos are
-researched from cited sources, planned, drawn, and assembled.
+Cutroom is a local reel-creation engine. A caller supplies a narrated brief, claims, visual
+criteria, a style, and a spending ceiling; Cutroom plans the reel, makes and checks stills, turns
+them into clips, narrates and captions them, and returns one measured MP4. The service runs on
+loopback, processes one machine's work, and records enough detail to inspect, cancel, or resume a
+run.
 
-The work is split in two, at the stills:
+The engine is built end to end. Its verified paid path uses MiniMax for planning and narration,
+fal for images and video, local sensors and ffmpeg for inspection and assembly. Recent real reels
+cost about 49–58 cents; a paid run is always started manually and confirms its ceiling before any
+provider is called. The same engine can start with stand-in providers for local integration work
+without keys, network access, or spend.
 
-| part            | from              | to                                                  |
-| --------------- | ----------------- | --------------------------------------------------- |
-| **reel-engine** | a brief           | a plan, then **approved still pictures**. No video. |
-| **reel-render** | approved pictures | clips, narration, **one finished video file**       |
+Cutroom is not a hosted product or a general interactive video editor. It currently targets five
+people on one machine. The SDK is packaged and externally installable, but neither the SDK nor the
+engine is published to a registry, and the engine has no binary, installer, updater, or deployment
+service.
 
-Later this repository becomes part of **Cutroom** proper — an interactive video agent, "Claude
-Code for video". The reel engine will be **one consumer of Cutroom's core**, not the whole of it.
-That core is not built, and the framework question behind it is deliberately unanswered. Nothing
-here is shaped around an answer to it.
+## What is ready
 
-## What this is not
+- Brief to plan, approved stills, clips, narration, captions, gates, retries, holds, and one MP4.
+- Real MiniMax and fal adapters with explicit spending and failure accounting.
+- A loopback HTTP service with submit, find, status, events, result, record, cancel, resume, and
+  readiness routes.
+- A typed `@cutroom/sdk` client that joins an existing service or launches a consumer-supplied
+  command.
+- Portable ESM packages for `@cutroom/sdk` and `@cutroom/reel-contract`, version `1.0.0`, with
+  declaration files for Node 22.14 or newer.
+- Recovery of failed runs through previewed, selective resume.
 
-- **Not the steering system.** Decisions, gates, the journal and the feature plans live in the
-  KnowScroll repository. See below.
-- **Not a product with users.** Five people, one machine, no scale.
-- **Not started.** At the time of writing there is **no feature code at all**: no contracts, no
-  tables, no stages, no providers. The gates that precede them are still in review.
+Current limitations and the next work are kept in [docs/STATUS.md](docs/STATUS.md). The detailed,
+authoritative engineering state is [docs/context.md](docs/context.md).
 
-## Where the decisions live
+## Quick start
 
-There is exactly **one** `steering/DECISIONS.md`, it lives in the KnowScroll repository, and it is
-the authority for both repositories (**D-088**). This repository gets no copy that can drift — it
-gets a **pinned submodule**:
+Requirements:
+
+- Node.js 22.14 or newer;
+- Corepack (included with the supported Node installation);
+- ffmpeg and ffprobe 8.x on `PATH`;
+- Git submodules initialized.
+
+Install and check the checkout:
 
 ```bash
-git submodule update --init            # check out steering-ref/
-node scripts/decisions.mjs             # which commit we can see; is it stale
-node scripts/decisions.mjs --fetch     # ask the remote instead of a local ref
-node scripts/decisions.mjs D-086       # print one decision
+git submodule update --init
+corepack pnpm install
+node scripts/decisions.mjs --fetch
+node scripts/check.mjs --changed --dry-run
 ```
 
-`scripts/decisions.mjs` fails loudly in **both** directions: when the pin is behind the remote,
-and when the remote is behind a local steering checkout — because a decision that exists only on
-one machine is invisible to the first check.
+Start the local service with its default stand-in providers:
 
-Setup choices made **in this repository** are in [`DECISIONS.md`](DECISIONS.md), numbered `S-`.
-They cover the room, never the furniture, and they never contradict a `D-` decision.
+```bash
+corepack pnpm service
+```
 
-## Layout
+It listens on `http://127.0.0.1:8787` by default. In another terminal:
+
+```bash
+curl http://127.0.0.1:8787/v1/ready
+```
+
+The default service is safe for readiness and integration work: it reads no provider key and
+spends nothing. Its model stand-in deliberately invents no answers, so a complete synthetic reel
+requires a `CUTROOM_STAND_IN_SCRIPT`; the verified free end-to-end example is exercised by
+`tests/paid-path-service.test.ts`.
+
+For every supported way to use the service and SDK—including an external consumer install, all
+public SDK operations, free experiments, a real paid reel, resume, outputs, settings, and known
+limits—read [Using Cutroom](docs/USING_CUTROOM.md).
+
+## Build the SDK packages
+
+```bash
+node scripts/package-sdk.mjs
+```
+
+This creates two gitignored artifacts:
 
 ```text
-packages/contracts   shared types, and the ports as types. Imports nothing internal.
-packages/pipeline    pure functions: stages and gates. No database, provider, file or socket.
-packages/providers   adapters behind the ports, including the stand-ins. No durable state.
-packages/domain      tables, migrations, the job queue, the budget ledger.
-apps/worker          the runner. The only place that knows both a stage and a table.
-apps/api             submitting work and reading records. Never calls a provider.
+.package-staging/cutroom-reel-contract-1.0.0.tgz
+.package-staging/cutroom-sdk-1.0.0.tgz
 ```
 
-`providers` holds one adapter: the stand-in model, the only one there is. The
-boundaries between the packages are not a convention — seventeen rules over the real dependency graph,
-three of them between two folders of a single package, two of them about npm packages:
+They contain compiled ESM JavaScript and declarations, not the engine. A consumer must connect to
+a running Cutroom service or supply an exact engine launcher command and argument vector. See the
+[external consumer instructions](docs/USING_CUTROOM.md#install-the-sdk-in-another-project).
+
+## Repository layout
+
+```text
+apps/service              composition root and runnable local service
+apps/api                  loopback HTTP API; never calls a provider
+apps/worker               job runner; receives ports and cannot construct providers
+packages/reel-contract    caller-facing schemas, types, routes, and contract version
+packages/sdk              typed local client and launcher lifecycle
+packages/contracts        internal shared types and port interfaces
+packages/pipeline         pure stages and gates; no database, filesystem, or network
+packages/providers        stand-in, MiniMax, fal, local-sensor, and ffmpeg adapters
+packages/domain           tables, migrations, queue, records, and budget ledger
+scripts                   checks, packaging, journeys, and the manual paid-reel command
+docs/features             approved gates and journey evidence for each feature
+```
+
+Twenty-two dependency rules enforce these boundaries over resolved file paths. They include
+package entry-point rules, three rules inside the planner/splitter package, SDK isolation, process
+and key confinement, and npm dependency restrictions.
 
 ```bash
-node scripts/drift.mjs            # no forbidden edge exists
-node scripts/drift.mjs --prove    # each rule still CATCHES one written to break it
-node scripts/drift.mjs --audit    # no rule has quietly stopped applying to anything
+node scripts/drift.mjs
+node scripts/drift.mjs --prove
+node scripts/drift.mjs --audit
 ```
 
-The rules are matched on **resolved file paths**, not on the text of an import line. That is what
-lets them express a boundary between `src/plan/` and `src/split/` inside one package, where
-every import is relative — the check D-073 calls for, and the one a specifier-prefix match can
-never make.
+## Development and verification
 
-## Running the checks
-
-`pnpm` is **not on this machine's PATH**. `corepack` is, and the pnpm version is pinned:
+`pnpm` is intentionally invoked through Corepack on this machine:
 
 ```bash
-corepack pnpm install
-node scripts/check.mjs             # every check, one summary
-node scripts/check.mjs --code      # only the checks about code in this repo
+node scripts/check.mjs                         # full suite
+node scripts/check.mjs --changed               # documentation-only changes
+node scripts/check.mjs --slice tests/name.test.ts
+node scripts/verification-status.mjs           # evidence bound to the exact HEAD tree
 ```
 
-The full recipe, including the Node 22.14 type-stripping flags and what to do when install
-misbehaves, is `.claude/skills/checks/SKILL.md`.
+Never commit `.env`, media, the SQLite database, `.artifacts/`, `.package-staging/`, or other
+generated files. Decisions and the rules for contributing are in [AGENTS.md](AGENTS.md) and
+[CLAUDE.md](CLAUDE.md). The public contract is version 1; changing it requires the feature gates
+and evidence described in those files.
 
-## The rule that matters most
+## Documentation map
 
-**Gates before code.** No implementation file exists for a feature whose four planning gates —
-product, architecture, program design, slices — have not been approved by an adversarial reviewer.
-The gates are written and reviewed in the steering repository. `CLAUDE.md` has the rest of the
-rules.
+- [Using Cutroom](docs/USING_CUTROOM.md) — operator and consumer guide.
+- [Current status](docs/STATUS.md) — what works, what is distributed, and what remains.
+- [Engineering context](docs/context.md) — exact current evidence, runs, queue, and recent changes.
+- [SDK feature](docs/features/cutroom-sdk.md) and
+  [package feature](docs/features/cutroom-sdk-package.md) — reviewed behavior and packaging proof.
+- [Reel pitfalls](docs/reel-pitfalls.md) — lessons from real runs.
+- [Prompt index](PROMPTS/README.md) and [journal](JOURNAL.md) — why the repository changed.

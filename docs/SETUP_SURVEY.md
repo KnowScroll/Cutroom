@@ -1,10 +1,14 @@
 ---
-status: current
-authority: record of a survey, not a plan
+status: historical
+authority: record of the 2026-09-12 survey, not current project state or a plan
 date: 2026-09-12
 ---
 
-# What the steering repository's Claude Code setup actually contains
+# Historical setup survey — what the steering repository contained on 2026-09-12
+
+> Kept as the session's evidence. Statements such as "there is no server yet" and "not copied yet"
+> describe that survey date; they are not current Cutroom status. Use `README.md`,
+> `docs/STATUS.md`, and `docs/context.md` for the current repository.
 
 The bootstrap prompt listed eight things to study in the KnowScroll repository and asked for a
 written note of **anything else found there**, and whether this repository should have an

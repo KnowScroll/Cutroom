@@ -10,9 +10,13 @@ agents then start from different beliefs while both sound certain.
 
 ## What this repository is
 
-The reel creation engine: brief → plan → approved stills (`reel-engine`), then stills → clips →
-narration → one video file (`reel-render`). Five users, one machine. Later it becomes one
-consumer of Cutroom's core, which does not exist yet.
+The working reel creation engine: brief → plan → approved stills (`reel-engine`), then stills
+→ clips → narration → one video file (`reel-render`). Its paid path has made real reels;
+its loopback service, caller contract, failed-run recovery, typed SDK, and portable SDK packages
+are built and verified. It is still a five-user, one-machine engine rather than the future broader
+interactive Cutroom product. Start with `README.md`, `docs/STATUS.md`, and
+`docs/USING_CUTROOM.md` for the user-facing truth; `docs/context.md` is the exact engineering
+state.
 
 ## Start here, in this order
 
@@ -30,12 +34,14 @@ file, or from a summary.
 ## The five rules
 
 1. **Gates before code.** A feature gets no implementation file until its four planning gates —
-   product, architecture, program design, slices — are approved by an adversarial reviewer. The
-   gates live in the steering repository. At the time of writing, **no feature has cleared them,
-   so there is no feature code here at all.** Do not add "just the types".
+   product, architecture, program design, slices — are approved by an adversarial reviewer. New
+   Cutroom feature gates live in this repository under `docs/features/`; their `Status`, `Gates`,
+   `Evidence`, and `Divergence` lines say what has actually cleared. Do not add "just the types"
+   for a feature that has not.
 2. **A choice between alternatives is written down**, with what was rejected and how a violation
-   gets caught. Setup choices: `DECISIONS.md` here, as `S-` entries. Product decisions: the
-   steering repository, as `D-` entries, append-only, never edited.
+   gets caught. Existing D-decisions in the pinned steering repository still bind. New decisions
+   about the engine or Cutroom are `S-` entries in this repository's `DECISIONS.md`; decisions
+   about KnowScroll's product side remain in the steering repository. Both are append-only.
 3. **Nothing gets weakened to reach green.** Not a test, not a boundary rule, not a check. If
    `drift --prove` reports a silent rule, that is the finding.
 4. **Secrets, media, the database and generated files are never committed.** One configured path
@@ -59,15 +65,17 @@ approved.
 ## Boundaries, stated once
 
 `pipeline` imports no `domain`, no `providers`, no app, and **no I/O at all**. `api` never imports
-`providers`. `providers` never imports `domain` or `pipeline`. `contracts` imports nothing
-internal. A package is entered only through its `src/index.ts`.
+`providers`. `providers` never imports `domain` or `pipeline`. `contracts` and `reel-contract`
+are leaves. The worker never imports providers. Keys stay in providers. A package is entered only
+through its `src/index.ts`. The SDK imports no engine internals; only its private launcher may
+start a process.
 
 Three more are **between two folders of one package** — the splitter imports nothing outside its
 own folder, may be imported only by the planner, and may be entered only through its index
 (D-073). Two are about npm packages: the pipeline imports none but `zod`, and nothing outside
 `providers` imports a model client (reel-plan, S-020).
 
-These are not conventions. They are **seventeen** rules checked against the real dependency graph,
+These are not conventions. They are **twenty-two** rules checked against the real dependency graph,
 and they are expressed on **resolved file paths**, never on the text of an import line — which is
 the only reason those three can exist at all, since inside one package every import is relative.
 

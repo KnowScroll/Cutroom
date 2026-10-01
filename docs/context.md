@@ -28,7 +28,8 @@ git and the journal keep them.
   `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: finish SDK v1 before `self-heal` (S-180, superseding S-179's integration scope). The
+- **Next**: `self-heal`; SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
+  integration scope). The
   `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
   the `reel-contract` re-journey at `6a95a8d` PASSed at `c15b2d4`. **`PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`
   is complete**: the `cutroom-sdk-package` journey PASSed at `2e66370` (every check green, 19 tests in
@@ -104,6 +105,13 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-01 · session 79
+
+- Replaced the pre-implementation root README and the 2026-09-20 status snapshot with current, user-facing descriptions of the built real-provider engine, verified local SDK package, distribution boundary, operating limits, and next queue item.
+- Added `docs/USING_CUTROOM.md`: requirements, safe stand-in startup, free process-level proof, package build and external install, SDK join/launch and all methods, a complete submission/follow example, the confirmed-spend real-reel command, resume, settings, outputs, and unsupported cases.
+- Brought `AGENTS.md`, `CLAUDE.md`, `docs/SETUP_SURVEY.md`, and `PROMPTS/README.md` into line with 22 live boundary rules, the paid adapters, Prompt 073/074 completion, and the historical/current distinction. No runtime, contract, provider, database, package artifact, test, or boundary changed.
+- Prompt 075 records the owner's documentation-and-push request. The documentation-only check is the evidence for this exact tree; the commit is pushed with the previously local Prompt 074 chain.
 
 ### 2026-10-01 · session 78
 

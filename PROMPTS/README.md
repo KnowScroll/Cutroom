@@ -58,8 +58,9 @@ its `JOURNAL.md` entry says it did (S-065).
 | 065 | [065-cutroom-sdk-slice-2.md](065-cutroom-sdk-slice-2.md)                               | `cutroom-sdk`         | Slice 2                         | 2026-09-29 | session 66               |
 | 069 | [069-cutroom-sdk-slice-3.md](069-cutroom-sdk-slice-3.md)                               | `cutroom-sdk`         | Slice 3                         | 2026-09-29 | session 69               |
 | 072 | [072-cutroom-sdk-slice-4.md](072-cutroom-sdk-slice-4.md)                               | `cutroom-sdk`         | Slice 4 journey                 | 2026-09-29 | session 72               |
-| 073 | [073-cutroom-sdk-format-finding.md](073-cutroom-sdk-format-finding.md)                 | `cutroom-sdk`         | resolve Slice 4 re-journey FAIL | 2026-09-30 | not yet run              |
-| 074 | [074-cutroom-sdk-v1-delivery-gates.md](074-cutroom-sdk-v1-delivery-gates.md)           | `cutroom-sdk-package` | finish portable SDK package     | 2026-09-30 | after prompt 073 A       |
+| 073 | [073-cutroom-sdk-format-finding.md](073-cutroom-sdk-format-finding.md)                 | `cutroom-sdk`         | resolve Slice 4 re-journey FAIL | 2026-09-30 | sessions 75 and 77       |
+| 074 | [074-cutroom-sdk-v1-delivery-gates.md](074-cutroom-sdk-v1-delivery-gates.md)           | `cutroom-sdk-package` | finish portable SDK package     | 2026-09-30 | session 78               |
+| 075 | [075-documentation-release.md](075-documentation-release.md)                           | —                     | current docs and usage guide    | 2026-10-01 | session 79               |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
