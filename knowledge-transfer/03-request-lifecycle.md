@@ -160,7 +160,7 @@ call, a failed run and an interrupted job.
 `reel.keyframes` exists only for an admitted `stills` or `video` run (D-081, D-083).
 
 1. `startStage(db, runId, 'stills')` — same pattern as plan: a cancelled run ends with `status:
-   'cancelled'`.
+'cancelled'`.
 2. Read the per-reel cap once. Wrap the image port in `guardedImagePort` (the cap is enforced
    here, so a stills stage cannot spend past it). Wrap the model port in `recordingPort`.
 3. Call `makeStills({…}, { image, sensors, model }, stillsSettings)`.
@@ -200,7 +200,7 @@ The runner ends the stage:
 
 1. `startStage(db, runId, 'video')`.
 2. Read the cap once; wrap the video and narration ports; call `makeClips({…}, { video,
-   narration, media, model }, renderSettings)`.
+narration, media, model }, renderSettings)`.
 
 `makeClips` runs **shot by shot, in plan order**. For each shot:
 
@@ -246,8 +246,8 @@ assembly begins (I-18, S-069).
 3. `ports.media.frames(...)` → three frames per shot (first, middle, last).
 4. `gate7(manifest, cutQuestions, model)` answers yes/no on
    `_Are the shots in a sensible order? Do they sit well together? Do the captions follow the
-   narration?_` and one more. If any answer is no, the stage stops `kind: 'stopped-rule',
-   rule: 'gate-7'`.
+narration?_` and one more. If any answer is no, the stage stops `kind: 'stopped-rule',
+rule: 'gate-7'`.
 5. `kind: 'completed'` otherwise.
 
 The runner ends the stage through `finishVideo` with the render row's outputs and the held

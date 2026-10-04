@@ -106,6 +106,12 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-10-04 · session 80
+
+- Added `knowledge-transfer/cutroom-kt.html`: one self-contained page (no CDN) that teaches the engine — draggable/zoomable graphs with click-for-detail drawers for the system map, packages and the 22 rules, every stage, failures/resume, the 21-table ER model, SDK connection and service startup; a step-through sequence diagram of one request (until plan/stills/video); tables for gates, ports and wrappers, budget, routes, settings, symptoms, playbooks, features, all 129 source files, glossary and decisions; global search. Built from source at `94ee04a`.
+- Its last tab lists 18 places the numbered KT markdown disagrees with the code (e.g. a resume re-enters at `reel.keyframes`; the service picture rule defaults to `upToThree`; `SubmitRequest` needs `worldId`, typed criteria and `depictionPolicyVersion`). The markdown was not rewritten; `knowledge-transfer/README.md` links the page.
+- The KT markdown committed in `94ee04a` failed `prettier --check`; it is formatted now (whitespace, list numbering, code-block style). Session 71's journal entry was reflowed to one line a paragraph, words unchanged, to keep JOURNAL.md within S-177's 80 lines.
+
 ### 2026-10-01 · session 79
 
 - Replaced the pre-implementation root README and the 2026-09-20 status snapshot with current, user-facing descriptions of the built real-provider engine, verified local SDK package, distribution boundary, operating limits, and next queue item.
@@ -247,3 +253,4 @@ journey PASS at 18e9a48`. The `reel-contract` re-journey FAILed on `format` at `
 | why pieces were refused, counted | `docs/research/refusals.md`: every refusal of the real runs      |
 | a run's rows                     | the `run-reader` agent, with the run's id                        |
 | how to run checks, and the traps | `CLAUDE.md`                                                      |
+| how the code fits together       | `knowledge-transfer/cutroom-kt.html`, opened in a browser        |

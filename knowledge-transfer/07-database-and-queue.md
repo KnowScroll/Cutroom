@@ -23,19 +23,19 @@ The schema lives in `packages/domain/src/schema.ts`. The migrations are in `db/m
 
 ### `run` — one row per request, plus at most one resume
 
-| Column              | Type   | Notes                                                          |
-| ------------------- | ------ | -------------------------------------------------------------- |
-| `runId`             | text   | primary key (`randomUUID()`)                                   |
-| `requestId`         | text   | the caller's name for the reel                                 |
-| `request`           | text   | the body exactly as it arrived                                 |
-| `requestCanonical`  | text   | the parsed request with keys sorted at every depth             |
-| `state`             | text   | `'running'` or `'finished'`                                    |
-| `result`            | text   | a `RunResult`, JSON, present once finished                     |
-| `cancelRequested`   | int    | boolean; honoured at `startStage`                              |
-| `createdAt`         | text   | ISO 8601 UTC                                                   |
-| `resumes`           | text   | the run this one resumes, or null for a first run (S-162)      |
-| `failure`           | text   | a `FailureKind`, written with `result` for a failed run        |
-| `resumeRequest`     | text   | the caller's normalised list of pieces to remake               |
+| Column             | Type | Notes                                                     |
+| ------------------ | ---- | --------------------------------------------------------- |
+| `runId`            | text | primary key (`randomUUID()`)                              |
+| `requestId`        | text | the caller's name for the reel                            |
+| `request`          | text | the body exactly as it arrived                            |
+| `requestCanonical` | text | the parsed request with keys sorted at every depth        |
+| `state`            | text | `'running'` or `'finished'`                               |
+| `result`           | text | a `RunResult`, JSON, present once finished                |
+| `cancelRequested`  | int  | boolean; honoured at `startStage`                         |
+| `createdAt`        | text | ISO 8601 UTC                                              |
+| `resumes`          | text | the run this one resumes, or null for a first run (S-162) |
+| `failure`          | text | a `FailureKind`, written with `result` for a failed run   |
+| `resumeRequest`    | text | the caller's normalised list of pieces to remake          |
 
 Two unique indexes: `requestId WHERE resumes IS NULL` (one first run per `requestId`) and
 `resumes` (one resume per failed run).
@@ -156,18 +156,18 @@ again. This is what the worker does with any thrown error.
 
 ## The run lifecycle
 
-| Function                                                              | When it runs                                               | What it writes                                                    |
-| --------------------------------------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
-| `submitRun(db, request, received, now)`                               | `POST /v1/runs`                                            | `run` row, `reel.plan` job, `run.accepted` event                   |
-| `startStage(db, runId, stage, now)`                                   | every stage, before the stage's work                       | `stage.started` event (first attempt only), or answers `'cancelled'` |
-| `finishRun(db, finish, now)`                                          | `reel.plan`                                                | `plan` rows, events, `run.finished` event, result, job done, **engine's own resume** |
-| `admitStills(db, admit, now)`                                         | `reel.plan` admits                                         | `plan` rows, events, plan job done, `reel.keyframes` job          |
-| `finishStills(db, finish, now)`                                       | `reel.keyframes` ends the run (`until: 'stills'`)         | chosen flags, degradations, events, `run.finished`, job done      |
-| `advanceStills(db, a, now)`                                            | `reel.keyframes` admits (`until: 'video'`)               | chosen flags, degradations, events, keyframes job done, `reel.clips` job |
-| `advanceClips(db, a, now)`                                            | `reel.clips` admits                                        | held labels, events, clips job done, `reel.assemble` job          |
-| `finishVideo(db, f, now)`                                             | `reel.clips` stops/fails, `reel.assemble` ends the run     | held labels (and render outputs from `reel.assemble`), events, `run.finished`, result, job done |
-| `resumeRun(tx, runId, plan, options, now)`                            | `POST /v1/runs/:runId/resume` admitted, engine's resume    | a new `run` row with `resumes = runId`, the new chain's first job |
-| `requestCancel(db, runId)`                                            | `POST /v1/runs/:runId/cancel`                              | sets `cancelRequested = true` on a running run                     |
+| Function                                   | When it runs                                            | What it writes                                                                                  |
+| ------------------------------------------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `submitRun(db, request, received, now)`    | `POST /v1/runs`                                         | `run` row, `reel.plan` job, `run.accepted` event                                                |
+| `startStage(db, runId, stage, now)`        | every stage, before the stage's work                    | `stage.started` event (first attempt only), or answers `'cancelled'`                            |
+| `finishRun(db, finish, now)`               | `reel.plan`                                             | `plan` rows, events, `run.finished` event, result, job done, **engine's own resume**            |
+| `admitStills(db, admit, now)`              | `reel.plan` admits                                      | `plan` rows, events, plan job done, `reel.keyframes` job                                        |
+| `finishStills(db, finish, now)`            | `reel.keyframes` ends the run (`until: 'stills'`)       | chosen flags, degradations, events, `run.finished`, job done                                    |
+| `advanceStills(db, a, now)`                | `reel.keyframes` admits (`until: 'video'`)              | chosen flags, degradations, events, keyframes job done, `reel.clips` job                        |
+| `advanceClips(db, a, now)`                 | `reel.clips` admits                                     | held labels, events, clips job done, `reel.assemble` job                                        |
+| `finishVideo(db, f, now)`                  | `reel.clips` stops/fails, `reel.assemble` ends the run  | held labels (and render outputs from `reel.assemble`), events, `run.finished`, result, job done |
+| `resumeRun(tx, runId, plan, options, now)` | `POST /v1/runs/:runId/resume` admitted, engine's resume | a new `run` row with `resumes = runId`, the new chain's first job                               |
+| `requestCancel(db, runId)`                 | `POST /v1/runs/:runId/cancel`                           | sets `cancelRequested = true` on a running run                                                  |
 
 Every write that numbers an event happens inside **one immediate transaction** — the event's
 `seq` and the row that carries it cannot be separated (`packages/domain/src/runs.ts:39`).

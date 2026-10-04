@@ -13,6 +13,7 @@ the ports it needs (`LanguageModelPort`, `ImagePort`, `VideoPort`, `NarrationPor
 to build them from settings. Each adapter is constructed in exactly one place.
 
 Two consequences:
+
 - The pipeline can be tested without a database, without a real provider, and without a key
   (every port has a stand-in).
 - A provider key (`MINIMAX_KEY`, `FAL_KEY`) is read in exactly one place (`packages/providers`
@@ -22,15 +23,15 @@ This is **S-021, S-038, S-108, S-109** — three rules read together.
 
 ## The five ports
 
-| Port              | Type                                                | Real | Built when…                                        |
-| ----------------- | --------------------------------------------------- | ---- | -------------------------------------------------- |
-| `LanguageModelPort` | `packages/contracts/src/model.ts`                 | ✅   | `model: 'minimax'` is configured                    |
-| `ImagePort`       | `packages/contracts/src/picture.ts`                 | ✅   | `image: 'fal'` is configured                       |
-| `VideoPort`       | `packages/contracts/src/providers.ts`               | ✅   | `video: 'fal'` is configured                       |
-| `NarrationPort`   | `packages/contracts/src/narration.ts`               | ✅   | `narration: 'minimax'` is configured               |
-| `MediaPort`       | `packages/contracts/src/observation.ts`             | ✅   | always; ffmpeg on this machine (S-075)            |
-| `AssemblerPort`   | `packages/contracts/src/render.ts`                  | ✅   | always; ffmpeg on this machine (S-075)            |
-| `PictureSensorPort` | `packages/contracts/src/observation.ts`            | ✅   | `sensor: 'local'` (the only real option; S-126)    |
+| Port                | Type                                    | Real | Built when…                                     |
+| ------------------- | --------------------------------------- | ---- | ----------------------------------------------- |
+| `LanguageModelPort` | `packages/contracts/src/model.ts`       | ✅   | `model: 'minimax'` is configured                |
+| `ImagePort`         | `packages/contracts/src/picture.ts`     | ✅   | `image: 'fal'` is configured                    |
+| `VideoPort`         | `packages/contracts/src/providers.ts`   | ✅   | `video: 'fal'` is configured                    |
+| `NarrationPort`     | `packages/contracts/src/narration.ts`   | ✅   | `narration: 'minimax'` is configured            |
+| `MediaPort`         | `packages/contracts/src/observation.ts` | ✅   | always; ffmpeg on this machine (S-075)          |
+| `AssemblerPort`     | `packages/contracts/src/render.ts`      | ✅   | always; ffmpeg on this machine (S-075)          |
+| `PictureSensorPort` | `packages/contracts/src/observation.ts` | ✅   | `sensor: 'local'` (the only real option; S-126) |
 
 `MediaPort` and `AssemblerPort` have no stand-in — the local ffmpeg is the implementation.
 

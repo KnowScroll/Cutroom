@@ -15,14 +15,9 @@ runtime and boundary behavior, so its exact tree received fresh full evidence. F
 
 ## 2026-09-29 — session 71, `cutroom-sdk` Slice 4 execution planned
 
-**Decision.** S-178 makes the final slice explicit and fixes the only valid evidence order: tick the evidence-only
-Slice 4 in a clean documentation commit; run the generated no-provider `cutroom-sdk` journey; then, only on PASS,
-run and commit the one exact compatibility re-journey, `reel-contract`. Its in-built full check is the Gate 4 final
-proof, so no third aggregate run is added. The Slice 0 impact record remains decisive: only `reel-contract` had its
-public contract evidence amended; Slice 2 and Slice 3 changed SDK-owned code, tests and rules only.
+**Decision.** S-178 makes the final slice explicit and fixes the only valid evidence order: tick the evidence-only Slice 4 in a clean documentation commit; run the generated no-provider `cutroom-sdk` journey; then, only on PASS, run and commit the one exact compatibility re-journey, `reel-contract`. Its in-built full check is the Gate 4 final proof, so no third aggregate run is added. The Slice 0 impact record remains decisive: only `reel-contract` had its public contract evidence amended; Slice 2 and Slice 3 changed SDK-owned code, tests and rules only.
 
-**Evidence.** `node scripts/verification-status.mjs` reports `ae0599a` has full verification for its exact tree.
-No test command ran: the owner asked to reuse the already completed Slice 3 evidence rather than rerun it as startup.
+**Evidence.** `node scripts/verification-status.mjs` reports `ae0599a` has full verification for its exact tree. No test command ran: the owner asked to reuse the already completed Slice 3 evidence rather than rerun it as startup.
 
 **Next.** Run `PROMPTS/072-cutroom-sdk-slice-4.md`; on its first FAIL, commit the generated finding and stop.
 
@@ -78,3 +73,7 @@ its gates, API and queue order remain unwritten. **Next.** Finish SDK v1 before 
 ## 2026-10-01 — session 79, current documentation and external usage handoff
 
 **Decision.** Document the true boundary: engine and SDK package verified; registry, engine packaging, installation, hosting and remote access unbuilt. **Outcome.** Replaced the pre-code README and old status; added `docs/USING_CUTROOM.md` for every supported free, SDK, paid and recovery path; corrected the agent contracts, historical survey and Prompt 073/074 index. Prompt 075 records the request; no runtime, contract, provider, database, test, artifact or boundary changed. **Next.** Verify this exact documentation tree, commit and push `main`; then resume at `self-heal`.
+
+## 2026-10-04 — session 80, interactive knowledge-transfer page
+
+**Decision.** Owner asked for one HTML page that teaches the whole engine (HLD, LLD, movable and clickable graphs, tabs); chose a single self-contained file in `knowledge-transfer/` (no CDN, works offline) and to commit it. **Outcome.** `knowledge-transfer/cutroom-kt.html`: 18 tabs — system map, packages with all 22 rules, a step-through sequence of one request, flowcharts of plan/stills/clips/render/resume, gates, ports and wrappers, an ER graph of the 21 tables, failures and resume, budget, API/SDK, settings and startup, debugging, change playbooks, checks, a 129-file code index, glossary and 18 corrections where the numbered KT markdown disagrees with the code. Every fact was read from source at `94ee04a`; interactions verified in headless Chrome (all tabs, drawer, rules, stepper, search, light/dark, 390 px). The KT markdown from `94ee04a` failed `prettier --check`; formatted (whitespace, list numbering, code-block style only). No runtime, contract, test or boundary changed. **Next.** `self-heal`; optionally correct the numbered KT files from the corrections tab.

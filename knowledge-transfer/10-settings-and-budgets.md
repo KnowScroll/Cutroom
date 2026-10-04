@@ -18,24 +18,24 @@ hands the `env` to the port factories; the factories decide whether the value is
 
 The full list is in `apps/service/src/settings.ts:84-110`. The most common ones:
 
-| Variable                       | Default                                              | What it does                                                              |
-| ------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------- |
-| `CUTROOM_ENV_FILE`             | `<repo>/.env`                                        | Path to the dotenv-style file a key may be in.                           |
-| `CUTROOM_DB_PATH`              | `<repo>/data/cutroom.sqlite`                         | The SQLite database file (gitignored).                                    |
-| `CUTROOM_ARTIFACT_ROOT`        | `<repo>/.artifacts/`                                  | Where every generated file goes (gitignored; D-086).                     |
-| `CUTROOM_QUESTIONS_PATH`       | `<repo>/QUESTIONS.md`                                 | The questions file a cap refusal or stop is appended to.                  |
-| `CUTROOM_BUDGET_PATH`          | `<repo>/BUDGET.md` (the pinned steering-ref's)      | The cap file the per-reel cap is read from.                               |
-| `CUTROOM_API_PORT`             | `8787`                                                | The HTTP port (loopback only — D-098).                                   |
-| `CUTROOM_LEASE_MS`             | the floor                                            | The job-claim lease. The service uses `DEFAULT_LEASE_FLOOR_MS` (4 h).     |
-| `CUTROOM_STAND_IN_SCRIPT`      | unset                                                 | A JSON file the stand-ins answer from (S-116).                            |
-| `CUTROOM_MINIMAX_BASE_URL`     | `MINIMAX_BASE_URL`                                    | Where MiniMax is.                                                        |
-| `CUTROOM_FAL_BASE_URL`         | `FAL_BASE_URL`                                        | Where fal's queue is.                                                     |
-| `CUTROOM_FAL_STORAGE_BASE_URL` | `FAL_STORAGE_BASE_URL`                                | Where fal's storage is.                                                   |
-| `CUTROOM_FAL_IMAGE_MODEL`      | the registry's default                                | Which admitted entry the image port uses (D-028).                         |
-| `CUTROOM_NARRATION_VOICE`      | `'stand-in'`                                          | The voice the narration adapter sends (S-070, D-008).                     |
-| `CUTROOM_PICTURES`             | `'recurring'`                                         | The picture rule (D-027, S-150).                                          |
-| `CUTROOM_RESUME_DELAY_MS`      | `15 * 60_000` (15 min)                                | How long the engine's resume of a failed run is due after the failure.    |
-| `CUTROOM_PROVIDER_<PORT>`      | `'stand-in'` (the default)                           | Which adapter to build. One per port: `model`, `image`, `sensor`, `video`, `narration`. |
+| Variable                       | Default                                        | What it does                                                                            |
+| ------------------------------ | ---------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `CUTROOM_ENV_FILE`             | `<repo>/.env`                                  | Path to the dotenv-style file a key may be in.                                          |
+| `CUTROOM_DB_PATH`              | `<repo>/data/cutroom.sqlite`                   | The SQLite database file (gitignored).                                                  |
+| `CUTROOM_ARTIFACT_ROOT`        | `<repo>/.artifacts/`                           | Where every generated file goes (gitignored; D-086).                                    |
+| `CUTROOM_QUESTIONS_PATH`       | `<repo>/QUESTIONS.md`                          | The questions file a cap refusal or stop is appended to.                                |
+| `CUTROOM_BUDGET_PATH`          | `<repo>/BUDGET.md` (the pinned steering-ref's) | The cap file the per-reel cap is read from.                                             |
+| `CUTROOM_API_PORT`             | `8787`                                         | The HTTP port (loopback only — D-098).                                                  |
+| `CUTROOM_LEASE_MS`             | the floor                                      | The job-claim lease. The service uses `DEFAULT_LEASE_FLOOR_MS` (4 h).                   |
+| `CUTROOM_STAND_IN_SCRIPT`      | unset                                          | A JSON file the stand-ins answer from (S-116).                                          |
+| `CUTROOM_MINIMAX_BASE_URL`     | `MINIMAX_BASE_URL`                             | Where MiniMax is.                                                                       |
+| `CUTROOM_FAL_BASE_URL`         | `FAL_BASE_URL`                                 | Where fal's queue is.                                                                   |
+| `CUTROOM_FAL_STORAGE_BASE_URL` | `FAL_STORAGE_BASE_URL`                         | Where fal's storage is.                                                                 |
+| `CUTROOM_FAL_IMAGE_MODEL`      | the registry's default                         | Which admitted entry the image port uses (D-028).                                       |
+| `CUTROOM_NARRATION_VOICE`      | `'stand-in'`                                   | The voice the narration adapter sends (S-070, D-008).                                   |
+| `CUTROOM_PICTURES`             | `'recurring'`                                  | The picture rule (D-027, S-150).                                                        |
+| `CUTROOM_RESUME_DELAY_MS`      | `15 * 60_000` (15 min)                         | How long the engine's resume of a failed run is due after the failure.                  |
+| `CUTROOM_PROVIDER_<PORT>`      | `'stand-in'` (the default)                     | Which adapter to build. One per port: `model`, `image`, `sensor`, `video`, `narration`. |
 
 Two settings are derived:
 
@@ -140,20 +140,20 @@ For a `plan` run, no ceiling comparison at all — planning costs nothing (D-083
 
 ## What you can re-configure without breaking anything
 
-| Setting                      | Reconfigurable? | Notes                                                            |
-| ---------------------------- | --------------- | ---------------------------------------------------------------- |
-| `CUTROOM_API_PORT`           | yes             | Must remain loopback; default `8787`                            |
-| `CUTROOM_DB_PATH`            | yes             | The path is gitignored                                            |
-| `CUTROOM_ARTIFACT_ROOT`      | yes             | The folder is gitignored; every artifact goes under it            |
-| `CUTROOM_QUESTIONS_PATH`     | yes             | Append-only                                                       |
-| `CUTROOM_BUDGET_PATH`        | yes             | The cap file must exist; reader is strict                         |
-| `CUTROOM_LEASE_MS`           | yes             | Must outlast the longest job; service enforces the floor         |
-| `CUTROOM_STAND_IN_SCRIPT`    | yes             | A JSON file the stand-ins answer from (S-116)                    |
-| `CUTROOM_MINIMAX_BASE_URL`   | yes             | For recorded-wire tests                                           |
-| `CUTROOM_FAL_BASE_URL`       | yes             | For recorded-wire tests; must be set together with storage URL  |
-| `CUTROOM_FAL_STORAGE_BASE_URL` | yes           | For recorded-wire tests                                           |
-| `CUTROOM_FAL_IMAGE_MODEL`    | yes             | Must be in `IMAGE_REGISTRY` (D-028)                              |
-| `CUTROOM_NARRATION_VOICE`    | yes             | A real voice for a paid run; `'stand-in'` for the default        |
-| `CUTROOM_PICTURES`           | yes             | `'recurring'` or `'upToThree'`                                  |
-| `CUTROOM_RESUME_DELAY_MS`    | yes             | Engine's resume delay; `0` or absent turns the switch off          |
-| `CUTROOM_PROVIDER_<PORT>`    | yes             | Adapter name; must be in the closed set for that port           |
+| Setting                        | Reconfigurable? | Notes                                                          |
+| ------------------------------ | --------------- | -------------------------------------------------------------- |
+| `CUTROOM_API_PORT`             | yes             | Must remain loopback; default `8787`                           |
+| `CUTROOM_DB_PATH`              | yes             | The path is gitignored                                         |
+| `CUTROOM_ARTIFACT_ROOT`        | yes             | The folder is gitignored; every artifact goes under it         |
+| `CUTROOM_QUESTIONS_PATH`       | yes             | Append-only                                                    |
+| `CUTROOM_BUDGET_PATH`          | yes             | The cap file must exist; reader is strict                      |
+| `CUTROOM_LEASE_MS`             | yes             | Must outlast the longest job; service enforces the floor       |
+| `CUTROOM_STAND_IN_SCRIPT`      | yes             | A JSON file the stand-ins answer from (S-116)                  |
+| `CUTROOM_MINIMAX_BASE_URL`     | yes             | For recorded-wire tests                                        |
+| `CUTROOM_FAL_BASE_URL`         | yes             | For recorded-wire tests; must be set together with storage URL |
+| `CUTROOM_FAL_STORAGE_BASE_URL` | yes             | For recorded-wire tests                                        |
+| `CUTROOM_FAL_IMAGE_MODEL`      | yes             | Must be in `IMAGE_REGISTRY` (D-028)                            |
+| `CUTROOM_NARRATION_VOICE`      | yes             | A real voice for a paid run; `'stand-in'` for the default      |
+| `CUTROOM_PICTURES`             | yes             | `'recurring'` or `'upToThree'`                                 |
+| `CUTROOM_RESUME_DELAY_MS`      | yes             | Engine's resume delay; `0` or absent turns the switch off      |
+| `CUTROOM_PROVIDER_<PORT>`      | yes             | Adapter name; must be in the closed set for that port          |

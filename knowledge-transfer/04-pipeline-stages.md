@@ -23,12 +23,12 @@ changing its code.
  Gate 0    Gates 1, 1S  Gates 2-5  Gate 7
 ```
 
-| Stage    | File                                                     | Inputs                                    | Outputs                                                          |
-| -------- | -------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
-| Plan     | `plan/index.ts` — `planReel`                              | `SubmitRequest`, `LanguageModelPort`, cap, `PlanSettings` | `PlanOutcome` (selected / refused-budget / stopped-rule)         |
-| Stills   | `stills/index.ts` — `makeStills`                         | `StillsInput`, ports (`image`, `sensors`, `model`), `StillsSettings` | `StillsOutcome` (completed / stopped-rule / stopped-budget / failed) |
-| Clips    | `clips/index.ts` — `makeClips`                           | `ClipsInput`, ports (`video`, `narration`, `media`, `model`), `RenderSettings` | `ClipsOutcome` (completed / stopped-rule / stopped-budget / failed) |
-| Render   | `render/index.ts` — `cutReel`                            | `RenderManifest`, ports (`assembler`, `media`, `model`), `RenderSettings` | `CutOutcome` (completed / stopped-rule / failed)                 |
+| Stage  | File                             | Inputs                                                                         | Outputs                                                              |
+| ------ | -------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Plan   | `plan/index.ts` — `planReel`     | `SubmitRequest`, `LanguageModelPort`, cap, `PlanSettings`                      | `PlanOutcome` (selected / refused-budget / stopped-rule)             |
+| Stills | `stills/index.ts` — `makeStills` | `StillsInput`, ports (`image`, `sensors`, `model`), `StillsSettings`           | `StillsOutcome` (completed / stopped-rule / stopped-budget / failed) |
+| Clips  | `clips/index.ts` — `makeClips`   | `ClipsInput`, ports (`video`, `narration`, `media`, `model`), `RenderSettings` | `ClipsOutcome` (completed / stopped-rule / stopped-budget / failed)  |
+| Render | `render/index.ts` — `cutReel`    | `RenderManifest`, ports (`assembler`, `media`, `model`), `RenderSettings`      | `CutOutcome` (completed / stopped-rule / failed)                     |
 
 The gate order is `['0', '1', '1S', '2', '3', '4', '5', '7']` (`packages/pipeline/src/gates/index.ts`).
 There is no `6` (no chain — S-067) and no `8` (KnowScroll's — S-068).
@@ -38,12 +38,14 @@ There is no `6` (no chain — S-067) and no `8` (KnowScroll's — S-068).
 `packages/pipeline/src/plan/index.ts:138-235`. The worker calls this; nothing else does.
 
 Inputs:
+
 - `request: SubmitRequest`.
 - `model: LanguageModelPort`.
 - `capCents: number` (read from `BUDGET.md`'s `Per reel, all-in` row, D-100).
 - `settings: PlanSettings`.
 
 Default settings (`DEFAULT_PLAN_SETTINGS`):
+
 - `shotCountUnits: [4, 6]` (D-112).
 - `totalSecondsBounds: [35, 45]` (D-111).
 - `imageRateCents: 15` (BUDGET.md: nano-banana-pro/edit, the dearest candidate — O-4).
@@ -80,8 +82,8 @@ Outcome shapes:
 The runner (`apps/worker/src/plan-job.ts`) handles each outcome:
 
 - `selected` + `until: 'plan'` → `finishRun` with `status: 'completed', until: 'plan'`.
-- `selected` + `until: 'stills' | 'video'` → compare the *whole estimate* (video) or *just the
-  pictures* (stills) to `request.options.budgetCents`. Admitted: `admitStills`; refused:
+- `selected` + `until: 'stills' | 'video'` → compare the _whole estimate_ (video) or _just the
+  pictures_ (stills) to `request.options.budgetCents`. Admitted: `admitStills`; refused:
   `finishRun` with `limit: 'ceiling'`.
 - `refused-budget` → `finishRun` with `limit: 'reel'` and an appended question to
   `QUESTIONS.md`.
@@ -99,6 +101,7 @@ The runner (`apps/worker/src/plan-job.ts`) handles each outcome:
 ports it built.
 
 Inputs (`StillsInput`):
+
 - `runId`, `attempt`.
 - `earlierImageCalls`: the run's image calls before this attempt (receipts + lost calls — S-048,
   S-142).
@@ -110,6 +113,7 @@ Inputs (`StillsInput`):
   (S-162). Zero for a first run.
 
 Ports (`StillsPorts`):
+
 - `image: ImagePort` (with `acceptsReferences: true` — D-026).
 - `sensors: PictureSensorPort`.
 - `model: LanguageModelPort`.
@@ -117,6 +121,7 @@ Ports (`StillsPorts`):
 - `refusalRecorder: RefusalRecorder`.
 
 Default settings (`DEFAULT_STILLS_SETTINGS`):
+
 - `canonicalFraming: ['medium', 'wide']` (D-032, S-044). Two equal canonical framing values
   would render one prompt twice — the worker refuses to start with them (D-032).
 - `scoreWeights`: from `DEFAULT_SCORE_WEIGHTS`.
@@ -167,6 +172,7 @@ The worker:
 ports it built.
 
 Inputs (`ClipsInput`):
+
 - `runId`, `attempt`.
 - `request: SubmitRequest`.
 - `plan: Plan`.
@@ -175,6 +181,7 @@ Inputs (`ClipsInput`):
   first attempt, empty. On a resume, populated.
 
 Ports (`ClipsPorts`):
+
 - `video: VideoPort`.
 - `narration: NarrationPort`.
 - `media: MediaPort`.
@@ -198,7 +205,7 @@ Algorithm (per shot, in plan order):
    the stage goes on to the next shot.
 4. **Final gate-5 check**. Once every shot is done, if a `mustShow` criterion has no accepted
    take that shows it (held shots show nothing — S-072, S-090), the stage stops `rule:
-   'gate-5'`.
+'gate-5'`.
 
 Outcome (`ClipsOutcome`):
 
@@ -221,15 +228,18 @@ The worker:
 the ports it built. **No port that buys** is handed in (I-18).
 
 Inputs:
+
 - `renderManifest: RenderManifest` — `runId`, `renderId`, `attempt`, `profile`, every shot's
   `startFrame`, `frames`, `captions`, `words`.
 
 Ports (`CutPorts`):
+
 - `assembler: AssemblerPort` (ffmpeg).
 - `media: MediaPort` (ffmpeg).
 - `model: LanguageModelPort` (for Gate 7).
 
 Default settings (`DEFAULT_RENDER_SETTINGS`):
+
 - `profile`: `mp4 / h264 / aac / 768x1366 / 24fps / 48kHz / 2 channels`.
 - `gateProfile: { id: 'phase-1', gates: GATE_ORDER }` — exactly one is defined (D-052, S-067).
 - `narrationRateCentsPerCharacter: 0` (T2A is covered by the token plan — D-019).
@@ -252,7 +262,7 @@ Algorithm:
    the stage fails `kind: 'failed', failure: 'engine'`.
 3. `ports.media.frames(file, [startFrame, midFrame, endFrame] × shots)` → the frame strip.
 4. `gate7(manifest, cutQuestions, model)` answers yes/no. Any `no` → `kind: 'stopped-rule',
-   rule: 'gate-7'`.
+rule: 'gate-7'`.
 5. `kind: 'completed'` otherwise.
 
 Outcome (`CutOutcome`):
@@ -275,7 +285,7 @@ the worker prices at, so the three can never plan one resume two ways (S-161, S-
 - `normalise(pieces, plan, until)`: the caller's named pieces as one list, in shot order then
   still / narration / clip (S-161). Refused pieces (a still on a shot the plan gives no picture,
   a narration or clip on a run that makes none, a run with no selected plan) answer `{ invalid:
-  '…' }`.
+'…' }`.
 - `takedown(named, plan, until)`: what the named pieces take down with them. A still takes down
   its shot's clip and the canonical's still every derived shot's still and clip drew from
   (D-026). A standalone's still takes down its shot only (S-150). A narration takes down its
@@ -286,7 +296,7 @@ the worker prices at, so the three can never plan one resume two ways (S-161, S-
 - `admitResume(spentCents, estimateCents, capCents, ceilingCents)`: admits against the per-reel
   cap first (D-100), then the caller's ceiling. Outcomes: `{ admitted: true, estimateCents }`,
   `{ admitted: false, limit: 'reel', estimateCents }`, `{ admitted: false, limit: 'ceiling',
-  estimateCents }`.
+estimateCents }`.
 
 The engine's resume (`apps/worker/src/resume.ts`) calls these inside a savepoint in the
 finishing transaction (S-163). The service's resume (`apps/service/src/service.ts:53-81`)

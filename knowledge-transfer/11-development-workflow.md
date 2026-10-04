@@ -51,14 +51,14 @@ real-reel settings.
 
 `node scripts/check.mjs` chooses what to run based on what changed.
 
-| Change kind          | Command                          | What runs                                                                  |
-| -------------------- | ------------------------------- | -------------------------------------------------------------------------- |
-| Documents only       | `node scripts/check.mjs --changed` | `prettier --check`, four scanning tests, decisions pin, copied docs         |
-| One code slice       | `node scripts/check.mjs --slice <test...>` | Static checks (typecheck, lint, format, boundaries, boundaries-proven) plus the named tests |
-| Unclassified / broad | `node scripts/check.mjs`         | Everything — the full suite, every check, every test                       |
-| Workspace / dependency changes | `node scripts/check.mjs`     | Same as unclassified                                                       |
-| Verification tooling / boundary changes | `node scripts/check.mjs` | Same as unclassified                                                       |
-| A new feature journey | `node scripts/check.mjs`        | Same as unclassified                                                       |
+| Change kind                             | Command                                    | What runs                                                                                   |
+| --------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Documents only                          | `node scripts/check.mjs --changed`         | `prettier --check`, four scanning tests, decisions pin, copied docs                         |
+| One code slice                          | `node scripts/check.mjs --slice <test...>` | Static checks (typecheck, lint, format, boundaries, boundaries-proven) plus the named tests |
+| Unclassified / broad                    | `node scripts/check.mjs`                   | Everything — the full suite, every check, every test                                        |
+| Workspace / dependency changes          | `node scripts/check.mjs`                   | Same as unclassified                                                                        |
+| Verification tooling / boundary changes | `node scripts/check.mjs`                   | Same as unclassified                                                                        |
+| A new feature journey                   | `node scripts/check.mjs`                   | Same as unclassified                                                                        |
 
 The mapping is in `scripts/check.mjs:51-69`. **If the diff has both documents and code, run
 the full suite** — the change-kind rules are strict.
@@ -77,12 +77,12 @@ the full suite** — the change-kind rules are strict.
 6. **no dead rule** — `scripts/drift.mjs --audit`. Fails when a rule names a folder that a
    renamed package lost.
 7. **tests** — `node --test --test-concurrency=1 tests/**/*.test.ts packages/**/*.test.ts
-   apps/**/*.test.ts`. The `--test-concurrency=1` is required — nested ffmpeg/SQLite workers
+apps/**/*.test.ts`. The `--test-concurrency=1` is required — nested ffmpeg/SQLite workers
    would otherwise compete for the same machine.
 8. **decisions pin** — `scripts/decisions.mjs`. Confirms the steering repository's decisions
    pin is current.
-10. **copied docs** — `scripts/docs-check.mjs`. Confirms the docs that have been written to
-    one place have been copied to the other.
+9. **copied docs** — `scripts/docs-check.mjs`. Confirms the docs that have been written to
+   one place have been copied to the other.
 
 ## Three "honest" rules
 
@@ -186,18 +186,18 @@ reasoning is not.
 
 ## Quick reference
 
-| Want to…                                              | Run                                                                  |
-| ------------------------------------------ | ------------------------------------------------------------------- |
-| See what decisions this repo answers to                   | `node scripts/decisions.mjs`                                        |
-| See the boundaries as currently configured             | `node scripts/drift.mjs`                                            |
-| Prove the boundaries are live (write a file per rule) | `node scripts/drift.mjs --prove`                                    |
-| Find rules that name no real folder                     | `node scripts/drift.mjs --audit`                                    |
-| Run everything                                          | `node scripts/check.mjs`                                            |
-| Run only the checks for docs                           | `node scripts/check.mjs --changed`                                  |
-| Run static checks + a named test                        | `node scripts/check.mjs --slice <test-file-or-test-glob>`           |
-| See what would run (no execution)                       | `node scripts/check.mjs --changed --dry-run`                        |
-| Run one test file                                       | `node --experimental-strip-types --test --test-concurrency=1 tests/<file>.test.ts` |
-| Start the service                                       | `corepack pnpm service`                                              |
-| Build the SDK tarballs                                  | `node scripts/package-sdk.mjs`                                      |
-| Make a real paid reel                                   | `node scripts/real-reel.mjs`                                        |
-| Verify a commit tree                                    | `node scripts/verification-status.mjs`                              |
+| Want to…                                              | Run                                                                                |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| See what decisions this repo answers to               | `node scripts/decisions.mjs`                                                       |
+| See the boundaries as currently configured            | `node scripts/drift.mjs`                                                           |
+| Prove the boundaries are live (write a file per rule) | `node scripts/drift.mjs --prove`                                                   |
+| Find rules that name no real folder                   | `node scripts/drift.mjs --audit`                                                   |
+| Run everything                                        | `node scripts/check.mjs`                                                           |
+| Run only the checks for docs                          | `node scripts/check.mjs --changed`                                                 |
+| Run static checks + a named test                      | `node scripts/check.mjs --slice <test-file-or-test-glob>`                          |
+| See what would run (no execution)                     | `node scripts/check.mjs --changed --dry-run`                                       |
+| Run one test file                                     | `node --experimental-strip-types --test --test-concurrency=1 tests/<file>.test.ts` |
+| Start the service                                     | `corepack pnpm service`                                                            |
+| Build the SDK tarballs                                | `node scripts/package-sdk.mjs`                                                     |
+| Make a real paid reel                                 | `node scripts/real-reel.mjs`                                                       |
+| Verify a commit tree                                  | `node scripts/verification-status.mjs`                                             |

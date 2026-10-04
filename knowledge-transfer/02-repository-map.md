@@ -171,42 +171,42 @@ a folder that a renamed package lost.
 
 ## Where things live, by concern
 
-| Concern                                   | Lives in                                                            |
-| ----------------------------------------- | ------------------------------------------------------------------- |
-| HTTP routes, request validation            | `packages/reel-contract`, served by `apps/api`                      |
-| Loopback server, route dispatch           | `apps/api/src/server.ts`                                            |
-| Job queue, claims, leases                 | `packages/domain/src/queue.ts`                                      |
-| Run lifecycle (accept/finish/resume)      | `packages/domain/src/runs.ts`                                       |
-| Tables and migrations                     | `packages/domain/src/{schema.ts,db.ts}`, `db/migrations/`           |
-| Planning stage (model calls, gate 0)      | `packages/pipeline/src/plan/index.ts`                               |
-| Stills stage (ladders, gates 1, 1S)       | `packages/pipeline/src/stills/index.ts`                             |
-| Clips stage (gates 2-5, holds)            | `packages/pipeline/src/clips/index.ts`                              |
-| Render stage (ffmpeg pass, gate 7)        | `packages/pipeline/src/render/index.ts`                             |
-| Resume planning and admission             | `packages/pipeline/src/resume/index.ts`                             |
-| Port types                                | `packages/contracts/src/{providers.ts,model.ts,picture.ts,…}`        |
-| Port factories (real and stand-in)        | `packages/providers/src/ports.ts`                                   |
-| Real adapters                             | `packages/providers/src/{minimax,fal,ffmpeg}/`                      |
-| Stand-in adapters                         | `packages/providers/src/fake/`                                      |
-| Provider key reading                    | `packages/providers/src/env.ts`                                        |
-| Worker loop, job dispatch                 | `apps/worker/src/worker.ts`                                         |
-| Per-job runners                          | `apps/worker/src/{plan-job,keyframes-job,clips-job,assemble-job}.ts` |
-| Engine's own resume                       | `apps/worker/src/resume.ts`                                         |
-| SDK typed client                          | `packages/sdk/src/index.ts`                                         |
-| SDK child-process lifecycle               | `packages/sdk/src/launcher.ts`                                      |
-| Settings and the composition root         | `apps/service/src/{settings.ts,service.ts}`                         |
-| BUDGET.md, QUESTIONS.md, paths            | `apps/worker/src/questions.ts`, `packages/domain/src/budget.ts`     |
+| Concern                              | Lives in                                                             |
+| ------------------------------------ | -------------------------------------------------------------------- |
+| HTTP routes, request validation      | `packages/reel-contract`, served by `apps/api`                       |
+| Loopback server, route dispatch      | `apps/api/src/server.ts`                                             |
+| Job queue, claims, leases            | `packages/domain/src/queue.ts`                                       |
+| Run lifecycle (accept/finish/resume) | `packages/domain/src/runs.ts`                                        |
+| Tables and migrations                | `packages/domain/src/{schema.ts,db.ts}`, `db/migrations/`            |
+| Planning stage (model calls, gate 0) | `packages/pipeline/src/plan/index.ts`                                |
+| Stills stage (ladders, gates 1, 1S)  | `packages/pipeline/src/stills/index.ts`                              |
+| Clips stage (gates 2-5, holds)       | `packages/pipeline/src/clips/index.ts`                               |
+| Render stage (ffmpeg pass, gate 7)   | `packages/pipeline/src/render/index.ts`                              |
+| Resume planning and admission        | `packages/pipeline/src/resume/index.ts`                              |
+| Port types                           | `packages/contracts/src/{providers.ts,model.ts,picture.ts,…}`        |
+| Port factories (real and stand-in)   | `packages/providers/src/ports.ts`                                    |
+| Real adapters                        | `packages/providers/src/{minimax,fal,ffmpeg}/`                       |
+| Stand-in adapters                    | `packages/providers/src/fake/`                                       |
+| Provider key reading                 | `packages/providers/src/env.ts`                                      |
+| Worker loop, job dispatch            | `apps/worker/src/worker.ts`                                          |
+| Per-job runners                      | `apps/worker/src/{plan-job,keyframes-job,clips-job,assemble-job}.ts` |
+| Engine's own resume                  | `apps/worker/src/resume.ts`                                          |
+| SDK typed client                     | `packages/sdk/src/index.ts`                                          |
+| SDK child-process lifecycle          | `packages/sdk/src/launcher.ts`                                       |
+| Settings and the composition root    | `apps/service/src/{settings.ts,service.ts}`                          |
+| BUDGET.md, QUESTIONS.md, paths       | `apps/worker/src/questions.ts`, `packages/domain/src/budget.ts`      |
 
 ## What you should never import, and why
 
-| If you are in… | You must not import… | Why                                      |
-| -------------- | -------------------- | ---------------------------------------- |
-| `pipeline`     | `domain`, `providers`, `node:fs`, `node:net`, `fetch`, any app | The stage must be reproducible from inputs |
-| `api`          | `providers`, `worker`, `pipeline`      | The API must not spend or plan           |
-| `worker`       | `providers`           | The worker must not construct adapters   |
-| `providers`    | `domain`, `pipeline`  | Adapters must not know the database or the stages |
-| `contracts`    | any other workspace package | Pure types |
-| `reel-contract` | any other workspace package | Public contract; leaf |
-| `sdk`          | `pipeline`, `domain`, `providers` | The SDK must not be tied to the engine's internals |
-| the splitter (`packages/pipeline/src/split/index.ts`) | anything outside `split/` | Only the planner calls it (D-073) |
+| If you are in…                                        | You must not import…                                           | Why                                                |
+| ----------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
+| `pipeline`                                            | `domain`, `providers`, `node:fs`, `node:net`, `fetch`, any app | The stage must be reproducible from inputs         |
+| `api`                                                 | `providers`, `worker`, `pipeline`                              | The API must not spend or plan                     |
+| `worker`                                              | `providers`                                                    | The worker must not construct adapters             |
+| `providers`                                           | `domain`, `pipeline`                                           | Adapters must not know the database or the stages  |
+| `contracts`                                           | any other workspace package                                    | Pure types                                         |
+| `reel-contract`                                       | any other workspace package                                    | Public contract; leaf                              |
+| `sdk`                                                 | `pipeline`, `domain`, `providers`                              | The SDK must not be tied to the engine's internals |
+| the splitter (`packages/pipeline/src/split/index.ts`) | anything outside `split/`                                      | Only the planner calls it (D-073)                  |
 
 The `node scripts/drift.mjs` script is what catches them; never assume a configured rule runs.

@@ -55,6 +55,7 @@ it). A clip takes itself. The cut and Gate 7 are **always** made again.
 ### `planResume(inputs, remake, rates, by)`
 
 Pure. Inputs:
+
 - `inputs: ResumeInputs` (the failed run's request, the kept pictures / narrations / takes,
   and the spent cents).
 - `remake`: extra pieces the caller wants remade, on top of the named pieces' takedown.
@@ -90,8 +91,8 @@ When a stage fails (`finishFailed`):
    runs **inside a `SAVEPOINT resume`** of the finishing transaction, rolled back if it
    throws (S-163).
 3. Inside the savepoint: `readResumeInputs(tx, runId, ending)`, `planResume(inputs, [], rates,
-   'engine')`, `admitResume(...)`. If admitted: `resumeRun(tx, runId, plan, { now, delayMs:
-   context.delayMs, resumeRequest: null })`. If over the ceiling: `{ outcome: 'not-resumed' }`.
+'engine')`, `admitResume(...)`. If admitted: `resumeRun(tx, runId, plan, { now, delayMs:
+context.delayMs, resumeRequest: null })`. If over the ceiling: `{ outcome: 'not-resumed' }`.
    If over the cap: `{ outcome: 'cap', question }`.
 4. After the transaction: write the question for a cap-refused resume, or one line for a
    resume that could not be made (D-097, S-026). Nothing for a ceiling-refused or a successful
@@ -124,16 +125,16 @@ Each `Piece` is `{ kind: 'still' | 'narration' | 'clip', shot?: 'shot-N' }`. A `
 
 Outcomes (`ResumeResponse`):
 
-| Status | Body                                                                                |
-| ------ | ----------------------------------------------------------------------------------- |
+| Status | Body                                                                                                                                                                                 |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 200    | `{ outcome: 'preview', runId, remake, estimateCents, spentCents, capCents, ceilingCents, limit? }` — read and write nothing; an admitted plan would be made, a refused one would not |
-| 202    | `{ outcome: 'accepted', runId, resumes, replayed: false }` — the resume was admitted and made in one transaction |
-| 202    | `{ outcome: 'accepted', runId, resumes, replayed: true }` — this run was already the resume |
-| 409    | `{ outcome: 'refused', runId, reason: 'resumed' }` — already resumed |
-| 409    | `{ outcome: 'refused', runId, reason: 'budget', limit, estimateCents, spentCents, capCents, ceilingCents }` — over the per-reel cap or the caller's ceiling |
-| 409    | `{ outcome: 'refused', runId, reason: 'invalid' }` — the named pieces are not in the plan |
-| 422    | `{ outcome: 'refused', runId, reason: 'unsupported' }` — the engine was started without a `ResumeService` |
-| 422    | `{ outcome: 'refused', runId, reason: 'invalid' }` — the body is not JSON / not a JSON object / fails the schema |
+| 202    | `{ outcome: 'accepted', runId, resumes, replayed: false }` — the resume was admitted and made in one transaction                                                                     |
+| 202    | `{ outcome: 'accepted', runId, resumes, replayed: true }` — this run was already the resume                                                                                          |
+| 409    | `{ outcome: 'refused', runId, reason: 'resumed' }` — already resumed                                                                                                                 |
+| 409    | `{ outcome: 'refused', runId, reason: 'budget', limit, estimateCents, spentCents, capCents, ceilingCents }` — over the per-reel cap or the caller's ceiling                          |
+| 409    | `{ outcome: 'refused', runId, reason: 'invalid' }` — the named pieces are not in the plan                                                                                            |
+| 422    | `{ outcome: 'refused', runId, reason: 'unsupported' }` — the engine was started without a `ResumeService`                                                                            |
+| 422    | `{ outcome: 'refused', runId, reason: 'invalid' }` — the body is not JSON / not a JSON object / fails the schema                                                                     |
 
 ### The transaction
 

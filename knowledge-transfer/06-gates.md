@@ -146,7 +146,9 @@ derived picture's Gate 1S. The rest are per-take.
 A held shot's `degraded` event is:
 
 ```ts
-{ type: 'degraded', shotId, reason }
+{
+  type: ('degraded', shotId, reason)
+}
 ```
 
 A `gate: '5'` verdict event on a held shot is its third take's outcome.

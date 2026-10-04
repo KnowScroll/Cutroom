@@ -4,6 +4,16 @@ This directory is an onboarding guide for **Cutroom**, the local reel-creation e
 this repository (`C:\Users\XZNON\Cutroom`). It explains what the system is, how its pieces fit
 together, how a request becomes a video, and where to look when something breaks or needs changing.
 
+## The interactive version
+
+**[`cutroom-kt.html`](./cutroom-kt.html)** is the same knowledge transfer as one self-contained page:
+open it in any browser, no server or network needed. It has a draggable system map (HLD), the package
+graph with all 22 boundary rules, a step-through sequence diagram of one request, flowcharts of every
+stage, the gates, an ER graph of all 21 tables, failure and resume paths, settings, a debugging guide,
+change playbooks, an index of every source file and a glossary, with search across all of it. It was
+checked against the source on 2026-10-04; its last tab lists where the numbered files below differ
+from the code.
+
 ## Who this is for
 
 Anyone who needs to read the repository competently — new contributors, reviewers, an agent
@@ -63,15 +73,15 @@ documents in order, you can:
 
 ## Where to look when something is wrong
 
-| Symptom                                                                  | Open first                                                                  |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| "The drift check is red"                                                  | `02-repository-map.md` (boundaries) — what rule broke, and why              |
-| "A run stopped at gate X"                                                 | `06-gates.md` — what gate X checks                                          |
-| "A real run failed in the middle"                                         | `08-resume-of-failed-runs.md` and `docs/context.md` (recent runs table)    |
-| "The service refuses to start"                                            | `10-settings-and-budgets.md` — what setting is missing or invalid          |
-| "I want to add a feature"                                                 | `AGENTS.md` (four gates) and `docs/features/<slug>.md` template               |
-| "I want to read a feature in depth"                                       | `docs/features/<slug>.md` for that feature                                |
-| "I want to know why a decision was made"                                  | `DECISIONS.md` — search for the D- or S-ID                                  |
-| "I want to write a journey"                                                                  | `docs/context.md` (verification), `scripts/journey.mjs` (the runner)         |
-| "I want to publish a new SDK release"                                     | `09-sdk-and-contracts.md` and `scripts/package-sdk.mjs`                      |
-| "I want to find a real bug"                                                | `docs/reel-pitfalls.md` — lessons from real runs                             |
+| Symptom                                  | Open first                                                              |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| "The drift check is red"                 | `02-repository-map.md` (boundaries) — what rule broke, and why          |
+| "A run stopped at gate X"                | `06-gates.md` — what gate X checks                                      |
+| "A real run failed in the middle"        | `08-resume-of-failed-runs.md` and `docs/context.md` (recent runs table) |
+| "The service refuses to start"           | `10-settings-and-budgets.md` — what setting is missing or invalid       |
+| "I want to add a feature"                | `AGENTS.md` (four gates) and `docs/features/<slug>.md` template         |
+| "I want to read a feature in depth"      | `docs/features/<slug>.md` for that feature                              |
+| "I want to know why a decision was made" | `DECISIONS.md` — search for the D- or S-ID                              |
+| "I want to write a journey"              | `docs/context.md` (verification), `scripts/journey.mjs` (the runner)    |
+| "I want to publish a new SDK release"    | `09-sdk-and-contracts.md` and `scripts/package-sdk.mjs`                 |
+| "I want to find a real bug"              | `docs/reel-pitfalls.md` — lessons from real runs                        |

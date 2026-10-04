@@ -20,6 +20,7 @@ node scripts/package-sdk.mjs
 ```
 
 This produces two gitignored tarballs in `.package-staging/`:
+
 - `.package-staging/cutroom-reel-contract-1.0.0.tgz`
 - `.package-staging/cutroom-sdk-1.0.0.tgz`
 
@@ -86,12 +87,13 @@ spawn a process.
 import { createCutroom } from '@cutroom/sdk'
 
 const cutroom = await createCutroom({
-  baseUrl: 'http://127.0.0.1:8787',  // default
-  launcher: {                        // optional; used only if no engine is listening
+  baseUrl: 'http://127.0.0.1:8787', // default
+  launcher: {
+    // optional; used only if no engine is listening
     command: 'node',
     args: ['--experimental-strip-types', '--no-warnings', 'apps/service/src/main.ts'],
   },
-  readyTimeoutMs: 30_000,            // default 30 s
+  readyTimeoutMs: 30_000, // default 30 s
 })
 ```
 
@@ -111,17 +113,17 @@ SDK started one itself. The distinction matters at `close()`:
 
 ### Methods
 
-| Method                                                | Route                                              | Returns                                |
-| ----------------------------------------------------- | -------------------------------------------------- | -------------------------------------- |
-| `submit(request)`                                     | `POST /v1/runs`                                    | `SubmitResponse`                       |
-| `find(requestId)`                                     | `GET /v1/runs?requestId=`                          | `RunStatus`                             |
-| `status(runId)`                                       | `GET /v1/runs/:runId`                              | `RunStatus`                            |
-| `follow(runId, since?)`                                | `GET /v1/runs/:runId/events?since=`                | `EventsPage`                            |
-| `result(runId)`                                       | `GET /v1/runs/:runId/result`                       | `RunResult | RunStatus` (409 if active) |
-| `record(runId)`                                       | `GET /v1/runs/:runId/record`                       | `RunRecord | RunStatus` (409 if active) |
-| `cancel(runId)`                                       | `POST /v1/runs/:runId/cancel`                      | `RunStatus`                            |
-| `resume(runId, request)`                              | `POST /v1/runs/:runId/resume`                      | `ResumeResponse`                        |
-| `close()`                                              | —                                                  | —                                       |
+| Method                   | Route                               | Returns          |
+| ------------------------ | ----------------------------------- | ---------------- |
+| `submit(request)`        | `POST /v1/runs`                     | `SubmitResponse` |
+| `find(requestId)`        | `GET /v1/runs?requestId=`           | `RunStatus`      |
+| `status(runId)`          | `GET /v1/runs/:runId`               | `RunStatus`      |
+| `follow(runId, since?)`  | `GET /v1/runs/:runId/events?since=` | `EventsPage`     |
+| `result(runId)`          | `GET /v1/runs/:runId/result`        | `RunResult       | RunStatus` (409 if active) |
+| `record(runId)`          | `GET /v1/runs/:runId/record`        | `RunRecord       | RunStatus` (409 if active) |
+| `cancel(runId)`          | `POST /v1/runs/:runId/cancel`       | `RunStatus`      |
+| `resume(runId, request)` | `POST /v1/runs/:runId/resume`       | `ResumeResponse` |
+| `close()`                | —                                   | —                |
 
 The `runId` and `requestId` are URL-encoded once. `since` is `encodeURIComponent(String(since))`.
 
@@ -134,11 +136,11 @@ no HTTP request is made.
 ```ts
 type SdkError = SdkApiError | SdkProtocolError | SdkConnectionError
 
-type SdkApiError = { kind: 'api', status: number, body: ErrorResponse }
-type SdkProtocolError = { kind: 'protocol', status?: number, stage: 'ready' | 'request' }
+type SdkApiError = { kind: 'api'; status: number; body: ErrorResponse }
+type SdkProtocolError = { kind: 'protocol'; status?: number; stage: 'ready' | 'request' }
 type SdkConnectionError = {
-  kind: 'connection',
-  stage: 'connect' | 'start' | 'ready' | 'close',
+  kind: 'connection'
+  stage: 'connect' | 'start' | 'ready' | 'close'
 }
 ```
 
@@ -177,11 +179,11 @@ wrong version or malformed JSON is also `SdkProtocolError`.
 
 ```ts
 launcherOptions = {
-  command,                          // from `options.launcher.command`
-  args,                             // from `options.launcher.args`
+  command, // from `options.launcher.command`
+  args, // from `options.launcher.args`
   env: { CUTROOM_API_PORT: '8787' }, // SDK-owned override; everything else inherits
   baseUrl,
-  timeoutMs,                        // from `options.readyTimeoutMs`
+  timeoutMs, // from `options.readyTimeoutMs`
 }
 ```
 
