@@ -21,19 +21,24 @@ Two consequences:
 
 This is **S-021, S-038, S-108, S-109** — three rules read together.
 
-## The five ports
+## The seven ports: five chosen by setting, two always ffmpeg
 
-| Port                | Type                                    | Real | Built when…                                     |
-| ------------------- | --------------------------------------- | ---- | ----------------------------------------------- |
-| `LanguageModelPort` | `packages/contracts/src/model.ts`       | ✅   | `model: 'minimax'` is configured                |
-| `ImagePort`         | `packages/contracts/src/picture.ts`     | ✅   | `image: 'fal'` is configured                    |
-| `VideoPort`         | `packages/contracts/src/providers.ts`   | ✅   | `video: 'fal'` is configured                    |
-| `NarrationPort`     | `packages/contracts/src/narration.ts`   | ✅   | `narration: 'minimax'` is configured            |
-| `MediaPort`         | `packages/contracts/src/observation.ts` | ✅   | always; ffmpeg on this machine (S-075)          |
-| `AssemblerPort`     | `packages/contracts/src/render.ts`      | ✅   | always; ffmpeg on this machine (S-075)          |
-| `PictureSensorPort` | `packages/contracts/src/observation.ts` | ✅   | `sensor: 'local'` (the only real option; S-126) |
+Five ports are chosen by one setting each, `CUTROOM_PROVIDER_<PORT>`, from a closed set whose
+default is the stand-in `fake` (S-108):
 
-`MediaPort` and `AssemblerPort` have no stand-in — the local ffmpeg is the implementation.
+| Port                | Type                                  | Setting value for the real adapter                      |
+| ------------------- | ------------------------------------- | ------------------------------------------------------- |
+| `LanguageModelPort` | `packages/contracts/src/model.ts`     | `CUTROOM_PROVIDER_MODEL=minimax`                        |
+| `ImagePort`         | `packages/contracts/src/picture.ts`   | `CUTROOM_PROVIDER_IMAGE=fal`                            |
+| `PictureSensorPort` | `packages/contracts/src/picture.ts`   | `CUTROOM_PROVIDER_SENSOR=local` (ffmpeg, no key; S-126) |
+| `VideoPort`         | `packages/contracts/src/clip.ts`      | `CUTROOM_PROVIDER_VIDEO=fal`                            |
+| `NarrationPort`     | `packages/contracts/src/narration.ts` | `CUTROOM_PROVIDER_NARRATION=minimax`                    |
+
+Two more are not settings at all: `MediaPort` (`packages/contracts/src/clip.ts`) and
+`AssemblerPort` (`packages/contracts/src/render.ts`) are always `ffmpegMedia` and
+`ffmpegAssembler` on this machine (S-075), stand-in runs included. The ffmpeg media port's probe,
+scan and frame strip are real; its `readText` (words on a clip) and `listen` (speech or music)
+answer from the stand-in script's `media` entry, defaulting to no words and neither.
 
 ## The factory
 
@@ -72,23 +77,34 @@ rule).
   Uses the `models` map from `PlanSettings` to route roles (`planner`, `reconciler`, `witness`,
   `judge`). M3 is the only model in the family that accepts images (D-006). The adapter is
   wrapped in `retryingModelPort` (`apps/worker/src/model-port.ts`) for transient failures.
-- `narration.ts` (`minimaxNarration`): T2A speech synthesis. Returns audio bytes plus word
-  timings.
-- `wire.ts`: `MinimaxBaseUrl`, the constant for the base URL.
+- `narration.ts` (`minimaxNarration`): T2A speech synthesis (`speech-2.8-hd`). The audio arrives
+  hex-encoded and is written under the artifact root; the answer carries its path and the word
+  timings, fetched from a presigned subtitle URL.
+- `wire.ts`: `MINIMAX_BASE_URL` and the shared answer to "would asking again help?".
 
 ### `packages/providers/src/fal/` — image and video
 
 - `image.ts` (`falImage`): against `fal-ai/flux-2-pro/edit` (or any closed-set entry —
   `registry.ts`). Uploads reference pictures, calls the model, polls until ready, downloads
   the result. The artifact goes under `artifactRoot`.
-- `video.ts` (`falVideo`): against `minimax/h3-turbo` (D-007's hard-locked path), or any
-  closed-set entry. Two hosts: `falBaseUrl` (queue) and `falStorageBaseUrl` (storage).
-- `registry.ts`: `IMAGE_REGISTRY` is a closed registry of admitted entries. `imageEntry(slug)`
-  refuses before the port is built if the slug is outside the registry (D-028). The entry's
-  `imageRateCents` is what the worker prices at (S-124).
-- `queue.ts`: fal is a queue — submit, poll until ready or `DEFAULT_VIDEO_WAIT_MS`.
-- `frame.ts`: `PICTURE_FRAME` is the canonical aspect (768 × 1366 by default).
-- `h3.ts`: H3 Turbo's specific settings.
+- `video.ts` (`falVideo`): against `fal-ai/minimax-h3-turbo/image-to-video` or
+  `…/text-to-video` — D-007's one hard-locked path, not a registry. Always 768P, whole seconds 5
+  to 15. Two hosts: `falBaseUrl` (queue) and `falStorageBaseUrl` (storage).
+- `registry.ts`: `IMAGE_REGISTRY` is a closed registry of four admitted entries
+  (`fal-ai/flux-2-pro/edit`, the configured default; `fal-ai/nano-banana-pro/edit`;
+  `fal-ai/nano-banana-2/edit`; `bytedance/seedream/v5/lite/edit`), each with its rate as data.
+  `imageEntry(slug)` refuses before the port is built if the slug is outside the registry
+  (D-028). With a real image port, the entry's rate is what the worker prices at (S-124).
+  `PICTURE_FRAME` is 864 × 1536, the size every picture is asked for.
+- `queue.ts`: fal is a queue — submit, poll the request's status, fetch the result.
+- `frame.ts`: reads a picture's dimensions from the file's own bytes, never from fal's answer, to
+  enforce the 9:16 frame (D-028).
+- `h3.ts`: the H3 path as data — slugs, 768P, 5–15 s, 0.5¢ a second, and
+  `DEFAULT_VIDEO_WAIT_MS` (10 minutes a clip).
+- `upload.ts`: puts a local picture on fal's storage so an edit or image-to-video call can use
+  it.
+
+(The rendered reel's own size is the output profile, 768 × 1366, set in the render settings.)
 
 ### `packages/providers/src/ffmpeg/` — media, assembler, sensors
 
@@ -96,8 +112,10 @@ rule).
   channels, frame count, moov-first), extract a frame strip at given timestamps.
 - `assemble.ts` (`ffmpegAssembler`): burn captions, apply the still-push on held shots,
   produce one MP4 with the manifest's profile.
-- `sensors.ts` (`ffmpegSensors`): read pixels for Gate 1 (`observation.ts`). The sensor port
-  has no key (S-075, S-112); it is ffmpeg on this machine.
+- `sensors.ts` (`ffmpegSensors`): measures a picture for Gate 1 (readable, size, sharpness,
+  brightness) and the similarity of two pictures for Gate 1S, with ffmpeg filters. It has no key
+  (S-075, S-112). Reading text off a picture is a model call (`readText`) the gate hands it,
+  because this ffmpeg has no OCR filter (S-126).
 
 ## Stand-in adapters — `packages/providers/src/fake/`
 
@@ -161,30 +179,43 @@ artifact escapes the configured root.
 
 ## Spent / unavailable / transient
 
-`packages/providers/src/transient.ts` defines:
+The error classes live in `packages/contracts/src/failures.ts` — not in providers — because the
+adapters throw them and the worker, which may not import providers, must catch them by class:
 
-- `Spent` — a call that succeeded and added to the spent total.
-- `Unavailable` — a call that the adapter could not make (network, 5xx).
-- `isSpent`, `isUnavailable`, `messageOf` — helpers.
-- `transientStatus(status)` — the transient classification.
+- `Spent` — the provider answered and the call was paid for, but the answer cannot be used (a
+  body that does not parse, an answer not in the schema). It is never sent again; the worker
+  writes a `lost_call` row and rethrows. A `structured` answer refused only for its shape is the
+  one exception: the pipeline asks once more, as a new call told why (S-156).
+- `Unavailable` — the provider made nothing and might if asked again (429, 5xx, connection
+  error, timeout).
+- `OffSpec` and `RefusedRequest` (both `Spent`), `Unanswered`, `ProviderFailed` and
+  `StillUnavailable` (an `Unavailable`) — see "Failure kinds" below.
 
-A transient failure is sent again up to `transient.maxAttempts` times (default `3`), with
-`backoffMs` between sends (default `1000` — D-024, I-11, S-096). The wrapping is in
-`apps/worker/src/{model-port,video-port,narration-port}.ts`.
+`packages/providers/src/transient.ts` only classifies an HTTP status as transient or not
+(`transientStatus`). Adapters never retry. The worker does: a video, narration or model call
+answered `Unavailable` is sent again, up to `transient.maxAttempts` sends in all (default `3`),
+waiting `backoffMs` (default `1000`) and then twice the last wait (D-024, I-11, S-096). The
+wrapping is in `apps/worker/src/{model-port,video-port,narration-port,transient}.ts`. An image
+call has no such retry: an `Unavailable` there fails the run (kind `unavailable`, resumable).
 
 ## Failure kinds
 
-`FailureKind` is decided where the error is caught (S-163):
+`FailureKind` is decided where the error is caught, by the error's **class**, never its message
+(`failureKindOf`, S-163):
 
-- `unavailable` — a transient failure the retries could not recover.
-- `unreadable` — a file or response that the adapter could not parse.
-- `provider-failed` — a non-transient provider error (e.g. the model returned a 4xx).
-- `crashed` — an unhandled throw inside the adapter.
-- `engine` — the engine's fault (a missing adapter, a bad input). Resume is not offered for
-  `engine` failures.
-- `off-spec` — the provider returned something off the contract's spec.
-
-`failureKindOf(error)` is the one decision point.
+- `unavailable` — `Unavailable` / `StillUnavailable`: the provider made nothing at every send.
+  Resumable.
+- `unreadable` — `Spent` (a paid answer that could not be used) or `Unanswered` (a gate refused
+  the model's answer at its last ask). Resumable.
+- `provider-failed` — `ProviderFailed`: fal accepted the job and then reported it failed.
+  Resumable.
+- `crashed` — never thrown: the stills stage returns it when a job claimed again after a crash can
+  no longer make its pictures within six image calls. Resumable.
+- `off-spec` — `OffSpec`: the provider made something this engine may never use (a picture whose
+  frame the registry entry refuses). Never resumed.
+- `engine` — everything else: a plain `Error`, a `ZodError`, a file-system or ffmpeg error, a 4xx,
+  `RefusedRequest` (MiniMax refused our request), a cap that cannot be read, a stand-in out of its
+  script. Never resumed.
 
 ## How ports are handed to the worker
 
@@ -201,6 +232,9 @@ const ports = {
 ```
 
 These five ports, plus `media` (ffmpeg) and `assembler` (ffmpeg), are spread into `startWorker`.
-The worker wraps the model port in `retryingModelPort`, the image port in `guardedImagePort`,
-and the video and narration ports in their recorders. The wrapped ports are what every job's
-context carries.
+The worker wraps the model port once in `retryingModelPort` at startup, and each job wraps it again
+in `recordingPort` (a `model_receipt` per call). Each job attempt wraps the image port in
+`guardedImagePort`, the video port in `validatingVideoPort(guardedVideoPort(…))` and the
+narration port in `guardedNarrationPort`: each guard compares spend with the cap and the ceiling
+before a call and writes the receipt after it. The sensor, media and assembler ports are used as
+built.

@@ -48,12 +48,15 @@ Default settings (`DEFAULT_PLAN_SETTINGS`):
 
 - `shotCountUnits: [4, 6]` (D-112).
 - `totalSecondsBounds: [35, 45]` (D-111).
-- `imageRateCents: 15` (BUDGET.md: nano-banana-pro/edit, the dearest candidate — O-4).
-- `videoRateCentsPerSecond: 4` (BUDGET.md: H3 Turbo 768P).
+- `imageRateCents: 15` (BUDGET.md: nano-banana-pro/edit, the dearest candidate — O-4). With a
+  real image port the service replaces it with the configured registry entry's own rate (S-124).
+- `videoRateCentsPerSecond: 4` (BUDGET.md: H3 Turbo 768P). With a real video port the service
+  replaces it with H3's 0.5¢ a second (S-125, S-155).
 - `models`: `planner: 'MiniMax-M2.7'`, `reconciler: 'MiniMax-M3'`, `witness: 'MiniMax-M3'`,
   `judge: 'MiniMax-M3'`. M3 is the only model that accepts images (D-006).
 - `score.weights`: `{ coverage: 1, recurrence: 1, order: 1, pacing: 1, juxtaposition: 1 }`.
-- `pictures: 'recurring'` (D-027's rule; `'upToThree'` only by setting — S-150).
+- `pictures: 'recurring'` (D-027's rule). The **service** overrides this: `CUTROOM_PICTURES`
+  defaults to `'upToThree'` there (S-153), and `'recurring'` must be asked for (S-150).
 
 Algorithm:
 
@@ -117,8 +120,11 @@ Ports (`StillsPorts`):
 - `image: ImagePort` (with `acceptsReferences: true` — D-026).
 - `sensors: PictureSensorPort`.
 - `model: LanguageModelPort`.
-- `recorder: StillsRecorder` (the worker wraps the model port in `recordingPort`).
-- `refusalRecorder: RefusalRecorder`.
+- `recorder: StillsRecorder` (makes each picture's progress durable as each check completes).
+- `refusals: RefusalRecorder` (keeps every answer a gate refused).
+
+The worker hands the stage the image port wrapped in `guardedImagePort` and the model port wrapped
+in `recordingPort`; the sensor port is passed as it was built.
 
 Default settings (`DEFAULT_STILLS_SETTINGS`):
 
@@ -129,24 +135,33 @@ Default settings (`DEFAULT_STILLS_SETTINGS`):
 
 Algorithm:
 
-For each shot in plan order:
-
-1. **The canonical picture**. Two candidates are generated, one per framing. The first that
-   passes Gate 1 is kept; if both fail, the **repair** is run from the reserve slot. The
-   canonical is fixed.
-2. **Derived pictures**. One per distinct subject (ranked by `rankSubjects`). Each goes through
-   the image ladder, then Gates 1 and 1S. Gate 1 (`image alone`) is in `gates/gate1.ts`. Gate 1S
-   (`against the canonical`) is in `gates/gate1s.ts`.
-3. **Ladders are shot-by-shot** (S-057). The next shot does not start until the current shot's
-   reserve decisions are made.
-4. **Suspicion**: a derived picture's witness observation above `suspicionThreshold` (default
-   `0.25`) sends it to the reconciler (D-049).
+1. **Placement** (`stills/place.ts`, `placePictures`), by the rule stored with the plan: the
+   rank-1 recurring subject gets the **canonical** on the first shot showing it; ranks 2 and 3
+   get one **derived** picture each on the earliest free shot showing them; under `upToThree`,
+   free slots (up to three pictures in all) go to early shots with no picture and no pictured
+   subject as **standalone** pictures. Nothing placed → `completed` at once.
+2. **The reserve** (`stills/ladder.ts`): six image calls a run (`IMAGE_CALLS`) less the run's
+   earlier calls less the first calls still to make. Every repair takes one slot; at most two
+   repairs a shot. Below 0 (only after a crash re-claim) the stage returns `failed`, kind
+   `crashed`.
+3. **The canonical**. Two candidates, one per framing, made from no reference, each through Gate 1
+   as soon as it is made. Two survivors are ranked by the keyframe score (tie → `a`); one
+   survivor is chosen outright; none gets **one repair**, told both candidates' reasons. A repair
+   that fails Gate 1 too stops the run for rule `gate-1`.
+4. **Derived pictures**, in rank order, made with the canonical as a reference (D-026), each
+   through Gate 1 (`gates/gate1.ts`); a failure takes a repair if a slot is free, otherwise the
+   shot is **degraded**. Then **Gate 1S** (`gates/gate1s.ts`) on each derived picture that passed:
+   suspicion = 1 − the pixel similarity of canonical and derived (sensor port). No shared
+   subject, or suspicion ≤ `suspicionThreshold` (0.25), is accepted with no call; above it, one
+   judge `compare` call decides (D-049). A 1S failure is repaired or degraded the same way.
+5. **Standalones** go through Gate 1 only, with the same repair-or-degrade rule.
+6. **Ladders are shot-by-shot** (S-057): one shot's ladder finishes before the next begins.
 
 The stage records:
 
-- `pictures`: every picture made or kept, with its `pictureId`, its shot's `unit`, its `role`
-  (`canonical`, `derived`), its Gate 1 verdict(s), its `chosen` flag, its `degradation` reason
-  if any.
+- `pictures`: every picture made or kept, with its `pictureId`, its `shotUnit`, its `role`
+  (`canonical`, `derived`, `standalone`), its Gate 1 and Gate 1S verdicts, its `chosen` flag, its
+  `degradation` reason if any.
 - `degradations`: every shot that the ladders degraded, with the gate and reason.
 - `events`: the verdict and `degraded` events the stage produced.
 
@@ -155,7 +170,7 @@ Outcome (`StillsOutcome`):
 ```
 { kind: 'completed' }
 { kind: 'stopped-rule', rule: 'gate-1', detail }
-{ kind: 'stopped-budget', limit: 'caller' | 'reel', estimateCents }
+{ kind: 'stopped-budget', limit: 'reel' | 'ceiling', estimateCents }
 { kind: 'failed', detail, failure: FailureKind }
 ```
 
@@ -193,26 +208,36 @@ Algorithm (per shot, in plan order):
 1. **Narration**. The shot's sentences are joined; the narration port returns audio or throws.
    The media port probes the file and parses `wordTimings`. A take that crashes mid-way is not
    kept and not resumed — it is made again under this attempt's id (I-15).
-2. **Takes**. Up to 3 per shot. Take 1 is the first try; takes 2 and 3 retry with the failed
-   take's reasons (D-033). Each take runs:
-   - **Gate 2** (`gates/gate2.ts`): technical (codec, geometry, fps, audio sample rate).
-   - **Gate 3** (`gates/gate3.ts`): sound (audio duration vs. narration's words, silence
-     detection).
-   - **Gate 4** (`gates/gate4.ts`): witness — does the take show what the picture was meant to.
-   - **Gate 5** (`gates/gate5.ts`): brief — does the take match the narration's intent.
-3. **Hold**. After three failed takes, the shot is held on its chosen picture (D-055, S-097,
-   S-098). The media port confirms the picture is readable; a `degraded` event is appended;
-   the stage goes on to the next shot.
-4. **Final gate-5 check**. Once every shot is done, if a `mustShow` criterion has no accepted
-   take that shows it (held shots show nothing — S-072, S-090), the stage stops `rule:
-'gate-5'`.
+2. **Takes**. Up to 3 per shot: image-to-video from the shot's chosen picture, or text-to-video
+   for a shot with none (no picture placed, or degraded). The seed is the CRC-32 of the take id.
+   Takes 2 and 3 are told every earlier failed take's reasons (D-033). Each take runs:
+   - **Gate 2** (`gates/gate2.ts`): technical — the media port probes and scans the file. Fails
+     when it is unreadable or has no video, when width/height is more than 0.01 from 9/16, or on
+     a black stretch ≥ 0.5 s or a frozen stretch ≥ 1 s. Length, frame rate, sample rate,
+     silence and loudness are recorded and fail nothing. A Gate 2 failure decides the take.
+   - **Gate 3** (`gates/gate3.ts`): text and sound — the words read off the clip are recorded and
+     never fail; sound classified as speech or as music fails. (On the ffmpeg media port both
+     answers come from its script, defaulting to none, so on a real run Gate 3 has never heard a
+     clip — P-007.)
+   - **Gate 4** (`gates/gate4.ts`): the witness, shown the whole clip and nothing else; accepts
+     once its answer parses (a refused answer is asked once more).
+   - **Gate 5** (`gates/gate5.ts`): the brief — the reconciler holds the observation against the
+     shot's subjects and criteria, and code fails the take on a subject not shown, a count that
+     does not match, a claimed `mustShow` not shown, or a `mustNotShow` shown.
+3. **At the cap** (`clips/ladder.ts`, `atTheCap`). After three failed takes, a shot that has a
+   chosen picture and claims no `event` mustShow is **held** on that picture (D-055, S-097,
+   S-098): the media port probes the picture, a `degraded` event is appended, and the stage goes
+   on. Otherwise the reel stops for the rule of the third take's lowest failing gate.
+4. **Final gate-5 check**. Once every shot is done, if a `mustShow` that no sentence claims was
+   shown by no accepted take (held shots show nothing — S-072, S-090), the stage stops
+   `rule: 'gate-5'`.
 
 Outcome (`ClipsOutcome`):
 
 ```
 { kind: 'completed' }
 { kind: 'stopped-rule', rule: 'gate-2' | 'gate-3' | 'gate-5', detail }
-{ kind: 'stopped-budget', limit: 'caller' | 'reel', estimateCents }
+{ kind: 'stopped-budget', limit: 'reel' | 'ceiling', estimateCents }
 { kind: 'failed', detail, failure: FailureKind }
 ```
 

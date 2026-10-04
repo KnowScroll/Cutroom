@@ -51,16 +51,17 @@ real-reel settings.
 
 `node scripts/check.mjs` chooses what to run based on what changed.
 
-| Change kind                             | Command                                    | What runs                                                                                   |
-| --------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------- |
-| Documents only                          | `node scripts/check.mjs --changed`         | `prettier --check`, four scanning tests, decisions pin, copied docs                         |
-| One code slice                          | `node scripts/check.mjs --slice <test...>` | Static checks (typecheck, lint, format, boundaries, boundaries-proven) plus the named tests |
-| Unclassified / broad                    | `node scripts/check.mjs`                   | Everything — the full suite, every check, every test                                        |
-| Workspace / dependency changes          | `node scripts/check.mjs`                   | Same as unclassified                                                                        |
-| Verification tooling / boundary changes | `node scripts/check.mjs`                   | Same as unclassified                                                                        |
-| A new feature journey                   | `node scripts/check.mjs`                   | Same as unclassified                                                                        |
+| Change kind                                                 | Command                                    | What runs                                                                     |
+| ----------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
+| Documents only (`docs/**.md`, `PROMPTS/**.md`, root `*.md`) | `node scripts/check.mjs --changed`         | format, the four file scans, decisions pin, copied docs                       |
+| One approved code slice                                     | `node scripts/check.mjs --slice <test...>` | typecheck, lint, format, the three boundary checks, plus only the named tests |
+| Unclassified / broad                                        | `node scripts/check.mjs`                   | Everything — the full suite, every check, every test                          |
+| Workspace / dependency changes                              | `node scripts/check.mjs`                   | Same as unclassified                                                          |
+| Verification tooling / boundary changes                     | `node scripts/check.mjs`                   | Same as unclassified                                                          |
+| A new feature journey                                       | `node scripts/check.mjs`                   | Same as unclassified                                                          |
 
-The mapping is in `scripts/check.mjs:51-69`. **If the diff has both documents and code, run
+The mapping is in `scripts/check.mjs` (`DOCUMENT` and `CODE_PATH`). A path that is neither — for
+example anything under `knowledge-transfer/` — makes `--changed` refuse and needs the full run. **If the diff has both documents and code, run
 the full suite** — the change-kind rules are strict.
 
 ## What each check is
@@ -69,7 +70,9 @@ the full suite** — the change-kind rules are strict.
 
 1. **typecheck** — `tsc -b --pretty`. Project references across the workspace.
 2. **lint** — `eslint .`.
-3. **format** — `prettier --check .`.
+3. **format** — `prettier --check .`: every file type prettier knows, Markdown and HTML included,
+   not only code (`.prettierignore` excludes `docs/design/`, `db/migrations/`, `steering-ref/`
+   and generated folders).
 4. **boundaries** — `scripts/drift.mjs`. Enforces the twenty-two boundaries.
 5. **boundaries proven** — `scripts/drift.mjs --prove`. Writes a file to break each rule and
    fails if one stays silent. **Configured-but-dead reads as covered** — never assume a rule
@@ -81,8 +84,11 @@ apps/**/*.test.ts`. The `--test-concurrency=1` is required — nested ffmpeg/SQL
    would otherwise compete for the same machine.
 8. **decisions pin** — `scripts/decisions.mjs`. Confirms the steering repository's decisions
    pin is current.
-9. **copied docs** — `scripts/docs-check.mjs`. Confirms the docs that have been written to
-   one place have been copied to the other.
+9. **copied docs** — `scripts/docs-check.mjs`. Confirms the design documents in `docs/design/` are
+   still byte-identical to their originals in the steering repository.
+
+The first seven are the code checks (`--code` runs only those); the last two are about the
+authority.
 
 ## Three "honest" rules
 

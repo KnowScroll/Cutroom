@@ -1591,11 +1591,15 @@
               </tbody>
             </table>
           </div>
-          <div class="callout warn">
-            <b>The markdown KT files in this folder have drifted from the code in places.</b>
-            This page was checked against the source on 2026-10-04; where they disagree, the code
-            wins. The
-            <a href="#errata">corrections tab</a> lists each difference found.
+          <div class="callout">
+            <b
+              >The numbered markdown files in <code>knowledge-transfer/</code> tell the same story
+              in prose.</b
+            >
+            This page and those files were checked against the source on 2026-10-04, and the files
+            were corrected where they disagreed with the code; the
+            <a href="#errata">corrections tab</a> records each change. If code and documents ever
+            disagree again, the code wins.
           </div>
         </section>
 
@@ -3357,12 +3361,13 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
 
         <!-- ===================================================== ERRATA -->
         <section class="tab" id="errata" data-group="Reference" data-title="KT doc corrections">
-          <div class="eyebrow">Checked against the code, 2026-10-04</div>
-          <h2 class="tab-title">Where the markdown KT files differ from the code</h2>
+          <div class="eyebrow">Corrected 2026-10-04</div>
+          <h2 class="tab-title">Corrections made to the markdown KT files</h2>
           <p class="lede">
-            The numbered markdown files in <code>knowledge-transfer/</code> are a good narrative,
-            but these statements do not match the source at <code>94ee04a</code>. This page uses the
-            code's version.
+            These statements in the numbered markdown files in <code>knowledge-transfer/</code> did
+            not match the source at <code>94ee04a</code>. Each was corrected in the markdown on
+            2026-10-04, along with the other places the same mistake was repeated; this table
+            records what changed.
           </p>
           <div class="tbl-wrap"><table id="errata-table"></table></div>
         </section>
@@ -9231,7 +9236,7 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
         }
         inits.errata = () => {
           $('#errata-table').innerHTML =
-            `<thead><tr><th>File</th><th>The markdown says</th><th>The code does</th></tr></thead><tbody>${ERRATA.map(
+            `<thead><tr><th>File</th><th>The markdown said</th><th>Now says (as the code does)</th></tr></thead><tbody>${ERRATA.map(
               ([f, s, c]) =>
                 `<tr><td><code>${f}</code></td><td class="wrap small">${s}</td><td class="wrap small">${c}</td></tr>`,
             ).join('')}</tbody>`

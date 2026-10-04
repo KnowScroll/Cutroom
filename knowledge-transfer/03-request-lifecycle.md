@@ -27,9 +27,9 @@ POST /v1/runs                 run row, run_event, plan/keyframes/clips/assemble 
         │                         │
         │                         ▼
         │              runKeyframesJob (kind=reel.keyframes)
-        │              ├─ image ladder (ladders.ts)
+        │              ├─ place pictures; ladders (stills/ladder.ts)
         │              ├─ Gates 1 and 1S
-        │              └─ per-shot picture kept / derived / held
+        │              └─ canonical / derived / standalone, or degraded
         │                         │
         │              finishStills (until=stills) OR
         │              advanceStills + enqueue reel.clips
@@ -39,7 +39,7 @@ POST /v1/runs                 run row, run_event, plan/keyframes/clips/assemble 
         │              ├─ narration per shot
         │              ├─ up to 3 takes per shot
         │              ├─ Gates 2, 3, 4, 5 per take
-        │              └─ third failed take → hold on chosen picture
+        │              └─ third failed take → hold on picture, or stop
         │                         │
         │              advanceClips + enqueue reel.assemble
         │                         │
@@ -92,8 +92,9 @@ unique index on `run.requestId WHERE resumes IS NULL` (a resumed run inherits it
 
 1. Calls `claimJob(db, [PLAN_JOB, KEYFRAMES_JOB, CLIPS_JOB, ASSEMBLE_JOB], now, leaseMs)`.
 2. The claim is `UPDATE … RETURNING`, so two workers cannot claim the same row. The claim holds
-   the job for `leaseMs` (60 seconds by default; the service raises the floor to the time the
-   video adapter allows times the most clips one job can ask for).
+   the job for `leaseMs`. The worker's own default is 60 seconds; the service keeps 60 seconds
+   while every port is a stand-in, and uses a 4-hour floor (the time the video adapter allows a
+   clip, times the most clips one job can ask for, plus an hour) as soon as any adapter is real.
 3. Runs the job's runner, catching any thrown error into `buryJob` (the job goes to state
    `'dead'` with the error message and is never claimed again).
 4. After the job returns or is buried, polls again.
@@ -119,9 +120,13 @@ For `reel.plan`, the runner is `runPlanJob` (`apps/worker/src/plan-job.ts`).
    (D-112).
 2. Asks the model port twice: once for `countA` units (role `'planner'`, temperature 0), once
    for `countB` units. Each call returns a structured `PlanningAnswer` (units, shots, subjects).
-3. Builds two `Plan`s from those answers; the planner computes `plannedImageCalls` (one
-   canonical + one per distinct subject / role) and `estimateCents` (image calls ×
-   `settings.imageRateCents`).
+3. Builds two `Plan`s from those answers. Code, not the model, copies the criteria and computes
+   `plannedImageCalls` and `estimateCents`. Under the `recurring` picture rule,
+   `plannedImageCalls` is 0 when no subject appears in two or more shots, otherwise
+   `2 + min(rankedSubjects − 1, 2)` — the rank-1 subject's canonical is made best of two, ranks 2
+   and 3 once each — so at most 4. Under `upToThree` it is the placement's own calls (2 for a
+   canonical, 1 for every other picture). `estimateCents` is
+   `⌈plannedImageCalls × imageRateCents + total shot seconds × videoRateCentsPerSecond⌉`.
 4. Runs `gate0` on both plans (`packages/pipeline/src/gates/gate0.ts`). A plan fails Gate 0 if
    any of the four conditions fails: `coverage`, `criteria`, `shape`, `cost`.
 5. If both survive, scores each (one reconciler call per plan, never two at once, D-064) and
@@ -165,18 +170,25 @@ call, a failed run and an interrupted job.
    here, so a stills stage cannot spend past it). Wrap the model port in `recordingPort`.
 3. Call `makeStills({…}, { image, sensors, model }, stillsSettings)`.
 
-`makeStills` runs **per shot, in plan order**. For each shot:
+`makeStills` first places the pictures by the plan's own rule (`placePictures`): the rank-1
+recurring subject gets the **canonical** on the first shot that shows it; ranks 2 and 3 get a
+**derived** picture each on the earliest free shot showing them; under `upToThree`, free slots (up
+to three pictures in all) go to early shots with no picture and no pictured subject as
+**standalone** pictures. Every other shot has no picture. A run makes at most six image calls;
+whatever the placement does not need is the reserve for repairs (at most two a shot). Then, one
+shot's ladder finished before the next begins (S-057):
 
-- The canonical picture is made once. Two candidates are generated (`canonicalFraming`,
-  default `[medium, wide]` — D-032), the first that passes Gate 1 is kept; if both fail, the
-  repair is run from the reserve slot. The canonical is fixed for the run.
-- Derived pictures (one per distinct subject, by `rankSubjects`) are made with a witness check:
-  the stills port records the picture, the sensor port reads pixels and Gate 1 (`image alone`)
-  judges. Gate 1S (`against the canonical`) judges the derived picture's consistency with the
-  canonical.
-- Ladders run shot-by-shot (S-057). A shot that cannot satisfy Gate 1 with the reserve spent is
-  `degraded` — its chosen picture becomes the shot's, with a degradation reason recorded
-  (S-058).
+- **The canonical.** Two candidates, framed `medium` and `wide` (`canonicalFraming`, D-032), each
+  through Gate 1 as soon as it is made. Two survivors are ranked by the keyframe score; one
+  survivor is chosen outright; none gets one repair from the reserve. If the repair fails Gate 1
+  too, the run stops for rule `gate-1` before any derived picture is attempted.
+- **Derived pictures** are made with the canonical as a reference picture and go through Gate 1;
+  a failure takes a repair if a reserve slot is free, otherwise the shot is **degraded**. Each
+  derived picture that passed Gate 1 is then held against the canonical by Gate 1S, with the
+  same repair-or-degrade rule.
+- **Standalones** go through Gate 1 only, with the same repair-or-degrade rule.
+- A **degraded** shot goes on without an approved picture: its clip is later made from words
+  (text-to-video), and the reason is recorded four ways (S-058).
 - The stage answers `kind: 'completed'`, `kind: 'stopped-rule'`, `kind: 'stopped-budget'`, or
   `kind: 'failed'` — never throws (S-046).
 
@@ -189,8 +201,10 @@ The runner ends the stage:
 - `kind: 'stopped-rule' | 'stopped-budget'` → `finishStills` (the run is finished with
   `status: 'stopped'` and the corresponding `reason`).
 - `kind: 'failed'` → `finishStills` with `status: 'failed'`. The failure kind is decided by
-  `failureKindOf(error)` — `unavailable`, `unreadable`, `provider-failed`, `crashed`,
-  `engine`. (S-163.)
+  `failureKindOf(error)` from the thrown error's class — `unavailable`, `unreadable`,
+  `provider-failed`, `off-spec` or `engine` — except `crashed`, which is never thrown: the stage
+  returns it when a job claimed again after a crash can no longer fit its pictures in six calls.
+  (S-163.)
 
 ## Step 5 — The clips stage
 
@@ -206,17 +220,21 @@ narration, media, model }, renderSettings)`.
 
 - **Narration**: the shot's sentences are joined; the narration port returns audio or throws.
   The media port probes the file and parses `wordTimings` (the narration returned).
-- **Takes**: up to 3 per shot. Take 1 is the first try; takes 2 and 3 are retried with the
-  failed take's reasons (D-033). Each take runs Gates 2 (`technical`, `media`), 3 (`sound`,
-  `media`), 4 (`witness`, `model`), 5 (`brief`, `model`). The first accepted take is the shot's
-  (D-030). A take that fails is followed by the next, told every earlier failed take's reasons.
-- **Hold**: if three takes all fail, the shot is held on its chosen picture — the media port
-  confirms the picture is readable, a `degraded` event is appended, the stage goes on (D-055,
-  S-097, S-098). A held shot contributes a still to the cut and is not filmed.
+- **Takes**: up to 3 per shot, each made from the shot's chosen picture (image-to-video) or, for a
+  shot with no picture, from words (text-to-video). Takes 2 and 3 are told every earlier failed
+  take's reasons (D-033). Each take runs Gate 2 (technical: probe and black/frozen scan), Gate 3
+  (text and sound: words recorded, speech or music fails), Gate 4 (the witness on the clip) and
+  Gate 5 (the brief, decided by code from the reconciler's answer). The first accepted take is
+  the shot's (D-030).
+- **At the cap**: after three failed takes, a shot that has a chosen picture and claims no `event`
+  mustShow is **held** on that picture — the media port probes the picture, a `degraded` event is
+  appended, and the stage goes on (D-055, S-097, S-098); the held shot is a slow push on the still
+  in the cut. A shot with no picture, or one that must show an event, cannot be held: the reel
+  stops for the rule of the third take's lowest failing gate.
 
-The stage ends with `kind: 'completed' | 'stopped-rule' | 'stopped-budget' | 'failed'`. A
-`gate-5` stop happens if a `mustShow` criterion has no accepted take that shows it (a held
-shot's failed takes show nothing — S-072, S-090).
+The stage ends with `kind: 'completed' | 'stopped-rule' | 'stopped-budget' | 'failed'`. Once
+every shot is done, a `gate-5` stop happens if a `mustShow` that no sentence claims was shown by
+no accepted take (a held shot's failed takes show nothing — S-072, S-090).
 
 The runner ends the stage:
 
@@ -244,10 +262,10 @@ assembly begins (I-18, S-069).
    (codec, geometry, fps, sample rate, channels, frame count, moov-first), the stage fails
    `kind: 'failed', failure: 'engine'` — the assembler broke its own input.
 3. `ports.media.frames(...)` → three frames per shot (first, middle, last).
-4. `gate7(manifest, cutQuestions, model)` answers yes/no on
-   `_Are the shots in a sensible order? Do they sit well together? Do the captions follow the
-narration?_` and one more. If any answer is no, the stage stops `kind: 'stopped-rule',
-rule: 'gate-7'`.
+4. `gate7` sends one `judgeCut` call (role judge) with each shot's three frames and sentences
+   and the four closed questions: _Are the shots in a sensible order? Does the pacing work? Does
+   every shot sit well beside the shot that follows it? Do the burned captions follow the
+   narration?_ If any answer is no, the stage stops `kind: 'stopped-rule', rule: 'gate-7'`.
 5. `kind: 'completed'` otherwise.
 
 The runner ends the stage through `finishVideo` with the render row's outputs and the held
@@ -263,8 +281,9 @@ Once the run is finished, the caller can read:
   monotonic; `since` is the last `seq` the caller has.
 - `GET /v1/runs/:runId/result` → the `RunResult` (200) or the `RunStatus` (409 if the run is
   still active — the contract's defined refusal).
-- `GET /v1/runs/:runId/record` → the `RunRecord`: every picture, every take, every receipt,
-  in seq order (S-046). In a resumed run, every picture and take copied into it names the run
+- `GET /v1/runs/:runId/record` → the `RunRecord`: every picture made (in seq order) and every
+  take made, each with the checks it reached, and every degradation (S-046). Receipts are not in
+  it; they stay in the receipt tables. In a resumed run, every picture and take copied into it names the run
   it came from (S-162).
 - `POST /v1/runs/:runId/cancel` → set the cancel flag. The run is cancelled at the next
   `startStage` check (the cancel is read inside one transaction with `stage.started`).
@@ -283,12 +302,13 @@ Once the run is finished, the caller can read:
 
 ## What happens on failure
 
-Every finishing transaction writes a `run.failure` kind (S-163):
+Every transaction that fails a run writes its `run.failure` kind (S-163):
 
-- `unavailable`, `unreadable`, `provider-failed`, `crashed` → a provider's fault. The engine
-  may resume the run automatically (if the worker's switch is on — see
-  `08-resume-of-failed-runs.md`).
-- `engine` → the engine's fault, never a provider's. Resume is not supported here.
+- `unavailable`, `unreadable`, `provider-failed`, `crashed` → resumable. The engine resumes the
+  run automatically when the worker's switch is on (it is, in the service — see
+  `08-resume-of-failed-runs.md`), and a caller may resume it.
+- `off-spec` (the provider made something this engine can never use) and `engine` (our own
+  fault) → never resumed: the same request would fail the same way.
 
 The failed `RunResult` does **not** carry the failure kind — that lives in `run.failure`, so a
 caller reads the result unchanged (S-157).

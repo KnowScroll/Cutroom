@@ -109,7 +109,7 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 ### 2026-10-04 · session 80
 
 - Added `knowledge-transfer/cutroom-kt.html`: one self-contained page (no CDN) that teaches the engine — draggable/zoomable graphs with click-for-detail drawers for the system map, packages and the 22 rules, every stage, failures/resume, the 21-table ER model, SDK connection and service startup; a step-through sequence diagram of one request (until plan/stills/video); tables for gates, ports and wrappers, budget, routes, settings, symptoms, playbooks, features, all 129 source files, glossary and decisions; global search. Built from source at `94ee04a`.
-- Its last tab lists 18 places the numbered KT markdown disagrees with the code (e.g. a resume re-enters at `reel.keyframes`; the service picture rule defaults to `upToThree`; `SubmitRequest` needs `worldId`, typed criteria and `depictionPolicyVersion`). The markdown was not rewritten; `knowledge-transfer/README.md` links the page.
+- 18 places the numbered KT markdown disagreed with the code (e.g. a resume re-enters at `reel.keyframes`; the service picture rule defaults to `upToThree`; `SubmitRequest` needs `worldId`, typed criteria and `depictionPolicyVersion`; 21 tables, not 12) were then corrected in `knowledge-transfer/01`–`11`, with every repeat of each mistake; the page's last tab records the corrections, and `knowledge-transfer/README.md` links the page.
 - The KT markdown committed in `94ee04a` failed `prettier --check`; it is formatted now (whitespace, list numbering, code-block style). Session 71's journal entry was reflowed to one line a paragraph, words unchanged, to keep JOURNAL.md within S-177's 80 lines.
 
 ### 2026-10-01 · session 79

@@ -41,70 +41,92 @@ D-114 counts them.
 
 ## Gate 1 — `gate1`
 
-`packages/pipeline/src/gates/gate1.ts`. One call to the model (reconciler role, temperature 0)
-on a picture by itself. The picture's pixels come from the sensor port; the criteria come
-from the shot.
+`packages/pipeline/src/gates/gate1.ts`. Four steps on one picture, in order, each recorded on the
+picture's row as it completes (D-042, S-040, S-041):
 
-The picture fails Gate 1 if any of the supplied `mustShow` criteria is not visible, or any of
-the supplied `mustNotShow` criteria is visible. A canonical that fails Gate 1 has the reserve
-slot for one repair (D-048); a derived that fails Gate 1 has the same.
+1. **technical** — the sensor port measures the file. It fails if the file is not a readable
+   image or is not exactly 9:16. A technical failure stops the gate there.
+2. **text** — the words on the picture are read with the model's `readText` call (role witness,
+   handed to the sensor) and recorded. This step never fails.
+3. **witness** — one `observe` call (role witness, `MiniMax-M3`) is shown the picture and a
+   temperature, nothing else — never the brief (I-8). Its answer is parsed at the gate; an answer
+   the schema refuses is kept and asked once more, told only the schema's issues, and a second
+   refusal fails the run (S-156).
+4. **reconcile** — one `structured` call (role reconciler) holds the observation against the
+   shot's subjects and its **presence** criteria (D-043). The reconciler answers fixed fields and
+   code decides: the picture fails if a subject the shot shows is not shown, a shown subject is
+   clipped by the edge of the frame, a subject's count does not match, a `mustShow` is not shown,
+   or a `mustNotShow` is shown.
 
-Output: `Gate1Verdict` with `outcome: 'accept' | 'fail'` and the failed criteria, plus
-suspicion data feeding Gate 1S.
+The verdict (`picture.gate1`) is `accept` only if every step accepted. A canonical whose two
+candidates both fail gets one repair; if that fails too, the run stops for rule `gate-1`. A derived
+or standalone picture that fails takes a repair if a reserve slot is free (at most two a shot);
+otherwise its shot is degraded.
 
 ## Gate 1S — `gate1s`
 
-`packages/pipeline/src/gates/gate1s.ts`. A derived picture against the canonical. Asks the
-model: do the two pictures look like they are of the same subject, in the same style, at the
-same level of detail? (D-049, S-041, S-042.)
+`packages/pipeline/src/gates/gate1s.ts`. A derived picture that passed Gate 1, held against the
+chosen canonical (D-049, S-045). The pixel similarity of the two pictures only **routes** it:
 
-The suspicion threshold (`settings.suspicionThreshold`, default `0.25`) gates the call: a
-derived whose Gate 1 suspicion is below the threshold skips the witness call entirely (D-049).
+- if the two shots share no subject, the picture is accepted with no call;
+- otherwise suspicion = 1 − the sensor port's similarity of the two whole pictures; at or below
+  `suspicionThreshold` (default `0.25`) the picture is accepted with no call;
+- above it, one `compare` call (role judge) is shown both pictures and the names of the shared
+  subjects, and decides. Only the judge can fail a picture here (I-16).
 
-A derived that fails 1S gets one repair from the reserve slot.
+A derived picture that fails 1S gets a repair if a slot is free and its shot has had fewer than
+two; otherwise its shot is degraded. The verdict is stored in `picture.gate1s`.
 
 ## Gate 2 — `gate2`
 
-`packages/pipeline/src/gates/gate2.ts`. Technical check on the assembled take. Uses the media
-port to read the file. Checks:
+`packages/pipeline/src/gates/gate2.ts`. Technical check on a take. The media port probes the clip
+and scans it once for black, frozen and silent stretches and loudness. The take fails when:
 
-- Codec matches the manifest's `videoCodec`.
-- Geometry matches the manifest's `width`, `height`.
-- Frame rate matches `fps`.
-- Aspect is within `settings.technical.aspectTolerance` (default `0.01`).
-- No black or frozen frames beyond `blackSeconds` / `frozenSeconds` (default `0.5` / `1.0`).
+- the file is not readable or has no video stream (it is then not scanned);
+- its width over its height differs from 9/16 by more than `settings.technical.aspectTolerance`
+  (default `0.01`);
+- it has a black stretch of at least `blackSeconds` (`0.5`) or a frozen stretch of at least
+  `frozenSeconds` (`1.0`).
 
-Output: `Gate2Verdict`.
+Its length, frame rate, sample rate and channels, a missing sound track, silence and loudness are
+recorded and fail nothing — the render conforms them later. A Gate 2 failure decides the take:
+Gates 3 to 5 do not run on it.
 
 ## Gate 3 — `gate3`
 
-`packages/pipeline/src/gates/gate3.ts`. Sound check on the take. Uses the media port to read
-the audio. Checks:
+`packages/pipeline/src/gates/gate3.ts`. Text and sound on a take, through the media port:
 
-- Audio duration vs. the narration's words.
-- No silence beyond the threshold.
+- the words read off the clip are recorded and never fail a take (no text policy exists — S-041);
+- sound classified as **speech** fails the take, and so does sound classified as **music**: the
+  video model's sound must be ambience only, and every clip prompt forbids both.
 
-Output: `Gate3Verdict`.
+On the ffmpeg media port these two readings come from the stand-in script (default: no words,
+neither speech nor music), so on a real run Gate 3 has not yet heard a clip (P-007).
 
 ## Gate 4 — `gate4`
 
-`packages/pipeline/src/gates/gate4.ts`. Witness check. Asks the model: does the take show
-what the picture was meant to show? The witness is `MiniMax-M3` (the only model in the family
-that accepts images — D-006).
-
-Output: `Gate4Verdict` with `outcome: 'accept' | 'fail'` and the reason.
+`packages/pipeline/src/gates/gate4.ts`. The witness on a take: one `observe` call (role witness,
+`MiniMax-M3`, the only model in the family that accepts images — D-006) shown the whole clip and
+a temperature, nothing else. Its answer is parsed as a clip observation; a refused answer is kept
+and asked once more, and a second refusal fails the run. Once it parses, Gate 4 accepts; the
+observation is what Gate 5 judges. Each verdict records the sampling limitation of D-051.
 
 ## Gate 5 — `gate5`
 
-`packages/pipeline/src/gates/gate5.ts`. Brief check. Asks the model: does the take match
-the narration's intent? The brief is supplied as the take's text plus the planned picture's text
-plus the request's `mustShow` / `mustNotShow` criteria.
+`packages/pipeline/src/gates/gate5.ts`. The brief on a take: one `structured` call (role
+reconciler) holds Gate 4's observation against the shot's subjects and the take's criteria, and the
+reel's unclaimed `mustShow`. Code decides: the take fails when a subject the shot shows is not
+shown, a subject's count does not match, a claimed `mustShow` (presence or event) is not shown, or
+a `mustNotShow` is shown. A clipped entity fails nothing here (a subject leaving a moving frame is
+motion).
 
-Output: `Gate5Verdict`. The first accepted take is the shot's (D-030); three failed takes
-send the shot to a hold (D-055, S-097, S-098).
+The first accepted take is the shot's (D-030). After three failed takes the ladder decides
+(`clips/ladder.ts`): a shot with a chosen picture and no `event` mustShow is held on that picture
+(D-055, S-097, S-098); any other shot stops the reel for the rule of the third take's lowest
+failing gate.
 
-After every shot is done, a final gate-5 check fires: a `mustShow` criterion with no accepted
-take that shows it stops the reel for `rule: 'gate-5'` (S-072, S-090).
+After every shot is done, a final gate-5 check fires: a `mustShow` that no sentence claims, shown by
+no accepted take, stops the reel for `rule: 'gate-5'` (S-072, S-090).
 
 ## Gate 7 — `gate7`
 
@@ -137,7 +159,7 @@ exception is `status: 'failed'`, `failure: <FailureKind>`. The two never overlap
 Every gate's verdict becomes a `verdict` event in `run_event`:
 
 ```ts
-{ type: 'verdict', gate: '0' | '1' | '1S' | '2' | '3' | '4' | '5' | '7', outcome: 'accept' | 'fail', shotId?, … }
+{ type: 'verdict', gate: '0' | '1' | '1S' | '2' | '3' | '4' | '5' | '7', outcome: 'accept' | 'accept_with_label' | 'fail', shotId? }
 ```
 
 `gate: '0'` is the plan gate. `gate: '1'` is each picture's Gate 1. `gate: '1S'` is each

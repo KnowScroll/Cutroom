@@ -49,23 +49,41 @@ SDK is the same body the API accepts.
 
 ### Submitting a brief
 
-`SubmitRequest`:
+`SubmitRequest` (`packages/reel-contract/src/request.ts`). Every object is **strict**: a field
+the contract does not define is rejected, not stripped.
 
 ```ts
 {
   contractVersion: 1,
-  requestId: string,
-  style: 'feature' | 'still' | '…',
-  claims: { id: string, text: string }[],
-  narration: { text: string, claimIds: string[] }[],
-  criteria: { mustShow: Criterion[], mustNotShow: Criterion[] },
+  requestId: string,                               // the caller's own name for the reel
+  worldId: string,
+  narration: { text: string, claimIds: string[] }[], // at least 4 sentences
+  claims: { id: string, role: 'main' | 'supporting' }[],
+  criteria: {
+    mustShow: Criterion[],
+    mustNotShow: Criterion[],                      // presence only
+    depictionPolicyVersion: string,
+  },
+  style: { id: string, version: number, text: string }, // version: whole number ≥ 0
   options: {
-    budgetCents: number,        // caller's ceiling
     until: 'plan' | 'stills' | 'video',
-    planVaryOn?: 'shotCount',
+    budgetCents: number,                           // the caller's ceiling, whole cents > 0
+    planVaryOn?: 'shotCount' | 'order' | 'canonicalSubject' | 'angle',
   },
 }
+
+Criterion = { id: string, text: string, type: 'presence' | 'event', claimId?: string }
 ```
+
+The schema also checks across fields: a claim is listed once; every `claimIds` entry is a listed
+claim and every listed claim is referenced by some sentence; a criterion's `claimId` is a listed
+claim; `mustNotShow` criteria are `presence` (a still cannot prove an event did not happen); and
+`planVaryOn: 'order'` needs a `main` claim. Only `shotCount` is built: the API answers the other
+three with `422 unsupported`.
+
+In practice a brief needs **at least six sentences**: the default fork cuts the narration into 4
+_and_ 6 units without splitting a sentence, and 4 or 5 sentences stop the run at the plan step with
+`rule: 'split'` before any model call.
 
 ### Reading the result
 
@@ -113,17 +131,17 @@ SDK started one itself. The distinction matters at `close()`:
 
 ### Methods
 
-| Method                   | Route                               | Returns          |
-| ------------------------ | ----------------------------------- | ---------------- |
-| `submit(request)`        | `POST /v1/runs`                     | `SubmitResponse` |
-| `find(requestId)`        | `GET /v1/runs?requestId=`           | `RunStatus`      |
-| `status(runId)`          | `GET /v1/runs/:runId`               | `RunStatus`      |
-| `follow(runId, since?)`  | `GET /v1/runs/:runId/events?since=` | `EventsPage`     |
-| `result(runId)`          | `GET /v1/runs/:runId/result`        | `RunResult       | RunStatus` (409 if active) |
-| `record(runId)`          | `GET /v1/runs/:runId/record`        | `RunRecord       | RunStatus` (409 if active) |
-| `cancel(runId)`          | `POST /v1/runs/:runId/cancel`       | `RunStatus`      |
-| `resume(runId, request)` | `POST /v1/runs/:runId/resume`       | `ResumeResponse` |
-| `close()`                | —                                   | —                |
+| Method                   | Route                               | Returns                                                          |
+| ------------------------ | ----------------------------------- | ---------------------------------------------------------------- |
+| `submit(request)`        | `POST /v1/runs`                     | `SubmitResponse` — 202 accepted, or a 409/422 refusal as a value |
+| `find(requestId)`        | `GET /v1/runs?requestId=`           | `RunStatus`                                                      |
+| `status(runId)`          | `GET /v1/runs/:runId`               | `RunStatus`                                                      |
+| `follow(runId, since?)`  | `GET /v1/runs/:runId/events?since=` | `EventsPage`                                                     |
+| `result(runId)`          | `GET /v1/runs/:runId/result`        | `RunResult`, or `RunStatus` (409) while the run is active        |
+| `record(runId)`          | `GET /v1/runs/:runId/record`        | `RunRecord`, or `RunStatus` (409) while the run is active        |
+| `cancel(runId)`          | `POST /v1/runs/:runId/cancel`       | `RunStatus`                                                      |
+| `resume(runId, request)` | `POST /v1/runs/:runId/resume`       | `ResumeResponse` — 200, 202, or a 409/422 refusal as a value     |
+| `close()`                | —                                   | —                                                                |
 
 The `runId` and `requestId` are URL-encoded once. `since` is `encodeURIComponent(String(since))`.
 
@@ -144,8 +162,9 @@ type SdkConnectionError = {
 }
 ```
 
-- **`SdkApiError`** is a `400`, `404`, `500`-class response that the server returned with a
-  schema-valid `ErrorResponse`. The body is the parsed error; nothing else from the wire is
+- **`SdkApiError`** is a `400`, `404` or `500` response that the server returned with a
+  schema-valid `ErrorResponse`. (A route's documented 409/422 bodies are returned as values, not
+  thrown.) The body is the parsed error; nothing else from the wire is
   exposed.
 - **`SdkProtocolError`** is an unexpected HTTP status, malformed JSON, or a body that fails
   the expected schema for the route and status. The wire body is dropped.
@@ -198,50 +217,64 @@ idempotent across concurrent consumers.
 ### Example flow
 
 ```ts
-import { createCutroom, type SubmitRequest } from '@cutroom/sdk'
+import { createCutroom } from '@cutroom/sdk'
+import type { SubmitRequest } from '@cutroom/reel-contract'
 
 const cutroom = await createCutroom({
   launcher: {
-    command: 'node',
+    command: process.execPath,
     args: ['--experimental-strip-types', '--no-warnings', 'apps/service/src/main.ts'],
   },
 })
 
 const submit: SubmitRequest = {
   contractVersion: 1,
-  requestId: 'demo-001',
-  style: 'feature',
-  claims: [
-    { id: 'a', text: 'A bee visits a flower.' },
-    { id: 'b', text: 'The bee collects nectar.' },
-  ],
+  requestId: 'honeybees-001',
+  worldId: 'honeybees',
   narration: [
-    { text: 'A bee visits a flower.', claimIds: ['a'] },
-    { text: 'The bee collects nectar.', claimIds: ['b'] },
+    { text: 'A honeybee lands on a flower.', claimIds: ['c1'] },
+    { text: 'It drinks nectar with its long tongue.', claimIds: ['c1'] },
+    { text: 'Pollen sticks to the hairs on its body.', claimIds: ['c2'] },
+    { text: 'The bee carries the pollen to the next flower.', claimIds: ['c2'] },
+    { text: 'Back at the hive it passes the nectar on.', claimIds: ['c3'] },
+    { text: 'Other bees fan it until it thickens into honey.', claimIds: ['c3'] },
   ],
-  criteria: { mustShow: [], mustNotShow: [] },
-  options: { budgetCents: 250, until: 'video' },
+  claims: [
+    { id: 'c1', role: 'main' },
+    { id: 'c2', role: 'supporting' },
+    { id: 'c3', role: 'supporting' },
+  ],
+  criteria: {
+    mustShow: [{ id: 'bee', text: 'a honeybee', type: 'presence', claimId: 'c1' }],
+    mustNotShow: [{ id: 'no-text', text: 'written words or letters', type: 'presence' }],
+    depictionPolicyVersion: 'v1',
+  },
+  style: { id: 'documentary', version: 1, text: 'Natural daylight, close macro photography.' },
+  options: { until: 'video', budgetCents: 250 },
 }
 
-const accepted = await cutroom.submit(submit)
-// accepted: { contractVersion: 1, outcome: 'accepted', requestId, runId, replayed: false }
+const answer = await cutroom.submit(submit)
+// 409 and 422 are answers, not exceptions: { outcome: 'refused', reason, detail }
+if (answer.outcome !== 'accepted') throw new Error(`${answer.reason}: ${answer.detail}`)
+const { runId } = answer
 
 // Follow events until finished.
 let last = 0
 while (true) {
-  const page = await cutroom.follow(accepted.runId, last)
+  const page = await cutroom.follow(runId, last)
   for (const ev of page.events) console.log(ev.seq, ev.type, ev)
   last = page.nextSince
-  const status = await cutroom.status(accepted.runId)
+  const status = await cutroom.status(runId)
   if (status.state === 'finished') break
   await new Promise((r) => setTimeout(r, 500))
 }
 
-const result = await cutroom.result(accepted.runId)
-const record = await cutroom.record(accepted.runId)
+const result = await cutroom.result(runId)
+const record = await cutroom.record(runId)
 
 await cutroom.close()
 ```
 
-`@cutroom/reel-contract` is the source of the type imports. The SDK never imports from
-`@cutroom/contracts`, `@cutroom/domain`, `@cutroom/pipeline` or `@cutroom/providers`.
+Types come from `@cutroom/reel-contract`; the SDK exports `createCutroom`, the `Cutroom` handle and
+its error types. The SDK never imports from `@cutroom/contracts`, `@cutroom/domain`,
+`@cutroom/pipeline` or `@cutroom/providers`.

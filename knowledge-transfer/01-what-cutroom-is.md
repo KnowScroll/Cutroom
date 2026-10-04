@@ -62,13 +62,16 @@ owner is the one who decided to spend. (S-021, S-038, S-108, S-109.)
 
 ## What is paid, what is not
 
-- A run's planner calls (`reel.plan`), pictures (`reel.keyframes`), clips (`reel.clips`), and
-  narration (`reel.clips`) all spend money when the corresponding real adapter is configured.
+- Pictures (`reel.keyframes`, fal) and clips (`reel.clips`, fal) cost money when the real
+  adapter is configured. Model calls (planning and every gate's model) and narration (MiniMax)
+  are priced at 0¢ under MiniMax's token plan, but every call still writes its receipt row.
 - The render stage (`reel.assemble`) uses ffmpeg locally and does not spend.
 - The default service starts with stand-in adapters for every port. It reads no key and spends
   nothing. The stand-in model port deliberately invents no answers, so a complete synthetic
-  reel requires a `CUTROOM_STAND_IN_SCRIPT`. A real reel costs roughly 49–58¢ against a 250¢
-  ceiling; the engine confirms it before any provider is called.
+  reel requires a `CUTROOM_STAND_IN_SCRIPT`.
+- A real reel costs roughly 49–58¢. Two limits are checked before every paid call: the owner's
+  **per-reel cap**, $3.00 (300¢) in `steering-ref/steering/BUDGET.md`, and the caller's
+  **ceiling**, `options.budgetCents` on each request (250¢ is a typical value).
 
 ## The contract
 

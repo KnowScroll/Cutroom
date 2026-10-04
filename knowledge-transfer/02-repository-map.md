@@ -27,7 +27,7 @@ Two more top-level entries are config: `pnpm-workspace.yaml`, `tsconfig.base.jso
 `.dependency-cruiser.cjs`. They exist to enforce the boundaries below; they are not "where code
 goes".
 
-## The seven packages and apps
+## The three apps and six packages
 
 The repository is a pnpm workspace with **three apps** and **six packages**. Each one has exactly
 one entry point (`src/index.ts`), and the dependency rules below are **enforced on resolved file
@@ -90,7 +90,10 @@ Source: `packages/sdk/src/{index.ts,launcher.ts}`.
 
 ### `packages/contracts`
 
-**Internal shared types and port interfaces**. Pure types — no I/O, no logic. Defines every port
+**Internal shared types and port interfaces**. No I/O. Mostly types, plus the few runtime values
+both sides of a boundary must name: the closed adapter sets, `PICTURE_RULES`, and the failure
+classes with `failureKindOf` (`failures.ts`), which providers throw and the worker catches. Imports
+only `@cutroom/reel-contract` and `zod`. Defines every port
 (`ImagePort`, `VideoPort`, `NarrationPort`, `LanguageModelPort`, `MediaPort`, `AssemblerPort`,
 `PictureSensorPort`), every provider setting (`PROVIDER_ADAPTERS`, `ProviderSettings`), and the
 shapes that cross a stage boundary (`Plan`, `PictureRecord`, `TakeRecord`, `RenderManifest`,
@@ -133,9 +136,10 @@ Source: `packages/providers/src/{index.ts,ports.ts,env.ts,artifacts.ts,transient
 
 ### `packages/domain`
 
-**Tables, migrations, queue, records, budget ledger**. SQLite through Drizzle. Owns the
-`run`, `run_event`, `job`, `plan`, `picture`, `take`, `hold`, `still_hold`, `render`,
-`model_receipt`, `video_receipt`, `narration_receipt` tables; the job queue (`claimJob`,
+**Tables, migrations, queue, records, budget ledger**. SQLite through Drizzle. Owns all 21
+tables (listed in `07-database-and-queue.md`), among them `run`, `run_event`, `job`, `plan`,
+`picture`, `take`, `narration`, `still_hold`, `render`, `hold` and the receipts `model_receipt`,
+`generation_receipt`, `video_receipt`, `speech_receipt`; the job queue (`claimJob`,
 `enqueue`, `completeJob`, `buryJob`); the run lifecycle (`submitRun`, `finishRun`,
 `finishStills`, `finishVideo`, `advanceStills`, `advanceClips`, `resumeRun`, `startStage`,
 `requestCancel`); and the `BUDGET.md` reader.
@@ -149,21 +153,35 @@ Source: `packages/providers/src/{index.ts,ports.ts,env.ts,artifacts.ts,transient
 ## The boundaries, restated
 
 The repository enforces **twenty-two rules** over resolved file paths. The text of an import
-line is not what is checked; the path it resolves to is. The rules are:
+line is not what is checked; the path it resolves to is. The rules, by their names in
+`.dependency-cruiser.cjs`:
 
-1. `pipeline` imports no `domain`, no `providers`, no app, and **no I/O at all** (no `node:fs`,
-   no `node:net`, no `fetch`).
-2. `api` never imports `providers`.
-3. `providers` never imports `domain` or `pipeline`.
-4. `contracts` and `reel-contract` are leaves.
-5. The worker never imports `providers`.
-6. Keys stay in `providers`.
-7. A package is entered only through its `src/index.ts`.
-8. The SDK imports no engine internals; only its private launcher may start a process.
-9. The splitter imports nothing outside its own folder, may be imported only by the planner, and
-   may be entered only through its index (D-073).
-10. The pipeline imports nothing but `zod` from npm.
-11. Nothing outside `providers` imports a model client (`reel-plan`, S-020).
+1. `pipeline-no-domain` — a stage never touches the database.
+2. `pipeline-no-providers` — a stage is handed a port; it never imports an adapter.
+3. `pipeline-no-apps` — a stage does not know whether a job or a person called it.
+4. `pipeline-no-io` — no `fs`, `child_process`, `net`, `http`/`https`/`http2`, `dgram`, `tls`,
+   `dns`, `cluster`, `worker_threads`, `sqlite`, `repl` or `readline` in the pipeline.
+5. `api-no-providers` — the API never imports `providers`.
+6. `worker-no-providers` — the worker is handed its ports and cannot construct one (S-038).
+7. `processes-only-in-providers` — `child_process` only in `packages/providers` (and the SDK
+   launcher, below).
+8. `keys-only-in-providers` — only `packages/providers` may import `env.ts`; `drift.mjs` also scans
+   for key-shaped environment reads outside it, which an import graph cannot see (S-109).
+9. `providers-no-domain` — an adapter has no database access.
+10. `providers-no-pipeline` — adapters are called by stages, never the other way round.
+11. `domain-no-pipeline-or-providers` — the domain imports no stage and no adapter.
+12. `contracts-are-a-leaf` — `contracts` imports nothing internal but `reel-contract` (D-099).
+13. `reel-contract-is-a-leaf` — `reel-contract` imports no other engine package.
+14. `sdk-no-engine-internals` — the SDK imports only `reel-contract` and Node built-ins.
+15. `sdk-processes-only-launcher` — only `packages/sdk/src/launcher.ts` may import `child_process`.
+16. `no-reaching-into-internals` — a package is entered only through its `src/index.ts`.
+17. `no-circular` — no import cycles.
+18. `split-imports-only-itself` — the splitter imports nothing outside `split/` (D-073).
+19. `split-imported-only-by-plan` — only `plan/` may import the splitter.
+20. `split-entered-through-its-index` — `plan/` enters `split/` only through its `index.ts`.
+21. `pipeline-npm-only-zod` — the pipeline's only npm package is `zod`.
+22. `model-client-only-in-providers` — no model client (`ai`, `@ai-sdk/*`) outside providers;
+    none is installed at all (S-114).
 
 `node scripts/drift.mjs` enforces them. `node scripts/drift.mjs --prove` writes a file to break
 each rule and fails if one stays silent. `node scripts/drift.mjs --audit` fails when a rule names
@@ -198,15 +216,15 @@ a folder that a renamed package lost.
 
 ## What you should never import, and why
 
-| If you are in…                                        | You must not import…                                           | Why                                                |
-| ----------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
-| `pipeline`                                            | `domain`, `providers`, `node:fs`, `node:net`, `fetch`, any app | The stage must be reproducible from inputs         |
-| `api`                                                 | `providers`, `worker`, `pipeline`                              | The API must not spend or plan                     |
-| `worker`                                              | `providers`                                                    | The worker must not construct adapters             |
-| `providers`                                           | `domain`, `pipeline`                                           | Adapters must not know the database or the stages  |
-| `contracts`                                           | any other workspace package                                    | Pure types                                         |
-| `reel-contract`                                       | any other workspace package                                    | Public contract; leaf                              |
-| `sdk`                                                 | `pipeline`, `domain`, `providers`                              | The SDK must not be tied to the engine's internals |
-| the splitter (`packages/pipeline/src/split/index.ts`) | anything outside `split/`                                      | Only the planner calls it (D-073)                  |
+| If you are in…                                        | You must not import…                                                                                                         | Why                                                             |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `pipeline`                                            | `domain`, `providers`, any app, I/O core modules (`node:fs`, `node:net`, `node:child_process`, …), any npm package but `zod` | The stage must be reproducible from inputs                      |
+| `api`                                                 | `providers`, `worker`, `pipeline`                                                                                            | The API must not spend or plan                                  |
+| `worker`                                              | `providers`                                                                                                                  | The worker must not construct adapters                          |
+| `providers`                                           | `domain`, `pipeline`                                                                                                         | Adapters must not know the database or the stages               |
+| `contracts`                                           | any workspace package but `reel-contract`                                                                                    | Shared by everything, so it depends on nothing internal (D-099) |
+| `reel-contract`                                       | any other workspace package                                                                                                  | Public contract; leaf                                           |
+| `sdk`                                                 | `pipeline`, `domain`, `providers`                                                                                            | The SDK must not be tied to the engine's internals              |
+| the splitter (`packages/pipeline/src/split/index.ts`) | anything outside `split/`                                                                                                    | Only the planner calls it (D-073)                               |
 
 The `node scripts/drift.mjs` script is what catches them; never assume a configured rule runs.
