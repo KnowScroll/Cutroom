@@ -155,6 +155,25 @@ jobs:
           ffmpeg -version | head -1 | grep -q '8\.1\.1'
           ffprobe -version | head -1 | grep -q '8\.1\.1'
 
+      # better-sqlite3@13.0.3 publishes NO prebuilt binary — v13.0.3's release carries zero assets — so
+      # every install compiles it with node-gyp, and the runner needs a C++ toolchain and a node-gyp
+      # able to find it. This image has the toolchain (Visual Studio Enterprise 2022 17.14, workload
+      # Microsoft.VisualStudio.Workload.NativeDesktop, and Python 3.12), but pnpm 10.15.1 bundles
+      # node-gyp 11.1.0, which reports "Could not find any Visual Studio installation to use" against
+      # a 17.14 install. So the runner is given a newer node-gyp, pinned, and told to use it through
+      # npm_config_node_gyp. This gives the runner a tool it lacks (S-183's "the runner is wrong"
+      # class); it changes nothing the repository runs, and writes no path — the location is computed
+      # on the runner from $RUNNER_TEMP, never spelled out (D-086).
+      - name: Give the runner a node-gyp new enough for its own C++ toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-fund --no-audit --prefix "$RUNNER_TEMP/gyp" node-gyp@13.1.0
+          gyp="$RUNNER_TEMP/gyp/node_modules/node-gyp/bin/node-gyp.js"
+          test -f "$gyp"
+          node "$gyp" --version
+          echo "npm_config_node_gyp=$gyp" >> "$GITHUB_ENV"
+
       # The output is republished as a workflow ANNOTATION on purpose. A job log can only be
       # downloaded by someone with admin rights on the repository, while a check run's annotations
       # are readable by anyone who can read a public repository — so a failure here can be read and
@@ -164,7 +183,7 @@ jobs:
         run: |
           set +e -uo pipefail # -e is on by default; the handler below needs to run
           log="$RUNNER_TEMP/install.log"
-          { node --version; corepack --version; } >>"$log" 2>&1
+          { node --version; corepack --version; node "${npm_config_node_gyp:-}" --version; } >>"$log" 2>&1
           corepack pnpm install --frozen-lockfile 2>&1 | tee -a "$log"
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
@@ -278,13 +297,32 @@ jobs:
           ffmpeg -version | head -1 | grep -q '8\.1\.1'
           ffprobe -version | head -1 | grep -q '8\.1\.1'
 
+      # better-sqlite3@13.0.3 publishes NO prebuilt binary — v13.0.3's release carries zero assets — so
+      # every install compiles it with node-gyp, and the runner needs a C++ toolchain and a node-gyp
+      # able to find it. This image has the toolchain (Visual Studio Enterprise 2022 17.14, workload
+      # Microsoft.VisualStudio.Workload.NativeDesktop, and Python 3.12), but pnpm 10.15.1 bundles
+      # node-gyp 11.1.0, which reports "Could not find any Visual Studio installation to use" against
+      # a 17.14 install. So the runner is given a newer node-gyp, pinned, and told to use it through
+      # npm_config_node_gyp. This gives the runner a tool it lacks (S-183's "the runner is wrong"
+      # class); it changes nothing the repository runs, and writes no path — the location is computed
+      # on the runner from $RUNNER_TEMP, never spelled out (D-086).
+      - name: Give the runner a node-gyp new enough for its own C++ toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-fund --no-audit --prefix "$RUNNER_TEMP/gyp" node-gyp@13.1.0
+          gyp="$RUNNER_TEMP/gyp/node_modules/node-gyp/bin/node-gyp.js"
+          test -f "$gyp"
+          node "$gyp" --version
+          echo "npm_config_node_gyp=$gyp" >> "$GITHUB_ENV"
+
       # Republished as an annotation for the same reason as the Windows job: a job log needs admin
       # rights on the repository, a check run's annotations do not.
       - name: Install dependencies
         run: |
           set +e -uo pipefail # -e is on by default; the handler below needs to run
           log="$RUNNER_TEMP/install.log"
-          { node --version; corepack --version; } >>"$log" 2>&1
+          { node --version; corepack --version; node "${npm_config_node_gyp:-}" --version; } >>"$log" 2>&1
           corepack pnpm install --frozen-lockfile 2>&1 | tee -a "$log"
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
