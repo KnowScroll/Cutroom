@@ -7812,6 +7812,96 @@ _"n reels with that topic"_ as _"a playlist of serial order"_, not _"3 reels on 
 
 ---
 
+## S-182 | 2026-10-12 | The benchmark reads what the engine already wrote: five part scorecards whose ratings are built only from the engine's own verdicts, a verdict only between two sides of runs under a rule fixed in advance, and the buying of reels deferred
+
+**Chose.**
+
+- **A reading half, built now, that spends nothing**: a pure `packages/benchmark` for the arithmetic and a
+  read-only `scripts/benchmark.mjs` that opens the record with `node:sqlite`'s `readOnly`, never the domain's
+  opener (`scripts/refused.mjs`' form, and its `--db` → `CUTROOM_DB_PATH` → default order). **It is built in this
+  repository**, not a new one: it reads internal tables and binds its reason classifier to `gates/gate1.ts`' own
+  strings, and a second repository would be a second copy of the schema — the drift D-088 and S-017 exist to catch.
+- **A benchmark run is a WHOLE REEL**, scored in five parts — plan, pictures, narration, clips, cut — each with
+  every count, timing, cost, retry and gate verdict the record holds, **a rating out of 100 a part and one for the
+  run**, and **whether a watchable reel came out reported beside the rating and never folded into it**. Any part of
+  any run can be read alone, and all 52 runs already in the record are scored the day it is built.
+- **Every rating term is one of the engine's own verdicts**, never a theory about what makes a good picture: plan
+  `Gate 0 admitted 0.5 · no repair plan needed 0.2 · every planner and scorer answer readable at the first ask 0.3`
+  (0 when no plan was selected); pictures `judged accepted 0.7 · shots not degraded 0.3`; narration `units spoken
+0.5 · timings parsed at the first ask 0.5`; clips `takes accepted 0.5 · shots not held at the cap 0.3 · delivered
+within 0.25 s of asked 0.2`; cut `Gate 7 answers yes 0.6 · no holds 0.2 · duration within 0.5 s of the plan
+0.2`; run `plan 0.1 · pictures 0.3 · narration 0.1 · clips 0.3 · cut 0.2`. **Rating version `r1`**, carried with
+  the run's Gate 7 question-set hash, since S-158 changed that set's size. **An absent part scores 0 against its
+  weight**, a run that reached no part has no rating, a run rated over a shorter `until` is labelled and never
+  pooled, and **no rating decides anything**.
+- **A verdict is only ever between two SIDES**, each a label and an explicit list of runs, grouped by **brief key**
+  — the SHA-256 of `request_canonical` with `requestId` and `options` removed, hashed in the reader — with
+  `until` and the request's ceiling carried outside that key. A measure moves only beyond **twice its own band**:
+  binomial from the counts for a share, and from the two sides' sample variances for a per-run average, which needs
+  two runs a side. **Two runs a side in a group and three shared groups at the least**; the same direction in two
+  thirds of the groups; a zero delta is not a move; a group where the measure is undefined on one side is dropped.
+  **Credit is withheld only when shots asked a picture for, accepted pictures per shot, or shots degraded move the
+  wrong way — never on judged pictures alone**, because a better prompt lowers judged pictures by not burning
+  retries.
+- **Comparability is what the record holds**: `until`, the measures version, the rating stamp, and a **fingerprint**
+  of every receipt kind's `rate_cents`, the style and its version, `depictionPolicyVersion`, `plannedImageCalls`,
+  the contract version and whether standalone pictures exist. **The engine's code version and the picture rule read
+  "not recorded" on every comparison**, with the declared change under test printed beside the verdict, until
+  `run-provenance` records them.
+- **Three boundary rules, not one** — `benchmark-no-engine`, `benchmark-no-io`, `benchmark-npm-only-zod` — taking
+  the enforced count from 22 to **25**, with the five places that assert 22 amended in S-099's form and no check
+  weakened. Hashing lives in the reader so the package may be forbidden `node:crypto` outright.
+- **Three outputs**: the scorecard on screen (figures only), the full record under `--out` with a gitignored default
+  (D-086), and a committed ledger at `docs/research/benchmark.md` whose path is a setting with a **tracked**
+  default, written by the script and never typed (S-016's rule). No path of any kind in the ledger; model text and
+  blobs only when asked for; never a key, a URL or a query string (D-022).
+- **Deferred, each named**: the paid pass — buying reels on a frozen brief set, with its ceilings and its typed
+  confirmation — and `run-provenance`, which records what made a run.
+
+**Why.** The owner asked why reels fail and what to fix, and the measurement that answered it
+(`docs/research/yield-baseline.md`) cannot be used to judge a fix: read this session, the 52 runs span **25 brief
+groups** with the largest holding 8 runs, every one `until: video`, and the engine changed between them with
+**nothing recording which version made which run**. A benchmark that only described runs would leave the owner's
+real question unanswered — _"how would we know whether the new engine or new thing in the engine worked"_ — so the
+comparison is in, with its limits printed rather than hidden. The ratings are built from verdicts alone because the
+first fix in the queue rewrites the picture prompt: a rating that counted how few things a shot asked for would rise
+by definition and stop measuring. An absent part scores zero because renormalising over the parts reached made two
+runs that died on their first picture score 100 and outrank every finished reel. And the arithmetic sits in a
+package because `check.mjs` holds every `scripts/` diff to the full suite, so a script-only feature would make
+every slice a 1413-second run.
+
+**Rejected.** **A separate benchmark repository** — a second copy of the schema, a pinned submodule to read
+`gate1.ts`, and this repository's whole ceremony paid twice for one reader. **A stills-only pass as the benchmark** —
+it cannot see Gate 5, Gate 7, the take ladder or the yield, and the owner chose whole reels. **A composite score
+that decides** — a number people optimise stops measuring; it ranks and nothing more. **Renormalising absent parts.**
+**Binding a comparison to a git diff between two commits** — the commit a reader runs at says nothing about the
+engine that made the rows, and the exemption list was wrong anyway, since `BUDGET.md` is Markdown the engine parses
+at run time. **One blanket purity rule** — dependency-cruiser ANDs a `to`'s attributes, so builtins and npm
+packages cannot share a rule, and a bare-name regex would report a legal unresolved import. **Classifying every
+gate's reason strings** — Gate 0, 1S, 2, 3, 7, the degradations, the holds and `lost_call.detail` are counted
+verbatim, because a classifier that claimed them would drop a legal string into `other` the first day it appeared.
+**Enforcing `BUDGET.md`'s per-day and total rows in code** — a new reader in `packages/domain` would put a
+benchmark inside a dozen verified features' amendment lists for a figure a person reads before confirming a spend.
+**Two rating terms that were proposed and cut**: image calls used of six, which rewards spending less while two of
+the six are reserve by design, and shots backed by a picture, which a service setting decides rather than a fix.
+
+**Caught by.** `docs/features/yield-benchmark.md`'s fifteen checks. The load-bearing ones: a rating function handed
+a plan whose shots name four subjects and the same plan with one returns the same rating; the four worked fixtures
+rate exactly 0.0, 10.0, 21.5 and 91.9 and rank in that order; `gate5.ts`' pushed templates are four and none of
+them is the clipping one; every column the scorecard names exists in `schema.ts` and in `db/migrations/`; the
+reader leaves a database's bytes unchanged, creates nothing on a missing path and starts no process but
+`git rev-parse`; every other check passes in a PATH-only child (S-028); and `drift --prove` fires 25 rules, with
+the five amended assertions green.
+
+**Confirmed-by.** The owner, 2026-10-12: _"whole reel, each part should have their own benchmarks, ratings, numbers,
+timings, everything"_ and _"one number, internal numbers, everything will be needed so we have full control and
+observability on each and every aspect of the system"_; _"we can keep the money eval for later once this benchmark
+is made"_; and, when the comparison was offered as a deferral, _"No we need job 2 as well, this is also the most
+important or else how would we know whether the new engine or new thing in the engine worked ... even if it takes
+more time and brainstorming and decision making to close."_
+
+---
+
 ## S-183 | 2026-10-12 | A hosted run corroborates and never verifies: the local full run stays S-177's only authority, and no run of a workflow may carry a verification trailer
 
 **Chose.** The repository is public, so standard GitHub-hosted runners are free, Windows included, and
@@ -7828,10 +7918,14 @@ the enforcement is stated rather than overstated:** `verification-status.mjs` re
 is not `full` or `targeted`, and `permissions: contents: read` stops the job writing, but nothing stops a session
 typing `Verification: full` after only a hosted green. That is a convention this entry binds, not a proof.
 
-`windows-latest` is the measured platform, because it is the only one this suite has ever been green on.
-Public-repository runners are 4 vCPU / 16 GB — twice a private repository's, and **a quarter of this machine's 16
-cores**, which is what the suite's bounds were measured on. `ubuntu-latest` is a second, separate measurement of an
-unverified port (session 81), started only on request; its reds are findings about the port. Only
+**`ubuntu-latest` is the primary measurement and `windows-latest` is the control**, at the owner's word:
+S-179 already makes Linux the deployment target, so Linux is the platform worth knowing about and it is what a push
+measures, while Windows is asked for and earns its place by being the only platform this suite has ever been green
+on. That pairing is what makes a red attributable — Linux red beside Windows green is the port (class 3); red on
+both is the repository (class 1) or the runner (class 2); a lone Linux measurement could say neither. Linux support
+is unverified (session 81), so a red there is a finding about the port, recorded, and Linux is **required to be
+measured, not required to pass**. Public-repository runners are 4 vCPU / 16 GB — twice a private repository's, and
+**a quarter of this machine's 16 cores**, which is what the suite's bounds were measured on. Only
 `scripts/check.mjs` runs there — journeys stay local, because `scripts/journey.mjs` writes an evidence line and
 flips a feature's `Status:`, so a hosted journey would have to commit back. **In the approved state
 `workflow_dispatch` is the only trigger, on `main`**, so the measured tree is `main`'s tree rather than a branch's
@@ -7888,8 +7982,10 @@ because it makes a deterministic offline checker depend on the network, so it wo
 the code, and a checker that fails transiently is one people learn to rerun — the habit S-111 and S-177 exist to
 remove. If it is ever wanted it is its own feature, with a deliberate break for each of those six conditions.
 **Requiring green on both Windows and Linux** — an unverified port could then block work, which is the pressure
-that produces a conditional check. **Linux only**, and **macOS** — no evidence on either, and macOS is the one
-standard runner with a 5-job concurrency cap. **Hosted journeys**, whether committing back (needs
+that produces a conditional check. **Windows only** — it measures the platform this engine will not be deployed on.
+**Linux only** — a red would be unattributable, with nothing to say whether the port or the code was at fault, which
+is the control's whole job. **macOS** — no evidence on it at all, and it is the one standard runner with a 5-job
+concurrency cap, so it is the scarce resource for no gain. **Hosted journeys**, whether committing back (needs
 `contents: write`, and would let a run mark a feature `verified` unwatched) or uploading an evidence line as an
 artifact for a local session to apply (the same forgery with an extra step, and `journey.mjs` would need a way to
 write an evidence line without running the journey). **Recording a hosted run under `## Evidence`** — that section
