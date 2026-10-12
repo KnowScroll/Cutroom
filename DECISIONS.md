@@ -7811,3 +7811,82 @@ gates settle their behavior.
 _"n reels with that topic"_ as _"a playlist of serial order"_, not _"3 reels on the same brief expanded"_.
 
 ---
+
+## S-183 | 2026-10-12 | A hosted run corroborates and never verifies: the local full run stays S-177's only authority, and no run of a workflow may carry a verification trailer
+
+**Chose.** The repository is public, so standard GitHub-hosted runners are free, Windows included, and
+`node scripts/check.mjs` may be measured somewhere other than this laptop. Seven things are settled, and they bind
+whether or not a workflow ever lands on `main`.
+
+A hosted run is **corroboration**. It writes no trailer, it is named nowhere `scripts/verification-status.mjs`
+reads, and that script is unchanged by this decision. Its result is recorded as prose in
+`docs/features/hosted-checks.md`'s Evidence, with the run id, the tree it ran and its conclusion, and that record
+carries no authority. A green hosted run makes no commit verified; a red one makes no commit unverified.
+
+`windows-latest` is the measured platform, because it is the only one this suite has ever been green on. Public
+repositories get 4 vCPU / 16 GB standard runners, twice what a private repository gets. `ubuntu-latest` is a second,
+separate measurement of an unverified port (session 81), started only on request; its reds are findings about the
+port and never reasons to change a check. Only `scripts/check.mjs` runs there — journeys stay local, because
+`scripts/journey.mjs` writes an evidence line and flips a feature's `Status:`, so a hosted journey would have to
+commit back. Triggers are `workflow_dispatch` and `push` on one measurement branch; there is no `pull_request`,
+`pull_request_target` or `schedule`, `permissions` is `contents: read`, no `secrets.*` is referenced, and no step
+can reach `scripts/real-reel.mjs`. S-177's targeted-slice arrangement is untouched: the local full run remains the
+sole authority, and no integrity boundary gains a second mandatory suite. A hosted red is classified before anything
+is done about it — the repository is wrong if it is red locally too; the runner is wrong if the same tree is green
+locally and the failure names a tool, a core count, a clock or the network; the port is wrong if only Linux is red —
+and in no class is a timeout raised, a bound loosened, a test skipped or conditioned, `continue-on-error` added, or
+a run repeated until green and the green reported.
+
+Whether any `.github/` file reaches `main` is decided by `docs/features/hosted-checks.md`'s four gates, not by this
+entry and not by whether a run was green.
+
+**Why.** A workflow that claims verification changes how this repository claims anything is done, and
+`scripts/verification-status.mjs` is forty offline, deterministic lines that compare a trailer against
+`git rev-parse HEAD^{tree}` and rerun nothing. Its soundness today rests on the session that types the trailer being
+the session that watched the run. A hosted trailer is a claim about work nobody present watched, so trusting it would
+make the trailer the weakest link in S-177 rather than its record. The measurement is still worth having: an
+independent reproduction on a machine nobody configured by hand is the only thing that can catch a green which
+depends on this laptop, and it makes Linux a measurement instead of a guess.
+
+**Rejected.** **A `Verification: hosted` trailer the checker trusts** — forgeable text about unwatched work. **A
+trailer the checker verifies over the network** — buildable, and costed: it would have to require `conclusion` of
+`success`, match `head_sha`'s tree to `Verification-Tree`, match the run's workflow `path`, **hash the workflow blob
+at `head_sha` against a pinned hash** (a branch can carry any workflow, and a run of one invoking `check.mjs --slice`
+would satisfy every other condition), and refuse an unexplained `run_attempt` above 1. Rejected because it makes a
+deterministic offline checker depend on the network, so it would fail for reasons unrelated to the code, and a
+checker that fails transiently is one people learn to rerun — the habit S-111 and S-177 exist to remove. If it is
+ever wanted it is its own feature, with a deliberate break for each of those six conditions. **Requiring green on
+both Windows and Linux** — an unverified port could then block work, which is the pressure that produces a
+conditional check. **Linux only**, and **macOS** — no evidence on either, and macOS is the one standard runner with
+a 5-job concurrency cap. **Hosted journeys**, whether committing back (needs `contents: write`, and would let a run
+mark a feature `verified` unwatched) or uploading an evidence line as an artifact for a local session to apply (the
+same forgery with an extra step, and `journey.mjs` would need a way to write an evidence line without running the
+journey). **A `pull_request` trigger** — the protection against a stranger's run should be the absence of the
+trigger, not a setting outside the file. **`schedule`** — a green nobody reads is a badge nobody earned. **Hosted
+replacing the local full run**, and **both required for an integrity boundary** — the first is forgeable and cannot
+run journeys, the second restores the ritual S-177 removed and makes a queue outage block committing. **A
+self-hosted runner on a small VM** — priced at roughly €60–€86 or $48–$60 a month against $0 for hosted, and
+rejected chiefly because a self-hosted runner on a public repository executes anything that can start a run on a
+machine whose state persists between jobs, while the only thing it would hide is `check.mjs` output, which holds no
+key and calls no provider. It becomes the right answer when a run needs a provider key, which this one does not.
+**Caching `node_modules` or the pnpm store** — a cache lets one run inherit another's state, and the first thing it
+hides is a lockfile that no longer installs cleanly.
+
+**Caught by.** `scripts/verification-status.mjs` already refuses any `Verification:` value that is not `full` or
+`targeted`, so a `Verification: hosted` trailer is red today with no change — `hosted-checks` Slice 1 exists to
+prove that keeps holding. Slice 1 also adds `tests/hosted-checks-workflow.test.ts`: every `.yml` under `.github/`
+names no `secrets.`, no `real-reel`, no `pull_request` and no `continue-on-error`, and declares
+`permissions: contents: read`. `tests/no-absolute-paths.test.ts` and `tests/line-endings.test.ts` already scan every
+tracked `.yml`, so a `C:\Users` or `/home/runner` path and a CRLF workflow are each red. `paid-path`'s check 20
+already asserts no step of `check.mjs` and no script it can reach names `scripts/real-reel.mjs`. `.github/` is an
+unknown path to `check.mjs --changed`, which fails closed to the full run, so no slice of this feature can use
+`--slice`.
+
+**Confirmed-by.** The owner, 2026-10-12: the run is on a branch and is report-only, its result may never be used as
+verification evidence under S-177, no secret is added to GitHub Actions ever, and a bound that fails on a small
+runner is a finding about the runner — _"DO NOT RAISE A TIMEOUT, LOOSEN A BOUND OR SKIP A TEST TO REACH GREEN"_.
+
+**Note on numbering.** `S-182` is reserved by `docs/features/yield-benchmark.md`, written in session 83 and under
+adversarial review; this entry takes `S-183` so the two cannot collide.
+
+---

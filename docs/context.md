@@ -51,7 +51,7 @@ git and the journal keep them.
 - **Checks**: Slice 1’s `127adc5` recorded a full green check (tests 1413 s). S-177 now binds verification to the exact
   commit tree: ordinary slices run static/boundary checks plus named affected tests; full suites remain for checker,
   boundary, workspace/dependency and journey work. The known PATH-only child transient remains a full-suite signal;
-  S-176’s serial aggregate and existing child bounds stand.
+  S-176’s serial aggregate and existing child bounds stand. A hosted run is corroboration only and carries no trailer (S-183).
 
 ## Runs
 
@@ -105,6 +105,53 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-12 · session 84
+
+- **The repository is public, and so is the steering repository it answers to.** `docs/research/public-exposure-audit.md`
+  records the whole-history audit: 1857 blobs (reachable and not), 287 commits, 599 paths ever committed, every commit
+  message, 18 refs, 0 tags, every version of every `tests/fixtures/wire/*.json`, and the steering clone’s 401 blobs,
+  swept for key shapes, credential-named URL query parameters and D-022’s presigned-OSS case. **No secret was found.**
+  Every hit is a fixture (`sk-canary-not-a-real-key`, `X-Amz-Signature=deadbeef`, `AKIAEXAMPLE`); `.env` was never
+  committed and no media, database or archive ever was. `Legend101Zz/Knowscroll-v2` is **public and was already public**,
+  so `BUDGET.md`, the founding research and all 115 `D-` entries were readable before this repository was. Nothing was
+  rewritten — a scrub is not a fix. What is public and is not a secret: the author’s email on all 287 commits, every
+  run’s cost, and the provider and model choices.
+- **S-183 — a hosted run corroborates and never verifies.** `scripts/verification-status.mjs` is unchanged and no
+  trailer names a run; journeys stay local because `journey.mjs` writes into the repository; triggers are
+  `workflow_dispatch` and `push` on one branch with `contents: read` and no `secrets.*`; `windows-latest` is the measured
+  platform and `ubuntu-latest` a separate measurement of an unverified port. `docs/features/hosted-checks.md` holds the
+  four gates (pending review) and all seven choices with what each rejected — a network-verified hosted trailer, costed
+  and rejected for making a deterministic offline checker depend on the network; a self-hosted VM, priced at €60–€86 or
+  $48–$60 a month against $0 and rejected chiefly as a hazard on a public repository.
+- **The measurement is incomplete, by an authentication gap and not by a finding.** Run `38248163234`,
+  `windows-latest`, on branch `ci-measurement` at `8a16efa` (`.github/workflows/measure-checks.yml`, report-only, **not
+  on `main`**): Windows minutes are free, public-repository runners are 4 vCPU/16 GB not 2/8, and every environment trap
+  cleared in 37 s — full-history submodule with an `origin/main` ref, Node 22.14.0, sha256-pinned ffmpeg 8.1.1 with both
+  binaries on PATH alone. `corepack pnpm install --frozen-lockfile` then failed at 63 s and `check.mjs` never ran. The
+  decisive line needs a job log, which needs admin rights (`403`), and this machine’s `gh` token is invalid.
+  `ERR_PNPM_OUTDATED_LOCKFILE` is ruled out offline: the lockfile is in sync with all ten importers.
+- No code, contract, test, boundary rule or check changed, and nothing was weakened. `main` gains documents only.
+
+### 2026-10-12 · session 83
+
+- Added `docs/features/yield-benchmark.md`, **gates NOT approved after two adversarial rounds** (both recorded in the file): the benchmark, designed and not built. Per the owner, a benchmark run is a WHOLE REEL with its own numbers, timings and rating per part, one composite number beside every internal number, and it must run on individual parts too; then the paid half was deferred, so this feature is the reading half only — a pure `packages/benchmark` plus one read-only script that scores the runs already in `data/cutroom.sqlite` across five parts (plan, pictures, narration, clips, cut), every count, timing, cost, retry and gate verdict, a rating a part and a rating a run, with the yield reported beside the rating and never folded in. It spends nothing and never opens the record for writing. **Deferred 1 holds the paid pass whole** — six frozen briefs with their measured refusal rates, a 150¢ per-reel ceiling, one typed confirmation, its own database file and artifact root, continuation by pass id, and a containment check in check 20’s shape. The benchmark stays in this repository (a second one would be a second copy of the schema).
+- Measured read-only from the record, and the figures the gates rest on: **52 runs over 25 brief groups** (the request minus `requestId` and `options`; largest group 8 runs), every one `until: video`; 43 selected plans, 132 pictures with all 132 files still on disk, 128 observations, 127 reconciliations, 118 takes, 95 narrations, 12 renders, 691 verdict events, 118 `stage.started` against 74 `stage.finished` (S-046); `job.cost_cents` 2202¢ = 732 + 1457 + 0 + 13 by receipt kind, `model_receipt` carrying no cost column; image calls 5¢ × 108 and 8¢ × 24, min 2 / median 4 / max 6 a run; selected-plan estimates 40–51¢ at today’s rates; plan plus stills a median 294 s over 23 runs; **subjects per shot from the selected plan agrees with the prompt’s `It shows:` line on 132 of 132 pictures**; 13 distinct Gate 1 reason shapes, all from reconcile.
+- Round 1 refused all four gates with 20 findings, three of them false claims about this repository’s own code: `gate5.ts` builds four reconcile templates and deliberately **no** clipping one (S-072, D-044); `gate2.ts` writes no silence reason (Gate 3 writes the two sound ones); and `scripts/` is in `check.mjs`’ `FULL_ONLY`, so a slice built there is never targeted. Four findings changed the design: the git-diff comparability rule is gone, because **no row records the engine version that made a run**; an absent part scores 0 against its weight, because renormalising made a run that died on its first picture outrank every finished reel; the arithmetic moved into a pure package; and the reason classifier is scoped to Gate 1 and Gate 5 reconcile.
+- Round 2 verified those four hold and found 20 more, every one applied in the file: a 23rd boundary rule would turn `reel-stills` check 3, `reel-render` check 2 and `paid-path` check 4 red (each asserts `22 rules proven to fire`) with no amendment list; the purity rule forbids the `node:crypto` the brief key needs; the brief key erases `until` and `budgetCents`; `kept_from` rows are counted twice across runs; the credit guard cannot separate an honest prompt fix from gaming; and the ledger’s columns, the fixture corpus’ provenance and the exact expected ratings are unspecified. **S-182 is unwritten** — its weights wait on the owner’s open decision about whether the comparison stays here or goes to Deferred 1.
+- Added `PROMPTS/077-benchmark-design.md` (run by this session) and `PROMPTS/078-ci-on-github-actions.md` (written here, run by session 84 in parallel on branch `ci-measurement`), both listed in `PROMPTS/README.md`. Session 82’s two documents — `docs/research/yield-baseline.md` and `docs/features/picture-prompt.md` — were written but never committed, and are committed with this session.
+- No code, contract, test, provider, database, media or boundary changed by this session. No reel was made and nothing was spent.
+
+### 2026-10-12 · session 82
+
+- Added `docs/research/yield-baseline.md`: the engine's yield over all 52 runs, read read-only from `data/cutroom.sqlite`, and the baseline later fixes are compared against. **8 of 52 runs produced a reel (15.4%)**; Gate 1 refuses 53% of pictures, Gate 5 26% of takes, Gate 7 33% of cuts; Gates 0, 1S, 3 and 4 have never refused. New measure: refusal by subjects named in the shot — 42% at one, 70% at two, 100% at three or more (clipping 23/49/100%), so the crammed prompt, not the gate, is the cause. Capacity half unused (3.1 pictures of 6; 63% of clips made from words, which cannot be held at the take cap). Five causes read from source: `PictureAnswer` has no `unavailable` kind so the image port gets no transient resend (6 dead runs); `reconcileAnswer`'s single `entity` index makes a plural subject unsatisfiable against `COUNT_RULE` (19 refusals); `gate4.ts` returns `accept` unconditionally; nothing caps subjects per shot; the picture prompt names what it forbids while FLUX.2 has no negative prompt (38 refusals). Clips are 53–87% of wall clock and the slowest run retried nothing, so retries are not what makes a reel slow.
+- Added `docs/features/picture-prompt.md`, gates unwritten: the first fix, scoped to `pictureEntry` in `packages/pipeline/src/stills/prompts.ts` — framing discipline, describing the wanted state instead of naming the forbidden, and removing prompts that both demand and forbid a person. Records the rejected alternative: changing the clipping veto in `gate1.ts`, disproved by the owner with a 9:16 image of a whole spiral galaxy; D-044 and D-046 stand.
+- Added `PROMPTS/077-benchmark-design.md` (for session 83) and listed it in `PROMPTS/README.md`: design and specify the benchmark every later fix is measured against — four gates and the `S-` entry, no implementation of any kind. It names the ten choices that session must settle, chief among them that the 15.4% baseline is a historical record across changing briefs and a changing engine, not a controlled measurement.
+- No code, contract, test or boundary changed. No `S-` entry yet — the owner asked first for a benchmark harness to compare fixes against (not started). The subjects-per-shot cap and a picture for every shot are their own feature, not started.
+
+### 2026-10-05 · session 81
+
+- No code or document changed besides `JOURNAL.md` (sessions 79 and 80 merged under one heading to stay within S-177's 80 lines, words unchanged). Owner asked for the minimum VM; the repository records none, so the answer was an estimate: 2 vCPU, 4 GB RAM, 20 GB disk to run reels; 4 vCPU, 8 GB, 50 GB for comfort and the full suite. Linux support is unverified.
 
 ### 2026-10-04 · session 80
 
@@ -173,73 +220,6 @@ invariant; complete the PASS chain` at `1c7c77d` (full preflight, tree `35d3382�
   own KnowScroll or any other integration, engine installation and launcher configuration. The unrun prompt 074 now
   approves minimal package gates, builds the artifacts and proves a clean external installation; it contains no
   consumer edit, engine bundle, registry publication, OS installer, activation or rollback work.
-
-### 2026-09-30 · session 73
-
-- S-179 extends the SDK-first queue through an actually installable v1: Linux is the deployment target; Windows-only
-  and source-checkout delivery are rejected; `self-heal` waits. `PROMPTS/074-cutroom-sdk-v1-delivery-gates.md` plans
-  linked Cutroom-release and KnowScroll-integration gates after prompt 073 resolution A restores full-green evidence.
-  No packaging or integration implementation began. The document check also found the unrun prompt 073 itself needs
-  Prettier, so its resolution-A command now names three files rather than leaving its own formatting failure behind.
-
-### 2026-09-30 · session 72
-
-- `cutroom-sdk` Slice 4 ran end to end. The SDK journey PASS at `18e9a48` (every check green, 65 tests in
-  `tests/cutroom-sdk-*.test.ts` pass, Status flipped to `verified`); committed as `5bd079c docs(cutroom-sdk):
-journey PASS at 18e9a48`. The `reel-contract` re-journey FAILed on `format` at `5bd079c`: `prettier --check .`
-  reports `docs/features/cutroom-sdk.md` as the sole failing file. That file fails prettier at the S-176 baseline
-  `019d2a9` (its first version) and at every slice commit since — the violation is pre-existing and the SDK
-  journey reported green because it was the first invocation of that exact post-tick tree. The FAIL is committed
-  as `3b50714 docs(reel-contract): re-journey FAIL at 5bd079c`. Per its wording, the session stops on first FAIL:
-  no re-run, no re-journey, no check/timeout/test amendment. The owner decides whether the file is reformatted
-  (and its new tree given a fresh full preflight per S-177), `.prettierignore` is widened, or the SDK status is
-  amended by hand.
-- Pre-session, the session 72 row began as the Slice 4 preparation tick only: the checkbox in
-  `docs/features/cutroom-sdk.md` (line 360) was flipped, no source/test/contract/boundary/provider/database/media/
-  secret/runtime was changed, `JOURNAL.md` gained the session-72 entry, `PROMPTS/README.md` updated the Run line
-  for prompt 072, and `node scripts/check.mjs --changed` ran green on the document-only tree. The `Gates:` line
-  case (`approved` vs `APPROVED`) was corrected in a separate preparation commit `18e9a8` to match the journey
-  reader; no gate state changed.
-
-### 2026-09-29 · session 71
-
-- `cutroom-sdk` Slice 4 is now explicit and planned, not silently absent from the journey gate. S-178 fixes its
-  evidence sequence: a clean tick commit, the no-provider SDK journey, then `reel-contract` alone, serially. The
-  final re-journey's full check is the final Gate 4 proof; there is no duplicate aggregate run. `PROMPTS/072` records
-  the executable stop-on-FAIL sequence. Slice 3's `ae0599a` verification was read through
-  `verification-status.mjs`; no test command ran in this planning session.
-
-### 2026-09-29 · session 70
-
-- `cutroom-sdk` Slice 3 corrective evidence — the missing boundary rule, strict readiness, explicit-port handling,
-  ordinary-environment inheritance, route-stand-in readiness handshake, and effect-based launcher tests are all
-  proven by `node scripts/check.mjs` at this commit. Trailer `Verification: full`, `Verification-Tree` is the tree
-  the trailers bind. Affected tests: `tests/cutroom-sdk-launcher.test.ts`, `tests/cutroom-sdk-routes.test.ts`,
-  `tests/cutroom-sdk-readiness.test.ts`, `tests/boundaries.test.ts`, `tests/paid-path-keys.test.ts`,
-  `tests/reel-render-rules.test.ts`, `tests/reel-stills-rules.test.ts`. Slice 4's journey and re-journeys remain
-  unstarted.
-
-### 2026-09-29 · session 68
-
-- `cutroom-sdk` Slice 2 review corrections (`45b9de9`) — every SDK fetch now uses `redirect: 'manual'`, so a 3xx
-  response becomes a request-stage protocol error before a loopback request body can be forwarded; the public-surface
-  test references all six exported SDK types; explicit `:80` loopback origins are accepted while no-port origins remain
-  rejected. Its targeted evidence binds tree `143d0bc4f3054ecacf854b8f5ff32a3c5a3d36b9` to the route, workspace and
-  boundary tests.
-- `PROMPTS/069-cutroom-sdk-slice-3.md` — the next-session launcher-lifecycle handoff. It keeps child-process access
-  in one private SDK module, uses stand-in-only integration tests, proves the launcher-only boundary by resolved path,
-  and requires a final full check because the boundary configuration and its proof script change. `PROMPTS/065` now
-  names its completed session and the prompt index has the Slice 2 and Slice 3 rows.
-
-### 2026-09-29 · session 65
-
-- **S-177** replaces repeated full-suite startup/ordinary-slice checks with commit-tree-bound verification evidence.
-  `check.mjs --slice` runs static checks, boundary proofs and the approved affected tests, refusing unlisted changed
-  tests, unknown paths and verification infrastructure; the latter, workspace/dependency changes and journeys remain
-  full-suite work. `verification-status.mjs` validates the current commit’s trailers without rerunning a prior result.
-- `JOURNAL.md` is now a short operational index; sessions 01–64 are preserved byte-for-byte in
-  `docs/history/JOURNAL-through-session-64.md`. The stop gate now requires a committed source tree with valid evidence
-  instead of starting the aggregate suite again. Slice 1’s readiness test now asserts exactly one getter call per probe.
 
 ## Where to look
 

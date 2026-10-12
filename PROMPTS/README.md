@@ -62,6 +62,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 074 | [074-cutroom-sdk-v1-delivery-gates.md](074-cutroom-sdk-v1-delivery-gates.md)           | `cutroom-sdk-package` | finish portable SDK package     | 2026-09-30 | session 78               |
 | 075 | [075-documentation-release.md](075-documentation-release.md)                           | —                     | current docs and usage guide    | 2026-10-01 | session 79               |
 | 076 | [076-knowledge-transfer-page.md](076-knowledge-transfer-page.md)                       | —                     | interactive KT page             | 2026-10-04 | session 80               |
+| 077 | [077-benchmark-design.md](077-benchmark-design.md)                                     | a new one             | design the benchmark, no code   | 2026-10-12 | session 83               |
+| 078 | [078-ci-on-github-actions.md](078-ci-on-github-actions.md)                             | a new one             | checks on GitHub Actions        | 2026-10-12 | session 84               |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
