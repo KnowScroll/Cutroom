@@ -8029,3 +8029,63 @@ runner is a finding about the runner — _"DO NOT RAISE A TIMEOUT, LOOSEN A BOUN
 adversarial review; this entry takes `S-183` so the two cannot collide.
 
 ---
+
+## S-184 | 2026-10-12 | The benchmark is three features, not one: scoring is built first, the comparison and the view each get their own gates
+
+**Supersedes.** **S-182**, in one part only: its scope. S-182 settled the scoring half, the ratings and the
+comparison as one feature, `yield-benchmark`. The comparison and the view are now features of their own; every
+other choice S-182 makes — the five parts, the ratings' terms and weights, the two tolerances, rating version
+`r1`, the brief key, the three boundary rules, the three outputs, hashing in the reader, the deferrals — stands
+unchanged and binds all three.
+
+**Chose.**
+
+- **`yield-benchmark` is the scoring half alone**: the pure `packages/benchmark`, the read-only
+  `scripts/benchmark.mjs`, the five part scorecards and their ratings, the run rating, the drill-down into one part
+  of one run, and the committed ledger. It computes the **brief key** so a run can be grouped later, and it
+  computes no band and reaches no verdict.
+- **`yield-compare` is the comparison**, its own feature with its own four gates: sides, per-unit rates, the two
+  uncertainty bands, the four verdict words — **helped, hurt, inside the noise, no verdict** — the shared-brief
+  minimums, the credit guard, the eight deciding measures, comparability and the fingerprint, **the config mode
+  where a declared difference is the axis and only an undeclared one refuses**, the stratify view over a recorded
+  property, and the null comparison that must report everything inside the noise.
+- **`benchmark-view` is the visualisation**, its own feature with its own four gates, **after the scoring half is
+  built**: one self-contained HTML page with its data inlined, written by the benchmark under its gitignored output
+  path, in `knowledge-transfer/cutroom-kt.html`' proven form — no CDN, no server, opens from the filesystem.
+- **The order is scoring, then comparison, then view.** Scoring ships first because it is the half that has
+  survived three adversarial rounds with no objection to its shape; the view comes last because a page that draws
+  numbers which do not exist yet is designed against guesses.
+- **Every rating term is phrased as something ACHIEVED over something ATTEMPTED**, never as an absence. This is the
+  fix for a whole class of defect rather than its instances: all three rating bugs the reviews found — an absent
+  part renormalised into a perfect score, a credit guard that withheld credit from an honest fix, and
+  "shots not degraded" paying full marks to a run that attempted nothing — are the same bug, which is that an
+  absence is free when nothing was tried.
+
+**Why.** The owner split it: _"Yes the comparison is its own feature that is right, and also the visualization also
+its own feature."_ Three adversarial rounds refused one document forty-plus times, and the findings divide cleanly:
+the scoring half's remaining problems are specification detail and one class of arithmetic bug, while the
+comparison's are genuine open design questions — how a band is computed for an average, what a side is, what the
+config mode's axis does to comparability. Gating the easy half behind the hard one is how a document stays
+unapproved and nothing gets built. The owner has also already refused to DEFER the comparison — _"we need job 2 as
+well, this is also the most important or else how would we know whether the new engine or new thing in the engine
+worked"_ — and a feature of its own is not a deferral: it is the next feature, with its own gates, not a later
+maybe.
+
+**Rejected.** **One feature for all three** — three rounds of evidence that it does not converge, and each round
+costs a strongest-model review. **Deferring the comparison to the paid pass** — the owner refused it, and it is
+how a change gets credited at all. **Building the view first or alongside** — it would be drawn against invented
+numbers, and it would add a twenty-first item to a round that already has twenty. **Keeping the comparison's
+measures inside S-182** — they are the new feature's to settle, and a decision that names measures nobody has
+implemented is a decision about nothing. **Patching each absence-shaped rating term as it is found** — three
+rounds found three instances; the phrasing rule removes the class.
+
+**Caught by.** `yield-benchmark`'s own checks, reduced to the scoring half, with no band and no verdict among
+them; each rating term's denominator asserted as attempted items, and the four worked fixture values recomputed and
+pinned; `yield-compare`'s and `benchmark-view`'s gates, each refusing until approved, and
+`tests/feature-files.test.ts` holding both new files to their front matter and their created-here note.
+
+**Confirmed-by.** The owner, 2026-10-12: _"Yes the comparison is its own feature that is right, and also the
+visualization also its own feature"_, and, on the view, _"i want the benchmark system to be visualizable as well ...
+some ui/frontend work for visualization"_.
+
+---
