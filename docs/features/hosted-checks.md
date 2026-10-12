@@ -121,11 +121,29 @@ Public-repository standard runners are **4 vCPU / 16 GB / 14 GB SSD** on both Wi
 That is twice what a _private_ repository gets and **a quarter of this machine's cores**: this laptop
 is **16 cores / 15 GB**. The bounds the suite carries were measured on 16 cores.
 
-**Decided:** `windows-latest` is the measured platform, because it is the only one this suite has
-ever been green on. A red there is a finding about this repository and is reproduced locally before
-anything is concluded. `ubuntu-latest` is a second, separate measurement of an unverified port
-(session 81), started only on request; its reds are findings about the port and never reasons to
-change a check.
+**Decided, at the owner's word on 2026-10-12: `ubuntu-latest` is the primary measurement, and
+`windows-latest` is the control.** S-179 already makes Linux the deployment target, so Linux is the
+platform worth knowing about and it is what a push measures. Windows is asked for rather than pushed,
+and it earns its place by being the only platform this suite has ever been green on — which is
+exactly what makes it a control:
+
+| Linux | Windows | what it means                                                                          |
+| ----- | ------- | -------------------------------------------------------------------------------------- |
+| red   | green   | **the port is wrong** (class 3). The same tree passes on the platform with evidence.   |
+| red   | red     | **the repository is wrong** (class 1), or the runner is (class 2) — reproduce locally. |
+| green | green   | corroboration on both, which is the most this feature can deliver.                     |
+| green | red     | a Windows regression, and the first time Linux would be the better-evidenced platform. |
+
+Linux support is **unverified** (session 81), so a red there is a finding about the port, recorded —
+never a reason to change a check, a bound or a test. **Linux is not required to pass**; it is
+required to be measured. Nothing in this repository blocks on either platform, which follows from
+choice 5.
+
+This reverses the session's first position, which measured Windows first because prompt 078 said to
+("_Linux is a port, not a lift … an ubuntu run is a second, separate measurement_"). The owner's
+reason is better and is recorded as the decision: a measurement of the platform we will not deploy
+on answers a less useful question. The Windows run that was already in flight was left to finish,
+because it is free and it is the control.
 
 **The stop condition, which round 1 found missing.** Eleven tests spawn a PATH-only journey child
 with its own bound, and the bounds are not uniform:
@@ -157,8 +175,11 @@ a likely outcome, not an edge case.** If that happens:
   which is a paid runner and a different decision.
 
 Rejected: **requiring green on both platforms** — an unverified port could then block work, which is
-the pressure that produces a conditional check; **Linux only**, and **macOS** — no evidence on
-either, and macOS is the one standard runner with a 5-job concurrency cap.
+the pressure that produces a conditional check; **Windows only** — it measures the platform this
+engine will not be deployed on, which answers a less useful question; **Linux only** — a red would
+then be unattributable, because nothing would say whether the port or the code was at fault, which is
+the whole job of the control; **macOS** — no evidence on it at all, and it is the one standard runner
+with a 5-job concurrency cap, so it is the scarce resource for no gain.
 
 ### Choice 3 — What runs there, what stays local? **Only `node scripts/check.mjs`. Journeys stay local.**
 
@@ -370,12 +391,12 @@ forever** — the measured tree is then never `main`'s; **a `schedule`** — see
 
 ### Exact files, pinned to one commit
 
-| file                                     | state                                                                                                                                                        |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `.github/workflows/measure-checks.yml`   | on `ci-measurement` at **`49c916e`**; **not on `main`**. Earlier revisions `8a16efa`, `b85d5de`, `0341942` are superseded and the gates do not describe them |
-| `docs/features/hosted-checks.md`         | this file                                                                                                                                                    |
-| `docs/research/public-exposure-audit.md` | session 84's audit, which made the repository's publicity a settled fact rather than an assumption                                                           |
-| `scripts/verification-status.mjs`        | **unchanged, and changed by no slice of this feature**                                                                                                       |
+| file                                     | state                                                                                                                                                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.github/workflows/measure-checks.yml`   | on `ci-measurement` at **`49b0686`**; **not on `main`**. Earlier revisions `8a16efa`, `b85d5de`, `0341942`, `49c916e` are superseded and the gates do not describe them |
+| `docs/features/hosted-checks.md`         | this file                                                                                                                                                               |
+| `docs/research/public-exposure-audit.md` | session 84's audit, which made the repository's publicity a settled fact rather than an assumption                                                                      |
+| `scripts/verification-status.mjs`        | **unchanged, and changed by no slice of this feature**                                                                                                                  |
 
 ### Affected-test inventory
 
@@ -502,7 +523,7 @@ is known rather than discovered.
       carries breaks 1–12 against a fixture workflow written into a temporary directory by the test
       itself (the scratch-repo technique `tests/verification-status.test.ts` already uses). The
       amendment to `tests/paid-path-real-reel.test.ts` check 20 lands here.
-- [ ] **Slice 2 — the workflow on `main`**, moved from `ci-measurement` at `49c916e`, with its
+- [ ] **Slice 2 — the workflow on `main`**, moved from `ci-measurement` at `49b0686`, with its
       `push: [ci-measurement]` trigger **removed** so `workflow_dispatch` is the only trigger
       (choice 9), the Linux `time` wrapper guarded, and the exact ffmpeg version asserted per
       platform (Gate 2). Slice 1's positive assertions then bind the real file.
