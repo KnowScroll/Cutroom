@@ -58,9 +58,12 @@
 #     and no absolute path anywhere (`tests/no-absolute-paths.test.ts` enforces it) — which is why
 #     every path below is written as `$RUNNER_TEMP` or `${{ runner.temp }}` and never spelled out.
 #
-# Windows is measured first because it is the only platform the suite has ever been green on.
-# Linux is a PORT, not a lift: session 81 recorded that Linux support is unverified, so the ubuntu
-# job is a SECOND, SEPARATE measurement and its reds are findings about the port.
+# LINUX IS THE PRIMARY MEASUREMENT, at the owner's word on 2026-10-12: S-179 makes Linux the
+# deployment target, so it is the platform worth knowing about, and it is what a push measures.
+# Its support is UNVERIFIED (session 81), so a red there is a finding ABOUT THE PORT and never a
+# reason to change a check, a bound or a test. Windows is kept as the CONTROL, asked for rather
+# than pushed: it is the only platform this suite has ever been green on, so a Linux red beside a
+# Windows green on the same tree localises the fault to the port instead of the code.
 #
 # Minutes: standard GitHub-hosted runners are free for public repositories, Windows included. Only
 # larger runners are charged. Public-repository standard runners are 4 vCPU / 16 GB.
@@ -71,9 +74,9 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: Which platform to measure (Windows is the verified one)
+        description: Which platform to measure (Linux is the deployment target)
         type: choice
-        default: windows
+        default: linux
         options:
           - windows
           - linux
@@ -85,17 +88,17 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: measure-checks-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   windows:
-    # The only platform this suite has ever been green on, so the first and cheapest measurement.
+    # The only platform this suite has ever been green on, kept as the CONTROL: if Linux is red and
+    # the same tree is green here, the fault is in the port and not in the code. Asked for, not
+    # pushed, so that a push measures the platform that matters (S-179: Linux is the target).
+    concurrency:
+      group: measure-checks-windows-${{ github.ref }}
+      cancel-in-progress: false
     if: >-
-      github.event_name == 'push' ||
-      inputs.platform == 'windows' ||
-      inputs.platform == 'both'
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.platform == 'windows' || inputs.platform == 'both')
     runs-on: windows-latest
     # Tighter than the 360-minute default on purpose: the local full run is ~1413 s of tests, so a
     # job still running at 90 minutes is a hang worth seeing, not a slow pass worth waiting for.
@@ -146,14 +149,19 @@ jobs:
           $bin = (Get-ChildItem -Path $dest -Recurse -Filter 'ffmpeg.exe' | Select-Object -First 1).Directory.FullName
           Add-Content -Path $env:GITHUB_PATH -Value $bin
 
-      - name: Both tools answer on PATH alone
+      # The exact build, not a loose version match: the Windows pin is ffmpeg-8.1.1-full_build,
+      # which is the build this machine has, while the Linux pin is n8.1.1-9-g58d4114d36 — nine
+      # commits past 8.1.1 and a different build. A '8.1.1' grep passes on both and so cannot tell
+      # them apart, and build identity is load-bearing: packages/providers/src/ffmpeg/tools.ts
+      # compares libx264, aac and a filter list at ready().
+      - name: Both tools answer on PATH alone, at the exact expected build
         shell: bash
         run: |
           set -euo pipefail
           ffmpeg -version | head -1
           ffprobe -version | head -1
-          ffmpeg -version | head -1 | grep -q '8\.1\.1'
-          ffprobe -version | head -1 | grep -q '8\.1\.1'
+          ffmpeg -version | head -1 | grep -q 'ffmpeg version 8\.1\.1-full_build'
+          ffprobe -version | head -1 | grep -q 'ffprobe version 8\.1\.1-full_build'
 
       # better-sqlite3@13.0.3 publishes NO prebuilt binary — v13.0.3's release carries zero assets — so
       # every install compiles it with node-gyp, and the runner needs a C++ toolchain and a node-gyp
@@ -227,7 +235,7 @@ jobs:
           # printed. Republished as an annotation for the same reason as the install step: a check
           # run's annotations are readable without admin rights on the repository.
           if (Test-Path $log) {
-            $report += (Get-Content $log | Where-Object { $_ -match '^\s+(ok|FAIL)\s' -or $_ -match '^(green|red|FAIL)' })
+            $report += (Get-Content $log | Where-Object { $_ -match '^\s+(ok|FAIL)\s' -or $_ -match '^everything green$' -or $_ -match '^\d+ check\(s\) failed$' -or $_ -match '^--- ' })
           }
           Write-Host '----- measurement -----'
           $report | ForEach-Object { Write-Host $_ }
@@ -241,11 +249,17 @@ jobs:
           exit $code
 
   linux:
-    # A SEPARATE measurement of an UNVERIFIED port (session 81). Never started by a push: it is
-    # asked for, so that a red here is read as a finding about Linux and not as a red repository.
+    # THE PRIMARY MEASUREMENT, at the owner's word, 2026-10-12: Linux is the deployment target
+    # (S-179), so it is the platform worth knowing about. Its support is UNVERIFIED (session 81),
+    # so a red here is a finding ABOUT THE PORT — never a reason to change a check, a bound or a
+    # test (CLAUDE.md rule 3). The windows job is the control that tells the two apart.
+    concurrency:
+      group: measure-checks-linux-${{ github.ref }}
+      cancel-in-progress: false
     if: >-
-      github.event_name == 'workflow_dispatch' &&
-      (inputs.platform == 'linux' || inputs.platform == 'both')
+      github.event_name == 'push' ||
+      inputs.platform == 'linux' ||
+      inputs.platform == 'both'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -289,13 +303,16 @@ jobs:
           tar -xJf "$archive" -C "$RUNNER_TEMP/ffmpeg" --strip-components=1
           echo "$RUNNER_TEMP/ffmpeg/bin" >> "$GITHUB_PATH"
 
-      - name: Both tools answer on PATH alone
+      # The exact build. This one is NOT 8.1.1 release: it is n8.1.1-9-g58d4114d36, nine commits
+      # past the tag, and a GPL build. Asserted exactly so the difference from the Windows pin and
+      # from this machine can never pass unnoticed.
+      - name: Both tools answer on PATH alone, at the exact expected build
         run: |
           set -euo pipefail
           ffmpeg -version | head -1
           ffprobe -version | head -1
-          ffmpeg -version | head -1 | grep -q '8\.1\.1'
-          ffprobe -version | head -1 | grep -q '8\.1\.1'
+          ffmpeg -version | head -1 | grep -q 'ffmpeg version n8\.1\.1-9-g58d4114d36'
+          ffprobe -version | head -1 | grep -q 'ffprobe version n8\.1\.1-9-g58d4114d36'
 
       # better-sqlite3@13.0.3 publishes NO prebuilt binary — v13.0.3's release carries zero assets — so
       # every install compiles it with node-gyp, and the runner needs a C++ toolchain and a node-gyp
@@ -335,9 +352,19 @@ jobs:
         run: |
           set +e -uo pipefail # -e is on by default; the handler below needs to run
           log="$RUNNER_TEMP/check.log"
-          /usr/bin/time -v node scripts/check.mjs 2>&1 | tee "$log"
-          code=${PIPESTATUS[0]}
-          report="$(grep -E '^[[:space:]]+(ok|FAIL)[[:space:]]|^(green|red)|Maximum resident set size|Elapsed \(wall clock\)' "$log" || true)"
+          # GNU time is the only absolute path this workflow names, and it is a MEASUREMENT WRAPPER,
+          # not a tool the repository needs. If the image lacks it, the suite still runs and the
+          # annotation says peak memory was not sampled — a missing wrapper must never be read as a
+          # red port (S-183's class 3).
+          if [ -x /usr/bin/time ]; then
+            /usr/bin/time -v node scripts/check.mjs 2>&1 | tee "$log"
+            code=${PIPESTATUS[0]}
+          else
+            echo 'GNU time absent from this image: peak memory not sampled' | tee "$log"
+            node scripts/check.mjs 2>&1 | tee -a "$log"
+            code=${PIPESTATUS[0]}
+          fi
+          report="$(grep -E '^[[:space:]]+(ok|FAIL)[[:space:]]|^everything green$|^[0-9]+ check\(s\) failed$|^--- |Maximum resident set size|Elapsed \(wall clock\)|peak memory not sampled' "$log" || true)"
           echo '----- measurement -----'
           echo "$report"
           echo "check.mjs exit $code"
