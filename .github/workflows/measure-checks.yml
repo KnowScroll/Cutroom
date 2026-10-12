@@ -162,9 +162,10 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          set -uo pipefail
+          set +e -uo pipefail # -e is on by default; the handler below needs to run
           log="$RUNNER_TEMP/install.log"
-          corepack pnpm install --frozen-lockfile 2>&1 | tee "$log"
+          { node --version; corepack --version; } >>"$log" 2>&1
+          corepack pnpm install --frozen-lockfile 2>&1 | tee -a "$log"
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
             printf '::error title=install failed (exit %s)::%s\n' "$code" \
@@ -281,9 +282,10 @@ jobs:
       # rights on the repository, a check run's annotations do not.
       - name: Install dependencies
         run: |
-          set -uo pipefail
+          set +e -uo pipefail # -e is on by default; the handler below needs to run
           log="$RUNNER_TEMP/install.log"
-          corepack pnpm install --frozen-lockfile 2>&1 | tee "$log"
+          { node --version; corepack --version; } >>"$log" 2>&1
+          corepack pnpm install --frozen-lockfile 2>&1 | tee -a "$log"
           code=${PIPESTATUS[0]}
           if [ "$code" -ne 0 ]; then
             printf '::error title=install failed (exit %s)::%s\n' "$code" \
@@ -293,7 +295,7 @@ jobs:
 
       - name: Measure node scripts/check.mjs — the whole suite, nothing conditional
         run: |
-          set -uo pipefail
+          set +e -uo pipefail # -e is on by default; the handler below needs to run
           log="$RUNNER_TEMP/check.log"
           /usr/bin/time -v node scripts/check.mjs 2>&1 | tee "$log"
           code=${PIPESTATUS[0]}
