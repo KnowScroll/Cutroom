@@ -155,11 +155,22 @@ jobs:
           ffmpeg -version | head -1 | grep -q '8\.1\.1'
           ffprobe -version | head -1 | grep -q '8\.1\.1'
 
+      # The output is republished as a workflow ANNOTATION on purpose. A job log can only be
+      # downloaded by someone with admin rights on the repository, while a check run's annotations
+      # are readable by anyone who can read a public repository — so a failure here can be read and
+      # recorded without handing anybody a token. Nothing about the command changes.
       - name: Install dependencies
         shell: bash
         run: |
-          set -euo pipefail
-          corepack pnpm install --frozen-lockfile
+          set -uo pipefail
+          log="$RUNNER_TEMP/install.log"
+          corepack pnpm install --frozen-lockfile 2>&1 | tee "$log"
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            printf '::error title=install failed (exit %s)::%s\n' "$code" \
+              "$(tail -c 1800 "$log" | sed -e 's/%/%25/g' -e 's/::/;;/g' | awk '{printf "%s%%0A", $0}')"
+          fi
+          exit "$code"
 
       - name: Measure node scripts/check.mjs — the whole suite, nothing conditional
         shell: pwsh
@@ -176,21 +187,37 @@ jobs:
               Start-Sleep -Seconds 2
             }
           }
+          $log = Join-Path $env:RUNNER_TEMP 'check.log'
           $started = Get-Date
-          node scripts/check.mjs
+          node scripts/check.mjs *>&1 | Tee-Object -FilePath $log
           $code = $LASTEXITCODE
           $elapsed = (Get-Date) - $started
           Stop-Job $sampler | Out-Null
           Remove-Job $sampler -Force | Out-Null
-          Write-Host "----- measurement -----"
-          Write-Host ("total wall clock   {0:n0} s" -f $elapsed.TotalSeconds)
+          $report = @()
+          $report += ("total wall clock   {0:n0} s" -f $elapsed.TotalSeconds)
           if (Test-Path $peakFile) {
             $peak = [int64](Get-Content $peakFile)
-            Write-Host ("peak node RSS      {0:n0} MiB (summed across node processes, sampled every 2 s)" -f ($peak / 1MB))
+            $report += ("peak node RSS      {0:n0} MiB (summed over node processes, sampled every 2 s)" -f ($peak / 1MB))
           } else {
-            Write-Host "peak node RSS      not sampled"
+            $report += 'peak node RSS      not sampled'
           }
-          Write-Host ("check.mjs exit     {0}" -f $code)
+          $report += ("check.mjs exit     {0}" -f $code)
+          # Each check's own label and milliseconds, straight out of check.mjs, plus any failure it
+          # printed. Republished as an annotation for the same reason as the install step: a check
+          # run's annotations are readable without admin rights on the repository.
+          if (Test-Path $log) {
+            $report += (Get-Content $log | Where-Object { $_ -match '^\s+(ok|FAIL)\s' -or $_ -match '^(green|red|FAIL)' })
+          }
+          Write-Host '----- measurement -----'
+          $report | ForEach-Object { Write-Host $_ }
+          $text = ($report -join "`n") -replace '%', '%25' -replace '::', ';;' -replace "`r", '' -replace "`n", '%0A'
+          if ($text.Length -gt 1800) { $text = $text.Substring(0, 1800) }
+          if ($code -eq 0) {
+            Write-Host "::notice title=measurement (check.mjs green)::$text"
+          } else {
+            Write-Host "::error title=measurement (check.mjs exit $code)::$text"
+          }
           exit $code
 
   linux:
@@ -250,12 +277,35 @@ jobs:
           ffmpeg -version | head -1 | grep -q '8\.1\.1'
           ffprobe -version | head -1 | grep -q '8\.1\.1'
 
+      # Republished as an annotation for the same reason as the Windows job: a job log needs admin
+      # rights on the repository, a check run's annotations do not.
       - name: Install dependencies
         run: |
-          set -euo pipefail
-          corepack pnpm install --frozen-lockfile
+          set -uo pipefail
+          log="$RUNNER_TEMP/install.log"
+          corepack pnpm install --frozen-lockfile 2>&1 | tee "$log"
+          code=${PIPESTATUS[0]}
+          if [ "$code" -ne 0 ]; then
+            printf '::error title=install failed (exit %s)::%s\n' "$code" \
+              "$(tail -c 1800 "$log" | sed -e 's/%/%25/g' -e 's/::/;;/g' | awk '{printf "%s%%0A", $0}')"
+          fi
+          exit "$code"
 
       - name: Measure node scripts/check.mjs — the whole suite, nothing conditional
         run: |
           set -uo pipefail
-          /usr/bin/time -v node scripts/check.mjs
+          log="$RUNNER_TEMP/check.log"
+          /usr/bin/time -v node scripts/check.mjs 2>&1 | tee "$log"
+          code=${PIPESTATUS[0]}
+          report="$(grep -E '^[[:space:]]+(ok|FAIL)[[:space:]]|^(green|red)|Maximum resident set size|Elapsed \(wall clock\)' "$log" || true)"
+          echo '----- measurement -----'
+          echo "$report"
+          echo "check.mjs exit $code"
+          text="$(printf '%s\ncheck.mjs exit %s\n' "$report" "$code" \
+            | sed -e 's/%/%25/g' -e 's/::/;;/g' | awk '{printf "%s%%0A", $0}' | cut -c1-1800)"
+          if [ "$code" -eq 0 ]; then
+            printf '::notice title=measurement linux (check.mjs green)::%s\n' "$text"
+          else
+            printf '::error title=measurement linux (check.mjs exit %s)::%s\n' "$code" "$text"
+          fi
+          exit "$code"
