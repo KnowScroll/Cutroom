@@ -1,0 +1,261 @@
+# REPORT-ONLY MEASUREMENT. THIS IS NOT VERIFICATION.
+#
+# What this file is for, and what it may never be used for:
+#
+#   This workflow exists to find out ONE thing: whether this repository's checks pass on a hosted
+#   runner, and what that costs in wall clock. Its result is a measurement and nothing else.
+#
+#   * A run of this workflow MAY NEVER be used as verification evidence under S-177. S-177 binds
+#     evidence to an exact commit tree through a `Verification-Tree` trailer that
+#     `scripts/verification-status.mjs` reads locally. Nothing here writes a trailer, nothing here
+#     commits, and `permissions: contents: read` means nothing here could. A green run of this
+#     workflow does not make any commit verified, and a red one does not make any commit unverified.
+#   * This file lives on the `ci-measurement` branch and is NOT merged to `main` in the session that
+#     wrote it. Whether it lives at all is decided by the four planning gates in
+#     `docs/features/hosted-checks.md` (CLAUDE.md rule 1), not by whether this run was green.
+#   * Nothing here weakens, skips, loosens or conditions a single check. Each job runs
+#     `node scripts/check.mjs` — the whole suite, with every bound and timeout exactly as the
+#     repository has them. If a bound fails here, THE FINDING IS THE RUNNER, and the answer is
+#     recorded, not the bound raised (CLAUDE.md rule 3; S-176's child bounds; S-111's reason).
+#   * The `if:` on each job selects WHICH PLATFORM is measured. It never selects which check runs.
+#     Inside a job, `check.mjs` runs unconditionally and entirely.
+#
+# No secret, ever:
+#
+#   * No `secrets.*` reference appears in this file, and none may be added. Every provider defaults
+#     to the stand-in ('fake'), so the suite needs no key and costs nothing to run.
+#   * `scripts/real-reel.mjs` is the script that spends, and nothing automatic may reach it.
+#     `paid-path`'s check 20 asserts that no step of `check.mjs` and no script it can reach names
+#     it. A workflow that could run it is a workflow that spends; this one runs `check.mjs` alone.
+#   * `permissions: contents: read` is the whole token. `persist-credentials: false` keeps even that
+#     out of the checked-out `.git/config`.
+#
+# This repository is PUBLIC, so:
+#
+#   * These logs are world-readable. Everything they print — timings, test names, failure output —
+#     is public the moment it is written. That is acceptable for a measurement of `check.mjs`,
+#     which reads no key and touches no provider.
+#   * There is NO `pull_request` trigger, and there must not be one. On a public repository a fork
+#     pull request can start a run, and while GitHub withholds secrets from fork runs and gives
+#     them a read-only token, the cheapest way to not depend on that is to not offer the trigger.
+#     A run happens on a push to this one branch, or because a maintainer asked for one.
+#
+# What the runner has to be given, each one already paid for in this repository:
+#
+#   * Node 22.14.0 exactly, because the tests are TypeScript run through
+#     `--experimental-strip-types`, and `check.mjs` passes quoted globs for Node to expand (a bare
+#     directory is read as a module path).
+#   * ffmpeg AND ffprobe on PATH, installed here and pinned to 8.1.1 by archive sha256 — the same
+#     version and the same build this machine has. Nothing in this repository installs them and no
+#     path to them is written (S-075, D-086): they go on PATH, and `check.mjs` finds them there.
+#   * `better-sqlite3`, a native module; `pnpm-workspace.yaml`'s `onlyBuiltDependencies` is what
+#     lets pnpm 10 build it.
+#   * The `steering-ref` submodule, with full history and an `origin/main` ref, because
+#     `scripts/decisions.mjs` counts commits between the pin and that ref, and
+#     `scripts/docs-check.mjs` compares `docs/design/` against files inside it. The steering
+#     repository is public, so this needs no credential.
+#   * A checkout whose line endings match `.gitattributes` (`tests/line-endings.test.ts` notices)
+#     and no absolute path anywhere (`tests/no-absolute-paths.test.ts` enforces it) — which is why
+#     every path below is written as `$RUNNER_TEMP` or `${{ runner.temp }}` and never spelled out.
+#
+# Windows is measured first because it is the only platform the suite has ever been green on.
+# Linux is a PORT, not a lift: session 81 recorded that Linux support is unverified, so the ubuntu
+# job is a SECOND, SEPARATE measurement and its reds are findings about the port.
+#
+# Minutes: standard GitHub-hosted runners are free for public repositories, Windows included. Only
+# larger runners are charged. Public-repository standard runners are 4 vCPU / 16 GB.
+
+name: measure-checks
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Which platform to measure (Windows is the verified one)
+        type: choice
+        default: windows
+        options:
+          - windows
+          - linux
+          - both
+  push:
+    branches:
+      - ci-measurement
+
+permissions:
+  contents: read
+
+concurrency:
+  group: measure-checks-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    # The only platform this suite has ever been green on, so the first and cheapest measurement.
+    if: >-
+      github.event_name == 'push' ||
+      inputs.platform == 'windows' ||
+      inputs.platform == 'both'
+    runs-on: windows-latest
+    # Tighter than the 360-minute default on purpose: the local full run is ~1413 s of tests, so a
+    # job still running at 90 minutes is a hang worth seeing, not a slow pass worth waiting for.
+    timeout-minutes: 90
+    steps:
+      - name: Check out, with the steering submodule and its full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Give the submodule an origin/main ref for decisions.mjs to count against
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C steering-ref fetch --quiet origin main
+          git -C steering-ref rev-parse --verify origin/main
+          test "$(git -C steering-ref rev-parse --is-shallow-repository)" = false
+
+      - name: Report what the checkout actually looks like
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "commit        $(git rev-parse HEAD)"
+          echo "tree          $(git rev-parse HEAD^{tree})"
+          echo "submodule pin $(git ls-tree HEAD steering-ref | awk '{print $3}')"
+          echo "runner        $RUNNER_OS $RUNNER_ARCH, $(nproc 2>/dev/null || echo "?") cores"
+          echo "CR bytes in a tracked text file (expect 0): $(tr -cd '\r' < CLAUDE.md | wc -c)"
+
+      - name: Node 22.14.0, the version this repository is written against
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.14.0
+
+      - name: Install ffmpeg and ffprobe 8.1.1, pinned by sha256
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $url = 'https://github.com/GyanD/codexffmpeg/releases/download/8.1.1/ffmpeg-8.1.1-full_build.7z'
+          $want = '5df9759304b5714cc99ff46af8a73d83217a51726524516ffb25501e754a5873'
+          $archive = Join-Path $env:RUNNER_TEMP 'ffmpeg.7z'
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          $got = (Get-FileHash -Algorithm SHA256 -Path $archive).Hash.ToLower()
+          if ($got -ne $want) { throw "ffmpeg archive sha256 is $got, expected $want" }
+          $dest = Join-Path $env:RUNNER_TEMP 'ffmpeg'
+          7z x $archive "-o$dest" | Out-Null
+          $bin = (Get-ChildItem -Path $dest -Recurse -Filter 'ffmpeg.exe' | Select-Object -First 1).Directory.FullName
+          Add-Content -Path $env:GITHUB_PATH -Value $bin
+
+      - name: Both tools answer on PATH alone
+        shell: bash
+        run: |
+          set -euo pipefail
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+          ffmpeg -version | head -1 | grep -q '8\.1\.1'
+          ffprobe -version | head -1 | grep -q '8\.1\.1'
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack pnpm install --frozen-lockfile
+
+      - name: Measure node scripts/check.mjs — the whole suite, nothing conditional
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $peakFile = Join-Path $env:RUNNER_TEMP 'peak-bytes.txt'
+          $sampler = Start-Job -ArgumentList $peakFile -ScriptBlock {
+            param($file)
+            $max = 0
+            while ($true) {
+              $sum = 0
+              foreach ($p in (Get-Process -Name node -ErrorAction SilentlyContinue)) { $sum += $p.WorkingSet64 }
+              if ($sum -gt $max) { $max = $sum; Set-Content -Path $file -Value $max }
+              Start-Sleep -Seconds 2
+            }
+          }
+          $started = Get-Date
+          node scripts/check.mjs
+          $code = $LASTEXITCODE
+          $elapsed = (Get-Date) - $started
+          Stop-Job $sampler | Out-Null
+          Remove-Job $sampler -Force | Out-Null
+          Write-Host "----- measurement -----"
+          Write-Host ("total wall clock   {0:n0} s" -f $elapsed.TotalSeconds)
+          if (Test-Path $peakFile) {
+            $peak = [int64](Get-Content $peakFile)
+            Write-Host ("peak node RSS      {0:n0} MiB (summed across node processes, sampled every 2 s)" -f ($peak / 1MB))
+          } else {
+            Write-Host "peak node RSS      not sampled"
+          }
+          Write-Host ("check.mjs exit     {0}" -f $code)
+          exit $code
+
+  linux:
+    # A SEPARATE measurement of an UNVERIFIED port (session 81). Never started by a push: it is
+    # asked for, so that a red here is read as a finding about Linux and not as a red repository.
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      (inputs.platform == 'linux' || inputs.platform == 'both')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out, with the steering submodule and its full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Give the submodule an origin/main ref for decisions.mjs to count against
+        run: |
+          set -euo pipefail
+          git -C steering-ref fetch --quiet origin main
+          git -C steering-ref rev-parse --verify origin/main
+          test "$(git -C steering-ref rev-parse --is-shallow-repository)" = false
+
+      - name: Report what the checkout actually looks like
+        run: |
+          set -euo pipefail
+          echo "commit        $(git rev-parse HEAD)"
+          echo "tree          $(git rev-parse HEAD^{tree})"
+          echo "submodule pin $(git ls-tree HEAD steering-ref | awk '{print $3}')"
+          echo "runner        $RUNNER_OS $RUNNER_ARCH, $(nproc 2>/dev/null || echo "?") cores"
+          echo "CR bytes in a tracked text file (expect 0): $(tr -cd '\r' < CLAUDE.md | wc -c)"
+
+      - name: Node 22.14.0, the version this repository is written against
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22.14.0
+
+      - name: Install ffmpeg and ffprobe 8.1.1, pinned by sha256
+        run: |
+          set -euo pipefail
+          url='https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-05-31-13-22/ffmpeg-n8.1.1-9-g58d4114d36-linux64-gpl-8.1.tar.xz'
+          want='0d14781b885c491f5c3b799cbe7d3a26ba8a7eb01935483185e31ea7d79c8cd3'
+          archive="$RUNNER_TEMP/ffmpeg.tar.xz"
+          curl -fsSL "$url" -o "$archive"
+          echo "$want  $archive" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/ffmpeg"
+          tar -xJf "$archive" -C "$RUNNER_TEMP/ffmpeg" --strip-components=1
+          echo "$RUNNER_TEMP/ffmpeg/bin" >> "$GITHUB_PATH"
+
+      - name: Both tools answer on PATH alone
+        run: |
+          set -euo pipefail
+          ffmpeg -version | head -1
+          ffprobe -version | head -1
+          ffmpeg -version | head -1 | grep -q '8\.1\.1'
+          ffprobe -version | head -1 | grep -q '8\.1\.1'
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          corepack pnpm install --frozen-lockfile
+
+      - name: Measure node scripts/check.mjs — the whole suite, nothing conditional
+        run: |
+          set -uo pipefail
+          /usr/bin/time -v node scripts/check.mjs
