@@ -76,536 +76,174 @@ was green, and a commit is not unverified because a hosted run was red.
 
 **Decided: a hosted run writes no trailer and is named nowhere that
 `scripts/verification-status.mjs` reads.** A hosted run is recorded under this file's
-**`## Measurement`** section — _not_ under `## Evidence`, which `scripts/journey.mjs:122-136` owns
-and rewrites, and which S-016 requires be written by the journey and by nothing typed. The record
-carries no authority and must state five things, so that a reader can check it and so that a
-re-run-until-green cannot hide:
-
-| field         | why it is required                                                                 |
-| ------------- | ---------------------------------------------------------------------------------- |
-| run id        | the run can be opened                                                              |
-| head sha      | which commit ran                                                                   |
-| **tree**      | what S-177 binds evidence to, so the record can be compared against a trailer      |
-| `run_attempt` | **the only field that reveals a re-run**, which goals 4 and choice 7 forbid hiding |
-| conclusion    | what happened                                                                      |
-
-**How far the enforcement actually reaches, stated plainly.** Two things hold today:
-`scripts/verification-status.mjs:27` refuses any `Verification:` value that is not `full` or
-`targeted`, so a `Verification: hosted` trailer is red; and `permissions: contents: read` means the
-job cannot write. **Neither prevents a session from typing `Verification: full` with a matching tree
-after only a hosted green.** That is indistinguishable to the checker. The property is a convention
-this feature writes down and S-183 binds — it is not a proof, and the gates do not claim it is.
-
-Rejected, with reasons:
-
-- **A `Verification: hosted` trailer that the checker trusts.** A trailer is text a session types.
-  Today that is sound because the session that types it is the session that watched the run on this
-  machine. A hosted trailer is a claim about work nobody present watched.
-- **A `Verification: hosted` trailer the checker verifies over the network.** Buildable, and costed:
-  the checker would have to read the run id from the trailer; call
-  `/repos/KnowScroll/Cutroom/actions/runs/{id}`; require `conclusion == "success"`; require
-  `head_sha`'s tree to equal `Verification-Tree`; require the run's `path` to be the one workflow;
-  **hash the workflow blob at `head_sha` against a pinned hash**, because a branch can carry any
-  workflow and a run of a workflow that invoked `check.mjs --slice` would otherwise satisfy every
-  other condition; and refuse a `run_attempt` above 1 whose earlier attempts it cannot see.
-  Rejected because it makes a deterministic offline checker depend on the network: it would then
-  fail for reasons that have nothing to do with the code, and a checker that fails transiently is
-  one people learn to rerun — the habit S-111 and S-177 exist to remove. If it is ever wanted, it is
-  its own feature with its own four gates and a deliberate break for each of those six conditions.
-- **Reusing the hosted run as the full-suite half of an integrity boundary.** Rejected by choice 3:
-  the hosted run cannot run a journey, and a feature is verified only by its journey (S-016).
-
-### Choice 2 — Which runner, must both pass, and what if it cannot pass at all?
-
-Public-repository standard runners are **4 vCPU / 16 GB / 14 GB SSD** on both Windows and Linux.
-That is twice what a _private_ repository gets and **a quarter of this machine's cores**: this laptop
-is **16 cores / 15 GB**. The bounds the suite carries were measured on 16 cores.
-
-**Decided, at the owner's word on 2026-10-12: `ubuntu-latest` is the primary measurement, and
-`windows-latest` is the control.** S-179 already makes Linux the deployment target, so Linux is the
-platform worth knowing about and it is what a push measures. Windows is asked for rather than pushed,
-and it earns its place by being the only platform this suite has ever been green on — which is
-exactly what makes it a control:
-
-| Linux | Windows | what it means                                                                          |
-| ----- | ------- | -------------------------------------------------------------------------------------- |
-| red   | green   | **the port is wrong** (class 3). The same tree passes on the platform with evidence.   |
-| red   | red     | **the repository is wrong** (class 1), or the runner is (class 2) — reproduce locally. |
-| green | green   | corroboration on both, which is the most this feature can deliver.                     |
-| green | red     | a Windows regression, and the first time Linux would be the better-evidenced platform. |
-
-Linux support is **unverified** (session 81), so a red there is a finding about the port, recorded —
-never a reason to change a check, a bound or a test. **Linux is not required to pass**; it is
-required to be measured. Nothing in this repository blocks on either platform, which follows from
-choice 5.
-
-This reverses the session's first position, which measured Windows first because prompt 078 said to
-("_Linux is a port, not a lift … an ubuntu run is a second, separate measurement_"). The owner's
-reason is better and is recorded as the decision: a measurement of the platform we will not deploy
-on answers a less useful question. The Windows run that was already in flight was left to finish,
-because it is free and it is the control.
-
-**The stop condition, which round 1 found missing.** Eleven tests spawn a PATH-only journey child
-with its own bound, and the bounds are not uniform:
-
-| file                                     | bound     |
-| ---------------------------------------- | --------- |
-| `tests/reel-plan-secrets.test.ts:76`     | 300 s     |
-| `tests/reel-stills-secrets.test.ts:80`   | 300 s     |
-| `tests/reel-render-secrets.test.ts:92`   | 300 s     |
-| `tests/reel-takes-secrets.test.ts:96`    | 300 s     |
-| `tests/paid-failures-secrets.test.ts:52` | 300 s     |
-| `tests/paid-path-secrets.test.ts:53`     | **360 s** |
-| `tests/ask-again-secrets.test.ts:49`     | **600 s** |
-| `tests/cut-rules-secrets.test.ts:44`     | **600 s** |
-| `tests/second-ask-secrets.test.ts:52`    | **600 s** |
-| `tests/three-pictures-secrets.test.ts`   | **600 s** |
-| `tests/resume-failed-secrets.test.ts:59` | **600 s** |
-
-S-176 made the aggregate runner serial because these children run their own bounded parallel suites
-and competed for _this_ machine. On a quarter of the cores, **one or more of these bounds failing is
-a likely outcome, not an edge case.** If that happens:
-
-- the finding is the runner's size, recorded in `## Measurement` with the bound, the file and the
-  elapsed time;
-- **no bound is raised, and no test is skipped or conditioned** — that is goal 4;
-- and the feature's conclusion is then written down plainly: **`hosted-checks` delivers no
-  corroboration on a 4-vCPU runner.** That is an accepted outcome of the measurement. The feature
-  would then either stop (choice 12's only coherent reading) or be re-opened against a larger runner,
-  which is a paid runner and a different decision.
-
-Rejected: **requiring green on both platforms** — an unverified port could then block work, which is
-the pressure that produces a conditional check; **Windows only** — it measures the platform this
-engine will not be deployed on, which answers a less useful question; **Linux only** — a red would
-then be unattributable, because nothing would say whether the port or the code was at fault, which is
-the whole job of the control; **macOS** — no evidence on it at all, and it is the one standard runner
-with a 5-job concurrency cap, so it is the scarce resource for no gain.
-
-### Choice 3 — What runs there, what stays local? **Only `node scripts/check.mjs`. Journeys stay local.**
-
-`scripts/journey.mjs:122-136` writes an evidence line into `docs/features/<slug>.md` and flips that
-feature's `Status:` to `verified`. A hosted journey would therefore have to commit back into the
-repository.
-
-**Decided: journeys stay local**, and the hosted job holds `permissions: contents: read` so it could
-not write even if someone asked it to.
-
-Rejected: **a hosted journey with a commit-back** — it needs `contents: write`, and it would let a
-run mark a feature `verified` with nobody watching; **a hosted journey that uploads its evidence
-line as an artifact for a local session to apply** — the local session is then trusting a downloaded
-file, which is the same forgery with an extra step, and `journey.mjs` would have to grow a way to
-write an evidence line without running the journey, which is strictly worse than having no hosted
-journey at all.
-
-### Choice 4 — What may a job see, and why are public logs acceptable?
-
-This repository is public, so **the workflow logs are world-readable** and **anyone can fork it and
-open a pull request**. GitHub withholds secrets from fork-pull-request runs and issues a read-only
-token, and approval can be required for new contributors — but every one of those is a setting
-outside this file.
-
-**Decided:** no `pull_request` and no `pull_request_target` trigger, ever; `permissions:
-contents: read` at workflow and job level; `persist-credentials: false`; no `secrets` reference in
-any form. A job sees the public repository, the public steering submodule, one sha256-pinned ffmpeg
-archive, and one pinned node-gyp.
-
-**Why public logs are acceptable, with the check that actually supports it.** `check.mjs` reads no
-key and calls no provider, but the suite's failure output can include recorded provider wire. The
-sentence "the most sensitive thing a log can contain is a test name and a duration" rests on
-`tests/paid-path-fixtures.test.ts:64-77`, check 21: _every recorded fixture holds no key-shaped value
-and no query string_, asserted over the bytes as well as the parsed walk, so a credential inside a
-string that is itself JSON is caught too. **That check is D-022's case applied to the fixtures**, and
-it is the reason the logs — and the annotations of choice 8 — are safe to publish. If that check were
-ever weakened, this choice would have to be re-made.
-
-Rejected: **`pull_request`** — the protection against a stranger's run should be the absence of the
-trigger, not a setting someone can change; **`pull_request_target`** — it runs in the base
-repository's context with access to secrets, and is the shape of every published Actions compromise;
-**`schedule`** — a green nobody reads is a badge nobody earned, and scheduled workflows are disabled
-in forks anyway, so it would also measure nothing for anyone else.
-
-### Choice 5 — Does the local full run stay the authority? **Yes, and S-177 is untouched.**
-
-**Decided:** the local full run remains the sole authority. An ordinary slice still commits on
-`check.mjs --slice`; the full suite is still reserved for integrity boundaries and journeys; the
-hosted run is added alongside and required by nothing.
-
-Rejected: **hosted replaces local** — it is forgeable (choice 1), it cannot run journeys (choice 3),
-and it would stop exercising the one platform with evidence; **both required for an integrity
-boundary** — it adds a second mandatory full suite, which is the ritual S-177 exists to remove, and
-makes a queue or a runner outage into a block on committing.
-
-### Choice 6 — Self-hosted runner on a small VM? **No. Hosted, priced against it.**
-
-| option                                                         | price                                                                                                                       |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Standard hosted runner, public repository** (4 vCPU / 16 GB) | **$0.** Only larger runners are charged, "even when used by public repositories"                                            |
-| Hosted runner if this repository went private (2 vCPU / 8 GB)  | 2,000 included minutes/month on Free, then **$0.010/min** Windows 2-core, $0.006/min Linux 2-core                           |
-| Self-hosted VM, 4 vCPU / 8 GB (session 81's comfort target)    | roughly **€62/month** (Hetzner CPX31/CPX32 after its June 2026 reprice); **€86/month** for CCX23's 4 dedicated vCPU / 16 GB |
-| Self-hosted VM, same shape at a US provider                    | roughly **$48–$60/month** for a 4 vCPU / 8 GB general-purpose instance                                                      |
-
-The private-repository line is the one worth noticing: going private costs money _and_ halves the
-cores.
-
-**Decided: hosted.** Three reasons, in order of weight:
-
-1. **A self-hosted runner on a public repository is a documented hazard.** Anything that can start a
-   run executes code on a machine whose state persists between jobs. The only safe self-hosted
-   arrangement is a private repository, which costs money and loses the 4-core runner.
-2. **The thing it would hide is not private.** The stated benefit was keeping logs out of public
-   view, but the logs are `check.mjs` output, protected by check 21 (choice 4).
-3. **It is a machine to patch**, and a long-lived runner is exactly the hand-configured machine
-   whose green cannot be told apart from this laptop's — which is the one thing the feature exists
-   to get away from.
-
-Kept on file: a self-hosted runner becomes the right answer the moment a run needs a provider key —
-a real-reel run — because that is when public logs and a hosted secret both become unacceptable.
-That is not this feature.
-
-### Choice 7 — What happens when the hosted run is red, and for which reasons?
-
-**Decided: classify the red before acting, in writing, and never act on it by changing a check.**
-Round 1 found three classes insufficient; there are five.
-
-| class                           | what it looks like                                                                                     | what happens                                                                                                                                                                                                                |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. the repository is wrong      | the same tree is red locally too                                                                       | fix the code. The local run is the authority; the hosted run was useful and is still not evidence.                                                                                                                          |
-| 2. the runner is wrong          | the same tree is green locally, and the failure names a tool, a core count or a clock                  | record it; give the runner the tool **in the workflow**. This is where the first run's node-gyp failure belongs.                                                                                                            |
-| 3. the port is wrong            | `ubuntu-latest` only                                                                                   | a finding about the port, recorded. Linux is not required to pass.                                                                                                                                                          |
-| 4. **the authority moved**      | `decisions pin` red on the runner and green locally, because the steering repository's `main` advanced | update the pin here, by `git submodule update --remote`. **Not by editing any check** — CLAUDE.md: a red `decisions pin` is not ours to fix by editing anything here, and unpushed commits over there mean say so and stop. |
-| 5. **the ffmpeg build differs** | a `ready()` refusal naming `libx264`, `aac` or a missing filter, on a tree that is green locally       | the provisioned build is wrong, not the port and not the code; fix the pinned archive. See Gate 2.                                                                                                                          |
-
-Class 4 exists because the workflow changes what one check compares against — see Gate 2's
-asymmetry. It is the most likely hosted red that is nobody's bug.
-
-The forbidden moves, named so that nobody has to decide in the moment: raising a timeout, loosening
-a bound, skipping or conditioning a test, `continue-on-error`, **`set +e` or `|| true` or
-`if: always()` without propagating the exit status**, hiding a red behind a matrix, and re-running
-until green and reporting the green.
-
-### Choice 8 — How is a failing step's decisive line read? **Check-run annotations.**
-
-Goal 1 promises every failing step's decisive line, and the first run proved the obvious route does
-not work: `GET /repos/{owner}/{repo}/actions/jobs/{id}/logs` answers
-**`403 Must have admin rights to Repository`**, even on a public repository.
-
-**Decided: each job republishes the decisive output as a check-run annotation** — `::error` on
-failure, `::notice` on success carrying each check's label and milliseconds, the total wall clock and
-the peak resident memory. `GET /repos/{o}/{r}/check-runs/{id}/annotations` is readable by anyone who
-can read a public repository, so a session can read its own measurement without anybody holding a
-token. The republished text is capped at 1800 characters and sanitised: `%`→`%25`, `::`→`;;`, and
-newlines to `%0A`, because an unsanitised `::` in provider output would otherwise be read as a
-workflow command.
-
-Rejected: **the job log** — needs admin rights, which is the problem; **`actions/upload-artifact`** —
-the artifacts list is public but the download is not, so it has the same gap with an extra step;
-**reading the web UI** — needs a human with a browser, and the measurement is meant to be read by
-the session that asked for it; **printing to `$GITHUB_STEP_SUMMARY` only** — no API exposes it.
-
-The consequence, stated rather than assumed: this is a **second public publication surface**, and
-what it publishes is `check.mjs` output. It is safe for the same reason the logs are — check 21 of
-`tests/paid-path-fixtures.test.ts` (choice 4) — and for no other reason.
-
-### Choice 9 — Does the file reach `main`, and with which triggers? **Yes, on `workflow_dispatch` alone.**
-
-Round 1 was right that this was never argued. A branch-only workflow already delivers the
-corroboration, so the question is real.
-
-**Decided: on `main`, with `workflow_dispatch` as the only trigger.** The reason is exactly that the
-measured tree should be `main`'s tree: a `push`-triggered branch workflow measures a branch forever,
-so somebody would have to keep pushing `main` to a branch to measure it, which is an unwritten ritual
-and the kind of thing that quietly stops happening. `workflow_dispatch` on `main` measures `main`,
-can be pointed at any ref, and **cannot be started by a stranger** — it requires write access.
-
-The `push: [ci-measurement]` trigger exists only while the branch does, for developing the workflow
-itself, and **is removed by the slice that lands the file** (Slice 2). The approved state has one
-trigger.
-
-**Cadence, also unsettled in round 1: on request, not on a schedule.** A measurement is asked for at
-an integrity boundary or when the environment changes (a Node bump, an ffmpeg bump, a new native
-dependency). `## Measurement` grows one entry per run. Nothing in this repository requires a
-measurement to exist, which follows from choice 5.
-
-Rejected: **`push` on `main`** — it makes every documentation commit start a 30-plus-minute run
-nobody asked for, and a green nobody reads is choice 4's badge nobody earned; **staying on a branch
-forever** — the measured tree is then never `main`'s; **a `schedule`** — see choice 4.
-
-## Gate 2 — Architecture
-
-- **One file, invoking one script.** `.github/workflows/measure-checks.yml` invokes
-  `node scripts/check.mjs` and no other script of this repository. The YAML adds no package, no
-  dependency and no boundary rule, and imports nothing — so none of the twenty-two boundary rules can
-  be affected by it, and `scripts/drift.mjs` has nothing new to see. (Slice 1 does add a test; the
-  claim is about the workflow file.)
-- **`.github/` is an unknown path to `check.mjs --changed`.** `kind()` classifies it as neither
-  document nor code, so `--changed` **exits 2 with a message and runs nothing** (`scripts/check.mjs:86-90`,
-  `:103-110`, `:182-190`); the operator must then type the full run. That is correct and is left
-  alone: a workflow file is checking infrastructure, which S-177 already reserves for the full suite.
-- **What the runner must be given.** Round 1 found this list incomplete in the one way that mattered
-  — it omitted the thing that actually failed.
-
-  | given to the runner          | why, and how                                                                                                                                                                                         |
-  | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | Node 22.14.0                 | the tests are TypeScript through `--experimental-strip-types`, and `check.mjs` passes quoted globs for Node to expand                                                                                |
-  | ffmpeg **and** ffprobe       | downloaded from a pinned release, sha256-verified, added to `GITHUB_PATH`                                                                                                                            |
-  | **pnpm 10.15.1**             | through `corepack`, from `package.json`'s `packageManager`. Named here because round 1 found it unnamed                                                                                              |
-  | **a C++ toolchain**          | `better-sqlite3@13.0.3` publishes **no prebuilt binary** — its release carries zero assets — so every install compiles it. The image has VS 2022 17.14 with `Workload.NativeDesktop` and Python 3.12 |
-  | **node-gyp 13.1.0, pinned**  | pnpm 10.15.1 bundles node-gyp 11.1.0, which cannot detect a VS 17.14 install. Installed under `$RUNNER_TEMP`, selected by `npm_config_node_gyp`                                                      |
-  | the `steering-ref` submodule | full history and an `origin/main` ref — see the asymmetry below                                                                                                                                      |
-  | LF line endings              | `actions/checkout` honours `.gitattributes`, and `tests/line-endings.test.ts` notices if it did not                                                                                                  |
-
-- **No path is written, and that claim is narrowed rather than asserted.** Every path the workflow
-  writes is `$RUNNER_TEMP` or `${{ runner.temp }}`, never spelled out, because
-  `tests/no-absolute-paths.test.ts:17` scans every tracked `.yml` and `.yaml` and both `/home/runner`
-  and `C:\Users` match its patterns. **The narrowing S-075 needs in writing:** S-075 governs what
-  this repository's _runtime_ does — a worker awaits `ready()` and refuses to start without ffmpeg on
-  PATH, and nothing in the runtime installs it or records where it is. A CI workflow provisioning a
-  runner's PATH is not the runtime: it adds no binary to the lockfile (which is what S-075's
-  "an npm package bundling ffmpeg" rejection was about), writes no path into any tracked runtime
-  file, and the worker it hands the machine to still finds ffmpeg on PATH or refuses. S-183 carries
-  that narrowing.
-- **The one asymmetry: `decisions pin` means something different there.**
-  `scripts/decisions.mjs:96-99` compares the pin against `origin/main` inside the submodule.
-  `check.mjs` runs it **without `--fetch`**, so locally it compares against whatever was last
-  fetched. The workflow's checkout step fetches `origin main` in the submodule, which makes the same
-  check a **live network comparison**. So the hosted run goes red on `decisions pin` the moment the
-  steering repository's `main` advances, with the local run green. This is why choice 7 has class 4.
-  Gate 2 does **not** claim "measurement is a wrapper that changes nothing": it changes what one
-  check compares against, and that is written down instead of being asserted away.
-- **The measurement wrappers, and their own failure mode.** Windows samples the summed working set
-  of `node` processes every 2 s from a background job. Linux uses GNU `time -v` — which is an
-  **absolute path** that `tests/no-absolute-paths.test.ts` does not catch, because its four patterns
-  are home-directory and drive-letter shaped. If `time` is absent from the image the step fails
-  before `check.mjs` runs, and choice 7 would misread it as class 3. **Slice 2 therefore guards it:**
-  the wrapper is used when present and the step otherwise runs `check.mjs` plainly and says in the
-  annotation that peak memory was not measured. A missing wrapper must never read as a port red.
-- **ffmpeg build identity is load-bearing, and the pins are not equivalent.**
-  `packages/providers/src/ffmpeg/tools.ts:12` requires `libx264` and `aac`, and `:70` a filter list,
-  compared at `ready()`. The Windows archive is `ffmpeg-8.1.1-full_build`, which is the build this
-  machine has. **The Linux archive is `ffmpeg-n8.1.1-9-g58d4114d36`** — nine commits past 8.1.1, and
-  a GPL build rather than the same build. `grep -q '8\.1\.1'` passes on that string and so cannot tell
-  the difference. Slice 2 asserts the exact expected version string per platform, and this file
-  records that Linux is not byte-for-byte the local build.
-
-## Gate 3 — Program design
-
-### Exact files, pinned to one commit
-
-| file                                     | state                                                                                                                                                                   |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.github/workflows/measure-checks.yml`   | on `ci-measurement` at **`49b0686`**; **not on `main`**. Earlier revisions `8a16efa`, `b85d5de`, `0341942`, `49c916e` are superseded and the gates do not describe them |
-| `docs/features/hosted-checks.md`         | this file                                                                                                                                                               |
-| `docs/research/public-exposure-audit.md` | session 84's audit, which made the repository's publicity a settled fact rather than an assumption                                                                      |
-| `scripts/verification-status.mjs`        | **unchanged, and changed by no slice of this feature**                                                                                                                  |
-
-### Affected-test inventory
-
-**Six** tests read every tracked file. Only four can be affected by a `.yml`; the other two assert no
-media or image is tracked, which a `.yml` cannot trip:
-
-| test                                  | what it asserts about the workflow file                               | affected?                      |
-| ------------------------------------- | --------------------------------------------------------------------- | ------------------------------ |
-| `tests/line-endings.test.ts`          | `.yml`/`.yaml` are in its `TEXT` set; 0 CR bytes                      | yes                            |
-| `tests/no-absolute-paths.test.ts`     | `.yml`/`.yaml` are in its `CHECKED` set; no home or drive-letter path | yes                            |
-| `tests/feature-files.test.ts`         | this file's front matter, `Created` note and one-line `Gates:`        | yes, by this document          |
-| `tests/context-file.test.ts`          | `docs/context.md` ≤ 300 lines and naming the journal's newest session | yes, by this document          |
-| `tests/reel-render-files.test.ts:224` | no audio, video or subtitle file is tracked (D-087)                   | no — a `.yml` is none of those |
-| `tests/reel-stills-files.test.ts:181` | no image is tracked (D-087)                                           | no — a `.yml` is none of those |
-
-**And one test is amended, which round 1 found missing and which blocks the slice as first written.**
-`tests/paid-path-real-reel.test.ts:45-58`, check 20, asserts that **no test file but itself** contains
-`real-reel.mjs` or the string `real-reel` (S-111: `tests/` holds a check that no test file names it).
-A new `tests/hosted-checks-workflow.test.ts` that greps the workflow for `real-reel` would have to
-contain that literal, and would therefore turn check 20 red — which turns `check.mjs` red, which turns
-**every verified feature's journey** red.
-
-| test                                | amendment                                                                                                                                                                                                                                      |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/paid-path-real-reel.test.ts` | the "no workflow names the spending script" assertion lives **here**, in the file that is already allowed to name it, as an `// AMENDED BY hosted-checks (S-183)` block — the established form used by `resume-failed` Slice 6 and `ask-again` |
-
-The consequence, stated: that assertion then lives outside `tests/hosted-checks-*.test.ts`, so the
-`hosted-checks` journey does not run it, and **`paid-path` needs a re-journey** (Gate 4, Slice 3).
-
-### Measured, with the tree each figure belongs to
-
-Round 1 correctly found the previous attribution false: at `8a16efa` neither document existed, so
-`tests/feature-files.test.ts` and `tests/context-file.test.ts` cannot have asserted anything about
-them. Corrected:
-
-| measurement                                                                                       | tree it ran on                                           |
-| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `tests/line-endings.test.ts` and `tests/no-absolute-paths.test.ts` pass with the workflow tracked | `8a16efa` — the workflow is the only relevant file there |
-| all four scanning tests pass, 11 of 11, with both documents present                               | session 84's working tree on `main`, uncommitted         |
-| `prettier --check .` passes with both documents and the workflow present                          | the same working tree                                    |
-| `node scripts/check.mjs --changed` green, documents only                                          | the same working tree                                    |
-
-### Deliberate breaks each slice must show red and restore
-
-Assigned to the slice whose verification command can actually demonstrate them — round 1 found
-break 8 assigned to a slice whose command cannot run the install step.
-
-Shown by `node scripts/check.mjs` (Slice 1 and 2):
-
-1. A `secrets` reference in any form — `secrets.FOO`, `secrets['FOO']`, `secrets . FOO`.
-2. A workflow naming `scripts/real-reel.mjs` or `real-reel` → red, from the amended `paid-path` check 20.
-3. `permissions: contents: write`, at workflow level **or job level** — a job-level grant overrides a
-   workflow-level `read`.
-4. A `pull_request` or `pull_request_target` trigger.
-5. `continue-on-error: true` on any step, **and its disguises**: `|| true`, `if: always()`, and a
-   `set +e` step that does not end by propagating the captured exit status.
-6. A `.yaml` workflow that escapes every rule above — the rules cover both extensions, because
-   GitHub accepts both and both scanning tests already do.
-7. A job whose check step is not exactly `node scripts/check.mjs` — this is the substitution choice 1
-   identifies as the dangerous one, and round 1 found it unchecked.
-8. A `uses:` that is not a 40-character commit SHA.
-9. A download step with no sha256 comparison against a literal.
-10. A literal `C:\Users` or `/home/runner` path → `tests/no-absolute-paths.test.ts` red.
-11. A CRLF workflow file → `tests/line-endings.test.ts` red.
-12. A `Verification: hosted` trailer → `scripts/verification-status.mjs` red. **This is a genuine
-    addition, not a re-proof:** `check.mjs` never runs that script, and
-    `tests/verification-status.test.ts` covers a wrong tree and a missing `Verification-Tests` but
-    **not an unknown kind**. The property is currently proven by nothing in the suite.
-
-Shown only by a hosted run (Slice 4, recorded in `## Measurement`, never in a trailer):
-
-13. A sha256 that does not match the archive → the install step red on the runner.
-
-### Verification commands
-
-| slice   | command                                                                                   |
-| ------- | ----------------------------------------------------------------------------------------- |
-| Slice 1 | `node scripts/check.mjs` — it touches `tests/` and the amended `paid-path` test           |
-| Slice 2 | `node scripts/check.mjs` — it adds `.github/`, an unknown path, so `--changed` is refused |
-| Slice 3 | `node scripts/journey.mjs hosted-checks`, then `node scripts/journey.mjs paid-path`       |
-| Slice 4 | documents only: `node scripts/check.mjs --changed`                                        |
-
-No slice of this feature may use `--slice`: Slice 1 and 2 are checking infrastructure, and S-177
-reserves that for the full suite.
-
-### Journey impact and stop conditions
-
-- `scripts/journey.mjs hosted-checks` runs every check plus `tests/hosted-checks-*.test.ts`, writes
-  the evidence line and flips `Status:`. It refuses until all four gates read `APPROVED` on one line
-  and every slice box is ticked.
-- **`paid-path` needs a re-journey**, because this feature amends its check 20. That is the only
-  re-journey: no other feature's public contract, stand-in or recorder changes.
-- **Stop on the first FAIL**, per S-178's established wording: record the FAIL as the finding, do not
-  re-run, and amend no check, timeout or test.
-- A hosted run's result is **never** a journey input and never flips a `Status:`.
-
-### What round 1 found unsettled and is now settled elsewhere in this file
-
-| round-1 finding                                    | where it is answered               |
-| -------------------------------------------------- | ---------------------------------- |
-| the `push` branch list after approval, and cadence | choice 9                           |
-| how pnpm and the C++ toolchain reach the runner    | Gate 2's table                     |
-| how a failing step's decisive line is retrieved    | choice 8                           |
-| the fourth and fifth red classes                   | choice 7                           |
-| what happens when a child bound fails on 4 vCPU    | choice 2's stop condition          |
-| Slice 3's command, and the journey                 | Gate 3's command table, and Gate 4 |
-| whether `.github/` becomes stop-gate source        | below                              |
-
-**`.github/` is outside the stop gate's notion of source.** `.claude/hooks/stop-gate.sh:27` reads
-`git status --porcelain -- packages apps tests scripts`, so a session can end with an uncommitted
-`.github/` change and the hook will not notice. **Decided: not changed by this feature.** Adding
-`.github` there is a `.claude/` change, which `check.mjs`'s `CODE_PATH` classifies as code and which
-would need its own slice and a full run; and the gate's purpose is uncommitted _source_, while
-`check.mjs --changed` already refuses to classify `.github/` at all. It is recorded here so the gap
-is known rather than discovered.
-
-## Gate 4 — Slices
-
-- [ ] **Slice 1 — the rules, as tests, with the workflow present as a fixture.** Round 1 found the
-      original Slice 1 vacuously green: at that point nothing exists under `.github/` on `main`, so a
-      test iterating "every `.yml` under `.github/`" iterates zero files and passes — the state
-      CLAUDE.md calls the worst to be in. So Slice 1 asserts **positively** that at least one
-      workflow exists and that every job's check step is exactly `node scripts/check.mjs`, and it
-      carries breaks 1–12 against a fixture workflow written into a temporary directory by the test
-      itself (the scratch-repo technique `tests/verification-status.test.ts` already uses). The
-      amendment to `tests/paid-path-real-reel.test.ts` check 20 lands here.
-- [ ] **Slice 2 — the workflow on `main`**, moved from `ci-measurement` at `49b0686`, with its
-      `push: [ci-measurement]` trigger **removed** so `workflow_dispatch` is the only trigger
-      (choice 9), the Linux `time` wrapper guarded, and the exact ffmpeg version asserted per
-      platform (Gate 2). Slice 1's positive assertions then bind the real file.
-- [ ] **Slice 3 — the journeys.** `hosted-checks`, then `paid-path` alone, serially, stopping on the
-      first FAIL (S-178's arrangement).
-- [ ] **Slice 4 — the measurement recorded** in `## Measurement`, with every field choice 1 requires
-      and every runner finding, including a bound that failed and what the feature then concludes.
-
-## Measurement
+**`## Measurement
 
 Report-only. No run below is or may become S-177 evidence (choice 1). All on branch
-`ci-measurement`, `windows-latest`.
+`ci-measurement`.
 
-| run           | head sha  | attempt | conclusion                        | what it established                                                              |
-| ------------- | --------- | ------- | --------------------------------- | -------------------------------------------------------------------------------- |
-| `38248163234` | `8a16efa` | 1       | failure at `Install dependencies` | the environment steps all pass; the install does not, and the log cannot be read |
-| `38249519497` | `b85d5de` | 1       | failure at `Install dependencies` | the annotation handler never ran — GitHub starts a bash step with `-e`           |
-| `38250397429` | `0341942` | 1       | failure at `Install dependencies` | **the decisive line, read from the annotation**                                  |
-| `38251456639` | `49c916e` | 1       | in flight at the time of writing  | first run with a node-gyp able to detect VS 17.14                                |
+| run           | head sha  | tree         | attempt | platform  | conclusion                                     |
+| ------------- | --------- | ------------ | ------- | --------- | ---------------------------------------------- |
+| `38248163234` | `8a16efa` | (unrecorded) | 1       | Windows   | failure — `Install dependencies`               |
+| `38249519497` | `b85d5de` | (unrecorded) | 1       | Windows   | failure — `Install dependencies`               |
+| `38250397429` | `0341942` | (unrecorded) | 1       | Windows   | failure — `Install dependencies`               |
+| `38251456639` | `49c916e` | `de3f5f7`    | 1       | Windows   | **failure — `tests`, 1 of 696**                |
+| `38253333794` | `49b0686` | `8cf7e29`    | 1       | **Linux** | **cancelled — the 90-minute cap, mid-`tests`** |
 
-**The tree is not recorded for these four runs.** Choice 1 requires it and these predate the
-requirement; Slice 4's entries carry it.
+The first three runs predate choice 1's requirement to record the tree, which is why theirs is
+missing; it is recorded from the fourth on.
 
-### Per-step wall clock, run `38250397429`
+### The environment, both platforms
 
-| step                              | wall clock | result      |
-| --------------------------------- | ---------- | ----------- |
-| Set up job                        | 1 s        | ok          |
-| Checkout, submodule, full history | 11 s       | ok          |
-| Submodule `origin/main` ref       | 1 s        | ok          |
-| Report the checkout               | 0 s        | ok          |
-| Node 22.14.0                      | 19 s       | ok          |
-| ffmpeg + ffprobe, sha256-pinned   | 17 s       | ok          |
-| Both tools answer on PATH alone   | 1 s        | ok          |
-| **Install dependencies**          | **56 s**   | **FAILURE** |
-| `node scripts/check.mjs`          | —          | skipped     |
+Every setup step passed on both, including the exact-build ffmpeg assertion.
 
-**What this does and does not establish.** It establishes that the environment this repository needs
-can be built on a hosted Windows runner in about 50 seconds: a full-history submodule with an
-`origin/main` ref, Node 22.14.0 exactly, and a sha256-pinned ffmpeg 8.1.1 with both binaries
-answering on PATH alone. **It establishes nothing about the suite**, which has never run on a hosted
-runner, and nothing about what a full run costs in minutes — the recorded local figure, tests at
-1413 s, still has nothing to compare against. Peak memory has never been sampled, because the step
-that samples it has never started.
+| step                                      | Linux    | Windows   |
+| ----------------------------------------- | -------- | --------- |
+| checkout, submodule, full history         | 3 s      | 12 s      |
+| submodule `origin/main` ref               | 0 s      | 0 s       |
+| Node 22.14.0                              | 8 s      | 14 s      |
+| ffmpeg + ffprobe, sha256-pinned           | 8 s      | 11 s      |
+| both tools on PATH, exact build           | 0 s      | 1 s       |
+| node-gyp 13.1.0                           | 1 s      | 6 s       |
+| `corepack pnpm install --frozen-lockfile` | 5 s      | 71 s      |
+| **total**                                 | **26 s** | **116 s** |
 
-### The decisive line, and the cause
+**The 5-second Linux install is not yet trusted.** `better-sqlite3@13.0.3` publishes no prebuilt
+binary, so it must compile from source, and 5 s is fast for that. Either gcc is that much quicker
+than a cold MSVC, or it did not build — in which case the domain tests say so. The Linux suite
+settles it, and until then this figure is recorded, not claimed.
 
-```
-gyp ERR! stack Error: Could not find any Visual Studio installation to use
-gyp ERR! System Windows_NT 10.0.26100
-gyp ERR! command ".../corepack/v1/pnpm/10.15.1/dist/node_modules/node-gyp/bin/node-gyp.js" "rebuild"
-gyp ERR! node -v v22.14.0
-gyp ERR! node-gyp -v v11.1.0
-.../node_modules/better-sqlite3 install: Failed
- ELIFECYCLE  Command failed with exit code 1.
-```
+### Windows, run `38251456639` — the full suite, measured
 
-Read from the check run's annotation, not from a log: a job-log download answers
-`403 Must have admin rights to Repository` (choice 8).
+Job 2157 s (36 min) end to end, inside the 90-minute cap. `check.mjs` itself: **2033 s**. Peak
+resident memory **1047 MiB**, summed across `node` processes and sampled every 2 s — comfortable
+inside the runner's 16 GB.
 
-**Cause, established rather than guessed.** `better-sqlite3@13.0.3` publishes **no prebuilt
-binary** — its `v13.0.3` release carries zero assets — so every install of this workspace compiles it
-with node-gyp. The `windows-latest` image does carry the toolchain: Visual Studio Enterprise 2022
-17.14 with `Microsoft.VisualStudio.Workload.NativeDesktop`, `VC.Tools.x86.x64`, the Windows 11 SDK,
-and Python 3.12. But pnpm 10.15.1 bundles **node-gyp 11.1.0**, which cannot detect a 17.14 install.
+| check             | hosted            | local reference |
+| ----------------- | ----------------- | --------------- |
+| typecheck         | 13.6 s            |                 |
+| lint              | 11.4 s            |                 |
+| format            | 17.0 s            |                 |
+| boundaries        | 1.5 s             |                 |
+| boundaries proven | 3.7 s             |                 |
+| no dead rule      | 0.07 s            |                 |
+| **tests**         | **1985 s — FAIL** | **1413 s**      |
+| decisions pin     | 0.16 s            |                 |
+| copied docs       | 0.09 s            |                 |
 
-**This is class 2 of choice 7 — the runner is wrong — and it now has the evidence that class
-requires:** the failure names a tool, and the same tree installs on this machine. The answer was
-therefore to give the runner the tool it lacks, in the workflow: node-gyp pinned to 13.1.0, installed
-under `$RUNNER_TEMP` and selected through `npm_config_node_gyp`. No check, bound, timeout or test was
-touched, and the measured commands are unchanged.
+**Nine of the ten checks are green on a hosted runner**, which is the thing this feature set out to
+find out and which was unknown before. Three results matter more than the total:
 
-**What it cost to learn.** Three runs, because the first had no readable output, the second had a
-handler that `-e` killed before it could speak, and only the third could say anything. Choice 8 exists
-so that the next failure costs one run.
+1. **The suite is 1.40× slower, not 4×.** Four cores against this machine's sixteen produced a
+   40% increase in the test phase. S-176's serial aggregate runner is why: the suite is not
+   CPU-parallel at the top level, so the core count moves it far less than expected.
+2. **No child bound fired.** The prompt expected the PATH-only transient to be worse on a small
+   runner, and choice 2 recorded a bound failure as a likely outcome. It did not happen on this
+   run: none of the eleven bounded children at 300/360/600 s timed out, and the word "bound" appears
+   in the log only on the two boundary checks. **The expectation is not borne out, and the stop
+   condition was not reached.** One run does not make that safe — it makes it unobserved so far.
+3. **`decisions pin` was green**, so the asymmetry of Gate 2 and class 4 of choice 7 did not bite
+   here. The steering repository's `main` had not moved.
+
+### The one failure, named — and it is the transient this repository already knows about
+
+**It is `tests/reel-takes-secrets.test.ts`**, test 26 ("every other test of the journey passes in a
+child process whose environment holds only PATH and what the operating system needs to start Node").
+The assertion that fails is line 106, `assert.equal(suite.status, 0, …)`: the nested child suite
+ended with exit status `null`, which means it was killed — its bound is `timeout: 300_000` at line
+96, and it runs `--test-concurrency=4` over the other `reel-takes-*` files.
+
+Established by running the `tests` step's exact command locally, because the hosted run could not
+say (see below):
+
+| run                              | counts                      |
+| -------------------------------- | --------------------------- |
+| hosted Windows, `38251456639`    | 696 / 695 pass / 1 fail     |
+| **local full run, this machine** | **696 / 695 pass / 1 fail** |
+| the same file alone, locally     | 1 / 1 pass / 0 fail         |
+
+**The counts match exactly, and the file passes alone.** So this is a timing failure under load, not
+a logic failure, and not a hosted-specific one: it is **the known PATH-only child transient** that
+`docs/context.md` already records and that S-176's serial aggregate and S-178's recorded Slice 4
+FAIL both concern. Nothing about it was weakened, skipped or re-run to green.
+
+**What that does to the Windows result.** Nine of ten checks green, and the tenth fails on the one
+test that also fails here. The hosted Windows run therefore shows **no hosted-specific defect**:
+every difference from a local run is accounted for. That is the strongest statement this measurement
+supports, and it is weaker than "green" on purpose.
+
+**An open question, not investigated.** The failing test's own reported `duration_ms` in the local
+full run was **2,187,010 ms — about 2187 s, far more than the 300 s bound it sets for its child**,
+and longer than the entire hosted Windows `tests` phase. Either the bound is not bounding what it is
+assumed to bound, or the duration covers more than the child. **This matters beyond tidiness:** if a
+300 s bound can hold a test for 2187 s, then the Linux cancellation below needs no Linux-specific
+explanation, and S-176's contention finding may be understated. It is recorded here as a question for
+a session with a gate, and nothing is changed on the strength of it.
+
+### Linux, run `38253333794` — cancelled at the cap, and faster at everything that finished
+
+The job ran 13:06:06Z to 14:36:26Z — **5420 s, cancelled by the 90-minute `timeout-minutes` cap**,
+with `check.mjs` 5394 s into its `tests` step. **The cap was not raised and will not be** (goal 4).
+
+Every static check finished, and every one was faster than Windows:
+
+| check             | Linux                      | Windows              | Linux is          |
+| ----------------- | -------------------------- | -------------------- | ----------------- |
+| typecheck         | 6.99 s                     | 13.61 s              | 1.95× faster      |
+| lint              | 3.24 s                     | 11.43 s              | 3.53× faster      |
+| format            | 8.28 s                     | 17.04 s              | 2.06× faster      |
+| boundaries        | 0.64 s                     | 1.50 s               | 2.34× faster      |
+| boundaries proven | 1.53 s                     | 3.73 s               | 2.43× faster      |
+| no dead rule      | 0.02 s                     | 0.07 s               | 3.23× faster      |
+| **static total**  | **20.7 s**                 | **47.4 s**           | **2.29× faster**  |
+| environment setup | 26 s                       | 116 s                | 4.5× faster       |
+| **tests**         | **5394 s, never finished** | **1985 s, finished** | **≥2.72× slower** |
+
+So Linux is faster at everything except the one thing that takes the time.
+
+**This is NOT established as a port defect, and an earlier reading of it as one was wrong.** The
+correction matters, so it is recorded rather than quietly replaced: the failure mode that fires on
+Windows and locally is a child killed at its bound under contention, and a 4-vCPU runner is the
+worst case for exactly that. Eleven tests spawn such a child, bounded at 300/360/600 s; if each
+bound fires, the bounds alone total about 4860 s ≈ 81 minutes, which exceeds the cap without any
+Linux-specific cause and is consistent with the 5394 s observed. That is arithmetic agreeing with
+the evidence — **not a diagnosis**, because no per-test output survives the run.
+
+Classification under choice 7 is therefore **unresolved between class 2 (the runner is wrong — too
+few cores for the existing contention) and class 3 (the port is wrong)**, with class 2 the leading
+explanation. Settling it needs per-test output from a Linux run, which the next finding says is
+currently impossible.
+
+### The observability finding, which is the measurement's most useful result
+
+Neither hosted run could say what it was doing, in two different ways:
+
+1. **Windows failed and would not name the test.** `scripts/check.mjs` prints only the last 80 lines
+   of a failing check; the log records `(3924 earlier output line(s) omitted)`. Node's TAP reporter
+   puts `not ok <name>` inline at the failure, and the run ends with counts alone — `1..670`,
+   `# tests 696`, `# pass 695`, `# fail 1`. Every subtest in the excerpt is `ok`. The name had to be
+   recovered by running the suite locally, 36 minutes after the hosted run already knew it.
+2. **Linux was cancelled and said nothing at all.** `check.mjs` captures the test runner's output
+   rather than streaming it, so the `tests` step emits **no progress whatsoever** until it ends — and
+   because a cancelled step never reaches its own handler, choice 8's annotation never fired either.
+   A 90-minute stall produced zero bytes about the suite.
+
+**This is a pre-existing weakness in `check.mjs` that the hosted path exposed rather than caused.**
+Locally it is survivable: a failing check can be re-run one file at a time, and CLAUDE.md keeps the
+`check-runner` agent precisely "to find WHICH test failed when check.mjs's 40-line excerpt does not
+say". A runner has no such agent, so the same script becomes unreadable there.
+
+**Nothing was changed in response.** `scripts/check.mjs` is checking infrastructure: S-177 reserves
+it for the full suite and CLAUDE.md rule 1 requires gates, so printing the `not ok` lines alongside
+the tail — which is the obvious fix, and cheap — belongs to a slice with a gate, not to a
+measurement that happened to discover it. It is the first thing the next session should weigh, because
+every later hosted measurement is worth less without it.
 
 ### Minutes
 
-Four runs started and none was refused or billed, so **Actions minutes are free for this public
-repository on `windows-latest`**, which is what the documentation says generally and what the prompt
-asked be confirmed for Windows specifically. Nothing is yet known about **how many** minutes a full
-suite costs, because no run has reached it.
+Five runs started, none refused or billed, so **Actions minutes are free for this public repository
+on both `windows-latest` and `ubuntu-latest`** — what the documentation says generally, confirmed
+for Windows specifically as the prompt asked. A full Windows measurement costs about **36 minutes of
+wall clock and $0**.
 
 ## Adversarial review — 2026-10-12, round 1
 
