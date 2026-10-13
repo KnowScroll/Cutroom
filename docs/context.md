@@ -128,14 +128,24 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   cores, so a hosted runner is a quarter of it. The blocking finding: a test grepping a workflow for `real-reel` must
   contain that literal, which `paid-path`’s check 20 forbids any other test file from doing (S-111) — so it becomes an
   amendment in `tests/paid-path-real-reel.test.ts` and `paid-path` takes a re-journey.
-- **The environment is measured; the suite is not yet.** `.github/workflows/measure-checks.yml` is report-only on branch
+- **Both platforms are measured.** `.github/workflows/measure-checks.yml` is report-only on branch
   `ci-measurement` at `49b0686` and **not on `main`**. Setup costs **26 s on Linux against 116 s on Windows** (install
   5 s against 71 s). Four runs were needed: the install failed because `better-sqlite3@13.0.3` **publishes no prebuilt
   binary** while pnpm 10.15.1 bundles node-gyp 11.1.0, which cannot detect the image’s Visual Studio 2022 17.14 — class
   2, the runner is wrong, answered with a pinned node-gyp 13.1.0 and no change to any check. Reading that line needed
   choice 8: a job-log download answers `403 Must have admin rights to Repository`, so each job republishes its decisive
-  output as a check-run annotation. Both `check.mjs` runs were still in flight at close, so there is nothing yet to set
-  against the local 1413 s.
+  output as a check-run annotation. **Windows: `check.mjs` 2033 s against the local 1413 s reference — 1.40× slower,
+  not 4×, because S-176's aggregate runner is serial — nine of ten checks green, peak 1047 MiB, job 36 min, no child
+  bound fired.** The tenth failed on 1 test of 696, named as `tests/reel-takes-secrets.test.ts` test 26, line 106, its
+  PATH-only child killed at the `timeout: 300_000` bound on line 96; a local full run reproduces 696/695/1 exactly and
+  the file passes alone, so it is the known transient and **no hosted-specific defect was found on Windows**.
+  **Linux was cancelled at the 90-minute cap** 5394 s into `tests`, after static checks 2.29× faster and setup 4.5×
+  faster than Windows — faster at everything but the one thing that takes the time. The cap was not raised and no
+  bound, timeout or test was touched; its class stays **unresolved between class 2 (runner too small for the existing
+  contention) and class 3 (the port)**, class 2 leading, correcting an earlier port reading. **The measurement's most
+  useful result is an observability finding about `check.mjs`**: last-80-lines output and capture-not-stream, so
+  Windows could not name its own failing test and Linux emitted zero bytes across a 90-minute stall. Pre-existing,
+  exposed not caused, and deliberately unfixed — that file is checking infrastructure and needs a gate.
 - No code, contract, test, boundary rule or check changed, and nothing was weakened. `main` gains documents only.
 - **Hazard:** a second Claude session was committing to `main` in this same checkout, swept this session’s untracked
   documents into its commits, and wrote files while this session had a branch checked out. One `--amend` landed on its
