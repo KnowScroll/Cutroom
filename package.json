@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@cutroom/api": "workspace:*",
+    "@cutroom/benchmark": "workspace:*",
     "@cutroom/contracts": "workspace:*",
     "@cutroom/pipeline": "workspace:*",
     "@cutroom/providers": "workspace:*",

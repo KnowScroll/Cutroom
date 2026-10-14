@@ -1,0 +1,196 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "the record's lost_call rows live on runs like this one",
+  "run": {
+    "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+    "request_id": "real-reel-20260925T172553",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260925T172553\",\"worldId\":\"cutroom-honeybees\",\"narration\":[{\"text\":\"One summer morning, a ball of bees hangs from a branch.\",\"claimIds\":[\"c1\"]},{\"text\":\"It is half a colony, and it has no home.\",\"claimIds\":[\"c1\"]},{\"text\":\"A scout flies off to a small hole in a tree.\",\"claimIds\":[\"c2\"]},{\"text\":\"She walks in and out, checking it is dry and roomy.\",\"claimIds\":[\"c2\"]},{\"text\":\"Back on the swarm, she dances to point the way.\",\"claimIds\":[\"c3\"]},{\"text\":\"Nobody leads, but the best place wins more dancers on the swarm.\",\"claimIds\":[\"c3\"]},{\"text\":\"Once they agree, the whole swarm lifts off.\",\"claimIds\":[\"c4\"]},{\"text\":\"It flies over the meadow, straight to its new home.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"main\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"supporting\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-cluster\",\"text\":\"a cluster of honeybees hanging from a branch\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-scout\",\"text\":\"a honeybee at a small hole in tree bark\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-dancers\",\"text\":\"a close view of a cluster of honeybees on a branch\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-flight\",\"text\":\"a swarm of honeybees flying through the air, seen from a distance\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-honeybees\",\"version\":1,\"text\":\"realistic nature documentary footage, close and warm, summer light, steady camera\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"main\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-cluster\",\"text\":\"a cluster of honeybees hanging from a branch\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-scout\",\"text\":\"a honeybee at a small hole in tree bark\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-dancers\",\"text\":\"a close view of a cluster of honeybees on a branch\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-flight\",\"text\":\"a swarm of honeybees flying through the air, seen from a distance\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"One summer morning, a ball of bees hangs from a branch.\"},{\"claimIds\":[\"c1\"],\"text\":\"It is half a colony, and it has no home.\"},{\"claimIds\":[\"c2\"],\"text\":\"A scout flies off to a small hole in a tree.\"},{\"claimIds\":[\"c2\"],\"text\":\"She walks in and out, checking it is dry and roomy.\"},{\"claimIds\":[\"c3\"],\"text\":\"Back on the swarm, she dances to point the way.\"},{\"claimIds\":[\"c3\"],\"text\":\"Nobody leads, but the best place wins more dancers on the swarm.\"},{\"claimIds\":[\"c4\"],\"text\":\"Once they agree, the whole swarm lifts off.\"},{\"claimIds\":[\"c4\"],\"text\":\"It flies over the meadow, straight to its new home.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260925T172553\",\"style\":{\"id\":\"style-honeybees\",\"text\":\"realistic nature documentary footage, close and warm, summer light, steady camera\",\"version\":1},\"worldId\":\"cutroom-honeybees\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"requestId\":\"real-reel-20260925T172553\",\"costCents\":5,\"status\":\"failed\",\"detail\":\"the provider is unavailable: the picture a1-shot-2-a on 'fal-ai/flux-2-pro''s file did not reach the provider: fetch failed — and the call had already spent (S-142)\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-25T17:25:54.186Z"
+  },
+  "job": [
+    {
+      "id": 93,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-25T17:25:54.186Z",
+      "locked_at": "2026-09-25T17:25:54.674Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "cost_cents": 0
+    },
+    {
+      "id": 94,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-25T17:27:21.980Z",
+      "locked_at": "2026-09-25T17:27:21.984Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 93,
+      "correlation_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "cost_cents": 5
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 1,
+      "at": "2026-09-25T17:25:54.186Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":1,\"at\":\"2026-09-25T17:25:54.186Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 2,
+      "at": "2026-09-25T17:25:54.676Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":2,\"at\":\"2026-09-25T17:25:54.676Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 3,
+      "at": "2026-09-25T17:27:21.980Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":3,\"at\":\"2026-09-25T17:27:21.980Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 4,
+      "at": "2026-09-25T17:27:21.980Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":4,\"at\":\"2026-09-25T17:27:21.980Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 5,
+      "at": "2026-09-25T17:27:21.980Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":5,\"at\":\"2026-09-25T17:27:21.980Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 6,
+      "at": "2026-09-25T17:27:21.987Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":6,\"at\":\"2026-09-25T17:27:21.987Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "seq": 7,
+      "at": "2026-09-25T17:27:55.552Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"9bc5821e-c6dc-4d71-a420-df04417e3bcc\",\"seq\":7,\"at\":\"2026-09-25T17:27:55.552Z\",\"type\":\"run.finished\",\"status\":\"failed\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":9,\"subjectIds\":[\"cluster\"]},{\"unit\":1,\"durationSeconds\":9,\"subjectIds\":[\"scout\"]},{\"unit\":2,\"durationSeconds\":9,\"subjectIds\":[\"dancers\"]},{\"unit\":3,\"durationSeconds\":9,\"subjectIds\":[\"flight\"]}],\"subjects\":[{\"id\":\"cluster\",\"name\":\"Cluster of Honeybees\"},{\"id\":\"scout\",\"name\":\"Scout Bee at Tree Hole\"},{\"id\":\"dancers\",\"name\":\"Dancing Bees on Branch\"},{\"id\":\"flight\",\"name\":\"Swarm in Flight\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-cluster\",\"text\":\"a cluster of honeybees hanging from a branch\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-scout\",\"text\":\"a honeybee at a small hole in tree bark\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-dancers\",\"text\":\"a close view of a cluster of honeybees on a branch\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-flight\",\"text\":\"a swarm of honeybees flying through the air, seen from a distance\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":3,\"estimateCents\":41,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 4,
+      "estimate_cents": 41,
+      "selected": 0
+    },
+    {
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4],[5],[6],[7]],\"shots\":[{\"unit\":0,\"durationSeconds\":6,\"subjectIds\":[\"cluster\"]},{\"unit\":1,\"durationSeconds\":6,\"subjectIds\":[\"scout\"]},{\"unit\":2,\"durationSeconds\":6,\"subjectIds\":[\"dancers\"]},{\"unit\":3,\"durationSeconds\":6,\"subjectIds\":[\"dancers\"]},{\"unit\":4,\"durationSeconds\":6,\"subjectIds\":[\"flight\"]},{\"unit\":5,\"durationSeconds\":6,\"subjectIds\":[\"flight\"]}],\"subjects\":[{\"id\":\"cluster\",\"name\":\"Bee Cluster\"},{\"id\":\"scout\",\"name\":\"Scout Bee\"},{\"id\":\"dancers\",\"name\":\"Dancing Bees\"},{\"id\":\"flight\",\"name\":\"Flying Swarm\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-cluster\",\"text\":\"a cluster of honeybees hanging from a branch\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-scout\",\"text\":\"a honeybee at a small hole in tree bark\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-dancers\",\"text\":\"a close view of a cluster of honeybees on a branch\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-flight\",\"text\":\"a swarm of honeybees flying through the air, seen from a distance\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 4.333333333333333,
+      "estimate_cents": 48,
+      "selected": 1
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 534,
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 647,
+      "output_tokens": 1958,
+      "fake": 0,
+      "at": "2026-09-25T17:26:27.304Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 535,
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 670,
+      "output_tokens": 2588,
+      "fake": 0,
+      "at": "2026-09-25T17:27:10.265Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 536,
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 582,
+      "output_tokens": 331,
+      "fake": 0,
+      "at": "2026-09-25T17:27:13.695Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 537,
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 600,
+      "output_tokens": 913,
+      "fake": 0,
+      "at": "2026-09-25T17:27:21.978Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [],
+  "observation": [],
+  "reconciliation": [],
+  "generation_receipt": [],
+  "lost_call": [
+    {
+      "id": 3,
+      "run_id": "9bc5821e-c6dc-4d71-a420-df04417e3bcc",
+      "port": "image",
+      "model": "fal-ai/flux-2-pro",
+      "cost_cents": 5,
+      "detail": "the provider is unavailable: the picture a1-shot-2-a on 'fal-ai/flux-2-pro''s file did not reach the provider: fetch failed",
+      "at": "2026-09-25T17:27:55.550Z"
+    }
+  ],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

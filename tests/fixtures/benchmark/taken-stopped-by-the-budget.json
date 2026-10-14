@@ -1,0 +1,1156 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "the record's ONLY run whose result carries capCents: a budget answer with its four figures",
+  "run": {
+    "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+    "request_id": "real-reel-20260923T124852",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260923T124852\",\"worldId\":\"cutroom-first-real-reel\",\"narration\":[{\"text\":\"For forty years a lamp on a headland was lit at dusk.\",\"claimIds\":[\"c1\"]},{\"text\":\"It turned all night above water nobody else was watching.\",\"claimIds\":[\"c1\"]},{\"text\":\"Before he slept, the keeper wrote the hour and the weather down.\",\"claimIds\":[\"c2\"]},{\"text\":\"The log was a condition of the job, and he met it.\",\"claimIds\":[\"c2\"]},{\"text\":\"A slatted white box on the grass held his thermometers.\",\"claimIds\":[\"c3\"]},{\"text\":\"He read them at the same hour, whatever the sea was doing.\",\"claimIds\":[\"c3\"]},{\"text\":\"A century later his logbook stands closed on an archive shelf.\",\"claimIds\":[\"c4\"]},{\"text\":\"Its columns became a record of the water itself; kept things outlive their reason.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"supporting\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-lamp\",\"text\":\"a lighthouse lamp of glass and brass\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-log\",\"text\":\"an open handwritten logbook on a desk\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-box\",\"text\":\"a white slatted wooden instrument box standing on grass\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-archive\",\"text\":\"a closed handwritten logbook on a shelf in a daylit archive\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-modern\",\"text\":\"a computer screen\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-1\",\"version\":2,\"text\":\"quiet, precise, natural light\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-modern\",\"text\":\"a computer screen\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-lamp\",\"text\":\"a lighthouse lamp of glass and brass\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-log\",\"text\":\"an open handwritten logbook on a desk\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-box\",\"text\":\"a white slatted wooden instrument box standing on grass\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-archive\",\"text\":\"a closed handwritten logbook on a shelf in a daylit archive\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"For forty years a lamp on a headland was lit at dusk.\"},{\"claimIds\":[\"c1\"],\"text\":\"It turned all night above water nobody else was watching.\"},{\"claimIds\":[\"c2\"],\"text\":\"Before he slept, the keeper wrote the hour and the weather down.\"},{\"claimIds\":[\"c2\"],\"text\":\"The log was a condition of the job, and he met it.\"},{\"claimIds\":[\"c3\"],\"text\":\"A slatted white box on the grass held his thermometers.\"},{\"claimIds\":[\"c3\"],\"text\":\"He read them at the same hour, whatever the sea was doing.\"},{\"claimIds\":[\"c4\"],\"text\":\"A century later his logbook stands closed on an archive shelf.\"},{\"claimIds\":[\"c4\"],\"text\":\"Its columns became a record of the water itself; kept things outlive their reason.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260923T124852\",\"style\":{\"id\":\"style-1\",\"text\":\"quiet, precise, natural light\",\"version\":2},\"worldId\":\"cutroom-first-real-reel\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"requestId\":\"real-reel-20260923T124852\",\"costCents\":231,\"status\":\"stopped\",\"reason\":\"budget\",\"limit\":\"ceiling\",\"estimateCents\":279,\"ceilingCents\":250,\"capCents\":300}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-23T12:48:52.963Z"
+  },
+  "job": [
+    {
+      "id": 37,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-23T12:48:52.963Z",
+      "locked_at": "2026-09-23T12:48:53.450Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "cost_cents": 0
+    },
+    {
+      "id": 38,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-23T12:50:31.447Z",
+      "locked_at": "2026-09-23T12:50:31.451Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 37,
+      "correlation_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "cost_cents": 15
+    },
+    {
+      "id": 39,
+      "kind": "reel.clips",
+      "payload": "{\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-23T12:53:56.277Z",
+      "locked_at": "2026-09-23T12:53:56.279Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 38,
+      "correlation_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "cost_cents": 216
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 1,
+      "at": "2026-09-23T12:48:52.963Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":1,\"at\":\"2026-09-23T12:48:52.963Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 2,
+      "at": "2026-09-23T12:48:53.453Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":2,\"at\":\"2026-09-23T12:48:53.453Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 3,
+      "at": "2026-09-23T12:50:31.447Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":3,\"at\":\"2026-09-23T12:50:31.447Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 4,
+      "at": "2026-09-23T12:50:31.447Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":4,\"at\":\"2026-09-23T12:50:31.447Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 5,
+      "at": "2026-09-23T12:50:31.447Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":5,\"at\":\"2026-09-23T12:50:31.447Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 6,
+      "at": "2026-09-23T12:50:31.453Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":6,\"at\":\"2026-09-23T12:50:31.453Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 7,
+      "at": "2026-09-23T12:53:56.277Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":7,\"at\":\"2026-09-23T12:53:56.277Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 8,
+      "at": "2026-09-23T12:53:56.277Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":8,\"at\":\"2026-09-23T12:53:56.277Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 9,
+      "at": "2026-09-23T12:53:56.277Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":9,\"at\":\"2026-09-23T12:53:56.277Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 10,
+      "at": "2026-09-23T12:53:56.277Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":10,\"at\":\"2026-09-23T12:53:56.277Z\",\"type\":\"stage.finished\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 11,
+      "at": "2026-09-23T12:53:56.280Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":11,\"at\":\"2026-09-23T12:53:56.280Z\",\"type\":\"stage.started\",\"stage\":\"video\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 12,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":12,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 13,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":13,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 14,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":14,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 15,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":15,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 16,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":16,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 17,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":17,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 18,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":18,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 19,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":19,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 20,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":20,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 21,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":21,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 22,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":22,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 23,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":23,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 24,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":24,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 25,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":25,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 26,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":26,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 27,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":27,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"fail\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 28,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":28,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 29,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":29,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 30,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":30,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 31,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":31,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"fail\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "seq": 32,
+      "at": "2026-09-23T13:00:58.385Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"a08a9c9c-9d10-41bd-9f81-215edfef871f\",\"seq\":32,\"at\":\"2026-09-23T13:00:58.385Z\",\"type\":\"run.finished\",\"status\":\"stopped\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":10,\"subjectIds\":[\"lamp\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"log\"]},{\"unit\":2,\"durationSeconds\":10,\"subjectIds\":[\"box\"]},{\"unit\":3,\"durationSeconds\":10,\"subjectIds\":[\"archive\"]}],\"subjects\":[{\"id\":\"lamp\",\"name\":\"Lighthouse Lamp\"},{\"id\":\"log\",\"name\":\"Open Logbook\"},{\"id\":\"box\",\"name\":\"Thermometer Box\"},{\"id\":\"archive\",\"name\":\"Archived Logbook\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-lamp\",\"text\":\"a lighthouse lamp of glass and brass\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-log\",\"text\":\"an open handwritten logbook on a desk\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-box\",\"text\":\"a white slatted wooden instrument box standing on grass\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-archive\",\"text\":\"a closed handwritten logbook on a shelf in a daylit archive\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-modern\",\"text\":\"a computer screen\",\"type\":\"presence\"}]},\"plannedImageCalls\":3,\"estimateCents\":183,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 5,
+      "estimate_cents": 183,
+      "selected": 1
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4],[5],[6],[7]],\"shots\":[{\"unit\":0,\"durationSeconds\":6,\"subjectIds\":[\"lamp\"]},{\"unit\":1,\"durationSeconds\":6,\"subjectIds\":[\"log\"]},{\"unit\":2,\"durationSeconds\":6,\"subjectIds\":[\"box\"]},{\"unit\":3,\"durationSeconds\":6,\"subjectIds\":[\"box\"]},{\"unit\":4,\"durationSeconds\":6,\"subjectIds\":[\"archive\"]},{\"unit\":5,\"durationSeconds\":6,\"subjectIds\":[\"archive\"]}],\"subjects\":[{\"id\":\"lamp\",\"name\":\"Lighthouse Lamp\"},{\"id\":\"log\",\"name\":\"Handwritten Logbook\"},{\"id\":\"box\",\"name\":\"Instrument Box\"},{\"id\":\"archive\",\"name\":\"Archive Shelf\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-lamp\",\"text\":\"a lighthouse lamp of glass and brass\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-log\",\"text\":\"an open handwritten logbook on a desk\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-box\",\"text\":\"a white slatted wooden instrument box standing on grass\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-archive\",\"text\":\"a closed handwritten logbook on a shelf in a daylit archive\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-modern\",\"text\":\"a computer screen\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":174,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.333333333333333,
+      "estimate_cents": 174,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 159,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 650,
+      "output_tokens": 1873,
+      "fake": 0,
+      "at": "2026-09-23T12:49:24.209Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 160,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 673,
+      "output_tokens": 2678,
+      "fake": 0,
+      "at": "2026-09-23T12:50:09.829Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 161,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 615,
+      "output_tokens": 664,
+      "fake": 0,
+      "at": "2026-09-23T12:50:15.976Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 162,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 640,
+      "output_tokens": 2142,
+      "fake": 0,
+      "at": "2026-09-23T12:50:31.446Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 163,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 98,
+      "fake": 0,
+      "at": "2026-09-23T12:51:07.800Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 164,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2468,
+      "output_tokens": 969,
+      "fake": 0,
+      "at": "2026-09-23T12:51:13.897Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 165,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1079,
+      "output_tokens": 396,
+      "fake": 0,
+      "at": "2026-09-23T12:51:17.657Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 166,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 251,
+      "fake": 0,
+      "at": "2026-09-23T12:51:44.636Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 167,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2468,
+      "output_tokens": 1090,
+      "fake": 0,
+      "at": "2026-09-23T12:52:00.554Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 168,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1105,
+      "output_tokens": 234,
+      "fake": 0,
+      "at": "2026-09-23T12:52:01.714Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 169,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 143,
+      "fake": 0,
+      "at": "2026-09-23T12:52:36.748Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-2-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 170,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2466,
+      "output_tokens": 613,
+      "fake": 0,
+      "at": "2026-09-23T12:53:54.801Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 171,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1047,
+      "output_tokens": 269,
+      "fake": 0,
+      "at": "2026-09-23T12:53:56.275Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-2-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 172,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 4315,
+      "output_tokens": 3881,
+      "fake": 0,
+      "at": "2026-09-23T12:55:09.920Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-0-take-1\"]"
+    },
+    {
+      "id": 173,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1109,
+      "output_tokens": 237,
+      "fake": 0,
+      "at": "2026-09-23T12:55:15.358Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-0-take-1\"]"
+    },
+    {
+      "id": 174,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 4315,
+      "output_tokens": 2576,
+      "fake": 0,
+      "at": "2026-09-23T12:56:26.698Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-1-take-1\"]"
+    },
+    {
+      "id": 175,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1067,
+      "output_tokens": 294,
+      "fake": 0,
+      "at": "2026-09-23T12:56:31.275Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-1-take-1\"]"
+    },
+    {
+      "id": 176,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 4315,
+      "output_tokens": 2464,
+      "fake": 0,
+      "at": "2026-09-23T12:57:37.486Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-2-take-1\"]"
+    },
+    {
+      "id": 177,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 880,
+      "output_tokens": 442,
+      "fake": 0,
+      "at": "2026-09-23T12:57:42.556Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-2-take-1\"]"
+    },
+    {
+      "id": 178,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5007,
+      "output_tokens": 2904,
+      "fake": 0,
+      "at": "2026-09-23T12:58:44.847Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-1\"]"
+    },
+    {
+      "id": 179,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1113,
+      "output_tokens": 2414,
+      "fake": 0,
+      "at": "2026-09-23T12:58:55.356Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-1\"]"
+    },
+    {
+      "id": 180,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5007,
+      "output_tokens": 3004,
+      "fake": 0,
+      "at": "2026-09-23T12:59:53.274Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-2\"]"
+    },
+    {
+      "id": 181,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1017,
+      "output_tokens": 6608,
+      "fake": 0,
+      "at": "2026-09-23T13:00:58.383Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-2\"]"
+    }
+  ],
+  "picture": [
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-0-single",
+      "seq": 1,
+      "attempt": 1,
+      "shot_unit": 0,
+      "subject_id": "lamp",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: quiet, precise, natural light\nShape: a vertical picture, 9:16.\nIt shows: Lighthouse Lamp.\nWhat is said over the shot:\n  \"For forty years a lamp on a headland was lit at dusk.\"\n  \"It turned all night above water nobody else was watching.\"\nIt must show:\n- a lighthouse lamp of glass and brass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7825027,\"brightness\":0.2538826484018265}",
+      "words": "[\"For forty years a lamp on a headland was lit at dusk.\",\"It turned all night above water nobody else was watching.\"]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-1-single",
+      "seq": 2,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "log",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: quiet, precise, natural light\nShape: a vertical picture, 9:16.\nIt shows: Open Logbook.\nWhat is said over the shot:\n  \"Before he slept, the keeper wrote the hour and the weather down.\"\n  \"The log was a condition of the job, and he met it.\"\nIt must show:\n- an open handwritten logbook on a desk\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7768895666666666,\"brightness\":0.2298917808219178}",
+      "words": "[\"Date\",\"Hour\",\"Date\",\"Weather\",\"22:10 - clear sky, light wind.\",\"22:10 - clear sky, light wind.\",\"10 - twccoed.\"]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-2-single",
+      "seq": 3,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "box",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: quiet, precise, natural light\nShape: a vertical picture, 9:16.\nIt shows: Thermometer Box.\nWhat is said over the shot:\n  \"A slatted white box on the grass held his thermometers.\"\n  \"He read them at the same hour, whatever the sea was doing.\"\nIt must show:\n- a white slatted wooden instrument box standing on grass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.8339879666666666,\"brightness\":0.5175479452054794}",
+      "words": "[\"A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.\"]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    }
+  ],
+  "observation": [
+    {
+      "id": "obs-a1-shot-0-single",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-0-single",
+      "observation": "{\"entities\":[{\"label\":\"brass lantern with lit flame inside a glass globe\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"cylindrical metal fuel reservoir/base beneath the lantern\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"bay window structure with multiple rectangular glass panes and wooden frames\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"dark rocky cliff or landmass\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":false},{\"label\":\"body of water (sea or ocean)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":false},{\"label\":\"dusk sky with gradient of pale light\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"caption text at bottom of image\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"closeUp\",\"setting\":\"interior of a glass-walled room at dusk, overlooking a coastal headland\",\"lighting\":\"mixed\",\"readableTextPresent\":true,\"ambiguities\":[\"The exact nature of the structure — it could be a lighthouse lantern room, an observatory, or a sun room — is not fully clear\",\"The dark shape on the left appears to be a cliff or sea stack but its precise form is hard to make out\",\"The body of water's extent is uncertain since it merges with the dim sky\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-1-single",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-1-single",
+      "observation": "{\"entities\":[{\"label\":\"open notebook with handwritten entries\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"black pen with silver clip\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden table surface with visible grain and wear\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"wooden chair with vertical slat back\",\"count\":1,\"position\":\"right\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"wooden window frame with glass pane\",\"count\":1,\"position\":\"left\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"hanging pull cord or string\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"dark hanging garment or curtain\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"indoor room, likely a study, office, or quiet domestic space with a wooden table near a window\",\"lighting\":\"dim\",\"readableTextPresent\":true,\"ambiguities\":[\"handwritten text in the notebook is cursive and partially legible; recurring phrases appear to read '22:10 - clear sky, light wind' on the right page\",\"the dark object hanging in the background could be a coat, robe, or a heavy curtain rather than a garment\",\"the cord on the left could be a window blind pull, a lamp pull, or a curtain tieback\",\"left page contains entries with what look like dates and codes such as 'DAY:' but exact words are difficult to decipher\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-2-single",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-2-single",
+      "observation": "{\"entities\":[{\"label\":\"white slatted wooden box on a post\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden support post\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"grass and low vegetation\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"distant horizon line\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"overcast sky\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"overlaid serif text block\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"an open grassy field under a pale overcast sky, likely coastal\",\"lighting\":\"mixed\",\"readableTextPresent\":true,\"ambiguities\":[\"the structure resembles a meteorological instrument shelter (Stevenson screen) but no instruments are visibly inside the louvered slats\",\"the exact purpose of the post and box is not confirmed by visible labels or contents\",\"the background is softly blurred so distant features cannot be resolved\",\"overlaid text reads: 'A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.' but its presence as graphic overlay versus on-scene signage is not certain\"],\"unsafeDepictions\":[]}"
+    }
+  ],
+  "reconciliation": [
+    {
+      "id": "rec-a1-shot-0-single",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-0-single",
+      "answer": "{\"subjects\":[{\"id\":\"lamp\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-lamp\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-1-single",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-1-single",
+      "answer": "{\"subjects\":[{\"id\":\"log\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-log\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-2-single",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-2-single",
+      "answer": "{\"subjects\":[{\"id\":\"box\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-box\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    }
+  ],
+  "generation_receipt": [
+    {
+      "id": 27,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-0-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: quiet, precise, natural light\nShape: a vertical picture, 9:16.\nIt shows: Lighthouse Lamp.\nWhat is said over the shot:\n  \"For forty years a lamp on a headland was lit at dusk.\"\n  \"It turned all night above water nobody else was watching.\"\nIt must show:\n- a lighthouse lamp of glass and brass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen",
+      "reference_ids": "[]",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:51:00.741Z"
+    },
+    {
+      "id": 28,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-1-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: quiet, precise, natural light\nShape: a vertical picture, 9:16.\nIt shows: Open Logbook.\nWhat is said over the shot:\n  \"Before he slept, the keeper wrote the hour and the weather down.\"\n  \"The log was a condition of the job, and he met it.\"\nIt must show:\n- an open handwritten logbook on a desk\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen",
+      "reference_ids": "[]",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:51:39.456Z"
+    },
+    {
+      "id": 29,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "picture_id": "a1-shot-2-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: quiet, precise, natural light\nShape: a vertical picture, 9:16.\nIt shows: Thermometer Box.\nWhat is said over the shot:\n  \"A slatted white box on the grass held his thermometers.\"\n  \"He read them at the same hour, whatever the sea was doing.\"\nIt must show:\n- a white slatted wooden instrument box standing on grass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen",
+      "reference_ids": "[]",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:52:30.071Z"
+    }
+  ],
+  "lost_call": [],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-0-narration",
+      "attempt": 1,
+      "shot_unit": 0,
+      "text": "For forty years a lamp on a headland was lit at dusk. It turned all night above water nobody else was watching.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"For\",\"startMs\":43,\"endMs\":128},{\"word\":\"forty\",\"startMs\":171,\"endMs\":725},{\"word\":\"years\",\"startMs\":768,\"endMs\":981},{\"word\":\"a\",\"startMs\":1024,\"endMs\":1579},{\"word\":\"lamp\",\"startMs\":1621,\"endMs\":1920},{\"word\":\"on\",\"startMs\":1963,\"endMs\":2219},{\"word\":\"a\",\"startMs\":2261,\"endMs\":2347},{\"word\":\"headland\",\"startMs\":2389,\"endMs\":2731},{\"word\":\"was\",\"startMs\":2773,\"endMs\":3072},{\"word\":\"lit\",\"startMs\":3115,\"endMs\":3328},{\"word\":\"at\",\"startMs\":3371,\"endMs\":3584},{\"word\":\"dusk.\",\"startMs\":3627,\"endMs\":4309},{\"word\":\"It\",\"startMs\":4352,\"endMs\":4779},{\"word\":\"turned\",\"startMs\":4821,\"endMs\":5035},{\"word\":\"all\",\"startMs\":5077,\"endMs\":5589},{\"word\":\"night\",\"startMs\":5632,\"endMs\":6059},{\"word\":\"above\",\"startMs\":6101,\"endMs\":6485},{\"word\":\"water\",\"startMs\":6528,\"endMs\":6827},{\"word\":\"nobody\",\"startMs\":6869,\"endMs\":7595},{\"word\":\"else\",\"startMs\":7680,\"endMs\":8149},{\"word\":\"was\",\"startMs\":8192,\"endMs\":8491},{\"word\":\"watching.\",\"startMs\":8533,\"endMs\":9216}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":9.508594,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-1-narration",
+      "attempt": 1,
+      "shot_unit": 1,
+      "text": "Before he slept, the keeper wrote the hour and the weather down. The log was a condition of the job, and he met it.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"Before\",\"startMs\":43,\"endMs\":341},{\"word\":\"he\",\"startMs\":384,\"endMs\":640},{\"word\":\"slept,\",\"startMs\":683,\"endMs\":1280},{\"word\":\"the\",\"startMs\":1323,\"endMs\":1493},{\"word\":\"keeper\",\"startMs\":1707,\"endMs\":2176},{\"word\":\"wrote\",\"startMs\":2219,\"endMs\":2432},{\"word\":\"the\",\"startMs\":2475,\"endMs\":2645},{\"word\":\"hour\",\"startMs\":2688,\"endMs\":2859},{\"word\":\"and\",\"startMs\":2901,\"endMs\":3371},{\"word\":\"the\",\"startMs\":3499,\"endMs\":3797},{\"word\":\"weather\",\"startMs\":3840,\"endMs\":4011},{\"word\":\"down.\",\"startMs\":4053,\"endMs\":4736},{\"word\":\"The\",\"startMs\":4779,\"endMs\":5035},{\"word\":\"log\",\"startMs\":5461,\"endMs\":5675},{\"word\":\"was\",\"startMs\":5717,\"endMs\":6229},{\"word\":\"a\",\"startMs\":6400,\"endMs\":6613},{\"word\":\"condition\",\"startMs\":6656,\"endMs\":6912},{\"word\":\"of\",\"startMs\":6955,\"endMs\":7296},{\"word\":\"the\",\"startMs\":7339,\"endMs\":7424},{\"word\":\"job,\",\"startMs\":7467,\"endMs\":7851},{\"word\":\"and\",\"startMs\":7893,\"endMs\":8064},{\"word\":\"he\",\"startMs\":8192,\"endMs\":8491},{\"word\":\"met\",\"startMs\":8533,\"endMs\":8661},{\"word\":\"it.\",\"startMs\":8704,\"endMs\":9131}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":9.380875,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-2-narration",
+      "attempt": 1,
+      "shot_unit": 2,
+      "text": "A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"A\",\"startMs\":43,\"endMs\":128},{\"word\":\"slatted\",\"startMs\":171,\"endMs\":640},{\"word\":\"white\",\"startMs\":683,\"endMs\":896},{\"word\":\"box\",\"startMs\":939,\"endMs\":1237},{\"word\":\"on\",\"startMs\":1280,\"endMs\":1621},{\"word\":\"the\",\"startMs\":1664,\"endMs\":1963},{\"word\":\"grass\",\"startMs\":2005,\"endMs\":2261},{\"word\":\"held\",\"startMs\":2304,\"endMs\":2731},{\"word\":\"his\",\"startMs\":3029,\"endMs\":3413},{\"word\":\"thermometers.\",\"startMs\":3456,\"endMs\":4267},{\"word\":\"He\",\"startMs\":4309,\"endMs\":4608},{\"word\":\"read\",\"startMs\":5205,\"endMs\":5504},{\"word\":\"them\",\"startMs\":5547,\"endMs\":5760},{\"word\":\"at\",\"startMs\":5803,\"endMs\":5888},{\"word\":\"the\",\"startMs\":5931,\"endMs\":6059},{\"word\":\"same\",\"startMs\":6101,\"endMs\":6187},{\"word\":\"hour,\",\"startMs\":6229,\"endMs\":7040},{\"word\":\"whatever\",\"startMs\":7083,\"endMs\":7637},{\"word\":\"the\",\"startMs\":7680,\"endMs\":7936},{\"word\":\"sea\",\"startMs\":7979,\"endMs\":8107},{\"word\":\"was\",\"startMs\":8149,\"endMs\":8448},{\"word\":\"doing.\",\"startMs\":8491,\"endMs\":9045}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":9.299594,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-3-narration",
+      "attempt": 1,
+      "shot_unit": 3,
+      "text": "A century later his logbook stands closed on an archive shelf. Its columns became a record of the water itself; kept things outlive their reason.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"A\",\"startMs\":43,\"endMs\":128},{\"word\":\"century\",\"startMs\":171,\"endMs\":469},{\"word\":\"later\",\"startMs\":512,\"endMs\":768},{\"word\":\"his\",\"startMs\":811,\"endMs\":1280},{\"word\":\"logbook\",\"startMs\":1323,\"endMs\":1835},{\"word\":\"stands\",\"startMs\":1877,\"endMs\":2261},{\"word\":\"closed\",\"startMs\":2304,\"endMs\":2859},{\"word\":\"on\",\"startMs\":2901,\"endMs\":3371},{\"word\":\"an\",\"startMs\":3413,\"endMs\":3584},{\"word\":\"archive\",\"startMs\":3627,\"endMs\":3968},{\"word\":\"shelf.\",\"startMs\":4011,\"endMs\":4608},{\"word\":\"Its\",\"startMs\":4651,\"endMs\":5803},{\"word\":\"columns\",\"startMs\":5845,\"endMs\":6315},{\"word\":\"became\",\"startMs\":6357,\"endMs\":6656},{\"word\":\"a\",\"startMs\":6699,\"endMs\":6955},{\"word\":\"record\",\"startMs\":6997,\"endMs\":7125},{\"word\":\"of\",\"startMs\":7168,\"endMs\":7552},{\"word\":\"the\",\"startMs\":7595,\"endMs\":7637},{\"word\":\"water\",\"startMs\":7680,\"endMs\":7851},{\"word\":\"itself;\",\"startMs\":7893,\"endMs\":8789},{\"word\":\"kept\",\"startMs\":8832,\"endMs\":9387},{\"word\":\"things\",\"startMs\":9429,\"endMs\":9685},{\"word\":\"outlive\",\"startMs\":9728,\"endMs\":10496},{\"word\":\"their\",\"startMs\":10539,\"endMs\":10923},{\"word\":\"reason.\",\"startMs\":10965,\"endMs\":11520}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":11.773469,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    }
+  ],
+  "speech_receipt": [
+    {
+      "id": 15,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-0-narration",
+      "model": "speech-2.8-hd",
+      "characters": 111,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-23T12:54:01.052Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 16,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-1-narration",
+      "model": "speech-2.8-hd",
+      "characters": 115,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-23T12:55:20.129Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 17,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-2-narration",
+      "model": "speech-2.8-hd",
+      "characters": 114,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-23T12:56:35.800Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 18,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "narration_id": "a1-shot-3-narration",
+      "model": "speech-2.8-hd",
+      "characters": 145,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-23T12:57:47.838Z",
+      "transient_errors": 0
+    }
+  ],
+  "take": [
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-0-take-1",
+      "attempt": 1,
+      "shot_unit": 0,
+      "number": 1,
+      "mode": "image-to-video",
+      "picture_id": "a1-shot-0-single",
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"For forty years a lamp on a headland was lit at dusk.\"\n  \"It turned all night above water nobody else was watching.\"\nIt shows: Lighthouse Lamp.\nIt must show:\n- a lighthouse lamp of glass and brass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nIt opens on its approved picture, which was seen to show:\nFraming: closeUp.\nSetting: interior of a glass-walled room at dusk, overlooking a coastal headland.\nLighting: mixed.\n- brass lantern with lit flame inside a glass globe, at the centre\n- cylindrical metal fuel reservoir/base beneath the lantern, at the centre\n- bay window structure with multiple rectangular glass panes and wooden frames, at the centre\n- dark rocky cliff or landmass, at the left\n- body of water (sea or ocean), at the centre\n- dusk sky with gradient of pale light, at the centre\n- caption text at bottom of image, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 10,
+      "seed": 3733533882,
+      "request_id": "01a0ce54-a133-7bc2-827f-238fb8ac1b1e",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> Cinematic, close-up, Static Shot of the interior of a glass-walled lighthouse room at dusk. In the center, a vintage brass lantern with a lit flame inside a glass globe glows, casting a warm golden light. The lantern is mounted on a cylindrical metal fuel reservoir. The background features a bay window with multiple rectangular glass panes and wooden frames, looking out over a dark rocky cliff on the left and the calm sea in the center under a pale gradient dusk sky. At the bottom center of the frame, clean white English text reads: \"For forty years a lamp on a headland was lit at dusk. It turned all night above water nobody else was watching,\". [Shot 1] The video is a single continuous shot. The camera pushes in with small amplitude at slow speed toward the brass lantern. The flame inside the glass globe flickers slightly, sending dancing highlights and warm reflections across the polished brass surfaces and the surrounding window panes. Outside, the light in the dusk sky gradually deepens into a rich blue, while the waves gently lap against the dark rocks below. The text at the bottom remains perfectly still and legible throughout the duration. An off-screen voiceover with a calm, mature male tone delivers the lines: <d>[English] For forty years a lamp on a headland was lit at dusk. It turned all night above water nobody else was watching.</d>\n\noverall_soundscape: The low, rhythmic sound of wind whistling softly through the window frames is accompanied by the distant, muffled crashing of waves against the rocky cliffside below. A faint, steady crackle of the lantern flame is audible in the quiet interior.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":10.144,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":243},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-19.9}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-1-take-1",
+      "attempt": 1,
+      "shot_unit": 1,
+      "number": 1,
+      "mode": "image-to-video",
+      "picture_id": "a1-shot-1-single",
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"Before he slept, the keeper wrote the hour and the weather down.\"\n  \"The log was a condition of the job, and he met it.\"\nIt shows: Open Logbook.\nIt must show:\n- an open handwritten logbook on a desk\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: indoor room, likely a study, office, or quiet domestic space with a wooden table near a window.\nLighting: dim.\n- open notebook with handwritten entries, at the centre\n- black pen with silver clip, at the centre\n- wooden table surface with visible grain and wear, at the centre\n- wooden chair with vertical slat back, at the right\n- wooden window frame with glass pane, at the left\n- hanging pull cord or string, at the left\n- dark hanging garment or curtain, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 10,
+      "seed": 304296996,
+      "request_id": "01a0ce55-daee-77f2-a2cc-dd881fe82226",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Cinematic, live-action, medium shot. The scene opens on <Picture 1>, revealing an open handwritten logbook resting on a worn wooden table with visible grain and signs of age. The notebook is filled with neat cursive ink entries, and a black pen with a silver clip lies horizontally on the right side of the pages. To the left, a wooden window frame with a glass pane is visible, with a hanging pull cord nearby. To the right, a wooden chair with a vertical slat back sits against a dark, heavy garment that hangs in the background. The lighting is dim and natural, coming from the side window. The camera performs a very slow, steady push-in with small amplitude toward the logbook. As the camera progresses, an off-screen voiceover delivers the lines: <d>[English]Before he slept, the keeper wrote the hour and the weather down.</d> followed shortly after by: <d>[English]The log was a condition of the job, and he met it.</d> The on-screen action remains static, focusing entirely on the texture of the paper, the ink, and the quiet atmosphere of the room.\n\noverall_soundscape: The atmosphere is heavy with silence, punctuated only by the faint, rhythmic whistle of wind passing through the window pane and the occasional, soft creak of the wooden furniture settling in the quiet room. No other physical sounds are present.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":10.144,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":243},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-16.7}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-2-take-1",
+      "attempt": 1,
+      "shot_unit": 2,
+      "number": 1,
+      "mode": "image-to-video",
+      "picture_id": "a1-shot-2-single",
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"A slatted white box on the grass held his thermometers.\"\n  \"He read them at the same hour, whatever the sea was doing.\"\nIt shows: Thermometer Box.\nIt must show:\n- a white slatted wooden instrument box standing on grass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: an open grassy field under a pale overcast sky, likely coastal.\nLighting: mixed.\n- white slatted wooden box on a post, at the centre\n- wooden support post, at the centre\n- grass and low vegetation, at the centre\n- distant horizon line, at the centre\n- overcast sky, at the centre\n- overlaid serif text block, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 10,
+      "seed": 2628531143,
+      "request_id": "01a0ce56-ff2e-72f1-addc-1920e7103185",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Cinematic, live-action, medium shot. The scene opens on <Picture 1>, featuring a white slatted wooden instrument box mounted on a sturdy wooden post in the center of a grassy coastal field. The background reveals a pale, overcast sky and a distant, blurred horizon line where the sea meets the air. The lighting is soft and natural, characteristic of a cloudy day. In the center of the frame, a clean, legible serif text block reads: \"A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.\" The camera performs a very slow, steady push-in with small amplitude, gradually focusing on the texture of the weathered white paint and the precise horizontal slats of the box. The surrounding grass and low-lying vegetation sway almost imperceptibly in the breeze. The composition remains static and centered, emphasizing the quiet and precise atmosphere of the setting throughout the 10-second duration. An off-screen voice with a calm, steady, and mature male tone delivers the lines: <d>[English] A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.</d> The on-screen box remains perfectly still during the narration.\n\noverall_soundscape: The soft, rhythmic whistling of a coastal breeze blowing through the dry grass. In the distance, the low, muffled rumble of waves breaking against a far shore provides a constant, ambient backdrop.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":10.144,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":243},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-17.9}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-1",
+      "attempt": 1,
+      "shot_unit": 3,
+      "number": 1,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"A century later his logbook stands closed on an archive shelf.\"\n  \"Its columns became a record of the water itself; kept things outlive their reason.\"\nIt shows: Archived Logbook.\nIt must show:\n- a closed handwritten logbook on a shelf in a daylit archive\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 12,
+      "seed": 1342583641,
+      "request_id": "01a0ce58-0ce0-7c03-9d3a-772875b4088b",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, live-action shot in a 9:16 vertical aspect ratio. The scene is a quiet, sunlit archive, focusing on a closed, weathered handwritten logbook resting on on a dark wood shelf. The logbook is bound in aged, cracked brown leather with visible wear on the spine, its paper edges yellowed and slightly frayed with time. Soft, natural daylight streams in from an unseen window, illuminating dancing dust motes in the air and highlighting the texture of the paper and wood. The camera performs a slow, precise Push In with small amplitude at slow speed toward the spine of the logbook. As the camera moves closer, the background of other blurred archive boxes and ancient books softly fades away, creating a shallow depth of field. The off-screen voiceover delivers the narration with a calm, contemplative tone as the camera lingers: <d>[English]A century later his logbook stands closed on an archive shelf.</d> <d>[English]Its columns became a record of the water itself; kept things outlive their reason.</d>\n\noverall_soundscape: The ambient silence of a large library is punctuated by the faint, rhythmic creak of the wooden shelf settling. A soft, distant whisper of wind passes through the building, barely breaking the quiet, emphasizing the stillness of the archive space.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":12.256,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":294},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-13.5}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"fail\",\"reasons\":[\"must show \\\"show-archive\\\" is not shown: a closed handwritten logbook on a shelf in a daylit archive\"],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "fail",
+      "degradation": null
+    },
+    {
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-2",
+      "attempt": 1,
+      "shot_unit": 3,
+      "number": 2,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"A century later his logbook stands closed on an archive shelf.\"\n  \"Its columns became a record of the water itself; kept things outlive their reason.\"\nIt shows: Archived Logbook.\nIt must show:\n- a closed handwritten logbook on a shelf in a daylit archive\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\n\nThe takes before this one failed their checks. What failed, take by take:\nTake 1:\nGate 5:\n- must show \"show-archive\" is not shown: a closed handwritten logbook on a shelf in a daylit archive\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 12,
+      "seed": 3373228771,
+      "request_id": "01a0ce59-12c7-7752-bdac-f7a9c1f824d7",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, live-action shot in a 9:16 vertical aspect ratio. The scene is a quiet, sunlit archive with a minimalist atmosphere. In the center of the frame, a weathered handwritten logbook sits closed on a dark oak wooden shelf. The logbook's cover is made of cracked, aged-brown leather, with edges slightly frayed and yellowed with time. Soft, natural daylight streams in from a side window, illuminating floating dust motes dancing in the air and casting a gentle shadow across the shelf. The camera performs a very slow, precise Push In with small amplitude at slow speed toward the spine of the logbook. As the camera moves closer, the texture of the leather and the fine grain of the wood shelf become sharp and detailed. No people or digital screens are visible. A mature male voice (S1) says in an off-screen voiceover with a calm, deep, resonant tone: <d>[English]A century later his logbook stands closed on an archive shelf.</d> <d>[English]Its columns became a record of the water itself; kept things outlive their reason.</d>\n\noverall_soundscape: The atmosphere is filled with the faint, heavy silence of a large room. A distant, soft creak of the old building settling is heard, accompanied by the nearly imperceptible whisper of wind passing through a window crack.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":12.256,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":294},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-13.9}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"fail\",\"reasons\":[\"must show \\\"show-archive\\\" is not shown: a closed handwritten logbook on a shelf in a daylit archive\"],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "fail",
+      "degradation": null
+    }
+  ],
+  "video_receipt": [
+    {
+      "id": 16,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-0-take-1",
+      "model": "fal-ai/minimax-h3-turbo/image-to-video",
+      "mode": "image-to-video",
+      "resolution": "768P",
+      "requested_seconds": 10,
+      "aspect_ratio": null,
+      "seed": 3733533882,
+      "request_id": "01a0ce54-a133-7bc2-827f-238fb8ac1b1e",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"For forty years a lamp on a headland was lit at dusk.\"\n  \"It turned all night above water nobody else was watching.\"\nIt shows: Lighthouse Lamp.\nIt must show:\n- a lighthouse lamp of glass and brass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nIt opens on its approved picture, which was seen to show:\nFraming: closeUp.\nSetting: interior of a glass-walled room at dusk, overlooking a coastal headland.\nLighting: mixed.\n- brass lantern with lit flame inside a glass globe, at the centre\n- cylindrical metal fuel reservoir/base beneath the lantern, at the centre\n- bay window structure with multiple rectangular glass panes and wooden frames, at the centre\n- dark rocky cliff or landmass, at the left\n- body of water (sea or ocean), at the centre\n- dusk sky with gradient of pale light, at the centre\n- caption text at bottom of image, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> Cinematic, close-up, Static Shot of the interior of a glass-walled lighthouse room at dusk. In the center, a vintage brass lantern with a lit flame inside a glass globe glows, casting a warm golden light. The lantern is mounted on a cylindrical metal fuel reservoir. The background features a bay window with multiple rectangular glass panes and wooden frames, looking out over a dark rocky cliff on the left and the calm sea in the center under a pale gradient dusk sky. At the bottom center of the frame, clean white English text reads: \"For forty years a lamp on a headland was lit at dusk. It turned all night above water nobody else was watching,\". [Shot 1] The video is a single continuous shot. The camera pushes in with small amplitude at slow speed toward the brass lantern. The flame inside the glass globe flickers slightly, sending dancing highlights and warm reflections across the polished brass surfaces and the surrounding window panes. Outside, the light in the dusk sky gradually deepens into a rich blue, while the waves gently lap against the dark rocks below. The text at the bottom remains perfectly still and legible throughout the duration. An off-screen voiceover with a calm, mature male tone delivers the lines: <d>[English] For forty years a lamp on a headland was lit at dusk. It turned all night above water nobody else was watching.</d>\n\noverall_soundscape: The low, rhythmic sound of wind whistling softly through the window frames is accompanied by the distant, muffled crashing of waves against the rocky cliffside below. A faint, steady crackle of the lantern flame is audible in the quiet interior.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 4,
+      "cost_cents": 40,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:54:28.282Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 17,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-1-take-1",
+      "model": "fal-ai/minimax-h3-turbo/image-to-video",
+      "mode": "image-to-video",
+      "resolution": "768P",
+      "requested_seconds": 10,
+      "aspect_ratio": null,
+      "seed": 304296996,
+      "request_id": "01a0ce55-daee-77f2-a2cc-dd881fe82226",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"Before he slept, the keeper wrote the hour and the weather down.\"\n  \"The log was a condition of the job, and he met it.\"\nIt shows: Open Logbook.\nIt must show:\n- an open handwritten logbook on a desk\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: indoor room, likely a study, office, or quiet domestic space with a wooden table near a window.\nLighting: dim.\n- open notebook with handwritten entries, at the centre\n- black pen with silver clip, at the centre\n- wooden table surface with visible grain and wear, at the centre\n- wooden chair with vertical slat back, at the right\n- wooden window frame with glass pane, at the left\n- hanging pull cord or string, at the left\n- dark hanging garment or curtain, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Cinematic, live-action, medium shot. The scene opens on <Picture 1>, revealing an open handwritten logbook resting on a worn wooden table with visible grain and signs of age. The notebook is filled with neat cursive ink entries, and a black pen with a silver clip lies horizontally on the right side of the pages. To the left, a wooden window frame with a glass pane is visible, with a hanging pull cord nearby. To the right, a wooden chair with a vertical slat back sits against a dark, heavy garment that hangs in the background. The lighting is dim and natural, coming from the side window. The camera performs a very slow, steady push-in with small amplitude toward the logbook. As the camera progresses, an off-screen voiceover delivers the lines: <d>[English]Before he slept, the keeper wrote the hour and the weather down.</d> followed shortly after by: <d>[English]The log was a condition of the job, and he met it.</d> The on-screen action remains static, focusing entirely on the texture of the paper, the ink, and the quiet atmosphere of the room.\n\noverall_soundscape: The atmosphere is heavy with silence, punctuated only by the faint, rhythmic whistle of wind passing through the window pane and the occasional, soft creak of the wooden furniture settling in the quiet room. No other physical sounds are present.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 4,
+      "cost_cents": 40,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:55:46.163Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 18,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-2-take-1",
+      "model": "fal-ai/minimax-h3-turbo/image-to-video",
+      "mode": "image-to-video",
+      "resolution": "768P",
+      "requested_seconds": 10,
+      "aspect_ratio": null,
+      "seed": 2628531143,
+      "request_id": "01a0ce56-ff2e-72f1-addc-1920e7103185",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"A slatted white box on the grass held his thermometers.\"\n  \"He read them at the same hour, whatever the sea was doing.\"\nIt shows: Thermometer Box.\nIt must show:\n- a white slatted wooden instrument box standing on grass\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: an open grassy field under a pale overcast sky, likely coastal.\nLighting: mixed.\n- white slatted wooden box on a post, at the centre\n- wooden support post, at the centre\n- grass and low vegetation, at the centre\n- distant horizon line, at the centre\n- overcast sky, at the centre\n- overlaid serif text block, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Cinematic, live-action, medium shot. The scene opens on <Picture 1>, featuring a white slatted wooden instrument box mounted on a sturdy wooden post in the center of a grassy coastal field. The background reveals a pale, overcast sky and a distant, blurred horizon line where the sea meets the air. The lighting is soft and natural, characteristic of a cloudy day. In the center of the frame, a clean, legible serif text block reads: \"A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.\" The camera performs a very slow, steady push-in with small amplitude, gradually focusing on the texture of the weathered white paint and the precise horizontal slats of the box. The surrounding grass and low-lying vegetation sway almost imperceptibly in the breeze. The composition remains static and centered, emphasizing the quiet and precise atmosphere of the setting throughout the 10-second duration. An off-screen voice with a calm, steady, and mature male tone delivers the lines: <d>[English] A slatted white box on the grass held his thermometers. He read them at the same hour, whatever the sea was doing.</d> The on-screen box remains perfectly still during the narration.\n\noverall_soundscape: The soft, rhythmic whistling of a coastal breeze blowing through the dry grass. In the distance, the low, muffled rumble of waves breaking against a far shore provides a constant, ambient backdrop.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 4,
+      "cost_cents": 40,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:57:03.113Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 19,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-1",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 12,
+      "aspect_ratio": "9:16",
+      "seed": 1342583641,
+      "request_id": "01a0ce58-0ce0-7c03-9d3a-772875b4088b",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"A century later his logbook stands closed on an archive shelf.\"\n  \"Its columns became a record of the water itself; kept things outlive their reason.\"\nIt shows: Archived Logbook.\nIt must show:\n- a closed handwritten logbook on a shelf in a daylit archive\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, live-action shot in a 9:16 vertical aspect ratio. The scene is a quiet, sunlit archive, focusing on a closed, weathered handwritten logbook resting on on a dark wood shelf. The logbook is bound in aged, cracked brown leather with visible wear on the spine, its paper edges yellowed and slightly frayed with time. Soft, natural daylight streams in from an unseen window, illuminating dancing dust motes in the air and highlighting the texture of the paper and wood. The camera performs a slow, precise Push In with small amplitude at slow speed toward the spine of the logbook. As the camera moves closer, the background of other blurred archive boxes and ancient books softly fades away, creating a shallow depth of field. The off-screen voiceover delivers the narration with a calm, contemplative tone as the camera lingers: <d>[English]A century later his logbook stands closed on an archive shelf.</d> <d>[English]Its columns became a record of the water itself; kept things outlive their reason.</d>\n\noverall_soundscape: The ambient silence of a large library is punctuated by the faint, rhythmic creak of the wooden shelf settling. A soft, distant whisper of wind passes through the building, barely breaking the quiet, emphasizing the stillness of the archive space.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 4,
+      "cost_cents": 48,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:58:11.686Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 20,
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-2",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 12,
+      "aspect_ratio": "9:16",
+      "seed": 3373228771,
+      "request_id": "01a0ce59-12c7-7752-bdac-f7a9c1f824d7",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: quiet, precise, natural light\nWhat is said over the shot:\n  \"A century later his logbook stands closed on an archive shelf.\"\n  \"Its columns became a record of the water itself; kept things outlive their reason.\"\nIt shows: Archived Logbook.\nIt must show:\n- a closed handwritten logbook on a shelf in a daylit archive\nIt must never show:\n- a recognisable real-world public figure\n- a computer screen\n\nThe takes before this one failed their checks. What failed, take by take:\nTake 1:\nGate 5:\n- must show \"show-archive\" is not shown: a closed handwritten logbook on a shelf in a daylit archive\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, live-action shot in a 9:16 vertical aspect ratio. The scene is a quiet, sunlit archive with a minimalist atmosphere. In the center of the frame, a weathered handwritten logbook sits closed on a dark oak wooden shelf. The logbook's cover is made of cracked, aged-brown leather, with edges slightly frayed and yellowed with time. Soft, natural daylight streams in from a side window, illuminating floating dust motes dancing in the air and casting a gentle shadow across the shelf. The camera performs a very slow, precise Push In with small amplitude at slow speed toward the spine of the logbook. As the camera moves closer, the texture of the leather and the fine grain of the wood shelf become sharp and detailed. No people or digital screens are visible. A mature male voice (S1) says in an off-screen voiceover with a calm, deep, resonant tone: <d>[English]A century later his logbook stands closed on an archive shelf.</d> <d>[English]Its columns became a record of the water itself; kept things outlive their reason.</d>\n\noverall_soundscape: The atmosphere is filled with the faint, heavy silence of a large room. A distant, soft creak of the old building settling is heard, accompanied by the nearly imperceptible whisper of wind passing through a window crack.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-1",
+      "style_version": 2,
+      "rate_cents": 4,
+      "cost_cents": 48,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-23T12:59:18.299Z",
+      "transient_errors": 0
+    }
+  ],
+  "take_observation": [
+    {
+      "id": "obs-a1-shot-0-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-0-take-1",
+      "observation": "{\"entities\":[{\"label\":\"lit lamp with metal cage and glass globe\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"multi-paned window structure\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"rocky headland\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"body of water\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"twilight sky with stars\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"closeUp\",\"setting\":\"An elevated, glass-enclosed space, indicated by surrounding window panes, looks out over a darkening seascape. The solitary placement of the central light source against the expansive, unpopulated exterior landscape establishes a narrative of an isolated, continuous function.\",\"lighting\":\"mixed\",\"readableTextPresent\":true,\"ambiguities\":[\"The specific architectural details of the surrounding structure are obscured by the dim lighting and tight framing. Subtitles at the bottom read: 'For forty years a lamp on a headland was lit at dusk. It turned all night above water nobody else was watching.'\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"zooms in continuously\",\"completes\":true},{\"entity\":\"lamp\",\"verb\":\"remains lit with a steady flame\",\"completes\":false}],\"eventOrder\":[\"Camera initiates a slow forward zoom on the central lamp.\",\"The base of the lamp exits the bottom of the frame as the zoom continues, focusing closer on the flame.\"]}"
+    },
+    {
+      "id": "obs-a1-shot-1-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-1-take-1",
+      "observation": "{\"entities\":[{\"label\":\"open notebook\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"pen\",\"count\":1,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"wooden table\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"window\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"wooden chair\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"hanging dark garment\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"closeUp\",\"setting\":\"Indoors, a dimly lit room featuring a textured wooden table, a window on the left, a chair on the right, and a dark garment hanging in the background.\",\"lighting\":\"mixed\",\"readableTextPresent\":true,\"ambiguities\":[\"The dense cursive handwriting on the left page of the notebook is only partially legible.\",\"The exact times and final word on the right page of the notebook become slightly blurred as the camera zooms in.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"zooms in\",\"completes\":true}],\"eventOrder\":[\"The camera continuously zooms in on the open notebook and pen resting on the table.\"]}"
+    },
+    {
+      "id": "obs-a1-shot-2-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-2-take-1",
+      "observation": "{\"entities\":[{\"label\":\"slatted white box on a post\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"A grassy field with a blurred, flat horizon and a pale sky.\",\"lighting\":\"dim\",\"readableTextPresent\":true,\"ambiguities\":[\"The exact purpose of the white box is not visually apparent from its structure alone.\",\"The exact nature of the distant background is obscured by the shallow depth of field.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"zooms in\",\"completes\":true},{\"entity\":\"slatted white box\",\"verb\":\"is stationary\",\"completes\":true}],\"eventOrder\":[\"overlaid text is visible\",\"camera slowly zooms in on the white box\",\"white box remains stationary\"]}"
+    },
+    {
+      "id": "obs-a1-shot-3-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-1",
+      "observation": "{\"entities\":[{\"label\":\"large book\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"books on lower shelf\",\"count\":6,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"wooden desk\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"archive boxes on shelves\",\"count\":3,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"window\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"radiator\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"dust motes\",\"count\":10,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"closeUp\",\"setting\":\"An indoor room, possibly an old library, study, or archive, featuring a wooden desk, shelves, and a window.\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"The text on the book spine and the box label is illegible\",\"The exact nature of the room (library vs. study) is unclear\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"pushes in\",\"completes\":true},{\"entity\":\"dust motes\",\"verb\":\"float\",\"completes\":false}],\"eventOrder\":[\"Camera slowly pushes in towards the large book\",\"Dust motes float in the air illuminated by the sunlight\"]}"
+    },
+    {
+      "id": "obs-a1-shot-3-take-2",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-2",
+      "observation": "{\"entities\":[{\"label\":\"thick book with a brown cover and a strap\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"bookshelf filled with books\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"window with a white frame\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"Indoor room featuring a wooden surface, a bookshelf, and a window looking out onto a building.\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"Faint markings on the main book's cover are not clearly readable.\",\"Small dust particles are visible floating in the light.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"moves forward\",\"completes\":true},{\"entity\":\"dust particles\",\"verb\":\"float\",\"completes\":true}],\"eventOrder\":[\"The camera begins a slow forward movement towards a stationary book resting on a wooden surface.\",\"The camera continues its forward motion, bringing the book into a closer view as light streams through the adjacent window.\"]}"
+    }
+  ],
+  "take_reconciliation": [
+    {
+      "id": "rec-a1-shot-0-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-0-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"lamp\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-lamp\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-1-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-1-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"log\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-log\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-2-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-2-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"box\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-box\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-3-take-1",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"archive\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-archive\",\"shown\":false,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"must show \\\"show-archive\\\" is not shown: a closed handwritten logbook on a shelf in a daylit archive\"]"
+    },
+    {
+      "id": "rec-a1-shot-3-take-2",
+      "run_id": "a08a9c9c-9d10-41bd-9f81-215edfef871f",
+      "take_id": "a1-shot-3-take-2",
+      "answer": "{\"subjects\":[{\"id\":\"archive\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-archive\",\"shown\":false,\"entity\":null},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-modern\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"must show \\\"show-archive\\\" is not shown: a closed handwritten logbook on a shelf in a daylit archive\"]"
+    }
+  ],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

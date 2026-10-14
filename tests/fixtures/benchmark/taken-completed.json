@@ -1,0 +1,1416 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "a watchable reel, with two degraded shots",
+  "run": {
+    "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+    "request_id": "real-reel-20260926T111044",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260926T111044\",\"worldId\":\"cutroom-game-graphics\",\"narration\":[{\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\",\"claimIds\":[\"c1\"]},{\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\",\"claimIds\":[\"c1\"]},{\"text\":\"Then games moved into three dimensions, built from polygons.\",\"claimIds\":[\"c2\"]},{\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\",\"claimIds\":[\"c3\"]},{\"text\":\"It lit and moved every triangle itself, freeing the main processor.\",\"claimIds\":[\"c3\"]},{\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\",\"claimIds\":[]},{\"text\":\"It follows each beam of light as it bounces through a scene.\",\"claimIds\":[\"c4\"]},{\"text\":\"Deep learning now fills in detail, so games look almost like film.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"an unbranded screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-game-graphics\",\"version\":1,\"text\":\"clean documentary footage, soft natural light, steady camera\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-tv\",\"text\":\"an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-screen\",\"text\":\"an unbranded screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\"},{\"claimIds\":[\"c1\"],\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"},{\"claimIds\":[\"c2\"],\"text\":\"Then games moved into three dimensions, built from polygons.\"},{\"claimIds\":[\"c3\"],\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"},{\"claimIds\":[\"c3\"],\"text\":\"It lit and moved every triangle itself, freeing the main processor.\"},{\"claimIds\":[],\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\"},{\"claimIds\":[\"c4\"],\"text\":\"It follows each beam of light as it bounces through a scene.\"},{\"claimIds\":[\"c4\"],\"text\":\"Deep learning now fills in detail, so games look almost like film.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260926T111044\",\"style\":{\"id\":\"style-game-graphics\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-game-graphics\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"requestId\":\"real-reel-20260926T111044\",\"costCents\":58,\"status\":\"completed\",\"until\":\"video\",\"estimateCents\":48,\"stills\":[{\"pictureId\":\"a1-shot-2-repair\",\"shotId\":\"shot-2\",\"path\":\"<artifact>\"}],\"video\":{\"path\":\"<artifact>\"},\"degradations\":[{\"shotId\":\"shot-0\",\"reason\":\"a1-shot-0-repair failed Gate 1 at reconcile: must never show \\\"never-text\\\" is shown: written words or labels; must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime; it was the shot's repair (S-043)\"},{\"shotId\":\"shot-1\",\"reason\":\"a1-shot-1-single failed Gate 1 at reconcile: subject \\\"show-screen\\\" (Low-polygon 3D screen) is clipped by the edge of the frame; must never show \\\"never-text\\\" is shown: written words or labels; no reserve slot is free (S-043)\"}]}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-26T11:10:44.998Z"
+  },
+  "job": [
+    {
+      "id": 120,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-26T11:10:44.998Z",
+      "locked_at": "2026-09-26T11:10:45.489Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "cost_cents": 0
+    },
+    {
+      "id": 121,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-26T11:12:19.231Z",
+      "locked_at": "2026-09-26T11:12:19.237Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 120,
+      "correlation_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "cost_cents": 30
+    },
+    {
+      "id": 122,
+      "kind": "reel.clips",
+      "payload": "{\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-26T11:16:48.677Z",
+      "locked_at": "2026-09-26T11:16:48.687Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 121,
+      "correlation_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "cost_cents": 28
+    },
+    {
+      "id": 123,
+      "kind": "reel.assemble",
+      "payload": "{\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-26T11:23:19.991Z",
+      "locked_at": "2026-09-26T11:23:19.994Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 122,
+      "correlation_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "cost_cents": 0
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 1,
+      "at": "2026-09-26T11:10:44.998Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":1,\"at\":\"2026-09-26T11:10:44.998Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 2,
+      "at": "2026-09-26T11:10:45.491Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":2,\"at\":\"2026-09-26T11:10:45.491Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 3,
+      "at": "2026-09-26T11:12:19.231Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":3,\"at\":\"2026-09-26T11:12:19.231Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 4,
+      "at": "2026-09-26T11:12:19.231Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":4,\"at\":\"2026-09-26T11:12:19.231Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 5,
+      "at": "2026-09-26T11:12:19.231Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":5,\"at\":\"2026-09-26T11:12:19.231Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 6,
+      "at": "2026-09-26T11:12:19.240Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":6,\"at\":\"2026-09-26T11:12:19.240Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 7,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":7,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 8,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":8,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 9,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":9,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 10,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":10,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 11,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":11,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 12,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":12,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"degraded\",\"shotId\":\"shot-0\",\"reason\":\"a1-shot-0-repair failed Gate 1 at reconcile: must never show \\\"never-text\\\" is shown: written words or labels; must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime; it was the shot's repair (S-043)\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 13,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":13,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 14,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":14,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"degraded\",\"shotId\":\"shot-1\",\"reason\":\"a1-shot-1-single failed Gate 1 at reconcile: subject \\\"show-screen\\\" (Low-polygon 3D screen) is clipped by the edge of the frame; must never show \\\"never-text\\\" is shown: written words or labels; no reserve slot is free (S-043)\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 15,
+      "at": "2026-09-26T11:16:48.677Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":15,\"at\":\"2026-09-26T11:16:48.677Z\",\"type\":\"stage.finished\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 16,
+      "at": "2026-09-26T11:16:48.689Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":16,\"at\":\"2026-09-26T11:16:48.689Z\",\"type\":\"stage.started\",\"stage\":\"video\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 17,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":17,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 18,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":18,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 19,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":19,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 20,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":20,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 21,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":21,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 22,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":22,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 23,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":23,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 24,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":24,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 25,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":25,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 26,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":26,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 27,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":27,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 28,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":28,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 29,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":29,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 30,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":30,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 31,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":31,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 32,
+      "at": "2026-09-26T11:23:19.991Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":32,\"at\":\"2026-09-26T11:23:19.991Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 33,
+      "at": "2026-09-26T11:23:46.901Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":33,\"at\":\"2026-09-26T11:23:46.901Z\",\"type\":\"verdict\",\"gate\":\"7\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 34,
+      "at": "2026-09-26T11:23:46.901Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":34,\"at\":\"2026-09-26T11:23:46.901Z\",\"type\":\"stage.finished\",\"stage\":\"video\"}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "seq": 35,
+      "at": "2026-09-26T11:23:46.901Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"seq\":35,\"at\":\"2026-09-26T11:23:46.901Z\",\"type\":\"run.finished\",\"status\":\"completed\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":8,\"subjectIds\":[\"show-tv\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"show-card\",\"show-screen\"]},{\"unit\":2,\"durationSeconds\":9,\"subjectIds\":[\"show-monitor\"]},{\"unit\":3,\"durationSeconds\":8,\"subjectIds\":[\"show-monitor\"]}],\"subjects\":[{\"id\":\"show-tv\",\"name\":\"Old TV showing blocky pixel game graphics\"},{\"id\":\"show-screen\",\"name\":\"Low-polygon 3D screen\"},{\"id\":\"show-card\",\"name\":\"Graphics card\"},{\"id\":\"show-monitor\",\"name\":\"Modern monitor showing lifelike forest lake\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"an unbranded screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.5,
+      "estimate_cents": 48,
+      "selected": 1
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4],[5],[6],[7]],\"shots\":[{\"unit\":0,\"durationSeconds\":7,\"subjectIds\":[\"show-tv\"]},{\"unit\":1,\"durationSeconds\":7,\"subjectIds\":[\"show-screen\",\"show-card\"]},{\"unit\":2,\"durationSeconds\":7,\"subjectIds\":[\"show-screen\",\"show-card\"]},{\"unit\":3,\"durationSeconds\":7,\"subjectIds\":[\"show-monitor\",\"show-card\"]},{\"unit\":4,\"durationSeconds\":7,\"subjectIds\":[\"show-monitor\"]},{\"unit\":5,\"durationSeconds\":7,\"subjectIds\":[\"show-monitor\",\"show-card\"]}],\"subjects\":[{\"id\":\"show-tv\",\"name\":\"Old TV showing blocky pixel game\"},{\"id\":\"show-screen\",\"name\":\"Screen showing low-polygon 3D graphics\"},{\"id\":\"show-card\",\"name\":\"Graphics card\"},{\"id\":\"show-monitor\",\"name\":\"Modern monitor showing lifelike rendered forest lake\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"an unbranded screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":51,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 2.6666666666666665,
+      "estimate_cents": 51,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 734,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 702,
+      "output_tokens": 2281,
+      "fake": 0,
+      "at": "2026-09-26T11:11:12.709Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 735,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 721,
+      "output_tokens": 2193,
+      "fake": 0,
+      "at": "2026-09-26T11:11:39.183Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 736,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 612,
+      "output_tokens": 658,
+      "fake": 0,
+      "at": "2026-09-26T11:11:41.993Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 737,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 663,
+      "output_tokens": 5281,
+      "fake": 0,
+      "at": "2026-09-26T11:12:19.229Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 738,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 306,
+      "fake": 0,
+      "at": "2026-09-26T11:12:50.364Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-2-a\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 739,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 1018,
+      "fake": 0,
+      "at": "2026-09-26T11:12:56.854Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-a\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 740,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1099,
+      "output_tokens": 919,
+      "fake": 0,
+      "at": "2026-09-26T11:13:03.494Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-2-a\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 741,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 124,
+      "fake": 0,
+      "at": "2026-09-26T11:13:29.900Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-2-b\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 742,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 1089,
+      "fake": 0,
+      "at": "2026-09-26T11:13:38.958Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-b\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 743,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1118,
+      "output_tokens": 821,
+      "fake": 0,
+      "at": "2026-09-26T11:13:42.000Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-2-b\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 744,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 156,
+      "fake": 0,
+      "at": "2026-09-26T11:14:12.403Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 745,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 1148,
+      "fake": 0,
+      "at": "2026-09-26T11:14:26.959Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 746,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1149,
+      "output_tokens": 532,
+      "fake": 0,
+      "at": "2026-09-26T11:14:30.935Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 747,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 408,
+      "fake": 0,
+      "at": "2026-09-26T11:14:59.141Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 748,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2474,
+      "output_tokens": 1538,
+      "fake": 0,
+      "at": "2026-09-26T11:15:08.956Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 749,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1299,
+      "output_tokens": 1073,
+      "fake": 0,
+      "at": "2026-09-26T11:15:12.588Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 750,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2061,
+      "output_tokens": 805,
+      "fake": 0,
+      "at": "2026-09-26T11:15:36.700Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-0-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 751,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 1603,
+      "fake": 0,
+      "at": "2026-09-26T11:15:54.927Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-0-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 752,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1367,
+      "output_tokens": 2022,
+      "fake": 0,
+      "at": "2026-09-26T11:16:04.427Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-0-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 753,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 274,
+      "fake": 0,
+      "at": "2026-09-26T11:16:33.168Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 754,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 1049,
+      "fake": 0,
+      "at": "2026-09-26T11:16:41.968Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 755,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1218,
+      "output_tokens": 1079,
+      "fake": 0,
+      "at": "2026-09-26T11:16:48.673Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 756,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5721,
+      "output_tokens": 2970,
+      "fake": 0,
+      "at": "2026-09-26T11:18:13.678Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-0-take-1\"]"
+    },
+    {
+      "id": 757,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1256,
+      "output_tokens": 581,
+      "fake": 0,
+      "at": "2026-09-26T11:18:16.452Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-0-take-1\"]"
+    },
+    {
+      "id": 758,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 6067,
+      "output_tokens": 3499,
+      "fake": 0,
+      "at": "2026-09-26T11:19:46.456Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-1-take-1\"]"
+    },
+    {
+      "id": 759,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1130,
+      "output_tokens": 445,
+      "fake": 0,
+      "at": "2026-09-26T11:19:49.834Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-1-take-1\"]"
+    },
+    {
+      "id": 760,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5721,
+      "output_tokens": 5155,
+      "fake": 0,
+      "at": "2026-09-26T11:21:37.835Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-2-take-1\"]"
+    },
+    {
+      "id": 761,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1598,
+      "output_tokens": 384,
+      "fake": 0,
+      "at": "2026-09-26T11:21:39.570Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-2-take-1\"]"
+    },
+    {
+      "id": 762,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5029,
+      "output_tokens": 4973,
+      "fake": 0,
+      "at": "2026-09-26T11:23:15.901Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-1\"]"
+    },
+    {
+      "id": 763,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1117,
+      "output_tokens": 1363,
+      "fake": 0,
+      "at": "2026-09-26T11:23:19.989Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-1\"]"
+    },
+    {
+      "id": 764,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "role": "judge",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 17109,
+      "output_tokens": 523,
+      "fake": 0,
+      "at": "2026-09-26T11:23:46.895Z",
+      "call": "judgeCut",
+      "picture_ids": "[\"a1-render-frame-0\",\"a1-render-frame-1\",\"a1-render-frame-2\",\"a1-render-frame-3\",\"a1-render-frame-4\",\"a1-render-frame-5\",\"a1-render-frame-6\",\"a1-render-frame-7\",\"a1-render-frame-8\",\"a1-render-frame-9\",\"a1-render-frame-10\",\"a1-render-frame-11\"]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-a",
+      "seq": 1,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "show-monitor",
+      "role": "canonical",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Modern monitor showing lifelike forest lake.\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "framing": "medium",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.6849471333333332,\"brightness\":0.5336621004566211}",
+      "words": "[\"RADEON\"]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"must never show \\\"never-text\\\" is shown: written words or labels\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-b",
+      "seq": 2,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "show-monitor",
+      "role": "canonical",
+      "label": "b",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: wide.\nIt shows: Modern monitor showing lifelike forest lake.\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "framing": "wide",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7986606333333334,\"brightness\":0.5215342465753425}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"subject \\\"show-monitor\\\" (Modern monitor showing lifelike forest lake) is clipped by the edge of the frame\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-repair",
+      "seq": 3,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "show-monitor",
+      "role": "canonical",
+      "label": "repair",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Modern monitor showing lifelike forest lake.\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\n\nEach of the 2 tries before this one failed its checks. Correct what failed:\nTry 1:\n- must never show \"never-text\" is shown: written words or labels\nTry 2:\n- subject \"show-monitor\" (Modern monitor showing lifelike forest lake) is clipped by the edge of the frame",
+      "framing": "medium",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.8184413666666667,\"brightness\":0.578324200913242}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-single",
+      "seq": 4,
+      "attempt": 1,
+      "shot_unit": 0,
+      "subject_id": "show-tv",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nIt shows: Old TV showing blocky pixel game graphics.\nWhat is said over the shot:\n  \"In nineteen seventy two, Pong was two paddles and a ball.\"\n  \"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"\nIt must show:\n- an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7856425,\"brightness\":0.2558155251141553}",
+      "words": "[\"VHF\",\"UHF\",\"CONT\",\"2\",\"4\",\"5\",\"6\",\"7\",\"8\",\"3000\",\"0\",\"1\",\"3\",\"5\",\"6\",\"7\",\"8\",\"Schaub Lorenz\"]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"must never show \\\"never-text\\\" is shown: written words or labels\",\"must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-repair",
+      "seq": 5,
+      "attempt": 1,
+      "shot_unit": 0,
+      "subject_id": "show-tv",
+      "role": "standalone",
+      "label": "repair",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nIt shows: Old TV showing blocky pixel game graphics.\nWhat is said over the shot:\n  \"In nineteen seventy two, Pong was two paddles and a ball.\"\n  \"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"\nIt must show:\n- an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\n\nThe try before this one failed its checks. Correct what failed:\n- must never show \"never-text\" is shown: written words or labels\n- must never show \"never-character\" is shown: a recognisable character from a real video game, comic or anime",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.8013246666666667,\"brightness\":0.44363470319634707}",
+      "words": "[\"100S 410\",\"180T\",\"POWSNN\"]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"must never show \\\"never-text\\\" is shown: written words or labels\",\"must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": "a1-shot-0-repair failed Gate 1 at reconcile: must never show \"never-text\" is shown: written words or labels; must never show \"never-character\" is shown: a recognisable character from a real video game, comic or anime; it was the shot's repair (S-043)",
+      "chosen": 0
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-1-single",
+      "seq": 6,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "show-card",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nIt shows: Graphics card; Low-polygon 3D screen.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- an unbranded screen showing only simple low-polygon three-dimensional graphics\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7637203333333333,\"brightness\":0.5185570776255708}",
+      "words": "[\"Platinum\"]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"subject \\\"show-screen\\\" (Low-polygon 3D screen) is clipped by the edge of the frame\",\"must never show \\\"never-text\\\" is shown: written words or labels\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": "a1-shot-1-single failed Gate 1 at reconcile: subject \"show-screen\" (Low-polygon 3D screen) is clipped by the edge of the frame; must never show \"never-text\" is shown: written words or labels; no reserve slot is free (S-043)",
+      "chosen": 0
+    }
+  ],
+  "observation": [
+    {
+      "id": "obs-a1-shot-0-repair",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-repair",
+      "observation": "{\"entities\":[{\"label\":\"CRT television set\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden shelf or table surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"plain wall (background)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"cables/wires hanging down\",\"count\":2,\"position\":\"right\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"small pixelated character on screen\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"partial\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"brick platforms on screen\",\"count\":4,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"green pipe structure on screen\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"cloud shapes on screen\",\"count\":3,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"small enemy creature on screen\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"control knobs on TV front panel\",\"count\":3,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"speaker grille on TV\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden table legs\",\"count\":2,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"indoor room with a CRT television placed on a wooden shelf or table against a plain wall\",\"lighting\":\"dim\",\"readableTextPresent\":true,\"ambiguities\":[\"Text on the TV screen appears garbled or nonsensical, possibly mimicking retro game HUD elements: '100S 410', '180T', 'STIHSITW', 'OWO'\",\"Brand label on the front of the TV is illegible and appears to read something like 'POWSSNN' or similar - cannot be confidently identified\",\"The displayed game appears similar in style to classic Super Mario Bros but the text and some details are distorted\",\"Exact nature of small knobs on the TV (likely channel/volume controls) is hard to determine\",\"The small object on the lower left of the screen could be a Goomba-like enemy or a turtle-like creature\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-0-single",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-single",
+      "observation": "{\"entities\":[{\"label\":\"vintage CRT television set\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden table or desk\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"textured plaster wall\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"pixelated game character (orange/brown sprite in mid-jump)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"white vertical poles/posts on screen\",\"count\":2,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"small pink rectangular block on screen\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"small orange/brown ground sprite on screen\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"green vertical pipes on screen\",\"count\":2,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"small white square/block floating on screen\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"brick-patterned ground strip on screen\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"black cables/cords\",\"count\":2,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"indoor room, vintage television placed on a simple wooden table against a textured off-white plaster wall\",\"lighting\":\"mixed\",\"readableTextPresent\":true,\"ambiguities\":[\"A label in the bottom-right corner of the TV chassis appears to read 'Fernseh' but is partly illegible\",\"Small text labels near the dials (UHF, VHF and channel numbers) are partially readable\",\"The exact number of green pipes is unclear — there appear to be two stacked pipe segments\",\"The screen content looks like a Super Mario Bros-style 8-bit game, but I cannot identify the specific title with certainty\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-1-single",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-1-single",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"orange cube on screen\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"blue rectangular cuboid on screen\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"gray multifaceted polyhedron on screen\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"purple cube on screen\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"green multifaceted polyhedron on screen\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"green printed circuit board with heatsink and connectors\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"table or desk surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"window with light\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"indoor room, likely a desk or workspace with a computer setup\",\"lighting\":\"bright\",\"readableTextPresent\":true,\"ambiguities\":[\"The monitor brand label on the top right is partially legible but unclear; text appears to read something like 'Acer' or similar but cannot be confirmed\",\"Text on the circuit board chips is present but too small to read clearly\",\"Whether the window has curtains or just blinds/blinds is unclear\",\"The exact model of the circuit board cannot be determined from the image\",\"There may be additional small objects or cables at the edges of the frame that are difficult to identify\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-2-a",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-a",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor displaying a nature landscape\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"graphics card (GPU) with two cooling fans\",\"count\":1,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"white desk or table surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"cream or beige wall\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"white curtain or window covering\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"cable or wire under the desk\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"landscape image on screen showing lake, trees, and sky with clouds\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"indoor home or office space with light-colored furnishings and a desktop computer setup\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"There appears to be small lettering on the monitor's lower bezel and on the GPU fans, but it is not clearly legible from this image\",\"The nature scene on the monitor could be a photograph or a rendered/desktop background\",\"The exact nature of the object under the desk (cable, pipe, or shadow) is unclear\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-2-b",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-b",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor with widescreen display\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"nature scene displayed on screen (lake, trees, misty forest)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"graphics card (GPU) with two black cooling fans\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"white desk surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"monitor stand (silver/grey rectangular base)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wooden shelving unit\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"books on shelf\",\"count\":4,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"framed picture or photo on top shelf\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"indoor workspace or home office\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"GPU label is too small to read clearly\",\"exact contents on the far shelves are not clearly distinguishable\",\"the image shown on the monitor appears to be a stock photo or wallpaper of a misty lakeside forest scene\",\"whether there is additional cabling behind the monitor is unclear\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-2-repair",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-repair",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor displaying a nature scene\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"monitor stand with rectangular base\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"black cable trailing from behind the monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":false},{\"label\":\"graphics card (GPU) with two cooling fans and black shroud\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"gold PCIe connector edge on the graphics card\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"light-colored desk or tabletop surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"window with outdoor view\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":false},{\"label\":\"trees visible through and reflected in the window\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"indoor desk or workspace near a window with an outdoor view of trees\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"Brand and model of the monitor are not legible\",\"Brand and model of the graphics card are not legible\",\"The exact GPU make cannot be determined from visible markings\",\"Whether the cable is a power, display, or data cable is unclear\",\"The image displayed on the screen (forest, lake, sunbeams) appears to be a wallpaper rather than an actual scene behind the window\"],\"unsafeDepictions\":[]}"
+    }
+  ],
+  "reconciliation": [
+    {
+      "id": "rec-a1-shot-0-repair",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-repair",
+      "answer": "{\"subjects\":[{\"id\":\"show-tv\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-tv\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":true,\"entity\":0},{\"id\":\"never-character\",\"shown\":true,\"entity\":4}]}",
+      "failed": "[\"must never show \\\"never-text\\\" is shown: written words or labels\",\"must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime\"]"
+    },
+    {
+      "id": "rec-a1-shot-0-single",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-single",
+      "answer": "{\"subjects\":[{\"id\":\"show-tv\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-tv\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":true,\"entity\":0},{\"id\":\"never-character\",\"shown\":true,\"entity\":3}]}",
+      "failed": "[\"must never show \\\"never-text\\\" is shown: written words or labels\",\"must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime\"]"
+    },
+    {
+      "id": "rec-a1-shot-1-single",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-1-single",
+      "answer": "{\"subjects\":[{\"id\":\"show-card\",\"entity\":6,\"countMatches\":true},{\"id\":\"show-screen\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-screen\",\"shown\":true,\"entity\":0},{\"id\":\"show-card\",\"shown\":true,\"entity\":6},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":true,\"entity\":0},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"subject \\\"show-screen\\\" (Low-polygon 3D screen) is clipped by the edge of the frame\",\"must never show \\\"never-text\\\" is shown: written words or labels\"]"
+    },
+    {
+      "id": "rec-a1-shot-2-a",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-a",
+      "answer": "{\"subjects\":[{\"id\":\"show-monitor\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-card\",\"shown\":true,\"entity\":1},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":true,\"entity\":1},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"must never show \\\"never-text\\\" is shown: written words or labels\"]"
+    },
+    {
+      "id": "rec-a1-shot-2-b",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-b",
+      "answer": "{\"subjects\":[{\"id\":\"show-monitor\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-card\",\"shown\":true,\"entity\":2},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"subject \\\"show-monitor\\\" (Modern monitor showing lifelike forest lake) is clipped by the edge of the frame\"]"
+    },
+    {
+      "id": "rec-a1-shot-2-repair",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-repair",
+      "answer": "{\"subjects\":[{\"id\":\"show-monitor\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-card\",\"shown\":true,\"entity\":3},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    }
+  ],
+  "generation_receipt": [
+    {
+      "id": 118,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-a",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Modern monitor showing lifelike forest lake.\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T11:12:42.416Z"
+    },
+    {
+      "id": 119,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-b",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: wide.\nIt shows: Modern monitor showing lifelike forest lake.\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T11:13:23.450Z"
+    },
+    {
+      "id": 120,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-2-repair",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Modern monitor showing lifelike forest lake.\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\n\nEach of the 2 tries before this one failed its checks. Correct what failed:\nTry 1:\n- must never show \"never-text\" is shown: written words or labels\nTry 2:\n- subject \"show-monitor\" (Modern monitor showing lifelike forest lake) is clipped by the edge of the frame",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T11:14:03.144Z"
+    },
+    {
+      "id": 121,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nIt shows: Old TV showing blocky pixel game graphics.\nWhat is said over the shot:\n  \"In nineteen seventy two, Pong was two paddles and a ball.\"\n  \"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"\nIt must show:\n- an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-26T11:14:49.129Z"
+    },
+    {
+      "id": 122,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-0-repair",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nIt shows: Old TV showing blocky pixel game graphics.\nWhat is said over the shot:\n  \"In nineteen seventy two, Pong was two paddles and a ball.\"\n  \"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"\nIt must show:\n- an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\n\nThe try before this one failed its checks. Correct what failed:\n- must never show \"never-text\" is shown: written words or labels\n- must never show \"never-character\" is shown: a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-26T11:15:29.290Z"
+    },
+    {
+      "id": 123,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "picture_id": "a1-shot-1-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nIt shows: Graphics card; Low-polygon 3D screen.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- an unbranded screen showing only simple low-polygon three-dimensional graphics\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-26T11:16:25.253Z"
+    }
+  ],
+  "lost_call": [],
+  "refused_answer": [],
+  "degradation": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "shot_id": "shot-0",
+      "gate": "1",
+      "reason": "a1-shot-0-repair failed Gate 1 at reconcile: must never show \"never-text\" is shown: written words or labels; must never show \"never-character\" is shown: a recognisable character from a real video game, comic or anime; it was the shot's repair (S-043)"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "shot_id": "shot-1",
+      "gate": "1",
+      "reason": "a1-shot-1-single failed Gate 1 at reconcile: subject \"show-screen\" (Low-polygon 3D screen) is clipped by the edge of the frame; must never show \"never-text\" is shown: written words or labels; no reserve slot is free (S-043)"
+    }
+  ],
+  "narration": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-0-narration",
+      "attempt": 1,
+      "shot_unit": 0,
+      "text": "In nineteen seventy two, Pong was two paddles and a ball. By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"In\",\"startMs\":43,\"endMs\":128},{\"word\":\"nineteen\",\"startMs\":171,\"endMs\":597},{\"word\":\"seventy\",\"startMs\":640,\"endMs\":1195},{\"word\":\"two,\",\"startMs\":1237,\"endMs\":1749},{\"word\":\"Pong\",\"startMs\":1792,\"endMs\":2432},{\"word\":\"was\",\"startMs\":2475,\"endMs\":2944},{\"word\":\"two\",\"startMs\":3200,\"endMs\":3499},{\"word\":\"paddles\",\"startMs\":3541,\"endMs\":4096},{\"word\":\"and\",\"startMs\":4139,\"endMs\":4395},{\"word\":\"a\",\"startMs\":4437,\"endMs\":4736},{\"word\":\"ball.\",\"startMs\":4779,\"endMs\":5205},{\"word\":\"By\",\"startMs\":5248,\"endMs\":5931},{\"word\":\"nineteen\",\"startMs\":5973,\"endMs\":6443},{\"word\":\"eighty\",\"startMs\":6485,\"endMs\":6955},{\"word\":\"five,\",\"startMs\":6997,\"endMs\":7595},{\"word\":\"Super\",\"startMs\":7637,\"endMs\":8405},{\"word\":\"Mario\",\"startMs\":8448,\"endMs\":8789},{\"word\":\"Bros\",\"startMs\":8832,\"endMs\":9216},{\"word\":\"drew\",\"startMs\":9259,\"endMs\":9984},{\"word\":\"whole\",\"startMs\":10027,\"endMs\":10240},{\"word\":\"worlds\",\"startMs\":10283,\"endMs\":11008},{\"word\":\"in\",\"startMs\":11051,\"endMs\":11179},{\"word\":\"pixels.\",\"startMs\":11221,\"endMs\":12032}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":12.236938,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-1-narration",
+      "attempt": 1,
+      "shot_unit": 1,
+      "text": "Then games moved into three dimensions, built from polygons. In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"Then\",\"startMs\":43,\"endMs\":171},{\"word\":\"games\",\"startMs\":213,\"endMs\":555},{\"word\":\"moved\",\"startMs\":597,\"endMs\":1109},{\"word\":\"into\",\"startMs\":1152,\"endMs\":1835},{\"word\":\"three\",\"startMs\":1877,\"endMs\":2176},{\"word\":\"dimensions,\",\"startMs\":2219,\"endMs\":2987},{\"word\":\"built\",\"startMs\":3029,\"endMs\":3499},{\"word\":\"from\",\"startMs\":3541,\"endMs\":3925},{\"word\":\"polygons.\",\"startMs\":3968,\"endMs\":4779},{\"word\":\"In\",\"startMs\":4821,\"endMs\":5589},{\"word\":\"nineteen\",\"startMs\":5632,\"endMs\":6101},{\"word\":\"ninety\",\"startMs\":6144,\"endMs\":6485},{\"word\":\"nine,\",\"startMs\":6528,\"endMs\":6955},{\"word\":\"Nvidia's\",\"startMs\":6997,\"endMs\":8021},{\"word\":\"GeForce\",\"startMs\":8064,\"endMs\":8661},{\"word\":\"two\",\"startMs\":8704,\"endMs\":9003},{\"word\":\"fifty\",\"startMs\":9045,\"endMs\":9557},{\"word\":\"six\",\"startMs\":9600,\"endMs\":9771},{\"word\":\"was\",\"startMs\":9813,\"endMs\":10539},{\"word\":\"sold\",\"startMs\":10581,\"endMs\":10795},{\"word\":\"as\",\"startMs\":10837,\"endMs\":11264},{\"word\":\"the\",\"startMs\":11307,\"endMs\":11392},{\"word\":\"first\",\"startMs\":11435,\"endMs\":11563},{\"word\":\"graphics\",\"startMs\":11605,\"endMs\":12373},{\"word\":\"processing\",\"startMs\":12416,\"endMs\":13141},{\"word\":\"unit.\",\"startMs\":13184,\"endMs\":13781}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":14.036469,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-2-narration",
+      "attempt": 1,
+      "shot_unit": 2,
+      "text": "It lit and moved every triangle itself, freeing the main processor. In twenty eighteen, Nvidia brought real time ray tracing to games.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"It\",\"startMs\":43,\"endMs\":128},{\"word\":\"lit\",\"startMs\":171,\"endMs\":384},{\"word\":\"and\",\"startMs\":427,\"endMs\":725},{\"word\":\"moved\",\"startMs\":1024,\"endMs\":1323},{\"word\":\"every\",\"startMs\":1365,\"endMs\":1749},{\"word\":\"triangle\",\"startMs\":1835,\"endMs\":2773},{\"word\":\"itself,\",\"startMs\":2816,\"endMs\":3627},{\"word\":\"freeing\",\"startMs\":3669,\"endMs\":4523},{\"word\":\"the\",\"startMs\":4565,\"endMs\":4907},{\"word\":\"main\",\"startMs\":4949,\"endMs\":5077},{\"word\":\"processor.\",\"startMs\":5120,\"endMs\":6315},{\"word\":\"In\",\"startMs\":6699,\"endMs\":6827},{\"word\":\"twenty\",\"startMs\":7125,\"endMs\":7381},{\"word\":\"eighteen,\",\"startMs\":7424,\"endMs\":8277},{\"word\":\"Nvidia\",\"startMs\":8320,\"endMs\":9301},{\"word\":\"brought\",\"startMs\":9344,\"endMs\":9515},{\"word\":\"real\",\"startMs\":9557,\"endMs\":10027},{\"word\":\"time\",\"startMs\":10069,\"endMs\":10581},{\"word\":\"ray\",\"startMs\":10624,\"endMs\":11136},{\"word\":\"tracing\",\"startMs\":11179,\"endMs\":11776},{\"word\":\"to\",\"startMs\":11819,\"endMs\":12075},{\"word\":\"games.\",\"startMs\":12117,\"endMs\":12800}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":13.096063,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-3-narration",
+      "attempt": 1,
+      "shot_unit": 3,
+      "text": "It follows each beam of light as it bounces through a scene. Deep learning now fills in detail, so games look almost like film.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"It\",\"startMs\":43,\"endMs\":128},{\"word\":\"follows\",\"startMs\":171,\"endMs\":640},{\"word\":\"each\",\"startMs\":683,\"endMs\":896},{\"word\":\"beam\",\"startMs\":939,\"endMs\":1451},{\"word\":\"of\",\"startMs\":1493,\"endMs\":1621},{\"word\":\"light\",\"startMs\":1664,\"endMs\":1835},{\"word\":\"as\",\"startMs\":1877,\"endMs\":2219},{\"word\":\"it\",\"startMs\":2432,\"endMs\":2560},{\"word\":\"bounces\",\"startMs\":2603,\"endMs\":3115},{\"word\":\"through\",\"startMs\":3157,\"endMs\":3413},{\"word\":\"a\",\"startMs\":3456,\"endMs\":3755},{\"word\":\"scene.\",\"startMs\":3797,\"endMs\":4267},{\"word\":\"Deep\",\"startMs\":4309,\"endMs\":5333},{\"word\":\"learning\",\"startMs\":5376,\"endMs\":5632},{\"word\":\"now\",\"startMs\":5675,\"endMs\":6059},{\"word\":\"fills\",\"startMs\":6101,\"endMs\":6656},{\"word\":\"in\",\"startMs\":6699,\"endMs\":6869},{\"word\":\"detail,\",\"startMs\":6912,\"endMs\":7680},{\"word\":\"so\",\"startMs\":7723,\"endMs\":7893},{\"word\":\"games\",\"startMs\":8107,\"endMs\":8448},{\"word\":\"look\",\"startMs\":8491,\"endMs\":8917},{\"word\":\"almost\",\"startMs\":8960,\"endMs\":9259},{\"word\":\"like\",\"startMs\":9301,\"endMs\":9728},{\"word\":\"film.\",\"startMs\":9771,\"endMs\":10496}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":10.750844,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    }
+  ],
+  "speech_receipt": [
+    {
+      "id": 83,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-0-narration",
+      "model": "speech-2.8-hd",
+      "characters": 128,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-26T11:16:56.396Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 84,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-1-narration",
+      "model": "speech-2.8-hd",
+      "characters": 164,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-26T11:18:23.543Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 85,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-2-narration",
+      "model": "speech-2.8-hd",
+      "characters": 134,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-26T11:19:56.399Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 86,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "narration_id": "a1-shot-3-narration",
+      "model": "speech-2.8-hd",
+      "characters": 127,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-26T11:21:44.942Z",
+      "transient_errors": 0
+    }
+  ],
+  "take": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-0-take-1",
+      "attempt": 1,
+      "shot_unit": 0,
+      "number": 1,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 1,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"In nineteen seventy two, Pong was two paddles and a ball.\"\n  \"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"\nIt shows: Old TV showing blocky pixel game graphics.\nIt must show:\n- an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 13,
+      "seed": 3733533882,
+      "request_id": "01a0dd6e-c032-7331-bead-67bd60b920e0",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, documentary-style footage in a 9:16 vertical aspect ratio. The scene centers on an unbranded vintage television resting on a bare, minimalist wooden table in a dimly lit room. The lighting is soft and natural, coming from a side window, casting gentle shadows across the textured grain of the wood. The television screen is active, displaying flickering, high-contrast blocky pixel game graphics—a simple white paddle and a small square ball bouncing across a dark digital field. No recognizable characters or logos are present. The camera remains steady with a very slow, subtle push-in toward the screen, capturing the slight curve of the cathode-ray tube. As the off-screen voiceover narrates, the pixels on the screen evolve. The voiceover says: <d>[English]In nineteen seventy two, Pong was two paddles and a ball.</d> At 00:06.500, the graphics on the screen shift rapidly, transforming into a more complex multi-colored landscape of blocky hills and floating structures, representing a vast world built from pixels. The off-screen voiceover continues: <d>[English]By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.</d> The camera continues its slow, steady approach as the glow of the screen reflects softly on the polished surface of the bare table.\n\noverall_soundscape: The low-frequency hum of a vintage vacuum tube television is accompanied by the rhythmic, electronic beeps and bloops of 8-bit game sound effects. A faint crackle of static fills the gaps between the sounds.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":13.696,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":328},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-14.5}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-1-take-1",
+      "attempt": 1,
+      "shot_unit": 1,
+      "number": 1,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 1,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt shows: Graphics card; Low-polygon 3D screen.\nIt must show:\n- an unbranded screen showing only simple low-polygon three-dimensional graphics\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 15,
+      "seed": 304296996,
+      "request_id": "01a0dd70-12f7-78c3-8d53-ef5c2487f1f3",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, clean documentary footage filmed in a 9:16 vertical aspect ratio. The shot is a steady, continuous medium shot of an unbranded computer graphics card resting on a neutral, matte surface. The card features a sleek black finish with intricate metallic heat fins and exposed circuitry components, lacking any logos, text, or branding. In the background, an unbranded computer monitor glows softly, displaying a simple, low-polygon 3D environment—a minimalist landscape of blocky green hills under a flat blue sky. The lighting is soft and natural, coming from an unseen side window. The camera pushes in with small amplitude at slow speed toward the hardware, capturing the tactile texture of the materials. (S1), a male voice with a calm, informative tone, says in an off-screen voiceover: <d>[English]Then games moved into three dimensions, built from polygons.</d> At 00:07.500, the camera continues its slow push-in, shifting focus slightly from the physical card to the screen where the low-polygon shapes rotate slowly. (S1) continues in an off-screen voiceover: <d>[English]In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.</d>\n\noverall_soundscape: The faint, low hum of a cooling fan spinning provides a steady mechanical backdrop. A subtle, high-frequency electronic whir is audible in the quiet room.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":15.104,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":362},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-15.1}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-2-take-1",
+      "attempt": 1,
+      "shot_unit": 2,
+      "number": 1,
+      "mode": "image-to-video",
+      "picture_id": "a1-shot-2-repair",
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt shows: Modern monitor showing lifelike forest lake.\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: indoor desk or workspace near a window with an outdoor view of trees.\nLighting: bright.\n- computer monitor displaying a nature scene, at the centre\n- monitor stand with rectangular base, at the centre\n- black cable trailing from behind the monitor, at the centre\n- graphics card (GPU) with two cooling fans and black shroud, at the centre\n- gold PCIe connector edge on the graphics card, at the centre\n- light-colored desk or tabletop surface, at the centre\n- window with outdoor view, at the centre\n- trees visible through and reflected in the window, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 14,
+      "seed": 2628531143,
+      "request_id": "01a0dd71-8d17-7e12-9155-00dff5bb581f",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] This is a clean documentary-style cinematic shot. The scene opens on a medium shot of a bright, sunlit workspace near a large window. In the center, a modern computer monitor displays a lifelike scene of a misty forest lake at sunrise, with sunlight filtering through the trees and reflecting off the water. In the foreground, an unbranded black graphics card with two cooling fans and a shroud sits on the light-colored desk, its gold PCIe connector edge clearly visible. A single black cable trails from behind the monitor. Through the window in the background, lush green trees are visible, also subtly reflected on the monitor's glass. The camera remains steady with a very slow push-in with small amplitude toward the GPU and monitor. As the shot progresses, the forest scene on the monitor becomes more dynamic, with light dancing on the water surface and mist drifting slowly, simulating real-time ray tracing. An off-screen voice (S1), with a calm and professional male tone, speaks: <d>[English]It lit and moved every triangle itself, freeing the main processor.</d> <d>[English]In twenty eighteen, Nvidia brought real time ray tracing to games.</d> The lighting remains soft and natural, emphasizing the textures of the hardware and the environment.\n\noverall_soundscape: The quiet ambiance of a still room with the very faint, mechanical whirring of computer cooling fans spinning up. A soft, low hum of electronics is present beneath the distant, rustle of leaves outside the window.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":14.4,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":345},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-14.3}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-3-take-1",
+      "attempt": 1,
+      "shot_unit": 3,
+      "number": 1,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"It follows each beam of light as it bounces through a scene.\"\n  \"Deep learning now fills in detail, so games look almost like film.\"\nIt shows: Modern monitor showing lifelike forest lake.\nIt must show:\n- an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 11,
+      "seed": 1342583641,
+      "request_id": "01a0dd73-251b-7ca2-896a-3b690b76c6d1",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, documentary-style footage in a vertical 9:16 aspect ratio. The scene opens with a steady shot of a sleek, unbranded modern monitor centered on a minimalist wide wooden desk. The monitor screen displays a hyper-realistic, lifelike render of a serene forest lake at midday; the water's surface features subtle ripples that reflect the dense pine trees and the soft blue sky above. The lighting in the room is soft and natural, coming from an unseen window, creating gentle shadows on the desk surface. The camera performs a very slow, steady push-in with small amplitude toward the screen. As the camera moves closer to the monitor, the digital details of the forest become increasingly intricate—individual leaves sway in a simulated breeze, and the glint of light on the water moves with optical clarity. No text, logos, or characters are visible on the monitor or in the environment. An off-screen voiceover speaks in a calm, professional tone: <d>[English]It follows each beam of light as it bounces through a scene.</d> followed shortly by: <d>[English]Deep learning now fills in detail, so games look almost like film.</d> The on-screen monitor remains focused entirely on the digital landscape.\n\noverall_soundscape: The faint, ambient hum of a quiet room is punctuated by the clear, resonant quality of the off-screen voiceover. There are no other physical sounds or environmental noises.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":11.552,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":277},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[{\"startSeconds\":9.454875,\"seconds\":2.097125}],\"loudnessLufs\":-14.6}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    }
+  ],
+  "video_receipt": [
+    {
+      "id": 104,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-0-take-1",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 13,
+      "aspect_ratio": "9:16",
+      "seed": 3733533882,
+      "request_id": "01a0dd6e-c032-7331-bead-67bd60b920e0",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"In nineteen seventy two, Pong was two paddles and a ball.\"\n  \"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"\nIt shows: Old TV showing blocky pixel game graphics.\nIt must show:\n- an old unbranded television on a bare table, its screen showing only blocky pixel game graphics\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, documentary-style footage in a 9:16 vertical aspect ratio. The scene centers on an unbranded vintage television resting on a bare, minimalist wooden table in a dimly lit room. The lighting is soft and natural, coming from a side window, casting gentle shadows across the textured grain of the wood. The television screen is active, displaying flickering, high-contrast blocky pixel game graphics—a simple white paddle and a small square ball bouncing across a dark digital field. No recognizable characters or logos are present. The camera remains steady with a very slow, subtle push-in toward the screen, capturing the slight curve of the cathode-ray tube. As the off-screen voiceover narrates, the pixels on the screen evolve. The voiceover says: <d>[English]In nineteen seventy two, Pong was two paddles and a ball.</d> At 00:06.500, the graphics on the screen shift rapidly, transforming into a more complex multi-colored landscape of blocky hills and floating structures, representing a vast world built from pixels. The off-screen voiceover continues: <d>[English]By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.</d> The camera continues its slow, steady approach as the glow of the screen reflects softly on the polished surface of the bare table.\n\noverall_soundscape: The low-frequency hum of a vintage vacuum tube television is accompanied by the rhythmic, electronic beeps and bloops of 8-bit game sound effects. A faint crackle of static fills the gaps between the sounds.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 7,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-26T11:17:20.133Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 105,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-1-take-1",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 15,
+      "aspect_ratio": "9:16",
+      "seed": 304296996,
+      "request_id": "01a0dd70-12f7-78c3-8d53-ef5c2487f1f3",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt shows: Graphics card; Low-polygon 3D screen.\nIt must show:\n- an unbranded screen showing only simple low-polygon three-dimensional graphics\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, clean documentary footage filmed in a 9:16 vertical aspect ratio. The shot is a steady, continuous medium shot of an unbranded computer graphics card resting on a neutral, matte surface. The card features a sleek black finish with intricate metallic heat fins and exposed circuitry components, lacking any logos, text, or branding. In the background, an unbranded computer monitor glows softly, displaying a simple, low-polygon 3D environment—a minimalist landscape of blocky green hills under a flat blue sky. The lighting is soft and natural, coming from an unseen side window. The camera pushes in with small amplitude at slow speed toward the hardware, capturing the tactile texture of the materials. (S1), a male voice with a calm, informative tone, says in an off-screen voiceover: <d>[English]Then games moved into three dimensions, built from polygons.</d> At 00:07.500, the camera continues its slow push-in, shifting focus slightly from the physical card to the screen where the low-polygon shapes rotate slowly. (S1) continues in an off-screen voiceover: <d>[English]In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.</d>\n\noverall_soundscape: The faint, low hum of a cooling fan spinning provides a steady mechanical backdrop. A subtle, high-frequency electronic whir is audible in the quiet room.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 8,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-26T11:18:52.043Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 106,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-2-take-1",
+      "model": "fal-ai/minimax-h3-turbo/image-to-video",
+      "mode": "image-to-video",
+      "resolution": "768P",
+      "requested_seconds": 14,
+      "aspect_ratio": null,
+      "seed": 2628531143,
+      "request_id": "01a0dd71-8d17-7e12-9155-00dff5bb581f",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"It lit and moved every triangle itself, freeing the main processor.\"\n  \"In twenty eighteen, Nvidia brought real time ray tracing to games.\"\nIt shows: Modern monitor showing lifelike forest lake.\nIt must show:\n- an unbranded computer graphics card\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: indoor desk or workspace near a window with an outdoor view of trees.\nLighting: bright.\n- computer monitor displaying a nature scene, at the centre\n- monitor stand with rectangular base, at the centre\n- black cable trailing from behind the monitor, at the centre\n- graphics card (GPU) with two cooling fans and black shroud, at the centre\n- gold PCIe connector edge on the graphics card, at the centre\n- light-colored desk or tabletop surface, at the centre\n- window with outdoor view, at the centre\n- trees visible through and reflected in the window, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] This is a clean documentary-style cinematic shot. The scene opens on a medium shot of a bright, sunlit workspace near a large window. In the center, a modern computer monitor displays a lifelike scene of a misty forest lake at sunrise, with sunlight filtering through the trees and reflecting off the water. In the foreground, an unbranded black graphics card with two cooling fans and a shroud sits on the light-colored desk, its gold PCIe connector edge clearly visible. A single black cable trails from behind the monitor. Through the window in the background, lush green trees are visible, also subtly reflected on the monitor's glass. The camera remains steady with a very slow push-in with small amplitude toward the GPU and monitor. As the shot progresses, the forest scene on the monitor becomes more dynamic, with light dancing on the water surface and mist drifting slowly, simulating real-time ray tracing. An off-screen voice (S1), with a calm and professional male tone, speaks: <d>[English]It lit and moved every triangle itself, freeing the main processor.</d> <d>[English]In twenty eighteen, Nvidia brought real time ray tracing to games.</d> The lighting remains soft and natural, emphasizing the textures of the hardware and the environment.\n\noverall_soundscape: The quiet ambiance of a still room with the very faint, mechanical whirring of computer cooling fans spinning up. A soft, low hum of electronics is present beneath the distant, rustle of leaves outside the window.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 7,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T11:20:27.251Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 107,
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-3-take-1",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 11,
+      "aspect_ratio": "9:16",
+      "seed": 1342583641,
+      "request_id": "01a0dd73-251b-7ca2-896a-3b690b76c6d1",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: clean documentary footage, soft natural light, steady camera\nWhat is said over the shot:\n  \"It follows each beam of light as it bounces through a scene.\"\n  \"Deep learning now fills in detail, so games look almost like film.\"\nIt shows: Modern monitor showing lifelike forest lake.\nIt must show:\n- an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, documentary-style footage in a vertical 9:16 aspect ratio. The scene opens with a steady shot of a sleek, unbranded modern monitor centered on a minimalist wide wooden desk. The monitor screen displays a hyper-realistic, lifelike render of a serene forest lake at midday; the water's surface features subtle ripples that reflect the dense pine trees and the soft blue sky above. The lighting in the room is soft and natural, coming from an unseen window, creating gentle shadows on the desk surface. The camera performs a very slow, steady push-in with small amplitude toward the screen. As the camera moves closer to the monitor, the digital details of the forest become increasingly intricate—individual leaves sway in a simulated breeze, and the glint of light on the water moves with optical clarity. No text, logos, or characters are visible on the monitor or in the environment. An off-screen voiceover speaks in a calm, professional tone: <d>[English]It follows each beam of light as it bounces through a scene.</d> followed shortly by: <d>[English]Deep learning now fills in detail, so games look almost like film.</d> The on-screen monitor remains focused entirely on the digital landscape.\n\noverall_soundscape: The faint, ambient hum of a quiet room is punctuated by the clear, resonant quality of the off-screen voiceover. There are no other physical sounds or environmental noises.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 6,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T11:22:04.165Z",
+      "transient_errors": 0
+    }
+  ],
+  "take_observation": [
+    {
+      "id": "obs-a1-shot-0-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-0-take-1",
+      "observation": "{\"entities\":[{\"label\":\"Vintage television set with antennas and dials\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"Wooden table\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"Wooden chair (partially visible)\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"Wooden chair (partially visible)\",\"count\":1,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"Window with sheer white curtains\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"Lamp with a green base and white shade\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"An indoor room featuring a wooden table supporting a television, with a curtained window to the left and a lamp to the right in the background.\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"The exact nature of the simple white line animation shown initially on the screen.\",\"The specific title or finer details of the colorful retro video game being displayed.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"Vintage television set with antennas and dials\",\"verb\":\"turns on\",\"completes\":true},{\"entity\":\"Vintage television set with antennas and dials\",\"verb\":\"displays a simple white line animation\",\"completes\":true},{\"entity\":\"Vintage television set with antennas and dials\",\"verb\":\"displays a colorful retro video game\",\"completes\":true},{\"entity\":\"Vintage television set with antennas and dials\",\"verb\":\"is zoomed in on\",\"completes\":true}],\"eventOrder\":[\"Vintage television set with antennas and dials turns on\",\"Vintage television set with antennas and dials displays a simple white line animation\",\"Vintage television set with antennas and dials displays a colorful retro video game\",\"Vintage television set with antennas and dials is zoomed in on\"]}"
+    },
+    {
+      "id": "obs-a1-shot-1-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-1-take-1",
+      "observation": "{\"entities\":[{\"label\":\"Graphics card\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"Computer monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"Window\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"Desk surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"Monitor stand\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"Keyboard\",\"count\":1,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"closeUp\",\"setting\":\"An indoor room, likely an office or bedroom, featuring a desk setup with a computer monitor and a window in the background.\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"The exact model of the graphics card is not clearly identifiable.\",\"Text on the monitor screen is blurry and unreadable.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"Camera\",\"verb\":\"tilts up and pans right\",\"completes\":true},{\"entity\":\"On-screen object (low-poly tree)\",\"verb\":\"appears\",\"completes\":true}],\"eventOrder\":[\"Camera tilts up and pans right\",\"On-screen object (low-poly tree) appears\",\"Keyboard comes into view\"]}"
+    },
+    {
+      "id": "obs-a1-shot-2-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-2-take-1",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"graphics card\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"white desk\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"window frame and handle\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"out-of-focus trees outside window\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"The scene unfolds within a bright, modern indoor workspace, bathed in the soft, diffused natural light spilling through a large window that dominates the background. The surface of the workspace is a pristine, flat white desk, its clean lines reflecting the ambient daylight. Resting upon this stark, minimalist surface is a black, unpowered computer graphics card, a piece of raw technological hardware characterized by its dual cooling fans, exposed circuit board, and metallic connectors. It sits unceremoniously in the foreground, disconnected and waiting. Just behind it, occupying the center of the midground, stands a flat-screen computer monitor mounted on a simple, rectangular silver stand with a geometric base. The monitor is active, acting as a glowing portal to a completely different environment. The screen displays a vibrant, highly realistic digital landscape: a tranquil forest scene at what appears to be sunrise or sunset. Warm, golden sunlight filters through a dense canopy of green trees, casting long shadows and illuminating a thick, ethereal mist that hovers just above the surface of a dark, still body of water. The reflection of the trees and the glowing sky is mirrored perfectly in the water below. The juxtaposition of the dark, mechanical hardware in the foreground and the luminous, organic digital world on the screen creates a silent narrative about technology and the immersive experiences it generates. Behind the monitor, the physical world continues with a white window frame featuring a visible handle, and through the glass, the out-of-focus, blurred green foliage of trees can be seen, mirroring the woodland scene depicted on the digital display.\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"The primary narrative tension lies in the relationship between the unpowered graphics card resting on the desk and the complex, rendered image of a sunlit forest on the monitor screen.\",\"The hardware appears stripped down, lacking a casing, suggesting a state of repair, upgrade, or assembly. It sits dormant, a tool of creation, while the screen showcases a finished, captivating digital environment.\",\"The camera's slow, deliberate push-in emphasizes this transition, forcing the viewer's attention away from the physical components and towards the virtual reality it helps create.\",\"The mist on the screen seems to glow with an internal heat, contrasting with the cool, objective light of the room.\",\"The out-of-focus trees outside the physical window add another layer of depth, blending the natural world outside the room with the simulated natural world on the screen.\",\"It is unclear if the scene on the monitor is a video game, a screensaver, or a high-resolution photograph, but its vividness suggests a high level of graphical processing power, directly linking back to the piece of hardware sitting idle in the foreground.\",\"The soft focus on the external foliage compared to the sharp clarity of the internal screen display highlights the difference between physical reality and digital representation.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"moves forward slowly\",\"completes\":true}],\"eventOrder\":[\"The video begins with a static view of the desk, graphics card, and monitor.\",\"The camera initiates a slow, steady forward movement towards the screen.\",\"As the camera advances, the foreground graphics card is gradually pushed past the bottom edge of the frame.\",\"The monitor and its displayed forest scene become the dominant focus as the camera continues to push in until the video ends.\"]}"
+    },
+    {
+      "id": "obs-a1-shot-3-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-3-take-1",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"landscape image\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"keyboard\",\"count\":1,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"shelf\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"plant\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"books\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"window\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"closeUp\",\"setting\":\"indoor workspace\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"Text on the books on the shelf is not legible.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"camera\",\"verb\":\"moves forward, framing the monitor more closely\",\"completes\":true},{\"entity\":\"keyboard\",\"verb\":\"moves out of the bottom of the frame\",\"completes\":true}],\"eventOrder\":[\"camera moves forward, framing the monitor more closely\",\"keyboard moves out of the bottom of the frame\"]}"
+    }
+  ],
+  "take_reconciliation": [
+    {
+      "id": "rec-a1-shot-0-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-0-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"show-tv\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-tv\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-1-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-1-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"show-card\",\"entity\":0,\"countMatches\":true},{\"id\":\"show-screen\",\"entity\":1,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-screen\",\"shown\":true,\"entity\":1},{\"id\":\"show-card\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-2-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-2-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"show-monitor\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-card\",\"shown\":true,\"entity\":1},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-3-take-1",
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "take_id": "a1-shot-3-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"show-monitor\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-monitor\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    }
+  ],
+  "render": [
+    {
+      "run_id": "d12931e1-6f78-4911-85a1-a90346627c4e",
+      "render_id": "a1-render",
+      "attempt": 1,
+      "render_manifest": "{\"captionStyle\":{\"fontName\":\"Arial\",\"fontSize\":48,\"id\":\"word-captions-1\",\"marginV\":200},\"captions\":[{\"endMs\":128,\"startMs\":43,\"text\":\"In\"},{\"endMs\":597,\"startMs\":171,\"text\":\"nineteen\"},{\"endMs\":1195,\"startMs\":640,\"text\":\"seventy\"},{\"endMs\":1749,\"startMs\":1237,\"text\":\"two,\"},{\"endMs\":2432,\"startMs\":1792,\"text\":\"Pong\"},{\"endMs\":2944,\"startMs\":2475,\"text\":\"was\"},{\"endMs\":3499,\"startMs\":3200,\"text\":\"two\"},{\"endMs\":4096,\"startMs\":3541,\"text\":\"paddles\"},{\"endMs\":4395,\"startMs\":4139,\"text\":\"and\"},{\"endMs\":4736,\"startMs\":4437,\"text\":\"a\"},{\"endMs\":5205,\"startMs\":4779,\"text\":\"ball.\"},{\"endMs\":5931,\"startMs\":5248,\"text\":\"By\"},{\"endMs\":6443,\"startMs\":5973,\"text\":\"nineteen\"},{\"endMs\":6955,\"startMs\":6485,\"text\":\"eighty\"},{\"endMs\":7595,\"startMs\":6997,\"text\":\"five,\"},{\"endMs\":8405,\"startMs\":7637,\"text\":\"Super\"},{\"endMs\":8789,\"startMs\":8448,\"text\":\"Mario\"},{\"endMs\":9216,\"startMs\":8832,\"text\":\"Bros\"},{\"endMs\":9984,\"startMs\":9259,\"text\":\"drew\"},{\"endMs\":10240,\"startMs\":10027,\"text\":\"whole\"},{\"endMs\":11008,\"startMs\":10283,\"text\":\"worlds\"},{\"endMs\":11179,\"startMs\":11051,\"text\":\"in\"},{\"endMs\":12032,\"startMs\":11221,\"text\":\"pixels.\"},{\"endMs\":12421,\"startMs\":12293,\"text\":\"Then\"},{\"endMs\":12805,\"startMs\":12463,\"text\":\"games\"},{\"endMs\":13359,\"startMs\":12847,\"text\":\"moved\"},{\"endMs\":14085,\"startMs\":13402,\"text\":\"into\"},{\"endMs\":14426,\"startMs\":14127,\"text\":\"three\"},{\"endMs\":15237,\"startMs\":14469,\"text\":\"dimensions,\"},{\"endMs\":15749,\"startMs\":15279,\"text\":\"built\"},{\"endMs\":16175,\"startMs\":15791,\"text\":\"from\"},{\"endMs\":17029,\"startMs\":16218,\"text\":\"polygons.\"},{\"endMs\":17839,\"startMs\":17071,\"text\":\"In\"},{\"endMs\":18351,\"startMs\":17882,\"text\":\"nineteen\"},{\"endMs\":18735,\"startMs\":18394,\"text\":\"ninety\"},{\"endMs\":19205,\"startMs\":18778,\"text\":\"nine,\"},{\"endMs\":20271,\"startMs\":19247,\"text\":\"Nvidia's\"},{\"endMs\":20911,\"startMs\":20314,\"text\":\"GeForce\"},{\"endMs\":21253,\"startMs\":20954,\"text\":\"two\"},{\"endMs\":21807,\"startMs\":21295,\"text\":\"fifty\"},{\"endMs\":22021,\"startMs\":21850,\"text\":\"six\"},{\"endMs\":22789,\"startMs\":22063,\"text\":\"was\"},{\"endMs\":23045,\"startMs\":22831,\"text\":\"sold\"},{\"endMs\":23514,\"startMs\":23087,\"text\":\"as\"},{\"endMs\":23642,\"startMs\":23557,\"text\":\"the\"},{\"endMs\":23813,\"startMs\":23685,\"text\":\"first\"},{\"endMs\":24623,\"startMs\":23855,\"text\":\"graphics\"},{\"endMs\":25391,\"startMs\":24666,\"text\":\"processing\"},{\"endMs\":26031,\"startMs\":25434,\"text\":\"unit.\"},{\"endMs\":26420,\"startMs\":26335,\"text\":\"It\"},{\"endMs\":26676,\"startMs\":26463,\"text\":\"lit\"},{\"endMs\":27017,\"startMs\":26719,\"text\":\"and\"},{\"endMs\":27615,\"startMs\":27316,\"text\":\"moved\"},{\"endMs\":28041,\"startMs\":27657,\"text\":\"every\"},{\"endMs\":29065,\"startMs\":28127,\"text\":\"triangle\"},{\"endMs\":29919,\"startMs\":29108,\"text\":\"itself,\"},{\"endMs\":30815,\"startMs\":29961,\"text\":\"freeing\"},{\"endMs\":31199,\"startMs\":30857,\"text\":\"the\"},{\"endMs\":31369,\"startMs\":31241,\"text\":\"main\"},{\"endMs\":32607,\"startMs\":31412,\"text\":\"processor.\"},{\"endMs\":33119,\"startMs\":32991,\"text\":\"In\"},{\"endMs\":33673,\"startMs\":33417,\"text\":\"twenty\"},{\"endMs\":34569,\"startMs\":33716,\"text\":\"eighteen,\"},{\"endMs\":35593,\"startMs\":34612,\"text\":\"Nvidia\"},{\"endMs\":35807,\"startMs\":35636,\"text\":\"brought\"},{\"endMs\":36319,\"startMs\":35849,\"text\":\"real\"},{\"endMs\":36873,\"startMs\":36361,\"text\":\"time\"},{\"endMs\":37428,\"startMs\":36916,\"text\":\"ray\"},{\"endMs\":38068,\"startMs\":37471,\"text\":\"tracing\"},{\"endMs\":38367,\"startMs\":38111,\"text\":\"to\"},{\"endMs\":39092,\"startMs\":38409,\"text\":\"games.\"},{\"endMs\":39545,\"startMs\":39460,\"text\":\"It\"},{\"endMs\":40057,\"startMs\":39588,\"text\":\"follows\"},{\"endMs\":40313,\"startMs\":40100,\"text\":\"each\"},{\"endMs\":40868,\"startMs\":40356,\"text\":\"beam\"},{\"endMs\":41038,\"startMs\":40910,\"text\":\"of\"},{\"endMs\":41252,\"startMs\":41081,\"text\":\"light\"},{\"endMs\":41636,\"startMs\":41294,\"text\":\"as\"},{\"endMs\":41977,\"startMs\":41849,\"text\":\"it\"},{\"endMs\":42532,\"startMs\":42020,\"text\":\"bounces\"},{\"endMs\":42830,\"startMs\":42574,\"text\":\"through\"},{\"endMs\":43172,\"startMs\":42873,\"text\":\"a\"},{\"endMs\":43684,\"startMs\":43214,\"text\":\"scene.\"},{\"endMs\":44750,\"startMs\":43726,\"text\":\"Deep\"},{\"endMs\":45049,\"startMs\":44793,\"text\":\"learning\"},{\"endMs\":45476,\"startMs\":45092,\"text\":\"now\"},{\"endMs\":46073,\"startMs\":45518,\"text\":\"fills\"},{\"endMs\":46286,\"startMs\":46116,\"text\":\"in\"},{\"endMs\":47097,\"startMs\":46329,\"text\":\"detail,\"},{\"endMs\":47310,\"startMs\":47140,\"text\":\"so\"},{\"endMs\":47865,\"startMs\":47524,\"text\":\"games\"},{\"endMs\":48334,\"startMs\":47908,\"text\":\"look\"},{\"endMs\":48676,\"startMs\":48377,\"text\":\"almost\"},{\"endMs\":49145,\"startMs\":48718,\"text\":\"like\"},{\"endMs\":49913,\"startMs\":49188,\"text\":\"film.\"}],\"gateProfile\":{\"gates\":[\"0\",\"1\",\"1S\",\"2\",\"3\",\"4\",\"5\",\"7\"],\"id\":\"phase-1\"},\"ledger\":{\"imageCents\":30,\"narrationCents\":0,\"videoCents\":28},\"profile\":{\"audioCodec\":\"aac\",\"channels\":2,\"container\":\"mp4\",\"fps\":24,\"height\":1366,\"sampleRate\":48000,\"videoCodec\":\"h264\",\"width\":768},\"renderId\":\"a1-render\",\"runId\":\"d12931e1-6f78-4911-85a1-a90346627c4e\",\"shots\":[{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":13.696,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":328,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"integrated_multimodal_description: [Shot 1] Cinematic, documentary-style footage in a 9:16 vertical aspect ratio. The scene centers on an unbranded vintage television resting on a bare, minimalist wooden table in a dimly lit room. The lighting is soft and natural, coming from a side window, casting gentle shadows across the textured grain of the wood. The television screen is active, displaying flickering, high-contrast blocky pixel game graphics—a simple white paddle and a small square ball bouncing across a dark digital field. No recognizable characters or logos are present. The camera remains steady with a very slow, subtle push-in toward the screen, capturing the slight curve of the cathode-ray tube. As the off-screen voiceover narrates, the pixels on the screen evolve. The voiceover says: <d>[English]In nineteen seventy two, Pong was two paddles and a ball.</d> At 00:06.500, the graphics on the screen shift rapidly, transforming into a more complex multi-colored landscape of blocky hills and floating structures, representing a vast world built from pixels. The off-screen voiceover continues: <d>[English]By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.</d> The camera continues its slow, steady approach as the glow of the screen reflects softly on the polished surface of the bare table.\\n\\noverall_soundscape: The low-frequency hum of a vintage vacuum tube television is accompanied by the rhythmic, electronic beeps and bloops of 8-bit game sound effects. A faint crackle of static fills the gaps between the sounds.\\n\\nnon_diegetic_music: N/A\",\"frames\":294,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-0-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"degradation\":\"a1-shot-0-repair failed Gate 1 at reconcile: must never show \\\"never-text\\\" is shown: written words or labels; must never show \\\"never-character\\\" is shown: a recognisable character from a real video game, comic or anime; it was the shot's repair (S-043)\",\"kind\":\"text-to-video\",\"placed\":true},\"pictureFrames\":294,\"requestId\":\"01a0dd6e-c032-7331-bead-67bd60b920e0\",\"shotId\":\"shot-0\",\"startFrame\":0,\"takeId\":\"a1-shot-0-take-1\",\"verdicts\":[{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":128,\"startMs\":43,\"word\":\"In\"},{\"endMs\":597,\"startMs\":171,\"word\":\"nineteen\"},{\"endMs\":1195,\"startMs\":640,\"word\":\"seventy\"},{\"endMs\":1749,\"startMs\":1237,\"word\":\"two,\"},{\"endMs\":2432,\"startMs\":1792,\"word\":\"Pong\"},{\"endMs\":2944,\"startMs\":2475,\"word\":\"was\"},{\"endMs\":3499,\"startMs\":3200,\"word\":\"two\"},{\"endMs\":4096,\"startMs\":3541,\"word\":\"paddles\"},{\"endMs\":4395,\"startMs\":4139,\"word\":\"and\"},{\"endMs\":4736,\"startMs\":4437,\"word\":\"a\"},{\"endMs\":5205,\"startMs\":4779,\"word\":\"ball.\"},{\"endMs\":5931,\"startMs\":5248,\"word\":\"By\"},{\"endMs\":6443,\"startMs\":5973,\"word\":\"nineteen\"},{\"endMs\":6955,\"startMs\":6485,\"word\":\"eighty\"},{\"endMs\":7595,\"startMs\":6997,\"word\":\"five,\"},{\"endMs\":8405,\"startMs\":7637,\"word\":\"Super\"},{\"endMs\":8789,\"startMs\":8448,\"word\":\"Mario\"},{\"endMs\":9216,\"startMs\":8832,\"word\":\"Bros\"},{\"endMs\":9984,\"startMs\":9259,\"word\":\"drew\"},{\"endMs\":10240,\"startMs\":10027,\"word\":\"whole\"},{\"endMs\":11008,\"startMs\":10283,\"word\":\"worlds\"},{\"endMs\":11179,\"startMs\":11051,\"word\":\"in\"},{\"endMs\":12032,\"startMs\":11221,\"word\":\"pixels.\"}]},{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":15.104,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":362,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"integrated_multimodal_description: [Shot 1] Cinematic, clean documentary footage filmed in a 9:16 vertical aspect ratio. The shot is a steady, continuous medium shot of an unbranded computer graphics card resting on a neutral, matte surface. The card features a sleek black finish with intricate metallic heat fins and exposed circuitry components, lacking any logos, text, or branding. In the background, an unbranded computer monitor glows softly, displaying a simple, low-polygon 3D environment—a minimalist landscape of blocky green hills under a flat blue sky. The lighting is soft and natural, coming from an unseen side window. The camera pushes in with small amplitude at slow speed toward the hardware, capturing the tactile texture of the materials. (S1), a male voice with a calm, informative tone, says in an off-screen voiceover: <d>[English]Then games moved into three dimensions, built from polygons.</d> At 00:07.500, the camera continues its slow push-in, shifting focus slightly from the physical card to the screen where the low-polygon shapes rotate slowly. (S1) continues in an off-screen voiceover: <d>[English]In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.</d>\\n\\noverall_soundscape: The faint, low hum of a cooling fan spinning provides a steady mechanical backdrop. A subtle, high-frequency electronic whir is audible in the quiet room.\\n\\nnon_diegetic_music: N/A\",\"frames\":337,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-1-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"degradation\":\"a1-shot-1-single failed Gate 1 at reconcile: subject \\\"show-screen\\\" (Low-polygon 3D screen) is clipped by the edge of the frame; must never show \\\"never-text\\\" is shown: written words or labels; no reserve slot is free (S-043)\",\"kind\":\"text-to-video\",\"placed\":true},\"pictureFrames\":337,\"requestId\":\"01a0dd70-12f7-78c3-8d53-ef5c2487f1f3\",\"shotId\":\"shot-1\",\"startFrame\":294,\"takeId\":\"a1-shot-1-take-1\",\"verdicts\":[{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":171,\"startMs\":43,\"word\":\"Then\"},{\"endMs\":555,\"startMs\":213,\"word\":\"games\"},{\"endMs\":1109,\"startMs\":597,\"word\":\"moved\"},{\"endMs\":1835,\"startMs\":1152,\"word\":\"into\"},{\"endMs\":2176,\"startMs\":1877,\"word\":\"three\"},{\"endMs\":2987,\"startMs\":2219,\"word\":\"dimensions,\"},{\"endMs\":3499,\"startMs\":3029,\"word\":\"built\"},{\"endMs\":3925,\"startMs\":3541,\"word\":\"from\"},{\"endMs\":4779,\"startMs\":3968,\"word\":\"polygons.\"},{\"endMs\":5589,\"startMs\":4821,\"word\":\"In\"},{\"endMs\":6101,\"startMs\":5632,\"word\":\"nineteen\"},{\"endMs\":6485,\"startMs\":6144,\"word\":\"ninety\"},{\"endMs\":6955,\"startMs\":6528,\"word\":\"nine,\"},{\"endMs\":8021,\"startMs\":6997,\"word\":\"Nvidia's\"},{\"endMs\":8661,\"startMs\":8064,\"word\":\"GeForce\"},{\"endMs\":9003,\"startMs\":8704,\"word\":\"two\"},{\"endMs\":9557,\"startMs\":9045,\"word\":\"fifty\"},{\"endMs\":9771,\"startMs\":9600,\"word\":\"six\"},{\"endMs\":10539,\"startMs\":9813,\"word\":\"was\"},{\"endMs\":10795,\"startMs\":10581,\"word\":\"sold\"},{\"endMs\":11264,\"startMs\":10837,\"word\":\"as\"},{\"endMs\":11392,\"startMs\":11307,\"word\":\"the\"},{\"endMs\":11563,\"startMs\":11435,\"word\":\"first\"},{\"endMs\":12373,\"startMs\":11605,\"word\":\"graphics\"},{\"endMs\":13141,\"startMs\":12416,\"word\":\"processing\"},{\"endMs\":13781,\"startMs\":13184,\"word\":\"unit.\"}]},{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":14.4,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":345,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\\n\\nintegrated_multimodal_description: [Shot 1] This is a clean documentary-style cinematic shot. The scene opens on a medium shot of a bright, sunlit workspace near a large window. In the center, a modern computer monitor displays a lifelike scene of a misty forest lake at sunrise, with sunlight filtering through the trees and reflecting off the water. In the foreground, an unbranded black graphics card with two cooling fans and a shroud sits on the light-colored desk, its gold PCIe connector edge clearly visible. A single black cable trails from behind the monitor. Through the window in the background, lush green trees are visible, also subtly reflected on the monitor's glass. The camera remains steady with a very slow push-in with small amplitude toward the GPU and monitor. As the shot progresses, the forest scene on the monitor becomes more dynamic, with light dancing on the water surface and mist drifting slowly, simulating real-time ray tracing. An off-screen voice (S1), with a calm and professional male tone, speaks: <d>[English]It lit and moved every triangle itself, freeing the main processor.</d> <d>[English]In twenty eighteen, Nvidia brought real time ray tracing to games.</d> The lighting remains soft and natural, emphasizing the textures of the hardware and the environment.\\n\\noverall_soundscape: The quiet ambiance of a still room with the very faint, mechanical whirring of computer cooling fans spinning up. A soft, low hum of electronics is present beneath the distant, rustle of leaves outside the window.\\n\\nnon_diegetic_music: N/A\",\"frames\":315,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-2-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"kind\":\"keyframe\",\"pictureId\":\"a1-shot-2-repair\"},\"pictureFrames\":315,\"requestId\":\"01a0dd71-8d17-7e12-9155-00dff5bb581f\",\"shotId\":\"shot-2\",\"startFrame\":631,\"takeId\":\"a1-shot-2-take-1\",\"verdicts\":[{\"coverage\":\"whole picture\",\"gate\":\"1\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":128,\"startMs\":43,\"word\":\"It\"},{\"endMs\":384,\"startMs\":171,\"word\":\"lit\"},{\"endMs\":725,\"startMs\":427,\"word\":\"and\"},{\"endMs\":1323,\"startMs\":1024,\"word\":\"moved\"},{\"endMs\":1749,\"startMs\":1365,\"word\":\"every\"},{\"endMs\":2773,\"startMs\":1835,\"word\":\"triangle\"},{\"endMs\":3627,\"startMs\":2816,\"word\":\"itself,\"},{\"endMs\":4523,\"startMs\":3669,\"word\":\"freeing\"},{\"endMs\":4907,\"startMs\":4565,\"word\":\"the\"},{\"endMs\":5077,\"startMs\":4949,\"word\":\"main\"},{\"endMs\":6315,\"startMs\":5120,\"word\":\"processor.\"},{\"endMs\":6827,\"startMs\":6699,\"word\":\"In\"},{\"endMs\":7381,\"startMs\":7125,\"word\":\"twenty\"},{\"endMs\":8277,\"startMs\":7424,\"word\":\"eighteen,\"},{\"endMs\":9301,\"startMs\":8320,\"word\":\"Nvidia\"},{\"endMs\":9515,\"startMs\":9344,\"word\":\"brought\"},{\"endMs\":10027,\"startMs\":9557,\"word\":\"real\"},{\"endMs\":10581,\"startMs\":10069,\"word\":\"time\"},{\"endMs\":11136,\"startMs\":10624,\"word\":\"ray\"},{\"endMs\":11776,\"startMs\":11179,\"word\":\"tracing\"},{\"endMs\":12075,\"startMs\":11819,\"word\":\"to\"},{\"endMs\":12800,\"startMs\":12117,\"word\":\"games.\"}]},{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":11.552,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":277,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"integrated_multimodal_description: [Shot 1] Cinematic, documentary-style footage in a vertical 9:16 aspect ratio. The scene opens with a steady shot of a sleek, unbranded modern monitor centered on a minimalist wide wooden desk. The monitor screen displays a hyper-realistic, lifelike render of a serene forest lake at midday; the water's surface features subtle ripples that reflect the dense pine trees and the soft blue sky above. The lighting in the room is soft and natural, coming from an unseen window, creating gentle shadows on the desk surface. The camera performs a very slow, steady push-in with small amplitude toward the screen. As the camera moves closer to the monitor, the digital details of the forest become increasingly intricate—individual leaves sway in a simulated breeze, and the glint of light on the water moves with optical clarity. No text, logos, or characters are visible on the monitor or in the environment. An off-screen voiceover speaks in a calm, professional tone: <d>[English]It follows each beam of light as it bounces through a scene.</d> followed shortly by: <d>[English]Deep learning now fills in detail, so games look almost like film.</d> The on-screen monitor remains focused entirely on the digital landscape.\\n\\noverall_soundscape: The faint, ambient hum of a quiet room is punctuated by the clear, resonant quality of the off-screen voiceover. There are no other physical sounds or environmental noises.\\n\\nnon_diegetic_music: N/A\",\"frames\":259,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-3-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"kind\":\"text-to-video\",\"placed\":false},\"pictureFrames\":259,\"requestId\":\"01a0dd73-251b-7ca2-896a-3b690b76c6d1\",\"shotId\":\"shot-3\",\"startFrame\":946,\"takeId\":\"a1-shot-3-take-1\",\"verdicts\":[{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":128,\"startMs\":43,\"word\":\"It\"},{\"endMs\":640,\"startMs\":171,\"word\":\"follows\"},{\"endMs\":896,\"startMs\":683,\"word\":\"each\"},{\"endMs\":1451,\"startMs\":939,\"word\":\"beam\"},{\"endMs\":1621,\"startMs\":1493,\"word\":\"of\"},{\"endMs\":1835,\"startMs\":1664,\"word\":\"light\"},{\"endMs\":2219,\"startMs\":1877,\"word\":\"as\"},{\"endMs\":2560,\"startMs\":2432,\"word\":\"it\"},{\"endMs\":3115,\"startMs\":2603,\"word\":\"bounces\"},{\"endMs\":3413,\"startMs\":3157,\"word\":\"through\"},{\"endMs\":3755,\"startMs\":3456,\"word\":\"a\"},{\"endMs\":4267,\"startMs\":3797,\"word\":\"scene.\"},{\"endMs\":5333,\"startMs\":4309,\"word\":\"Deep\"},{\"endMs\":5632,\"startMs\":5376,\"word\":\"learning\"},{\"endMs\":6059,\"startMs\":5675,\"word\":\"now\"},{\"endMs\":6656,\"startMs\":6101,\"word\":\"fills\"},{\"endMs\":6869,\"startMs\":6699,\"word\":\"in\"},{\"endMs\":7680,\"startMs\":6912,\"word\":\"detail,\"},{\"endMs\":7893,\"startMs\":7723,\"word\":\"so\"},{\"endMs\":8448,\"startMs\":8107,\"word\":\"games\"},{\"endMs\":8917,\"startMs\":8491,\"word\":\"look\"},{\"endMs\":9259,\"startMs\":8960,\"word\":\"almost\"},{\"endMs\":9728,\"startMs\":9301,\"word\":\"like\"},{\"endMs\":10496,\"startMs\":9771,\"word\":\"film.\"}]}],\"totalFrames\":1205}",
+      "hash": "34026e852320c5ab0102cb985eeaf6139551a991837de6652b6d7b90b91a2403",
+      "path": "<artifact>",
+      "profile": "{\"audioCodec\":\"aac\",\"channels\":2,\"container\":\"mp4\",\"fps\":24,\"height\":1366,\"sampleRate\":48000,\"videoCodec\":\"h264\",\"width\":768}",
+      "invocations": "[[\"ffmpeg\",\"-hide_banner\",\"-nostdin\",\"-y\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-filter_complex\",\"[0:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=294[v0];anullsrc=r=48000:cl=stereo,atrim=end_sample=588000[c0];[1:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=588000,apad=whole_len=588000[n0];[c0][n0]amix=inputs=2:duration=longest:normalize=0[a0];[2:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=337[v1];anullsrc=r=48000:cl=stereo,atrim=end_sample=674000[c1];[3:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=674000,apad=whole_len=674000[n1];[c1][n1]amix=inputs=2:duration=longest:normalize=0[a1];[4:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=315[v2];anullsrc=r=48000:cl=stereo,atrim=end_sample=630000[c2];[5:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=630000,apad=whole_len=630000[n2];[c2][n2]amix=inputs=2:duration=longest:normalize=0[a2];[6:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=259[v3];anullsrc=r=48000:cl=stereo,atrim=end_sample=518000[c3];[7:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=518000,apad=whole_len=518000[n3];[c3][n3]amix=inputs=2:duration=longest:normalize=0[a3];[v0][a0][v1][a1][v2][a2][v3][a3]concat=n=4:v=1:a=1[cut][a];[cut]ass='C\\\\:<artifact>'[v]\",\"-map\",\"[v]\",\"-map\",\"[a]\",\"-c:v\",\"libx264\",\"-preset\",\"veryfast\",\"-pix_fmt\",\"yuv420p\",\"-r\",\"24\",\"-c:a\",\"aac\",\"-ar\",\"48000\",\"-ac\",\"2\",\"-movflags\",\"+faststart\",\"-f\",\"mp4\",\"<artifact>\"]]",
+      "measure": "{\"readable\":true,\"durationSeconds\":50.208333,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1366,\"fps\":24,\"frames\":1205},\"audio\":{\"codec\":\"aac\",\"sampleRate\":48000,\"channels\":2},\"moovFirst\":true}",
+      "started_at": "2026-09-26T11:23:20.034Z",
+      "finished_at": "2026-09-26T11:23:46.901Z",
+      "gate7": "{\"outcome\":\"accept\",\"coverage\":{\"strategy\":\"frames\",\"frames\":12},\"answer\":[{\"question\":\"Are the shots in a sensible order?\",\"answer\":\"yes\"},{\"question\":\"Does the pacing work?\",\"answer\":\"yes\"},{\"question\":\"Does every shot sit well beside the shot that follows it?\",\"answer\":\"yes\"},{\"question\":\"Do the burned captions follow the narration?\",\"answer\":\"yes\"}],\"reasons\":[]}"
+    }
+  ],
+  "hold": [],
+  "still_hold": []
+}

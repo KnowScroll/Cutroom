@@ -1,0 +1,83 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "the planner threw at its first call: one model receipt, no plan",
+  "run": {
+    "run_id": "cd9648c9-7a13-4ebf-a088-d155121824df",
+    "request_id": "real-reel-20260925T183623",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260925T183623\",\"worldId\":\"cutroom-game-graphics\",\"narration\":[{\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\",\"claimIds\":[\"c1\"]},{\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\",\"claimIds\":[\"c1\"]},{\"text\":\"Then games moved into three dimensions, built from polygons.\",\"claimIds\":[\"c2\"]},{\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\",\"claimIds\":[\"c3\"]},{\"text\":\"It lit and moved every triangle itself, freeing the main processor.\",\"claimIds\":[\"c3\"]},{\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\",\"claimIds\":[\"c4\"]},{\"text\":\"It follows each beam of light as it bounces through a scene.\",\"claimIds\":[\"c4\"]},{\"text\":\"Deep learning now fills in detail, so games look almost like film.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old television showing blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor showing a lifelike rendered city skyline\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-game-graphics\",\"version\":1,\"text\":\"clean documentary footage, soft natural light, steady camera\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-tv\",\"text\":\"an old television showing blocky pixel game graphics\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor showing a lifelike rendered city skyline\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\"},{\"claimIds\":[\"c1\"],\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"},{\"claimIds\":[\"c2\"],\"text\":\"Then games moved into three dimensions, built from polygons.\"},{\"claimIds\":[\"c3\"],\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"},{\"claimIds\":[\"c3\"],\"text\":\"It lit and moved every triangle itself, freeing the main processor.\"},{\"claimIds\":[\"c4\"],\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\"},{\"claimIds\":[\"c4\"],\"text\":\"It follows each beam of light as it bounces through a scene.\"},{\"claimIds\":[\"c4\"],\"text\":\"Deep learning now fills in detail, so games look almost like film.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260925T183623\",\"style\":{\"id\":\"style-game-graphics\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-game-graphics\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"cd9648c9-7a13-4ebf-a088-d155121824df\",\"requestId\":\"real-reel-20260925T183623\",\"costCents\":0,\"status\":\"failed\",\"detail\":\"the planner call was answered unavailable at each of its 3 sends, the last saying \\\"the planner call to MiniMax-M2.7 did not reach the provider: fetch failed\\\": a provider's transient errors have their own counter, and it is spent, so nothing was made and no take is counted (I-11, S-096)\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-25T18:36:24.111Z"
+  },
+  "job": [
+    {
+      "id": 104,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"cd9648c9-7a13-4ebf-a088-d155121824df\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-25T18:36:24.111Z",
+      "locked_at": "2026-09-25T18:36:24.594Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "cd9648c9-7a13-4ebf-a088-d155121824df",
+      "cost_cents": 0
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "cd9648c9-7a13-4ebf-a088-d155121824df",
+      "seq": 1,
+      "at": "2026-09-25T18:36:24.111Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"cd9648c9-7a13-4ebf-a088-d155121824df\",\"seq\":1,\"at\":\"2026-09-25T18:36:24.111Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "cd9648c9-7a13-4ebf-a088-d155121824df",
+      "seq": 2,
+      "at": "2026-09-25T18:36:24.597Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"cd9648c9-7a13-4ebf-a088-d155121824df\",\"seq\":2,\"at\":\"2026-09-25T18:36:24.597Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "cd9648c9-7a13-4ebf-a088-d155121824df",
+      "seq": 3,
+      "at": "2026-09-25T18:38:30.398Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"cd9648c9-7a13-4ebf-a088-d155121824df\",\"seq\":3,\"at\":\"2026-09-25T18:38:30.398Z\",\"type\":\"run.finished\",\"status\":\"failed\"}"
+    }
+  ],
+  "plan": [],
+  "model_receipt": [
+    {
+      "id": 620,
+      "run_id": "cd9648c9-7a13-4ebf-a088-d155121824df",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 684,
+      "output_tokens": 2268,
+      "fake": 0,
+      "at": "2026-09-25T18:37:06.285Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [],
+  "observation": [],
+  "reconciliation": [],
+  "generation_receipt": [],
+  "lost_call": [],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

@@ -11,6 +11,9 @@ importers:
       '@cutroom/api':
         specifier: workspace:*
         version: link:apps/api
+      '@cutroom/benchmark':
+        specifier: workspace:*
+        version: link:packages/benchmark
       '@cutroom/contracts':
         specifier: workspace:*
         version: link:packages/contracts
@@ -114,6 +117,15 @@ importers:
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:../../packages/reel-contract
+
+  packages/benchmark:
+    dependencies:
+      '@cutroom/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@cutroom/reel-contract':
+        specifier: workspace:*
+        version: link:../reel-contract
 
   packages/contracts:
     dependencies:

@@ -1,0 +1,481 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "the canonical picture of one shot failed Gate 1 three times (D-047); its stills stage has no stage.finished (S-046)",
+  "run": {
+    "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+    "request_id": "real-reel-20260926T104917",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260926T104917\",\"worldId\":\"cutroom-game-graphics\",\"narration\":[{\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\",\"claimIds\":[\"c1\"]},{\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\",\"claimIds\":[\"c1\"]},{\"text\":\"Then games moved into three dimensions, built from polygons.\",\"claimIds\":[\"c2\"]},{\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\",\"claimIds\":[\"c3\"]},{\"text\":\"It lit and moved every triangle itself, freeing the main processor.\",\"claimIds\":[\"c3\"]},{\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\",\"claimIds\":[\"c4\"]},{\"text\":\"It follows each beam of light as it bounces through a scene.\",\"claimIds\":[\"c4\"]},{\"text\":\"Deep learning now fills in detail, so games look almost like film.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old unbranded television alone on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"a plain black computer graphics card with no markings\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-game-graphics\",\"version\":1,\"text\":\"clean documentary footage, soft natural light, steady camera\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-tv\",\"text\":\"an old unbranded television alone on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-card\",\"text\":\"a plain black computer graphics card with no markings\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\"},{\"claimIds\":[\"c1\"],\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"},{\"claimIds\":[\"c2\"],\"text\":\"Then games moved into three dimensions, built from polygons.\"},{\"claimIds\":[\"c3\"],\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"},{\"claimIds\":[\"c3\"],\"text\":\"It lit and moved every triangle itself, freeing the main processor.\"},{\"claimIds\":[\"c4\"],\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\"},{\"claimIds\":[\"c4\"],\"text\":\"It follows each beam of light as it bounces through a scene.\"},{\"claimIds\":[\"c4\"],\"text\":\"Deep learning now fills in detail, so games look almost like film.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260926T104917\",\"style\":{\"id\":\"style-game-graphics\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-game-graphics\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"requestId\":\"real-reel-20260926T104917\",\"costCents\":15,\"status\":\"stopped\",\"reason\":\"rule\",\"rule\":\"gate-1\",\"step\":\"stills\",\"detail\":\"the canonical picture of shot-1 failed Gate 1 three times (D-047): a1-shot-1-a failed Gate 1 at reconcile: must show \\\"show-card\\\" is not shown: a plain black computer graphics card with no markings; must never show \\\"never-text\\\" is shown: written words or labels. a1-shot-1-b failed Gate 1 at reconcile: must show \\\"show-card\\\" is not shown: a plain black computer graphics card with no markings; must never show \\\"never-text\\\" is shown: written words or labels. a1-shot-1-repair failed Gate 1 at reconcile: subject \\\"screen_lowpoly\\\" (Low-Poly Screen) is clipped by the edge of the frame\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-26T10:49:18.032Z"
+  },
+  "job": [
+    {
+      "id": 115,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-26T10:49:18.032Z",
+      "locked_at": "2026-09-26T10:49:18.519Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "cost_cents": 0
+    },
+    {
+      "id": 116,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-26T10:50:24.561Z",
+      "locked_at": "2026-09-26T10:50:24.566Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 115,
+      "correlation_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "cost_cents": 15
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 1,
+      "at": "2026-09-26T10:49:18.032Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":1,\"at\":\"2026-09-26T10:49:18.032Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 2,
+      "at": "2026-09-26T10:49:18.521Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":2,\"at\":\"2026-09-26T10:49:18.521Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 3,
+      "at": "2026-09-26T10:50:24.561Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":3,\"at\":\"2026-09-26T10:50:24.561Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 4,
+      "at": "2026-09-26T10:50:24.561Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":4,\"at\":\"2026-09-26T10:50:24.561Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 5,
+      "at": "2026-09-26T10:50:24.561Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":5,\"at\":\"2026-09-26T10:50:24.561Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 6,
+      "at": "2026-09-26T10:50:24.568Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":6,\"at\":\"2026-09-26T10:50:24.568Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 7,
+      "at": "2026-09-26T10:52:35.488Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":7,\"at\":\"2026-09-26T10:52:35.488Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 8,
+      "at": "2026-09-26T10:52:35.488Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":8,\"at\":\"2026-09-26T10:52:35.488Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 9,
+      "at": "2026-09-26T10:52:35.488Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":9,\"at\":\"2026-09-26T10:52:35.488Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "seq": 10,
+      "at": "2026-09-26T10:52:35.488Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"f44e960b-aaff-4bcb-b026-5cfb06641766\",\"seq\":10,\"at\":\"2026-09-26T10:52:35.488Z\",\"type\":\"run.finished\",\"status\":\"stopped\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":9,\"subjectIds\":[\"tv_old\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"screen_lowpoly\",\"gpu_card\"]},{\"unit\":2,\"durationSeconds\":10,\"subjectIds\":[\"gpu_card\",\"monitor_lifelike\"]},{\"unit\":3,\"durationSeconds\":9,\"subjectIds\":[\"monitor_lifelike\"]}],\"subjects\":[{\"id\":\"tv_old\",\"name\":\"Old Television\"},{\"id\":\"screen_lowpoly\",\"name\":\"Low-Poly Screen\"},{\"id\":\"gpu_card\",\"name\":\"Graphics Card\"},{\"id\":\"monitor_lifelike\",\"name\":\"Lifelike Monitor\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old unbranded television alone on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"a plain black computer graphics card with no markings\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":49,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.5,
+      "estimate_cents": 49,
+      "selected": 1
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4],[5],[6],[7]],\"shots\":[{\"unit\":0,\"durationSeconds\":6,\"subjectIds\":[\"show-tv\"]},{\"unit\":1,\"durationSeconds\":6,\"subjectIds\":[\"show-screen\",\"show-card\"]},{\"unit\":2,\"durationSeconds\":6,\"subjectIds\":[\"show-screen\",\"show-card\"]},{\"unit\":3,\"durationSeconds\":6,\"subjectIds\":[\"show-monitor\"]},{\"unit\":4,\"durationSeconds\":6,\"subjectIds\":[\"show-monitor\"]},{\"unit\":5,\"durationSeconds\":5,\"subjectIds\":[\"show-monitor\"]}],\"subjects\":[{\"id\":\"show-tv\",\"name\":\"Old Television\"},{\"id\":\"show-screen\",\"name\":\"Low‑Polygon Screen\"},{\"id\":\"show-card\",\"name\":\"Graphics Card\"},{\"id\":\"show-monitor\",\"name\":\"Modern Monitor\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old unbranded television alone on a bare table, its screen showing only blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"a plain black computer graphics card with no markings\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor on a wide desk, its whole screen showing only a lifelike rendered forest lake\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.5,
+      "estimate_cents": 48,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 687,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 707,
+      "output_tokens": 1640,
+      "fake": 0,
+      "at": "2026-09-26T10:49:37.601Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 688,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 724,
+      "output_tokens": 3160,
+      "fake": 0,
+      "at": "2026-09-26T10:50:12.101Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 689,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 598,
+      "output_tokens": 475,
+      "fake": 0,
+      "at": "2026-09-26T10:50:18.791Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 690,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 624,
+      "output_tokens": 371,
+      "fake": 0,
+      "at": "2026-09-26T10:50:24.560Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 691,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 326,
+      "fake": 0,
+      "at": "2026-09-26T10:50:52.537Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-1-a\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 692,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2474,
+      "output_tokens": 923,
+      "fake": 0,
+      "at": "2026-09-26T10:50:59.713Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-1-a\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 693,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1113,
+      "output_tokens": 1180,
+      "fake": 0,
+      "at": "2026-09-26T10:51:03.221Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-1-a\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 694,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 103,
+      "fake": 0,
+      "at": "2026-09-26T10:51:32.851Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-1-b\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 695,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 1271,
+      "fake": 0,
+      "at": "2026-09-26T10:51:40.258Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-1-b\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 696,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1337,
+      "output_tokens": 1361,
+      "fake": 0,
+      "at": "2026-09-26T10:51:48.315Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-1-b\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 697,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 262,
+      "fake": 0,
+      "at": "2026-09-26T10:52:11.964Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-1-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 698,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 641,
+      "fake": 0,
+      "at": "2026-09-26T10:52:16.851Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-1-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 699,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1071,
+      "output_tokens": 1415,
+      "fake": 0,
+      "at": "2026-09-26T10:52:35.483Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-1-repair\"]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-a",
+      "seq": 1,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "gpu_card",
+      "role": "canonical",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Low-Poly Screen; Graphics Card.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- a screen showing only simple low-polygon three-dimensional graphics\n- a plain black computer graphics card with no markings\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "framing": "medium",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7433818,\"brightness\":0.5514155251141553}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"must show \\\"show-card\\\" is not shown: a plain black computer graphics card with no markings\",\"must never show \\\"never-text\\\" is shown: written words or labels\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-b",
+      "seq": 2,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "gpu_card",
+      "role": "canonical",
+      "label": "b",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: wide.\nIt shows: Low-Poly Screen; Graphics Card.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- a screen showing only simple low-polygon three-dimensional graphics\n- a plain black computer graphics card with no markings\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "framing": "wide",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7512028666666667,\"brightness\":0.3474716894977169}",
+      "words": "[\"DELL\",\"TUF\"]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"must show \\\"show-card\\\" is not shown: a plain black computer graphics card with no markings\",\"must never show \\\"never-text\\\" is shown: written words or labels\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    },
+    {
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-repair",
+      "seq": 3,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "gpu_card",
+      "role": "canonical",
+      "label": "repair",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Low-Poly Screen; Graphics Card.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- a screen showing only simple low-polygon three-dimensional graphics\n- a plain black computer graphics card with no markings\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\n\nEach of the 2 tries before this one failed its checks. Correct what failed:\nTry 1:\n- must show \"show-card\" is not shown: a plain black computer graphics card with no markings\n- must never show \"never-text\" is shown: written words or labels\nTry 2:\n- must show \"show-card\" is not shown: a plain black computer graphics card with no markings\n- must never show \"never-text\" is shown: written words or labels",
+      "framing": "medium",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7187514,\"brightness\":0.6016803652968037}",
+      "words": "[\"DELL\"]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"subject \\\"screen_lowpoly\\\" (Low-Poly Screen) is clipped by the edge of the frame\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    }
+  ],
+  "observation": [
+    {
+      "id": "obs-a1-shot-1-a",
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-a",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"graphics card with cooling fan\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"window with daylight\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":true,\"clippedByEdge\":true},{\"label\":\"white desk surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"black cable\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"plain wall\",\"count\":1,\"position\":\"right\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"indoor office or workspace, white desk against a wall with a window on the left providing natural light\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"small logo/text appears on bottom-right of monitor bezel but is not legible\",\"markings or text on the graphics card appear blurred and unreadable\",\"the depicted scene on the monitor is a low-poly digital landscape with angular mountain shapes in shades of grey, brown, and white on green polygonal terrain, with one small yellow/orange angular shape in the centre — purpose of the displayed image is unclear\",\"the graphics card sits loose on the desk without visible mounting in a chassis\",\"precise model/brand of both the monitor and graphics card cannot be determined from the image\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-1-b",
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-b",
+      "observation": "{\"entities\":[{\"label\":\"flat-panel computer monitor\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"graphics card (printed circuit board with two cooling fans and a mounting bracket)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"window with sheer white curtain\",\"count\":1,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"windowsill\",\"count\":1,\"position\":\"left\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"flat light-coloured desk or table\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"dark grey wall\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"cables hanging from the monitor stand\",\"count\":2,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"dark rounded object at the bottom edge (possibly the top of a chair or stool)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"small red indicator light on the graphics card\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"small blue indicator light on the monitor's lower bezel\",\"count\":1,\"position\":\"right\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"indoor workspace or home office with a desk against a wall and a window to the left\",\"lighting\":\"mixed\",\"readableTextPresent\":true,\"ambiguities\":[\"Text 'DELL' is visible on the monitor's lower bezel\",\"Text 'TUF' is visible on the graphics card's shroud between the fans\",\"The brand name on the graphics card appears to be ASUS but is not fully legible in the image\",\"The exact model of the graphics card is not readable\",\"The dark object at the bottom could be a chair, stool, or other furniture — its identity is unclear because only the top edge is shown\",\"The number of cables behind the monitor is approximate — they overlap and individual runs are hard to separate\",\"The polygons on the monitor screen (blue, green, white, red shapes) are abstract geometric figures, not real objects\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-1-repair",
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-repair",
+      "observation": "{\"entities\":[{\"label\":\"computer monitor displaying a 3D scene of white cubes and pyramids\",\"count\":1,\"position\":\"left\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"black graphics card or expansion card with a gold connector edge and ports on the back\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"black cable extending from the card toward the right\",\"count\":1,\"position\":\"right\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"white desk or tabletop surface\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"off-white wall in the background\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"medium\",\"setting\":\"an indoor workspace or desk setup with a monitor and a hardware component placed on a white surface against a light wall\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"a small Dell logo is faintly visible on the lower-left bezel of the monitor but is not clearly legible\",\"the exact identity of the black electronic component is unclear; it could be a GPU, an NVMe expansion card, or another type of hardware device\",\"the on-screen image on the monitor contains both cubes and pyramids, making the count of each shape approximate\"],\"unsafeDepictions\":[]}"
+    }
+  ],
+  "reconciliation": [
+    {
+      "id": "rec-a1-shot-1-a",
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-a",
+      "answer": "{\"subjects\":[{\"id\":\"screen_lowpoly\",\"entity\":0,\"countMatches\":true},{\"id\":\"gpu_card\",\"entity\":1,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-screen\",\"shown\":true,\"entity\":0},{\"id\":\"show-card\",\"shown\":false,\"entity\":null},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":true,\"entity\":0},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"must show \\\"show-card\\\" is not shown: a plain black computer graphics card with no markings\",\"must never show \\\"never-text\\\" is shown: written words or labels\"]"
+    },
+    {
+      "id": "rec-a1-shot-1-b",
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-b",
+      "answer": "{\"subjects\":[{\"id\":\"screen_lowpoly\",\"entity\":0,\"countMatches\":true},{\"id\":\"gpu_card\",\"entity\":1,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-screen\",\"shown\":true,\"entity\":0},{\"id\":\"show-card\",\"shown\":false,\"entity\":null},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":true,\"entity\":0},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"must show \\\"show-card\\\" is not shown: a plain black computer graphics card with no markings\",\"must never show \\\"never-text\\\" is shown: written words or labels\"]"
+    },
+    {
+      "id": "rec-a1-shot-1-repair",
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-repair",
+      "answer": "{\"subjects\":[{\"id\":\"screen_lowpoly\",\"entity\":0,\"countMatches\":true},{\"id\":\"gpu_card\",\"entity\":1,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-screen\",\"shown\":true,\"entity\":0},{\"id\":\"show-card\",\"shown\":true,\"entity\":1},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null},{\"id\":\"never-character\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"subject \\\"screen_lowpoly\\\" (Low-Poly Screen) is clipped by the edge of the frame\"]"
+    }
+  ],
+  "generation_receipt": [
+    {
+      "id": 109,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-a",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Low-Poly Screen; Graphics Card.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- a screen showing only simple low-polygon three-dimensional graphics\n- a plain black computer graphics card with no markings\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T10:50:42.525Z"
+    },
+    {
+      "id": 110,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-b",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: wide.\nIt shows: Low-Poly Screen; Graphics Card.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- a screen showing only simple low-polygon three-dimensional graphics\n- a plain black computer graphics card with no markings\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T10:51:26.598Z"
+    },
+    {
+      "id": 111,
+      "run_id": "f44e960b-aaff-4bcb-b026-5cfb06641766",
+      "picture_id": "a1-shot-1-repair",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: clean documentary footage, soft natural light, steady camera\nShape: a vertical picture, 9:16.\nFraming: medium.\nIt shows: Low-Poly Screen; Graphics Card.\nWhat is said over the shot:\n  \"Then games moved into three dimensions, built from polygons.\"\n  \"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"\nIt must show:\n- a screen showing only simple low-polygon three-dimensional graphics\n- a plain black computer graphics card with no markings\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n- a recognisable character from a real video game, comic or anime\n\nEach of the 2 tries before this one failed its checks. Correct what failed:\nTry 1:\n- must show \"show-card\" is not shown: a plain black computer graphics card with no markings\n- must never show \"never-text\" is shown: written words or labels\nTry 2:\n- must show \"show-card\" is not shown: a plain black computer graphics card with no markings\n- must never show \"never-text\" is shown: written words or labels",
+      "reference_ids": "[]",
+      "style_id": "style-game-graphics",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-26T10:52:04.517Z"
+    }
+  ],
+  "lost_call": [],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

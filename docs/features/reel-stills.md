@@ -32,6 +32,17 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `yield-benchmark` on 2026-10-14, Slice 1 — the gates below are not edited, and no assertion is removed**
+> (**S-184**, **S-185**). **Check 3's printed line counts twenty-five rules, not twenty-two.**
+> `yield-benchmark` adds `benchmark-no-engine`, `benchmark-no-io` and `benchmark-npm-only-zod` in one change —
+> three and not one, because dependency-cruiser ANDs a `to`'s attributes and a single rule cannot say both "any
+> builtin" and "any npm package but `zod`". `tests/reel-stills-rules.test.ts` keeps check 3 in its exact form with
+> its number corrected: `assert.match(prove.out, /25 rules proven to fire/)`, and the comment naming each rule and
+> its ordinal gains the three, as every count change has (S-078). **The count stays EXACT**, so cases for a
+> twenty-sixth still fail here. Nothing else in this feature changes: no contract, stand-in, helper, provider,
+> setting or other check, and `worker-no-providers` — check 2's subject — is untouched. This feature's journey
+> re-runs in `yield-benchmark`'s last slice (S-099's form, S-178's order).
+
 > **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
 > (**S-163**, **S-164**). **`finishStills` takes the engine's own resume**, run after `endStills` — the chosen flags,
 > every degraded shot's labels and the stage's events — and before `run.finished`, in a savepoint

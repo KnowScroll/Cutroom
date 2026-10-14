@@ -1383,7 +1383,7 @@
               </div>
             </div>
             <div class="card k" style="--k: var(--c-contract)">
-              <div class="stat">22 rules</div>
+              <div class="stat">25 rules</div>
               <div class="stat-l">import boundaries, proven live by <code>drift --prove</code></div>
             </div>
             <div class="card k" style="--k: var(--c-ext)">
@@ -1457,7 +1457,7 @@
             <a class="card" href="#packages"
               ><h4>Packages &amp; boundaries →</h4>
               <p class="muted small">
-                Who may import whom. Click one of the 22 rules to see the forbidden edge.
+                Who may import whom. Click one of the 25 rules to see the forbidden edge.
               </p></a
             >
             <a class="card" href="#data"
@@ -1658,7 +1658,7 @@
           data-title="Packages &amp; boundaries"
         >
           <div class="eyebrow">Static structure</div>
-          <h2 class="tab-title">Packages and the 22 boundary rules</h2>
+          <h2 class="tab-title">Packages and the 25 boundary rules</h2>
           <p class="lede">
             Solid arrows are the real workspace dependencies (from each <code>package.json</code>).
             The rules live in <code>.dependency-cruiser.cjs</code> and are checked on
@@ -3193,7 +3193,7 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
                   <td>4</td>
                   <td>boundaries</td>
                   <td><code>scripts/drift.mjs</code></td>
-                  <td>the 22 rules hold on the real graph</td>
+                  <td>the 25 rules hold on the real graph</td>
                 </tr>
                 <tr>
                   <td>5</td>
@@ -3328,7 +3328,7 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
           <div class="eyebrow">Every source file</div>
           <h2 class="tab-title">Code index</h2>
           <p class="lede">
-            All 129 TypeScript source files under <code>apps/*/src</code> and
+            All 132 TypeScript source files under <code>apps/*/src</code> and
             <code>packages/*/src</code>, with line counts, their job and their exports. Filter by
             text or by package.
           </p>
@@ -3965,6 +3965,14 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
               x: 120,
               y: 560,
             },
+            {
+              id: 'benchmark',
+              label: 'packages/benchmark',
+              sub: 'measures · reasons',
+              kind: 'pipe',
+              x: 120,
+              y: 300,
+            },
             { id: 'zod', label: 'zod', sub: 'npm', kind: 'out', x: 760, y: 760 },
             {
               id: 'sqlite',
@@ -4020,6 +4028,8 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
             ['reelc', 'zod'],
             ['sdk', 'reelc'],
             ['sdk', 'core', 'launcher.ts only'],
+            ['benchmark', 'contracts'],
+            ['benchmark', 'reelc'],
           ].map(([from, to, label]) => ({ from, to, kind: 'dep', label })),
         }
         const RULES = [
@@ -4160,6 +4170,28 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
               ['api', 'ai'],
             ],
           ],
+          [
+            'benchmark-no-engine',
+            'The benchmark reads rows it was handed: no domain opener, no adapter that spends, no app (S-184).',
+            [
+              ['benchmark', 'domain'],
+              ['benchmark', 'providers'],
+              ['benchmark', 'worker'],
+            ],
+          ],
+          [
+            'benchmark-no-io',
+            'pipeline-no-io’s builtins plus crypto: a pure scorer that can hash can grow a key of its own.',
+            [['benchmark', 'core']],
+          ],
+          [
+            'benchmark-npm-only-zod',
+            'A driver is exactly what someone scoring a database full of runs would reach for.',
+            [
+              ['benchmark', 'sqlite'],
+              ['benchmark', 'ai'],
+            ],
+          ],
         ]
         const PKG_DETAIL = {
           service:
@@ -4168,6 +4200,8 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
           worker: 'Imports contracts, domain, pipeline, reel-contract. Never providers.',
           pipeline:
             'Imports contracts, reel-contract and zod. Nothing else — no I/O, no npm but zod.',
+          benchmark:
+            'Pure measures of a stored run. Imports contracts and reel-contract; no database, no adapter, no app, no I/O, not even node:crypto — the reader hands its hash in.',
           plan: 'The planner folder; the only folder allowed to import <code>split/</code>, and only through <code>split/index.ts</code>.',
           split:
             '<code>groupSentences(sentenceCount, units)</code>. Imports nothing outside its folder. Not exported from the package index.',
@@ -6873,7 +6907,7 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
           [
             'checks',
             'boundaries red',
-            'An import crosses one of the 22 rules.',
+            'An import crosses one of the 25 rules.',
             'Packages tab: find the rule; move the code, never the rule.',
           ],
           [
@@ -7162,6 +7196,24 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
             272,
             'startWorker: startup refusals, contexts, the poll → claim → dispatch loop.',
             'startWorker, WorkerOptions',
+          ],
+          [
+            'packages/benchmark/src/index.ts',
+            82,
+            "The package's only entrance: every measure and every reason bucket.",
+            'scorecard, termInputs, briefKeyInput, classify, verbatim',
+          ],
+          [
+            'packages/benchmark/src/measures.ts',
+            1534,
+            'Every measure of one run, from arrays of rows: the parts reached, the spans and their rules, the costs, the brief key’s input, and every rating term.',
+            'scorecard, termInputs, inheritance, briefKeyInput, gate7QuestionSetInput, subjectsPerShot, FIELD_COLUMNS',
+          ],
+          [
+            'packages/benchmark/src/reasons.ts',
+            309,
+            'The Gate 1 and Gate 5 reconcile classifier, and a verbatim bucket for every other reason-writing site.',
+            'classify, classifyGate1AndGate5, verbatim, VERBATIM_SITES',
           ],
           [
             'packages/contracts/src/brands.ts',
@@ -7957,7 +8009,7 @@ node --experimental-strip-types --no-warnings scripts/real-reel.mjs --resume &lt
           [
             '02',
             '"The seven packages and apps" / "enforces twenty-two rules" then lists 11',
-            'Nine workspace members (3 apps + 6 packages); all 22 rules are listed in the Packages tab.',
+            'Ten workspace members (3 apps + 7 packages); all 25 rules are listed in the Packages tab.',
           ],
           [
             '03',

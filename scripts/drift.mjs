@@ -233,6 +233,27 @@ function check() {
 // ---------------------------------------------------------------- prove
 
 /**
+ * One case per builtin `benchmark-no-io` enumerates, under BOTH spellings, with the enumeration
+ * read out of the rule itself rather than copied here: a builtin dropped from the pattern takes
+ * its two cases with it, the rule count stays 25, and the case count falls — which is what the
+ * tests that pin the printed line are for (S-078). Bare `sqlite` is NOT a Node builtin (only
+ * `node:sqlite` is), so it reaches the graph as an unresolved bare specifier; the rule names no
+ * `dependencyTypes` for exactly that reason, the way `model-client-only-in-providers` catches a
+ * client that is not installed.
+ */
+const BENCHMARK_IO_CASES = (() => {
+  const io = loadRules(CONFIG).forbidden.find((rule) => rule.name === 'benchmark-no-io')
+  const inner = /^\^\(node:\)\?\((.+)\)\$$/.exec(io?.to?.path ?? '')
+  if (inner === null) {
+    throw new Error('benchmark-no-io does not enumerate its builtins; --prove cannot be built')
+  }
+  return inner[1].split('|').flatMap((builtin, i) => [
+    ['benchmark-no-io', `packages/benchmark/src/io-${i}-bare.ts`, builtin],
+    ['benchmark-no-io', `packages/benchmark/src/io-${i}-node.ts`, `node:${builtin}`],
+  ])
+})()
+
+/**
  * Each entry: [rule, file, specifier] — a file written specifically to trip the rule it names, by
  * importing that one specifier. A case counts as caught only when its rule fires on that file's
  * edge to that module, so two cases of one rule are two things proven, not one seen twice.
@@ -331,6 +352,29 @@ const CASES = [
   // reason as the sdk-no-engine-internals cases above.
   ['sdk-processes-only-launcher', 'packages/sdk/src/index.ts', 'node:child_process'],
   ['sdk-processes-only-launcher', 'packages/sdk/src/spawns-in-index.ts', 'child_process'],
+  // yield-benchmark, Slice 1: the benchmark is arithmetic over rows it was handed, so it may
+  // reach no engine package, no app, no builtin that touches the outside world, and no npm
+  // package but zod. Three rules, because dependency-cruiser ANDs a `to`'s attributes (S-184).
+  //
+  // EVERY builtin `benchmark-no-io` enumerates is proven under BOTH spellings — the enumeration
+  // is read out of the rule itself, so a pattern that silently loses one case fails here rather
+  // than reading as coverage. `node:crypto` is among them on purpose: hashing was moved into the
+  // reader so this package could be denied it, and the brief key's hash is handed in.
+  //
+  // Each case needs its own file: every one of them would otherwise share the package's single
+  // entry, and one file overwritten 32 times leaves only the last import in the graph.
+  ['benchmark-no-engine', 'packages/benchmark/src/reaches-domain.ts', '../../domain/src/index.ts'],
+  [
+    'benchmark-no-engine',
+    'packages/benchmark/src/reaches-providers.ts',
+    '../../providers/src/index.ts',
+  ],
+  [
+    'benchmark-no-engine',
+    'packages/benchmark/src/reaches-worker.ts',
+    '../../../apps/worker/src/index.ts',
+  ],
+  ...BENCHMARK_IO_CASES,
 ]
 
 const EXTRA_FILES = [
@@ -403,6 +447,13 @@ const BY_NAME_CASES = [
   ['sdk-no-engine-internals', 'packages/sdk', '@cutroom/domain'],
   ['sdk-no-engine-internals', 'packages/sdk', '@cutroom/api'],
   ['sdk-no-engine-internals', 'packages/sdk', '@cutroom/contracts'],
+  // yield-benchmark, Slice 1: by package name, the import real code writes. The legal case below
+  // proves zod and the contract still resolve clean from the same package.
+  ['benchmark-no-engine', 'packages/benchmark', '@cutroom/domain'],
+  ['benchmark-no-engine', 'packages/benchmark', '@cutroom/providers'],
+  ['benchmark-no-engine', 'packages/benchmark', '@cutroom/api'],
+  ['benchmark-npm-only-zod', 'packages/benchmark', 'drizzle-orm'],
+  ['benchmark-npm-only-zod', 'packages/benchmark', 'better-sqlite3'],
 ]
 
 /**
@@ -422,6 +473,9 @@ const BY_NAME_LEGAL = [
   ['packages/providers', '@ai-sdk/openai'],
   // cutroom-sdk, Slice 2: the one permitted workspace import.
   ['packages/sdk', '@cutroom/reel-contract'],
+  // yield-benchmark, Slice 1: the two imports the benchmark really makes.
+  ['packages/benchmark', '@cutroom/reel-contract'],
+  ['packages/benchmark', 'zod'],
 ]
 
 const PACKAGE_FOLDERS = [
@@ -430,6 +484,7 @@ const PACKAGE_FOLDERS = [
   'packages/sdk',
   'packages/domain',
   'packages/pipeline',
+  'packages/benchmark',
   'packages/providers',
   'apps/api',
   'apps/worker',
@@ -583,6 +638,11 @@ const LEGAL = [
   [
     'packages/sdk/src/launcher.ts',
     "import { spawn } from 'node:child_process'\nexport const launch = () => spawn('node')",
+  ],
+  // yield-benchmark, Slice 1: the benchmark reads a type from the contracts and nothing else.
+  [
+    'packages/benchmark/src/index.ts',
+    "import type { Port } from '../../contracts/src/index.ts'\nexport type Measure = Port",
   ],
 ]
 

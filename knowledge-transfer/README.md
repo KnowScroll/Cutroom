@@ -8,7 +8,7 @@ together, how a request becomes a video, and where to look when something breaks
 
 **[`cutroom-kt.html`](./cutroom-kt.html)** is the same knowledge transfer as one self-contained page:
 open it in any browser, no server or network needed. It has a draggable system map (HLD), the package
-graph with all 22 boundary rules, a step-through sequence diagram of one request, flowcharts of every
+graph with all 25 boundary rules, a step-through sequence diagram of one request, flowcharts of every
 stage, the gates, an ER graph of all 21 tables, failure and resume paths, settings, a debugging guide,
 change playbooks, an index of every source file and a glossary, with search across all of it. The
 page and the numbered files below were checked against the source on 2026-10-04 and the files were

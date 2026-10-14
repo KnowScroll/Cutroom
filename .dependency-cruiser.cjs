@@ -54,6 +54,40 @@ module.exports = {
       },
     },
     {
+      name: 'benchmark-no-engine',
+      severity: 'error',
+      comment:
+        'The benchmark reads rows it was handed, and nothing else. It must not reach the domain — ' +
+        'whose opener opens for writing, migrates and creates a missing file — nor a provider, ' +
+        'which spends, nor an app. One regex, three targets, because dependency-cruiser ANDs a ' +
+        "`to`'s attributes and this is the only shape that forbids all three at once " +
+        '(yield-benchmark, Gate 2).',
+      from: { path: '^packages/benchmark' },
+      to: { path: '^(packages/(domain|providers)|apps)/' },
+    },
+    {
+      name: 'benchmark-no-io',
+      severity: 'error',
+      comment:
+        'The benchmark does no input or output of its own: it is arithmetic over arrays of rows, ' +
+        "and the reader does the reading. This is `pipeline-no-io`'s enumeration PLUS `crypto`, " +
+        'because a pure scorer that can hash can grow a key of its own and stop being a function ' +
+        "of its rows — the brief key's hash is handed in by the reader (yield-benchmark, Gate 2). " +
+        'Out, deliberately: path, url, util, assert, buffer, events, string_decoder and ' +
+        'querystring, none of which reaches the outside world, and several of which the pipeline ' +
+        'uses today. Unlike `pipeline-no-io` this names no `dependencyTypes`, and that is ' +
+        'load-bearing: bare `sqlite` is NOT a Node builtin — only `node:sqlite` is — so it ' +
+        'resolves to nothing, and a rule restricted to core modules is SILENT on it. Measured by ' +
+        "yield-benchmark's Slice 1: 31 of the 32 spellings fired under `dependencyTypes: ['core']` " +
+        'and that one did not, which also means `pipeline-no-io` does not hold bare `sqlite`. The ' +
+        'pattern is anchored to exact builtin names, so it cannot reach an unresolved `zod` — the ' +
+        'trap that makes this three rules and not one.',
+      from: { path: '^packages/benchmark' },
+      to: {
+        path: '^(node:)?(fs|fs/promises|child_process|net|http|https|http2|dgram|tls|dns|cluster|worker_threads|sqlite|repl|readline|crypto)$',
+      },
+    },
+    {
       name: 'api-no-providers',
       severity: 'error',
       comment:
@@ -281,6 +315,17 @@ module.exports = {
         'shape a model call must answer in. A database driver, an ORM or a model client imported ' +
         'here passes every rule about folders, because none of them lives in one.',
       from: { path: '^packages/pipeline/' },
+      to: { path: 'node_modules/', pathNot: 'node_modules/zod/|node_modules/\\.pnpm/zod@' },
+    },
+    {
+      name: 'benchmark-npm-only-zod',
+      severity: 'error',
+      comment:
+        'The benchmark is pure functions, and zod is the one npm package it may use. A database ' +
+        'driver imported here would pass every rule about folders, because none of them lives in ' +
+        'one — and this is the package that scores a database full of runs, so a driver is exactly ' +
+        'what someone would reach for (yield-benchmark, Gate 2).',
+      from: { path: '^packages/benchmark/' },
       to: { path: 'node_modules/', pathNot: 'node_modules/zod/|node_modules/\\.pnpm/zod@' },
     },
     {

@@ -98,15 +98,17 @@ packages/reel-contract    caller-facing schemas, types, routes, and contract ver
 packages/sdk              typed local client and launcher lifecycle
 packages/contracts        internal shared types and port interfaces
 packages/pipeline         pure stages and gates; no database, filesystem, or network
+packages/benchmark        pure measures of a stored run; rows in, figures out
 packages/providers        stand-in, MiniMax, fal, local-sensor, and ffmpeg adapters
 packages/domain           tables, migrations, queue, records, and budget ledger
 scripts                   checks, packaging, journeys, and the manual paid-reel command
 docs/features             approved gates and journey evidence for each feature
 ```
 
-Twenty-two dependency rules enforce these boundaries over resolved file paths. They include
-package entry-point rules, three rules inside the planner/splitter package, SDK isolation, process
-and key confinement, and npm dependency restrictions.
+Twenty-five dependency rules enforce these boundaries over resolved file paths. They include
+package entry-point rules, three rules inside the planner/splitter package, SDK isolation, three
+rules confining the benchmark package, process and key confinement, and npm dependency
+restrictions.
 
 ```bash
 node scripts/drift.mjs

@@ -797,7 +797,7 @@ column holds a path**, and nothing reaches it that could.
 
 ## Gate 4 — Slices
 
-- [ ] **Slice 1 — the package, its boundary, and the count.** `packages/benchmark` with its index, measures and
+- [x] **Slice 1 — the package, its boundary, and the count.** `packages/benchmark` with its index, measures and
       reasons; its `package.json` and `tsconfig.json`; the root reference and workspace dependency; the row
       fixtures; the three rules in `.dependency-cruiser.cjs` with their `--prove` cases, `node:crypto` among them;
       and every amendment taking 22 to 25 — the three test files (five assertions, two titles, two ordinal

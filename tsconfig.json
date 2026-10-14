@@ -14,6 +14,7 @@
     { "path": "./packages/contracts" },
     { "path": "./packages/domain" },
     { "path": "./packages/pipeline" },
+    { "path": "./packages/benchmark" },
     { "path": "./packages/providers" },
     { "path": "./apps/api" },
     { "path": "./apps/service" },

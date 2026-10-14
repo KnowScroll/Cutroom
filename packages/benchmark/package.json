@@ -1,0 +1,17 @@
+{
+  "name": "@cutroom/benchmark",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure functions - every measure of a stored run and its reason families. No database, no provider, no app, no I/O, no hash of its own.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@cutroom/contracts": "workspace:*",
+    "@cutroom/reel-contract": "workspace:*"
+  }
+}

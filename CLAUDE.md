@@ -36,6 +36,7 @@ whole mechanism exists to catch.
 ```text
 packages/contracts   shared types, and the ports AS TYPES. Imports nothing internal.
 packages/pipeline    pure functions: stages and gates.
+packages/benchmark   pure functions: every measure of a stored run. Reads rows, not a database.
 packages/providers   adapters behind the ports, including stand-ins. No durable state.
 packages/domain      tables, migrations, the job queue, the budget ledger.
 apps/worker          the runner. The only place that knows both a stage and a table.
@@ -53,7 +54,7 @@ is handed ports and never chooses or constructs one. Stand-ins write real PNG, M
 under one artifact root, `.artifacts/` by default (D-086, D-087), while paid adapters are reached
 only by a manually confirmed paid run or an explicitly configured service. A worker awaits the
 local tools' `ready()` before it opens its database and refuses to start without them (S-075).
-**Twenty-two** boundary rules are enforced on the real dependency graph, and
+**Twenty-five** boundary rules are enforced on the real dependency graph, and
 `node scripts/drift.mjs --prove` builds a deliberate violation of each one — relative and by
 package name, npm packages laid out the way pnpm lays them out — and fails if any case stays silent
 or any legal import is reported or fails to resolve. The load-bearing ones: **pipeline imports no
@@ -66,7 +67,7 @@ handed its ports, so it cannot construct an adapter that spends (`worker-no-prov
 (`processes-only-in-providers`, `sdk-processes-only-launcher`, S-075, S-175). Key-shaped
 environment reads likewise stay in providers, apart from non-secret service settings.
 
-**Three of the twenty-two are between two folders of one package**, and they are the reason this is
+**Three of the twenty-five are between two folders of one package**, and they are the reason this is
 dependency-cruiser rather than a script matching import text. It resolves every import to a file
 path, so `'../split/index.ts'` and `'@cutroom/pipeline'` are the same kind of thing to it:
 `split-imports-only-itself`, `split-imported-only-by-plan`, `split-entered-through-its-index` —

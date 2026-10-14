@@ -1,0 +1,1231 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "Gate 7 said no to a finished cut; carries a refused answer",
+  "run": {
+    "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+    "request_id": "real-reel-20260924T095951",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260924T095951\",\"worldId\":\"cutroom-black-holes\",\"narration\":[{\"text\":\"A black hole begins with a giant star, far heavier than our own.\",\"claimIds\":[\"c1\"]},{\"text\":\"When its fuel runs out, the core collapses and the star explodes.\",\"claimIds\":[\"c1\"]},{\"text\":\"What is left is crushed into a space far smaller than a city.\",\"claimIds\":[\"c2\"]},{\"text\":\"Its edge is the event horizon; past it, not even light escapes.\",\"claimIds\":[\"c2\"]},{\"text\":\"A star that drifts too close is stretched into a long thin stream.\",\"claimIds\":[\"c3\"]},{\"text\":\"That gas swirls inward, glowing hot, in a bright spiral.\",\"claimIds\":[\"c3\"]},{\"text\":\"Most black holes weigh a few Suns, each left behind by a single star.\",\"claimIds\":[\"c4\"]},{\"text\":\"At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"main\"},{\"id\":\"c3\",\"role\":\"supporting\"},{\"id\":\"c4\",\"role\":\"supporting\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-explosion\",\"text\":\"a giant star exploding in space\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-horizon\",\"text\":\"a black sphere circled by a ring of glowing gas\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-stream\",\"text\":\"a star being torn into a bright swirl of glowing gas\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-galaxy\",\"text\":\"a spiral galaxy with a bright glowing centre\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-black-holes\",\"version\":1,\"text\":\"semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"main\"},{\"id\":\"c3\",\"role\":\"supporting\"},{\"id\":\"c4\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-explosion\",\"text\":\"a giant star exploding in space\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-horizon\",\"text\":\"a black sphere circled by a ring of glowing gas\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-stream\",\"text\":\"a star being torn into a bright swirl of glowing gas\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-galaxy\",\"text\":\"a spiral galaxy with a bright glowing centre\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A black hole begins with a giant star, far heavier than our own.\"},{\"claimIds\":[\"c1\"],\"text\":\"When its fuel runs out, the core collapses and the star explodes.\"},{\"claimIds\":[\"c2\"],\"text\":\"What is left is crushed into a space far smaller than a city.\"},{\"claimIds\":[\"c2\"],\"text\":\"Its edge is the event horizon; past it, not even light escapes.\"},{\"claimIds\":[\"c3\"],\"text\":\"A star that drifts too close is stretched into a long thin stream.\"},{\"claimIds\":[\"c3\"],\"text\":\"That gas swirls inward, glowing hot, in a bright spiral.\"},{\"claimIds\":[\"c4\"],\"text\":\"Most black holes weigh a few Suns, each left behind by a single star.\"},{\"claimIds\":[\"c4\"],\"text\":\"At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260924T095951\",\"style\":{\"id\":\"style-black-holes\",\"text\":\"semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\",\"version\":1},\"worldId\":\"cutroom-black-holes\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"requestId\":\"real-reel-20260924T095951\",\"costCents\":45,\"status\":\"stopped\",\"reason\":\"rule\",\"rule\":\"gate-7\",\"step\":\"video\",\"detail\":\"the assembled reel a1-render failed Gate 7: the judge answered no to \\\"Does every shot show something no other shot repeats?\\\". No edit exists to try, so the reel stops (S-066, S-074).\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-24T09:59:51.571Z"
+  },
+  "job": [
+    {
+      "id": 54,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-24T09:59:51.571Z",
+      "locked_at": "2026-09-24T09:59:52.052Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "cost_cents": 0
+    },
+    {
+      "id": 55,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-24T10:01:14.313Z",
+      "locked_at": "2026-09-24T10:01:14.320Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 54,
+      "correlation_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "cost_cents": 20
+    },
+    {
+      "id": 56,
+      "kind": "reel.clips",
+      "payload": "{\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-24T10:04:38.142Z",
+      "locked_at": "2026-09-24T10:04:38.146Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 55,
+      "correlation_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "cost_cents": 25
+    },
+    {
+      "id": 57,
+      "kind": "reel.assemble",
+      "payload": "{\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-24T10:10:14.057Z",
+      "locked_at": "2026-09-24T10:10:14.062Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 56,
+      "correlation_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "cost_cents": 0
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 1,
+      "at": "2026-09-24T09:59:51.571Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":1,\"at\":\"2026-09-24T09:59:51.571Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 2,
+      "at": "2026-09-24T09:59:52.054Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":2,\"at\":\"2026-09-24T09:59:52.054Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 3,
+      "at": "2026-09-24T10:01:14.313Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":3,\"at\":\"2026-09-24T10:01:14.313Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 4,
+      "at": "2026-09-24T10:01:14.313Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":4,\"at\":\"2026-09-24T10:01:14.313Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 5,
+      "at": "2026-09-24T10:01:14.313Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":5,\"at\":\"2026-09-24T10:01:14.313Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 6,
+      "at": "2026-09-24T10:01:14.321Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":6,\"at\":\"2026-09-24T10:01:14.321Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 7,
+      "at": "2026-09-24T10:04:38.142Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":7,\"at\":\"2026-09-24T10:04:38.142Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 8,
+      "at": "2026-09-24T10:04:38.142Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":8,\"at\":\"2026-09-24T10:04:38.142Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 9,
+      "at": "2026-09-24T10:04:38.142Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":9,\"at\":\"2026-09-24T10:04:38.142Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 10,
+      "at": "2026-09-24T10:04:38.142Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":10,\"at\":\"2026-09-24T10:04:38.142Z\",\"type\":\"verdict\",\"gate\":\"1\",\"outcome\":\"fail\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 11,
+      "at": "2026-09-24T10:04:38.142Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":11,\"at\":\"2026-09-24T10:04:38.142Z\",\"type\":\"degraded\",\"shotId\":\"shot-2\",\"reason\":\"a1-shot-2-repair failed Gate 1 at reconcile: subject \\\"s3\\\" (Tidal Stream of Star Gas) is clipped by the edge of the frame; it was the shot's repair (S-043)\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 12,
+      "at": "2026-09-24T10:04:38.142Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":12,\"at\":\"2026-09-24T10:04:38.142Z\",\"type\":\"stage.finished\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 13,
+      "at": "2026-09-24T10:04:38.148Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":13,\"at\":\"2026-09-24T10:04:38.148Z\",\"type\":\"stage.started\",\"stage\":\"video\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 14,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":14,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 15,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":15,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 16,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":16,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 17,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":17,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-0\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 18,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":18,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 19,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":19,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 20,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":20,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 21,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":21,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-1\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 22,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":22,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 23,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":23,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 24,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":24,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 25,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":25,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-2\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 26,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":26,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"2\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 27,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":27,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"3\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 28,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":28,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"4\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 29,
+      "at": "2026-09-24T10:10:14.057Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":29,\"at\":\"2026-09-24T10:10:14.057Z\",\"type\":\"verdict\",\"gate\":\"5\",\"outcome\":\"accept\",\"shotId\":\"shot-3\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 30,
+      "at": "2026-09-24T10:10:46.486Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":30,\"at\":\"2026-09-24T10:10:46.486Z\",\"type\":\"verdict\",\"gate\":\"7\",\"outcome\":\"fail\"}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "seq": 31,
+      "at": "2026-09-24T10:10:46.486Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"seq\":31,\"at\":\"2026-09-24T10:10:46.486Z\",\"type\":\"run.finished\",\"status\":\"stopped\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":9,\"subjectIds\":[\"s1\"]},{\"unit\":1,\"durationSeconds\":9,\"subjectIds\":[\"s2\"]},{\"unit\":2,\"durationSeconds\":9,\"subjectIds\":[\"s3\"]},{\"unit\":3,\"durationSeconds\":9,\"subjectIds\":[\"s4\"]}],\"subjects\":[{\"id\":\"s1\",\"name\":\"Giant Star Explosion\"},{\"id\":\"s2\",\"name\":\"Black Sphere with Event Horizon\"},{\"id\":\"s3\",\"name\":\"Tidal Stream of Star Gas\"},{\"id\":\"s4\",\"name\":\"Spiral Galaxy with Supermassive Black Hole\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-explosion\",\"text\":\"a giant star exploding in space\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-horizon\",\"text\":\"a black sphere circled by a ring of glowing gas\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-stream\",\"text\":\"a star being torn into a bright swirl of glowing gas\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-galaxy\",\"text\":\"a spiral galaxy with a bright glowing centre\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":3,\"estimateCents\":41,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 4,
+      "estimate_cents": 41,
+      "selected": 1
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4],[5],[6],[7]],\"shots\":[{\"unit\":0,\"durationSeconds\":6,\"subjectIds\":[\"exp\"]},{\"unit\":1,\"durationSeconds\":6,\"subjectIds\":[\"horizon\"]},{\"unit\":2,\"durationSeconds\":6,\"subjectIds\":[\"stream\"]},{\"unit\":3,\"durationSeconds\":6,\"subjectIds\":[\"stream\"]},{\"unit\":4,\"durationSeconds\":6,\"subjectIds\":[\"horizon\"]},{\"unit\":5,\"durationSeconds\":6,\"subjectIds\":[\"galaxy\"]}],\"subjects\":[{\"id\":\"exp\",\"name\":\"Explosion\"},{\"id\":\"horizon\",\"name\":\"Black Hole Horizon\"},{\"id\":\"stream\",\"name\":\"Gas Stream\"},{\"id\":\"galaxy\",\"name\":\"Galaxy\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-explosion\",\"text\":\"a giant star exploding in space\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-horizon\",\"text\":\"a black sphere circled by a ring of glowing gas\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-stream\",\"text\":\"a star being torn into a bright swirl of glowing gas\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-galaxy\",\"text\":\"a spiral galaxy with a bright glowing centre\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.333333333333333,
+      "estimate_cents": 48,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 268,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 659,
+      "output_tokens": 1481,
+      "fake": 0,
+      "at": "2026-09-24T10:00:17.987Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 269,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 683,
+      "output_tokens": 2100,
+      "fake": 0,
+      "at": "2026-09-24T10:01:02.951Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 270,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 637,
+      "output_tokens": 400,
+      "fake": 0,
+      "at": "2026-09-24T10:01:11.185Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 271,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 649,
+      "output_tokens": 535,
+      "fake": 0,
+      "at": "2026-09-24T10:01:14.312Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 272,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 137,
+      "fake": 0,
+      "at": "2026-09-24T10:01:48.377Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 273,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 757,
+      "fake": 0,
+      "at": "2026-09-24T10:01:57.294Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 274,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 998,
+      "output_tokens": 1914,
+      "fake": 0,
+      "at": "2026-09-24T10:02:19.592Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-0-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 275,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 116,
+      "fake": 0,
+      "at": "2026-09-24T10:02:43.163Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 276,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 584,
+      "fake": 0,
+      "at": "2026-09-24T10:02:50.538Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 277,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 954,
+      "output_tokens": 712,
+      "fake": 0,
+      "at": "2026-09-24T10:02:54.855Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-1-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 278,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2063,
+      "output_tokens": 73,
+      "fake": 0,
+      "at": "2026-09-24T10:03:20.684Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-2-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 279,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 936,
+      "fake": 0,
+      "at": "2026-09-24T10:03:31.087Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 280,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1017,
+      "output_tokens": 1179,
+      "fake": 0,
+      "at": "2026-09-24T10:03:58.313Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-2-single\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 281,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2061,
+      "output_tokens": 89,
+      "fake": 0,
+      "at": "2026-09-24T10:04:21.049Z",
+      "call": "readText",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 282,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2476,
+      "output_tokens": 438,
+      "fake": 0,
+      "at": "2026-09-24T10:04:25.189Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 283,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 2514,
+      "output_tokens": 720,
+      "fake": 0,
+      "at": "2026-09-24T10:04:33.226Z",
+      "call": "observe",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 284,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 967,
+      "output_tokens": 859,
+      "fake": 0,
+      "at": "2026-09-24T10:04:38.140Z",
+      "call": "structured",
+      "picture_ids": "[\"a1-shot-2-repair\"]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 285,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 4337,
+      "output_tokens": 2467,
+      "fake": 0,
+      "at": "2026-09-24T10:06:04.175Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-0-take-1\"]"
+    },
+    {
+      "id": 286,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 979,
+      "output_tokens": 368,
+      "fake": 0,
+      "at": "2026-09-24T10:06:08.496Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-0-take-1\"]"
+    },
+    {
+      "id": 287,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5721,
+      "output_tokens": 2294,
+      "fake": 0,
+      "at": "2026-09-24T10:07:21.054Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-1-take-1\"]"
+    },
+    {
+      "id": 288,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 943,
+      "output_tokens": 660,
+      "fake": 0,
+      "at": "2026-09-24T10:07:31.793Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-1-take-1\"]"
+    },
+    {
+      "id": 289,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5029,
+      "output_tokens": 2837,
+      "fake": 0,
+      "at": "2026-09-24T10:08:35.318Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-2-take-1\"]"
+    },
+    {
+      "id": 290,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 1011,
+      "output_tokens": 674,
+      "fake": 0,
+      "at": "2026-09-24T10:08:41.490Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-2-take-1\"]"
+    },
+    {
+      "id": 291,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "witness",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 5721,
+      "output_tokens": 3311,
+      "fake": 0,
+      "at": "2026-09-24T10:10:09.694Z",
+      "call": "observe",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-1\"]"
+    },
+    {
+      "id": 292,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 984,
+      "output_tokens": 726,
+      "fake": 0,
+      "at": "2026-09-24T10:10:14.052Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[\"a1-shot-3-take-1\"]"
+    },
+    {
+      "id": 293,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "role": "judge",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 17151,
+      "output_tokens": 1544,
+      "fake": 0,
+      "at": "2026-09-24T10:10:46.484Z",
+      "call": "judgeCut",
+      "picture_ids": "[\"a1-render-frame-0\",\"a1-render-frame-1\",\"a1-render-frame-2\",\"a1-render-frame-3\",\"a1-render-frame-4\",\"a1-render-frame-5\",\"a1-render-frame-6\",\"a1-render-frame-7\",\"a1-render-frame-8\",\"a1-render-frame-9\",\"a1-render-frame-10\",\"a1-render-frame-11\"]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-0-single",
+      "seq": 1,
+      "attempt": 1,
+      "shot_unit": 0,
+      "subject_id": "s1",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Giant Star Explosion.\nWhat is said over the shot:\n  \"A black hole begins with a giant star, far heavier than our own.\"\n  \"When its fuel runs out, the core collapses and the star explodes.\"\nIt must show:\n- a giant star exploding in space\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.8083782666666667,\"brightness\":0.4219452054794521}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-1-single",
+      "seq": 2,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "s2",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Black Sphere with Event Horizon.\nWhat is said over the shot:\n  \"What is left is crushed into a space far smaller than a city.\"\n  \"Its edge is the event horizon; past it, not even light escapes.\"\nIt must show:\n- a black sphere circled by a ring of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.5583168333333333,\"brightness\":0.12406529680365296}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-single",
+      "seq": 3,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "s3",
+      "role": "standalone",
+      "label": "single",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Tidal Stream of Star Gas.\nWhat is said over the shot:\n  \"A star that drifts too close is stretched into a long thin stream.\"\n  \"That gas swirls inward, glowing hot, in a bright spiral.\"\nIt must show:\n- a star being torn into a bright swirl of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.7785009333333334,\"brightness\":0.26290456621004565}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"subject \\\"s3\\\" (Tidal Stream of Star Gas) is clipped by the edge of the frame\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-repair",
+      "seq": 4,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "s3",
+      "role": "standalone",
+      "label": "repair",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Tidal Stream of Star Gas.\nWhat is said over the shot:\n  \"A star that drifts too close is stretched into a long thin stream.\"\n  \"That gas swirls inward, glowing hot, in a bright spiral.\"\nIt must show:\n- a star being torn into a bright swirl of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n\nThe try before this one failed its checks. Correct what failed:\n- subject \"s3\" (Tidal Stream of Star Gas) is clipped by the edge of the frame",
+      "framing": null,
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.8115346666666667,\"brightness\":0.16020365296803654}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"subject \\\"s3\\\" (Tidal Stream of Star Gas) is clipped by the edge of the frame\"]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": "a1-shot-2-repair failed Gate 1 at reconcile: subject \"s3\" (Tidal Stream of Star Gas) is clipped by the edge of the frame; it was the shot's repair (S-043)",
+      "chosen": 0
+    }
+  ],
+  "observation": [
+    {
+      "id": "obs-a1-shot-0-single",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-0-single",
+      "observation": "{\"entities\":[{\"label\":\"glowing textured sphere\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"vertical stream of light and particles\",\"count\":2,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"orange flame-like plume clusters around the sphere's perimeter\",\"count\":8,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"small background stars\",\"count\":50,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"diffuse purple and blue nebula clouds\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"medium\",\"setting\":\"outer space, deep starfield with diffuse nebular gas\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"the central object could be a star, a planet, or an artistic/CGI rendering rather than a real astronomical object\",\"the surface bright spots could be interpreted as molten patches, solar flares, or stylised textures\",\"the vertical streams may be polar jets, beams of ejected material, or decorative rays rather than a physical feature\",\"the orange wisps at the edges could be solar prominences, fire, or painted flame effects\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-1-single",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-1-single",
+      "observation": "{\"entities\":[{\"label\":\"dark circular disk\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"glowing ring of light around the dark disk\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"stars (small bright points)\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"wispy purple and blue nebulous clouds\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"closeUp\",\"setting\":\"outer space, dark starry void\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"Whether the central object is a photograph of a solar eclipse, a black hole with an accretion disk, or a digital/artistic illustration\",\"The glow on the left side appears warm golden/tan while the right side has cooler bluish tones; reason unclear\",\"Some background points may be distant stars or possibly faint galaxies\",\"Whether the purple haze is nebular gas, lens flare, or atmospheric/scattered light\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-2-repair",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-repair",
+      "observation": "{\"entities\":[{\"label\":\"swirling cosmic vortex or spiral galaxy\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"horizontal beam or jet of light streaming from the left\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"stars scattered across the background\",\"count\":100,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"diffuse dark cosmic dust or nebula clouds\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"wide\",\"setting\":\"deep outer space with a starfield backdrop\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"The central object could be a black hole accretion disk, a quasar, a spiral galaxy seen face-on, or an artistic rendering rather than an actual astronomical object\",\"The stream of light on the left could be a relativistic jet, a wormhole, or stylized motion blur\",\"The reddish and bluish bands within the swirl could be star-forming regions, ionized gas, or purely decorative color\",\"Exact count of stars is estimated rather than precisely known\"],\"unsafeDepictions\":[]}"
+    },
+    {
+      "id": "obs-a1-shot-2-single",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-single",
+      "observation": "{\"entities\":[{\"label\":\"swirling luminous vortex or spiral\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"bright star with starburst flare\",\"count\":1,\"position\":\"right\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"arcing beam or stream of light connecting vortex to star\",\"count\":1,\"position\":\"centre\",\"prominence\":\"midground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"scattered point stars\",\"count\":30,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"diffuse nebula-like cloud wisps\",\"count\":2,\"position\":\"left\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"extremeWide\",\"setting\":\"deep space, a cosmic vista with a luminous spiral structure, a star, and a connecting light stream against a starfield\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"The nature of the left swirling structure is unclear — it could be a galaxy, a black hole accretion disc, a wormhole, or a purely artistic/AI-generated form\",\"Whether the arcing stream is a physical object, a jet, a light trail, or a lens flare is uncertain\",\"Some of the larger 'stars' with four-pointed diffraction spikes may be foreground stars or graphic artefacts\"],\"unsafeDepictions\":[]}"
+    }
+  ],
+  "reconciliation": [
+    {
+      "id": "rec-a1-shot-0-single",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-0-single",
+      "answer": "{\"subjects\":[{\"id\":\"s1\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-explosion\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-1-single",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-1-single",
+      "answer": "{\"subjects\":[{\"id\":\"s2\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-horizon\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-2-repair",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-repair",
+      "answer": "{\"subjects\":[{\"id\":\"s3\",\"entity\":1,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-stream\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"subject \\\"s3\\\" (Tidal Stream of Star Gas) is clipped by the edge of the frame\"]"
+    },
+    {
+      "id": "rec-a1-shot-2-single",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-single",
+      "answer": "{\"subjects\":[{\"id\":\"s3\",\"entity\":2,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-stream\",\"shown\":true,\"entity\":2},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[\"subject \\\"s3\\\" (Tidal Stream of Star Gas) is clipped by the edge of the frame\"]"
+    }
+  ],
+  "generation_receipt": [
+    {
+      "id": 46,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-0-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Giant Star Explosion.\nWhat is said over the shot:\n  \"A black hole begins with a giant star, far heavier than our own.\"\n  \"When its fuel runs out, the core collapses and the star explodes.\"\nIt must show:\n- a giant star exploding in space\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels",
+      "reference_ids": "[]",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-24T10:01:42.642Z"
+    },
+    {
+      "id": 47,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-1-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Black Sphere with Event Horizon.\nWhat is said over the shot:\n  \"What is left is crushed into a space far smaller than a city.\"\n  \"Its edge is the event horizon; past it, not even light escapes.\"\nIt must show:\n- a black sphere circled by a ring of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels",
+      "reference_ids": "[]",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-24T10:02:38.901Z"
+    },
+    {
+      "id": 48,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-single",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Tidal Stream of Star Gas.\nWhat is said over the shot:\n  \"A star that drifts too close is stretched into a long thin stream.\"\n  \"That gas swirls inward, glowing hot, in a bright spiral.\"\nIt must show:\n- a star being torn into a bright swirl of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels",
+      "reference_ids": "[]",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-24T10:03:15.203Z"
+    },
+    {
+      "id": 49,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "picture_id": "a1-shot-2-repair",
+      "model": "fal-ai/flux-2-pro",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nShape: a vertical picture, 9:16.\nIt shows: Tidal Stream of Star Gas.\nWhat is said over the shot:\n  \"A star that drifts too close is stretched into a long thin stream.\"\n  \"That gas swirls inward, glowing hot, in a bright spiral.\"\nIt must show:\n- a star being torn into a bright swirl of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\n\nThe try before this one failed its checks. Correct what failed:\n- subject \"s3\" (Tidal Stream of Star Gas) is clipped by the edge of the frame",
+      "reference_ids": "[]",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 7.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-24T10:04:16.981Z"
+    }
+  ],
+  "lost_call": [],
+  "refused_answer": [
+    {
+      "id": 1,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "port": "model",
+      "role": "witness",
+      "call": "observe",
+      "about": "[\"a1-shot-2-repair\"]",
+      "ask": 1,
+      "reasons": "[\"entities.3.count: Invalid input: expected number, received string\"]",
+      "answer": "{\"entities\":[{\"label\":\"bright glowing core of a vortex-like structure\",\"count\":1,\"position\":\"right\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"concentric swirling rings around the core\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"horizontal beam of streaking light extending leftward\",\"count\":1,\"position\":\"left\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"small background stars\",\"count\":\"many\",\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"wide\",\"setting\":\"outer space or cosmic environment\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"whether this is a black hole, a portal, a wormhole, or purely abstract art\",\"the nature of the leftward light beam — it could be a jet, a streak, or a beam of energy\",\"the exact count of background stars is uncertain due to faintness\"],\"unsafeDepictions\":[]}",
+      "at": "2026-09-24T10:04:25.191Z"
+    }
+  ],
+  "degradation": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "shot_id": "shot-2",
+      "gate": "1",
+      "reason": "a1-shot-2-repair failed Gate 1 at reconcile: subject \"s3\" (Tidal Stream of Star Gas) is clipped by the edge of the frame; it was the shot's repair (S-043)"
+    }
+  ],
+  "narration": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-0-narration",
+      "attempt": 1,
+      "shot_unit": 0,
+      "text": "A black hole begins with a giant star, far heavier than our own. When its fuel runs out, the core collapses and the star explodes.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"A\",\"startMs\":43,\"endMs\":128},{\"word\":\"black\",\"startMs\":171,\"endMs\":299},{\"word\":\"hole\",\"startMs\":341,\"endMs\":640},{\"word\":\"begins\",\"startMs\":683,\"endMs\":1109},{\"word\":\"with\",\"startMs\":1152,\"endMs\":1451},{\"word\":\"a\",\"startMs\":1493,\"endMs\":1579},{\"word\":\"giant\",\"startMs\":1621,\"endMs\":2048},{\"word\":\"star,\",\"startMs\":2091,\"endMs\":2773},{\"word\":\"far\",\"startMs\":2816,\"endMs\":3200},{\"word\":\"heavier\",\"startMs\":3243,\"endMs\":3925},{\"word\":\"than\",\"startMs\":3968,\"endMs\":4096},{\"word\":\"our\",\"startMs\":4139,\"endMs\":4224},{\"word\":\"own.\",\"startMs\":4267,\"endMs\":4693},{\"word\":\"When\",\"startMs\":4736,\"endMs\":5205},{\"word\":\"its\",\"startMs\":5248,\"endMs\":5376},{\"word\":\"fuel\",\"startMs\":5419,\"endMs\":5803},{\"word\":\"runs\",\"startMs\":5845,\"endMs\":6144},{\"word\":\"out,\",\"startMs\":6187,\"endMs\":6485},{\"word\":\"the\",\"startMs\":6528,\"endMs\":6699},{\"word\":\"core\",\"startMs\":6827,\"endMs\":6997},{\"word\":\"collapses\",\"startMs\":7040,\"endMs\":7723},{\"word\":\"and\",\"startMs\":7765,\"endMs\":8064},{\"word\":\"the\",\"startMs\":8107,\"endMs\":8448},{\"word\":\"star\",\"startMs\":8491,\"endMs\":8619},{\"word\":\"explodes.\",\"startMs\":8661,\"endMs\":9813}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":9.973469,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-1-narration",
+      "attempt": 1,
+      "shot_unit": 1,
+      "text": "What is left is crushed into a space far smaller than a city. Its edge is the event horizon; past it, not even light escapes.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"What\",\"startMs\":43,\"endMs\":171},{\"word\":\"is\",\"startMs\":213,\"endMs\":469},{\"word\":\"left\",\"startMs\":512,\"endMs\":640},{\"word\":\"is\",\"startMs\":683,\"endMs\":1237},{\"word\":\"crushed\",\"startMs\":1536,\"endMs\":2048},{\"word\":\"into\",\"startMs\":2091,\"endMs\":2560},{\"word\":\"a\",\"startMs\":2688,\"endMs\":2901},{\"word\":\"space\",\"startMs\":2944,\"endMs\":3072},{\"word\":\"far\",\"startMs\":3115,\"endMs\":3669},{\"word\":\"smaller\",\"startMs\":3797,\"endMs\":4565},{\"word\":\"than\",\"startMs\":4608,\"endMs\":5077},{\"word\":\"a\",\"startMs\":5120,\"endMs\":5419},{\"word\":\"city.\",\"startMs\":5461,\"endMs\":5931},{\"word\":\"Its\",\"startMs\":5973,\"endMs\":7083},{\"word\":\"edge\",\"startMs\":7125,\"endMs\":7253},{\"word\":\"is\",\"startMs\":7296,\"endMs\":7765},{\"word\":\"the\",\"startMs\":7808,\"endMs\":7979},{\"word\":\"event\",\"startMs\":8021,\"endMs\":8192},{\"word\":\"horizon;\",\"startMs\":8235,\"endMs\":9301},{\"word\":\"past\",\"startMs\":9344,\"endMs\":10155},{\"word\":\"it,\",\"startMs\":10197,\"endMs\":10709},{\"word\":\"not\",\"startMs\":10752,\"endMs\":11264},{\"word\":\"even\",\"startMs\":11307,\"endMs\":11648},{\"word\":\"light\",\"startMs\":11691,\"endMs\":12032},{\"word\":\"escapes.\",\"startMs\":12075,\"endMs\":13611}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":13.862313,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-2-narration",
+      "attempt": 1,
+      "shot_unit": 2,
+      "text": "A star that drifts too close is stretched into a long thin stream. That gas swirls inward, glowing hot, in a bright spiral.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"A\",\"startMs\":43,\"endMs\":128},{\"word\":\"star\",\"startMs\":171,\"endMs\":341},{\"word\":\"that\",\"startMs\":384,\"endMs\":896},{\"word\":\"drifts\",\"startMs\":939,\"endMs\":1365},{\"word\":\"too\",\"startMs\":1408,\"endMs\":1536},{\"word\":\"close\",\"startMs\":1579,\"endMs\":1835},{\"word\":\"is\",\"startMs\":1877,\"endMs\":2304},{\"word\":\"stretched\",\"startMs\":2517,\"endMs\":3200},{\"word\":\"into\",\"startMs\":3243,\"endMs\":3456},{\"word\":\"a\",\"startMs\":3499,\"endMs\":3712},{\"word\":\"long\",\"startMs\":3755,\"endMs\":3883},{\"word\":\"thin\",\"startMs\":3925,\"endMs\":4565},{\"word\":\"stream.\",\"startMs\":4608,\"endMs\":5632},{\"word\":\"That\",\"startMs\":5675,\"endMs\":6400},{\"word\":\"gas\",\"startMs\":6443,\"endMs\":6784},{\"word\":\"swirls\",\"startMs\":6827,\"endMs\":7595},{\"word\":\"inward,\",\"startMs\":7637,\"endMs\":8192},{\"word\":\"glowing\",\"startMs\":8235,\"endMs\":8917},{\"word\":\"hot,\",\"startMs\":8960,\"endMs\":9387},{\"word\":\"in\",\"startMs\":9429,\"endMs\":9771},{\"word\":\"a\",\"startMs\":9984,\"endMs\":10112},{\"word\":\"bright\",\"startMs\":10155,\"endMs\":10325},{\"word\":\"spiral.\",\"startMs\":10368,\"endMs\":11435}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":11.551938,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-3-narration",
+      "attempt": 1,
+      "shot_unit": 3,
+      "text": "Most black holes weigh a few Suns, each left behind by a single star. At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.",
+      "path": "<artifact>",
+      "words": "[{\"word\":\"Most\",\"startMs\":43,\"endMs\":299},{\"word\":\"black\",\"startMs\":341,\"endMs\":597},{\"word\":\"holes\",\"startMs\":640,\"endMs\":1152},{\"word\":\"weigh\",\"startMs\":1195,\"endMs\":1707},{\"word\":\"a\",\"startMs\":1749,\"endMs\":2091},{\"word\":\"few\",\"startMs\":2133,\"endMs\":2304},{\"word\":\"Suns,\",\"startMs\":2347,\"endMs\":2901},{\"word\":\"each\",\"startMs\":2944,\"endMs\":3925},{\"word\":\"left\",\"startMs\":3968,\"endMs\":4309},{\"word\":\"behind\",\"startMs\":4352,\"endMs\":4651},{\"word\":\"by\",\"startMs\":4693,\"endMs\":5163},{\"word\":\"a\",\"startMs\":5205,\"endMs\":5419},{\"word\":\"single\",\"startMs\":5461,\"endMs\":5675},{\"word\":\"star.\",\"startMs\":5717,\"endMs\":6528},{\"word\":\"At\",\"startMs\":6571,\"endMs\":7253},{\"word\":\"the\",\"startMs\":7381,\"endMs\":7680},{\"word\":\"heart\",\"startMs\":7723,\"endMs\":7808},{\"word\":\"of\",\"startMs\":7851,\"endMs\":8192},{\"word\":\"nearly\",\"startMs\":8235,\"endMs\":8363},{\"word\":\"every\",\"startMs\":8405,\"endMs\":8661},{\"word\":\"galaxy\",\"startMs\":8747,\"endMs\":9429},{\"word\":\"sits\",\"startMs\":9472,\"endMs\":9899},{\"word\":\"a\",\"startMs\":9941,\"endMs\":10155},{\"word\":\"supermassive\",\"startMs\":10197,\"endMs\":10880},{\"word\":\"one,\",\"startMs\":10923,\"endMs\":11435},{\"word\":\"millions\",\"startMs\":11477,\"endMs\":12331},{\"word\":\"of\",\"startMs\":12373,\"endMs\":12587},{\"word\":\"times\",\"startMs\":12629,\"endMs\":12757},{\"word\":\"heavier.\",\"startMs\":12800,\"endMs\":13653}]",
+      "probe": "{\"readable\":true,\"durationSeconds\":13.734625,\"video\":null,\"audio\":{\"codec\":\"mp3\",\"sampleRate\":32000,\"channels\":1},\"moovFirst\":null}"
+    }
+  ],
+  "speech_receipt": [
+    {
+      "id": 27,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-0-narration",
+      "model": "speech-2.8-hd",
+      "characters": 130,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-24T10:04:44.158Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 28,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-1-narration",
+      "model": "speech-2.8-hd",
+      "characters": 125,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-24T10:06:15.032Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 29,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-2-narration",
+      "model": "speech-2.8-hd",
+      "characters": 123,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-24T10:07:38.060Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 30,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "narration_id": "a1-shot-3-narration",
+      "model": "speech-2.8-hd",
+      "characters": 157,
+      "rate_cents": 0,
+      "cost_cents": 0,
+      "fake": 0,
+      "at": "2026-09-24T10:08:48.069Z",
+      "transient_errors": 0
+    }
+  ],
+  "take": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-0-take-1",
+      "attempt": 1,
+      "shot_unit": 0,
+      "number": 1,
+      "mode": "image-to-video",
+      "picture_id": "a1-shot-0-single",
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"A black hole begins with a giant star, far heavier than our own.\"\n  \"When its fuel runs out, the core collapses and the star explodes.\"\nIt shows: Giant Star Explosion.\nIt must show:\n- a giant star exploding in space\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: outer space, deep starfield with diffuse nebular gas.\nLighting: bright.\n- glowing textured sphere, at the centre\n- vertical stream of light and particles, at the centre\n- orange flame-like plume clusters around the sphere's perimeter, at the centre\n- small background stars, at the centre\n- diffuse purple and blue nebula clouds, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 10,
+      "seed": 3733533882,
+      "request_id": "01a0d2e0-0676-77b3-a482-65c9ab732e9a",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Semi-realistic animation, medium shot. The scene opens on a glowing, textured sphere of a giant star centered in a deep starfield. The star's surface is roiling with intense orange energy, with vertical streams of light and particles erupting in flame-like clusters around its perimeter. Diffuse purple and blue nebula clouds drift in the background. The camera pushes in with small amplitude at slow speed toward the pulsating core. (S1) says in an off-screen voiceover: <d>[English]A black hole begins with a giant star, far heavier than our own.</d> At 00:04.500, the star's surface begins to vibrate violently, and the orange flares intensify into a blinding white-hot light. (S1) says again in an off-screen voiceover: <d>[English]When its fuel runs out, the core collapses and the star explodes.</d> At 00:07.000, the core suddenly shrinks inward for a fraction of a second before detonating a massive supernova. A shockwave of light, fire, and cosmic debris expands outward in all directions, filling the frame with brilliant gold and white light as the nebula is pushed aside by the force.\n\noverall_soundscape: A deep, low-frequency rumble represents the star's massive gravity, followed by a high-pitched crystalline crackling sound as the core collapses. The final explosion produces a thunderous, resonant boom that fades into the sustained, rushing wind sound of expanding energy and particles traveling through the vacuum.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":10.144,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":243},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-14.3}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-1-take-1",
+      "attempt": 1,
+      "shot_unit": 1,
+      "number": 1,
+      "mode": "image-to-video",
+      "picture_id": "a1-shot-1-single",
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"What is left is crushed into a space far smaller than a city.\"\n  \"Its edge is the event horizon; past it, not even light escapes.\"\nIt shows: Black Sphere with Event Horizon.\nIt must show:\n- a black sphere circled by a ring of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nIt opens on its approved picture, which was seen to show:\nFraming: closeUp.\nSetting: outer space, dark starry void.\nLighting: mixed.\n- dark circular disk, at the centre\n- glowing ring of light around the dark disk, at the centre\n- stars (small bright points), at the centre\n- wispy purple and blue nebulous clouds, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 14,
+      "seed": 304296996,
+      "request_id": "01a0d2e1-6689-7390-99a1-d9d844f15394",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] This is a semi-realistic animation with a blend of live footage textures and digital illustration. The scene opens on a close-up of a perfectly circular, void-black disk centered in a dark, starry cosmic void. The dark disk is encircled by a brilliant, ethereal ring of glowing golden and white wispy gas that swirls with intense energy. Faint purple and blue nebulous clouds drift in the deep background, punctuated by tiny, sharp points of distant stars. The camera performs a slow, steady push-in with small amplitude toward the event horizon. As the video progresses, the glowing gas in the accretion disk begins to rotate faster, with filaments of light bending and warping as they approach the edge of the black sphere. The nebulous clouds shift and expand slowly, creating a sense of immense scale and gravitational pull. The lighting remains focused on the celestial ring, illuminating the surrounding darkness. An off-screen voiceover says: <d>[English]What is left is crushed into a space far smaller than a city.</d> followed shortly by <d>[English]Its edge is the event horizon; past it, not even light escapes.</d>\n\noverall_soundscape: A deep, low-frequency cosmic rumble represents the immense mass of the black hole, accompanied by faint, crystalline shimmering sounds as the glowing gas swirls rapidly. A subtle, ethereal wind-like rushing noise suggests the movement of celestial energy.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":14.4,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":345},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-21.7}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-2-take-1",
+      "attempt": 1,
+      "shot_unit": 2,
+      "number": 1,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 1,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"A star that drifts too close is stretched into a long thin stream.\"\n  \"That gas swirls inward, glowing hot, in a bright spiral.\"\nIt shows: Tidal Stream of Star Gas.\nIt must show:\n- a star being torn into a bright swirl of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 12,
+      "seed": 2628531143,
+      "request_id": "01a0d2e2-9fa6-71c2-a8c0-3f53904fa35b",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] A semi-realistic animation in a vertical 9:16 aspect ratio, blending the depth of realistic space photography with ethereal digital illustration. The scene opens on a deep, cosmic void filled with a soft glow and distant shimmering nebulae. In the center, a brilliant white-blue star (S1) pulses with intense light. The camera performs a slow, steady push-in with small amplitude toward the star as it suddenly begins to deform under immense gravitational forces. The star's surface starts to ripple and tear, with its outer layers being pulled away into a long, thin stream of glowing incandescent gas that stretches across the frame. At 00:04.500, the camera continues its slow approach, capturing the tidal stream in high detail. The gas begins to rotate and decompress, forming vibrant filaments of gold and violet. At 00:08.000, the motion accelerates as the gas de-aligns with kinetic energy, swirling inward toward a central point in a bright, mesmerizing spiral formation. The light from the spiral casts a flickering, warm glow across the surrounding cosmic clouds, while the swirling motion remains fluid and continuous until the end of the clip.\n\noverall_soundscape: A deep, resonant low-frequency hum represents the gravitational pull. As the star is torn apart, a crystalline tearing sound echoes through the void, followed by a rushing, airy whoosh that grows in intensity and pitch as the gas swirls into a high-speed spiral.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":12.256,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":294},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-24.5}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    },
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-3-take-1",
+      "attempt": 1,
+      "shot_unit": 3,
+      "number": 1,
+      "mode": "text-to-video",
+      "picture_id": null,
+      "degraded": 0,
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"Most black holes weigh a few Suns, each left behind by a single star.\"\n  \"At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.\"\nIt shows: Spiral Galaxy with Supermassive Black Hole.\nIt must show:\n- a spiral galaxy with a bright glowing centre\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "requested_seconds": 14,
+      "seed": 1342583641,
+      "request_id": "01a0d2e3-b271-7633-a1a2-ad9b698b8377",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, semi-realistic animation with a blend of photorealistic textures and digital illustration. The scene opens with a breathtaking vertical composition of a vast spiral galaxy suspended in the deep, cosmic void. The galaxy is composed of swirling arms of violet and gold dust and gas clouds, shimmering with a soft, ethereal cosmic glow. At the very center of the galaxy, a brilliant, dense core pulses with light, illuminating the surrounding structures. The camera performs a slow, majestic Push In with small amplitude at slow speed, traveling toward the galactic nucleus. At 00:04.000, an off-screen voice (S1), with a calm and resonant tone, says: <d>[English]Most black holes weigh a few Suns, each left behind by a single star.</d> At 00:08.500, the camera continues its steady journey, revealing the true scale of the center. In the heart of the brilliant light, a massive black hole emerges—a perfect sphere of darkness surrounded by a violent, glowing accretion disk of white-hot gas and warped light. S1 continues: <d>[English]At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.</d> The camera slows its movement as it nears the event horizon of the supermassive black hole, the surrounding light bending in gravitational arcs around the dark void.\n\noverall_soundscape: A deep, low-frequency cosmic hum represents the immense scale of space. Subtle, crystalline shimmering sounds are synchronized with the visual pulsing of the glowing galactic core and the swirling gas clouds.\n\nnon_diegetic_music: N/A",
+      "path": "<artifact>",
+      "probe": "{\"readable\":true,\"durationSeconds\":14.4,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1344,\"fps\":24,\"frames\":345},\"audio\":{\"codec\":\"aac\",\"sampleRate\":32000,\"channels\":2},\"moovFirst\":true}",
+      "scan": "{\"black\":[],\"frozen\":[],\"silent\":[],\"loudnessLufs\":-18.8}",
+      "words": "[]",
+      "sound": "{\"speech\":false,\"music\":false}",
+      "verdicts": "[{\"gate\":\"2\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"3\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"whole file\"}},{\"gate\":\"4\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"full\",\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"]}},{\"gate\":\"5\",\"outcome\":\"accept\",\"reasons\":[],\"coverage\":{\"strategy\":\"observation\"}}]",
+      "outcome": "accept",
+      "degradation": null
+    }
+  ],
+  "video_receipt": [
+    {
+      "id": 31,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-0-take-1",
+      "model": "fal-ai/minimax-h3-turbo/image-to-video",
+      "mode": "image-to-video",
+      "resolution": "768P",
+      "requested_seconds": 10,
+      "aspect_ratio": null,
+      "seed": 3733533882,
+      "request_id": "01a0d2e0-0676-77b3-a482-65c9ab732e9a",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"A black hole begins with a giant star, far heavier than our own.\"\n  \"When its fuel runs out, the core collapses and the star explodes.\"\nIt shows: Giant Star Explosion.\nIt must show:\n- a giant star exploding in space\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nIt opens on its approved picture, which was seen to show:\nFraming: medium.\nSetting: outer space, deep starfield with diffuse nebular gas.\nLighting: bright.\n- glowing textured sphere, at the centre\n- vertical stream of light and particles, at the centre\n- orange flame-like plume clusters around the sphere's perimeter, at the centre\n- small background stars, at the centre\n- diffuse purple and blue nebula clouds, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Semi-realistic animation, medium shot. The scene opens on a glowing, textured sphere of a giant star centered in a deep starfield. The star's surface is roiling with intense orange energy, with vertical streams of light and particles erupting in flame-like clusters around its perimeter. Diffuse purple and blue nebula clouds drift in the background. The camera pushes in with small amplitude at slow speed toward the pulsating core. (S1) says in an off-screen voiceover: <d>[English]A black hole begins with a giant star, far heavier than our own.</d> At 00:04.500, the star's surface begins to vibrate violently, and the orange flares intensify into a blinding white-hot light. (S1) says again in an off-screen voiceover: <d>[English]When its fuel runs out, the core collapses and the star explodes.</d> At 00:07.000, the core suddenly shrinks inward for a fraction of a second before detonating a massive supernova. A shockwave of light, fire, and cosmic debris expands outward in all directions, filling the frame with brilliant gold and white light as the nebula is pushed aside by the force.\n\noverall_soundscape: A deep, low-frequency rumble represents the star's massive gravity, followed by a high-pitched crystalline crackling sound as the core collapses. The final explosion produces a thunderous, resonant boom that fades into the sustained, rushing wind sound of expanding energy and particles traveling through the vacuum.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-24T10:05:11.272Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 32,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-1-take-1",
+      "model": "fal-ai/minimax-h3-turbo/image-to-video",
+      "mode": "image-to-video",
+      "resolution": "768P",
+      "requested_seconds": 14,
+      "aspect_ratio": null,
+      "seed": 304296996,
+      "request_id": "01a0d2e1-6689-7390-99a1-d9d844f15394",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"What is left is crushed into a space far smaller than a city.\"\n  \"Its edge is the event horizon; past it, not even light escapes.\"\nIt shows: Black Sphere with Event Horizon.\nIt must show:\n- a black sphere circled by a ring of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nIt opens on its approved picture, which was seen to show:\nFraming: closeUp.\nSetting: outer space, dark starry void.\nLighting: mixed.\n- dark circular disk, at the centre\n- glowing ring of light around the dark disk, at the centre\n- stars (small bright points), at the centre\n- wispy purple and blue nebulous clouds, at the centre\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] This is a semi-realistic animation with a blend of live footage textures and digital illustration. The scene opens on a close-up of a perfectly circular, void-black disk centered in a dark, starry cosmic void. The dark disk is encircled by a brilliant, ethereal ring of glowing golden and white wispy gas that swirls with intense energy. Faint purple and blue nebulous clouds drift in the deep background, punctuated by tiny, sharp points of distant stars. The camera performs a slow, steady push-in with small amplitude toward the event horizon. As the video progresses, the glowing gas in the accretion disk begins to rotate faster, with filaments of light bending and warping as they approach the edge of the black sphere. The nebulous clouds shift and expand slowly, creating a sense of immense scale and gravitational pull. The lighting remains focused on the celestial ring, illuminating the surrounding darkness. An off-screen voiceover says: <d>[English]What is left is crushed into a space far smaller than a city.</d> followed shortly by <d>[English]Its edge is the event horizon; past it, not even light escapes.</d>\n\noverall_soundscape: A deep, low-frequency cosmic rumble represents the immense mass of the black hole, accompanied by faint, crystalline shimmering sounds as the glowing gas swirls rapidly. A subtle, ethereal wind-like rushing noise suggests the movement of celestial energy.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 7,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-24T10:06:46.535Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 33,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-2-take-1",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 12,
+      "aspect_ratio": "9:16",
+      "seed": 2628531143,
+      "request_id": "01a0d2e2-9fa6-71c2-a8c0-3f53904fa35b",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"A star that drifts too close is stretched into a long thin stream.\"\n  \"That gas swirls inward, glowing hot, in a bright spiral.\"\nIt shows: Tidal Stream of Star Gas.\nIt must show:\n- a star being torn into a bright swirl of glowing gas\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] A semi-realistic animation in a vertical 9:16 aspect ratio, blending the depth of realistic space photography with ethereal digital illustration. The scene opens on a deep, cosmic void filled with a soft glow and distant shimmering nebulae. In the center, a brilliant white-blue star (S1) pulses with intense light. The camera performs a slow, steady push-in with small amplitude toward the star as it suddenly begins to deform under immense gravitational forces. The star's surface starts to ripple and tear, with its outer layers being pulled away into a long, thin stream of glowing incandescent gas that stretches across the frame. At 00:04.500, the camera continues its slow approach, capturing the tidal stream in high detail. The gas begins to rotate and decompress, forming vibrant filaments of gold and violet. At 00:08.000, the motion accelerates as the gas de-aligns with kinetic energy, swirling inward toward a central point in a bright, mesmerizing spiral formation. The light from the spiral casts a flickering, warm glow across the surrounding cosmic clouds, while the swirling motion remains fluid and continuous until the end of the clip.\n\noverall_soundscape: A deep, resonant low-frequency hum represents the gravitational pull. As the star is torn apart, a crystalline tearing sound echoes through the void, followed by a rushing, airy whoosh that grows in intensity and pitch as the gas swirls into a high-speed spiral.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 6,
+      "fake": 0,
+      "degraded": 1,
+      "at": "2026-09-24T10:07:59.322Z",
+      "transient_errors": 0
+    },
+    {
+      "id": 34,
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-3-take-1",
+      "model": "fal-ai/minimax-h3-turbo/text-to-video",
+      "mode": "text-to-video",
+      "resolution": "768P",
+      "requested_seconds": 14,
+      "aspect_ratio": "9:16",
+      "seed": 1342583641,
+      "request_id": "01a0d2e3-b271-7633-a1a2-ad9b698b8377",
+      "prompt": "Make one shot of a short vertical reel: one continuous clip.\nStyle: semi-realistic animation, between real footage and illustration, soft cosmic glow, calm\nWhat is said over the shot:\n  \"Most black holes weigh a few Suns, each left behind by a single star.\"\n  \"At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.\"\nIt shows: Spiral Galaxy with Supermassive Black Hole.\nIt must show:\n- a spiral galaxy with a bright glowing centre\nIt must never show:\n- a recognisable real-world public figure\n- written words or labels\nNo dialogue, no speech, no music.\nnon_diegetic_music: N/A",
+      "expanded_prompt": "integrated_multimodal_description: [Shot 1] Cinematic, semi-realistic animation with a blend of photorealistic textures and digital illustration. The scene opens with a breathtaking vertical composition of a vast spiral galaxy suspended in the deep, cosmic void. The galaxy is composed of swirling arms of violet and gold dust and gas clouds, shimmering with a soft, ethereal cosmic glow. At the very center of the galaxy, a brilliant, dense core pulses with light, illuminating the surrounding structures. The camera performs a slow, majestic Push In with small amplitude at slow speed, traveling toward the galactic nucleus. At 00:04.000, an off-screen voice (S1), with a calm and resonant tone, says: <d>[English]Most black holes weigh a few Suns, each left behind by a single star.</d> At 00:08.500, the camera continues its steady journey, revealing the true scale of the center. In the heart of the brilliant light, a massive black hole emerges—a perfect sphere of darkness surrounded by a violent, glowing accretion disk of white-hot gas and warped light. S1 continues: <d>[English]At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.</d> The camera slows its movement as it nears the event horizon of the supermassive black hole, the surrounding light bending in gravitational arcs around the dark void.\n\noverall_soundscape: A deep, low-frequency cosmic hum represents the immense scale of space. Subtle, crystalline shimmering sounds are synchronized with the visual pulsing of the glowing galactic core and the swirling gas clouds.\n\nnon_diegetic_music: N/A",
+      "expansion_mode": "balanced",
+      "style_id": "style-black-holes",
+      "style_version": 1,
+      "rate_cents": 0.5,
+      "cost_cents": 7,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-09-24T10:09:15.202Z",
+      "transient_errors": 0
+    }
+  ],
+  "take_observation": [
+    {
+      "id": "obs-a1-shot-0-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-0-take-1",
+      "observation": "{\"entities\":[{\"label\":\"fiery glowing sphere\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"closeUp\",\"setting\":\"outer space with stars and faint nebula clouds\",\"lighting\":\"bright\",\"readableTextPresent\":false,\"ambiguities\":[\"It is unclear if the camera is zooming out or if the object is actually expanding in size.\",\"The exact nature of the object is ambiguous, resembling a star, sun, or a magical fireball.\",\"The expanding flames at the end of the clip extend beyond the edges of the frame.\",\"There are many small stars in the background that are difficult to count individually.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"fiery glowing sphere\",\"verb\":\"radiates flames outward from its surface\",\"completes\":true},{\"entity\":\"fiery glowing sphere\",\"verb\":\"flares intensely, turning its core bright white\",\"completes\":true},{\"entity\":\"fiery glowing sphere\",\"verb\":\"expands outward, filling the frame with fire\",\"completes\":true}],\"eventOrder\":[\"fiery glowing sphere radiates flames outward from its surface\",\"fiery glowing sphere flares intensely, turning its core bright white\",\"fiery glowing sphere expands outward, filling the frame with fire\"]}"
+    },
+    {
+      "id": "obs-a1-shot-1-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-1-take-1",
+      "observation": "{\"entities\":[{\"label\":\"black circle\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"glowing ring of light\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true}],\"framing\":\"closeUp\",\"setting\":\"a dark expanse resembling outer space, scattered with small white dots resembling stars and faint purple wisps resembling a nebula\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"the physical nature of the glowing material forming the ring\",\"whether the central object is moving forward or the camera is zooming in\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"glowing ring of light\",\"verb\":\"swirls continuously\",\"completes\":false},{\"entity\":\"black circle and glowing ring of light\",\"verb\":\"scale up, taking up more of the frame\",\"completes\":false}],\"eventOrder\":[\"glowing ring of light swirls continuously\",\"black circle and glowing ring of light scale up, taking up more of the frame\"]}"
+    },
+    {
+      "id": "obs-a1-shot-2-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-2-take-1",
+      "observation": "{\"entities\":[{\"label\":\"central celestial object\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"swirling ring of light\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":true},{\"label\":\"starry background\",\"count\":1,\"position\":\"centre\",\"prominence\":\"background\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"extremeWide\",\"setting\":\"outer space\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"The exact nature of the central celestial object (e.g., star, black hole).\",\"The central object appearing to collapse into a dark point.\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"central celestial object\",\"verb\":\"glows and forms a ring\",\"completes\":true},{\"entity\":\"central celestial object\",\"verb\":\"changes color to orange\",\"completes\":true},{\"entity\":\"swirling ring of light\",\"verb\":\"expands and spirals\",\"completes\":true},{\"entity\":\"central celestial object\",\"verb\":\"collapses into a dark center\",\"completes\":true}],\"eventOrder\":[\"central celestial object glows and forms a ring\",\"central celestial object changes color to orange\",\"swirling ring of light expands and spirals\",\"central celestial object collapses into a dark center\"]}"
+    },
+    {
+      "id": "obs-a1-shot-3-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-3-take-1",
+      "observation": "{\"entities\":[{\"label\":\"Spiral galaxy\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"Dark central object\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false},{\"label\":\"Glowing ring\",\"count\":1,\"position\":\"centre\",\"prominence\":\"foreground\",\"faceVisible\":\"noFace\",\"occluded\":false,\"clippedByEdge\":false}],\"framing\":\"wide\",\"setting\":\"Outer space\",\"lighting\":\"mixed\",\"readableTextPresent\":false,\"ambiguities\":[\"The dark central object strongly resembles a black hole with an accretion disk\",\"The video appears to be a digital rendering or animation\"],\"unsafeDepictions\":[],\"actions\":[{\"entity\":\"Camera\",\"verb\":\"zooms in on the spiral galaxy\",\"completes\":true},{\"entity\":\"Bright central light\",\"verb\":\"diminishes to reveal a dark circular object\",\"completes\":true},{\"entity\":\"Glowing ring\",\"verb\":\"appears around the dark circular object\",\"completes\":true}],\"eventOrder\":[\"Camera zooms in on the spiral galaxy\",\"The bright center of the galaxy diminishes to reveal a dark circular object\",\"A glowing ring appears around the dark circular object\"]}"
+    }
+  ],
+  "take_reconciliation": [
+    {
+      "id": "rec-a1-shot-0-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-0-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"s1\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-explosion\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-1-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-1-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"s2\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-horizon\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-2-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-2-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"s3\",\"entity\":1,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-stream\",\"shown\":true,\"entity\":1},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    },
+    {
+      "id": "rec-a1-shot-3-take-1",
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "take_id": "a1-shot-3-take-1",
+      "answer": "{\"subjects\":[{\"id\":\"s4\",\"entity\":0,\"countMatches\":true}],\"criteria\":[{\"id\":\"show-galaxy\",\"shown\":true,\"entity\":0},{\"id\":\"never-person\",\"shown\":false,\"entity\":null},{\"id\":\"never-text\",\"shown\":false,\"entity\":null}]}",
+      "failed": "[]"
+    }
+  ],
+  "render": [
+    {
+      "run_id": "12a097bf-d3e5-48d0-8b68-f83fc80239ac",
+      "render_id": "a1-render",
+      "attempt": 1,
+      "render_manifest": "{\"captionStyle\":{\"fontName\":\"Arial\",\"fontSize\":48,\"id\":\"word-captions-1\",\"marginV\":200},\"captions\":[{\"endMs\":128,\"startMs\":43,\"text\":\"A\"},{\"endMs\":299,\"startMs\":171,\"text\":\"black\"},{\"endMs\":640,\"startMs\":341,\"text\":\"hole\"},{\"endMs\":1109,\"startMs\":683,\"text\":\"begins\"},{\"endMs\":1451,\"startMs\":1152,\"text\":\"with\"},{\"endMs\":1579,\"startMs\":1493,\"text\":\"a\"},{\"endMs\":2048,\"startMs\":1621,\"text\":\"giant\"},{\"endMs\":2773,\"startMs\":2091,\"text\":\"star,\"},{\"endMs\":3200,\"startMs\":2816,\"text\":\"far\"},{\"endMs\":3925,\"startMs\":3243,\"text\":\"heavier\"},{\"endMs\":4096,\"startMs\":3968,\"text\":\"than\"},{\"endMs\":4224,\"startMs\":4139,\"text\":\"our\"},{\"endMs\":4693,\"startMs\":4267,\"text\":\"own.\"},{\"endMs\":5205,\"startMs\":4736,\"text\":\"When\"},{\"endMs\":5376,\"startMs\":5248,\"text\":\"its\"},{\"endMs\":5803,\"startMs\":5419,\"text\":\"fuel\"},{\"endMs\":6144,\"startMs\":5845,\"text\":\"runs\"},{\"endMs\":6485,\"startMs\":6187,\"text\":\"out,\"},{\"endMs\":6699,\"startMs\":6528,\"text\":\"the\"},{\"endMs\":6997,\"startMs\":6827,\"text\":\"core\"},{\"endMs\":7723,\"startMs\":7040,\"text\":\"collapses\"},{\"endMs\":8064,\"startMs\":7765,\"text\":\"and\"},{\"endMs\":8448,\"startMs\":8107,\"text\":\"the\"},{\"endMs\":8619,\"startMs\":8491,\"text\":\"star\"},{\"endMs\":9813,\"startMs\":8661,\"text\":\"explodes.\"},{\"endMs\":10171,\"startMs\":10043,\"text\":\"What\"},{\"endMs\":10469,\"startMs\":10213,\"text\":\"is\"},{\"endMs\":10640,\"startMs\":10512,\"text\":\"left\"},{\"endMs\":11237,\"startMs\":10683,\"text\":\"is\"},{\"endMs\":12048,\"startMs\":11536,\"text\":\"crushed\"},{\"endMs\":12560,\"startMs\":12091,\"text\":\"into\"},{\"endMs\":12901,\"startMs\":12688,\"text\":\"a\"},{\"endMs\":13072,\"startMs\":12944,\"text\":\"space\"},{\"endMs\":13669,\"startMs\":13115,\"text\":\"far\"},{\"endMs\":14565,\"startMs\":13797,\"text\":\"smaller\"},{\"endMs\":15077,\"startMs\":14608,\"text\":\"than\"},{\"endMs\":15419,\"startMs\":15120,\"text\":\"a\"},{\"endMs\":15931,\"startMs\":15461,\"text\":\"city.\"},{\"endMs\":17083,\"startMs\":15973,\"text\":\"Its\"},{\"endMs\":17253,\"startMs\":17125,\"text\":\"edge\"},{\"endMs\":17765,\"startMs\":17296,\"text\":\"is\"},{\"endMs\":17979,\"startMs\":17808,\"text\":\"the\"},{\"endMs\":18192,\"startMs\":18021,\"text\":\"event\"},{\"endMs\":19301,\"startMs\":18235,\"text\":\"horizon;\"},{\"endMs\":20155,\"startMs\":19344,\"text\":\"past\"},{\"endMs\":20709,\"startMs\":20197,\"text\":\"it,\"},{\"endMs\":21264,\"startMs\":20752,\"text\":\"not\"},{\"endMs\":21648,\"startMs\":21307,\"text\":\"even\"},{\"endMs\":22032,\"startMs\":21691,\"text\":\"light\"},{\"endMs\":23611,\"startMs\":22075,\"text\":\"escapes.\"},{\"endMs\":24003,\"startMs\":23918,\"text\":\"A\"},{\"endMs\":24216,\"startMs\":24046,\"text\":\"star\"},{\"endMs\":24771,\"startMs\":24259,\"text\":\"that\"},{\"endMs\":25240,\"startMs\":24814,\"text\":\"drifts\"},{\"endMs\":25411,\"startMs\":25283,\"text\":\"too\"},{\"endMs\":25710,\"startMs\":25454,\"text\":\"close\"},{\"endMs\":26179,\"startMs\":25752,\"text\":\"is\"},{\"endMs\":27075,\"startMs\":26392,\"text\":\"stretched\"},{\"endMs\":27331,\"startMs\":27118,\"text\":\"into\"},{\"endMs\":27587,\"startMs\":27374,\"text\":\"a\"},{\"endMs\":27758,\"startMs\":27630,\"text\":\"long\"},{\"endMs\":28440,\"startMs\":27800,\"text\":\"thin\"},{\"endMs\":29507,\"startMs\":28483,\"text\":\"stream.\"},{\"endMs\":30275,\"startMs\":29550,\"text\":\"That\"},{\"endMs\":30659,\"startMs\":30318,\"text\":\"gas\"},{\"endMs\":31470,\"startMs\":30702,\"text\":\"swirls\"},{\"endMs\":32067,\"startMs\":31512,\"text\":\"inward,\"},{\"endMs\":32792,\"startMs\":32110,\"text\":\"glowing\"},{\"endMs\":33262,\"startMs\":32835,\"text\":\"hot,\"},{\"endMs\":33646,\"startMs\":33304,\"text\":\"in\"},{\"endMs\":33987,\"startMs\":33859,\"text\":\"a\"},{\"endMs\":34200,\"startMs\":34030,\"text\":\"bright\"},{\"endMs\":35310,\"startMs\":34243,\"text\":\"spiral.\"},{\"endMs\":35757,\"startMs\":35501,\"text\":\"Most\"},{\"endMs\":36055,\"startMs\":35799,\"text\":\"black\"},{\"endMs\":36610,\"startMs\":36098,\"text\":\"holes\"},{\"endMs\":37165,\"startMs\":36653,\"text\":\"weigh\"},{\"endMs\":37549,\"startMs\":37207,\"text\":\"a\"},{\"endMs\":37762,\"startMs\":37591,\"text\":\"few\"},{\"endMs\":38359,\"startMs\":37805,\"text\":\"Suns,\"},{\"endMs\":39383,\"startMs\":38402,\"text\":\"each\"},{\"endMs\":39767,\"startMs\":39426,\"text\":\"left\"},{\"endMs\":40109,\"startMs\":39810,\"text\":\"behind\"},{\"endMs\":40621,\"startMs\":40151,\"text\":\"by\"},{\"endMs\":40877,\"startMs\":40663,\"text\":\"a\"},{\"endMs\":41133,\"startMs\":40919,\"text\":\"single\"},{\"endMs\":41986,\"startMs\":41175,\"text\":\"star.\"},{\"endMs\":42711,\"startMs\":42029,\"text\":\"At\"},{\"endMs\":43138,\"startMs\":42839,\"text\":\"the\"},{\"endMs\":43266,\"startMs\":43181,\"text\":\"heart\"},{\"endMs\":43650,\"startMs\":43309,\"text\":\"of\"},{\"endMs\":43821,\"startMs\":43693,\"text\":\"nearly\"},{\"endMs\":44119,\"startMs\":43863,\"text\":\"every\"},{\"endMs\":44887,\"startMs\":44205,\"text\":\"galaxy\"},{\"endMs\":45357,\"startMs\":44930,\"text\":\"sits\"},{\"endMs\":45613,\"startMs\":45399,\"text\":\"a\"},{\"endMs\":46338,\"startMs\":45655,\"text\":\"supermassive\"},{\"endMs\":46893,\"startMs\":46381,\"text\":\"one,\"},{\"endMs\":47789,\"startMs\":46935,\"text\":\"millions\"},{\"endMs\":48045,\"startMs\":47831,\"text\":\"of\"},{\"endMs\":48215,\"startMs\":48087,\"text\":\"times\"},{\"endMs\":49111,\"startMs\":48258,\"text\":\"heavier.\"}],\"duckDb\":18,\"gateProfile\":{\"gates\":[\"0\",\"1\",\"1S\",\"2\",\"3\",\"4\",\"5\",\"7\"],\"id\":\"phase-1\"},\"ledger\":{\"imageCents\":20,\"narrationCents\":0,\"videoCents\":25},\"profile\":{\"audioCodec\":\"aac\",\"channels\":2,\"container\":\"mp4\",\"fps\":24,\"height\":1366,\"sampleRate\":48000,\"videoCodec\":\"h264\",\"width\":768},\"renderId\":\"a1-render\",\"runId\":\"12a097bf-d3e5-48d0-8b68-f83fc80239ac\",\"shots\":[{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":10.144,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":243,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\\n\\nintegrated_multimodal_description: [Shot 1] Semi-realistic animation, medium shot. The scene opens on a glowing, textured sphere of a giant star centered in a deep starfield. The star's surface is roiling with intense orange energy, with vertical streams of light and particles erupting in flame-like clusters around its perimeter. Diffuse purple and blue nebula clouds drift in the background. The camera pushes in with small amplitude at slow speed toward the pulsating core. (S1) says in an off-screen voiceover: <d>[English]A black hole begins with a giant star, far heavier than our own.</d> At 00:04.500, the star's surface begins to vibrate violently, and the orange flares intensify into a blinding white-hot light. (S1) says again in an off-screen voiceover: <d>[English]When its fuel runs out, the core collapses and the star explodes.</d> At 00:07.000, the core suddenly shrinks inward for a fraction of a second before detonating a massive supernova. A shockwave of light, fire, and cosmic debris expands outward in all directions, filling the frame with brilliant gold and white light as the nebula is pushed aside by the force.\\n\\noverall_soundscape: A deep, low-frequency rumble represents the star's massive gravity, followed by a high-pitched crystalline crackling sound as the core collapses. The final explosion produces a thunderous, resonant boom that fades into the sustained, rushing wind sound of expanding energy and particles traveling through the vacuum.\\n\\nnon_diegetic_music: N/A\",\"frames\":240,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-0-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"kind\":\"keyframe\",\"pictureId\":\"a1-shot-0-single\"},\"pictureFrames\":240,\"requestId\":\"01a0d2e0-0676-77b3-a482-65c9ab732e9a\",\"shotId\":\"shot-0\",\"startFrame\":0,\"takeId\":\"a1-shot-0-take-1\",\"verdicts\":[{\"coverage\":\"whole picture\",\"gate\":\"1\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":128,\"startMs\":43,\"word\":\"A\"},{\"endMs\":299,\"startMs\":171,\"word\":\"black\"},{\"endMs\":640,\"startMs\":341,\"word\":\"hole\"},{\"endMs\":1109,\"startMs\":683,\"word\":\"begins\"},{\"endMs\":1451,\"startMs\":1152,\"word\":\"with\"},{\"endMs\":1579,\"startMs\":1493,\"word\":\"a\"},{\"endMs\":2048,\"startMs\":1621,\"word\":\"giant\"},{\"endMs\":2773,\"startMs\":2091,\"word\":\"star,\"},{\"endMs\":3200,\"startMs\":2816,\"word\":\"far\"},{\"endMs\":3925,\"startMs\":3243,\"word\":\"heavier\"},{\"endMs\":4096,\"startMs\":3968,\"word\":\"than\"},{\"endMs\":4224,\"startMs\":4139,\"word\":\"our\"},{\"endMs\":4693,\"startMs\":4267,\"word\":\"own.\"},{\"endMs\":5205,\"startMs\":4736,\"word\":\"When\"},{\"endMs\":5376,\"startMs\":5248,\"word\":\"its\"},{\"endMs\":5803,\"startMs\":5419,\"word\":\"fuel\"},{\"endMs\":6144,\"startMs\":5845,\"word\":\"runs\"},{\"endMs\":6485,\"startMs\":6187,\"word\":\"out,\"},{\"endMs\":6699,\"startMs\":6528,\"word\":\"the\"},{\"endMs\":6997,\"startMs\":6827,\"word\":\"core\"},{\"endMs\":7723,\"startMs\":7040,\"word\":\"collapses\"},{\"endMs\":8064,\"startMs\":7765,\"word\":\"and\"},{\"endMs\":8448,\"startMs\":8107,\"word\":\"the\"},{\"endMs\":8619,\"startMs\":8491,\"word\":\"star\"},{\"endMs\":9813,\"startMs\":8661,\"word\":\"explodes.\"}]},{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":14.4,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":345,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\\n\\nintegrated_multimodal_description: [Shot 1] This is a semi-realistic animation with a blend of live footage textures and digital illustration. The scene opens on a close-up of a perfectly circular, void-black disk centered in a dark, starry cosmic void. The dark disk is encircled by a brilliant, ethereal ring of glowing golden and white wispy gas that swirls with intense energy. Faint purple and blue nebulous clouds drift in the deep background, punctuated by tiny, sharp points of distant stars. The camera performs a slow, steady push-in with small amplitude toward the event horizon. As the video progresses, the glowing gas in the accretion disk begins to rotate faster, with filaments of light bending and warping as they approach the edge of the black sphere. The nebulous clouds shift and expand slowly, creating a sense of immense scale and gravitational pull. The lighting remains focused on the celestial ring, illuminating the surrounding darkness. An off-screen voiceover says: <d>[English]What is left is crushed into a space far smaller than a city.</d> followed shortly by <d>[English]Its edge is the event horizon; past it, not even light escapes.</d>\\n\\noverall_soundscape: A deep, low-frequency cosmic rumble represents the immense mass of the black hole, accompanied by faint, crystalline shimmering sounds as the glowing gas swirls rapidly. A subtle, ethereal wind-like rushing noise suggests the movement of celestial energy.\\n\\nnon_diegetic_music: N/A\",\"frames\":333,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-1-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"kind\":\"keyframe\",\"pictureId\":\"a1-shot-1-single\"},\"pictureFrames\":333,\"requestId\":\"01a0d2e1-6689-7390-99a1-d9d844f15394\",\"shotId\":\"shot-1\",\"startFrame\":240,\"takeId\":\"a1-shot-1-take-1\",\"verdicts\":[{\"coverage\":\"whole picture\",\"gate\":\"1\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":171,\"startMs\":43,\"word\":\"What\"},{\"endMs\":469,\"startMs\":213,\"word\":\"is\"},{\"endMs\":640,\"startMs\":512,\"word\":\"left\"},{\"endMs\":1237,\"startMs\":683,\"word\":\"is\"},{\"endMs\":2048,\"startMs\":1536,\"word\":\"crushed\"},{\"endMs\":2560,\"startMs\":2091,\"word\":\"into\"},{\"endMs\":2901,\"startMs\":2688,\"word\":\"a\"},{\"endMs\":3072,\"startMs\":2944,\"word\":\"space\"},{\"endMs\":3669,\"startMs\":3115,\"word\":\"far\"},{\"endMs\":4565,\"startMs\":3797,\"word\":\"smaller\"},{\"endMs\":5077,\"startMs\":4608,\"word\":\"than\"},{\"endMs\":5419,\"startMs\":5120,\"word\":\"a\"},{\"endMs\":5931,\"startMs\":5461,\"word\":\"city.\"},{\"endMs\":7083,\"startMs\":5973,\"word\":\"Its\"},{\"endMs\":7253,\"startMs\":7125,\"word\":\"edge\"},{\"endMs\":7765,\"startMs\":7296,\"word\":\"is\"},{\"endMs\":7979,\"startMs\":7808,\"word\":\"the\"},{\"endMs\":8192,\"startMs\":8021,\"word\":\"event\"},{\"endMs\":9301,\"startMs\":8235,\"word\":\"horizon;\"},{\"endMs\":10155,\"startMs\":9344,\"word\":\"past\"},{\"endMs\":10709,\"startMs\":10197,\"word\":\"it,\"},{\"endMs\":11264,\"startMs\":10752,\"word\":\"not\"},{\"endMs\":11648,\"startMs\":11307,\"word\":\"even\"},{\"endMs\":12032,\"startMs\":11691,\"word\":\"light\"},{\"endMs\":13611,\"startMs\":12075,\"word\":\"escapes.\"}]},{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":12.256,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":294,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"integrated_multimodal_description: [Shot 1] A semi-realistic animation in a vertical 9:16 aspect ratio, blending the depth of realistic space photography with ethereal digital illustration. The scene opens on a deep, cosmic void filled with a soft glow and distant shimmering nebulae. In the center, a brilliant white-blue star (S1) pulses with intense light. The camera performs a slow, steady push-in with small amplitude toward the star as it suddenly begins to deform under immense gravitational forces. The star's surface starts to ripple and tear, with its outer layers being pulled away into a long, thin stream of glowing incandescent gas that stretches across the frame. At 00:04.500, the camera continues its slow approach, capturing the tidal stream in high detail. The gas begins to rotate and decompress, forming vibrant filaments of gold and violet. At 00:08.000, the motion accelerates as the gas de-aligns with kinetic energy, swirling inward toward a central point in a bright, mesmerizing spiral formation. The light from the spiral casts a flickering, warm glow across the surrounding cosmic clouds, while the swirling motion remains fluid and continuous until the end of the clip.\\n\\noverall_soundscape: A deep, resonant low-frequency hum represents the gravitational pull. As the star is torn apart, a crystalline tearing sound echoes through the void, followed by a rushing, airy whoosh that grows in intensity and pitch as the gas swirls into a high-speed spiral.\\n\\nnon_diegetic_music: N/A\",\"frames\":278,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-2-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"degradation\":\"a1-shot-2-repair failed Gate 1 at reconcile: subject \\\"s3\\\" (Tidal Stream of Star Gas) is clipped by the edge of the frame; it was the shot's repair (S-043)\",\"kind\":\"text-to-video\",\"placed\":true},\"pictureFrames\":278,\"requestId\":\"01a0d2e2-9fa6-71c2-a8c0-3f53904fa35b\",\"shotId\":\"shot-2\",\"startFrame\":573,\"takeId\":\"a1-shot-2-take-1\",\"verdicts\":[{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":128,\"startMs\":43,\"word\":\"A\"},{\"endMs\":341,\"startMs\":171,\"word\":\"star\"},{\"endMs\":896,\"startMs\":384,\"word\":\"that\"},{\"endMs\":1365,\"startMs\":939,\"word\":\"drifts\"},{\"endMs\":1536,\"startMs\":1408,\"word\":\"too\"},{\"endMs\":1835,\"startMs\":1579,\"word\":\"close\"},{\"endMs\":2304,\"startMs\":1877,\"word\":\"is\"},{\"endMs\":3200,\"startMs\":2517,\"word\":\"stretched\"},{\"endMs\":3456,\"startMs\":3243,\"word\":\"into\"},{\"endMs\":3712,\"startMs\":3499,\"word\":\"a\"},{\"endMs\":3883,\"startMs\":3755,\"word\":\"long\"},{\"endMs\":4565,\"startMs\":3925,\"word\":\"thin\"},{\"endMs\":5632,\"startMs\":4608,\"word\":\"stream.\"},{\"endMs\":6400,\"startMs\":5675,\"word\":\"That\"},{\"endMs\":6784,\"startMs\":6443,\"word\":\"gas\"},{\"endMs\":7595,\"startMs\":6827,\"word\":\"swirls\"},{\"endMs\":8192,\"startMs\":7637,\"word\":\"inward,\"},{\"endMs\":8917,\"startMs\":8235,\"word\":\"glowing\"},{\"endMs\":9387,\"startMs\":8960,\"word\":\"hot,\"},{\"endMs\":9771,\"startMs\":9429,\"word\":\"in\"},{\"endMs\":10112,\"startMs\":9984,\"word\":\"a\"},{\"endMs\":10325,\"startMs\":10155,\"word\":\"bright\"},{\"endMs\":11435,\"startMs\":10368,\"word\":\"spiral.\"}]},{\"clip\":{\"audio\":{\"channels\":2,\"codec\":\"aac\",\"sampleRate\":32000},\"durationSeconds\":14.4,\"moovFirst\":true,\"readable\":true,\"video\":{\"codec\":\"h264\",\"fps\":24,\"frames\":345,\"height\":1344,\"width\":768}},\"clipPath\":\"<artifact>\",\"conform\":[\"pad: 768×1344 inside 768×1366\"],\"expandedPrompt\":\"integrated_multimodal_description: [Shot 1] Cinematic, semi-realistic animation with a blend of photorealistic textures and digital illustration. The scene opens with a breathtaking vertical composition of a vast spiral galaxy suspended in the deep, cosmic void. The galaxy is composed of swirling arms of violet and gold dust and gas clouds, shimmering with a soft, ethereal cosmic glow. At the very center of the galaxy, a brilliant, dense core pulses with light, illuminating the surrounding structures. The camera performs a slow, majestic Push In with small amplitude at slow speed, traveling toward the galactic nucleus. At 00:04.000, an off-screen voice (S1), with a calm and resonant tone, says: <d>[English]Most black holes weigh a few Suns, each left behind by a single star.</d> At 00:08.500, the camera continues its steady journey, revealing the true scale of the center. In the heart of the brilliant light, a massive black hole emerges—a perfect sphere of darkness surrounded by a violent, glowing accretion disk of white-hot gas and warped light. S1 continues: <d>[English]At the heart of nearly every galaxy sits a supermassive one, millions of times heavier.</d> The camera slows its movement as it nears the event horizon of the supermassive black hole, the surrounding light bending in gravitational arcs around the dark void.\\n\\noverall_soundscape: A deep, low-frequency cosmic hum represents the immense scale of space. Subtle, crystalline shimmering sounds are synchronized with the visual pulsing of the glowing galactic core and the swirling gas clouds.\\n\\nnon_diegetic_music: N/A\",\"frames\":330,\"hold\":null,\"joinMode\":\"cut\",\"narrationId\":\"a1-shot-3-narration\",\"narrationPath\":\"<artifact>\",\"opening\":{\"kind\":\"text-to-video\",\"placed\":false},\"pictureFrames\":330,\"requestId\":\"01a0d2e3-b271-7633-a1a2-ad9b698b8377\",\"shotId\":\"shot-3\",\"startFrame\":851,\"takeId\":\"a1-shot-3-take-1\",\"verdicts\":[{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"2\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"whole file\"},\"gate\":\"3\",\"outcome\":\"accept\"},{\"coverage\":{\"limitations\":[\"how the model samples a supplied clip is undocumented, so a moment it skips is not witnessed (D-051)\"],\"strategy\":\"full\"},\"gate\":\"4\",\"outcome\":\"accept\"},{\"coverage\":{\"strategy\":\"observation\"},\"gate\":\"5\",\"outcome\":\"accept\"}],\"words\":[{\"endMs\":299,\"startMs\":43,\"word\":\"Most\"},{\"endMs\":597,\"startMs\":341,\"word\":\"black\"},{\"endMs\":1152,\"startMs\":640,\"word\":\"holes\"},{\"endMs\":1707,\"startMs\":1195,\"word\":\"weigh\"},{\"endMs\":2091,\"startMs\":1749,\"word\":\"a\"},{\"endMs\":2304,\"startMs\":2133,\"word\":\"few\"},{\"endMs\":2901,\"startMs\":2347,\"word\":\"Suns,\"},{\"endMs\":3925,\"startMs\":2944,\"word\":\"each\"},{\"endMs\":4309,\"startMs\":3968,\"word\":\"left\"},{\"endMs\":4651,\"startMs\":4352,\"word\":\"behind\"},{\"endMs\":5163,\"startMs\":4693,\"word\":\"by\"},{\"endMs\":5419,\"startMs\":5205,\"word\":\"a\"},{\"endMs\":5675,\"startMs\":5461,\"word\":\"single\"},{\"endMs\":6528,\"startMs\":5717,\"word\":\"star.\"},{\"endMs\":7253,\"startMs\":6571,\"word\":\"At\"},{\"endMs\":7680,\"startMs\":7381,\"word\":\"the\"},{\"endMs\":7808,\"startMs\":7723,\"word\":\"heart\"},{\"endMs\":8192,\"startMs\":7851,\"word\":\"of\"},{\"endMs\":8363,\"startMs\":8235,\"word\":\"nearly\"},{\"endMs\":8661,\"startMs\":8405,\"word\":\"every\"},{\"endMs\":9429,\"startMs\":8747,\"word\":\"galaxy\"},{\"endMs\":9899,\"startMs\":9472,\"word\":\"sits\"},{\"endMs\":10155,\"startMs\":9941,\"word\":\"a\"},{\"endMs\":10880,\"startMs\":10197,\"word\":\"supermassive\"},{\"endMs\":11435,\"startMs\":10923,\"word\":\"one,\"},{\"endMs\":12331,\"startMs\":11477,\"word\":\"millions\"},{\"endMs\":12587,\"startMs\":12373,\"word\":\"of\"},{\"endMs\":12757,\"startMs\":12629,\"word\":\"times\"},{\"endMs\":13653,\"startMs\":12800,\"word\":\"heavier.\"}]}],\"totalFrames\":1181}",
+      "hash": "2047bf56dae61462cdc4b4dafa3e8c8db88cc97916404f7ed86db3bf7799a00c",
+      "path": "<artifact>",
+      "profile": "{\"audioCodec\":\"aac\",\"channels\":2,\"container\":\"mp4\",\"fps\":24,\"height\":1366,\"sampleRate\":48000,\"videoCodec\":\"h264\",\"width\":768}",
+      "invocations": "[[\"ffmpeg\",\"-hide_banner\",\"-nostdin\",\"-y\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-i\",\"<artifact>\",\"-filter_complex\",\"[0:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=240[v0];[0:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=480000,apad=whole_len=480000,volume=-18dB[c0];[1:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=480000,apad=whole_len=480000[n0];[c0][n0]amix=inputs=2:duration=longest:normalize=0[a0];[2:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=333[v1];[2:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=666000,apad=whole_len=666000,volume=-18dB[c1];[3:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=666000,apad=whole_len=666000[n1];[c1][n1]amix=inputs=2:duration=longest:normalize=0[a1];[4:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=278[v2];[4:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=556000,apad=whole_len=556000,volume=-18dB[c2];[5:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=556000,apad=whole_len=556000[n2];[c2][n2]amix=inputs=2:duration=longest:normalize=0[a2];[6:v]scale=768:1344,pad=768:1366:0:10:black,setsar=1,format=yuv420p,trim=end_frame=330[v3];[6:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=660000,apad=whole_len=660000,volume=-18dB[c3];[7:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,atrim=end_sample=660000,apad=whole_len=660000[n3];[c3][n3]amix=inputs=2:duration=longest:normalize=0[a3];[v0][a0][v1][a1][v2][a2][v3][a3]concat=n=4:v=1:a=1[cut][a];[cut]ass='C\\\\:<artifact>'[v]\",\"-map\",\"[v]\",\"-map\",\"[a]\",\"-c:v\",\"libx264\",\"-preset\",\"veryfast\",\"-pix_fmt\",\"yuv420p\",\"-r\",\"24\",\"-c:a\",\"aac\",\"-ar\",\"48000\",\"-ac\",\"2\",\"-movflags\",\"+faststart\",\"-f\",\"mp4\",\"<artifact>\"]]",
+      "measure": "{\"readable\":true,\"durationSeconds\":49.208333,\"video\":{\"codec\":\"h264\",\"width\":768,\"height\":1366,\"fps\":24,\"frames\":1181},\"audio\":{\"codec\":\"aac\",\"sampleRate\":48000,\"channels\":2},\"moovFirst\":true}",
+      "started_at": "2026-09-24T10:10:14.088Z",
+      "finished_at": "2026-09-24T10:10:46.486Z",
+      "gate7": "{\"outcome\":\"fail\",\"coverage\":{\"strategy\":\"frames\",\"frames\":12},\"answer\":[{\"question\":\"Are the shots in a sensible order?\",\"answer\":\"yes\"},{\"question\":\"Does the pacing work?\",\"answer\":\"yes\"},{\"question\":\"Does every shot sit well beside the shot that follows it?\",\"answer\":\"yes\"},{\"question\":\"Do the burned captions follow the narration?\",\"answer\":\"yes\"},{\"question\":\"Does every shot show something no other shot repeats?\",\"answer\":\"no\"}],\"reasons\":[\"Does every shot show something no other shot repeats?\"]}"
+    }
+  ],
+  "hold": [],
+  "still_hold": []
+}

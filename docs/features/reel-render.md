@@ -10,6 +10,15 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `yield-benchmark` on 2026-10-14, Slice 1 — the gates below are not edited, and no assertion is removed**
+> (**S-184**, **S-185**). **Check 2's printed line counts twenty-five rules, not twenty-two**, for the same reason
+> `reel-stills`' check 3 does: `yield-benchmark` adds `benchmark-no-engine`, `benchmark-no-io` and
+> `benchmark-npm-only-zod` in one change. `tests/reel-render-rules.test.ts` keeps check 2 in its exact form with
+> its number corrected — `assert.match(prove.out, /25 rules proven to fire/)` — and its comment gains the three
+> new rules with their ordinals (S-078, S-120). **The count stays EXACT.** `processes-only-in-providers`, check 2's
+> own subject, is unchanged in form and in subject, and nothing else in this feature moves. Its journey re-runs in
+> `yield-benchmark`'s last slice (S-099's form, S-178's order).
+
 > **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed;
 > check 40 is amended by exactly one key** (**S-161**, **S-163**). **`AssembleJobContext` gains one key, `resume`**:
 > the engine's own resume of a run the job fails — its delay, the worker's plan and render settings its rates come

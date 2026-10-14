@@ -1,0 +1,186 @@
+{
+  "about": "Taken from data/cutroom.sqlite on 2026-10-14 at commit 038f69d, read-only, by yield-benchmark Slice 1. Rows are as the schema stores them; every path-shaped value is the literal <artifact> (yield-benchmark check 12). Nothing else is altered.",
+  "what": "the stills stage started and the first image call threw: no picture row at all",
+  "run": {
+    "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+    "request_id": "real-reel-20260925T190208",
+    "request": "{\"contractVersion\":1,\"requestId\":\"real-reel-20260925T190208\",\"worldId\":\"cutroom-game-graphics\",\"narration\":[{\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\",\"claimIds\":[\"c1\"]},{\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\",\"claimIds\":[\"c1\"]},{\"text\":\"Then games moved into three dimensions, built from polygons.\",\"claimIds\":[\"c2\"]},{\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\",\"claimIds\":[\"c3\"]},{\"text\":\"It lit and moved every triangle itself, freeing the main processor.\",\"claimIds\":[\"c3\"]},{\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\",\"claimIds\":[\"c4\"]},{\"text\":\"It follows each beam of light as it bounces through a scene.\",\"claimIds\":[\"c4\"]},{\"text\":\"Deep learning now fills in detail, so games look almost like film.\",\"claimIds\":[\"c4\"]}],\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old television showing blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor showing a lifelike rendered city skyline\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"depictionPolicyVersion\":\"policy-3\"},\"style\":{\"id\":\"style-game-graphics\",\"version\":1,\"text\":\"clean documentary footage, soft natural light, steady camera\"},\"options\":{\"until\":\"video\",\"budgetCents\":250}}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"supporting\"},{\"id\":\"c2\",\"role\":\"supporting\"},{\"id\":\"c3\",\"role\":\"main\"},{\"id\":\"c4\",\"role\":\"main\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-tv\",\"text\":\"an old television showing blocky pixel game graphics\",\"type\":\"presence\"},{\"claimId\":\"c2\",\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\"},{\"claimId\":\"c3\",\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\"},{\"claimId\":\"c4\",\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor showing a lifelike rendered city skyline\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"In nineteen seventy two, Pong was two paddles and a ball.\"},{\"claimIds\":[\"c1\"],\"text\":\"By nineteen eighty five, Super Mario Bros drew whole worlds in pixels.\"},{\"claimIds\":[\"c2\"],\"text\":\"Then games moved into three dimensions, built from polygons.\"},{\"claimIds\":[\"c3\"],\"text\":\"In nineteen ninety nine, Nvidia's GeForce two fifty six was sold as the first graphics processing unit.\"},{\"claimIds\":[\"c3\"],\"text\":\"It lit and moved every triangle itself, freeing the main processor.\"},{\"claimIds\":[\"c4\"],\"text\":\"In twenty eighteen, Nvidia brought real time ray tracing to games.\"},{\"claimIds\":[\"c4\"],\"text\":\"It follows each beam of light as it bounces through a scene.\"},{\"claimIds\":[\"c4\"],\"text\":\"Deep learning now fills in detail, so games look almost like film.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"real-reel-20260925T190208\",\"style\":{\"id\":\"style-game-graphics\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-game-graphics\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"requestId\":\"real-reel-20260925T190208\",\"costCents\":0,\"status\":\"failed\",\"detail\":\"the provider is unavailable: the picture a1-shot-1-a on 'fal-ai/flux-2-pro' did not reach the provider: fetch failed\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-09-25T19:02:08.842Z"
+  },
+  "job": [
+    {
+      "id": 110,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-25T19:02:08.842Z",
+      "locked_at": "2026-09-25T19:02:09.328Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "cost_cents": 0
+    },
+    {
+      "id": 111,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-09-25T19:03:50.203Z",
+      "locked_at": "2026-09-25T19:03:50.209Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": 110,
+      "correlation_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "cost_cents": 0
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 1,
+      "at": "2026-09-25T19:02:08.842Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":1,\"at\":\"2026-09-25T19:02:08.842Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 2,
+      "at": "2026-09-25T19:02:09.330Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":2,\"at\":\"2026-09-25T19:02:09.330Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 3,
+      "at": "2026-09-25T19:03:50.203Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":3,\"at\":\"2026-09-25T19:03:50.203Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 4,
+      "at": "2026-09-25T19:03:50.203Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":4,\"at\":\"2026-09-25T19:03:50.203Z\",\"type\":\"verdict\",\"gate\":\"0\",\"outcome\":\"accept\"}"
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 5,
+      "at": "2026-09-25T19:03:50.203Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":5,\"at\":\"2026-09-25T19:03:50.203Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 6,
+      "at": "2026-09-25T19:03:50.212Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":6,\"at\":\"2026-09-25T19:03:50.212Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "seq": 7,
+      "at": "2026-09-25T19:04:01.059Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"fdff208b-b8f2-4379-a842-10a98ac1b641\",\"seq\":7,\"at\":\"2026-09-25T19:04:01.059Z\",\"type\":\"run.finished\",\"status\":\"failed\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":10,\"subjectIds\":[\"show-tv\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"show-screen\",\"show-card\"]},{\"unit\":2,\"durationSeconds\":10,\"subjectIds\":[\"show-card\",\"show-monitor\"]},{\"unit\":3,\"durationSeconds\":10,\"subjectIds\":[\"show-monitor\"]}],\"subjects\":[{\"id\":\"show-tv\",\"name\":\"Old Television showing blocky pixel game graphics\"},{\"id\":\"show-screen\",\"name\":\"Low‑polygon 3D graphics screen\"},{\"id\":\"show-card\",\"name\":\"Unbranded computer graphics card\"},{\"id\":\"show-monitor\",\"name\":\"Modern monitor showing lifelike rendered city skyline\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old television showing blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor showing a lifelike rendered city skyline\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":50,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.5,
+      "estimate_cents": 50,
+      "selected": 1
+    },
+    {
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4],[5],[6],[7]],\"shots\":[{\"unit\":0,\"durationSeconds\":6,\"subjectIds\":[\"tv\"]},{\"unit\":1,\"durationSeconds\":6,\"subjectIds\":[\"screen\",\"card\"]},{\"unit\":2,\"durationSeconds\":6,\"subjectIds\":[\"card\"]},{\"unit\":3,\"durationSeconds\":6,\"subjectIds\":[\"monitor\"]},{\"unit\":4,\"durationSeconds\":6,\"subjectIds\":[\"monitor\"]},{\"unit\":5,\"durationSeconds\":6,\"subjectIds\":[\"monitor\",\"card\"]}],\"subjects\":[{\"id\":\"tv\",\"name\":\"Show TV\"},{\"id\":\"screen\",\"name\":\"Show Screen\"},{\"id\":\"card\",\"name\":\"Show Graphics Card\"},{\"id\":\"monitor\",\"name\":\"Show Monitor\"}],\"criteria\":{\"mustShow\":[{\"id\":\"show-tv\",\"text\":\"an old television showing blocky pixel game graphics\",\"type\":\"presence\",\"claimId\":\"c1\"},{\"id\":\"show-screen\",\"text\":\"a screen showing only simple low-polygon three-dimensional graphics\",\"type\":\"presence\",\"claimId\":\"c2\"},{\"id\":\"show-card\",\"text\":\"an unbranded computer graphics card\",\"type\":\"presence\",\"claimId\":\"c3\"},{\"id\":\"show-monitor\",\"text\":\"an unbranded modern monitor showing a lifelike rendered city skyline\",\"type\":\"presence\",\"claimId\":\"c4\"}],\"mustNotShow\":[{\"id\":\"never-person\",\"text\":\"a recognisable real-world public figure\",\"type\":\"presence\"},{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"},{\"id\":\"never-character\",\"text\":\"a recognisable character from a real video game, comic or anime\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48,\"pictures\":\"upToThree\"}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.5,
+      "estimate_cents": 48,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 650,
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 684,
+      "output_tokens": 1763,
+      "fake": 0,
+      "at": "2026-09-25T19:02:38.775Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 651,
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 701,
+      "output_tokens": 3337,
+      "fake": 0,
+      "at": "2026-09-25T19:03:45.049Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 652,
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 627,
+      "output_tokens": 665,
+      "fake": 0,
+      "at": "2026-09-25T19:03:47.685Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 653,
+      "run_id": "fdff208b-b8f2-4379-a842-10a98ac1b641",
+      "role": "reconciler",
+      "model": "MiniMax-M3",
+      "temperature": 0,
+      "input_tokens": 623,
+      "output_tokens": 624,
+      "fake": 0,
+      "at": "2026-09-25T19:03:50.202Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [],
+  "observation": [],
+  "reconciliation": [],
+  "generation_receipt": [],
+  "lost_call": [],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

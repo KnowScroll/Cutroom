@@ -112,14 +112,16 @@ test('4. drift itself reads the repository for key-shaped reads, and finds none 
   )
 })
 
-test('4. drift, drift --prove and drift --audit pass, and the rule count is twenty-two', () => {
-  // cutroom-sdk's Slice 2 added the twenty-first rule, sdk-no-engine-internals. Slice 3 adds
+test('4. drift, drift --prove and drift --audit pass, and the rule count is twenty-five', () => {
+  // cutroom-sdk's Slice 2 added the twenty-first rule, sdk-no-engine-internals. Slice 3 added
   // sdk-processes-only-launcher as the twenty-second, alongside the twentieth this slice keeps
-  // added (keys-only-in-providers, S-109, S-119, S-120).
+  // added (keys-only-in-providers, S-109, S-119, S-120). yield-benchmark's Slice 1 adds the
+  // twenty-third, twenty-fourth and twenty-fifth — benchmark-no-engine, benchmark-no-io and
+  // benchmark-npm-only-zod (S-184, S-185).
   assert.equal(prove.status, 0, prove.out)
   assert.doesNotMatch(prove.out, /SILENT/, prove.out)
   assert.doesNotMatch(prove.out, /EAGER/, prove.out)
-  assert.match(prove.out, /22 rules proven to fire/, prove.out)
+  assert.match(prove.out, /25 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)
@@ -127,15 +129,21 @@ test('4. drift, drift --prove and drift --audit pass, and the rule count is twen
   assert.match(audit.out, /live\s+keys-only-in-providers/, audit.out)
 })
 
-test("4. reel-stills' check 3 counts twenty-two, and so does reel-render's check 2", () => {
+test("4. reel-stills' check 3 counts twenty-five, and so does reel-render's check 2", () => {
   // Gate 2 names reel-stills' check 3. reel-render's check 2 pins the same printed line (S-078's
   // own words), and the feature's list of what it changes in verified features did not say so —
   // the miss S-049 found in S-047 and S-078 found in S-077, a third time (S-120). Both are here,
   // so a slice that updates one and leaves the other fails this check rather than the suite.
-  // cutroom-sdk's Slice 3 added the twenty-second rule, sdk-processes-only-launcher.
+  // cutroom-sdk's Slice 3 added the twenty-second rule, sdk-processes-only-launcher;
+  // yield-benchmark's Slice 1 added the twenty-third, twenty-fourth and twenty-fifth in one
+  // change, with its amendments, because leaving them apart turned three verified features red
+  // (S-184, S-185). The guard below is RAISED, never removed: it forbade a file still counting
+  // twenty-one, which once every file says twenty-five is a number nobody could write, and the
+  // dead guard would read as coverage. At twenty-two it guards the change being made now,
+  // exactly as it guarded the last one.
   for (const file of ['reel-stills-rules.test.ts', 'reel-render-rules.test.ts']) {
     const source = readFileSync(join(REPO, 'tests', file), 'utf8')
-    assert.match(source, /22 rules proven to fire/, `${file} does not count twenty-two`)
-    assert.doesNotMatch(source, /21 rules proven to fire/, `${file} still counts twenty-one`)
+    assert.match(source, /25 rules proven to fire/, `${file} does not count twenty-five`)
+    assert.doesNotMatch(source, /22 rules proven to fire/, `${file} still counts twenty-two`)
   }
 })

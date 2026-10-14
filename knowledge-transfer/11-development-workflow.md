@@ -73,7 +73,7 @@ the full suite** — the change-kind rules are strict.
 3. **format** — `prettier --check .`: every file type prettier knows, Markdown and HTML included,
    not only code (`.prettierignore` excludes `docs/design/`, `db/migrations/`, `steering-ref/`
    and generated folders).
-4. **boundaries** — `scripts/drift.mjs`. Enforces the twenty-two boundaries.
+4. **boundaries** — `scripts/drift.mjs`. Enforces the twenty-five boundaries.
 5. **boundaries proven** — `scripts/drift.mjs --prove`. Writes a file to break each rule and
    fails if one stays silent. **Configured-but-dead reads as covered** — never assume a rule
    runs.

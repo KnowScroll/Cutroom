@@ -75,7 +75,7 @@ own folder, may be imported only by the planner, and may be entered only through
 (D-073). Two are about npm packages: the pipeline imports none but `zod`, and nothing outside
 `providers` imports a model client (reel-plan, S-020).
 
-These are not conventions. They are **twenty-two** rules checked against the real dependency graph,
+These are not conventions. They are **twenty-five** rules checked against the real dependency graph,
 and they are expressed on **resolved file paths**, never on the text of an import line — which is
 the only reason those three can exist at all, since inside one package every import is relative.
 

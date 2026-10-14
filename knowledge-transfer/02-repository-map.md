@@ -8,7 +8,7 @@ it as a reference when you want to know **where X lives** or **what rule constra
 ```
 Cutroom/
   apps/                 three runnable programs (composition roots + workers + API)
-  packages/             six libraries (engines, contracts, SDK)
+  packages/             seven libraries (engines, contracts, SDK, benchmark)
   docs/                 features, history, research, the current-state context.md
   scripts/              checks, packaging, journeys, the manual paid-reel command
   db/migrations/        the SQLite migrations the service applies at startup
@@ -27,9 +27,9 @@ Two more top-level entries are config: `pnpm-workspace.yaml`, `tsconfig.base.jso
 `.dependency-cruiser.cjs`. They exist to enforce the boundaries below; they are not "where code
 goes".
 
-## The three apps and six packages
+## The three apps and seven packages
 
-The repository is a pnpm workspace with **three apps** and **six packages**. Each one has exactly
+The repository is a pnpm workspace with **three apps** and **seven packages**. Each one has exactly
 one entry point (`src/index.ts`), and the dependency rules below are **enforced on resolved file
 paths** by `node scripts/drift.mjs`. The text of an import line is not what is checked.
 
@@ -120,6 +120,19 @@ The planner calls the model port it is handed; nothing else.
 
 Source: `packages/pipeline/src/{index.ts,plan/,stills/,clips/,render/,gates/,resume/,split/,admit.ts,estimate.ts,rank.ts}`.
 
+### `packages/benchmark`
+
+**Pure measures of a run the record already holds**. It is handed arrays of rows shaped as
+`packages/domain` stores them and returns figures: the parts a run reached, their counts,
+timings, costs and retries, every gate's own words, the brief key's input, and each rating
+term as something achieved over something attempted. It opens nothing: `scripts/benchmark.mjs`
+does the reading, read-only, and hands the rows in. It may not import the domain, a provider,
+an app, any npm package but `zod`, or any builtin that touches the outside world —
+`node:crypto` included, so the hash the brief key needs is handed in rather than reached for
+(`benchmark-no-engine`, `benchmark-no-io`, `benchmark-npm-only-zod`).
+
+Source: `packages/benchmark/src/{index.ts,measures.ts,reasons.ts}`.
+
 ### `packages/providers`
 
 **Adapters behind the ports**. Stand-ins (the default) plus real ones: fal (images, videos, via
@@ -152,7 +165,7 @@ tables (listed in `07-database-and-queue.md`), among them `run`, `run_event`, `j
 
 ## The boundaries, restated
 
-The repository enforces **twenty-two rules** over resolved file paths. The text of an import
+The repository enforces **twenty-five rules** over resolved file paths. The text of an import
 line is not what is checked; the path it resolves to is. The rules, by their names in
 `.dependency-cruiser.cjs`:
 
@@ -182,6 +195,11 @@ line is not what is checked; the path it resolves to is. The rules, by their nam
 21. `pipeline-npm-only-zod` — the pipeline's only npm package is `zod`.
 22. `model-client-only-in-providers` — no model client (`ai`, `@ai-sdk/*`) outside providers;
     none is installed at all (S-114).
+23. `benchmark-no-engine` — the benchmark imports no `domain`, no `providers` and no app: it
+    reads rows it was handed (S-184).
+24. `benchmark-no-io` — `pipeline-no-io`’s builtins plus `crypto` in `packages/benchmark`, so a
+    pure scorer cannot grow a hash of its own; the reader passes SHA-256 in.
+25. `benchmark-npm-only-zod` — the benchmark’s only npm package is `zod`.
 
 `node scripts/drift.mjs` enforces them. `node scripts/drift.mjs --prove` writes a file to break
 each rule and fails if one stays silent. `node scripts/drift.mjs --audit` fails when a rule names

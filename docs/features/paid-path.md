@@ -26,6 +26,20 @@ Supersedes, through the entries it rests on: D-005 for this engine's model layer
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
 Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
+> **Amended by `yield-benchmark` on 2026-10-14, Slice 1 — the gates below are not edited, and no assertion is removed**
+> (**S-184**, **S-185**). **Check 4 counts twenty-five rules, and its dead guard is RAISED rather than deleted.**
+> `yield-benchmark` adds `benchmark-no-engine`, `benchmark-no-io` and `benchmark-npm-only-zod` in one change, so
+> in `tests/paid-path-keys.test.ts`: the two test titles read **twenty-five**; the proof's printed line is
+> `/25 rules proven to fire/`; and the cross-read of `reel-stills-rules.test.ts` and `reel-render-rules.test.ts`
+> asserts the same. Its `assert.doesNotMatch(source, /21 rules proven to fire/)` becomes
+> `/22 rules proven to fire/`: once every file says twenty-five, twenty-one is a number nobody could write and the
+> guard would be dead while reading as coverage, so it guards the change being made now exactly as it guarded the
+> last one. **Nothing is removed and no form is loosened**; `keys-only-in-providers`, check 4's own subject, is
+> untouched, and **check 20 is unchanged in form and in subject** — `scripts/benchmark.mjs`, which Slice 3 adds,
+> is bound by it like every other script and may not contain the spending script's name, and
+> `yield-benchmark`'s own check 5 BUILDS that string rather than writing it. This feature's journey re-runs in
+> `yield-benchmark`'s last slice (S-099's form, S-178's order).
+
 > **Amended by `resume-failed` on 2026-09-27, Slice 6 — the gates below are not edited, and no assertion is removed**
 > (**S-162**, **S-163**). **The owner's script and the helpers behind it.** One `post(path, body)` helper
 > holds the sole `method: 'POST'` spelling in `scripts/real-reel.mjs`; `makeReel` owns the one `/v1/runs`
