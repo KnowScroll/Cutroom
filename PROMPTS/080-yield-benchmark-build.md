@@ -1,0 +1,84 @@
+# 080 — build `yield-benchmark`, slice by slice
+
+- **For:** session 87
+- **Feature:** `yield-benchmark` (`docs/features/yield-benchmark.md`), four gates APPROVED by owner decision
+  (S-185). `yield-compare` and `benchmark-view` are named stubs and are not worked on
+- **Work:** build all four slices, one `slice-builder` at a time, each verified and committed before the next
+  opens. The first building session of this feature
+- **Written:** 2026-10-14
+- **Run:** not yet
+
+```text
+Read docs/context.md first, then docs/features/yield-benchmark.md whole — it is the specification and it is
+approved, so you build what it says rather than redesigning it. Then S-185 (grep -n '^## S-185' DECISIONS.md) and
+S-182's Amended block (grep -n '^## S-182' DECISIONS.md), which carry the weights, the tolerances, the rating
+version and what the split moved out.
+
+THE TREE IS DIRTY WHEN YOU START, AND IT IS NOT YOURS YET. Session 86 began Slice 1 in the wrong phase, was
+stopped, and the owner chose to leave the partial work uncommitted rather than discard it. Sitting in the working
+tree at HEAD = 7938383, committed nowhere:
+
+  M .dependency-cruiser.cjs          the three new rules
+  M scripts/drift.mjs                their --prove cases
+  M package.json, pnpm-lock.yaml     @cutroom/benchmark as a workspace dependency
+  M tsconfig.json                    the new package's reference
+  ?? packages/benchmark/package.json
+  ?? packages/benchmark/tsconfig.json
+  ?? tests/yield-benchmark-boundary.test.ts
+
+NOTHING VERIFIED IT. No check has been run over it, it was written by an agent that did not finish, and no source
+file, fixture or amendment exists. Treat it as a draft somebody left you: READ EVERY LINE against the gates before
+you build on it, and if a line is wrong, fix it rather than working around it. Two specific traps it is exposed to:
+a regex written through a heredoc can arrive with its backslashes halved (\. instead of \\.), which silently
+matches any character and has already broken a boundary rule here — so verify .dependency-cruiser.cjs's patterns
+in the file, not in the command that wrote them; and benchmark-no-io's pattern must be pipeline-no-io's
+enumeration character-for-character (.dependency-cruiser.cjs:53) PLUS crypto. `git diff` and
+`node scripts/verification-status.mjs` are the first two things to run.
+
+WHAT TO BUILD, IN ORDER. Four slices, exactly as Gate 4 states them, ONE slice-builder at a time — never two at
+once, because they would edit the same files. Each slice: its tests first, then its code, one deliberate break per
+property seen red and restored, its amendment blocks. The builder never commits; you run the check and commit its
+tree-bound evidence before opening the next slice.
+
+  Slice 1  packages/benchmark's index, measures and reasons; the package manifest and tsconfig; the root reference
+           and workspace dependency; the row fixtures under tests/fixtures/benchmark/; the three boundary rules
+           with their --prove cases; and EVERY amendment taking the rule count from 22 to 25 — three test files
+           and seven documents, each named by line in the gate's S-099 section, plus the two enumerations a tenth
+           workspace member falsifies and cutroom-kt.html's rules array. reel-stills, reel-render and paid-path
+           each gain an amendment block. Checks 1, 2, 3, 4, 11, 12. FULL SUITE.
+  Slice 2  ratings.ts: the thirteen terms in their achieved-over-attempted phrasing, the weights, the tolerances,
+           the three conventions, the stamp, absent parts, the partial label, the five worked values and their
+           ranking WITH the tie between dead-on-first-picture and stopped-at-gate-1 at 10.0. Checks 8, 9, 10.
+           TARGETED.
+  Slice 3  scripts/benchmark.mjs: the read-only open, the scorecard, the drill-down, the flag table and its four
+           exit codes, the brief key's SHA-256, the full record under --out, --rescore writing the ledger; then
+           docs/research/refusals.md and docs/research/yield-baseline.md frozen with their date and commit, and
+           PictureAnswer corrected to ImageAnswer there. Checks 5, 6, 7, 13. FULL SUITE.
+  Slice 4  node scripts/journey.mjs yield-benchmark, then reel-stills, reel-render and paid-path again, serially,
+           for the rule count (S-099's form, S-178's order). Proves none — it is the feature's proof.
+
+Thirteen checks, 6 + 3 + 4 + 0, every check in exactly one slice.
+
+S-185'S ACCEPTED RISK IS YOURS TO HONOUR. Four adversarial rounds refused these gates and the owner approved them
+by decision after all nineteen of round 4's findings were applied; no reviewer approved them, and the Gates: line
+says so. The bargain is that THE SLICES CARRY THE REVIEW. So: a check you cannot make pass as written is a FINDING
+— stop, report it, and let the owner decide — never a check you reword, loosen, skip or make conditional. The same
+goes for anything in the gates you find to be wrong about this repository's own code: five such errors were caught
+in session 86 by reading source, and more may remain. Report them; do not quietly build around them.
+
+HARD LIMITS. Never weaken a check, test, timeout, bound or boundary rule — add, never subtract. Change no engine
+behaviour. Spend nothing, reach no provider, read no key, and never open data/cutroom.sqlite for writing. Commit
+no media, no database and no generated artifact. Do not write yield-compare's or benchmark-view's gates, and do
+not start picture-prompt, the paid pass, run-provenance or hosted-checks.
+
+ENVIRONMENT, each trap already paid for. pnpm is not on PATH — corepack pnpm <script>, or node scripts/check.mjs.
+Node is 22.14, so TypeScript tests need --experimental-strip-types and a quoted glob, never a bare directory.
+Windows with a CRLF working tree: sed, awk and grep strip \r on read and lie about line endings, so count bytes
+with tr -cd '\r' < file | wc -c. No absolute paths anywhere (D-086). Adding a package's first file means adding
+its root tsconfig.json reference, or tests/workspace.test.ts fails. The full suite takes about 25 minutes; the
+known PATH-only child transient in tests/reel-takes-secrets.test.ts is a full-suite signal, not a new defect.
+
+Before you stop: the JOURNAL.md entry and this session's entry in docs/context.md, this prompt's Run line, and a
+commit per slice whose trailers bind the exact tree — Verification: full for Slices 1 and 3, targeted for Slice 2
+with its tests named, and node scripts/verification-status.mjs checked before and after each.
+```

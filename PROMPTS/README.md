@@ -65,6 +65,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 077 | [077-benchmark-design.md](077-benchmark-design.md)                                     | a new one             | design the benchmark, no code   | 2026-10-12 | session 83               |
 | 078 | [078-ci-on-github-actions.md](078-ci-on-github-actions.md)                             | a new one             | checks on GitHub Actions        | 2026-10-12 | session 84               |
 | 079 | [079-benchmark-gates-round-4.md](079-benchmark-gates-round-4.md)                       | `yield-benchmark`     | the split, round 3, round 4     | 2026-10-12 | session 86               |
+| 080 | [080-yield-benchmark-build.md](080-yield-benchmark-build.md)                           | `yield-benchmark`     | build all four slices           | 2026-10-14 | not yet                  |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
