@@ -7948,6 +7948,23 @@ superseded by five recomputed over stated inputs: **0.0, 10.0, 24.4, 34.0 and 89
 --prove` still fires 25 rules, and the five amended assertions this entry promised are now three test files and
 seven documents, each named in `yield-benchmark`'s S-099 section.
 
+**Amended again 2026-10-14 — the five worked values, after round 4.** The amendment above pinned **0.0, 10.0,
+24.4, 34.0, 89.7** and said they rank with no tie. Round 4 of `yield-benchmark`'s gate review found that
+`stopped-at-gate-1`, the fixture holding the 24.4, is **a state the engine cannot produce**: the D-047 stop is the
+**canonical** picture's and fires before any derived picture is attempted
+(`packages/pipeline/src/stills/index.ts:514-521`), while a derived picture that fails takes one repair and
+degrades without ending the run. The ending the record actually holds is one shot, three pictures judged, none
+accepted — the three 15¢ Gate-1 runs `f44e960b`, `52c63f62` and `0ac13e84` — which rates pictures 0.0 and the run
+**10.0**. So the pinned values are **0.0, 10.0, 10.0, 34.0, 89.7**, and the **tie between
+`dead-on-first-picture` and `stopped-at-gate-1` at 10.0 is kept and explained** rather than removed: both runs
+achieved nothing in the parts they reached, and a rating that separated them would be paying for the attempt,
+which is the defect class S-184 names. What distinguishes them is reported beside the rating and never folded into
+it — 3 pictures judged against 0, 3 image calls against 1, 15¢ against 5¢ — and `yield-benchmark`'s check 9 holds
+`≤` where it ties and asserts that difference. **No weight and neither tolerance moves**, rating version `r1` and
+the Gate 7 question-set stamp are unchanged, and `drift --prove` still fires 25 rules. Applied by the owner's
+decision **S-185**, which approved the four gates after all nineteen of round 4's findings were applied; the
+worked arithmetic is in `docs/features/yield-benchmark.md`'s rating section and its round 4 record.
+
 ---
 
 ## S-183 | 2026-10-12 | A hosted run corroborates and never verifies: the local full run stays S-177's only authority, and no run of a workflow may carry a verification trailer
@@ -8192,5 +8209,52 @@ the feature's only proof of done (S-016), which this waiver does not touch.
 **Confirmed-by.** The owner, 2026-10-14, choosing **"Build it"** when offered a fifth round at a lowered bar, a
 no-review revision, or pausing the feature, and told in the same question that the choice suspends CLAUDE.md
 rule 1 for this feature and needs this entry.
+
+---
+
+## S-186 | 2026-10-14 | `benchmark-no-io` names no `dependencyTypes`, because bare `sqlite` is not a Node builtin and a core-scoped rule is silent on it
+
+**Chose.**
+
+- **`benchmark-no-io` forbids its enumerated builtins with no `dependencyTypes` attribute**, where
+  `pipeline-no-io` carries `dependencyTypes: ['core']`. The rule is therefore **strictly broader** than
+  `pipeline-no-io`'s equivalent: it fires on the enumerated names however they resolve, and nothing legal in
+  `packages/benchmark` is reported — `drift --prove`'s legal shape, by path and by package name, is clean
+  (`yield-benchmark` check 11).
+- **The measurement that forced it**, made with dependency-cruiser over all 32 spellings in
+  `yield-benchmark`'s Slice 1: **31 fire under `dependencyTypes: ['core']`, and bare `sqlite` does not.** Only
+  `node:sqlite` is a Node builtin, so bare `sqlite` resolves to nothing, reaches the graph with a dependency type
+  of `unknown`, and a core-scoped rule cannot see it. `yield-benchmark` check 11 requires **every** enumerated
+  builtin under **both** spellings, so the core-scoped version of this rule could not pass the check as written.
+- **The reason is written in the rule's own comment**, beside the pattern, so the next reader does not restore
+  the attribute for symmetry with `pipeline-no-io` and silently lose one case.
+- **`pipeline-no-io`'s own gap is NOT closed here**, and this entry does not decide it. That rule is
+  `reel-plan`'s, its `--prove` case imports `node:fs`, and no gate asks for a change to it. **It is left to the
+  owner**, named here so it is not mistaken for something this slice already handled: today, a pipeline file
+  importing bare `sqlite` would pass `pipeline-no-io`.
+
+**Why.** The alternative was to make the check fit the rule rather than the rule fit the repository, which S-185's
+bargain forbids: the slices carry the review, and a check that cannot pass as written is a finding rather than
+something to reword. Widening a forbidding rule adds coverage and removes none, which is CLAUDE.md rule 3's
+direction of travel — add, never subtract. And the gap is not hypothetical: `node:sqlite` is how this repository
+opens a database, so bare `sqlite` is exactly the spelling a reader would try next.
+
+**Rejected.** **`dependencyTypes: ['core']`, for symmetry with `pipeline-no-io`** — it is silent on bare `sqlite`,
+which is one of the 32 cases check 11 pins, so the rule would have read as coverage while missing a spelling.
+**Narrowing check 11 to the 31 spellings that do fire** — weakening a check to reach green, forbidden outright.
+**Adding `dependencyTypes: ['core', 'unknown']`** — `unknown` is every unresolved import, which would make the
+rule fire on any bare specifier the resolver fails on, for reasons having nothing to do with I/O. **Changing
+`pipeline-no-io` in the same slice** — another feature's rule, outside this slice's scope, and a verified
+feature's check is not amended as a side effect of someone else's slice.
+
+**Caught by.** `yield-benchmark` check 11, which asserts `benchmark-no-io`'s pattern equals `pipeline-no-io`'s
+with `|crypto` inserted — computed from the loaded config rather than from a literal — and requires every
+enumerated builtin under both spellings; `scripts/drift.mjs`'s `BENCHMARK_IO_CASES`, which reads the enumeration
+out of the rule itself and throws if the rule stops enumerating, so a builtin dropped from the pattern loses its
+two cases and the printed case count falls; and Slice 1's deliberate break narrowing the rule to
+`dependencyTypes: ['core']`, which was seen red on bare `sqlite` going SILENT and restored.
+
+**Confirmed-by.** The measurement above, made in session 87 against this repository's own graph, and reported to
+the owner as finding 1 of Slice 1's hand-back.
 
 ---
