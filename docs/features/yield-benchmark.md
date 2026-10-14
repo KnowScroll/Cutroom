@@ -5,7 +5,7 @@ authority: plan
 
 # yield-benchmark — every run the engine has made, scored part by part out of what it already wrote
 
-Status: planned
+Status: verified
 Decisions: D-001, D-014, D-022, D-025, D-027, D-028, D-031, D-042, D-044, D-046, D-047, D-050, D-055, D-059, D-065, D-073, D-083, D-086, D-094, D-100, D-111, D-113, S-016, S-020, S-028, S-035, S-040, S-043, S-046, S-066, S-070, S-071, S-072, S-073, S-074, S-090, S-096, S-097, S-098, S-099, S-103, S-109, S-111, S-124, S-126, S-129, S-141, S-150, S-153, S-155, S-156, S-158, S-159, S-161, S-162, S-163, S-164, S-172, S-176, S-177, S-178, S-182, S-184, S-185
 Named only as what it cannot see, or as what waits: S-115, S-149, S-154
 Gates: product APPROVED 2026-10-14 owner-decision-S-185 · architecture APPROVED 2026-10-14 owner-decision-S-185 · program-design APPROVED 2026-10-14 owner-decision-S-185 · slices APPROVED 2026-10-14 owner-decision-S-185
@@ -839,6 +839,8 @@ Every check appears in exactly one slice: 6 + 3 + 4 + 0 = 13.
    what one brief is.
 
 ## Evidence (newest first; appended by the journey, never typed by hand)
+
+- 2026-10-14 journey=PASS at d898693 — every check green; 43 tests in tests/yield-benchmark-*.test.ts pass
 
 ## Divergence (the first broken boundary, or "none")
 
