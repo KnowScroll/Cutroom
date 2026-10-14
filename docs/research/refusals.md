@@ -1,9 +1,19 @@
 ---
-status: current
-authority: a count of what real runs were refused for, read from data/cutroom.sqlite — not a plan; nothing here binds
+status: frozen
+authority: a frozen count of what real runs were refused for, read from data/cutroom.sqlite — not a plan; nothing here binds
 ---
 
 # Refusals — every refusal a real run met, counted
+
+**FROZEN on 2026-10-14, by `yield-benchmark`'s Slice 3.** This is a snapshot and is kept as it was read: from
+`data/cutroom.sqlite`, read-only, over the 52 runs of 2026-09-21 to 2026-09-26, written down at commit `e7e6f2d`
+on 2026-09-26 — the commit where session 55's last six runs were added. **What the runs did is now
+`docs/research/benchmark.md`**, written by `scripts/benchmark.mjs` and never typed by hand: three live documents
+counting the same refusals is the drift `CLAUDE.md` refuses for the decisions, so this one stopped counting rather
+than becoming a second authority. Nothing here is recounted, and nothing here is corrected — where it and the
+ledger disagree, the ledger is the authority. One disagreement is already recorded in
+`docs/features/yield-benchmark.md`: Gate 1's clipping reasons are **45 strings on 43 pictures**, and the count
+below is of the 43 pictures, not of the strings.
 
 The owner asked in session 53 (2026-09-25) for every reason a picture, a clip or a cut was refused to be noted, so the
 engine can be fixed from it. This file counts them. It was generated from the database, read-only, over **all 52 real

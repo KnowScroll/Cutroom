@@ -10,6 +10,14 @@ Decisions: D-001, D-014, D-022, D-025, D-027, D-028, D-031, D-042, D-044, D-046,
 Named only as what it cannot see, or as what waits: S-115, S-149, S-154
 Gates: product APPROVED 2026-10-14 owner-decision-S-185 · architecture APPROVED 2026-10-14 owner-decision-S-185 · program-design APPROVED 2026-10-14 owner-decision-S-185 · slices APPROVED 2026-10-14 owner-decision-S-185
 
+> **Amended by this feature's own Slice 3 on 2026-10-14, at the owner's instruction — the gates below are not
+> edited, and no assertion is removed.** **Check 12's fixture glob RECURSES**: `readdirSync` is given
+> `{ recursive: true }`, so the placeholder rule reads `tests/fixtures/benchmark/ratings/*.json` — Slice 2's five
+> worked fixtures — beside `tests/fixtures/benchmark/*.json`. The rule itself does not change: every assertion
+> keeps its exact form, both test titles are untouched, and the only thing wider is the set of files it reads, so
+> nothing is loosened or skipped. Gate 3's two mentions of `tests/fixtures/benchmark/*.json` therefore understate
+> the set they describe; they are left exactly as written, because no amendment of them is listed for this slice.
+>
 > **Created 2026-10-12 at the owner's request**, in session 83, out of `PROMPTS/077-benchmark-design.md`. Session 82
 > measured the engine's first 52 runs (`docs/research/yield-baseline.md`): 8 of 52 produced a reel, and the picture
 > check refused 53% of all pictures. The first fix is scoped (`docs/features/picture-prompt.md`) and cannot be

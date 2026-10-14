@@ -134,7 +134,12 @@ test('12. every path-shaped value in tests/fixtures/benchmark/*.json is exactly 
     [/\.artifacts[\\/]/, "a path under this repository's artifact root"],
   ]
 
-  const files = readdirSync(FIXTURES).filter((name) => name.endsWith('.json'))
+  // The glob RECURSES (widened in Slice 3): the five worked rating fixtures live one folder
+  // down, in tests/fixtures/benchmark/ratings/, and the placeholder rule is the corpus's rather
+  // than one folder's. The rule itself is unchanged — only the set of files it reads is wider.
+  const files = readdirSync(FIXTURES, { recursive: true })
+    .map((name) => String(name))
+    .filter((name) => name.endsWith('.json'))
   assert.ok(files.length > 0, 'the row corpus is empty')
   const offenders: string[] = []
 

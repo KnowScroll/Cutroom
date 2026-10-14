@@ -1,9 +1,16 @@
 ---
-status: current
-authority: a measurement of what the engine produced in its first 52 runs, read from data/cutroom.sqlite — not a plan; nothing here binds
+status: frozen
+authority: a frozen measurement of what the engine produced in its first 52 runs, read from data/cutroom.sqlite — not a plan; nothing here binds
 ---
 
 # Yield baseline — what the engine produced in its first 52 runs
+
+**FROZEN on 2026-10-14, by `yield-benchmark`'s Slice 3.** This is a snapshot and is kept as it was read: from
+`data/cutroom.sqlite`, read-only, on 2026-10-12 over all 52 runs, written down at commit `ccef51b` the same day.
+**What the runs did is now `docs/research/benchmark.md`**, written by `scripts/benchmark.mjs` and never typed by
+hand, and it is the authority where the two disagree. One correction is carried into the freeze and nothing else
+is recounted: the image port's answer type is **`ImageAnswer`**, not `PictureAnswer` —
+`packages/contracts/src/picture.ts` has never held that name — and cause 1 below now says so.
 
 The owner asked in session 82 (2026-10-12) for the numbers from the start: what fails, what fails most, and what
 fails inside each of those. This file is that measurement, and it is **the number later fixes are compared against**.
@@ -178,7 +185,7 @@ the judges' answer shape · Gate 7 · the transient counter.
 
 Five things the rows imply and the source confirms.
 
-1. **The image port cannot report a transient fault.** `PictureAnswer` in `packages/contracts/src/picture.ts` has only
+1. **The image port cannot report a transient fault.** `ImageAnswer` in `packages/contracts/src/picture.ts` has only
    `made` and `refused` — no `unavailable`. `sentUntilAvailable` (`apps/worker/src/transient.ts`) is wired into the
    model, narration and video ports; `apps/worker/src/guarded-image-port.ts` does not mention it. So a fal `504` or a
    failed fetch on an image must throw, and a throw fails the run (S-046). Six runs died this way. Video and narration
