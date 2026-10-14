@@ -162,14 +162,16 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   slice that cannot make its check pass as written stops and reports rather than adjusting the check.
 - **Building is the next session's, and this session wrongly opened it.** Slice 1 was started here and stopped by
   the owner: S-160 rule 2 makes a session one phase and `PROMPTS/079` forbade any implementation file — the
-  owner's _"Build it"_ settled whether to keep reviewing, not which session builds. **The partial work is left
-  UNCOMMITTED at the owner's word**, so the next session opens on a dirty tree at `7938383`:
-  `.dependency-cruiser.cjs` (the three rules), `scripts/drift.mjs` (their `--prove` cases), `package.json`,
-  `pnpm-lock.yaml`, `tsconfig.json` (the workspace wiring), `packages/benchmark/package.json` and `tsconfig.json`,
-  and `tests/yield-benchmark-boundary.test.ts`. **No source file, no fixture, no amendment, and no check has been
-  run over any of it.** `PROMPTS/080-yield-benchmark-build.md` names it line by line and tells the building
-  session to read every line against the gates first — including the halved-backslash trap, which has already
-  broken a boundary rule here.
+  owner's _"Build it"_ settled whether to keep reviewing, not which session builds.
+- **The partial work was discarded, and why is the finding worth keeping.** Left in the tree it turned three
+  verified features **red**: it had added the three boundary rules and their `--prove` cases, so `drift --prove`
+  printed **25** while `tests/reel-stills-rules.test.ts`, `tests/reel-render-rules.test.ts` and
+  `tests/paid-path-keys.test.ts` still assert 22 and the amendments were never written — 9 of 12 tests passing.
+  The owner was first told only that the work was unverified, which was true and incomplete, and chose to leave
+  it; **the stop-gate's refusal to end on uncommitted source is what made anyone measure it**, and the owner then
+  discarded it. The tree is clean at `cda948f`, `drift --prove` prints 22, and those three files are 12 of 12.
+  **The three rules and their amendments are ONE change**, which is now written into the next prompt as what
+  Slice 1 must carry before it is committable.
 - Added `PROMPTS/080-yield-benchmark-build.md`, listed in `PROMPTS/README.md`: all four slices, one
   `slice-builder` at a time, full suite for Slices 1 and 3, targeted for 2, the journeys in 4.
 - No code, contract, test, provider, database, media, boundary rule or check was COMMITTED by this session, and

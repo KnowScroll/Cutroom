@@ -14,26 +14,16 @@ approved, so you build what it says rather than redesigning it. Then S-185 (grep
 S-182's Amended block (grep -n '^## S-182' DECISIONS.md), which carry the weights, the tolerances, the rating
 version and what the split moved out.
 
-THE TREE IS DIRTY WHEN YOU START, AND IT IS NOT YOURS YET. Session 86 began Slice 1 in the wrong phase, was
-stopped, and the owner chose to leave the partial work uncommitted rather than discard it. Sitting in the working
-tree at HEAD = 7938383, committed nowhere:
+YOU START FROM A CLEAN TREE, AND SLICE 1 IS UNBUILT. Session 86 opened Slice 1 in the wrong phase, was stopped,
+and the partial work was DISCARDED at the owner's word — because it turned three verified features' checks red:
+it had added the three boundary rules and their --prove cases, so `drift --prove` printed 25 while
+tests/reel-stills-rules.test.ts, tests/reel-render-rules.test.ts and tests/paid-path-keys.test.ts still assert 22,
+and the amendments that answer that were never written. Nothing of it survives. HEAD is cda948f, the tree is
+clean, and `node scripts/drift.mjs --prove` prints 22.
 
-  M .dependency-cruiser.cjs          the three new rules
-  M scripts/drift.mjs                their --prove cases
-  M package.json, pnpm-lock.yaml     @cutroom/benchmark as a workspace dependency
-  M tsconfig.json                    the new package's reference
-  ?? packages/benchmark/package.json
-  ?? packages/benchmark/tsconfig.json
-  ?? tests/yield-benchmark-boundary.test.ts
-
-NOTHING VERIFIED IT. No check has been run over it, it was written by an agent that did not finish, and no source
-file, fixture or amendment exists. Treat it as a draft somebody left you: READ EVERY LINE against the gates before
-you build on it, and if a line is wrong, fix it rather than working around it. Two specific traps it is exposed to:
-a regex written through a heredoc can arrive with its backslashes halved (\. instead of \\.), which silently
-matches any character and has already broken a boundary rule here — so verify .dependency-cruiser.cjs's patterns
-in the file, not in the command that wrote them; and benchmark-no-io's pattern must be pipeline-no-io's
-enumeration character-for-character (.dependency-cruiser.cjs:53) PLUS crypto. `git diff` and
-`node scripts/verification-status.mjs` are the first two things to run.
+THE LESSON THAT COST IS WORTH CARRYING: the three new rules and their amendments are ONE change. A slice that
+adds a rule without amending every place that counts them leaves the repository red, so Slice 1 is not done — and
+is not committable — until `drift --prove` says 25 AND those three test files say 25 with it.
 
 WHAT TO BUILD, IN ORDER. Four slices, exactly as Gate 4 states them, ONE slice-builder at a time — never two at
 once, because they would edit the same files. Each slice: its tests first, then its code, one deliberate break per
@@ -74,7 +64,12 @@ not start picture-prompt, the paid pass, run-provenance or hosted-checks.
 ENVIRONMENT, each trap already paid for. pnpm is not on PATH — corepack pnpm <script>, or node scripts/check.mjs.
 Node is 22.14, so TypeScript tests need --experimental-strip-types and a quoted glob, never a bare directory.
 Windows with a CRLF working tree: sed, awk and grep strip \r on read and lie about line endings, so count bytes
-with tr -cd '\r' < file | wc -c. No absolute paths anywhere (D-086). Adding a package's first file means adding
+with tr -cd '\r' < file | wc -c. Shell tooling can HALVE BACKSLASHES in transit, so a regex written through a heredoc can
+arrive with single backslashes where it needs double, silently matching any character — this has already broken
+a boundary rule here, and it bit session 86 again while writing this prompt. Verify .dependency-cruiser.cjs's
+patterns by READING THE FILE, never by trusting the command that wrote them, and check benchmark-no-io's
+enumeration against pipeline-no-io's character-for-character (.dependency-cruiser.cjs:53) plus crypto.
+No absolute paths anywhere (D-086). Adding a package's first file means adding
 its root tsconfig.json reference, or tests/workspace.test.ts fails. The full suite takes about 25 minutes; the
 known PATH-only child transient in tests/reel-takes-secrets.test.ts is a full-suite signal, not a new defect.
 
