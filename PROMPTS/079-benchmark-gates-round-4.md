@@ -1,12 +1,12 @@
 # 079 — the scoring half's gates: apply round 3, shrink to the split, round 4
 
-- **For:** session 85
+- **For:** session 86
 - **Feature:** `yield-benchmark` (`docs/features/yield-benchmark.md`), the scoring half only. `yield-compare` and
   `benchmark-view` are named stubs and are not worked on
 - **Work:** shrink the feature to what S-184 leaves it, apply round 3's findings that belong to it, amend its
   checks and slices, send a fresh adversarial round 4. **No implementation file of any kind**
 - **Written:** 2026-10-12
-- **Run:** not yet
+- **Run:** session 86, 2026-10-14
 
 ```text
 Read docs/context.md first, then, in this order: docs/features/yield-benchmark.md whole, including its three

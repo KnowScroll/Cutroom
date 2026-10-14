@@ -27,8 +27,13 @@ git and the journal keep them.
   been weakened. **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `caption-match` (S-165),
   `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
+- **`yield-benchmark`: four gates APPROVED by owner decision (S-185), not by a reviewer** — four adversarial
+  rounds refused it, all findings applied, and the slices carry the review. **Gates written and NOT approved**:
+  `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
+  `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next**: `self-heal`; SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
+- **Next, settled by the owner in session 85**: **the benchmark first**, `hosted-checks` on hold — _"Lets make the
+  benchmark first."_ Then `self-heal`. SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
   integration scope). The
   `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
   the `reel-contract` re-journey at `6a95a8d` PASSed at `c15b2d4`. **`PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`
@@ -105,6 +110,75 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-14 · session 86
+
+- **`docs/features/yield-benchmark.md` is now the scoring half alone** (S-184). Deleted: sides, per-unit rates, the
+  two uncertainty bands, the verdict words, the eight deciding measures, the credit guard, comparability and the
+  fingerprint, and `compare.ts` from the file list. In their place one section names what `yield-compare` owns and
+  why the brief key stays here — it is a property of one run, not of a pair. **Each of the six round-3 findings
+  that moved was confirmed present in `docs/features/yield-compare.md`'s "What the gates must settle" before being
+  deleted here.**
+- **Round 3's twenty findings are recorded in the file for the first time** — they existed only in
+  `PROMPTS/079` — and fifteen are applied. Load-bearing, each verified against source first: **all thirteen rating
+  terms rephrased achieved-over-attempted** with the weights unmoved and three conventions stated; **the five
+  worked values recomputed to 0.0, 10.0, 24.4, 34.0, 89.7**, ranking strictly with no tie, every fixture now
+  **constructed** rather than taken; a **part-to-stage/job table**, since `RunEvent`'s stage is only
+  `plan | stills | video` and narration, clips and the cut all sit inside `video` (118 starts = 52 + 43 + 23), so
+  narration and clips are reached by a `reel.clips` job row and the cut by `reel.assemble`; **`benchmark-no-io`
+  enumerates its builtins** — `pipeline-no-io`'s real pattern plus `crypto`, which it did not forbid before; the
+  **brief key's input composed in the package against an injected hash**, the reader supplying SHA-256, so no
+  slice needs a later slice's code; the **ledger's fifteen columns** with the read date and commit in the header;
+  the **flag table with four exit codes** answering _"run on individual things"_; inherited degradations, holds and
+  still-holds recognised through the `kept_from` their tables do not carry; `capCents` reported where a
+  budget-limited result holds it; the estimate's exclusions extended to retakes and lost calls; five further
+  reason-writing sites and "a run-ending `detail` is never classified"; the fixture placeholder rule asserted here,
+  because `tests/no-absolute-paths.test.ts` matches four machine-path shapes only; and S-178 on the `Decisions:`
+  line. **Thirteen checks in four slices, 6 + 3 + 4 + 0.**
+- **The count amendment list is corrected**: not five places but **three test files** (five assertions, two titles,
+  two ordinal comments) and **seven documents** (fourteen occurrences), each named by line —
+  `tests/paid-path-keys.test.ts:139`'s `doesNotMatch(/21 rules proven to fire/)` is raised to 22 rather than left
+  guarding a number nobody could write. Round 3's eighth site, `docs/features/hosted-checks.md:337`, **does not
+  exist** (278 lines, no rule count) and is recorded as not owed.
+- **S-182 carries an `Amended 2026-10-14` block**: what it no longer governs, its comparison clauses changing
+  address rather than being withdrawn, and a term-by-term table of old phrasing beside new. **No weight and
+  neither tolerance moved.** The owner's deletion of the overclaim _"No two of those 25 groups hold two runs on one
+  engine version"_ is applied — unknowable, since no row records an engine version — replaced by the measured 5 of
+  25 matching brief groups.
+- **Round 4 refused all four gates with nineteen findings; all nineteen are applied.** Three were serious and were
+  verified against source here: the `stopped-at-gate-1` fixture was **a state the engine cannot produce** — the
+  D-047 stop is the **canonical** picture's and fires before any derived one (`stills/index.ts:514-521`) — so its
+  24.4 was unreachable and round 3's tie had been hidden, not fixed; **three terms were achievements whose stated
+  column was still an absence** (a stopped shot writes no `degradation`, a failed-take shot no `still_hold`, and
+  `render_manifest` is notNull and written before the assembler, so an unassembled cut scored 20.0); and the
+  plan's third term named no column that scopes a model call to a stage. Also: **the picture rule IS recorded**
+  (`Plan.pictures`), which three gates called unrecordable. The **tie is kept and explained** — both runs achieved
+  nothing in the parts they reached — and the pinned values are **0.0, 10.0, 10.0, 34.0, 89.7**.
+- **S-185 — the owner read the round count and chose to build.** Four rounds, about **890,000 reviewer tokens over
+  five sessions, zero implementation files**. The four gates are **APPROVED by owner decision**; the `Gates:` line
+  reads `owner-decision-S-185` and names no reviewer, so this feature is never read as having passed the review
+  every other verified feature passed. **The waiver is for `yield-benchmark` alone** — rule 1 stands for
+  `yield-compare`, `benchmark-view` and everything else. Accepted risk: **the slices carry the review**, and a
+  slice that cannot make its check pass as written stops and reports rather than adjusting the check.
+- No code, contract, test, provider, database, media, boundary rule or check changed, and nothing was weakened.
+  `node scripts/check.mjs --changed` green. No reel was made and nothing was spent.
+
+### 2026-10-14 · session 85
+
+- **A status read, and nothing of substance changed.** The owner asked where things stand; the answer came from the
+  record only: pin current at `e05e9f0` with 115 `D-` entries and 0 unpushed commits, 146 modules / 0 boundary
+  violations / 0 key-shaped reads, tree clean at `c8a3839`. The two open fronts are `hosted-checks` (gates NOT
+  APPROVED, round 1's 17 findings answered in the file, the `real-reel` literal owed to
+  `tests/paid-path-real-reel.test.ts` per S-111 and a `paid-path` re-journey) and the three-way benchmark split
+  (`yield-benchmark`, `yield-compare`, `benchmark-view`, all four gates pending on each, with
+  `PROMPTS/079-benchmark-gates-round-4.md` written and unrun).
+- **The owner settled the order: the benchmark first, `hosted-checks` on hold.** Next session runs
+  `PROMPTS/079-benchmark-gates-round-4.md` (`For:` corrected to session 86) — shrink `yield-benchmark` to the scoring
+  half, apply round 3's findings, amend S-182, send a fresh round 4, no implementation file. The two features
+  overlap only in `paid-path`'s test evidence, so whichever lands first sets the boundary-rule count.
+- **`JOURNAL.md` was compacted to fit S-177's 80-line cap**, which the stop-gate's required entry would otherwise have
+  broken at 78 lines: session 83's five body paragraphs are now one, **joined verbatim, no word dropped**. No code,
+  contract, test, boundary rule, check or decision changed, and nothing was weakened.
 
 ### 2026-10-12 · session 84
 
@@ -197,51 +271,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - `tests/cutroom-sdk-*.test.ts` now also matches `tests/cutroom-sdk-package-build.test.ts`, so the cutroom-sdk journey now exercises 84 tests (65 prior in routes, launcher, and readiness, plus the 19 from the package-owner test).
 - Journey: `cutroom-sdk-package` at `2e66370` PASS (every check green, 19 tests, `Verification: full`); `cutroom-sdk` re-journey at `5acba17` PASS (84 tests, one transient FAIL at `3a202b0` recorded per Slice 4 / S-178 in `docs/features/cutroom-sdk.md`'s Evidence before passing on the second run); `reel-contract` re-journey at `7c648d2` PASS (42 tests, no change).
 - SDK v1 is complete on Cutroom's side per S-180: reproducible build `node scripts/package-sdk.mjs` produces `.package-staging/cutroom-reel-contract-1.0.0.tgz` and `.package-staging/cutroom-sdk-1.0.0.tgz`; any consumer can install them and exercise the SDK contract. Per S-180, no KnowScroll integration, engine package, registry publication, OS installer, release manager, telemetry or update service is added. `self-heal` is the next queue item (S-168).
-
-### 2026-09-30 · session 77
-
-- Repaired `scripts/journey.mjs` so the writer leaves every feature file format-clean: the Divergence
-  replacement now trims to a single trailing newline, no matter where Divergence lives. Without this fix the
-  journey appended a trailing blank line to any feature whose last section is Divergence (as in
-  `docs/features/cutroom-sdk.md`), which `prettier --check` rejects. Two regression cases in
-  `tests/journey.test.ts` cover the PASS and FAIL paths.
-- The interrupted prompt-073-A PASS chain is now complete: `fix(journey): preserve the file's format
-invariant; complete the PASS chain` at `1c7c77d` (full preflight, tree `35d3382…`); SDK journey PASS at
-  `6a95a8d`; `reel-contract` re-journey PASS at `c15b2d4` — every check green, 42 tests in
-  `tests/reel-contract-*.test.ts` pass, Divergence reset to `none`, both feature files format-clean. The same
-  writer fix keeps subsequent runs green.
-- `docs/features/cutroom-sdk.md` was prettier-formatted at `1c7c77d` (the trailing-blank-line shape the journey
-  would write, applied once by hand so the commit's tree carries `Verification: full`); the SDK journey then
-  wrote a real evidence line on a clean file.
-
-### 2026-09-30 · session 76
-
-- S-181 records the future `reel-series` feature: one topic-level brief plus a positive integer `n` produces
-  exactly `n` ordered, individually complete reels, planned together and made serially. Neither variants of one
-  brief nor fragments of a long reel; the public API, gates and queue order remain unwritten.
-- `docs/features/reel-series.md` is the recorded feature stub, with the future success criteria, edge cases
-  the gates must cover and the open questions for gate review. No implementation, boundary or check change
-  is added.
-
-### 2026-09-30 · session 75
-
-- Resolution A of `PROMPTS/073-cutroom-sdk-format-finding.md` ran end to end. `prettier --write` removed the
-  pre-existing format failures from `docs/features/cutroom-sdk.md`, `docs/context.md`, and `PROMPTS/073-cutroom-sdk-format-finding.md`;
-  the formatting commit `48a6746` carries a full-green `check.mjs` evidence (`Verification: full`, tree
-  `85cd3ec2`). The SDK journey at `48a6746` PASS at `3226321`. The `reel-contract` re-journey at `3226321`
-  FAILed on `format` at `647c5e6` — the same divergence session 72 caught at `3b50714`, now legible: the SDK
-  journey's own modification to `docs/features/cutroom-sdk.md` appended an evidence line and a trailing blank
-  line, and `prettier --check` rejects that file. The session stops per Slice 4's wording; no check, journey,
-  timeout, test or boundary rule was changed. The owner decides between widening `.prettierignore` (resolution B),
-  fixing `scripts/journey.mjs` so the writer leaves the file format-clean (resolution A's missing pre-condition),
-  or another outcome; prompt 074 then runs after that.
-
-### 2026-09-30 · session 74
-
-- S-180 corrects S-179's scope: Cutroom ships and proves portable consumer-neutral SDK/contract packages; consumers
-  own KnowScroll or any other integration, engine installation and launcher configuration. The unrun prompt 074 now
-  approves minimal package gates, builds the artifacts and proves a clean external installation; it contains no
-  consumer edit, engine bundle, registry publication, OS installer, activation or rollback work.
 
 ## Where to look
 

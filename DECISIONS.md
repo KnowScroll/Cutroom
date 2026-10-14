@@ -7900,6 +7900,54 @@ is made"_; and, when the comparison was offered as a deferral, _"No we need job 
 important or else how would we know whether the new engine or new thing in the engine worked ... even if it takes
 more time and brainstorming and decision making to close."_
 
+**Amended 2026-10-14 — where the comparison went, and the rating terms rephrased.** Two changes, and no weight
+moves.
+
+**First, what this entry no longer governs.** S-184 split the benchmark in three. Every clause above about
+**putting two sets of runs beside each other** — a side as a label and a list of runs, a measure moving beyond its
+band, the binomial and sample-variance bands, two runs a side in a group and three shared groups, the
+two-thirds-of-groups direction, a zero delta, a dropped group, the credit guard's three quantities, and
+comparability with its fingerprint — now governs `docs/features/yield-compare.md` and nothing in
+`docs/features/yield-benchmark.md`. The scoring half computes **no band, no delta and no verdict**, and its gates
+carry no check that asserts one. What stays with the scoring half out of that paragraph is the **brief key** and
+nothing else, because the key is a property of one run rather than of a pair, and `yield-compare` groups by it
+rather than re-deriving it. Those clauses are not withdrawn and nothing in them is decided again here; they change
+address, and the gates that must still settle their open questions — the band's wording, the pooling scope, the
+guard's missing quantity, which comparability conditions are not vacuous, the verdict's unit — are
+`yield-compare`'s, recorded in that file.
+
+**Second, every rating term is rephrased as something achieved over something attempted** (S-184), which this
+entry's table was not. Round 3 proved the cost: `shots not degraded` has the plan's shots as its denominator and
+no degradation row to subtract, so a run that died on its first image call collected the term's full 0.3 for work
+it never attempted, and two fixtures that should have ranked apart tied at 19.0. The same shape paid `shots not
+held at the cap` 0.3 and `no holds` 0.2 to a run that entered the video stage and made nothing. **The weights,
+both tolerances, rating version `r1` and the Gate 7 question-set stamp are unchanged**; only each term's
+numerator and denominator are restated:
+
+| part      | the term as this entry first wrote it                     | the term now                                                                        | weight |
+| --------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------- | -----: |
+| plan      | Gate 0 admitted                                           | Gate 0 admitted the selected plan                                                   |    0.5 |
+| plan      | no repair plan needed                                     | the selected plan was admitted at its first round                                   |    0.2 |
+| plan      | every planner and scorer answer readable at the first ask | share of the plan stage's model asks answered readably at the first ask             |    0.3 |
+| pictures  | judged accepted                                           | share of the pictures Gate 1 decided that it accepted                               |    0.7 |
+| pictures  | shots not degraded                                        | share of the shots a picture was attempted for that ended with an accepted picture  |    0.3 |
+| narration | units spoken                                              | share of the selected plan's units the run spoke                                    |    0.5 |
+| narration | timings parsed at the first ask                           | share of the narrations made whose word timings parsed at the first ask             |    0.5 |
+| clips     | takes accepted                                            | share of the takes judged that every take gate accepted                             |    0.5 |
+| clips     | shots not held at the cap                                 | share of the shots a take was made for that ended with an accepted take             |    0.3 |
+| clips     | delivered within 0.25 s of asked                          | share of the takes probed that were delivered within 0.25 s of the seconds asked    |    0.2 |
+| cut       | Gate 7 answers yes                                        | share of Gate 7's questions answered yes                                            |    0.6 |
+| cut       | no holds                                                  | share of the cut's shots whose clip carried its narration without a hold            |    0.2 |
+| cut       | duration within 0.5 s of the plan                         | the delivered file's measured duration is within 0.5 s of the selected plan's total |    0.2 |
+
+With them, two conventions this entry stated once and now states for every term: **a share with an empty
+denominator inside a part that was reached is 0**, and **a yes/no term whose subject never existed inside a
+reached part is 0, not 1**. The worked values this entry's "Caught by" named — 0.0, 10.0, 21.5 and 91.9 — are
+superseded by five recomputed over stated inputs: **0.0, 10.0, 24.4, 34.0 and 89.7**, ranking `dead-in-plan`,
+`dead-on-first-picture`, `stopped-at-gate-1`, `entered-video-made-nothing`, `completed`, with no tie. `drift
+--prove` still fires 25 rules, and the five amended assertions this entry promised are now three test files and
+seven documents, each named in `yield-benchmark`'s S-099 section.
+
 ---
 
 ## S-183 | 2026-10-12 | A hosted run corroborates and never verifies: the local full run stays S-177's only authority, and no run of a workflow may carry a verification trailer
@@ -8080,12 +8128,69 @@ implemented is a decision about nothing. **Patching each absence-shaped rating t
 rounds found three instances; the phrasing rule removes the class.
 
 **Caught by.** `yield-benchmark`'s own checks, reduced to the scoring half, with no band and no verdict among
-them; each rating term's denominator asserted as attempted items, and the four worked fixture values recomputed and
-pinned; `yield-compare`'s and `benchmark-view`'s gates, each refusing until approved, and
+them; each rating term's denominator asserted as attempted items, and the worked fixture values recomputed and
+pinned (**five, not four** — a fifth fixture, `entered-video-made-nothing`, was added to pin this entry's own
+rule, since no other fixture reaches a part and attempts nothing in it; S-185); `yield-compare`'s and `benchmark-view`'s gates, each refusing until approved, and
 `tests/feature-files.test.ts` holding both new files to their front matter and their created-here note.
 
 **Confirmed-by.** The owner, 2026-10-12: _"Yes the comparison is its own feature that is right, and also the
 visualization also its own feature"_, and, on the view, _"i want the benchmark system to be visualizable as well ...
 some ui/frontend work for visualization"_.
+
+---
+
+## S-185 | 2026-10-14 | `yield-benchmark`'s four gates are approved by the owner after four adversarial rounds, and rule 1's adversarial approval is waived for this one feature only
+
+**Chose.**
+
+- **The four gates of `docs/features/yield-benchmark.md` are APPROVED by the owner's decision**, dated
+  2026-10-14, recorded on its `Gates:` line as `owner-decision-S-185` rather than as a reviewer's name. **No
+  reviewer approved them**, and the line says so, so nobody later reads this feature as having passed the review
+  every other verified feature passed.
+- **Every one of round 4's nineteen findings is applied to the gates BEFORE the first implementation file**, which
+  is what the owner's decision buys time on — not correctness. Five were verified against source by this session
+  before being applied: the D-047 stop is the canonical picture's and fires before any derived one
+  (`stills/index.ts:514-521`), so the worked fixture that pinned 24.4 was a state the engine cannot produce;
+  `render_manifest` is notNull and written before the assembler (`schema.ts:487-500`), so "manifest shots with no
+  hold" pays an unassembled cut 20.0; `take.outcome` (`schema.ts:412`) is the positive column the clips term
+  needed; `Plan.pictures` (`contracts/src/cinematic.ts:38`) records the picture rule, which three gates called
+  unrecordable; and the amendment list's two comment ranges were off by one.
+- **The remaining risk is named and accepted**: the gates were last read adversarially at a version that has since
+  changed in every section, so **this feature's slices carry the review**. A slice that cannot make its check pass
+  as written stops and reports, exactly as a divergence does (S-016) — it does not adjust the check to fit.
+- **This waiver is for `yield-benchmark` alone.** CLAUDE.md rule 1 stands for every other feature, including
+  `yield-compare` and `benchmark-view`, which have no gates written at all.
+
+**Why.** Four adversarial rounds — 20, 20, 20 and 19 findings — about **890,000 reviewer tokens across five
+sessions, and not one implementation file.** The owner, 2026-10-14, asked the question that settles it: _"All I
+can see now is we go to build something and most our time is wasted in reviews, tests, instead of
+implementations."_ The reviews were not idle: round 1 caught a rating that made a dead run outrank a finished
+reel, round 2 caught three verified features' checks turning red with no amendment list, round 3 caught a whole
+class of term paying for work never attempted, and round 4 caught a pinned fixture the engine cannot produce. But
+**the kind of defect has converged while the count has not**: twelve of round 4's nineteen are "the column named
+does not implement the term written" — `degradation`'s absence where an accepted picture was meant, `still_hold`'s
+where `take.outcome` was meant, an empty manifest that is never empty. **That class is free to catch in code and
+expensive to catch in prose**: a test over the committed fixtures prints it in a second, while a reviewer
+hand-simulating the schema costs 240,000 tokens a round and finds a different twelve each time. Prose cannot be
+typechecked, and a specification detailed enough to be wrong about a column is detailed enough to be code.
+
+**Rejected.** **A fifth adversarial round** — four rounds give no evidence of convergence in count, and the
+marginal finding is now cheaper to buy from the test runner. **Shipping the gates unfixed** — round 4's findings
+are real and five were verified against source here; building against them would put the same arithmetic defects
+into code, where they are harder to see. **Abandoning the gates** — they are what the slices are built against,
+and the document is now the only place the part-to-stage mapping, the positive column rules and the ledger's
+columns are written down. **Dropping `yield-benchmark`** — the owner refused: the benchmark comes first, and
+without it no later fix to the engine can be judged. **Amending CLAUDE.md rule 1 in general** — one feature's
+cost is not evidence about every feature's, and the rule has caught real defects here four times out of four.
+
+**Caught by.** The `Gates:` line naming `owner-decision-S-185` and no reviewer, so the exception is visible in the
+file it applies to. Every round-4 finding applied in the gates before Slice 1 opens, and round 4 recorded in the
+file beside rounds 1 to 3. The slices' own checks, unweakened and unskipped: thirteen checks over four slices,
+with Slice 1 and Slice 3 full-suite and the rule count taken to 25. `node scripts/journey.mjs yield-benchmark` as
+the feature's only proof of done (S-016), which this waiver does not touch.
+
+**Confirmed-by.** The owner, 2026-10-14, choosing **"Build it"** when offered a fifth round at a lowered bar, a
+no-review revision, or pausing the feature, and told in the same question that the choice suspends CLAUDE.md
+rule 1 for this feature and needs this entry.
 
 ---
