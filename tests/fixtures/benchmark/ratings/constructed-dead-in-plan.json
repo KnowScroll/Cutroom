@@ -1,0 +1,112 @@
+{
+  "about": "CONSTRUCTED BY HAND by yield-benchmark Slice 2, because a pinned rating must be computed from stated inputs: a fixture lifted from the record pins numbers nobody restated. `terms` states every term's inputs as Gate 2 states them and `expected` the figures it pins; the rows below are shaped as the schema stores them, and every path-shaped value is the literal <artifact>.",
+  "what": "the plan stage started; one planner ask, its answer unreadable at that ask, no second ask, no plan selected; no other part reached. A refused answer leaves NO model_receipt (recording-port.ts:46-66), so the ask is the refused_answer row.",
+  "terms": {
+    "plan": {
+      "gate0AdmittedTheSelectedPlan": {
+        "achieved": 0,
+        "attempted": 1
+      },
+      "admittedAtItsFirstRound": {
+        "achieved": 0,
+        "attempted": 1
+      },
+      "asksAnsweredAtTheFirstAsk": {
+        "achieved": 0,
+        "attempted": 1
+      }
+    },
+    "pictures": "absent",
+    "narration": "absent",
+    "clips": "absent",
+    "cut": "absent"
+  },
+  "expected": {
+    "parts": {
+      "plan": "0.0",
+      "pictures": "absent",
+      "narration": "absent",
+      "clips": "absent",
+      "cut": "absent"
+    },
+    "rating": "0.0",
+    "stamp": "r1/—"
+  },
+  "run": {
+    "run_id": "ra71n657-0000-4001-8000-000000000001",
+    "request_id": "benchmark-rating-dead-in-plan",
+    "request": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A tsunami is a train of very long waves.\"},{\"claimIds\":[\"c1\"],\"text\":\"Most are set off by the seabed moving in an earthquake.\"},{\"claimIds\":[\"c1\"],\"text\":\"In deep water the wave is low and very fast.\"},{\"claimIds\":[\"c1\"],\"text\":\"It can cross an ocean in a few hours.\"},{\"claimIds\":[\"c2\"],\"text\":\"As the sea shallows the front slows and the water piles up.\"},{\"claimIds\":[\"c2\"],\"text\":\"The wave can stand many metres above the shore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The sea often draws back first, baring the sea floor.\"},{\"claimIds\":[\"c2\"],\"text\":\"That withdrawal is the last warning before the water returns.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"benchmark-rating-dead-in-plan\",\"style\":{\"id\":\"style-benchmark-fixture\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-tsunamis\"}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A tsunami is a train of very long waves.\"},{\"claimIds\":[\"c1\"],\"text\":\"Most are set off by the seabed moving in an earthquake.\"},{\"claimIds\":[\"c1\"],\"text\":\"In deep water the wave is low and very fast.\"},{\"claimIds\":[\"c1\"],\"text\":\"It can cross an ocean in a few hours.\"},{\"claimIds\":[\"c2\"],\"text\":\"As the sea shallows the front slows and the water piles up.\"},{\"claimIds\":[\"c2\"],\"text\":\"The wave can stand many metres above the shore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The sea often draws back first, baring the sea floor.\"},{\"claimIds\":[\"c2\"],\"text\":\"That withdrawal is the last warning before the water returns.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"benchmark-rating-dead-in-plan\",\"style\":{\"id\":\"style-benchmark-fixture\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-tsunamis\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000001\",\"requestId\":\"benchmark-rating-dead-in-plan\",\"costCents\":0,\"status\":\"failed\",\"detail\":\"the planner's answer could not be read at its one ask, and the plan stage asked nothing again (S-096)\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-10-01T00:00:00.000Z"
+  },
+  "job": [
+    {
+      "id": 1,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000001\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:00:00.000Z",
+      "locked_at": "2026-10-01T00:00:01.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000001",
+      "cost_cents": 0
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000001",
+      "seq": 1,
+      "at": "2026-10-01T00:00:00.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000001\",\"seq\":1,\"at\":\"2026-10-01T00:00:00.000Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000001",
+      "seq": 2,
+      "at": "2026-10-01T00:00:01.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000001\",\"seq\":2,\"at\":\"2026-10-01T00:00:01.000Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000001",
+      "seq": 3,
+      "at": "2026-10-01T00:00:44.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000001\",\"seq\":3,\"at\":\"2026-10-01T00:00:44.000Z\",\"type\":\"run.finished\",\"status\":\"failed\"}"
+    }
+  ],
+  "plan": [],
+  "model_receipt": [],
+  "picture": [],
+  "observation": [],
+  "reconciliation": [],
+  "generation_receipt": [],
+  "lost_call": [],
+  "refused_answer": [
+    {
+      "id": 1,
+      "run_id": "ra71n657-0000-4001-8000-000000000001",
+      "port": "model",
+      "role": "planner",
+      "call": "structured",
+      "about": "[]",
+      "ask": 1,
+      "reasons": "[\"shots.0.durationSeconds: Invalid input: expected number, received string\"]",
+      "answer": "{\"shots\":[{\"unit\":0,\"durationSeconds\":\"ten\"}]}",
+      "at": "2026-10-01T00:00:41.000Z"
+    }
+  ],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

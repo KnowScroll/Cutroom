@@ -1,0 +1,224 @@
+{
+  "about": "CONSTRUCTED BY HAND by yield-benchmark Slice 2, because a pinned rating must be computed from stated inputs: a fixture lifted from the record pins numbers nobody restated. `terms` states every term's inputs as Gate 2 states them and `expected` the figures it pins; the rows below are shaped as the schema stores them, and every path-shaped value is the literal <artifact>.",
+  "what": "plan selected, admitted at its first round, 4 model asks all answered at the first ask; the stills stage started and the first image call threw, so NO picture row exists at all; no other part reached. The one image call is a lost_call, because ImageAnswer has only made and refused and cannot report a transient (six runs died of it).",
+  "terms": {
+    "plan": {
+      "gate0AdmittedTheSelectedPlan": {
+        "achieved": 1,
+        "attempted": 1
+      },
+      "admittedAtItsFirstRound": {
+        "achieved": 1,
+        "attempted": 1
+      },
+      "asksAnsweredAtTheFirstAsk": {
+        "achieved": 4,
+        "attempted": 4
+      }
+    },
+    "pictures": {
+      "judgedAccepted": {
+        "achieved": 0,
+        "attempted": 0
+      },
+      "shotsEndingAccepted": {
+        "achieved": 0,
+        "attempted": 0
+      }
+    },
+    "narration": "absent",
+    "clips": "absent",
+    "cut": "absent"
+  },
+  "expected": {
+    "parts": {
+      "plan": "100.0",
+      "pictures": "0.0",
+      "narration": "absent",
+      "clips": "absent",
+      "cut": "absent"
+    },
+    "rating": "10.0",
+    "stamp": "r1/—"
+  },
+  "run": {
+    "run_id": "ra71n657-0000-4001-8000-000000000002",
+    "request_id": "benchmark-rating-dead-on-first-picture",
+    "request": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A tsunami is a train of very long waves.\"},{\"claimIds\":[\"c1\"],\"text\":\"Most are set off by the seabed moving in an earthquake.\"},{\"claimIds\":[\"c1\"],\"text\":\"In deep water the wave is low and very fast.\"},{\"claimIds\":[\"c1\"],\"text\":\"It can cross an ocean in a few hours.\"},{\"claimIds\":[\"c2\"],\"text\":\"As the sea shallows the front slows and the water piles up.\"},{\"claimIds\":[\"c2\"],\"text\":\"The wave can stand many metres above the shore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The sea often draws back first, baring the sea floor.\"},{\"claimIds\":[\"c2\"],\"text\":\"That withdrawal is the last warning before the water returns.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"benchmark-rating-dead-on-first-picture\",\"style\":{\"id\":\"style-benchmark-fixture\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-tsunamis\"}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A tsunami is a train of very long waves.\"},{\"claimIds\":[\"c1\"],\"text\":\"Most are set off by the seabed moving in an earthquake.\"},{\"claimIds\":[\"c1\"],\"text\":\"In deep water the wave is low and very fast.\"},{\"claimIds\":[\"c1\"],\"text\":\"It can cross an ocean in a few hours.\"},{\"claimIds\":[\"c2\"],\"text\":\"As the sea shallows the front slows and the water piles up.\"},{\"claimIds\":[\"c2\"],\"text\":\"The wave can stand many metres above the shore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The sea often draws back first, baring the sea floor.\"},{\"claimIds\":[\"c2\"],\"text\":\"That withdrawal is the last warning before the water returns.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"benchmark-rating-dead-on-first-picture\",\"style\":{\"id\":\"style-benchmark-fixture\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-tsunamis\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000002\",\"requestId\":\"benchmark-rating-dead-on-first-picture\",\"costCents\":5,\"status\":\"failed\",\"estimateCents\":48,\"detail\":\"the canonical picture of shot-0's file did not reach the provider: fetch failed, and the image port's sends are spent (P-020)\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-10-01T00:00:00.000Z"
+  },
+  "job": [
+    {
+      "id": 1,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000002\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:00:00.000Z",
+      "locked_at": "2026-10-01T00:00:01.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000002",
+      "cost_cents": 0
+    },
+    {
+      "id": 2,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000002\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:01:50.000Z",
+      "locked_at": "2026-10-01T00:01:51.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000002",
+      "cost_cents": 5
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "seq": 1,
+      "at": "2026-10-01T00:00:00.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000002\",\"seq\":1,\"at\":\"2026-10-01T00:00:00.000Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "seq": 2,
+      "at": "2026-10-01T00:00:01.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000002\",\"seq\":2,\"at\":\"2026-10-01T00:00:01.000Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "seq": 3,
+      "at": "2026-10-01T00:01:48.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000002\",\"seq\":3,\"at\":\"2026-10-01T00:01:48.000Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "seq": 4,
+      "at": "2026-10-01T00:01:52.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000002\",\"seq\":4,\"at\":\"2026-10-01T00:01:52.000Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "seq": 5,
+      "at": "2026-10-01T00:02:50.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000002\",\"seq\":5,\"at\":\"2026-10-01T00:02:50.000Z\",\"type\":\"run.finished\",\"status\":\"failed\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "role": "a",
+      "unit_count": 4,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7]],\"shots\":[{\"unit\":0,\"durationSeconds\":10,\"subjectIds\":[\"wave_open_sea\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"seabed_fault\"]},{\"unit\":2,\"durationSeconds\":10,\"subjectIds\":[\"shallow_front\"]},{\"unit\":3,\"durationSeconds\":10,\"subjectIds\":[\"bared_sea_floor\"]}],\"subjects\":[{\"id\":\"wave_open_sea\",\"name\":\"Open-Sea Wave\"},{\"id\":\"seabed_fault\",\"name\":\"Seabed Fault\"},{\"id\":\"shallow_front\",\"name\":\"Shallowing Wave Front\"},{\"id\":\"bared_sea_floor\",\"name\":\"Bared Sea Floor\"}],\"criteria\":{\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}],\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.6,
+      "estimate_cents": 48,
+      "selected": 1
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "role": "b",
+      "unit_count": 5,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4,5],[6,7],[8,9]],\"shots\":[{\"unit\":0,\"durationSeconds\":8,\"subjectIds\":[\"wave_open_sea\"]},{\"unit\":1,\"durationSeconds\":8,\"subjectIds\":[\"seabed_fault\"]},{\"unit\":2,\"durationSeconds\":8,\"subjectIds\":[\"shallow_front\"]},{\"unit\":3,\"durationSeconds\":8,\"subjectIds\":[\"bared_sea_floor\"]},{\"unit\":4,\"durationSeconds\":8,\"subjectIds\":[\"warning_buoy\"]}],\"subjects\":[{\"id\":\"wave_open_sea\",\"name\":\"Open-Sea Wave\"},{\"id\":\"seabed_fault\",\"name\":\"Seabed Fault\"},{\"id\":\"shallow_front\",\"name\":\"Shallowing Wave Front\"},{\"id\":\"bared_sea_floor\",\"name\":\"Bared Sea Floor\"},{\"id\":\"warning_buoy\",\"name\":\"Warning Buoy\"}],\"criteria\":{\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}],\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.1,
+      "estimate_cents": 51,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 1,
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 684,
+      "output_tokens": 1890,
+      "fake": 0,
+      "at": "2026-10-01T00:00:22.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 2,
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 684,
+      "output_tokens": 1944,
+      "fake": 0,
+      "at": "2026-10-01T00:00:48.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 3,
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "role": "reconciler",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 902,
+      "output_tokens": 318,
+      "fake": 0,
+      "at": "2026-10-01T00:01:11.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 4,
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "role": "reconciler",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 902,
+      "output_tokens": 324,
+      "fake": 0,
+      "at": "2026-10-01T00:01:34.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [],
+  "observation": [],
+  "reconciliation": [],
+  "generation_receipt": [],
+  "lost_call": [
+    {
+      "id": 1,
+      "run_id": "ra71n657-0000-4001-8000-000000000002",
+      "port": "image",
+      "model": "fal-ai/flux-2-pro",
+      "cost_cents": 5,
+      "detail": "the provider is unavailable: the picture a1-shot-0-a on 'fal-ai/flux-2-pro''s file did not reach the provider: fetch failed",
+      "at": "2026-10-01T00:02:48.000Z"
+    }
+  ],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}

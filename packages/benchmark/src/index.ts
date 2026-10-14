@@ -63,6 +63,31 @@ export type {
 } from './measures.ts'
 
 export {
+  LABELS,
+  NO_QUESTION_SET,
+  NO_RATING,
+  PART_WEIGHTS,
+  RATING_VERSION,
+  TERM_WEIGHTS,
+  TOLERANCES,
+  cutRatingsComparable,
+  partRatings,
+  printed,
+  rank,
+  runRating,
+  termValue,
+} from './ratings.ts'
+
+export type {
+  CutComparability,
+  PartRating,
+  RankedPool,
+  RatedTerm,
+  RatingOptions,
+  RunRating,
+} from './ratings.ts'
+
+export {
   REASON_FAMILIES,
   VERBATIM_SITES,
   classify,

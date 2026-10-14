@@ -1,0 +1,471 @@
+{
+  "about": "CONSTRUCTED BY HAND by yield-benchmark Slice 2, because a pinned rating must be computed from stated inputs: a fixture lifted from the record pins numbers nobody restated. `terms` states every term's inputs as Gate 2 states them and `expected` the figures it pins; the rows below are shaped as the schema stores them, and every path-shaped value is the literal <artifact>.",
+  "what": "the fixture that pins S-184's rule: a reel.clips job row and a reel.assemble job row exist, so narration, clips and the cut are all REACHED, and there is no narration row, no take row and no render row. Under the struck phrasing the same rows scored clips 30.0 (\"shots not held at the take cap\") and the cut 20.0 (\"no holds\"), paying 13.0 points of run rating for work never attempted. CONSTRUCTED, not an engine trace: the record holds no such run.",
+  "terms": {
+    "plan": {
+      "gate0AdmittedTheSelectedPlan": {
+        "achieved": 1,
+        "attempted": 1
+      },
+      "admittedAtItsFirstRound": {
+        "achieved": 1,
+        "attempted": 1
+      },
+      "asksAnsweredAtTheFirstAsk": {
+        "achieved": 4,
+        "attempted": 4
+      }
+    },
+    "pictures": {
+      "judgedAccepted": {
+        "achieved": 4,
+        "attempted": 5
+      },
+      "shotsEndingAccepted": {
+        "achieved": 4,
+        "attempted": 5
+      }
+    },
+    "narration": {
+      "unitsSpoken": {
+        "achieved": 0,
+        "attempted": 5
+      },
+      "timingsParsedAtFirstAsk": {
+        "achieved": 0,
+        "attempted": 0
+      }
+    },
+    "clips": {
+      "takesAccepted": {
+        "achieved": 0,
+        "attempted": 0
+      },
+      "shotsEndingAccepted": {
+        "achieved": 0,
+        "attempted": 0
+      },
+      "deliveredWithinAsked": {
+        "achieved": 0,
+        "attempted": 0
+      }
+    },
+    "cut": {
+      "questionsAnsweredYes": {
+        "achieved": 0,
+        "attempted": 0
+      },
+      "shotsCarriedWithoutAHold": {
+        "achieved": 0,
+        "attempted": 0
+      },
+      "durationWithinThePlan": {
+        "achieved": 0,
+        "attempted": 1
+      }
+    }
+  },
+  "expected": {
+    "parts": {
+      "plan": "100.0",
+      "pictures": "80.0",
+      "narration": "0.0",
+      "clips": "0.0",
+      "cut": "0.0"
+    },
+    "rating": "34.0",
+    "stamp": "r1/—"
+  },
+  "run": {
+    "run_id": "ra71n657-0000-4001-8000-000000000004",
+    "request_id": "benchmark-rating-entered-video-made-nothing",
+    "request": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A tsunami is a train of very long waves.\"},{\"claimIds\":[\"c1\"],\"text\":\"Most are set off by the seabed moving in an earthquake.\"},{\"claimIds\":[\"c1\"],\"text\":\"In deep water the wave is low and very fast.\"},{\"claimIds\":[\"c1\"],\"text\":\"It can cross an ocean in a few hours.\"},{\"claimIds\":[\"c1\"],\"text\":\"As the sea shallows the front slows and the water piles up.\"},{\"claimIds\":[\"c2\"],\"text\":\"The wave can stand many metres above the shore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The sea often draws back first, baring the sea floor.\"},{\"claimIds\":[\"c2\"],\"text\":\"That withdrawal is the last warning before the water returns.\"},{\"claimIds\":[\"c2\"],\"text\":\"A buoy network measures the open sea and sends the height ashore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The warning is only useful if people are already moving uphill.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"benchmark-rating-entered-video-made-nothing\",\"style\":{\"id\":\"style-benchmark-fixture\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-tsunamis\"}",
+    "request_canonical": "{\"claims\":[{\"id\":\"c1\",\"role\":\"main\"},{\"id\":\"c2\",\"role\":\"supporting\"}],\"contractVersion\":1,\"criteria\":{\"depictionPolicyVersion\":\"policy-3\",\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}],\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}]},\"narration\":[{\"claimIds\":[\"c1\"],\"text\":\"A tsunami is a train of very long waves.\"},{\"claimIds\":[\"c1\"],\"text\":\"Most are set off by the seabed moving in an earthquake.\"},{\"claimIds\":[\"c1\"],\"text\":\"In deep water the wave is low and very fast.\"},{\"claimIds\":[\"c1\"],\"text\":\"It can cross an ocean in a few hours.\"},{\"claimIds\":[\"c1\"],\"text\":\"As the sea shallows the front slows and the water piles up.\"},{\"claimIds\":[\"c2\"],\"text\":\"The wave can stand many metres above the shore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The sea often draws back first, baring the sea floor.\"},{\"claimIds\":[\"c2\"],\"text\":\"That withdrawal is the last warning before the water returns.\"},{\"claimIds\":[\"c2\"],\"text\":\"A buoy network measures the open sea and sends the height ashore.\"},{\"claimIds\":[\"c2\"],\"text\":\"The warning is only useful if people are already moving uphill.\"}],\"options\":{\"budgetCents\":250,\"until\":\"video\"},\"requestId\":\"benchmark-rating-entered-video-made-nothing\",\"style\":{\"id\":\"style-benchmark-fixture\",\"text\":\"clean documentary footage, soft natural light, steady camera\",\"version\":1},\"worldId\":\"cutroom-tsunamis\"}",
+    "state": "finished",
+    "result": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"requestId\":\"benchmark-rating-entered-video-made-nothing\",\"costCents\":25,\"status\":\"failed\",\"estimateCents\":48,\"detail\":\"the clip call for shot-0 did not reach the provider: fetch failed, and nothing was made in the video stage\"}",
+    "cancel_requested": 0,
+    "created_at": "2026-10-01T00:00:00.000Z"
+  },
+  "job": [
+    {
+      "id": 1,
+      "kind": "reel.plan",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000004\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:00:00.000Z",
+      "locked_at": "2026-10-01T00:00:01.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000004",
+      "cost_cents": 0
+    },
+    {
+      "id": 2,
+      "kind": "reel.keyframes",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000004\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:01:50.000Z",
+      "locked_at": "2026-10-01T00:01:51.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000004",
+      "cost_cents": 25
+    },
+    {
+      "id": 3,
+      "kind": "reel.clips",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000004\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:07:00.000Z",
+      "locked_at": "2026-10-01T00:07:01.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000004",
+      "cost_cents": 0
+    },
+    {
+      "id": 4,
+      "kind": "reel.assemble",
+      "payload": "{\"runId\":\"ra71n657-0000-4001-8000-000000000004\"}",
+      "state": "done",
+      "attempts": 1,
+      "run_at": "2026-10-01T00:08:40.000Z",
+      "locked_at": "2026-10-01T00:08:41.000Z",
+      "lease_until": null,
+      "error": null,
+      "parent_id": null,
+      "correlation_id": "ra71n657-0000-4001-8000-000000000004",
+      "cost_cents": 0
+    }
+  ],
+  "run_event": [
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 1,
+      "at": "2026-10-01T00:00:00.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":1,\"at\":\"2026-10-01T00:00:00.000Z\",\"type\":\"run.accepted\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 2,
+      "at": "2026-10-01T00:00:01.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":2,\"at\":\"2026-10-01T00:00:01.000Z\",\"type\":\"stage.started\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 3,
+      "at": "2026-10-01T00:01:48.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":3,\"at\":\"2026-10-01T00:01:48.000Z\",\"type\":\"stage.finished\",\"stage\":\"plan\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 4,
+      "at": "2026-10-01T00:01:52.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":4,\"at\":\"2026-10-01T00:01:52.000Z\",\"type\":\"stage.started\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 5,
+      "at": "2026-10-01T00:06:55.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":5,\"at\":\"2026-10-01T00:06:55.000Z\",\"type\":\"stage.finished\",\"stage\":\"stills\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 6,
+      "at": "2026-10-01T00:07:02.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":6,\"at\":\"2026-10-01T00:07:02.000Z\",\"type\":\"stage.started\",\"stage\":\"video\"}"
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "seq": 7,
+      "at": "2026-10-01T00:09:00.000Z",
+      "body": "{\"contractVersion\":1,\"runId\":\"ra71n657-0000-4001-8000-000000000004\",\"seq\":7,\"at\":\"2026-10-01T00:09:00.000Z\",\"type\":\"run.finished\",\"status\":\"failed\"}"
+    }
+  ],
+  "plan": [
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "role": "a",
+      "unit_count": 5,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"a\",\"units\":[[0,1],[2,3],[4,5],[6,7],[8,9]],\"shots\":[{\"unit\":0,\"durationSeconds\":10,\"subjectIds\":[\"wave_open_sea\"]},{\"unit\":1,\"durationSeconds\":10,\"subjectIds\":[\"seabed_fault\"]},{\"unit\":2,\"durationSeconds\":10,\"subjectIds\":[\"shallow_front\"]},{\"unit\":3,\"durationSeconds\":10,\"subjectIds\":[\"bared_sea_floor\"]},{\"unit\":4,\"durationSeconds\":10,\"subjectIds\":[\"warning_buoy\"]}],\"subjects\":[{\"id\":\"wave_open_sea\",\"name\":\"Open-Sea Wave\"},{\"id\":\"seabed_fault\",\"name\":\"Seabed Fault\"},{\"id\":\"shallow_front\",\"name\":\"Shallowing Wave Front\"},{\"id\":\"bared_sea_floor\",\"name\":\"Bared Sea Floor\"},{\"id\":\"warning_buoy\",\"name\":\"Warning Buoy\"}],\"criteria\":{\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}],\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.6,
+      "estimate_cents": 48,
+      "selected": 1
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "role": "b",
+      "unit_count": 6,
+      "axis": "shotCount",
+      "plan": "{\"role\":\"b\",\"units\":[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11]],\"shots\":[{\"unit\":0,\"durationSeconds\":8,\"subjectIds\":[\"wave_open_sea\"]},{\"unit\":1,\"durationSeconds\":8,\"subjectIds\":[\"seabed_fault\"]},{\"unit\":2,\"durationSeconds\":8,\"subjectIds\":[\"shallow_front\"]},{\"unit\":3,\"durationSeconds\":8,\"subjectIds\":[\"bared_sea_floor\"]},{\"unit\":4,\"durationSeconds\":8,\"subjectIds\":[\"warning_buoy\"]},{\"unit\":5,\"durationSeconds\":8,\"subjectIds\":[\"wave_open_sea\"]}],\"subjects\":[{\"id\":\"wave_open_sea\",\"name\":\"Open-Sea Wave\"},{\"id\":\"seabed_fault\",\"name\":\"Seabed Fault\"},{\"id\":\"shallow_front\",\"name\":\"Shallowing Wave Front\"},{\"id\":\"bared_sea_floor\",\"name\":\"Bared Sea Floor\"},{\"id\":\"warning_buoy\",\"name\":\"Warning Buoy\"}],\"criteria\":{\"mustShow\":[{\"claimId\":\"c1\",\"id\":\"show-wave\",\"text\":\"a single long ocean wave seen whole\",\"type\":\"presence\"}],\"mustNotShow\":[{\"id\":\"never-text\",\"text\":\"written words or labels\",\"type\":\"presence\"}]},\"plannedImageCalls\":4,\"estimateCents\":48}",
+      "verdict": "{\"outcome\":\"accept\",\"failed\":[]}",
+      "score": 3.1,
+      "estimate_cents": 51,
+      "selected": 0
+    }
+  ],
+  "model_receipt": [
+    {
+      "id": 1,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 684,
+      "output_tokens": 1890,
+      "fake": 0,
+      "at": "2026-10-01T00:00:22.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 2,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "role": "planner",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 684,
+      "output_tokens": 1944,
+      "fake": 0,
+      "at": "2026-10-01T00:00:48.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 3,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "role": "reconciler",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 902,
+      "output_tokens": 318,
+      "fake": 0,
+      "at": "2026-10-01T00:01:11.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    },
+    {
+      "id": 4,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "role": "reconciler",
+      "model": "MiniMax-M2.7",
+      "temperature": 0,
+      "input_tokens": 902,
+      "output_tokens": 324,
+      "fake": 0,
+      "at": "2026-10-01T00:01:34.000Z",
+      "call": "structured",
+      "picture_ids": "[]",
+      "take_ids": "[]"
+    }
+  ],
+  "picture": [
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-0-a",
+      "seq": 1,
+      "attempt": 1,
+      "shot_unit": 0,
+      "subject_id": "wave_open_sea",
+      "role": "canonical",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nIt shows: wave_open_sea.",
+      "framing": "medium",
+      "reference_ids": "[]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.74,\"brightness\":0.52}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": null,
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-1-a",
+      "seq": 2,
+      "attempt": 1,
+      "shot_unit": 1,
+      "subject_id": "seabed_fault",
+      "role": "derived",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nIt shows: seabed_fault.",
+      "framing": "medium",
+      "reference_ids": "[\"a1-shot-0-a\"]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.74,\"brightness\":0.52}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": "{\"total\":0.72,\"terms\":{},\"weights\":{}}",
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-2-a",
+      "seq": 3,
+      "attempt": 1,
+      "shot_unit": 2,
+      "subject_id": "shallow_front",
+      "role": "derived",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nIt shows: shallow_front.",
+      "framing": "medium",
+      "reference_ids": "[\"a1-shot-0-a\"]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.74,\"brightness\":0.52}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": "{\"total\":0.72,\"terms\":{},\"weights\":{}}",
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-3-a",
+      "seq": 4,
+      "attempt": 1,
+      "shot_unit": 3,
+      "subject_id": "bared_sea_floor",
+      "role": "derived",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nIt shows: bared_sea_floor.",
+      "framing": "medium",
+      "reference_ids": "[\"a1-shot-0-a\"]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.74,\"brightness\":0.52}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"accept\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"accept\",\"reasons\":[]}]}",
+      "score": "{\"total\":0.72,\"terms\":{},\"weights\":{}}",
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 1
+    },
+    {
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-4-a",
+      "seq": 5,
+      "attempt": 1,
+      "shot_unit": 4,
+      "subject_id": "warning_buoy",
+      "role": "derived",
+      "label": "a",
+      "path": "<artifact>",
+      "prompt": "Make the opening frame of one shot of a short vertical reel.\nIt shows: warning_buoy.",
+      "framing": "medium",
+      "reference_ids": "[\"a1-shot-0-a\"]",
+      "measure": "{\"readable\":true,\"width\":864,\"height\":1536,\"sharpness\":0.74,\"brightness\":0.52}",
+      "words": "[]",
+      "gate1": "{\"outcome\":\"fail\",\"coverage\":\"whole picture\",\"steps\":[{\"step\":\"technical\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"text\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"witness\",\"outcome\":\"accept\",\"reasons\":[]},{\"step\":\"reconcile\",\"outcome\":\"fail\",\"reasons\":[\"subject \\\"warning_buoy\\\" (Warning Buoy) is not shown\"]}]}",
+      "score": "{\"total\":0.72,\"terms\":{},\"weights\":{}}",
+      "gate1s": null,
+      "degradation": null,
+      "chosen": 0
+    }
+  ],
+  "observation": [],
+  "reconciliation": [],
+  "generation_receipt": [
+    {
+      "id": 1,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-0-a",
+      "model": "fal-ai/flux-2-pro/edit",
+      "prompt": "Make the opening frame of one shot of a short vertical reel. (a1-shot-0-a)",
+      "reference_ids": "[]",
+      "style_id": "style-benchmark-fixture",
+      "style_version": 1,
+      "rate_cents": 5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-10-01T00:02:20.000Z"
+    },
+    {
+      "id": 2,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-1-a",
+      "model": "fal-ai/flux-2-pro/edit",
+      "prompt": "Make the opening frame of one shot of a short vertical reel. (a1-shot-1-a)",
+      "reference_ids": "[]",
+      "style_id": "style-benchmark-fixture",
+      "style_version": 1,
+      "rate_cents": 5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-10-01T00:03:10.000Z"
+    },
+    {
+      "id": 3,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-2-a",
+      "model": "fal-ai/flux-2-pro/edit",
+      "prompt": "Make the opening frame of one shot of a short vertical reel. (a1-shot-2-a)",
+      "reference_ids": "[]",
+      "style_id": "style-benchmark-fixture",
+      "style_version": 1,
+      "rate_cents": 5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-10-01T00:04:00.000Z"
+    },
+    {
+      "id": 4,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-3-a",
+      "model": "fal-ai/flux-2-pro/edit",
+      "prompt": "Make the opening frame of one shot of a short vertical reel. (a1-shot-3-a)",
+      "reference_ids": "[]",
+      "style_id": "style-benchmark-fixture",
+      "style_version": 1,
+      "rate_cents": 5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-10-01T00:04:50.000Z"
+    },
+    {
+      "id": 5,
+      "run_id": "ra71n657-0000-4001-8000-000000000004",
+      "picture_id": "a1-shot-4-a",
+      "model": "fal-ai/flux-2-pro/edit",
+      "prompt": "Make the opening frame of one shot of a short vertical reel. (a1-shot-4-a)",
+      "reference_ids": "[]",
+      "style_id": "style-benchmark-fixture",
+      "style_version": 1,
+      "rate_cents": 5,
+      "cost_cents": 5,
+      "fake": 0,
+      "degraded": 0,
+      "at": "2026-10-01T00:05:40.000Z"
+    }
+  ],
+  "lost_call": [],
+  "refused_answer": [],
+  "degradation": [],
+  "narration": [],
+  "speech_receipt": [],
+  "take": [],
+  "video_receipt": [],
+  "take_observation": [],
+  "take_reconciliation": [],
+  "render": [],
+  "hold": [],
+  "still_hold": []
+}
