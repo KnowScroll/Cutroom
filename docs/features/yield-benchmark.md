@@ -622,7 +622,7 @@ any other test file from holding it.
 
 Three new boundary rules take the count from 22 to **25**. Round 2 said five places assert the old number; round 3
 found that was wrong, and the corrected list is **three test files, holding five assertions and two test titles,
-plus seven documents holding fourteen occurrences**. **All of them are amended in Slice 1**, and no check is
+plus seven documents holding thirteen occurrences**. **All of them are amended in Slice 1**, and no check is
 weakened — each keeps its exact form with its number corrected.
 
 **The three test files, which turn red:**
@@ -801,7 +801,7 @@ column holds a path**, and nothing reaches it that could.
       reasons; its `package.json` and `tsconfig.json`; the root reference and workspace dependency; the row
       fixtures; the three rules in `.dependency-cruiser.cjs` with their `--prove` cases, `node:crypto` among them;
       and every amendment taking 22 to 25 — the three test files (five assertions, two titles, two ordinal
-      comments) and the seven documents (fourteen occurrences, plus `cutroom-kt.html`'s rules array) — with
+      comments) and the seven documents (thirteen occurrences, plus `cutroom-kt.html`'s rules array) — with
       `reel-stills`, `reel-render` and `paid-path` each gaining an amendment block. Checks 1, 2, 3, 4, 11, 12.
       **Full suite** — boundary and workspace configuration are both integrity boundaries.
       **Proves: 1, 2, 3, 4, 11, 12.**
@@ -1002,7 +1002,7 @@ ran.
    columns in order with their formats, and the read date and commit in the header, which is what makes
    "byte-identical" true of the rows.
 7. **"Five places assert 22" was false; there are more.** **Answered:** three test files (five assertions, two
-   titles, two ordinal comments) and seven documents (fourteen occurrences), each named with its line, including
+   titles, two ordinal comments) and seven documents (thirteen occurrences), each named with its line, including
    `paid-path-keys.test.ts:139`'s dead `doesNotMatch(/21 .../)`. Round 3's eighth document,
    `hosted-checks.md:337`, does not exist and is recorded as not owed.
 8. **The inherited-piece rule could not reach degradations, holds or still-holds**, and a resumed run writes a
