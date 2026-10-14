@@ -3,8 +3,9 @@
 - **For:** session 87
 - **Feature:** `yield-benchmark` (`docs/features/yield-benchmark.md`), four gates APPROVED by owner decision
   (S-185). `yield-compare` and `benchmark-view` are named stubs and are not worked on
-- **Work:** build all four slices, one `slice-builder` at a time, each verified and committed before the next
-  opens. The first building session of this feature
+- **Work:** build the four slices, one `slice-builder` at a time, each verified and committed before the next
+  opens. **Written for more than one session**: it stops at a slice boundary and hands over when context runs
+  short. The first building session of this feature
 - **Written:** 2026-10-14
 - **Run:** not yet
 
@@ -73,7 +74,27 @@ No absolute paths anywhere (D-086). Adding a package's first file means adding
 its root tsconfig.json reference, or tests/workspace.test.ts fails. The full suite takes about 25 minutes; the
 known PATH-only child transient in tests/reel-takes-secrets.test.ts is a full-suite signal, not a new defect.
 
+THIS PROMPT IS WRITTEN FOR MORE THAN ONE SESSION, AND SAYS SO RATHER THAN HOPING. Four slices carry about three
+hours of check runs on their own — a full suite for Slice 1 and another for Slice 3 at roughly 25 minutes each,
+and FOUR journeys in Slice 4, every one of which runs every check. Add four slice-builder agents reading context
+and this will not fit in one session. That is expected and is not a failure.
+
+So, AFTER EACH COMMITTED SLICE, judge whether there is room for the next one. If there is, open it. If there is
+not:
+
+  1. stop at the slice boundary, never inside one — a half-built slice is what turned three verified features red
+     in session 86, and an uncommitted slice is what the stop-gate refuses;
+  2. write the next session's prompt in PROMPTS/ as NNN-yield-benchmark-build-<n>.md, listed in PROMPTS/README.md,
+     naming the slice to resume at, the commit it resumes from, and anything the gates got wrong that you found;
+  3. write the JOURNAL.md entry and this session's entry in docs/context.md, and set this prompt's Run line;
+  4. stop.
+
+Resuming is cheap and guessing is not: a new session re-reads docs/context.md and the gates in minutes, while a
+slice abandoned half-written costs someone an afternoon working out what is real.
+
 Before you stop: the JOURNAL.md entry and this session's entry in docs/context.md, this prompt's Run line, and a
 commit per slice whose trailers bind the exact tree — Verification: full for Slices 1 and 3, targeted for Slice 2
-with its tests named, and node scripts/verification-status.mjs checked before and after each.
+with its tests named, and node scripts/verification-status.mjs checked before and after each. This holds whether
+you finish all four slices or one: the journal says which slices landed, which remain, and where the next session
+picks up.
 ```
