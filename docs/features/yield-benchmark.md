@@ -813,15 +813,15 @@ column holds a path**, and nothing reaches it that could.
       `reel-stills`, `reel-render` and `paid-path` each gaining an amendment block. Checks 1, 2, 3, 4, 11, 12.
       **Full suite** — boundary and workspace configuration are both integrity boundaries.
       **Proves: 1, 2, 3, 4, 11, 12.**
-- [ ] **Slice 2 — the ratings.** `ratings.ts`: the terms in their achieved-over-attempted phrasing, the weights,
+- [x] **Slice 2 — the ratings.** `ratings.ts`: the terms in their achieved-over-attempted phrasing, the weights,
       the tolerances, the three conventions, the stamp, absent parts, the shorter-`until` label, the five worked
       values and their ranking. Checks 8, 9, 10. **Targeted.** **Proves: 8, 9, 10.**
-- [ ] **Slice 3 — the reader, the flags, the ledger and the freeze.** `scripts/benchmark.mjs`: the read-only open,
+- [x] **Slice 3 — the reader, the flags, the ledger and the freeze.** `scripts/benchmark.mjs`: the read-only open,
       the scorecard, the drill-down, the flag table and its exit codes, the brief key's SHA-256, the full record
       under `--out`, `--rescore` writing the ledger over the real record read-only; `docs/research/refusals.md` and
       `docs/research/yield-baseline.md` frozen with their date and commit, and `PictureAnswer` corrected to
       `ImageAnswer` there. Checks 5, 6, 7, 13. **Full suite** — `scripts/` is full-only. **Proves: 5, 6, 7, 13.**
-- [ ] **Slice 4 — the journeys.** `node scripts/journey.mjs yield-benchmark`, then `reel-stills`, `reel-render` and
+- [x] **Slice 4 — the journeys.** `node scripts/journey.mjs yield-benchmark`, then `reel-stills`, `reel-render` and
       `paid-path` again, serially, for the rule count (S-099's form, S-178's order). **Proves: none** — it is the
       feature's proof.
 

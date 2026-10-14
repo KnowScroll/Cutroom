@@ -162,8 +162,10 @@ const shown = (path) => {
 /**
  * A piece of a root, as a pattern matches it literally — and a drive letter's `:` may arrive
  * with backslashes before it, because a Windows path inside an ffmpeg FILTERGRAPH has its `:`
- * and `\` escaped (S-075), so `invocations` holds `C\:/Users/...` where every other column
- * holds `C:\Users\...`.
+ * and `\` escaped (S-075), so `invocations` holds a drive letter followed by
+ * `\:/Users/...`, where every other column holds that letter followed by `:\Users\...`.
+ * Neither spelling is written out whole here: D-086 forbids a machine path in committed source,
+ * and tests/no-absolute-paths.test.ts matches one in a comment exactly as it would in code.
  */
 const quoted = (piece) => piece.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll(':', '[\\\\]*:')
 
