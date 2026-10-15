@@ -63,7 +63,7 @@ git and the journal keep them.
   commit tree: ordinary slices run static/boundary checks plus named affected tests; full suites remain for checker,
   boundary, workspace/dependency and journey work — and, since **S-188**, for a journey only at content no green
   full receipt covers; `node scripts/check.mjs --documents` is the ~15 s set a Markdown change can fail. The known PATH-only child transient remains a full-suite signal;
-  S-192 replaced S-176’s serial aggregate with two non-overlapping pools (617 s, floor 5431 MB); every child bound is unchanged. A hosted run is corroboration only and carries no trailer (S-183).
+  S-192 replaced S-176’s serial aggregate with two non-overlapping pools (617 s, lowest free memory 2483 MB over four green runs); every child bound is unchanged. A hosted run is corroboration only and carries no trailer (S-183).
 
 ## Runs
 
@@ -123,7 +123,7 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - **§4.2 is built (S-192, superseding S-176 in part)**: the tests step is two pools that never overlap —
   142 ordinary files at 4, then the twelve PATH-only children at 2, each keeping its own ratified nested
   concurrency. **617 / 620 / 627 s over three consecutive green full runs against 1455 s**, 797 tests
-  over 154 files, nothing skipped. **Floor 5431 MB of 15714 MB; worst child margin 155.7 s**
+  over 154 files, nothing skipped. **Lowest free memory 2483 MB of 15714 MB over four green runs** (5431 MB in three — the floor follows the machine, so judge a change by the receipt’s own `freeMinMB`); **worst child margin 155.7 s**
   (`reel-render-secrets`, 48 % of its 300 s bound). `scripts/run-tests.mjs` owns the pools and writes
   each one's time and floor into the receipt; `--serial` restores S-176's behaviour for a bisect.
 - **The first attempt found a real fault, in a test's teardown rather than in the scheduler**:

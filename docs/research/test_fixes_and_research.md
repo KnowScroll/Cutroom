@@ -251,8 +251,7 @@ and rejected Biome for Markdown (unsupported). `Caught-by:` `check.mjs` runs bot
 **BUILT, 2026-10-15, session 89 — S-192, superseding S-176 in part.** The tests step is two pools that
 never overlap: the 142 ordinary files at **4**, then the twelve PATH-only children at **2**, each still
 spawning its own ratified 2 or 4. Three consecutive green full runs: **617 s, 620 s, 627 s** against
-1455 s, 797 tests over 154 files, nothing skipped. **Recorded floor 5431 MB of 15714 MB** (S-107 saw
-815 MB under the old overlap). **Worst child margin 155.7 s** — `reel-render-secrets` at 144.3 s of its
+1455 s, 797 tests over 154 files, nothing skipped. **Lowest free memory across four green runs 2483 MB of 15714 MB** — 5431 MB in three of them, so the floor follows the machine rather than the pools (S-107 saw 815 MB under the old overlap). **Worst child margin 155.7 s** — `reel-render-secrets` at 144.3 s of its
 300 s bound, 48 % used; the pool costs a child about 16 % of its alone time. Sizes stayed at the bottom
 of §4.2's ranges because the floor above is the floor AT FOUR; 6 needs its own three runs. A fault came
 out of the first attempt and it was not the scheduler's: `cutroom-sdk-launcher` check 8 failed once with

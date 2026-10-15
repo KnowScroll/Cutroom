@@ -181,9 +181,10 @@ unlisted changed test, an unknown path, and verification infrastructure. `--dry-
 `scripts/run-tests.mjs` runs the ordinary files at an outer concurrency of **4**, then the twelve
 PATH-only journey children at a pool of **2**, each still spawning the 2 or 4 its own file ratifies.
 **617 s where the serial runner took 1455 s**, nothing skipped, with each pool's time and lowest free
-memory written into the receipt and printed on every run. The sizes rest on three consecutive green
-full runs and a recorded floor of 5431 MB of 15714 MB — raising either needs its own three runs and its
-own floor, and `node scripts/run-tests.mjs --serial` restores S-176's single serial pool for a bisect.
+memory written into the receipt and printed on every run. The sizes rest on four consecutive green
+full runs, whose lowest free memory was **2483 MB of 15714 MB** — the floor moves with the machine's
+state, not with the pools, so the figure to compare against is each run's own `freeMinMB` in the
+receipt; raising either size needs its own three runs, and `node scripts/run-tests.mjs --serial` restores S-176's single serial pool for a bisect.
 Test files are enumerated from the filesystem, so an uncommitted one still runs.
 
 **The full run is reserved for integrity boundaries**: a change to checking/journey/boundary tooling, workspace or

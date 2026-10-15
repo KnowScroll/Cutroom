@@ -8776,4 +8776,16 @@ rather than in a memory.
 **Confirmed-by.** The owner, 2026-10-15 — "now try", and the standing instruction to work through
 `docs/research/test_fixes_and_research.md` in order as far as the session goes.
 
+**Amended 2026-10-15, same session, by a fourth green run.** The documenting commit's own full run —
+green, tests **612.7 s** — recorded a floor of **2483 MB** in the secrets pool and 2866 MB in the
+ordinary one, against 5431 MB in the three runs above. Nothing about the pools changed between them; the
+machine's free memory at rest did. **So 5431 MB is not a property of this scheduler and must not be read
+as its margin.** What four green runs support is narrower and still enough: at these pool sizes the step
+passed with as little as **2483 MB free of 15714 MB**, and the lowest figure ever recorded on this
+repository remains S-107's 815 MB under the overlap S-192 removes. The number to compare a future change
+against is therefore the receipt's own `freeMinMB` for that run, which is why the runner writes it every
+time rather than once into this entry. The honest form of the floor requirement: a run that approaches
+S-107's 815 MB is the signal, and the pool sizes stay at 4 and 2 until some run has room to spare at a
+larger one.
+
 ---

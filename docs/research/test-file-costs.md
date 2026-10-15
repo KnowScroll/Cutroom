@@ -72,13 +72,13 @@ Shortening the suite means shortening those 35, which is §4.6, or running them 
 
 S-192 made the step two pools that never overlap. The before/after §6 asks for:
 
-|                        | serial (S-176)                | two pools (S-192)                                            |
-| ---------------------- | ----------------------------- | ------------------------------------------------------------ |
-| tests step             | **1455 s**                    | **617 / 620 / 627 s** over three consecutive green runs      |
-| 141–142 ordinary files | 1077.8 s alone, serial        | **349–354 s** at an outer concurrency of 4                   |
-| 12 secrets children    | 423.9 s alone, serial         | **263–276 s** at a pool of 2                                 |
-| lowest free memory     | 815 MB (S-107, under overlap) | **5431 MB** of 15714 MB                                      |
-| worst child margin     | not recorded                  | **155.7 s** (`reel-render-secrets`, 48 % of its 300 s bound) |
+|                        | serial (S-176)                | two pools (S-192)                                                                                                                 |
+| ---------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| tests step             | **1455 s**                    | **617 / 620 / 627 s** over three consecutive green runs                                                                           |
+| 141–142 ordinary files | 1077.8 s alone, serial        | **349–354 s** at an outer concurrency of 4                                                                                        |
+| 12 secrets children    | 423.9 s alone, serial         | **263–276 s** at a pool of 2                                                                                                      |
+| lowest free memory     | 815 MB (S-107, under overlap) | **2483 MB** of 15714 MB, lowest of four green runs — 5431 MB in three of them, so the floor follows the machine and not the pools |
+| worst child margin     | not recorded                  | **155.7 s** (`reel-render-secrets`, 48 % of its 300 s bound)                                                                      |
 
 The arithmetic floors this table predicted were 269 s and 212 s; the pools came in at 352 s and 270 s,
 so about 75 % of the available parallelism is realised. The 121 nested executions below are untouched —
