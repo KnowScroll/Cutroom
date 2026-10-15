@@ -7,7 +7,7 @@
   journeys), write the table, then build the two-class scheduler sized from it — with three consecutive
   green full runs as its evidence, not one
 - **Written:** 2026-10-15, session 88
-- **Run:**
+- **Run:** session 89, 2026-10-15 — part one complete (S-191, table at `docs/research/test-file-costs.md`); part two in the same session
 
 ```text
 Read docs/context.md first, then §2, §3, §4.2 and §6 of docs/research/test_fixes_and_research.md, and

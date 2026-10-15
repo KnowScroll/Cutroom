@@ -118,6 +118,28 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-10-15 · session 89
+
+- **§3 is taken, all 153 files** (**S-191**, superseding S-190 in part). The table is committed as
+  `docs/research/test-file-costs.md`; the runner stays a throwaway in `.tmp/`, now writing one file per slice
+  with a `missing` mode, so a kill costs one file — session 88’s partial data was one invocation from being
+  overwritten — and keeping `.tmp/red-<file>.log` on a red.
+- **The subtraction answers §4.2 before it is built.** 153 files alone cost **1501.7 s** (twelve secrets
+  children **423.9 s**, the other 141 **1077.8 s**) against the suite’s **1455 s**: a difference of -46.7 s,
+  which is the measuring runner’s own per-file overhead. **The serial suite already costs what its files cost**,
+  so §4.2 can only win what real parallelism wins — floor 269 s at 4 ordinary, 212 s at 2 secrets, ~480 s for
+  both classes — and memory, not arithmetic, is the open question.
+- **One full suite is 274 file executions of 153 files**: 153 direct plus **121 nested** inside the twelve
+  secrets children (`reel-render` 28, `reel-stills` 23, `reel-takes` 20, `reel-plan` 12, `paid-path` 11). The
+  design — only running a journey with no secrets proves it passes with none — and the largest block in the
+  suite, which puts **§4.4 ahead of §4.6** in value and in the owner’s hands.
+- **The cost is 35 files**: 67 files under 3 s cost 90.7 s together; 35 files cost 742 s of 1077.8 s.
+  **Twelve** secrets journeys, not eleven (`yield-benchmark-secrets`, session 87). Every child far inside its
+  bound alone, worst `reel-render-secrets` 123.8 s of 300 s. Floor **3045 MB** of 15.3 GB.
+- **One red, cause unrecovered**: `reel-render-secrets` failed once at 123.8 s with nothing else running, then
+  passed alone at 100.6 s. The known PATH-only transient, but not explained by outer contention this time; its
+  lines were discarded by the runner, and the next occurrence keeps them.
+
 ### 2026-10-15 · session 88
 
 - **The verification receipt, and a journey that reads it** (**S-188**, from `docs/research/test_fixes_and_research.md`

@@ -8603,3 +8603,80 @@ requirements into the session that will do it.
 session as far as it goes.
 
 ---
+
+## S-191 | 2026-10-15 | The §3 measurement is finished: the serial suite costs exactly what its files cost, the suite runs most of itself twice, and one secrets child went red alone on an idle machine
+
+**Supersedes.** S-190 in part — its "six secrets journeys remain unmeasured" is answered, and its count of
+**eleven** secrets journeys was already wrong when written: `yield-benchmark-secrets` joined in session 87, so
+there are **twelve**. Everything S-190 measured stands.
+
+**Chose.**
+
+- **The merged table is committed as `docs/research/test-file-costs.md`; the runner stays a throwaway in
+  `.tmp/`.** §3 asks for the table and forbids a committed runner, and the two are different things: the
+  numbers are what §4.2 and §4.6 are sized from and they cost 25 minutes of an idle machine to take, while the
+  runner is 100 lines that would make every edit to itself a full-suite change under S-177.
+- **The runner measures in slices and keeps a red's output.** It writes `.tmp/measure-<tag>.json` per slice
+  instead of one file every run — session 88's partial data was one invocation away from being overwritten,
+  because the old script wrote `.tmp/measure.json` unconditionally — and a `missing` mode skips any file an
+  earlier slice already timed, so a kill costs one file rather than a pass. A non-zero exit now writes
+  `.tmp/red-<file>.log`, which is the finding below, paid for once.
+- **The red is recorded as a finding and not chased further this session.** It is the known PATH-only child
+  transient (S-107, S-176), and what is new is that it happened with nothing else running in the tree. Its
+  decisive lines are not recoverable, so there is nothing to diagnose yet; what changed is that the next
+  occurrence will have them.
+
+**What the measurement says**, all 153 files, each run alone in its own process, free memory sampled every
+500 ms:
+
+- **1501.7 s** for the 153 files one at a time: **423.9 s** for the twelve secrets children, **1077.8 s** for
+  the other 141. The suite's own tests step at `019cbb2` was **1455 s**.
+- **The subtraction answers that there is nothing to recover from scheduling as such.** 1455 s against
+  1077.8 + 423.9 = 1501.7 s is a difference of **-46.7 s**, about 0.3 s per file, which is the measuring
+  runner's own spawn and TAP parse 153 times over. The serial suite costs what its files cost to within 3 %,
+  so §4.2 has no overhead to remove and its whole case is genuine parallelism: `Σ ÷ concurrency`, floor 269 s
+  for the ordinary files at 4 and 212 s for the secrets children at 2, with the longest child (123.8 s)
+  binding and the longest ordinary file (73.4 s) not. Two non-overlapping classes land near **480 s**.
+- **The cost is 35 files, not 153.** 24 ordinary files under 1 s cost 11.6 s together and 43 more under 3 s
+  cost 79.1 s, while 31 files between 10 s and 30 s plus 4 above 30 s cost **742 s of the 1077.8 s**. The
+  longest are `resume-failed-contract` 73.4 s, `paid-path-refusals` 39.3 s, `resume-failed-resume` 35.4 s,
+  `resume-failed-engine` 35.3 s, `reel-render-gates` 29.6 s.
+- **Every secrets child is far inside its bound when it runs alone.** Worst margin is
+  `reel-render-secrets`: 123.8 s against a 300 s bound, **176.2 s** spare. Then `reel-takes-secrets` 234.5 s
+  spare and `reel-stills-secrets` 272.4 s. `reel-takes-secrets` at **65.5 s** is well under the 101 s and
+  130 s its own file records from S-107; `reel-render-secrets` at 100.6 s green matches the 97 s recorded.
+  These are margins of the whole file, which is an upper bound on the nested child, so each real margin is at
+  least this large.
+- **The lowest free memory anywhere was 3045 MB of 15.3 GB**, during `paid-path-secrets`, and S-190's reading
+  holds: S-107's 815 MB was a wall of overlap. The free-memory column is comparable within a slice and not
+  across them — session 88's machine had about 4 GB free at rest, session 89's about 7.5 GB — so the floor is
+  the only figure from it that carries.
+- **One full suite is 274 file executions of 153 files**: 153 direct, plus **121 nested** inside the twelve
+  secrets children, each of which re-runs its own feature's other files in a PATH-only environment
+  (`reel-render` 28 files, `reel-stills` 23, `reel-takes` 20, `reel-plan` 12, `paid-path` 11, the rest 6 or
+  fewer). That is the design — the property is that the journey passes with no secrets in its environment, and
+  only running it there proves it — and it is also the whole of §4.4.
+
+**Why.** §3 exists so that §4's numbers stop being estimates, and two of them changed on contact. The
+scheduler was assumed to be leaving time on the table; it is not, so §4.2 is worth only what parallelism is
+worth and must be judged against memory rather than against tidiness. And the 121 nested runs were known as a
+design but never counted: they are the largest single block in the suite, which puts §4.4's narrowing ahead of
+§4.6's fixture shrinking in value and squarely in the owner's hands, since it is the one lever that changes
+what a proven property covers.
+
+**Rejected.** **Treating the red as a measurement artefact** — it was a real non-zero exit with one failing
+test, and the next one will be diagnosable. **Restarting the whole pass for a clean set of memory figures on
+one machine state** — 25 minutes to make one column comparable, when the only figure that carries from it is
+the floor. **Writing the child's own elapsed time into each secrets file**, which §3 asks for as "a one-line
+addition inside each test": it is a change to twelve verified test files and belongs in a slice with its own
+targeted run, not in a measurement pass. **Keeping the table only in `.tmp/`** — gitignored means the next
+session re-measures. **Sizing §4.2 here** — the arithmetic is above, the memory behaviour of four ordinary
+files or two secrets children at once is not measured, and 083 requires three consecutive green full runs.
+
+**Caught by.** Nothing in the suite; this is a measurement. What keeps it honest is that
+`docs/research/test-file-costs.md` names its provenance, its one red and the slice its memory column came
+from, and that §4.2's own entry must record the floor and the worst child margin it was sized against.
+
+**Confirmed-by.** The owner, 2026-10-15, "now try" — the restart S-190 refused to make unasked.
+
+---
