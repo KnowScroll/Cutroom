@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { extname, join } from 'node:path'
 import { test } from 'node:test'
+import { repoFiles } from './_files.ts'
 import { REPO } from './_repo.ts'
 
 // D-086, which exists because of a specific failure: the steering repository hardcoded a
@@ -26,15 +26,12 @@ const PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
   [/\/home\/[a-z]/, 'a Linux home path'],
 ]
 
-function trackedFiles(): string[] {
-  const out = execFileSync('git', ['ls-files', '-z'], { cwd: REPO, encoding: 'utf8' })
-  return out.split('\0').filter(Boolean)
-}
-
 test('no absolute, machine-specific path is committed', () => {
   const offenders: string[] = []
 
-  for (const rel of trackedFiles()) {
+  // S-195: tracked AND untracked-not-ignored, so a file this change ADDS is read by the run that
+  // verifies it rather than by the next one, when it is already committed.
+  for (const rel of repoFiles(REPO)) {
     if (SKIP_PREFIX.some((p) => rel.startsWith(p))) continue
     if (!CHECKED.has(extname(rel))) continue
     if (rel === 'tests/no-absolute-paths.test.ts') continue

@@ -8889,3 +8889,55 @@ exception was wrong, this entry names what to look at.
 **Corrected 2026-10-15, same session.** This entry said the full run that had been started was "cancelled on that instruction". It was not: only the wait on it was cancelled, and the run itself finished **green** at tree `4c2fbcb` — tests **615.7 s**, **798 tests**, none failing, ordinary pool 353.3 s at 4 and secrets 262.4 s at 2. So S-193 has both kinds of evidence: the targeted slice above, and a full suite that agrees with it. The reasoning for accepting targeted evidence stands for the next change of this shape, and the gap it names was closed here by accident rather than by argument. The run also recorded a **4142 MB** floor, a third figure after 5431 MB and 2483 MB, which is the amendment to S-192 making its own point: the floor follows the machine, not the pools.
 
 ---
+
+## S-195 | 2026-10-15 | The file scans read the working copy, not just what is tracked — so a change's new files are scanned by the run that verifies them
+
+**Supersedes.** Nothing. It closes a hole in S-177's evidence model that session 87 found and reported
+and nobody had fixed.
+
+**The hole, measured rather than argued.** `tests/no-absolute-paths.test.ts` and
+`tests/line-endings.test.ts` enumerated with `git ls-files`, which lists **tracked files only**. The
+working order is write, run the checks, then commit — so **every file a change adds is untracked at
+exactly the moment the checks run**, and these two scans were blind to it until the next run, by which
+time it was already committed. Demonstrated here with one file, same content, both ways: untracked, the
+absolute-path scan reports **1 pass, 0 fail**; after `git add -N`, the same file fails it twice, named
+by line. Session 87 paid for this for real — `scripts/benchmark.mjs` was committed carrying an absolute
+path (D-086) and the green full run that verified its slice could not see it.
+
+**Chose.** **One enumeration, `repoFiles(cwd)` in `tests/_files.ts`: tracked plus untracked that git
+does not ignore**, which is the pairing `scripts/_markup.mjs` already uses for prettier (S-189).
+`--others --exclude-standard` is what keeps the junk out, so `.artifacts/`, `.tmp/`, `.verification/`
+and `node_modules/` are still unread and no scan can report on something generated. Both scans now call
+it and neither keeps an enumeration of its own.
+
+**Why it lives in `tests/` and not in `scripts/`.** A helper under `scripts/` is matched by
+`FULL_ONLY`, so every later edit of it would owe the full suite; and the shared test helper the scans
+already import, `tests/_repo.ts`, is imported by most of the suite, which would make the honest slice
+for a one-line change most of the suite. A new file imported by exactly three test files has an honest
+slice of exactly those three.
+
+**What this does NOT fix.** The other two scans, `feature-files` and `context-file`, read named paths
+rather than an enumeration, so they were never blind in this way. And a file that is both untracked and
+**ignored** is still unscanned — that is deliberate: `.gitignore` is the statement that it is not part
+of the repository, and the four scans exist to govern what is.
+
+**Rejected.** **`git status --porcelain` as the enumeration** — it lists what CHANGED, so a scan built
+on it would stop reading the files a change does not touch, which is the opposite mistake and a much
+worse one. **Scanning everything on disk** — `node_modules` and `.artifacts/` make that minutes of
+reading and would report on files nobody here wrote. **Leaving it and relying on the next run** — that
+is the status quo, and the status quo already let a D-086 violation through a green suite. **Teaching
+only the absolute-path scan** — a new file is exactly where a stray CRLF comes from too.
+
+**Caught by.** `tests/file-scans.test.ts`, four checks against a scratch repository and this one: an
+added file is enumerated although nothing has committed it, including in a folder that is itself new;
+nothing git ignores is enumerated; every tracked file in this repository is still enumerated and each
+one only once; and neither scan keeps an enumeration of its own. **Three deliberate breaks, each seen
+red at the right check and restored** — the enumeration back to tracked-only, the enumeration no longer
+excluding ignored files, and a scan growing its own `ls-files` again. **And the hole itself, end to
+end**: an untracked file carrying `C:/Users/...` now fails the absolute-path scan, where before the fix
+the identical file passed it.
+
+**Confirmed-by.** The owner, 2026-10-15 — "WHAT IS THE SCAN HOLE", then "yes do it", after the
+demonstration above.
+
+---

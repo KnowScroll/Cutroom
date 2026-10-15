@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { extname, join } from 'node:path'
 import { test } from 'node:test'
+import { repoFiles } from './_files.ts'
 import { REPO } from './_repo.ts'
 
 // §8 of the bootstrap prompt, and an afternoon lost to it:
@@ -32,15 +32,12 @@ const TEXT = new Set([
   '.txt',
 ])
 
-function trackedFiles(): string[] {
-  const out = execFileSync('git', ['ls-files', '-z'], { cwd: REPO, encoding: 'utf8' })
-  return out.split('\0').filter(Boolean)
-}
-
-test('no tracked text file contains a carriage return', () => {
+test('no text file in the working copy contains a carriage return', () => {
   const offenders: string[] = []
 
-  for (const rel of trackedFiles()) {
+  // S-195: tracked AND untracked-not-ignored. A new file is where a stray CRLF comes from, and it
+  // is untracked exactly while the checks that should catch it are running.
+  for (const rel of repoFiles(REPO)) {
     const base = rel.split('/').pop() ?? rel
     const isDotfile = base.startsWith('.') && !extname(base)
     if (!TEXT.has(extname(rel)) && !isDotfile) continue

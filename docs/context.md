@@ -120,6 +120,13 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-15 · session 89
 
+- **The scan hole is closed** (**S-195**, open since session 87): `no-absolute-paths` and `line-endings`
+  enumerated `git ls-files` — tracked only — so a file a change ADDED was invisible to the run that
+  verified it (the order is write, check, commit). One file, same bytes: untracked it passes, tracked it
+  fails twice. Both scans now use `repoFiles(cwd)` in `tests/_files.ts` — tracked plus
+  untracked-not-ignored — and the hole is proved closed end to end. `feature-files` and `context-file`
+  read named paths and were never blind this way.
+
 - **Markdown is a document wherever it lives** (**S-193**, superseding S-159 in part): `DOCUMENT` is
   `[/\.md$/]`, not three named places, so prose under `.claude/agents/`, a skill's `SKILL.md`, a package
   README or the copied authority runs `--changed`'s seven document checks instead of the full suite —
