@@ -28,6 +28,14 @@ export const isDocument = (path) => DOCUMENT.some((re) => re.test(path))
 export const verificationName = () => setting('CUTROOM_VERIFICATION_DIR') ?? '.verification'
 export const verificationDir = (cwd) => join(cwd, verificationName())
 export const receiptPath = (cwd) => join(verificationDir(cwd), 'receipt.json')
+/**
+ * The last FULL run keeps a file of its own, because only a full run is reusable and the ordinary
+ * order destroys it otherwise: a journey writes an evidence line, the documents-only `--changed`
+ * run before its commit writes a receipt of its own, and the next journey would find a
+ * `documents` record where the full one had been. Measured here, 2026-10-15, on the first real
+ * use — one `--changed` run between two journeys took the reuse away.
+ */
+export const fullReceiptPath = (cwd) => join(verificationDir(cwd), 'receipt-full.json')
 export const testsRawPath = (cwd) => join(verificationDir(cwd), 'tests.json')
 
 /**
@@ -135,18 +143,27 @@ export function writeReceipt(cwd, receipt) {
     commit: git(cwd, ['rev-parse', 'HEAD']),
     ...receipt,
   }
-  writeFileSync(receiptPath(cwd), `${JSON.stringify(body, null, 2)}\n`)
+  const text = `${JSON.stringify(body, null, 2)}\n`
+  writeFileSync(receiptPath(cwd), text)
+  // Only a full run touches the full receipt, so a documents or targeted run after it cannot
+  // take a journey's reuse away.
+  if (body.mode === 'full') writeFileSync(fullReceiptPath(cwd), text)
   return body
 }
 
-export function readReceipt(cwd) {
+function read(path) {
   try {
-    const parsed = JSON.parse(readFileSync(receiptPath(cwd), 'utf8'))
+    const parsed = JSON.parse(readFileSync(path, 'utf8'))
     return parsed && typeof parsed === 'object' ? parsed : undefined
   } catch {
     return undefined
   }
 }
+
+/** The last run of any mode: what a human or a diagnostic reads. */
+export const readReceipt = (cwd) => read(receiptPath(cwd))
+/** The last FULL run: the only record a journey may rest on. */
+export const readFullReceipt = (cwd) => read(fullReceiptPath(cwd))
 
 /**
  * Whether a journey at `headTree` may rest on `receipt`, and what it must still run.

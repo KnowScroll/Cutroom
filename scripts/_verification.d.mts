@@ -46,6 +46,9 @@ export function readTestsRaw(
 ): { total: number; fail: number; files: Record<string, TestFileResult> } | undefined
 export function writeReceipt(cwd: string, receipt: Partial<Receipt>): Receipt
 export function readReceipt(cwd: string): Receipt | undefined
+export function readFullReceipt(cwd: string): Receipt | undefined
+export function fullReceiptPath(cwd: string): string
+export function ensureVerificationDir(cwd: string): string
 export function reuseVerdict(asked: {
   receipt: Receipt | undefined | Record<string, unknown>
   headTree: string | undefined

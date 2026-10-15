@@ -6,7 +6,15 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { after, test } from 'node:test'
 import { REPO } from './_repo.ts'
-import { isDocument, reuseVerdict, testedTree, treeDelta } from '../scripts/_verification.mjs'
+import {
+  isDocument,
+  readFullReceipt,
+  readReceipt,
+  reuseVerdict,
+  testedTree,
+  treeDelta,
+  writeReceipt,
+} from '../scripts/_verification.mjs'
 
 // S-188 lets a journey rest on a run it did not watch, so the receipt is the only thing standing
 // between "it passed here" and "it passed at this content". Three properties carry that weight:
@@ -106,6 +114,30 @@ test('a tree delta names the paths that differ, and nothing else', () => {
   git(dir, 'add', '-A')
   git(dir, 'commit', '-q', '-m', 'edit the document')
   assert.deepEqual(treeDelta(dir, before, git(dir, 'rev-parse', 'HEAD^{tree}')), ['docs.md'])
+})
+
+// ---------------------------------------------------------------- the full run keeps its own file
+
+test('a full run writes the reusable receipt, and a later run of another mode leaves it alone', () => {
+  // Found on the first real use, 2026-10-15: the documents-only `--changed` run that precedes a
+  // journey's evidence commit overwrote the full receipt, so the next journey in the chain found a
+  // `documents` record where the reusable one had been — the saving gone in exactly the chain it
+  // was built for. Only a full run may touch the full receipt.
+  const dir = repo()
+  const full = {
+    mode: 'full' as const,
+    ok: true,
+    testedTree: 'a'.repeat(40),
+    tests: { ok: true, files: { 'tests/demo-one.test.ts': { pass: 3, fail: 0 } } },
+  }
+  writeReceipt(dir, full)
+  writeReceipt(dir, { mode: 'documents', ok: true, testedTree: 'b'.repeat(40) })
+  writeReceipt(dir, { mode: 'targeted', ok: true, testedTree: 'c'.repeat(40) })
+  assert.equal(readReceipt(dir)?.mode, 'targeted', 'the latest run is not recorded')
+  const reusable = readFullReceipt(dir)
+  assert.equal(reusable?.mode, 'full')
+  assert.equal(reusable?.testedTree, 'a'.repeat(40), 'the full receipt was overwritten')
+  assert.deepEqual(reusable?.tests?.files, full.tests.files)
 })
 
 // ---------------------------------------------------------------- per-file attribution

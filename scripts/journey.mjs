@@ -29,7 +29,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
-import { readReceipt, reuseVerdict, treeDelta, workingTreeDirt } from './_verification.mjs'
+import { readFullReceipt, reuseVerdict, treeDelta, workingTreeDirt } from './_verification.mjs'
 
 const GATES = ['product', 'architecture', 'program-design', 'slices']
 
@@ -108,7 +108,7 @@ function failingCheck(result) {
 
 /** The feature's own tests counted from a recorded run at this exact content, or undefined. */
 function recorded() {
-  const receipt = readReceipt(root)
+  const receipt = readFullReceipt(root)
   const testedTree = typeof receipt?.testedTree === 'string' ? receipt.testedTree : undefined
   const delta =
     testedTree === undefined || headTree === undefined

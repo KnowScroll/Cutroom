@@ -8438,4 +8438,23 @@ pathspec.
 document-delta shape over exact-tree-only after being shown that a chain of journeys changes its own tree
 and would otherwise save nothing, and asking for the build in the same session.
 
+**Amended 2026-10-15, on its first real use, before the session ended.** Running it found the flaw its
+own tests could not: **a run of any other mode overwrote the reusable receipt.** The order every
+re-journey chain uses is journey, evidence line, `check.mjs --changed` before the commit, next journey —
+and that middle run wrote a `documents` receipt over the full one, so the next journey had nothing to
+rest on and the saving vanished in exactly the chain this decision was written for. Observed here at
+`11a9698`, one command after the first reuse worked.
+
+- **The last full run keeps a file of its own**, `.verification/receipt-full.json`, written only when
+  `mode` is `full`; `receipt.json` remains whatever ran last, of any mode, for a human or a diagnostic.
+  `scripts/journey.mjs` reads the full one and nothing else.
+- **Caught by** two more checks and two more deliberate breaks, each seen red and restored: in
+  `tests/check-receipt.test.ts`, a full run followed by a `documents` run and a `targeted` run, asserting
+  the reusable record is still the full one with its per-file rows (break: let every mode write it); in
+  `tests/journey.test.ts`, a journey whose `receipt.json` is a `documents` record while the full receipt is
+  green, asserting it invokes nothing (break: read `receipt.json` instead). That makes
+  **25 checks in `tests/check-receipt.test.ts`, 19 in `tests/journey.test.ts` and fifteen breaks.**
+- **Measured, the same session**: `node scripts/journey.mjs reel-plan` at `f06bc4e` took **0.277 s** and ran
+  no check, reporting the feature’s **51 tests** — the count session 87 got by running them.
+
 ---

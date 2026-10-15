@@ -275,9 +275,11 @@ function receipt(tree: string, over: Record<string, unknown> = {}) {
   })
 }
 
-function plant(dir: string, body: string) {
+function plant(dir: string, body: string, latest?: string) {
   mkdirSync(join(dir, '.verification'), { recursive: true })
-  writeFileSync(join(dir, '.verification', 'receipt.json'), body)
+  // The journey reads the FULL receipt; receipt.json is whatever ran last, of any mode.
+  writeFileSync(join(dir, '.verification', 'receipt-full.json'), body)
+  writeFileSync(join(dir, '.verification', 'receipt.json'), latest ?? body)
 }
 
 const tree = (dir: string) => git(dir, 'rev-parse', 'HEAD^{tree}')
@@ -382,7 +384,9 @@ test('after a full run the count comes from the receipt that run wrote, not from
       "import { execFileSync } from 'node:child_process'",
       "const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { encoding: 'utf8' }).trim()",
       "mkdirSync('.verification', { recursive: true })",
-      "writeFileSync('.verification/receipt.json', JSON.stringify({ receipt: 1, mode: 'full', ok: true, testedTree: tree, checks: [{ label: 'tests', ok: true, ms: 1 }], tests: { ok: true, total: 7, files: { 'tests/demo-one.test.ts': { pass: 7, fail: 0 } } } }))",
+      "const body = JSON.stringify({ receipt: 1, mode: 'full', ok: true, testedTree: tree, checks: [{ label: 'tests', ok: true, ms: 1 }], tests: { ok: true, total: 7, files: { 'tests/demo-one.test.ts': { pass: 7, fail: 0 } } } })",
+      "writeFileSync('.verification/receipt.json', body)",
+      "writeFileSync('.verification/receipt-full.json', body)",
       "console.log('  ok    tests')",
       '',
     ].join('\n'),
@@ -392,5 +396,24 @@ test('after a full run the count comes from the receipt that run wrote, not from
   assert.equal(
     section(read(dir), 'Evidence'),
     `- ${today()} journey=PASS at ${sha} — every check green; 7 tests in tests/demo-*.test.ts pass`,
+  )
+})
+
+test('a documents-only run after the full one does not take the reuse away', () => {
+  // The order every re-journey chain uses: journey, evidence line, `check.mjs --changed` before
+  // its commit, next journey. That middle run writes a receipt of its own, and until S-188's
+  // receipt-full.json it overwrote the reusable one — measured on the first real use.
+  const { dir, sha } = repo({ text: feature(), check: CHECK_RECORDS })
+  plant(
+    dir,
+    receipt(tree(dir)),
+    JSON.stringify({ receipt: 1, mode: 'documents', ok: true, testedTree: tree(dir) }),
+  )
+  const r = journey(dir)
+  assert.equal(r.status, 0, r.out)
+  assert.deepEqual(calls(dir), [], 'a documents run between two journeys cost the reuse')
+  assert.match(
+    section(read(dir), 'Evidence'),
+    new RegExp(`journey=PASS at ${sha} — every check green; 7 tests`),
   )
 })

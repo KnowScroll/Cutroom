@@ -131,8 +131,12 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   throwaway index, so change → full run → commit stays reusable. The receipt folder holds a `.gitignore` of `*` and keeps
   itself out of every tree: a `:(exclude)` pathspec made `git add -A` exit 1 on an ignored path, so the tree
   came out undefined HERE while every scratch fixture passed — found by running it, now its own check and break.
-- **Proof**: `tests/check-receipt.test.ts` (23 checks), five S-188 cases in `tests/journey.test.ts` watching what the
-  journey invokes, and **thirteen deliberate breaks each seen red and restored**. CLAUDE.md's full-run sentence and
+- **The first real use amended it** (S-188 `Amended 2026-10-15`): the journey at `f06bc4e` ran nothing in
+  **0.277 s** and reported `reel-plan`’s 51 tests, and then the `check.mjs --changed` run before the
+  evidence commit **overwrote the reusable receipt** — the middle step of every chain. The last full run
+  now keeps `receipt-full.json`; the journey reads only that.
+- **Proof**: `tests/check-receipt.test.ts` (25 checks), six S-188 cases in `tests/journey.test.ts` watching what the
+  journey invokes, and **fifteen deliberate breaks each seen red and restored**. CLAUDE.md's full-run sentence and
   `PROMPTS/081` written. Nothing weakened; no bound, check or secrets journey touched.
 
 ### 2026-10-14/15 · session 87
