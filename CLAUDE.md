@@ -177,6 +177,15 @@ it must name every approved affected test through `--slice`, or use the full run
 the code check, the markup that differs and all boundary checks, then only its named test files; it rejects an
 unlisted changed test, an unknown path, and verification infrastructure. `--dry-run` says which checks would run and why.
 
+**The suite's `tests` step is two pools that never overlap** (S-192, superseding S-176 in part):
+`scripts/run-tests.mjs` runs the ordinary files at an outer concurrency of **4**, then the twelve
+PATH-only journey children at a pool of **2**, each still spawning the 2 or 4 its own file ratifies.
+**617 s where the serial runner took 1455 s**, nothing skipped, with each pool's time and lowest free
+memory written into the receipt and printed on every run. The sizes rest on three consecutive green
+full runs and a recorded floor of 5431 MB of 15714 MB — raising either needs its own three runs and its
+own floor, and `node scripts/run-tests.mjs --serial` restores S-176's single serial pool for a bisect.
+Test files are enumerated from the filesystem, so an uncommitted one still runs.
+
 **The full run is reserved for integrity boundaries**: a change to checking/journey/boundary tooling, workspace or
 dependency configuration, an unclassified or broad diff, and a feature journey at content no recorded full run has
 seen (S-188, superseding S-177's _"every feature journey"_). An ordinary slice commits only

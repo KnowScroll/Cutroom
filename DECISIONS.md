@@ -8680,3 +8680,100 @@ from, and that §4.2's own entry must record the floor and the worst child margi
 **Confirmed-by.** The owner, 2026-10-15, "now try" — the restart S-190 refused to make unasked.
 
 ---
+
+## S-192 | 2026-10-15 | The tests step is two pools that never overlap: 617 s instead of 1455 s, with the memory floor and every child's margin recorded
+
+**Supersedes.** **S-176 in part** — the outer runner is no longer one number for every file. Everything
+else S-176 settled stands, and its four rejections stand with it: **no bound raised, no child's internal
+concurrency reduced, no journey skipped, no file dropped.** This removes the _cause_ S-176 named —
+ordinary work running beside a nested child suite — rather than widening a limit.
+
+**Chose.**
+
+- **Two classes, in order, never at the same time.** The 142 ordinary files at an outer concurrency of
+  **4**, then the **twelve** PATH-only journey children at a pool of **2**, each still spawning the 2 or 4
+  its own file ratifies. `scripts/_pools.mjs` holds the classes and both sizes with the measurement behind
+  each; `scripts/run-tests.mjs` runs them; `check.mjs` keeps the step's name, `tests`, so the receipt, the
+  journey and `--dry-run` are unchanged.
+- **4 and 2, not §4.2's 4–6 and 2–3.** Every figure in S-191 is a file measured ALONE, so what four
+  together cost is the thing these runs are evidence for, and the floor below is the floor at four. A
+  secrets child at a pool of two is already up to eight nested test processes, each able to start ffmpeg,
+  a service and a worker. Raising either number needs its own three green runs and its own recorded floor.
+- **The runner records what the change is accountable for.** Each pool's wall time, file count,
+  concurrency and lowest free memory go into `.verification/receipt.json`, and `check.mjs` prints them on
+  a GREEN run as well as a red one — evidence nobody reads unless something breaks is not evidence.
+- **Test files are enumerated from the filesystem, not from git.** An uncommitted test file still runs;
+  this must not copy the hole the four file scans have (session 87, still open).
+- **`--serial` keeps S-176's exact behaviour one flag away**, so a suspected contention red can be
+  bisected against the scheduler without reverting anything.
+
+**Measured here.** Three consecutive green full runs at the committing tree — §4.2 requires three,
+because one green run is not evidence for a contention change:
+
+| run | tests step | ordinary pool (142 at 4) | secrets pool (12 at 2) | lowest free |
+| --- | ---------- | ------------------------ | ---------------------- | ----------- |
+| 1   | **617 s**  | 354 s                    | 263 s                  | 5431 MB     |
+| 2   | **620 s**  | 349 s                    | 272 s                  | 5550 MB     |
+| 3   | **627 s**  | 352 s                    | 276 s                  | 5476 MB     |
+
+Against **1455 s** at `019cbb2`, with **797 tests over 154 files** and nothing skipped. **The recorded
+memory floor is 5431 MB of 15714 MB** — S-107 recorded 815 MB free under the overlap this replaces, and
+S-191 measured 3045 MB with files running one at a time.
+
+**Every child's margin against its own bound, measured under the pool** (a throwaway reporter in `.tmp/`,
+since the committed one records counts and not durations): worst is **`reel-render-secrets`, 144.3 s of
+its 300 s bound — 155.7 s spare, 48 % used**, against 123.8 s alone; then `resume-failed-secrets` 102.3 s
+of 600 s, `reel-takes-secrets` 89.1 s of 300 s (30 %), `paid-path-secrets` 66.2 s of 360 s (18 %). The
+pool costs a child about 16 % of its alone time and no child passes half its bound.
+
+**One fault, found by running it, and it was not in the scheduler.**
+`tests/cutroom-sdk-launcher.test.ts` check 8 — the fixed-port race between two SDK callers — failed once
+in the ordinary pool with `write EPIPE`, and its body's assertions had all passed: the throw came from
+the teardown. **A failed IPC send is reported asynchronously**: Node emits `error` on the child rather
+than throwing where `send` was called, so the `try/catch` already in `stopCaller` could not see it, and
+nothing listened. Latent since the test was written; the pool made a loser caller exiting first ordinary
+rather than rare. The fix attaches the listener and swallows **only** `EPIPE` and
+`ERR_IPC_CHANNEL_CLOSED`, which mean exactly that; anything else still surfaces. No assertion changed,
+and `node scripts/journey.mjs cutroom-sdk` PASSed at `88c2bc4` — 99 tests, from the full run recorded for
+that exact tree (S-188). The reproduction is kept honest: the red appeared at 374 s with the ordinary pool
+run on its own, and a synthetic probe of the same mechanism did NOT reproduce the timing, so what is
+claimed here is the captured stack — a throw that passed straight through an in-place `try/catch`.
+
+**Why.** S-191 measured that the serial suite costs what its files cost to within 3 %: there was no slack
+to reclaim by being tidier, so either the suite ran files beside each other or it stayed at 24 minutes.
+S-176's red was real, and its cause was specific — nested child suites starved by ordinary work — so the
+answer is to keep the two apart, which is a smaller claim than "more concurrency is safe". The pool sizes
+are now the only thing resting on measurement, and both the floor and the worst margin are written down
+where the next change to them has to beat them.
+
+**Rejected.** **An ordinary concurrency of 6** — nothing measured it, and the floor above is the floor at
+four; it is a separate decision with its own three runs. **One green run as evidence** — S-176 was a
+contention red, and contention reds are intermittent by definition; this very change found an
+intermittent one in run 2 of the first attempt. **Sizing the pools from S-191's alone-measurements
+alone** — they bound the arithmetic and say nothing about what four processes do to each other.
+**Narrowing what each secrets child re-runs** — that is §4.4, it changes what a proven property covers,
+and it stays the owner's call. **Classifying by filename alone** — the check is that every file which
+builds a bare environment is in the second pool, so a new PATH-only child under another name cannot land
+in the first. **Adding per-file durations to the receipt's reporter now** — right, and it would have
+invalidated the three green runs it was measured with, so it is left for a later change. **Serialising
+the whole suite again at the first red** — the red was a fault in a test's teardown, and reverting would
+have buried it.
+
+**Caught by.** `tests/check-pools.test.ts`, nine checks: the enumeration against a reference glob and
+against git, a three-root fixture that fails if a root is dropped before any package has its first test,
+the classification by what a file does, both pools running, the merge of their per-file results, that the
+pools do not overlap, that the ordinary pool really runs its files beside each other, that a red in
+either pool fails the step while the other pool's results survive, and `--serial`.
+`tests/check-changed.test.ts` gains the S-192 case: neither new script may ride a targeted run, by name
+and not merely by the blanket `scripts/` rule. **Eleven deliberate breaks, each seen red at the right
+check and restored** — a dropped root, a secrets child in the ordinary pool, a merge that keeps one pool,
+a merge that overwrites a repeated file, an ordinary pool at concurrency 1, overlapping pools, a red pool
+that exits 0, a red that skips the second pool, an unrecorded memory floor, an ignored `--serial`, and
+the infrastructure listing without its entry. And every full run from here records its own floor and pool
+times in the receipt, so a later change that costs the suite its headroom is visible in the evidence
+rather than in a memory.
+
+**Confirmed-by.** The owner, 2026-10-15 — "now try", and the standing instruction to work through
+`docs/research/test_fixes_and_research.md` in order as far as the session goes.
+
+---

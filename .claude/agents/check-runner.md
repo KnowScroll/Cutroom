@@ -1,6 +1,6 @@
 ---
 name: check-runner
-description: Runs this repository's checks and hands back only the verdict and the decisive lines — `node scripts/check.mjs` (about six minutes), `--code`, one test file, a drift proof, or a named journey. Use whenever a check run's output would otherwise flood the main context, and to find WHICH test failed when check.mjs's 40-line excerpt does not say. Never fixes anything.
+description: Runs this repository's checks and hands back only the verdict and the decisive lines — `node scripts/check.mjs` (about eleven minutes since S-192; it was twenty-four), `--code`, one test file, a drift proof, or a named journey. Use whenever a check run's output would otherwise flood the main context, and to find WHICH test failed when check.mjs's 40-line excerpt does not say. Never fixes anything.
 tools: Bash, Read, Grep
 model: haiku
 ---

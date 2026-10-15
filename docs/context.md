@@ -63,7 +63,7 @@ git and the journal keep them.
   commit tree: ordinary slices run static/boundary checks plus named affected tests; full suites remain for checker,
   boundary, workspace/dependency and journey work — and, since **S-188**, for a journey only at content no green
   full receipt covers; `node scripts/check.mjs --documents` is the ~15 s set a Markdown change can fail. The known PATH-only child transient remains a full-suite signal;
-  S-176’s serial aggregate and existing child bounds stand. A hosted run is corroboration only and carries no trailer (S-183).
+  S-192 replaced S-176’s serial aggregate with two non-overlapping pools (617 s, floor 5431 MB); every child bound is unchanged. A hosted run is corroboration only and carries no trailer (S-183).
 
 ## Runs
 
@@ -119,6 +119,18 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
 ### 2026-10-15 · session 89
+
+- **§4.2 is built (S-192, superseding S-176 in part)**: the tests step is two pools that never overlap —
+  142 ordinary files at 4, then the twelve PATH-only children at 2, each keeping its own ratified nested
+  concurrency. **617 / 620 / 627 s over three consecutive green full runs against 1455 s**, 797 tests
+  over 154 files, nothing skipped. **Floor 5431 MB of 15714 MB; worst child margin 155.7 s**
+  (`reel-render-secrets`, 48 % of its 300 s bound). `scripts/run-tests.mjs` owns the pools and writes
+  each one's time and floor into the receipt; `--serial` restores S-176's behaviour for a bisect.
+- **The first attempt found a real fault, in a test's teardown rather than in the scheduler**:
+  `cutroom-sdk-launcher` check 8 failed with `write EPIPE` after every assertion in its body passed,
+  because a failed IPC send arrives as an `error` event on the child and nothing listened. Fixed by
+  listening for exactly `EPIPE` and `ERR_IPC_CHANNEL_CLOSED`; no assertion changed; `cutroom-sdk`
+  journey re-PASSed at `88c2bc4` (99 tests, from the recorded run).
 
 - **§3 is taken, all 153 files** (**S-191**, superseding S-190 in part). The table is committed as
   `docs/research/test-file-costs.md`; the runner stays a throwaway in `.tmp/`, now writing one file per slice

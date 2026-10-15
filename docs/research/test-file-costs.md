@@ -68,6 +68,22 @@ Shortening the suite means shortening those 35, which is §4.6, or running them 
 | `tests/three-pictures-secrets.test.ts`  | 5.8       | 600.0     | 594.2               | 2           | 7579             | 1     |
 | `tests/paid-failures-secrets.test.ts`   | 1.7       | 300.0     | 298.3               | 4           | 3881             | 1     |
 
+## After §4.2, on the same machine in the same state
+
+S-192 made the step two pools that never overlap. The before/after §6 asks for:
+
+|                        | serial (S-176)                | two pools (S-192)                                            |
+| ---------------------- | ----------------------------- | ------------------------------------------------------------ |
+| tests step             | **1455 s**                    | **617 / 620 / 627 s** over three consecutive green runs      |
+| 141–142 ordinary files | 1077.8 s alone, serial        | **349–354 s** at an outer concurrency of 4                   |
+| 12 secrets children    | 423.9 s alone, serial         | **263–276 s** at a pool of 2                                 |
+| lowest free memory     | 815 MB (S-107, under overlap) | **5431 MB** of 15714 MB                                      |
+| worst child margin     | not recorded                  | **155.7 s** (`reel-render-secrets`, 48 % of its 300 s bound) |
+
+The arithmetic floors this table predicted were 269 s and 212 s; the pools came in at 352 s and 270 s,
+so about 75 % of the available parallelism is realised. The 121 nested executions below are untouched —
+that is §4.4, not §4.2.
+
 ## The suite runs most of itself twice
 
 Each secrets check re-runs its own feature's other test files inside a PATH-only child, so one full suite is
