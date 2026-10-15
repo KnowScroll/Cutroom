@@ -142,6 +142,35 @@ test('S-177. checker and workspace tooling changes fail closed to the full suite
   assert.match(`${result.stdout}${result.stderr}`, /full check/)
 })
 
+test('S-193. Markdown anywhere is a document: prose outside docs/ no longer costs the full suite', () => {
+  const dir = scratch()
+  // Each of these used to be an unclassified path, so a sentence of English failed --changed
+  // closed to the whole suite. None of them is executed by anything.
+  write(dir, '.claude/agents/check-runner.md', '# an agent\n\nprose\n')
+  write(dir, '.claude/skills/checks/SKILL.md', '# a skill\n\nprose\n')
+  write(dir, 'packages/pipeline/README.md', '# a package\n\nprose\n')
+  const chosen = dryRun(dir, '--changed')
+  assert.deepEqual(
+    [...chosen.run].sort(),
+    ['copied docs', 'decisions pin', 'markup changed', 'scans'],
+    `Markdown outside docs/ did not choose the document checks:\n${chosen.out}`,
+  )
+  for (const label of ['typecheck', 'code', 'boundaries', 'boundaries proven', 'tests']) {
+    assert.ok(chosen.skipped.includes(label), `${label} was not skipped:\n${chosen.out}`)
+  }
+
+  // A file that executes still fails closed, whatever prose sits beside it.
+  const other = scratch()
+  write(other, '.claude/settings.json', '{}\n')
+  const refused = spawnSync(process.execPath, ['scripts/check.mjs', '--changed', '--dry-run'], {
+    cwd: other,
+    encoding: 'utf8',
+    env: { ...process.env, NO_COLOR: '1' },
+  })
+  assert.notEqual(refused.status, 0, 'a settings change was treated as a document')
+  assert.match(`${refused.stdout}${refused.stderr}`, /a path of code: \.claude\/settings\.json/)
+})
+
 test('S-192. the two-pool runner and its classes are checker tooling: no slice may carry them', () => {
   // The pool sizes and the split decide WHAT runs beside what; a targeted run that accepted a
   // change to either would be verifying the suite with the scheduler under test.

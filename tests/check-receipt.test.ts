@@ -293,8 +293,17 @@ test('one document list serves check.mjs and the reuse verdict', () => {
   assert.doesNotMatch(source, /^const DOCUMENT = \[/m, 'check.mjs grew its own document list')
   assert.ok(isDocument('docs/features/demo.md'))
   assert.ok(isDocument('JOURNAL.md'))
+  // S-193: Markdown is a document wherever it lives, including prose that used to be unclassified.
+  assert.ok(isDocument('.claude/agents/check-runner.md'))
+  assert.ok(isDocument('.claude/skills/checks/SKILL.md'))
+  assert.ok(isDocument('packages/sdk/README.md'))
+  assert.ok(isDocument('steering-ref/steering/DECISIONS.md'))
+  // And nothing that executes becomes one, whatever folder of prose it sits beside.
   assert.ok(!isDocument('packages/pipeline/src/plan.ts'))
   assert.ok(!isDocument('docs/features/demo.ts'))
+  assert.ok(!isDocument('.claude/settings.json'))
+  assert.ok(!isDocument('.claude/hooks/stop-gate.sh'))
+  assert.ok(!isDocument('docs/notes.md.ts'))
 })
 
 // ---------------------------------------------------------------- the mode a journey calls

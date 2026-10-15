@@ -170,9 +170,12 @@ warnings do not gate: the thirteen rules eslint never enforced are `warn` in `bi
 reason, so nothing that used to be caught stopped being caught and nothing new became a blocker without a
 decision.
 
-**`--changed` is enough for documents** (S-159, superseded in part by S-177): Markdown under `docs/` or `PROMPTS/`,
-the journal, decisions and this file run markup formatting — prettier over the files that differ, 0.26 s for two
-of them against 8.7 s for all 126 (S-189) — authority and the four file scans. A code diff cannot use it:
+**`--changed` is enough for documents** (S-159, superseded in part by S-177 and S-193): **any Markdown file,
+wherever it lives** — `docs/`, `PROMPTS/`, the journal, decisions, this file, an agent's description under
+`.claude/agents/`, a skill's `SKILL.md`, a package README, the copied authority — runs markup formatting
+(prettier over the files that differ, 0.26 s for two of them against 8.7 s for all 126, S-189), the authority
+and the four file scans, and nothing of code. Prose stops costing the suite; what executes does not become
+prose, so `.claude/settings.json` and `.claude/hooks/*.sh` are still code paths and a check holds that line. A code diff cannot use it:
 it must name every approved affected test through `--slice`, or use the full run. `--slice` always runs typecheck,
 the code check, the markup that differs and all boundary checks, then only its named test files; it rejects an
 unlisted changed test, an unknown path, and verification infrastructure. `--dry-run` says which checks would run and why.

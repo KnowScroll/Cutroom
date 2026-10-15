@@ -120,6 +120,16 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-15 · session 89
 
+- **Markdown is a document wherever it lives** (**S-193**, superseding S-159 in part): `DOCUMENT` is
+  `[/\.md$/]`, not three named places, so prose under `.claude/agents/`, a skill's `SKILL.md`, a package
+  README or the copied authority runs `--changed`'s seven document checks instead of the full suite —
+  which one stale sentence in an agent description had just cost this session. What executes stays code:
+  `.claude/settings.json` and `.claude/hooks/*.sh` are still refused by name. `journey.mjs` reuses a
+  recorded run for a prose-only delta anywhere, by the same list (S-188). **Verified targeted, not by the
+  full suite (S-194, owner’s call against S-177)**: everything that reads `DOCUMENT` was enumerated —
+  `check.mjs` and `reuseVerdict`, nothing else — so the slice was `check-receipt`, `check-changed` and
+  `journey` plus every static check, 50 s; the gap is the 151 files that never read the rule.
+
 - **§4.2 is built (S-192, superseding S-176 in part)**: the tests step is two pools that never overlap —
   142 ordinary files at 4, then the twelve PATH-only children at 2, each keeping its own ratified nested
   concurrency. **617 / 620 / 627 s over three consecutive green full runs against 1455 s**, 797 tests
@@ -209,73 +219,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - Also reported: the `hold` table is **empty over all 52 runs**; the record is a migration behind `schema.ts`, so
   the reader reports five columns absent, never zero. Sessions 79–82 dropped for the cap; git keeps them. Nothing
   weakened, nothing spent, no reel made.
-
-### 2026-10-14 · session 86
-
-- **`docs/features/yield-benchmark.md` is now the scoring half alone** (S-184). Deleted: sides, per-unit rates, the
-  two uncertainty bands, the verdict words, the eight deciding measures, the credit guard, comparability and the
-  fingerprint, and `compare.ts` from the file list. In their place one section names what `yield-compare` owns and
-  why the brief key stays here — it is a property of one run, not of a pair. **Each of the six round-3 findings
-  that moved was confirmed present in `docs/features/yield-compare.md`'s "What the gates must settle" before being
-  deleted here.**
-- **Round 3's twenty findings are recorded in the file for the first time** — they existed only in
-  `PROMPTS/079` — and fifteen are applied. Load-bearing, each verified against source first: **all thirteen rating
-  terms rephrased achieved-over-attempted** with the weights unmoved and three conventions stated; **the five
-  worked values recomputed to 0.0, 10.0, 24.4, 34.0, 89.7**, ranking strictly with no tie, every fixture now
-  **constructed** rather than taken; a **part-to-stage/job table**, since `RunEvent`'s stage is only
-  `plan | stills | video` and narration, clips and the cut all sit inside `video` (118 starts = 52 + 43 + 23), so
-  narration and clips are reached by a `reel.clips` job row and the cut by `reel.assemble`; **`benchmark-no-io`
-  enumerates its builtins** — `pipeline-no-io`'s real pattern plus `crypto`, which it did not forbid before; the
-  **brief key's input composed in the package against an injected hash**, the reader supplying SHA-256, so no
-  slice needs a later slice's code; the **ledger's fifteen columns** with the read date and commit in the header;
-  the **flag table with four exit codes** answering _"run on individual things"_; inherited degradations, holds and
-  still-holds recognised through the `kept_from` their tables do not carry; `capCents` reported where a
-  budget-limited result holds it; the estimate's exclusions extended to retakes and lost calls; five further
-  reason-writing sites and "a run-ending `detail` is never classified"; the fixture placeholder rule asserted here,
-  because `tests/no-absolute-paths.test.ts` matches four machine-path shapes only; and S-178 on the `Decisions:`
-  line. **Thirteen checks in four slices, 6 + 3 + 4 + 0.**
-- **The count amendment list is corrected**: not five places but **three test files** (five assertions, two titles,
-  two ordinal comments) and **seven documents** (fourteen occurrences), each named by line —
-  `tests/paid-path-keys.test.ts:139`'s `doesNotMatch(/21 rules proven to fire/)` is raised to 22 rather than left
-  guarding a number nobody could write. Round 3's eighth site, `docs/features/hosted-checks.md:337`, **does not
-  exist** (278 lines, no rule count) and is recorded as not owed.
-- **S-182 carries an `Amended 2026-10-14` block**: what it no longer governs, its comparison clauses changing
-  address rather than being withdrawn, and a term-by-term table of old phrasing beside new. **No weight and
-  neither tolerance moved.** The owner's deletion of the overclaim _"No two of those 25 groups hold two runs on one
-  engine version"_ is applied — unknowable, since no row records an engine version — replaced by the measured 5 of
-  25 matching brief groups.
-- **Round 4 refused all four gates with nineteen findings; all nineteen are applied.** Three were serious and were
-  verified against source here: the `stopped-at-gate-1` fixture was **a state the engine cannot produce** — the
-  D-047 stop is the **canonical** picture's and fires before any derived one (`stills/index.ts:514-521`) — so its
-  24.4 was unreachable and round 3's tie had been hidden, not fixed; **three terms were achievements whose stated
-  column was still an absence** (a stopped shot writes no `degradation`, a failed-take shot no `still_hold`, and
-  `render_manifest` is notNull and written before the assembler, so an unassembled cut scored 20.0); and the
-  plan's third term named no column that scopes a model call to a stage. Also: **the picture rule IS recorded**
-  (`Plan.pictures`), which three gates called unrecordable. The **tie is kept and explained** — both runs achieved
-  nothing in the parts they reached — and the pinned values are **0.0, 10.0, 10.0, 34.0, 89.7**.
-- **S-185 — the owner read the round count and chose to build.** Four rounds, about **890,000 reviewer tokens over
-  five sessions, zero implementation files**. The four gates are **APPROVED by owner decision**; the `Gates:` line
-  reads `owner-decision-S-185` and names no reviewer, so this feature is never read as having passed the review
-  every other verified feature passed. **The waiver is for `yield-benchmark` alone** — rule 1 stands for
-  `yield-compare`, `benchmark-view` and everything else. Accepted risk: **the slices carry the review**, and a
-  slice that cannot make its check pass as written stops and reports rather than adjusting the check.
-- **Building is the next session's, and this session wrongly opened it.** Slice 1 was started here and stopped by
-  the owner: S-160 rule 2 makes a session one phase and `PROMPTS/079` forbade any implementation file — the
-  owner's _"Build it"_ settled whether to keep reviewing, not which session builds.
-- **The partial work was discarded, and why is the finding worth keeping.** Left in the tree it turned three
-  verified features **red**: it had added the three boundary rules and their `--prove` cases, so `drift --prove`
-  printed **25** while `tests/reel-stills-rules.test.ts`, `tests/reel-render-rules.test.ts` and
-  `tests/paid-path-keys.test.ts` still assert 22 and the amendments were never written — 9 of 12 tests passing.
-  The owner was first told only that the work was unverified, which was true and incomplete, and chose to leave
-  it; **the stop-gate's refusal to end on uncommitted source is what made anyone measure it**, and the owner then
-  discarded it. The tree is clean at `cda948f`, `drift --prove` prints 22, and those three files are 12 of 12.
-  **The three rules and their amendments are ONE change**, which is now written into the next prompt as what
-  Slice 1 must carry before it is committable.
-- Added `PROMPTS/080-yield-benchmark-build.md`, listed in `PROMPTS/README.md`: all four slices, one
-  `slice-builder` at a time, full suite for Slices 1 and 3, targeted for 2, the journeys in 4.
-- No code, contract, test, provider, database, media, boundary rule or check was COMMITTED by this session, and
-  nothing was weakened. `node scripts/check.mjs --changed` green over the documents. No reel was made and nothing
-  was spent.
 
 ## Where to look
 

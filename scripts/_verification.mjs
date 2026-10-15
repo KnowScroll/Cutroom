@@ -16,11 +16,17 @@ import { run, setting } from './_lib.mjs'
 export const RECEIPT_VERSION = 1
 
 /** Markdown this repository keeps. The only class whose change a document check can turn red. */
-export const DOCUMENT = [
-  /^docs\/.+\.md$/,
-  /^PROMPTS\/.+\.md$/,
-  /^(JOURNAL|DECISIONS|CLAUDE|README|AGENTS)\.md$/,
-]
+/**
+ * What counts as a document: **any Markdown file, wherever it lives** (S-193). It used to be three
+ * named places, so prose outside them — an agent's description under `.claude/agents/`, a skill's
+ * `SKILL.md`, a package README — was an unclassified path and `--changed` failed closed to the full
+ * suite for a sentence of English. Nothing executes a `.md` file here: the four file scans still
+ * read every one of them for line endings and absolute paths, `feature-files` still reads the
+ * `Gates:` and `Status:` lines it governs, `docs-check` still compares the copied authority, and
+ * all of those run in the document set. A Markdown change therefore still has checks it can fail;
+ * it just no longer runs the suite of code it cannot affect.
+ */
+export const DOCUMENT = [/\.md$/]
 
 export const isDocument = (path) => DOCUMENT.some((re) => re.test(path))
 

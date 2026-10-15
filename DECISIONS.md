@@ -8789,3 +8789,101 @@ S-107's 815 MB is the signal, and the pool sizes stay at 4 and 2 until some run 
 larger one.
 
 ---
+
+## S-193 | 2026-10-15 | Markdown is a document wherever it lives, so prose stops costing the full suite
+
+**Supersedes.** **S-159 in part** — its document class was three named places (`docs/**.md`,
+`PROMPTS/**.md`, and five files at the root). It is now any `.md` path. Everything else S-159 and
+S-177 settled stands: code still names its affected tests through `--slice` or runs the full suite,
+and an unclassified path still fails closed.
+
+**Chose.** **`DOCUMENT` is `[/\.md$/]`.** A Markdown file anywhere — an agent's description under
+`.claude/agents/`, a skill's `SKILL.md`, a package README, the copied authority under
+`steering-ref/` — runs the document checks and not the suite of code it cannot affect.
+
+**Why.** Correcting one stale sentence in `.claude/agents/check-runner.md` cost an eleven-minute full
+suite in this session, because the path matched no class and S-177 fails closed. Failing closed is
+right for a path nobody classified; it is wrong as a permanent answer for prose. **Nothing executes a
+`.md` file in this repository**, and the checks a Markdown change can actually fail all stay: prettier
+over the markup that differs, the four file scans — line endings and absolute paths read every
+Markdown file there is — `feature-files` reading the `Gates:` and `Status:` lines it governs,
+`context-file` matching the journal's newest session against the digest's, the decisions pin, and
+`docs-check` comparing the copied authority. A Markdown change therefore still has seven checks to
+answer to. The owner's instruction was explicit: _"remove .claude/agents/\*.md or any other .md files
+or anything like these from the changed, so they don't trigger the test suites, only flipping code
+changes"_.
+
+**What it also changes, deliberately.** `scripts/journey.mjs` asks the same question of a tree delta
+(S-188), so a journey whose tree differs from a recorded full run **only** in Markdown — now including
+prose outside `docs/` — reuses that run and runs the document checks alone. That is the same claim as
+before over a wider set of files, and it rests on the same fact: a `.md` file changes no behaviour the
+suite measures.
+
+**Rejected.** **Adding `.claude/agents/` and `.claude/skills/` as named places** — the next folder of
+prose would pay the same eleven minutes, and the list would keep growing by incident. **Classifying all
+of `.claude/`** — `settings.json` wires the hooks and `hooks/*.sh` run on every tool call; both execute,
+both stay code, and a check now holds that line. **Treating YAML as prose too** — `pnpm-workspace.yaml`
+and `pnpm-lock.yaml` decide what resolves and what gets installed; they are code paths today and stay
+so. **Leaving it closed and living with the eleven minutes** — that is the status quo the owner
+rejected, and after S-192 the suite is cheap enough that nobody would notice the waste, which is
+exactly how a wrong default survives.
+
+**Caught by.** `tests/check-receipt.test.ts`: `isDocument` says yes to `.claude/agents/check-runner.md`,
+`.claude/skills/checks/SKILL.md`, `packages/sdk/README.md` and `steering-ref/steering/DECISIONS.md`, and
+no to `packages/pipeline/src/plan.ts`, `docs/features/demo.ts`, `.claude/settings.json`,
+`.claude/hooks/stop-gate.sh` and `docs/notes.md.ts`. `tests/check-changed.test.ts` gains the end-to-end
+case: a scratch repository whose only changes are three Markdown files outside `docs/` chooses
+`markup changed`, `scans`, `decisions pin` and `copied docs` and skips every check of code, while a
+`.claude/settings.json` change in the same shape is still refused as a path of code, by name in the
+message. **Two deliberate breaks, each seen red and restored**: the rule narrowed back to its three
+named places, and the rule widened until it swallowed `.claude/` as well.
+
+**Confirmed-by.** The owner, 2026-10-15, in those words, after this session paid the eleven minutes.
+
+---
+
+## S-194 | 2026-10-15 | S-193 is verified by the three files that read its rule, plus every static check — not by the full suite
+
+**Supersedes.** Nothing. S-177 stands: a change to verification infrastructure runs the full suite. This
+records one departure from it, its reason, its evidence and what that evidence does not cover.
+
+**Chose.** **S-193's commit carries targeted evidence.** What ran, all green, about 50 s in total:
+typecheck, `biome check .`, prettier over the changed Markdown, all three drift checks (boundaries, the
+25-rule proof, the dead-rule audit), the four file scans, the authority pair, and
+`tests/check-receipt.test.ts`, `tests/check-changed.test.ts`, `tests/journey.test.ts` run serially.
+
+**Why those three test files and no others.** The change is one list, `DOCUMENT`, in
+`scripts/_verification.mjs`. Everything that reads it was enumerated rather than guessed: `check.mjs`
+imports `DOCUMENT` to classify a changed path, `reuseVerdict` in the same module calls `isDocument` to
+decide whether a journey may rest on a recorded run, and nothing else in `scripts/` or `tests/` mentions
+either name. The three files are the ones that exercise those two paths — `check-receipt` the list and
+the reuse verdict directly, `check-changed` the end-to-end classification through `check.mjs`, `journey`
+the reuse a document-only delta earns. The remaining 151 test files neither import the module nor read
+the rule.
+
+**What this evidence does not cover, stated plainly.** The full suite would also have shown that the
+rule change breaks nothing anywhere else in the repository; this run shows that it breaks nothing in the
+checker, the journey, the boundaries, the scans, the authority or the types. The gap is the 151 files
+that do not read the rule, and the argument for accepting it is the enumeration above, not a hope.
+
+**Why the departure.** The owner, 2026-10-15, twice: _"Then only run the tests for files we changed bro
+why the whole suit"_. The full run had already been started and was cancelled on that instruction. The
+cost being avoided is real — about ten minutes — and S-193's whole point is that verification should
+cost what the change can actually break.
+
+**Rejected.** **Removing `scripts/_verification.mjs` from `check.mjs`'s infrastructure list, or the
+blanket `scripts/` rule from `FULL_ONLY`, so that `--slice` would accept this change** — that is
+weakening the check that refused, it is asserted by two tests, and it would silently lower the bar for
+every future change to the checker rather than for this one. The refusal was right; this entry is the
+exception, written down, not a new default. **Committing without recording the departure** — an
+undocumented exception to S-177 is exactly the drift the decision files exist to catch. **Running the
+full suite anyway after the owner said not to** — the owner's call, and the enumeration makes it a
+defensible one.
+
+**Caught by.** The three test files named above, and the fact that a later full run — the next feature
+journey, or any broad change — exercises the rule across everything. If that run ever shows this
+exception was wrong, this entry names what to look at.
+
+**Confirmed-by.** The owner, 2026-10-15, in the words quoted.
+
+---
