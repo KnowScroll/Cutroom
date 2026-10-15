@@ -8886,4 +8886,6 @@ exception was wrong, this entry names what to look at.
 
 **Confirmed-by.** The owner, 2026-10-15, in the words quoted.
 
+**Corrected 2026-10-15, same session.** This entry said the full run that had been started was "cancelled on that instruction". It was not: only the wait on it was cancelled, and the run itself finished **green** at tree `4c2fbcb` — tests **615.7 s**, **798 tests**, none failing, ordinary pool 353.3 s at 4 and secrets 262.4 s at 2. So S-193 has both kinds of evidence: the targeted slice above, and a full suite that agrees with it. The reasoning for accepting targeted evidence stands for the next change of this shape, and the gap it names was closed here by accident rather than by argument. The run also recorded a **4142 MB** floor, a third figure after 5431 MB and 2483 MB, which is the amendment to S-192 making its own point: the floor follows the machine, not the pools.
+
 ---
