@@ -27,6 +27,22 @@ Gates: product APPROVED 2026-09-14 adversarial-reviewer · architecture APPROVED
 > **Built in the engine repository** (D-088), `C:\Users\XZNON\Cutroom`. **This file moves there once its gates
 > are approved** (D-089, D-105), and its journey runs there.
 >
+> **Amended by the `pipeline-no-io` fix slice on 2026-10-15 — the gates below are not edited, and no assertion is
+> removed** (**S-187**). **`pipeline-no-io` lost its `dependencyTypes: ['core']`** and keeps its pattern
+> character-for-character (`.dependency-cruiser.cjs`). dependency-cruiser ANDs a `to`'s attributes, and bare
+> `sqlite` is not a Node builtin — only `node:sqlite` is — so `import 'sqlite'` resolved to nothing, reached the
+> graph typed `unknown` rather than `core`, and the rule was **silent** on it: 31 of the 32 spellings measured in
+> `yield-benchmark`'s Slice 1 fired, and that one did not. Without the attribute the rule is **strictly broader**
+> — it fires on the fifteen names it enumerates however they resolve — and `drift` over the real graph still
+> reports 0 boundary violations. **Its check gained cases**: `drift --prove` had one, `node:fs`, and now has one
+> per enumerated builtin under **both** spellings, generated from the rule's own pattern by the helper
+> `benchmark-no-io` already used (`ioCases` in `scripts/drift.mjs`), each in its own file under
+> `packages/pipeline/src/`; the printed count goes from 102 cases to 131 and the rule count stays 25. **Check 8 is
+> amended by addition only**, in `tests/reel-plan-rules.test.ts`: a new check named for S-187 asserts the rule
+> names no `dependencyTypes` and that every builtin its pattern enumerates is caught under both spellings, bare
+> `sqlite` among them, with the enumeration read out of the loaded config. Nothing in checks 2, 8 or 9 is removed,
+> loosened or reworded.
+>
 > **Amended by `resume-failed` on 2026-09-27, Slice 5 — the gates below are not edited, and no assertion is removed**
 > (**S-163**). **`finishRun` takes the engine's own resume**: an optional `resume(tx, now)` it runs after the plan rows
 > and events and before `run.finished`, inside `SAVEPOINT resume` — released when the step answers, rolled back to

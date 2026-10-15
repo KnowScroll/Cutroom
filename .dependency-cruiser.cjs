@@ -46,10 +46,23 @@ module.exports = {
       comment:
         'The pipeline does no input or output of its own: no filesystem, no network, no processes, ' +
         'no database driver. Anything touching the outside world sits behind a named port. A stage ' +
-        'that reads a file is a stage whose test needs that file to exist.',
+        'that reads a file is a stage whose test needs that file to exist. Like ' +
+        '`benchmark-no-io`, this names no `dependencyTypes`, and that is load-bearing (S-187): ' +
+        'bare `sqlite` is NOT a Node builtin — only `node:sqlite` is — so it resolves to nothing, ' +
+        'reaches the graph as an unresolved bare specifier, and a rule restricted to core modules ' +
+        "is SILENT on it. Measured in yield-benchmark's Slice 1 over all 32 spellings of " +
+        "`benchmark-no-io`'s enumeration, the fifteen names below plus `crypto`: 31 fired under " +
+        "`dependencyTypes: ['core']` and bare `sqlite` did not — so with the attribute this rule " +
+        'read as coverage while missing the one spelling a reader would try next, `node:sqlite` ' +
+        'being how this repository opens a database. Without it the rule is strictly broader: it ' +
+        'fires on the enumerated names however they resolve, and the pattern is anchored to exact ' +
+        'builtin names, so it cannot reach an unresolved `zod` — the trap that keeps the npm rule ' +
+        'separate. Do not restore the attribute for symmetry with `processes-only-in-providers`, ' +
+        'which keeps it harmlessly because `child_process` has a bare form that resolves: here it ' +
+        'takes bare `sqlite` back out of the rule, and `benchmark-no-io` dropped it first for ' +
+        'exactly this reason (S-186).',
       from: { path: '^packages/pipeline' },
       to: {
-        dependencyTypes: ['core'],
         path: '^(node:)?(fs|fs/promises|child_process|net|http|https|http2|dgram|tls|dns|cluster|worker_threads|sqlite|repl|readline)$',
       },
     },

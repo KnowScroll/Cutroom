@@ -233,25 +233,32 @@ function check() {
 // ---------------------------------------------------------------- prove
 
 /**
- * One case per builtin `benchmark-no-io` enumerates, under BOTH spellings, with the enumeration
- * read out of the rule itself rather than copied here: a builtin dropped from the pattern takes
- * its two cases with it, the rule count stays 25, and the case count falls — which is what the
- * tests that pin the printed line are for (S-078). Bare `sqlite` is NOT a Node builtin (only
- * `node:sqlite` is), so it reaches the graph as an unresolved bare specifier; the rule names no
+ * One case per builtin an I/O rule enumerates, under BOTH spellings, with the enumeration read out
+ * of the rule itself rather than copied here: a builtin dropped from the pattern takes its two
+ * cases with it, the rule count stays 25, and the case count falls — which is what the tests that
+ * pin the printed line are for (S-078). Bare `sqlite` is NOT a Node builtin (only `node:sqlite`
+ * is), so it reaches the graph as an unresolved bare specifier; neither rule names
  * `dependencyTypes` for exactly that reason, the way `model-client-only-in-providers` catches a
- * client that is not installed.
+ * client that is not installed (S-186 for `benchmark-no-io`, S-187 for `pipeline-no-io`).
+ *
+ * Each case needs its own file, since one file rewritten once per spelling would leave only the
+ * last import in the graph; `io-<i>-bare.ts` and `io-<i>-node.ts` are indexed by position in the
+ * enumeration, so `fs/promises` needs no name of its own.
  */
-const BENCHMARK_IO_CASES = (() => {
-  const io = loadRules(CONFIG).forbidden.find((rule) => rule.name === 'benchmark-no-io')
+function ioCases(name, folder) {
+  const io = loadRules(CONFIG).forbidden.find((rule) => rule.name === name)
   const inner = /^\^\(node:\)\?\((.+)\)\$$/.exec(io?.to?.path ?? '')
   if (inner === null) {
-    throw new Error('benchmark-no-io does not enumerate its builtins; --prove cannot be built')
+    throw new Error(`${name} does not enumerate its builtins; --prove cannot be built`)
   }
   return inner[1].split('|').flatMap((builtin, i) => [
-    ['benchmark-no-io', `packages/benchmark/src/io-${i}-bare.ts`, builtin],
-    ['benchmark-no-io', `packages/benchmark/src/io-${i}-node.ts`, `node:${builtin}`],
+    [name, `${folder}/src/io-${i}-bare.ts`, builtin],
+    [name, `${folder}/src/io-${i}-node.ts`, `node:${builtin}`],
   ])
-})()
+}
+
+const BENCHMARK_IO_CASES = ioCases('benchmark-no-io', 'packages/benchmark')
+const PIPELINE_IO_CASES = ioCases('pipeline-no-io', 'packages/pipeline')
 
 /**
  * Each entry: [rule, file, specifier] — a file written specifically to trip the rule it names, by
@@ -262,7 +269,11 @@ const CASES = [
   ['pipeline-no-domain', 'packages/pipeline/src/index.ts', '../../domain/src/index.ts'],
   ['pipeline-no-providers', 'packages/pipeline/src/a.ts', '../../providers/src/index.ts'],
   ['pipeline-no-apps', 'packages/pipeline/src/b.ts', '../../../apps/api/src/index.ts'],
-  ['pipeline-no-io', 'packages/pipeline/src/c.ts', 'node:fs'],
+  // EVERY builtin `pipeline-no-io` enumerates, under BOTH spellings, read out of the rule itself
+  // (S-187). It had one case, `node:fs`, and one spelling of one builtin is what hid the gap this
+  // closes: with `dependencyTypes: ['core']` the rule was silent on bare `sqlite`, which resolves
+  // to nothing because only `node:sqlite` is a builtin. `node:fs` is still among these cases.
+  ...PIPELINE_IO_CASES,
   // A built-in module has no package for the by-name cases to place, so both of child_process's
   // names are imported here, from each of the three places that must not start a process (S-075).
   ['processes-only-in-providers', 'apps/worker/src/spawns.ts', 'child_process'],

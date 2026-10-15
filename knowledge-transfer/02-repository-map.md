@@ -173,7 +173,9 @@ line is not what is checked; the path it resolves to is. The rules, by their nam
 2. `pipeline-no-providers` — a stage is handed a port; it never imports an adapter.
 3. `pipeline-no-apps` — a stage does not know whether a job or a person called it.
 4. `pipeline-no-io` — no `fs`, `child_process`, `net`, `http`/`https`/`http2`, `dgram`, `tls`,
-   `dns`, `cluster`, `worker_threads`, `sqlite`, `repl` or `readline` in the pipeline.
+   `dns`, `cluster`, `worker_threads`, `sqlite`, `repl` or `readline` in the pipeline; it names no
+   `dependencyTypes`, so it holds under both spellings, bare `sqlite` — which is not a builtin, and
+   so resolves to nothing — included (S-187).
 5. `api-no-providers` — the API never imports `providers`.
 6. `worker-no-providers` — the worker is handed its ports and cannot construct one (S-038).
 7. `processes-only-in-providers` — `child_process` only in `packages/providers` (and the SDK

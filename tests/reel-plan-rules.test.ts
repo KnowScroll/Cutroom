@@ -14,11 +14,16 @@ import { importedNames, isDeclaration, names, sourceFiles, where } from './engin
 // A rule is asserted here by the line `drift --prove` prints for ONE case — the rule, the importing
 // folder and the specifier — not by the rule's name appearing somewhere in the output, which one
 // firing case would satisfy for every case of that rule.
+//
+// Amended by the `pipeline-no-io` fix slice on 2026-10-15 (S-187) — nothing above or below is
+// removed or loosened. `reel-plan` owns `pipeline-no-io`, so one more property is pinned at the end
+// of this file: the rule names no `dependencyTypes`, and `drift --prove` catches every builtin its
+// pattern enumerates under BOTH spellings, bare `sqlite` among them.
 
 type Rule = {
   name: string
   from?: { path?: string; pathNot?: string }
-  to?: { path?: string; pathNot?: string }
+  to?: { path?: string; pathNot?: string; dependencyTypes?: string[] }
 }
 type Config = {
   forbidden: Rule[]
@@ -202,4 +207,48 @@ test('9. a pipeline file importing an npm package other than zod, and a file out
   clean(prove.out, 'packages/pipeline', '@cutroom/contracts')
   clean(prove.out, 'packages/providers', 'ai')
   clean(prove.out, 'packages/providers', '@ai-sdk/openai')
+})
+
+// ---------------------------------------------------------------- S-187
+
+// `pipeline-no-io` carried `dependencyTypes: ['core']`, and dependency-cruiser ANDs a `to`'s
+// attributes, so the rule was SILENT on bare `sqlite`: that is the one enumerated name with no bare
+// form — Node exposes it only as `node:sqlite` — so `import 'sqlite'` resolves to nothing and
+// reaches the graph typed `unknown` rather than `core`. Measured over all 32 spellings of
+// `benchmark-no-io`'s enumeration: 31 fired with the attribute, bare `sqlite` did not (S-186).
+// The attribute is gone (S-187), which makes the rule strictly broader, and its `--prove` cases are
+// now generated from its own pattern instead of the single `node:fs` that let the gap read as
+// coverage.
+
+test('S-187. pipeline-no-io names no dependencyTypes, and drift --prove catches EVERY builtin its pattern enumerates under BOTH spellings — bare sqlite, which no core-scoped rule can see, among them', () => {
+  const io = config.forbidden.find((r) => r.name === 'pipeline-no-io')
+  assert.ok(io !== undefined, '.dependency-cruiser.cjs has no rule pipeline-no-io')
+  assert.equal(
+    io.to?.dependencyTypes,
+    undefined,
+    'pipeline-no-io names dependencyTypes again, and a core-scoped rule is silent on bare sqlite',
+  )
+
+  // The enumeration comes out of the loaded rule, never a literal: a builtin dropped from the
+  // pattern drops its two cases rather than leaving a case list that reads as coverage.
+  const pattern = io.to?.path
+  assert.ok(typeof pattern === 'string', 'pipeline-no-io names no path')
+  const inner = /^\^\(node:\)\?\((.+)\)\$$/.exec(pattern)
+  assert.ok(inner !== null, `pipeline-no-io's pattern is not the enumeration: ${pattern}`)
+  const builtins = String(inner[1]).split('|')
+  for (const name of ['fs', 'child_process', 'sqlite']) {
+    assert.ok(builtins.includes(name), builtins.join('|'))
+  }
+
+  assert.equal(prove.status, 0, prove.out)
+  for (const builtin of builtins) {
+    for (const specifier of [builtin, `node:${builtin}`]) {
+      const line = new RegExp(
+        `caught\\s+pipeline-no-io\\s+packages/pipeline/src/\\S+ -> ${escape(specifier)}(?=\\s|$)`,
+        'm',
+      )
+      assert.match(prove.out, line, `no pipeline-no-io case for ${specifier}:\n${prove.out}`)
+    }
+  }
+  assert.doesNotMatch(prove.out, /SILENT/, prove.out)
 })

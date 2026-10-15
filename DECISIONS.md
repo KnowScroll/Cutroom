@@ -8258,3 +8258,74 @@ two cases and the printed case count falls; and Slice 1's deliberate break narro
 the owner as finding 1 of Slice 1's hand-back.
 
 ---
+
+## S-187 | 2026-10-15 | `pipeline-no-io` names no `dependencyTypes` either, so it holds bare `sqlite`, and its proof asks about every builtin it enumerates under both spellings
+
+**Supersedes.** **S-186**, in one part only: its last bullet, _"`pipeline-no-io`'s own gap is NOT closed here
+... **It is left to the owner** ... today, a pipeline file importing bare `sqlite` would pass `pipeline-no-io`"_.
+The owner asked for it closed on 2026-10-15, and it is closed here. Every other choice S-186 makes stands
+unchanged: `benchmark-no-io`'s pattern, its missing attribute, and the reason written in its comment.
+
+**Chose.**
+
+- **`dependencyTypes: ['core']` is removed from `pipeline-no-io`**, and nothing about its `to.path` changes. The
+  rule is therefore **strictly broader** than it was: it fires on the fifteen builtins it enumerates however they
+  resolve. `node scripts/drift.mjs` over the real graph is unchanged — 150 modules, **0 boundary violations** —
+  and every legal shape in `--prove`, by path and by package name, stays clean.
+- **The measurement that forced it**, made in `yield-benchmark`'s Slice 1 over all 32 spellings of
+  `benchmark-no-io`'s enumeration: **31 fire under `dependencyTypes: ['core']`, and bare `sqlite` does not.** Node
+  exposes that module only as `node:sqlite`, so `import 'sqlite'` resolves to nothing, dependency-cruiser types
+  that edge `unknown` rather than `core`, and dependency-cruiser ANDs a `to`'s attributes — so the rule was
+  **silent** on it. Re-measured here as a deliberate break: with the attribute back, exactly one case of 131 goes
+  SILENT, and it is bare `sqlite`.
+- **`drift --prove` gives the rule one case per enumerated builtin under BOTH spellings**, generated from the
+  rule's own pattern by the helper `benchmark-no-io` already used — now `ioCases(name, folder)` in
+  `scripts/drift.mjs`, parameterised by rule name and package folder, with `benchmark-no-io`'s 32 generated cases
+  coming out identical to what it had. Each case gets its own file under `packages/pipeline/src/`, because one
+  file overwritten thirty times leaves only the last import in the graph. `pipeline-no-io` had **one** case,
+  `node:fs` — one spelling of one builtin — and that is what kept the gap hidden. The printed case count goes
+  from **102 to 131**; the rule count stays **25**.
+- **The reason is written in the rule's own comment**, beside the pattern, the way `benchmark-no-io`'s is, so the
+  next reader does not restore the attribute for symmetry with `processes-only-in-providers` and silently lose the
+  bare spelling of all fifteen names.
+- **Nothing is weakened, reworded or skipped.** `benchmark-no-io` is untouched, and
+  `tests/yield-benchmark-boundary.test.ts`'s assertion that its pattern is `pipeline-no-io`'s with `|crypto`
+  inserted — computed from the loaded config, not from a literal — stays green precisely because the pattern did
+  not move. `yield-benchmark`'s gate sentence that `pipeline-no-io` _"already holds `sqlite` under both
+  spellings"_, which was imprecise when it was written, is now true.
+
+**Why.** A rule that reads correctly and matches nothing is the worst state to be in (`CLAUDE.md`), and this one
+read as coverage on the exact spelling a reader would try next: `node:sqlite` is how this repository opens a
+database, so bare `sqlite` is the import a stage would grow. Widening a forbidding rule adds coverage and removes
+none, which is rule 3's direction of travel — add, never subtract. And one case of one spelling is not a proof:
+the gap survived every suite and every journey because `--prove` asked this rule exactly one question, which is
+the same defect as a rule naming a folder nobody kept.
+
+**Rejected.** **Keeping `dependencyTypes: ['core']` for symmetry** with `processes-only-in-providers`, which
+carries it still — symmetry is not an argument here, because `child_process` has a bare form that resolves, so
+the attribute costs that rule nothing and cost this one a spelling; a reader who wants the rules to look alike
+can read the comment instead. **Adding `'unknown'` to it** (`dependencyTypes: ['core', 'unknown']`) — `unknown`
+is every unresolved import, so the rule would fire on any bare specifier the resolver fails on, for reasons
+having nothing to do with I/O: a missing workspace link, a dependency not installed, a typo in a package name.
+A boundary rule that fires on a resolver fault is a rule people learn to ignore. **Widening the pattern instead**
+— the attribute, not the pattern, is what made the rule silent, and `tests/yield-benchmark-boundary.test.ts`
+pins the pattern as `benchmark-no-io`'s minus `crypto`, so moving it would turn a verified feature's check red
+for nothing. **Leaving the single `node:fs` case** and fixing only the rule — then nothing in the repository
+would ever ask this rule about `sqlite` again, and the next attribute restored would be silent in the same way.
+**Changing `benchmark-no-io`, the rule count, or any check** — none of them is what the gap needs.
+
+**Caught by.** `tests/reel-plan-rules.test.ts`'s S-187 check — `reel-plan` owns this rule — which asserts the
+rule names **no** `dependencyTypes` and that `drift --prove` catches every builtin its pattern enumerates under
+**both** spellings, bare `sqlite` among them, reading the enumeration out of the loaded config rather than from a
+literal; `scripts/drift.mjs`'s `ioCases`, which throws if either I/O rule stops enumerating, so a builtin
+dropped from a pattern loses its two cases and the printed case count falls; and two deliberate breaks, each
+alone and each restored — the attribute put back, which took `--prove` to exit 1 with one SILENT case (bare
+`sqlite`) and all four tests in `tests/reel-plan-rules.test.ts` red; and the single `node:fs` case put back with
+the rule left fixed, which left `--prove` green at 102 cases while the new check went red on `fs`, which is what
+the old shape would have done forever.
+
+**Confirmed-by.** The owner, 2026-10-15, naming this gap as the first of the four open calls S-186 left and
+asking for it closed as a fix slice — one rule, its proof, one test, one decision entry — with `benchmark-no-io`,
+the rule count and every other feature's checks untouched.
+
+---
