@@ -21,19 +21,25 @@ git and the journal keep them.
   judged by Gates 0 to 7. A reel costs about 55¢ against a 250¢ ceiling (D-014). Run: `scripts/real-reel.mjs`.
 - **Verified features** (`docs/features/<slug>.md`, `Status:` line): `reel-contract`, `reel-plan`, `reel-stills`,
   `reel-render`, `reel-takes`, `paid-path`, `paid-failures`, `second-ask`, `three-pictures`, `ask-again`, `cut-rules`,
-  `resume-failed` (S-161 to S-164, S-171 to S-174). `cutroom-sdk` carries `Status: verified` from its Slice 4
+  `resume-failed`, `yield-benchmark` (S-161 to S-164, S-171 to S-174, S-182 to S-186). `cutroom-sdk` carries `Status: verified` from its Slice 4
   journey at `1c7c77d` (`6a95a8d`); its sole compatibility re-journey at `6a95a8d` PASSed at `c15b2d4` after the
   journey writer's format invariant was repaired in `1c7c77d`. The re-journey list is closed on file; nothing has
   been weakened. **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `caption-match` (S-165),
   `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
-- **`yield-benchmark`: four gates APPROVED by owner decision (S-185), not by a reviewer** — four adversarial
-  rounds refused it, all findings applied, and the slices carry the review. **Gates written and NOT approved**:
+- **`yield-benchmark` is BUILT and `Status: verified`** (session 87): its journey PASS at `d898693`, and
+  `reel-stills`, `reel-render`, `paid-path` re-journeyed for the count (S-099's form, S-178's order). Gates
+  approved by owner decision (S-185) and no reviewer, so **the slices carried the review**: 25 findings reported
+  rather than built around, three gate sentences now known imprecise. **Enforced boundary rules: 25.**
+  **Gates written and NOT approved**:
   `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
   `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next, settled by the owner in session 85**: **the benchmark first**, `hosted-checks` on hold — _"Lets make the
-  benchmark first."_ Then `self-heal`. SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
+- **Next: four calls are the owner's, then `self-heal`** — `pipeline-no-io`'s own bare-`sqlite` gap (S-186
+  names it, does not close it); the four file scans reading TRACKED files only, so a slice's new files escape them
+  during the suite that verifies it; teaching `journey.mjs` to reuse evidence bound to HEAD's exact tree (S-177's
+  mechanism), worth ninety minutes of every four-journey slice; and the three imprecise gate sentences.
+  `hosted-checks` stays on hold. SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
   integration scope). The
   `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
   the `reel-contract` re-journey at `6a95a8d` PASSed at `c15b2d4`. **`PROMPTS/074-cutroom-sdk-v1-delivery-gates.md`
@@ -53,7 +59,7 @@ git and the journal keep them.
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: Slice 1’s `127adc5` recorded a full green check (tests 1413 s). S-177 now binds verification to the exact
+- **Checks**: session 87 ran four full suites green (tests 1420–1465 s) and four journeys. S-177 now binds verification to the exact
   commit tree: ordinary slices run static/boundary checks plus named affected tests; full suites remain for checker,
   boundary, workspace/dependency and journey work. The known PATH-only child transient remains a full-suite signal;
   S-176’s serial aggregate and existing child bounds stand. A hosted run is corroboration only and carries no trailer (S-183).
@@ -110,6 +116,27 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-14/15 · session 87
+
+- **`yield-benchmark` is built and `Status: verified`**, four slices, one `slice-builder` each (S-172).
+  **`d535a58`** (full): `packages/benchmark` — `index`, `measures`, `reasons` — its manifest, tsconfig,
+  root and tooling references, workspace dependency, 10 row fixtures, the three boundary rules with `--prove`
+  cases **generated from the rule's own enumeration**, and **every amendment taking 22 to 25 in one tree** (three
+  test files, seven documents, the tenth-member enumerations, amendment blocks in the three features) — session
+  86's discarded partial is why they are one commit. **`e9f1266`** (targeted): `ratings.ts`, the thirteen terms,
+  S-182's weights and tolerances, the `r1` stamp, five worked fixtures at **0.0, 10.0, 10.0, 34.0, 89.7**, tie
+  kept. **`11f036e`** (full): `scripts/benchmark.mjs` read-only through `node:sqlite`, its flags and four exit
+  codes, and `docs/research/benchmark.md` — **52 rows written by the script** — with `refusals.md` and
+  `yield-baseline.md` frozen onto it. **Slice 4**: four journeys PASS, 43 tests at `d898693`, then 63, 106, 120.
+- **A verification hole, reported not patched**: Slice 3's full suite passed with a D-086 violation in
+  `scripts/benchmark.mjs` — the four file scans read **tracked** files, and it was untracked when that suite ran.
+  Source fixed at `d898693`, check untouched. **`963be3c`**: S-182's second amendment (24.4 and "no tie"
+  superseded by 10.0 and a kept tie) and **S-186**, `benchmark-no-io` naming no `dependencyTypes` because bare
+  `sqlite` is not a builtin (31 of 32 spellings fire with it); `pipeline-no-io`'s own gap is named, not closed.
+- Also reported: the `hold` table is **empty over all 52 runs**; the record is a migration behind `schema.ts`, so
+  the reader reports five columns absent, never zero. Sessions 79–82 dropped for the cap; git keeps them. Nothing
+  weakened, nothing spent, no reel made.
 
 ### 2026-10-14 · session 86
 
@@ -253,30 +280,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - Added `PROMPTS/077-benchmark-design.md` (run by this session) and `PROMPTS/078-ci-on-github-actions.md` (written here, run by session 84 in parallel on branch `ci-measurement`), both listed in `PROMPTS/README.md`. Session 82’s two documents — `docs/research/yield-baseline.md` and `docs/features/picture-prompt.md` — were written but never committed, and are committed with this session.
 - No code, contract, test, provider, database, media or boundary changed by this session. No reel was made and nothing was spent.
 
-### 2026-10-12 · session 82
-
-- Added `docs/research/yield-baseline.md`: the engine's yield over all 52 runs, read read-only from `data/cutroom.sqlite`, and the baseline later fixes are compared against. **8 of 52 runs produced a reel (15.4%)**; Gate 1 refuses 53% of pictures, Gate 5 26% of takes, Gate 7 33% of cuts; Gates 0, 1S, 3 and 4 have never refused. New measure: refusal by subjects named in the shot — 42% at one, 70% at two, 100% at three or more (clipping 23/49/100%), so the crammed prompt, not the gate, is the cause. Capacity half unused (3.1 pictures of 6; 63% of clips made from words, which cannot be held at the take cap). Five causes read from source: `PictureAnswer` has no `unavailable` kind so the image port gets no transient resend (6 dead runs); `reconcileAnswer`'s single `entity` index makes a plural subject unsatisfiable against `COUNT_RULE` (19 refusals); `gate4.ts` returns `accept` unconditionally; nothing caps subjects per shot; the picture prompt names what it forbids while FLUX.2 has no negative prompt (38 refusals). Clips are 53–87% of wall clock and the slowest run retried nothing, so retries are not what makes a reel slow.
-- Added `docs/features/picture-prompt.md`, gates unwritten: the first fix, scoped to `pictureEntry` in `packages/pipeline/src/stills/prompts.ts` — framing discipline, describing the wanted state instead of naming the forbidden, and removing prompts that both demand and forbid a person. Records the rejected alternative: changing the clipping veto in `gate1.ts`, disproved by the owner with a 9:16 image of a whole spiral galaxy; D-044 and D-046 stand.
-- Added `PROMPTS/077-benchmark-design.md` (for session 83) and listed it in `PROMPTS/README.md`: design and specify the benchmark every later fix is measured against — four gates and the `S-` entry, no implementation of any kind. It names the ten choices that session must settle, chief among them that the 15.4% baseline is a historical record across changing briefs and a changing engine, not a controlled measurement.
-- No code, contract, test or boundary changed. No `S-` entry yet — the owner asked first for a benchmark harness to compare fixes against (not started). The subjects-per-shot cap and a picture for every shot are their own feature, not started.
-
-### 2026-10-05 · session 81
-
-- No code or document changed besides `JOURNAL.md` (sessions 79 and 80 merged under one heading to stay within S-177's 80 lines, words unchanged). Owner asked for the minimum VM; the repository records none, so the answer was an estimate: 2 vCPU, 4 GB RAM, 20 GB disk to run reels; 4 vCPU, 8 GB, 50 GB for comfort and the full suite. Linux support is unverified.
-
-### 2026-10-04 · session 80
-
-- Added `knowledge-transfer/cutroom-kt.html`: one self-contained page (no CDN) that teaches the engine — draggable/zoomable graphs with click-for-detail drawers for the system map, packages and the 22 rules, every stage, failures/resume, the 21-table ER model, SDK connection and service startup; a step-through sequence diagram of one request (until plan/stills/video); tables for gates, ports and wrappers, budget, routes, settings, symptoms, playbooks, features, all 129 source files, glossary and decisions; global search. Built from source at `94ee04a`.
-- 18 places the numbered KT markdown disagreed with the code (e.g. a resume re-enters at `reel.keyframes`; the service picture rule defaults to `upToThree`; `SubmitRequest` needs `worldId`, typed criteria and `depictionPolicyVersion`; 21 tables, not 12) were then corrected in `knowledge-transfer/01`–`11`, with every repeat of each mistake; the page's last tab records the corrections, and `knowledge-transfer/README.md` links the page.
-- The KT markdown committed in `94ee04a` failed `prettier --check`; it is formatted now (whitespace, list numbering, code-block style). Session 71's journal entry was reflowed to one line a paragraph, words unchanged, to keep JOURNAL.md within S-177's 80 lines.
-
-### 2026-10-01 · session 79
-
-- Replaced the pre-implementation root README and the 2026-09-20 status snapshot with current, user-facing descriptions of the built real-provider engine, verified local SDK package, distribution boundary, operating limits, and next queue item.
-- Added `docs/USING_CUTROOM.md`: requirements, safe stand-in startup, free process-level proof, package build and external install, SDK join/launch and all methods, a complete submission/follow example, the confirmed-spend real-reel command, resume, settings, outputs, and unsupported cases.
-- Brought `AGENTS.md`, `CLAUDE.md`, `docs/SETUP_SURVEY.md`, and `PROMPTS/README.md` into line with 22 live boundary rules, the paid adapters, Prompt 073/074 completion, and the historical/current distinction. No runtime, contract, provider, database, package artifact, test, or boundary changed.
-- Prompt 075 records the owner's documentation-and-push request. The documentation-only check is the evidence for this exact tree; the commit is pushed with the previously local Prompt 074 chain.
-
 ## Where to look
 
 | to learn                         | read                                                             |
@@ -288,5 +291,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 | a pitfall                        | `docs/reel-pitfalls.md`, the short list, then the `### P-` entry |
 | why pieces were refused, counted | `docs/research/refusals.md`: every refusal of the real runs      |
 | a run's rows                     | the `run-reader` agent, with the run's id                        |
+| what every run did, scored       | `docs/research/benchmark.md`, 52 rows, written by the script     |
 | how to run checks, and the traps | `CLAUDE.md`                                                      |
 | how the code fits together       | `knowledge-transfer/cutroom-kt.html`, opened in a browser        |

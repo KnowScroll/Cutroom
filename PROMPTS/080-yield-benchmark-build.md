@@ -7,7 +7,8 @@
   opens. **Written for more than one session**: it stops at a slice boundary and hands over when context runs
   short. The first building session of this feature
 - **Written:** 2026-10-14
-- **Run:** not yet
+- **Run:** session 87, 2026-10-14/15 — all four slices built, verified and committed in one session
+  (`d535a58`, `e9f1266`, `11f036e`, `d898693`, and the four journeys); it did not need to hand over
 
 ```text
 Read docs/context.md first, then docs/features/yield-benchmark.md whole — it is the specification and it is
