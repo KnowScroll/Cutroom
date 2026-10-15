@@ -322,7 +322,17 @@ workspace or dependency configuration, an unclassified or broad diff, and every 
 ordinary slice runs static checks, the boundary proofs and its named affected tests, then commits
 `Verification: targeted`, `Verification-Tree` and `Verification-Tests`;
 `verification-status.mjs` refuses stale evidence. If a session is spending 23 minutes routinely, that
-is habit, not requirement.
+that is habit, not requirement.
+
+**AND THE NAMING IS NOW RECORDED, NOT JUDGED (S-196, session 89, beyond what this file planned).**
+`node scripts/impact-map.mjs` records which test files cover which source files, by running each test
+file alone under `NODE_V8_COVERAGE` and crediting what it and every process it spawned loaded, plus every
+repository path it names as a string. `--changed` then answers a code diff itself instead of failing
+closed. Measured: a change under `packages/sdk` or `scripts/` selects 2-5 test files, seconds against
+617 s; a change to `reel-contract`, `pipeline`, `domain` or the API selects 110-128, which is 91-93 % of
+the suite, because D-094 means a package is entered only through its `src/index.ts`. So the judgement is
+gone everywhere and the cost in about a third of cases. Function-level granularity is the remaining lever
+and is deliberately unbuilt: a diff-line-to-function mistake under-selects silently.
 
 ### 4.6 Shrink the work itself — only after §3 names the offenders
 
@@ -357,7 +367,9 @@ Worth doing for tidiness, not for speed.
    ~14 s off a documents-only run, measured.
 3. **§3 the measurement pass.** Idle machine, `.tmp/`, one table. Nothing after this is guesswork.
    **Taken (S-190, S-191): all 153 files. The table is `docs/research/test-file-costs.md`.**
-4. **§4.2 the two-class scheduler**, sized from §3, with three green full runs as its evidence.
+4. ~~**§4.2 the two-class scheduler**, sized from §3, with three green full runs as its evidence.~~
+   **Done: S-192, session 89.** 1455 s to 588-627 s over four green runs; floor and every child's
+   margin recorded. §6 met in full.
 5. **§4.3 CI jobs** as `hosted-checks`, gates already written and round 1 answered.
 6. **§4.6 fixture shrinking**, against the named offenders.
 7. **§4.4 the S-028 narrowing**, only if still needed, with a gate.
@@ -381,8 +393,10 @@ prompt as the handover.
    journey session. Worth settling before §4.3 is built, because it changes what CI is for.
 2. **Is the S-028 narrowing (§4.4) on the table at all?** It is the only lever that touches a proven
    property's scope, and the only one that could halve the suite outright.
-3. **Pool size is a spend-free risk decision**: a larger pool is faster and nearer the memory wall. The
-   floor belongs to you, not to the measurement.
+3. **ANSWERED IN PART, 2026-10-16 (S-192): built at the conservative end, 4 ordinary and 2 secrets.**
+   Four green full runs; lowest free memory across them 2483 MB of 15714 MB, and the floor moves with the
+   machine rather than the pools, so each run records its own. Raising either size is still yours: it needs
+   its own three green runs and its own recorded floor.
 4. **ANSWERED, 2026-10-15: yes, and wider than asked — a document-only delta too (S-188).** §4.0's whole saving is that trade. The
    mechanism already exists and is tree-bound; what changes is that a journey would believe a receipt
    it did not watch being produced.
