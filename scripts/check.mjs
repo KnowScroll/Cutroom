@@ -5,6 +5,7 @@
  *   node scripts/check.mjs            everything
  *   node scripts/check.mjs --code     only the checks about the code in this repo
  *   node scripts/check.mjs --changed  document checks, or explain why code needs --slice
+ *   node scripts/check.mjs --documents  the checks a document can fail, asked for by name
  *   node scripts/check.mjs --slice <test...>  static checks plus approved tests for one code slice
  *   node scripts/check.mjs --changed --dry-run   which checks, and why; runs none of them
  *
@@ -12,12 +13,32 @@
  * this machine's PATH (§8 of the bootstrap prompt). corepack is how pnpm itself is run:
  *   corepack pnpm install
  */
-import { existsSync } from 'node:fs'
+import { existsSync, rmSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
+import {
+  DOCUMENT,
+  ensureVerificationDir,
+  readTestsRaw,
+  testedTree,
+  testsRawPath,
+  writeReceipt,
+} from './_verification.mjs'
 
 const node = process.execPath
 const bin = (...parts) => join(REPO, 'node_modules', ...parts)
+
+// The receipt is written beside the repository being checked, so a check of another working copy
+// (tests/journey.test.ts does this) records there and not here.
+const WHERE = process.cwd()
+// A second reporter collecting per-file results; the stream a human reads stays the tap default.
+const RECEIPT_REPORTER = [
+  '--test-reporter=tap',
+  '--test-reporter-destination=stdout',
+  `--test-reporter=${pathToFileURL(join(REPO, 'scripts', 'test-receipt.mjs')).href}`,
+  `--test-reporter-destination=${testsRawPath(WHERE)}`,
+]
 
 const CODE = [
   ['typecheck', node, [bin('typescript', 'bin', 'tsc'), '-b', '--pretty']],
@@ -36,6 +57,7 @@ const CODE = [
       // outer suite serially preserves every check while preventing nested ffmpeg/SQLite workers
       // from competing for the same machine and turning a load timeout into a false aggregate red.
       '--test-concurrency=1',
+      ...RECEIPT_REPORTER,
       'tests/**/*.test.ts',
       'packages/**/*.test.ts',
       'apps/**/*.test.ts',
@@ -55,11 +77,8 @@ const AUTHORITY = [
 // Code must name the tests its approved impact review owns through `--slice`; unknown paths and
 // verification infrastructure fail closed to the full run.
 
-const DOCUMENT = [
-  /^docs\/.+\.md$/,
-  /^PROMPTS\/.+\.md$/,
-  /^(JOURNAL|DECISIONS|CLAUDE|README|AGENTS)\.md$/,
-]
+// DOCUMENT lives in _verification.mjs, because scripts/journey.mjs asks the same question of a
+// tree delta (S-188) and two copies of the list would drift.
 
 const CODE_PATH = [
   /^(packages|apps|tests|scripts|db)\//,
@@ -116,17 +135,17 @@ function choose() {
 }
 
 const changed = process.argv.includes('--changed')
+const documents = process.argv.includes('--documents')
 const sliceAt = process.argv.indexOf('--slice')
 const slice = sliceAt >= 0
 const sliceTests = slice
   ? process.argv.slice(sliceAt + 1).filter((arg) => !arg.startsWith('--'))
   : []
-if (
-  (changed && process.argv.includes('--code')) ||
-  (changed && slice) ||
-  (slice && process.argv.includes('--code'))
-) {
-  console.error(`\n${red('FAIL')}  choose one mode: --changed, --code, or --slice <test...>\n`)
+const modes = [changed, documents, slice, process.argv.includes('--code')].filter(Boolean)
+if (modes.length > 1) {
+  console.error(
+    `\n${red('FAIL')}  choose one mode: --changed, --documents, --code, or --slice <test...>\n`,
+  )
   process.exit(2)
 }
 
@@ -136,8 +155,12 @@ const VERIFY_INFRASTRUCTURE = new Set([
   'scripts/verification-status.mjs',
   'scripts/drift.mjs',
   'scripts/journey.mjs',
+  'scripts/_verification.mjs',
+  'scripts/test-receipt.mjs',
   'tests/check-changed.test.ts',
   'tests/verification-status.test.ts',
+  'tests/check-receipt.test.ts',
+  'tests/journey.test.ts',
 ])
 const FULL_ONLY = [
   /^scripts\//,
@@ -197,6 +220,15 @@ if (changed) {
   console.log(`  ${partial ? 'the checks a document can fail' : 'every check'}: ${choice.why}\n`)
 }
 
+// The document-class checks, asked for by name: what a Markdown change alone can turn red. A
+// journey reusing a recorded full run whose tree differs only in documents runs exactly these
+// (S-188), so the set is named once and not re-derived there.
+if (documents) {
+  steps = DOCUMENTS_ONLY
+  partial = true
+  console.log('  --documents: the checks a document can fail\n')
+}
+
 if (slice) {
   const problem = validateSlice()
   if (problem !== undefined) {
@@ -225,12 +257,21 @@ if (process.argv.includes('--dry-run')) {
   process.exit(0)
 }
 
+// What this run is about to see, recorded before it starts: the tree a commit of the working copy
+// would write, so the receipt still names this content once it is committed (S-188).
+const tree = testedTree(WHERE)
+ensureVerificationDir(WHERE)
+// A stale per-file file must never be folded into a run that did not produce it.
+rmSync(testsRawPath(WHERE), { force: true })
+
 const failures = []
+const verdicts = []
 
 for (const [label, cmd, args] of steps) {
   const started = Date.now()
   const result = run(cmd, args, { env: { ...process.env, NO_COLOR: '1' } })
   const ms = `${Date.now() - started}ms`
+  verdicts.push({ label, ok: result.ok, ms: Date.now() - started })
   if (result.ok) {
     console.log(`  ${green('ok')}    ${label.padEnd(18)} ${dim(ms)}`)
   } else {
@@ -238,6 +279,33 @@ for (const [label, cmd, args] of steps) {
     failures.push([label, `${result.stdout}${result.stderr}`.trim(), [cmd, ...args]])
   }
 }
+
+const mode = slice
+  ? 'targeted'
+  : partial
+    ? 'documents'
+    : process.argv.includes('--code')
+      ? 'code'
+      : 'full'
+const suite = verdicts.find(({ label }) => label === 'tests' || label === 'slice tests')
+const perFile = suite === undefined ? undefined : readTestsRaw(WHERE)
+writeReceipt(WHERE, {
+  mode,
+  testedTree: tree,
+  ok: failures.length === 0,
+  checks: verdicts,
+  tests:
+    suite === undefined
+      ? undefined
+      : {
+          label: suite.label,
+          ok: suite.ok,
+          ms: suite.ms,
+          total: perFile?.total,
+          failed: perFile?.fail,
+          files: perFile?.files,
+        },
+})
 
 if (failures.length === 0) {
   const verdict = partial

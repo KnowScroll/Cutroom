@@ -10,7 +10,8 @@ import { REPO } from './_repo.ts'
 // `--slice`; a checker/configuration/unknown diff fails closed to the full suite. What must never
 // happen is a code change quietly selecting no tests.
 //
-// Each case is a scratch repository holding this repository's own `check.mjs` and `_lib.mjs`,
+// Each case is a scratch repository holding this repository's own `check.mjs`, `_lib.mjs` and
+// `_verification.mjs` (S-188: the checker imports the receipt module),
 // asked with `--dry-run`, which prints what it would run and runs none of it. "Every check" is
 // never a list kept here: it is what the full run's own dry run prints, so a step added to the
 // full run is one `--changed` must also choose.
@@ -39,7 +40,7 @@ function scratch(): string {
   const dir = mkdtempSync(join(tmpdir(), 'check-changed-'))
   made.push(dir)
   mkdirSync(join(dir, 'scripts'))
-  for (const f of ['check.mjs', '_lib.mjs']) {
+  for (const f of ['check.mjs', '_lib.mjs', '_verification.mjs']) {
     copyFileSync(join(REPO, 'scripts', f), join(dir, 'scripts', f))
   }
   write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 1\n')

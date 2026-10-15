@@ -8329,3 +8329,113 @@ asking for it closed as a fix slice — one rule, its proof, one test, one decis
 the rule count and every other feature's checks untouched.
 
 ---
+
+## S-188 | 2026-10-15 | Nothing re-runs at a tree where a recorded full run already passed: a machine receipt, and a journey that reads it
+
+**Supersedes.** **S-177**, in one part only: the sentence reserving the full run for _"every feature
+journey"_. A journey still owes every check at content no recorded run has seen; it no longer owes them
+twice at the same content. CLAUDE.md's matching sentence changes with it. **S-016 is untouched** — the
+journey is still the only thing that verifies a feature and the only writer of its evidence line. Every
+other part of S-177 stands: ordinary slices run static checks, boundary proofs and named affected tests;
+checker, boundary, workspace and dependency work still owes the full suite; `verification-status.mjs` and
+the commit trailers are unchanged.
+
+**Chose.**
+
+- **A full `check.mjs` run writes a machine receipt**, `.verification/receipt.json`, gitignored and never
+  committed: the tree it tested, the mode, every check's label, verdict and duration, and **every test
+  file's passing and failing counts**. One setting, `CUTROOM_VERIFICATION_DIR`, defaults inside the
+  repository being checked (D-086), and the receipt is written beside _that_ repository, not beside this
+  one, so a check of another working copy records there.
+- **The tree a receipt names is the content the checks saw, not the commit they started from.** A run on a
+  dirty tree records what `git add -A` would commit, written through a **throwaway index** so the
+  repository's own index is untouched. This is what makes the ordinary order — change, full run, commit —
+  reusable at all: the receipt still names that content once it is committed.
+- **A journey at a tree a green full run already covered runs nothing.** Its evidence line's test count
+  comes from the receipt's per-file rows for `tests/<slug>-*.test.ts`.
+- **A journey whose tree differs from the recording in documents alone re-runs the document-class checks
+  and nothing else** — `node scripts/check.mjs --documents`: format, the four file scans, the decisions pin
+  and the copied docs, the set `--changed` already ran for a documents-only diff, now askable by name. A
+  red document check is a FAIL exactly as before. This is the case the re-journey chains are made of: each
+  journey commits an evidence line, so the next one starts at a tree that differs by one Markdown file.
+- **Only `full` qualifies, and only green.** `targeted` evidence names a subset of tests and cannot carry
+  "every check was green". A receipt is also refused when it names no tree, records no tests, does not name
+  one of the feature's own test files, or records that file failing or running nothing — and a refused
+  receipt means the full suite, not a weaker claim.
+- **After a full run the journey takes its count from the receipt that run just wrote**, instead of running
+  `tests/<slug>-*.test.ts` a second time as it has since S-016. When no receipt is there — an older
+  `check.mjs`, another working copy — it counts them itself, as before.
+- **Per-file attribution comes from a reporter of our own**, `scripts/test-receipt.mjs`. Measured
+  2026-10-15 on Node 22.14: the built-in **tap and junit reporters print one flat stream for several
+  files** and attribute nothing, while the runner's own event stream carries `data.file`. Without
+  attribution a receipt could only say the suite was green, and reuse would be a claim about the suite
+  rather than about this feature.
+- **The receipt's own folder keeps itself out of every tree**, by holding a `.gitignore` of `*` that ignores
+  the folder's contents and that file itself, so nothing generated there reaches an index, a tree or a status
+  whatever the repository being checked ignores. It is left out of the dirt a journey refuses on and of the
+  delta between two trees as well. **Measured here, and the reason it is not a pathspec**: with
+  `:(exclude).verification` on `git add -A` git reports the folder as an explicitly named ignored path and
+  exits 1, so the tested tree came out **undefined in this repository** while every scratch fixture passed,
+  the fixtures having no `.gitignore` at all. A receipt with no tree is one no journey can ever reuse.
+- **One document list, read by both.** `DOCUMENT` moved to `scripts/_verification.mjs`; `check.mjs`
+  classifies a changed path with it and the reuse verdict classifies a tree delta with it.
+
+**Why.** The owner, 2026-10-14: _"this needs to be the case dont fucking re run shit that has already ran
+and didnt change."_ S-177 built tree-bound evidence so a clean later session need not repeat a passed
+suite, and then left the single most expensive consumer of it outside: `scripts/journey.mjs` ran the whole
+of `check.mjs` — 1413 s measured at `127adc5` — and then ran the feature's own tests **again**, which that
+suite had just run. The four-journey chains this repository keeps running (`cutroom-sdk` at `1c7c77d`,
+`reel-contract` at `6a95a8d`, `7c648d2`, `6001657`; `reel-stills`, `reel-render`, `paid-path`, `reel-plan`
+in session 87) each paid about 24 minutes to re-measure content that differed from the previous run by one
+Markdown line. After this, the first journey at a tree pays the suite and every journey after it pays the
+document checks, about 15 s. `docs/research/test_fixes_and_research.md` §4.0 is where it was sized.
+
+**The honest cost, stated plainly.** The journey used to make its own observation and trust nothing; now it
+can accept one it did not watch. What it accepts is narrower than a trailer: a receipt is written by
+`check.mjs` itself rather than typed into a commit message, it is bound to the content by a tree object
+rather than to a commit, it must be green and full, and it must name this feature's own files. What differs
+is still re-run. A receipt is a file in a working copy, so a session that forges one forges its own
+verification — the same exposure a hand-written trailer always had, and `verification-status.mjs` validates
+the binding, not the run.
+
+**Rejected.** **Accepting `targeted` evidence in a journey's place** — it names a subset of tests, so it
+cannot support "every check was green". **Re-running the suite at an unchanged tree**, today's behaviour
+and the reason a re-journey chain costs hours. **Trusting the commit trailer alone** — prose someone wrote,
+with no per-check or per-file record; the receipt exists so reuse rests on a machine's own account of what
+it ran. **Reusing across a delta of code** — any non-document path sends the journey back to the full
+suite, because a code path is exactly what the code checks are about. **Recording HEAD's tree** instead of
+the working content, which would have made every full-run-then-commit receipt name content the run never
+saw. **Relying on `.gitignore`** to keep the receipt out of the tested tree, which makes correctness depend
+on a file outside the mechanism. **Node's built-in reporters**, measured: no file attribution, so no
+per-feature claim. **Shape A of §4.0** — reuse the suite but still re-run the feature's tests — which is
+the owner's rule approximated rather than kept. **Skipping, narrowing or widening any check, raising any
+bound, and touching the eleven PATH-only secrets journeys**: none of them is what this needs, and S-176's
+four rejections stand untouched.
+
+**Caught by.** **`tests/check-receipt.test.ts`**, 23 checks: the tree a clean run records; the tree a dirty
+run records, asserted equal to the tree of the commit that follows; that a tree is recorded at all in a
+repository that **ignores** the receipt folder, which every real one does and no scratch fixture did; that
+the throwaway index stages nothing in the repository being checked; a tree delta naming only what differs;
+`tests/check-changed.test.ts`'s fixture, which now copies the receipt module the checker imports; the
+reporter's per-file counts with
+a deliberately failing test among them; eleven refusals of a receipt that must not be reused (no receipt,
+wrong version, `targeted`, not green, no tree, no tests, a file the run does not name, a file that failed,
+a file that ran nothing, a code path in the delta, an unclassified path in the delta, and git unable to
+compare); that one document list serves both readers, asserted against `check.mjs`'s own source; and
+`--documents` selecting exactly format, scans, decisions pin and copied docs while skipping the suite.
+**`tests/journey.test.ts`**'s five S-188 cases, which watch what the journey invokes through a stub
+`check.mjs` that records its arguments: an exact-tree receipt invokes nothing; a document-only delta
+invokes `--documents` and nothing else; a red document check is still a FAIL; four receipts that must not
+be reused each send it back to the full suite; and a planted count of seven, against a feature whose tests
+really number two, proves the count came from the recording rather than a second run. **Thirteen deliberate
+breaks**, each applied alone, seen red and restored, 2026-10-15: reuse disabled, the `full`-only test, the
+green-only test, the code-delta test, the feature-files test, the dirty-tree recording, the throwaway
+index, the reporter's file keying, the single document list, the `--documents` invocation, the document
+check's verdict, the fall-back to the full suite, and the self-ignoring folder put back to a `:(exclude)`
+pathspec.
+
+**Confirmed-by.** The owner, 2026-10-14 in the words quoted above, and 2026-10-15 choosing the
+document-delta shape over exact-tree-only after being shown that a chain of journeys changes its own tree
+and would otherwise save nothing, and asking for the build in the same session.
+
+---

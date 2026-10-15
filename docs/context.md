@@ -35,9 +35,10 @@ git and the journal keep them.
   `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
   `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: three calls are the owner's, then `self-heal`** — the four file scans reading TRACKED files only, so a slice's new files escape them
-  during the suite that verifies it; teaching `journey.mjs` to reuse evidence bound to HEAD's exact tree (S-177's
-  mechanism), worth ninety minutes of every four-journey slice; and the three imprecise gate sentences.
+- **Next: two calls are the owner's, then `self-heal`** — the four file scans reading TRACKED files only, so a slice's new files escape them
+  during the suite that verifies it; and the three imprecise gate sentences. **Journey reuse is CLOSED (S-188,
+  session 88)**: a full run writes `.verification/receipt.json` and the journey re-runs nothing at that content,
+  or only the document checks when Markdown alone differs.
   `hosted-checks` stays on hold. SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
   integration scope). The
   `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
@@ -58,9 +59,10 @@ git and the journal keep them.
   registry entries go, with their amended checks; P-003 accepted for now. None open.
 - **Outside the engine**: reels made from code (Hyperframes) and hybrids — the engine's clips with layers drawn over
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
-- **Checks**: session 87 ran four full suites green (tests 1420–1465 s) and four journeys. S-177 now binds verification to the exact
+- **Checks**: session 87 ran four full suites green (tests 1420–1465 s) and four journeys. S-177 binds verification to the exact
   commit tree: ordinary slices run static/boundary checks plus named affected tests; full suites remain for checker,
-  boundary, workspace/dependency and journey work. The known PATH-only child transient remains a full-suite signal;
+  boundary, workspace/dependency and journey work — and, since **S-188**, for a journey only at content no green
+  full receipt covers; `node scripts/check.mjs --documents` is the ~15 s set a Markdown change can fail. The known PATH-only child transient remains a full-suite signal;
   S-176’s serial aggregate and existing child bounds stand. A hosted run is corroboration only and carries no trailer (S-183).
 
 ## Runs
@@ -115,6 +117,23 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-15 · session 88
+
+- **The verification receipt, and a journey that reads it** (**S-188**, from `docs/research/test_fixes_and_research.md`
+  §4.0). New: `scripts/_verification.mjs` (+`.d.mts`) — the receipt, the document list, the tree a run tested, the
+  tree delta, the reuse verdict — and `scripts/test-receipt.mjs`, a reporter that attributes each test to its file,
+  because **Node 22.14's tap and junit reporters print one flat stream** for several files (measured here).
+  `check.mjs` writes `.verification/receipt.json` (gitignored), gains `--documents`, and keeps one document list;
+  `journey.mjs` runs nothing at a tree a green full receipt covers, `--documents` alone when only Markdown differs,
+  and takes its test count from the receipt instead of running `tests/<slug>-*.test.ts` a second time.
+- **The tested tree is the content, not the commit**: a dirty run records what `git add -A` would commit, through a
+  throwaway index, so change → full run → commit stays reusable. The receipt folder holds a `.gitignore` of `*` and keeps
+  itself out of every tree: a `:(exclude)` pathspec made `git add -A` exit 1 on an ignored path, so the tree
+  came out undefined HERE while every scratch fixture passed — found by running it, now its own check and break.
+- **Proof**: `tests/check-receipt.test.ts` (23 checks), five S-188 cases in `tests/journey.test.ts` watching what the
+  journey invokes, and **thirteen deliberate breaks each seen red and restored**. CLAUDE.md's full-run sentence and
+  `PROMPTS/081` written. Nothing weakened; no bound, check or secrets journey touched.
 
 ### 2026-10-14/15 · session 87
 
@@ -206,23 +225,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   nothing was weakened. `node scripts/check.mjs --changed` green over the documents. No reel was made and nothing
   was spent.
 
-### 2026-10-14 · session 85
-
-- **A status read, and nothing of substance changed.** The owner asked where things stand; the answer came from the
-  record only: pin current at `e05e9f0` with 115 `D-` entries and 0 unpushed commits, 146 modules / 0 boundary
-  violations / 0 key-shaped reads, tree clean at `c8a3839`. The two open fronts are `hosted-checks` (gates NOT
-  APPROVED, round 1's 17 findings answered in the file, the `real-reel` literal owed to
-  `tests/paid-path-real-reel.test.ts` per S-111 and a `paid-path` re-journey) and the three-way benchmark split
-  (`yield-benchmark`, `yield-compare`, `benchmark-view`, all four gates pending on each, with
-  `PROMPTS/079-benchmark-gates-round-4.md` written and unrun).
-- **The owner settled the order: the benchmark first, `hosted-checks` on hold.** Next session runs
-  `PROMPTS/079-benchmark-gates-round-4.md` (`For:` corrected to session 86) — shrink `yield-benchmark` to the scoring
-  half, apply round 3's findings, amend S-182, send a fresh round 4, no implementation file. The two features
-  overlap only in `paid-path`'s test evidence, so whichever lands first sets the boundary-rule count.
-- **`JOURNAL.md` was compacted to fit S-177's 80-line cap**, which the stop-gate's required entry would otherwise have
-  broken at 78 lines: session 83's five body paragraphs are now one, **joined verbatim, no word dropped**. No code,
-  contract, test, boundary rule, check or decision changed, and nothing was weakened.
-
 ### 2026-10-12 · session 84
 
 - **The repository is public, and so is the steering repository it answers to.** `docs/research/public-exposure-audit.md`
@@ -268,18 +270,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   documents into its commits, and wrote files while this session had a branch checked out. One `--amend` landed on its
   commit and was repaired by `git reset --soft` to its original object (same SHA, message and tree). Nothing lost,
   nothing pushed. One working tree per session.
-
-### 2026-10-12 · session 83
-
-- Added `docs/features/yield-benchmark.md`, **gates NOT approved after two adversarial rounds** (both recorded in the file): the benchmark, designed and not built. Per the owner, a benchmark run is a WHOLE REEL with its own numbers, timings and rating per part, one composite number beside every internal number, and it must run on individual parts too; then the paid half was deferred, so this feature is the reading half only — a pure `packages/benchmark` plus one read-only script that scores the runs already in `data/cutroom.sqlite` across five parts (plan, pictures, narration, clips, cut), every count, timing, cost, retry and gate verdict, a rating a part and a rating a run, with the yield reported beside the rating and never folded in. It spends nothing and never opens the record for writing. **Deferred 1 holds the paid pass whole** — six frozen briefs with their measured refusal rates, a 150¢ per-reel ceiling, one typed confirmation, its own database file and artifact root, continuation by pass id, and a containment check in check 20’s shape. The benchmark stays in this repository (a second one would be a second copy of the schema).
-- Measured read-only from the record, and the figures the gates rest on: **52 runs over 25 brief groups** (the request minus `requestId` and `options`; largest group 8 runs), every one `until: video`; 43 selected plans, 132 pictures with all 132 files still on disk, 128 observations, 127 reconciliations, 118 takes, 95 narrations, 12 renders, 691 verdict events, 118 `stage.started` against 74 `stage.finished` (S-046); `job.cost_cents` 2202¢ = 732 + 1457 + 0 + 13 by receipt kind, `model_receipt` carrying no cost column; image calls 5¢ × 108 and 8¢ × 24, min 2 / median 4 / max 6 a run; selected-plan estimates 40–51¢ at today’s rates; plan plus stills a median 294 s over 23 runs; **subjects per shot from the selected plan agrees with the prompt’s `It shows:` line on 132 of 132 pictures**; 13 distinct Gate 1 reason shapes, all from reconcile.
-- Round 1 refused all four gates with 20 findings, three of them false claims about this repository’s own code: `gate5.ts` builds four reconcile templates and deliberately **no** clipping one (S-072, D-044); `gate2.ts` writes no silence reason (Gate 3 writes the two sound ones); and `scripts/` is in `check.mjs`’ `FULL_ONLY`, so a slice built there is never targeted. Four findings changed the design: the git-diff comparability rule is gone, because **no row records the engine version that made a run**; an absent part scores 0 against its weight, because renormalising made a run that died on its first picture outrank every finished reel; the arithmetic moved into a pure package; and the reason classifier is scoped to Gate 1 and Gate 5 reconcile.
-- Round 2 verified those four hold and found 20 more, every one applied in the file: a 23rd boundary rule would turn `reel-stills` check 3, `reel-render` check 2 and `paid-path` check 4 red (each asserts `22 rules proven to fire`) with no amendment list; the purity rule forbids the `node:crypto` the brief key needs; the brief key erases `until` and `budgetCents`; `kept_from` rows are counted twice across runs; the credit guard cannot separate an honest prompt fix from gaming; and the ledger’s columns, the fixture corpus’ provenance and the exact expected ratings are unspecified. **S-182 is unwritten** — its weights wait on the owner’s open decision about whether the comparison stays here or goes to Deferred 1.
-- **S-182 is written** (every weight, both tolerances, the rating version, the comparison rule, each with what it rejected), and `docs/features/run-provenance.md` is named at the owner’s request — no row records which engine made a run, so every comparison of stored runs is stamped “engine version: not recorded”. **Round 3 refused all four gates again with twenty findings**, three of them defects in the rating arithmetic: the worked value for a run that died on its first picture is 19.0, not 10.0, because a complement term’s denominator is non-empty and pays for work never attempted; the Gate-1-stop fixture ties with it at 19.0, so the ranking check would be red on its own fixtures; and the five parts do not map onto the engine’s three stage events (narration, clips and the cut all sit inside `video`, and the assemble job writes no start). Also: `benchmark-no-io` does not forbid the `node:crypto` hashing was moved to avoid; S-182 and the gate state the threshold a factor of two apart; the guard misses fewer or shorter shots; no verdict word for **hurt**; the ledger’s columns unenumerated; **nine** places assert the old rule count, not five; and no flag table for reading one part of one run.
-- The owner then kept the comparison in the feature — _“we need job 2 as well ... or else how would we know whether the new engine or new thing in the engine worked”_ — and added two modes the file does not yet carry: a **config comparison**, where the declared difference is the axis and only an undeclared difference refuses, with cost and wall clock reported rather than judged; and a **stratify** view over a recorded property. Measured for them: **5 of 25 brief groups hold two or more runs with matching fingerprints**, the largest set five runs in one group, so **no verdict is available from history** (a verdict needs four matching runs in each of three groups) and that five-run set is the null comparison the tool must report entirely inside the noise.
-- **The owner split the benchmark in three** (S-184, superseding S-182’s scope alone): `yield-benchmark` keeps the scoring half and computes no band and no verdict; `docs/features/yield-compare.md` takes sides, the two uncertainty bands, the four verdict words (**hurt** added), the eight deciding measures, the credit guard, comparability, the config mode whose declared difference is the axis, stratify and the null comparison; `docs/features/benchmark-view.md` takes one self-contained HTML page with inlined data, after the scoring half is built. S-184 also settles **every rating term as something achieved over something attempted, never an absence** — the one rule that removes the defect class all three rounds kept finding. `PROMPTS/079` was rewritten to the split: thirteen round-3 findings stay with the scoring half, six move to `yield-compare`’s stub, and round 4 reviews the scoring half alone.
-- Added `PROMPTS/077-benchmark-design.md` (run by this session) and `PROMPTS/078-ci-on-github-actions.md` (written here, run by session 84 in parallel on branch `ci-measurement`), both listed in `PROMPTS/README.md`. Session 82’s two documents — `docs/research/yield-baseline.md` and `docs/features/picture-prompt.md` — were written but never committed, and are committed with this session.
-- No code, contract, test, provider, database, media or boundary changed by this session. No reel was made and nothing was spent.
 
 ## Where to look
 

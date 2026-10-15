@@ -238,3 +238,159 @@ for (const [why, opts, message] of refusals) {
     if (before !== undefined) assert.equal(read(dir), before, 'a refused journey changed the file')
   })
 }
+
+// ---------------------------------------------------------------- reusing a recorded run (S-188)
+//
+// The journey may rest on the receipt a full check run wrote, and must not rest on anything less.
+// Each case plants a receipt in the scratch repository and watches what the journey invokes: the
+// stub check.mjs appends its arguments to a file, so "nothing re-runs" is observable, and the
+// planted test count (7) differs from what the feature's tests really number (2), so an evidence
+// line saying 7 proves the count came from the recording and not from a second run.
+
+const CHECK_RECORDS = [
+  "import { appendFileSync } from 'node:fs'",
+  "appendFileSync('check-calls.txt', `${process.argv.slice(2).join(' ')}\n`)",
+  "console.log('  ok    tests')",
+  '',
+].join('\n')
+
+const CHECK_RECORDS_FAILING = [
+  "import { appendFileSync } from 'node:fs'",
+  "appendFileSync('check-calls.txt', `${process.argv.slice(2).join(' ')}\n`)",
+  "console.log('  FAIL  format')",
+  'process.exit(1)',
+  '',
+].join('\n')
+
+/** A green full-run receipt naming the feature's one test file with seven passing tests. */
+function receipt(tree: string, over: Record<string, unknown> = {}) {
+  return JSON.stringify({
+    receipt: 1,
+    mode: 'full',
+    ok: true,
+    testedTree: tree,
+    checks: [{ label: 'tests', ok: true, ms: 1 }],
+    tests: { ok: true, total: 7, files: { 'tests/demo-one.test.ts': { pass: 7, fail: 0 } } },
+    ...over,
+  })
+}
+
+function plant(dir: string, body: string) {
+  mkdirSync(join(dir, '.verification'), { recursive: true })
+  writeFileSync(join(dir, '.verification', 'receipt.json'), body)
+}
+
+const tree = (dir: string) => git(dir, 'rev-parse', 'HEAD^{tree}')
+const calls = (dir: string) => {
+  try {
+    return readFileSync(join(dir, 'check-calls.txt'), 'utf8').trim().split('\n')
+  } catch {
+    return []
+  }
+}
+
+/** Commit a Markdown document, so HEAD's tree differs from the recorded one in documents alone. */
+function commitDocument(dir: string, name = 'docs/note.md') {
+  mkdirSync(join(dir, 'docs'), { recursive: true })
+  writeFileSync(join(dir, name), '# a note\n')
+  git(dir, 'add', '-A')
+  git(dir, 'commit', '-q', '-m', 'a document')
+}
+
+test('a green full run recorded for this exact tree is reused, and nothing re-runs', () => {
+  const { dir, sha } = repo({ text: feature(), check: CHECK_RECORDS })
+  plant(dir, receipt(tree(dir)))
+  const r = journey(dir)
+  assert.equal(r.status, 0, r.out)
+  assert.deepEqual(calls(dir), [], 'check.mjs ran although the recording covered this tree')
+  assert.equal(
+    section(read(dir), 'Evidence'),
+    `- ${today()} journey=PASS at ${sha} — every check green; 7 tests in tests/demo-*.test.ts pass — from the full run recorded for this exact tree`,
+  )
+})
+
+test('a tree differing only in documents re-runs the document checks and nothing else', () => {
+  const { dir } = repo({ text: feature(), check: CHECK_RECORDS })
+  const recorded = tree(dir)
+  plant(dir, receipt(recorded))
+  commitDocument(dir)
+  const sha = git(dir, 'rev-parse', '--short', 'HEAD')
+  const r = journey(dir)
+  assert.equal(r.status, 0, r.out)
+  assert.deepEqual(calls(dir), ['--documents'], 'the full suite ran for a document-only difference')
+  assert.equal(
+    section(read(dir), 'Evidence'),
+    `- ${today()} journey=PASS at ${sha} — every check green; 7 tests in tests/demo-*.test.ts pass — document checks re-run; the rest from the full run recorded at ${recorded.slice(0, 7)}, which differs only in documents`,
+  )
+})
+
+test('a red document check is a FAIL even when the rest of the run is reused', () => {
+  const { dir } = repo({ text: feature(), check: CHECK_RECORDS_FAILING })
+  plant(dir, receipt(tree(dir)))
+  commitDocument(dir)
+  const r = journey(dir)
+  assert.equal(r.status, 1, r.out)
+  const text = read(dir)
+  assert.match(text, /^Status: planned$/m)
+  assert.equal(section(text, 'Divergence'), "the check 'format' failed")
+})
+
+const notReusable: Array<[string, (dir: string) => void]> = [
+  [
+    'a path of code differs from the recorded run',
+    (dir) => {
+      writeFileSync(join(dir, 'tests', 'demo-one.test.ts'), `${TEST_PASSES}\n`)
+      git(dir, 'add', '-A')
+      git(dir, 'commit', '-q', '-m', 'a code change')
+    },
+  ],
+  ['the recorded run was targeted, not full', () => {}],
+  ['the recorded run was not green', () => {}],
+  ['the receipt cannot be read', () => {}],
+]
+
+test('a recorded run that does not cover this tree is not reused: every check runs again', () => {
+  for (const [why, change] of notReusable) {
+    const { dir } = repo({ text: feature(), check: CHECK_RECORDS })
+    const body = why.includes('targeted')
+      ? receipt(tree(dir), { mode: 'targeted' })
+      : why.includes('not green')
+        ? receipt(tree(dir), { ok: false })
+        : why.includes('cannot be read')
+          ? '{ not json'
+          : receipt(tree(dir))
+    plant(dir, body)
+    change(dir)
+    const r = journey(dir)
+    assert.equal(r.status, 0, `${why}: ${r.out}`)
+    assert.deepEqual(calls(dir), [''], `${why}: the full check did not run`)
+    assert.match(
+      section(read(dir), 'Evidence'),
+      /every check green; 2 tests in tests\/demo-\*\.test\.ts pass$/,
+      `${why}: the count did not come from a real run of the feature's tests`,
+    )
+  }
+})
+
+test('after a full run the count comes from the receipt that run wrote, not from a second run', () => {
+  // The feature's two tests were already run by the suite. Re-running them is what S-188 removes,
+  // so a check.mjs that records seven must leave an evidence line saying seven.
+  const { dir, sha } = repo({
+    text: feature(),
+    check: [
+      "import { mkdirSync, writeFileSync } from 'node:fs'",
+      "import { execFileSync } from 'node:child_process'",
+      "const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { encoding: 'utf8' }).trim()",
+      "mkdirSync('.verification', { recursive: true })",
+      "writeFileSync('.verification/receipt.json', JSON.stringify({ receipt: 1, mode: 'full', ok: true, testedTree: tree, checks: [{ label: 'tests', ok: true, ms: 1 }], tests: { ok: true, total: 7, files: { 'tests/demo-one.test.ts': { pass: 7, fail: 0 } } } }))",
+      "console.log('  ok    tests')",
+      '',
+    ].join('\n'),
+  })
+  const r = journey(dir)
+  assert.equal(r.status, 0, r.out)
+  assert.equal(
+    section(read(dir), 'Evidence'),
+    `- ${today()} journey=PASS at ${sha} — every check green; 7 tests in tests/demo-*.test.ts pass`,
+  )
+})

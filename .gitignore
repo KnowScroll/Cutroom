@@ -53,3 +53,7 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# S-188: the verification receipt a check run writes, and the per-file test results it folds in.
+# Generated, machine-read, never committed.
+.verification/

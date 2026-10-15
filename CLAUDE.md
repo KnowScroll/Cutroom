@@ -155,6 +155,7 @@ node scripts/verification-status.mjs             # reuse only evidence bound to 
 node scripts/check.mjs --slice tests/<feature>-*.test.ts  # static checks plus an approved ordinary slice
 node scripts/check.mjs                            # full suite: tooling, broad diffs and journeys
 node scripts/check.mjs --changed                  # document-only work
+node scripts/check.mjs --documents                # the document checks, asked for by name (S-188)
 ```
 
 Seven code checks plus two about the authority. `--code` runs only the first seven. A red
@@ -167,7 +168,8 @@ lint, format and all boundary checks, then only its named test files; it rejects
 path, and verification infrastructure. `--dry-run` says which checks would run and why.
 
 **The full run is reserved for integrity boundaries**: a change to checking/journey/boundary tooling, workspace or
-dependency configuration, an unclassified or broad diff, and every feature journey. An ordinary slice commits only
+dependency configuration, an unclassified or broad diff, and a feature journey at content no recorded full run has
+seen (S-188, superseding S-177's _"every feature journey"_). An ordinary slice commits only
 after its targeted run passes. Its commit carries `Verification: targeted` (or `full`), `Verification-Tree`, and for
 targeted evidence `Verification-Tests`; `verification-status.mjs` refuses a stale tree. This keeps a clean later
 session from rerunning a suite that already passed for the same commit without accepting evidence for changed code.
@@ -179,8 +181,16 @@ committed:
 node scripts/journey.mjs <slug>
 ```
 
-It runs every check and `tests/<slug>-*.test.ts`, and writes the evidence, the status and the divergence. Never
-type any of the three by hand. A FAIL is the finding: stop and report.
+It writes the evidence, the status and the divergence. Never type any of the three by hand. A FAIL is the finding:
+stop and report.
+
+**Nothing re-runs at a tree where a recorded full run already passed** (S-188). A full `check.mjs` run writes
+`.verification/receipt.json` — gitignored, naming the content it tested, each check's verdict and each test file's
+counts — and the journey reads it: at the same content it runs nothing; where only Markdown differs it runs
+`node scripts/check.mjs --documents` (format, the four scans, the authority) and nothing else; anything else is the
+full suite. Only a green `full` receipt naming the feature's own passing test files qualifies. The receipt is
+written by the checker, not typed, and the content it names is the content a commit of that working copy writes —
+so the usual order, change then full run then commit, stays reusable.
 
 ## Prompts
 

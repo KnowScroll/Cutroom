@@ -115,6 +115,12 @@ of whatever is changed afterwards. Until it exists, every number in §4 is an es
 
 ### 4.0 Wire `journey.mjs` to the evidence record S-177 already built — touches no property at all
 
+**BUILT, 2026-10-15, session 88, as S-188** — shape B, plus a document-only delta the owner chose
+over exact-tree-only. One measurement changed the build: Node 22.14 attributes no test to its file in either
+built-in reporter (tap and junit both print one flat stream for several files), so the receipt collects per-file
+results through `scripts/test-receipt.mjs`, reading the runner event stream. The tested tree is the content the run
+saw, written through a throwaway index, not HEAD. Read S-188 rather than the plan below for what holds.
+
 **What is there now.** `scripts/journey.mjs:89` runs `scripts/check.mjs` — the full thing, all nine
 checks including the 1413 s suite. Then `scripts/journey.mjs:99-101` runs `tests/<slug>-*.test.ts`
 **again**, with a TAP reporter, to count them; the suite at line 89 has just run those same files.
@@ -307,8 +313,9 @@ Worth doing for tidiness, not for speed.
 
 ## 5. Order of work
 
-1. **§4.0 wire `journey.mjs` to tree-bound `full` evidence.** Touches no property, needs no
-   measurement, and removes a whole suite from every journey after the first at one tree.
+1. ~~**§4.0 wire `journey.mjs` to tree-bound `full` evidence.**~~ **Done: S-188, session 88.** It removes
+   the whole suite from every journey after the first at one tree, and the document checks (~15 s) are all a
+   re-journey chain pays after its first run.
 2. **§4.1 biome + changed-Markdown formatting.** Independent of everything else; ~19 s off every run.
 3. **§3 the measurement pass.** Idle machine, `.tmp/`, one table. Nothing after this is guesswork.
 4. **§4.2 the two-class scheduler**, sized from §3, with three green full runs as its evidence.
@@ -337,6 +344,6 @@ prompt as the handover.
    property's scope, and the only one that could halve the suite outright.
 3. **Pool size is a spend-free risk decision**: a larger pool is faster and nearer the memory wall. The
    floor belongs to you, not to the measurement.
-4. **May a journey rest on a recorded run instead of its own?** §4.0's whole saving is that trade. The
+4. **ANSWERED, 2026-10-15: yes, and wider than asked — a document-only delta too (S-188).** §4.0's whole saving is that trade. The
    mechanism already exists and is tree-bound; what changes is that a journey would believe a receipt
    it did not watch being produced.

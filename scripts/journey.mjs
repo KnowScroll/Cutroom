@@ -5,9 +5,19 @@
  *   node scripts/journey.mjs <slug>
  *
  * A feature's journey is every check in this repository plus the tests named for it,
- * tests/<slug>-*.test.ts, run at a commit. PASS writes an evidence line and flips Status to
+ * tests/<slug>-*.test.ts, judged at a commit. PASS writes an evidence line and flips Status to
  * verified. FAIL writes an evidence line and fills Divergence, and leaves Status alone. Evidence
  * is appended by this script and never typed by hand (S-016).
+ *
+ * Nothing re-runs at a tree where a recorded full run already passed (S-188). The receipt a full
+ * `check.mjs` run writes names the tree it tested, every check's verdict and every test file's
+ * result; this script reads it and runs what that recording does not cover:
+ *
+ *   the same tree          nothing: every verdict and the feature's own test count are recorded
+ *   only documents differ  the document-class checks, `check.mjs --documents`, and nothing else
+ *   anything else          every check, and the feature's tests only if the run wrote no receipt
+ *
+ * It judges as it always did; it stops re-measuring content that has not changed.
  *
  * It refuses, writes nothing and exits 2 when the feature is not ready to be judged: a gate not
  * approved, a slice not ticked, no test named for it, or uncommitted changes — an evidence line
@@ -19,6 +29,7 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
+import { readReceipt, reuseVerdict, treeDelta, workingTreeDirt } from './_verification.mjs'
 
 const GATES = ['product', 'architecture', 'program-design', 'slices']
 
@@ -68,9 +79,9 @@ const testFiles = existsSync(testsDir)
   : []
 if (testFiles.length === 0) refuse(`no test file matches ${testGlob}`)
 
-const status = run('git', ['status', '--porcelain'], { cwd: root })
-if (!status.ok) refuse(`git status failed: ${status.stderr.trim()}`)
-if (status.stdout.trim() !== '') {
+const dirt = workingTreeDirt(root)
+if (dirt === undefined) refuse('git status failed')
+if (dirt !== '') {
   refuse('the working tree has uncommitted changes; commit first, so the evidence names what ran')
 }
 const sha = run('git', ['rev-parse', '--short', 'HEAD'], { cwd: root }).stdout.trim()
@@ -85,16 +96,29 @@ delete env.NODE_TEST_CONTEXT
 let divergence = 'none'
 let summary = ''
 
-console.log(dim(`\n  ${slug} at ${sha}: every check …`))
-const check = run(process.execPath, ['scripts/check.mjs'], { cwd: root, env })
-if (!check.ok) {
-  const line = `${check.stdout}${check.stderr}`.split('\n').find((l) => /^\s*FAIL\s/.test(l))
+/** Which check said no, from check.mjs's own one-line-per-check verdicts. */
+function failingCheck(result) {
+  const line = `${result.stdout}${result.stderr}`.split('\n').find((l) => /^\s*FAIL\s/.test(l))
   const label = line
     ?.replace(/^\s*FAIL\s+/, '')
     .replace(/\s{2,}\S*\s*$/, '')
     .trim()
-  divergence = label ? `the check '${label}' failed` : 'the checks failed, and none said which'
-} else {
+  return label ? `the check '${label}' failed` : 'the checks failed, and none said which'
+}
+
+/** The feature's own tests counted from a recorded run at this exact content, or undefined. */
+function recorded() {
+  const receipt = readReceipt(root)
+  const testedTree = typeof receipt?.testedTree === 'string' ? receipt.testedTree : undefined
+  const delta =
+    testedTree === undefined || headTree === undefined
+      ? undefined
+      : treeDelta(root, testedTree, headTree)
+  return reuseVerdict({ receipt, headTree, delta, testFiles: relativeTests })
+}
+
+/** Count the feature's tests here and now — the fallback when no receipt covers this tree. */
+function countTests() {
   console.log(dim(`  ${slug} at ${sha}: ${testGlob} …`))
   const tests = run(
     process.execPath,
@@ -104,13 +128,44 @@ if (!check.ok) {
   const out = `${tests.stdout}${tests.stderr}`
   const count = (name) => Number(new RegExp(`^# ${name} (\\d+)$`, 'm').exec(out)?.[1] ?? NaN)
   const [total, failed] = [count('tests'), count('fail')]
-  if (!Number.isInteger(total) || total === 0) {
-    divergence = `${testGlob} ran no tests`
-  } else if (failed > 0 || !tests.ok) {
+  if (!Number.isInteger(total) || total === 0) return { divergence: `${testGlob} ran no tests` }
+  if (failed > 0 || !tests.ok) {
     const first = /^not ok \d+ - (.*)$/m.exec(out)?.[1]
-    divergence = `${failed} of ${total} tests in ${testGlob} fail${first ? `, first '${first}'` : ''}`
-  } else {
-    summary = `every check green; ${total} tests in ${testGlob} pass`
+    return {
+      divergence: `${failed} of ${total} tests in ${testGlob} fail${first ? `, first '${first}'` : ''}`,
+    }
+  }
+  return { total }
+}
+
+const headTree = run('git', ['rev-parse', 'HEAD^{tree}'], { cwd: root }).stdout.trim()
+const relativeTests = testFiles.map((file) => `tests/${file}`).sort()
+const reuse = recorded()
+
+if (reuse.kind === 'exact') {
+  // S-188: nothing re-runs at a tree where a recorded full run already passed.
+  console.log(dim(`\n  ${slug} at ${sha}: the full run recorded for this tree — nothing re-runs`))
+  summary = `every check green; ${reuse.total} tests in ${testGlob} pass — from the full run recorded for this exact tree`
+} else if (reuse.kind === 'documents') {
+  // Only Markdown differs from the recorded run, so only what a document can fail is re-run.
+  const differs = reuse.delta.length === 1 ? reuse.delta[0] : `${reuse.delta.length} documents`
+  console.log(dim(`\n  ${slug} at ${sha}: document checks (${differs} differs) …`))
+  const docs = run(process.execPath, ['scripts/check.mjs', '--documents'], { cwd: root, env })
+  if (!docs.ok) divergence = failingCheck(docs)
+  else {
+    summary = `every check green; ${reuse.total} tests in ${testGlob} pass — document checks re-run; the rest from the full run recorded at ${reuse.tree.slice(0, 7)}, which differs only in documents`
+  }
+} else {
+  console.log(dim(`\n  ${slug} at ${sha}: every check (${reuse.why}) …`))
+  const check = run(process.execPath, ['scripts/check.mjs'], { cwd: root, env })
+  if (!check.ok) divergence = failingCheck(check)
+  else {
+    // The run just made writes its own receipt; take the count from it rather than running the
+    // feature's tests a second time, and count them here when it did not.
+    const fresh = recorded()
+    const counted = fresh.kind === 'exact' ? { total: fresh.total } : countTests()
+    if (counted.divergence !== undefined) divergence = counted.divergence
+    else summary = `every check green; ${counted.total} tests in ${testGlob} pass`
   }
 }
 
