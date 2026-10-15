@@ -8454,6 +8454,10 @@ rest on and the saving vanished in exactly the chain this decision was written f
   `tests/journey.test.ts`, a journey whose `receipt.json` is a `documents` record while the full receipt is
   green, asserting it invokes nothing (break: read `receipt.json` instead). That makes
   **25 checks in `tests/check-receipt.test.ts`, 19 in `tests/journey.test.ts` and fifteen breaks.**
+- **The whole chain, measured here afterwards**: `reel-contract` **0.248 s** exact-tree with no check run; a
+  `check.mjs --changed` run between the two journeys leaving the full receipt intact; `reel-stills`
+  **18.4 s** on a one-document delta, running only the document checks. Counts 42 and 63, each the one
+  already on file.
 - **Measured, the same session**: `node scripts/journey.mjs reel-plan` at `f06bc4e` took **0.277 s** and ran
   no check, reporting the feature’s **51 tests** — the count session 87 got by running them.
 

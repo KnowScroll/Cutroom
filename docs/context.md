@@ -135,6 +135,9 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   **0.277 s** and reported `reel-plan`’s 51 tests, and then the `check.mjs --changed` run before the
   evidence commit **overwrote the reusable receipt** — the middle step of every chain. The last full run
   now keeps `receipt-full.json`; the journey reads only that.
+- **Measured on this repository, both branches**: `reel-plan` 0.277 s and `reel-contract` 0.248 s with no
+  check run, and `reel-stills` **18.4 s** on a one-document delta — 51, 42 and 63 tests, each the count
+  already on file, against ~25 min a journey before. Evidence commits `11a9698`, `621d608`, `4c58af6`.
 - **Proof**: `tests/check-receipt.test.ts` (25 checks), six S-188 cases in `tests/journey.test.ts` watching what the
   journey invokes, and **fifteen deliberate breaks each seen red and restored**. CLAUDE.md's full-run sentence and
   `PROMPTS/081` written. Nothing weakened; no bound, check or secrets journey touched.
