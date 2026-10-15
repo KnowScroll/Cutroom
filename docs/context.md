@@ -35,8 +35,7 @@ git and the journal keep them.
   `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
   `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: four calls are the owner's, then `self-heal`** — `pipeline-no-io`'s own bare-`sqlite` gap (S-186
-  names it, does not close it); the four file scans reading TRACKED files only, so a slice's new files escape them
+- **Next: three calls are the owner's, then `self-heal`** — the four file scans reading TRACKED files only, so a slice's new files escape them
   during the suite that verifies it; teaching `journey.mjs` to reuse evidence bound to HEAD's exact tree (S-177's
   mechanism), worth ninety minutes of every four-journey slice; and the three imprecise gate sentences.
   `hosted-checks` stays on hold. SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
@@ -133,7 +132,9 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   `scripts/benchmark.mjs` — the four file scans read **tracked** files, and it was untracked when that suite ran.
   Source fixed at `d898693`, check untouched. **`963be3c`**: S-182's second amendment (24.4 and "no tie"
   superseded by 10.0 and a kept tie) and **S-186**, `benchmark-no-io` naming no `dependencyTypes` because bare
-  `sqlite` is not a builtin (31 of 32 spellings fire with it); `pipeline-no-io`'s own gap is named, not closed.
+  `sqlite` is not a builtin (31 of 32 spellings fire with it). **`050536a` then closed `pipeline-no-io`'s own
+  gap (S-187)** at the owner's word: the attribute dropped, its pattern untouched, its proof grown from one case
+  to 30, and `reel-plan` re-journeyed PASS at `050536a` with 51 tests. `--prove` now fires 25 rules over 131 cases.
 - Also reported: the `hold` table is **empty over all 52 runs**; the record is a migration behind `schema.ts`, so
   the reader reports five columns absent, never zero. Sessions 79–82 dropped for the cap; git keeps them. Nothing
   weakened, nothing spent, no reel made.
