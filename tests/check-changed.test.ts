@@ -142,6 +142,25 @@ test('S-177. checker and workspace tooling changes fail closed to the full suite
   assert.match(`${result.stdout}${result.stderr}`, /full check/)
 })
 
+test('S-192. the two-pool runner and its classes are checker tooling: no slice may carry them', () => {
+  // The pool sizes and the split decide WHAT runs beside what; a targeted run that accepted a
+  // change to either would be verifying the suite with the scheduler under test.
+  for (const file of ['scripts/run-tests.mjs', 'scripts/_pools.mjs']) {
+    const dir = scratch()
+    write(dir, file, '// changed\n')
+    const result = spawnSync(
+      process.execPath,
+      ['scripts/check.mjs', '--slice', 'tests/stage.test.ts'],
+      { cwd: dir, encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' } },
+    )
+    const out = `${result.stdout}${result.stderr}`
+    assert.notEqual(result.status, 0, `${file} was accepted for targeted verification:\n${out}`)
+    // Named as verification infrastructure, not merely caught by the blanket scripts/ rule: the
+    // listing is what keeps a scheduler change from ever resting on a targeted run.
+    assert.match(out, /changes verification infrastructure; run the full check/)
+  }
+})
+
 test('S-177. an untracked source file still requires named tests', () => {
   const dir = scratch()
   write(dir, 'packages/pipeline/src/new-stage.ts', 'export const next = 1\n')

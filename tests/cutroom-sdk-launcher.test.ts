@@ -264,6 +264,16 @@ function startCaller(
       stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
     },
   )
+  // A send down a channel the other end has already closed fails ASYNCHRONOUSLY: Node reports it
+  // by emitting `error` on the child, not by throwing at the call site, so the try/catch in
+  // `stopCaller` cannot see it and an unhandled one takes the whole test down from its teardown.
+  // Harmless here — a caller that has exited needs no `exit` message — and only the two codes that
+  // mean exactly that are swallowed; anything else still surfaces (found under S-192's parallel
+  // pools, where a loser caller exiting first stopped being rare).
+  child.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EPIPE' || err.code === 'ERR_IPC_CHANNEL_CLOSED') return
+    throw err
+  })
   const queued: CallerEvent[] = []
   const waiting = new Map<CallerEvent['event'], (message: CallerEvent) => void>()
   child.on('message', (value) => {

@@ -15,7 +15,6 @@
  */
 import { existsSync, rmSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
-import { pathToFileURL } from 'node:url'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
 import { allMarkup, markupAmong } from './_markup.mjs'
 import {
@@ -33,14 +32,6 @@ const bin = (...parts) => join(REPO, 'node_modules', ...parts)
 // The receipt is written beside the repository being checked, so a check of another working copy
 // (tests/journey.test.ts does this) records there and not here.
 const WHERE = process.cwd()
-// A second reporter collecting per-file results; the stream a human reads stays the tap default.
-const RECEIPT_REPORTER = [
-  '--test-reporter=tap',
-  '--test-reporter-destination=stdout',
-  `--test-reporter=${pathToFileURL(join(REPO, 'scripts', 'test-receipt.mjs')).href}`,
-  `--test-reporter-destination=${testsRawPath(WHERE)}`,
-]
-
 // S-189: biome lints AND formats every file of code in one pass; prettier keeps the markup it is
 // the only one of the two that can format — Markdown, YAML and the one HTML page.
 const BIOME = bin('@biomejs/biome', 'bin', 'biome')
@@ -61,22 +52,12 @@ const CODE = [
   ['boundaries', node, ['scripts/drift.mjs']],
   ['boundaries proven', node, ['scripts/drift.mjs', '--prove']],
   ['no dead rule', node, ['scripts/drift.mjs', '--audit']],
-  [
-    'tests',
-    node,
-    [
-      '--experimental-strip-types',
-      '--test',
-      // Some PATH-only journey checks run their own bounded, parallel child suites. Running the
-      // outer suite serially preserves every check while preventing nested ffmpeg/SQLite workers
-      // from competing for the same machine and turning a load timeout into a false aggregate red.
-      '--test-concurrency=1',
-      ...RECEIPT_REPORTER,
-      'tests/**/*.test.ts',
-      'packages/**/*.test.ts',
-      'apps/**/*.test.ts',
-    ],
-  ],
+  // Two pools that never overlap: the ordinary files several at a time, then the twelve PATH-only
+  // journey children fewer at a time, each still spawning its own ratified nested suite (S-192,
+  // superseding S-176 in part). The runner owns the per-file reporter, the pool sizes and the
+  // free-memory floor it records; it enumerates test files from the filesystem, so an uncommitted
+  // one still runs.
+  ['tests', node, ['scripts/run-tests.mjs']],
 ]
 
 const AUTHORITY = [
@@ -186,6 +167,9 @@ const VERIFY_INFRASTRUCTURE = new Set([
   'scripts/journey.mjs',
   'scripts/_verification.mjs',
   'scripts/test-receipt.mjs',
+  'scripts/run-tests.mjs',
+  'scripts/_pools.mjs',
+  'tests/check-pools.test.ts',
   'tests/check-changed.test.ts',
   'tests/verification-status.test.ts',
   'tests/check-receipt.test.ts',
@@ -339,8 +323,26 @@ writeReceipt(WHERE, {
           total: perFile?.total,
           failed: perFile?.fail,
           files: perFile?.files,
+          // What the two pools cost and how close the machine came to its limit: the evidence a
+          // contention change owes (§4.2), written by the runner rather than remembered.
+          freeMinMB: perFile?.freeMinMB,
+          totalMemoryMB: perFile?.totalMemoryMB,
+          pools: perFile?.pools,
         },
 })
+
+// What the pools cost and how close the machine came to its limit. Printed on a green run too:
+// it is the evidence a contention change owes (S-192), and a run that only shows it when something
+// breaks is a run whose evidence nobody reads.
+for (const pool of perFile?.pools ?? []) {
+  console.log(
+    dim(
+      `        pool ${pool.label.padEnd(10)} ${(pool.ms / 1000).toFixed(1).padStart(7)} s  ` +
+        `${String(pool.files).padStart(3)} file(s) at ${pool.concurrency}  ` +
+        `${pool.freeMinMB} MB free at its lowest`,
+    ),
+  )
+}
 
 if (failures.length === 0) {
   const verdict = partial
