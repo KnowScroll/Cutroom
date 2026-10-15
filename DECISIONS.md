@@ -8543,3 +8543,63 @@ after §4.0 was built and committed — which is also why this decision and S-18
 S-160 rule 2's one-phase-per-session, at the owner's explicit word.
 
 ---
+
+## S-190 | 2026-10-15 | The §3 measurement is half taken, and what it already says: the heavy files are the media ones, and the machine was never near its memory wall
+
+**Supersedes.** Nothing. It records a measurement and one choice about how to finish it.
+
+**Chose.**
+
+- **The measurement runner stays a throwaway in `.tmp/`** (`measure.mjs`, gitignored), as §3 asks: it
+  carries no verification obligation and never becomes a committed tool. If it ever did, it would be
+  checker tooling and S-177 would make every change to it a full-suite change — which is precisely the
+  cost this whole line of work exists to reduce.
+- **It will be finished in slices, secrets journeys first.** Claude Code killed the background shell at 80
+  of 153 files because the system ran low on memory — not a failure of the script, and nothing in the run
+  to debug. A kill costs whatever has not yet been written, so the remaining files are measured in groups
+  and merged, rather than in one 30-minute pass.
+
+**What it already says**, 80 files of 153, alphabetical through `tests/reel-render-rules`, each file run
+alone in its own process with free memory sampled every 500 ms:
+
+- **644 s** for those 80 files run one at a time. No reds.
+- **85 s** of it is five of the eleven secrets journeys; `paid-path-secrets` alone is **49.4 s**, against
+  the 52 s recorded in its own file on 2026-09-21 — so that figure still holds.
+- **The lowest free memory seen anywhere was 3045 MB**, during `paid-path-secrets`, on a machine with
+  15.3 GB. S-107 recorded **815 MB** free with the outer runner at Node's default — so the wall S-176
+  measured is a wall of _overlap_, not of any single file, which is the premise §4.2 rests on and it now
+  has one half-confirmed.
+- **The expensive files are the media ones, not the many small ones**: `paid-path-refusals` 39.3 s,
+  `reel-render-gates` 29.6 s, `reel-render-faults` 27.7 s, `reel-render-pass` 27.0 s, `paid-path-video`
+  26.1 s, `paid-path-sensor` 24.7 s, `paid-path-service` 24.5 s — ffmpeg, a service or a worker, seconds
+  per assertion. That is where §4.6's fixture shrinking would land, and it is a bigger block than the
+  database opens §4.6 sizes at 36.4 ms each.
+
+**What it does not yet say.** Six of the eleven secrets journeys are unmeasured, including
+`reel-render-secrets` (97 s alone, recorded 2026-09-20) and `reel-takes-secrets` (101 s at Node's default,
+130 s bounded to four). The subtraction §3 asks for — outer suite total minus the sum of the children —
+therefore has no answer yet, and **§4.2 must not be sized until it does.** The suite's own total is known
+for this tree: **1455 s** at `019cbb2`, 787 tests over 153 files.
+
+**Why.** §4.2's pool sizes are a memory risk, and the floor belongs to the owner (§7.3). A number guessed
+and then defended with one green run is exactly the shape of the red S-176 already paid for. Half a table
+is worth writing down because it is the half that was expensive to take, and because two of its facts —
+the 3 GB floor and the media files' dominance — already narrow what §4.2 and §4.6 may claim.
+
+**Rejected.** **Sizing §4.2 from the 80 files already measured** — the unmeasured six include the two
+largest children known, so the ratio the decision turns on is the part that is missing. **Restarting the
+pass unasked after the kill** — the harness stopped it for system memory, and starting it again on the
+same machine in the same state is how a measurement becomes a cause. **Committing the runner** — §3 says
+throwaway, and S-177 would then tax every edit to it with a full suite. **Estimating the children from the
+three figures already in the test files** — those were measured under a different outer scheduler, which
+is the thing being changed.
+
+**Caught by.** Nothing in the suite: this is a measurement, not a mechanism. What keeps it honest is that
+§4.2's own decision is required to name the recorded free-memory floor and the worst child margin, and to
+rest on **three consecutive green full runs** — `PROMPTS/083-measure-and-schedule.md` carries both
+requirements into the session that will do it.
+
+**Confirmed-by.** The owner, 2026-10-15, asking for the research file's order to be worked through in this
+session as far as it goes.
+
+---

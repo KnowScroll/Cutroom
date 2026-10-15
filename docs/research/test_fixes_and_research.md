@@ -91,6 +91,16 @@ does not name a bounded pool that never overlaps the two classes** — that is t
 
 ## 3. Measure first — the one pass to run before changing anything
 
+**HALF TAKEN, 2026-10-15, session 88 — see S-190.** `.tmp/measure.mjs` runs every file alone, times it,
+counts its tests and samples free memory; it reached **80 of 153 files (644 s, no reds)** before Claude Code
+killed the background shell for system memory pressure. What it says already: five of the eleven secrets
+journeys account for **85 s** of that, `paid-path-secrets` **49.4 s** alone (its own file recorded 52 s), the
+heavy files are the media ones (`paid-path-refusals` 39.3 s, `reel-render-gates` 29.6 s,
+`reel-render-faults` 27.7 s, `reel-render-pass` 27.0 s), and **the lowest free memory seen anywhere was
+3045 MB** of 15.3 GB — so S-107's 815 MB was a wall of overlap, not of any one file. **Six secrets journeys
+remain unmeasured, including the two largest known**, so the subtraction below has no answer yet and §4.2
+must not be sized until it does. Finish it in slices, secrets first: `PROMPTS/083-measure-and-schedule.md`.
+
 Run on an idle machine, with no other session building in this tree (contention is the variable
 being measured, so a second session invalidates the numbers). Write everything to `.tmp/`, which is
 gitignored. The measurement runner is a throwaway in `.tmp/`, **not** a committed script, so it
@@ -327,6 +337,7 @@ Worth doing for tidiness, not for speed.
 2. ~~**§4.1 biome + changed-Markdown formatting.**~~ **Done: S-189, session 88.** ~23 s off a slice run and
    ~14 s off a documents-only run, measured.
 3. **§3 the measurement pass.** Idle machine, `.tmp/`, one table. Nothing after this is guesswork.
+   **Half taken (S-190): 80 of 153 files. Finish it in slices, secrets journeys first.**
 4. **§4.2 the two-class scheduler**, sized from §3, with three green full runs as its evidence.
 5. **§4.3 CI jobs** as `hosted-checks`, gates already written and round 1 answered.
 6. **§4.6 fixture shrinking**, against the named offenders.

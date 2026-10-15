@@ -135,6 +135,10 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   **0.277 s** and reported `reel-plan`’s 51 tests, and then the `check.mjs --changed` run before the
   evidence commit **overwrote the reusable receipt** — the middle step of every chain. The last full run
   now keeps `receipt-full.json`; the journey reads only that.
+- **§3 is half taken (S-190)**: 80 of 153 files timed alone, 644 s, no reds; killed at that point by the
+  harness for system memory. Lowest free memory anywhere **3045 MB** of 15.3 GB — S-107’s 815 MB was
+  overlap, not one file. Heavy files are the media ones. Six secrets journeys unmeasured, so **§4.2 is not
+  sized**. Data: `.tmp/measure.json`, `.tmp/measure.md`; next: `PROMPTS/083-measure-and-schedule.md`.
 - **Measured on this repository, both branches**: `reel-plan` 0.277 s and `reel-contract` 0.248 s with no
   check run, and `reel-stills` **18.4 s** on a one-document delta — 51, 42 and 63 tests, each the count
   already on file, against ~25 min a journey before. Evidence commits `11a9698`, `621d608`, `4c58af6`.
