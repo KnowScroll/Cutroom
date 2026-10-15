@@ -43,6 +43,8 @@ export const receiptPath = (cwd) => join(verificationDir(cwd), 'receipt.json')
  */
 export const fullReceiptPath = (cwd) => join(verificationDir(cwd), 'receipt-full.json')
 export const testsRawPath = (cwd) => join(verificationDir(cwd), 'tests.json')
+/** The recorded impact map: which test files cover which source files (S-196). */
+export const impactPath = (cwd) => join(verificationDir(cwd), 'impact.json')
 
 /**
  * Make the receipt's folder, holding a `.gitignore` of `*` so it ignores itself and everything in

@@ -190,6 +190,19 @@ state, not with the pools, so the figure to compare against is each run's own `f
 receipt; raising either size needs its own three runs, and `node scripts/run-tests.mjs --serial` restores S-176's single serial pool for a bisect.
 Test files are enumerated from the filesystem, so an uncommitted one still runs.
 
+**A code diff asks the recorded impact map which tests to run** (S-196, superseding S-177 in part).
+`node scripts/impact-map.mjs` runs each test file alone under `NODE_V8_COVERAGE` — 402 s — and records
+every file of this repository that process or any process it spawned loaded, plus every repository path the
+test NAMES as a string, which is how a tool a test copies into a scratch repository is credited. The twelve
+PATH-only children are derived from their feature's siblings and never measured, because coverage reaches a
+child through an environment variable and those files exist to prove none does. `--changed` then runs the
+static checks, the boundary proofs and exactly the covering tests, through the two pools when more than
+eight files are selected. **It is worth 617 s to 4 s for a change under `packages/sdk` or `scripts/`, and
+close to nothing for a change inside the engine**: a package is entered only through its `src/index.ts`
+(D-094), so importing one symbol loads the whole package and the median change selects 110 of 156 test
+files. Every uncertainty still owes the full run — an unclassified path, verification infrastructure,
+tooling or workspace configuration, a missing map, or a changed file no recorded test covers.
+
 **The full run is reserved for integrity boundaries**: a change to checking/journey/boundary tooling, workspace or
 dependency configuration, an unclassified or broad diff, and a feature journey at content no recorded full run has
 seen (S-188, superseding S-177's _"every feature journey"_). An ordinary slice commits only

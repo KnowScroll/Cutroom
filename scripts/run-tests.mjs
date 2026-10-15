@@ -31,7 +31,11 @@ import { ensureVerificationDir, testsRawPath, verificationDir } from './_verific
 
 const WHERE = process.cwd()
 const serial = process.argv.includes('--serial')
-const files = testFiles(WHERE)
+// Named files run instead of every file: how a map-selected set of tests (S-196) gets the same
+// two pools as a full run, because a broad selection run one at a time is SLOWER than the whole
+// suite pooled — measured: 110 selected files cost 1361 s serially against 617 s pooled.
+const named = process.argv.slice(2).filter((arg) => arg.endsWith('.test.ts'))
+const files = named.length > 0 ? named : testFiles(WHERE)
 if (files.length === 0) {
   console.error(`${red('FAIL')}  no test file found under tests/, packages/ or apps/`)
   process.exit(2)

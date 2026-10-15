@@ -16,7 +16,9 @@
 import { existsSync, rmSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
+import { readImpact, selectTests } from './_impact.mjs'
 import { allMarkup, markupAmong } from './_markup.mjs'
+import { testFiles } from './_pools.mjs'
 import {
   DOCUMENT,
   ensureVerificationDir,
@@ -132,16 +134,62 @@ function changedPaths() {
   return [...new Set(paths)].sort()
 }
 
+/** Static checks, the boundary proofs, the markup that differs, then exactly these test files. */
+function sliceSteps(tests, paths) {
+  return narrowMarkup(
+    [
+      ...CODE.filter(([label]) => label !== 'tests'),
+      // Eight or fewer files run one at a time, which is deterministic and already seconds. A
+      // larger set — what a change to a shared package selects (S-196) — goes through the two
+      // pools, because 110 files one at a time cost 1361 s against 617 s for the whole suite
+      // pooled. Either way only these files run.
+      tests.length > 8
+        ? ['slice tests', node, ['scripts/run-tests.mjs', ...tests]]
+        : [
+            'slice tests',
+            node,
+            ['--experimental-strip-types', '--test', '--test-concurrency=1', ...tests],
+          ],
+      ...AUTHORITY,
+    ],
+    paths,
+  )
+}
+
 function choose() {
   const paths = changedPaths()
   if (paths === null) {
     return { steps: undefined, paths: [], why: 'git could not list what changed' }
   }
-  const first = paths.find((path) => kind(path) !== 'document')
-  if (first !== undefined)
-    return { steps: undefined, paths, why: `a path of ${kind(first)}: ${first}` }
-  const why = paths.length === 0 ? 'nothing differs from HEAD' : 'documents only'
-  return { steps: DOCUMENTS_ONLY, paths, why }
+  const code = paths.filter((path) => kind(path) !== 'document')
+  if (code.length === 0) {
+    const why = paths.length === 0 ? 'nothing differs from HEAD' : 'documents only'
+    return { steps: DOCUMENTS_ONLY, paths, why }
+  }
+
+  // A path nobody classified, or a piece of the checker itself, still owes the full run: the first
+  // because nothing knows what it can break, the second because the map and the selection are the
+  // thing under test (S-196).
+  const unknown = code.find((path) => kind(path) === 'unknown')
+  if (unknown !== undefined)
+    return { steps: undefined, paths, why: `a path of unknown: ${unknown}` }
+  const infrastructure = code.find((path) => VERIFY_INFRASTRUCTURE.has(path))
+  if (infrastructure !== undefined)
+    return { steps: undefined, paths, why: `${infrastructure} is verification infrastructure` }
+  const tooling = code.find((path) => FULL_ONLY.some((rule) => rule.test(path)))
+  if (tooling !== undefined)
+    return { steps: undefined, paths, why: `${tooling} is tooling or workspace configuration` }
+
+  // Otherwise the recorded map says which tests cover what changed (S-196). It answers with a set
+  // or with a reason it cannot, and a reason is the full run.
+  const selected = selectTests(readImpact(WHERE), code, { testFilesOnDisk: testFiles(WHERE) })
+  if (selected.tests === undefined) return { steps: undefined, paths, why: selected.why }
+  return {
+    steps: sliceSteps(selected.tests, paths),
+    paths,
+    why: 'the impact map',
+    selected: selected.tests,
+  }
 }
 
 const changed = process.argv.includes('--changed')
@@ -169,6 +217,9 @@ const VERIFY_INFRASTRUCTURE = new Set([
   'scripts/test-receipt.mjs',
   'scripts/run-tests.mjs',
   'scripts/_pools.mjs',
+  'scripts/_impact.mjs',
+  'scripts/impact-map.mjs',
+  'tests/impact-map.test.ts',
   'tests/check-pools.test.ts',
   'tests/check-changed.test.ts',
   'tests/verification-status.test.ts',
@@ -226,6 +277,11 @@ if (changed) {
   }
   steps = choice.steps
   partial = steps === DOCUMENTS_ONLY
+  if (choice.selected !== undefined) {
+    console.log(`  --changed: the impact map chose ${choice.selected.length} test file(s)`)
+    for (const test of choice.selected) console.log(dim(`    ${test}`))
+    console.log('')
+  }
   if (partial) steps = narrowMarkup(steps, choice.paths)
   console.log(`  --changed: ${choice.paths.length} path(s) differ from HEAD`)
   for (const path of choice.paths.slice(0, 30))
@@ -249,18 +305,7 @@ if (slice) {
     console.error(`\n${red('FAIL')}  ${problem}\n`)
     process.exit(2)
   }
-  steps = narrowMarkup(
-    [
-      ...CODE.filter(([label]) => label !== 'tests'),
-      [
-        'slice tests',
-        node,
-        ['--experimental-strip-types', '--test', '--test-concurrency=1', ...sliceTests],
-      ],
-      ...AUTHORITY,
-    ],
-    changedPaths() ?? [],
-  )
+  steps = sliceSteps(sliceTests, changedPaths() ?? [])
   console.log(`  --slice: ${sliceTests.join(', ')}\n`)
 }
 

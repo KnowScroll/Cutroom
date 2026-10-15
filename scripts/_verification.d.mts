@@ -38,6 +38,7 @@ export function verificationName(): string
 export function verificationDir(cwd: string): string
 export function receiptPath(cwd: string): string
 export function testsRawPath(cwd: string): string
+export function impactPath(cwd: string): string
 export function workingTreeDirt(cwd: string): string | undefined
 export function testedTree(cwd: string): string | undefined
 export function treeDelta(cwd: string, from: string, to: string): string[] | undefined

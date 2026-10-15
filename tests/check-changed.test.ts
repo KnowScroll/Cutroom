@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import {
+  appendFileSync,
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -49,7 +50,16 @@ function scratch(): string {
   const dir = mkdtempSync(join(tmpdir(), 'check-changed-'))
   made.push(dir)
   mkdirSync(join(dir, 'scripts'))
-  for (const f of ['check.mjs', '_lib.mjs', '_verification.mjs', '_markup.mjs']) {
+  // Every module check.mjs imports, or the scratch repository's copy cannot load — the fault
+  // S-188 paid for once already (S-196 added _impact.mjs and _pools.mjs).
+  for (const f of [
+    'check.mjs',
+    '_lib.mjs',
+    '_verification.mjs',
+    '_markup.mjs',
+    '_impact.mjs',
+    '_pools.mjs',
+  ]) {
     copyFileSync(join(REPO, 'scripts', f), join(dir, 'scripts', f))
   }
   write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 1\n')
@@ -168,7 +178,11 @@ test('S-193. Markdown anywhere is a document: prose outside docs/ no longer cost
     env: { ...process.env, NO_COLOR: '1' },
   })
   assert.notEqual(refused.status, 0, 'a settings change was treated as a document')
-  assert.match(`${refused.stdout}${refused.stderr}`, /a path of code: \.claude\/settings\.json/)
+  // S-196 made the refusal say WHICH rule refused; it still names the file.
+  assert.match(
+    `${refused.stdout}${refused.stderr}`,
+    /\.claude\/settings\.json is tooling or workspace configuration/,
+  )
 })
 
 test('S-192. the two-pool runner and its classes are checker tooling: no slice may carry them', () => {
@@ -176,7 +190,9 @@ test('S-192. the two-pool runner and its classes are checker tooling: no slice m
   // change to either would be verifying the suite with the scheduler under test.
   for (const file of ['scripts/run-tests.mjs', 'scripts/_pools.mjs']) {
     const dir = scratch()
-    write(dir, file, '// changed\n')
+    // Appended, not replaced: check.mjs imports _pools.mjs, and a broken import would fail the
+    // run for the wrong reason, leaving the refusal under test unexercised.
+    appendFileSync(join(dir, file), '\n// changed by the test\n')
     const result = spawnSync(
       process.execPath,
       ['scripts/check.mjs', '--slice', 'tests/stage.test.ts'],

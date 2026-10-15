@@ -118,7 +118,23 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
-### 2026-10-15 · session 89
+### 2026-10-15/16 · session 89
+
+- **A recorded impact map answers "which tests" for a code diff** (**S-196**, superseding S-177 in part).
+  `node scripts/impact-map.mjs` (402 s, 156 files) runs each test file alone under `NODE_V8_COVERAGE` and
+  records what it and every process it spawned loaded, plus the repository paths it NAMES — which is how a
+  test that copies a tool into a scratch repository is credited. The twelve PATH-only children are derived
+  from their siblings and never measured: coverage reaches a child through an environment variable, which is
+  what they exist to refuse (all twelve fail under it, naming `NODE_V8_COVERAGE`). `--changed` runs the
+  static checks plus exactly the covering tests, pooled above eight files because 110 selected files cost
+  1361 s serially against 617 s for the whole suite pooled.
+- **Worth 617 s to 4 s on a peripheral change, close to nothing on an engine one.** 2 tests for
+  `packages/sdk/src/launcher.ts`; 110–128 tests (91–93 % of the serial suite) for `reel-contract`,
+  `pipeline`, `domain` or the API; **median 110 of 156**. Cause: D-094 — a package is entered only through
+  its `src/index.ts`, so file-level coverage collapses to package-level. Function-level granularity would
+  fix it and is NOT built, because a mapping mistake under-selects silently. Every uncertainty still owes
+  the full run: unknown path, verification infrastructure, tooling configuration, missing map, uncovered
+  file.
 
 - **The scan hole is closed** (**S-195**, open since session 87): `no-absolute-paths` and `line-endings`
   enumerated `git ls-files` — tracked only — so a file a change ADDED was invisible to the run that

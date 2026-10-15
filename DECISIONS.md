@@ -8941,3 +8941,103 @@ the identical file passed it.
 demonstration above.
 
 ---
+
+## S-196 | 2026-10-16 | A recorded impact map answers "which tests" for a code diff — worth 617 s to 4 s on a peripheral change, and worth nothing on an engine one
+
+**Supersedes.** **S-177 in part.** `--changed` no longer fails closed on every code diff: it asks a
+recorded map which test files cover what changed. `--slice` and its approved list are untouched, and
+every fail-closed rule S-177 set is still in place — an unclassified path, verification
+infrastructure, workspace or tooling configuration, a missing map, or a changed file no recorded test
+covers, each still owes the full run.
+
+**Chose.**
+
+- **`scripts/impact-map.mjs` builds the map by running each test file alone under
+  `NODE_V8_COVERAGE`**, recording every file of this repository that process **or any process it
+  spawned** loaded. 156 test files, **402 s**, written to `.verification/impact.json` (gitignored,
+  like the receipt). Most of this suite's dependencies are spawns rather than imports, and they are
+  recorded: one test file produced 22 coverage files.
+- **A test also covers every repository path it NAMES.** `tests/check-changed.test.ts` copies
+  `scripts/check.mjs` into a scratch repository and runs it there, so coverage attributes the load to
+  a temporary path and the checker's own best test would never be selected for a checker change. With
+  the naming rule it covers `check.mjs`, `run-tests.mjs`, `_pools.mjs` and `_verification.mjs`.
+- **The twelve PATH-only children are DERIVED, never measured.** Coverage follows a process tree
+  because Node propagates `NODE_V8_COVERAGE` into children — which is exactly the variable those
+  children exist to refuse. Measured: run under coverage, all twelve fail with _"the child holds a
+  variable beyond PATH"_, naming `NODE_V8_COVERAGE`, and the first map build was 13 files red.
+  What each one does is re-run its feature's other test files, so its entry is the union of theirs:
+  structural, exact and free.
+- **A selection of more than eight files runs through S-192's two pools**, not one at a time.
+  Measured: the 110 files a `packages/domain` change selects cost **1361 s** serially against
+  **617 s** for the whole suite pooled, so a naive targeted run would have been slower than the thing
+  it replaced.
+- **Every uncertainty selects MORE.** The four file scans plus `file-scans` read files instead of
+  importing them, so coverage can attribute nothing to them and they run whenever anything changed. A
+  test file the map has never seen runs too, which is what lets a map outlive the commits after it was
+  built. A changed test file always runs.
+
+**What it is worth, measured on this repository.** 181 source files are covered by 156 test files:
+
+| a change to                                                | tests selected | their cost               |
+| ---------------------------------------------------------- | -------------- | ------------------------ |
+| `packages/sdk/src/launcher.ts`                             | 2              | 4 s                      |
+| `scripts/benchmark.mjs`, `packages/benchmark/src/index.ts` | 2–5            | 46–48 s                  |
+| `packages/domain/src/schema.ts`, `apps/api/src/server.ts`  | 110            | 91 % of the serial suite |
+| `packages/pipeline/src/plan/index.ts`                      | 119            | 92 %                     |
+| `packages/reel-contract/src/index.ts`                      | 128            | 93 %                     |
+
+**Median: 110 of 156 test files.** 37 source files select five tests or fewer, 19 more select under
+twenty, and **123 select sixty or more**. So this is a large win for tooling, scripts, the SDK and the
+benchmark package, and **close to nothing for a change inside the engine** — which is where feature
+work happens.
+
+**Why, and it is a design consequence rather than a defect.** A package here is entered **only**
+through its `src/index.ts` (D-094, CLAUDE.md). Importing one symbol therefore loads the whole
+package's index graph, so file-level coverage collapses to package-level for every engine package,
+and the expensive test files — the journeys and the media ones — import the engine broadly. The map
+is correct; the granularity is as fine as the import structure allows.
+
+**What would make it worth more, and is NOT built.** V8 coverage already carries per-function ranges
+and hit counts. A map at function granularity would let a change to one function in `plan/index.ts`
+select only the tests that executed that function, rather than every test that imported the package.
+It needs a diff-line to byte-offset to function-range mapping, and a mistake there under-selects
+silently, which is the one failure mode this whole entry is built to avoid. It is a separate decision
+with its own evidence, not an extension of this one.
+
+**Why.** `--slice` has always taken a human-named list, approved in a feature's gate 3 or read out by
+the `test-impact` agent, and a missed test is invisible: the slice goes green and nothing says a check
+never ran. The owner asked for the judgement to be removed — _"only run the tests for files that
+changed instead of suits or journeys everytime"_ — and a recorded map is the only way to remove it
+without lowering the bar. The honest result is that it removes the judgement everywhere and the cost
+in a third of cases.
+
+**Rejected.** **A static import graph alone** — dependency-cruiser already resolves one for the 25
+boundary rules, and it sees no spawn, no copy and no file read as data, which is most of what this
+suite does. **Trusting coverage alone** — the two blind spots above would have silently dropped the
+checker's own tests. **Letting a map answer for verification infrastructure** — the map and the
+selection are then the thing under test; `check.mjs`, `_impact.mjs`, `impact-map.mjs`, `_pools.mjs`,
+`run-tests.mjs`, `_verification.mjs`, `test-receipt.mjs`, `journey.mjs`, `drift.mjs` and
+`verification-status.mjs` still owe the full run. **Committing the map** — it is generated, it is
+large, and a stale committed map is a lie that looks like evidence; it is gitignored and rebuilt with
+`node scripts/impact-map.mjs`. **Binding the map to a tree the way the receipt is** — a map is still
+true after a commit that changes a function body, and a tree-exact rule would mean a 402 s rebuild per
+commit, which is worse than the suite it saves.
+
+**Caught by.** `tests/impact-map.test.ts`, nine checks: selection picks exactly the covering tests; an
+uncovered path, and a missing map, each owe the full run with a reason; an unmapped test runs; the
+always-run scans run and nothing else does; a named path is credited; the map is really built from what
+ran, including a SPAWNED process's loads, and a PATH-only child inherits its siblings and nothing
+else; the checker asks the map for an ordinary change and still refuses it for its own pieces; and the
+threshold that sends a large selection through the pools exists in both files. `tests/check-changed.test.ts`
+is at twelve checks, its scratch fixture now copying every module `check.mjs` imports — the S-188
+fault, which this change hit again and which turned all twelve red until the two new modules were
+copied. **Six deliberate breaks, each seen red at the right check and restored**: an uncovered path no
+longer owing the full run, the always-run set emptied, an unmapped test skipped, the naming rule
+removed, the PATH-only derivation removed, and the checker no longer refusing its own pieces. One of
+those six **stayed green at first** — the always-run break — because the unmapped-test rule was
+rescuing the same files; the check was rewritten to put the always-run set inside the map, and then it
+failed as it should. That is the kind of vacuous check this repository exists to catch.
+
+**Confirmed-by.** The owner, 2026-10-16, asking twice for exactly this and then "yes do it".
+
+---
