@@ -29,7 +29,14 @@ export function sourceFiles(...folders: string[]): string[] {
 }
 
 export type NameKind =
-  'interface' | 'type' | 'class' | 'enum' | 'variable' | 'function' | 'export-alias' | 'field'
+  | 'interface'
+  | 'type'
+  | 'class'
+  | 'enum'
+  | 'variable'
+  | 'function'
+  | 'export-alias'
+  | 'field'
 
 export interface Name {
   file: string

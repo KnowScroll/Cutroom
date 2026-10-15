@@ -254,12 +254,7 @@ export function resumeRun(
   if (keep.pictures.length > 0) {
     const kept = and(eq(picture.runId, origin), inArray(picture.pictureId, keep.pictures))
     // Every copy in the order its origin row was written, so a copy reads back as the row did.
-    for (const p of tx
-      .select()
-      .from(picture)
-      .where(kept)
-      .orderBy(sql`rowid`)
-      .all()) {
+    for (const p of tx.select().from(picture).where(kept).orderBy(sql`rowid`).all()) {
       tx.insert(picture)
         .values({ ...p, runId, chosen: false, keptFrom: origin })
         .run()
@@ -289,12 +284,7 @@ export function resumeRun(
   }
   if (keep.narrations.length > 0) {
     const kept = and(eq(narration.runId, origin), inArray(narration.narrationId, keep.narrations))
-    for (const n of tx
-      .select()
-      .from(narration)
-      .where(kept)
-      .orderBy(sql`rowid`)
-      .all()) {
+    for (const n of tx.select().from(narration).where(kept).orderBy(sql`rowid`).all()) {
       tx.insert(narration)
         .values({ ...n, runId, keptFrom: origin })
         .run()
@@ -303,12 +293,7 @@ export function resumeRun(
   if (keep.takes.length > 0) {
     // In the order made, which is the order every reader of takes reads them in (S-092, S-093).
     const kept = and(eq(take.runId, origin), inArray(take.takeId, keep.takes))
-    for (const t of tx
-      .select()
-      .from(take)
-      .where(kept)
-      .orderBy(sql`rowid`)
-      .all()) {
+    for (const t of tx.select().from(take).where(kept).orderBy(sql`rowid`).all()) {
       tx.insert(take)
         .values({ ...t, runId, degradation: null, keptFrom: origin })
         .run()

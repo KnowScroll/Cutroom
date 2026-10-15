@@ -182,7 +182,12 @@ export class StillUnavailable extends Unavailable {
  * and `engine` never are.
  */
 export type FailureKind =
-  'unavailable' | 'unreadable' | 'provider-failed' | 'crashed' | 'off-spec' | 'engine'
+  | 'unavailable'
+  | 'unreadable'
+  | 'provider-failed'
+  | 'crashed'
+  | 'off-spec'
+  | 'engine'
 
 /**
  * The kind of one thrown thing, by its CLASS alone — never its message (S-096's rejection of a

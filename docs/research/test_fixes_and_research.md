@@ -200,6 +200,14 @@ at the commit that introduces it.
 
 ### 4.1 Biome for code, prettier only on changed Markdown — do first
 
+**BUILT, 2026-10-15, session 88, as S-189.** Measured after: the `code` step (biome, lint and format
+together) **0.492 s**; markup over all 126 files **8.7 s**, over two changed files **0.259 s**. A slice's
+static checks **≈6.9 s** against 30.3 s, a documents-only `--changed` run **≈1.2 s** against ≈15 s, a full
+run's static part **≈15.4 s**. Better than the ≈11 s estimated below. Two things this plan did not foresee:
+prettier exits **2** on a glob matching nothing, so the markup step enumerates files from git
+(`scripts/_markup.mjs`); and `--documents` must NOT be narrowed to the changed set, because a journey
+resting on a recorded run has a clean tree and the check would be vacuous. Read S-189 for what holds.
+
 **Change.** Replace eslint + prettier for `.ts`/`.mjs`/`.json` with Biome; keep prettier for
 Markdown but run it on changed files only, not all 3.67 MB.
 
@@ -316,7 +324,8 @@ Worth doing for tidiness, not for speed.
 1. ~~**§4.0 wire `journey.mjs` to tree-bound `full` evidence.**~~ **Done: S-188, session 88.** It removes
    the whole suite from every journey after the first at one tree, and the document checks (~15 s) are all a
    re-journey chain pays after its first run.
-2. **§4.1 biome + changed-Markdown formatting.** Independent of everything else; ~19 s off every run.
+2. ~~**§4.1 biome + changed-Markdown formatting.**~~ **Done: S-189, session 88.** ~23 s off a slice run and
+   ~14 s off a documents-only run, measured.
 3. **§3 the measurement pass.** Idle machine, `.tmp/`, one table. Nothing after this is guesswork.
 4. **§4.2 the two-class scheduler**, sized from §3, with three green full runs as its evidence.
 5. **§4.3 CI jobs** as `hosted-checks`, gates already written and round 1 answered.

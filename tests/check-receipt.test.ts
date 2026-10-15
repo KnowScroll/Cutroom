@@ -307,7 +307,10 @@ test('--documents runs what a document can fail and skips the suite', () => {
   })
   assert.equal(r.status, 0, `${r.stdout}${r.stderr}`)
   const would = [...r.stdout.matchAll(/^\s*would run\s+(.+?)\s*$/gm)].map((m) => m[1])
-  assert.deepEqual(would, ['format', 'scans', 'decisions pin', 'copied docs'])
+  // S-189: `markup` is prettier over ALL Markdown, YAML and HTML — not narrowed to what differs
+  // from HEAD, because a journey resting on a recorded run has a clean tree and the narrowed set
+  // would be empty, which is green for the wrong reason.
+  assert.deepEqual(would, ['markup', 'scans', 'decisions pin', 'copied docs'])
   assert.match(r.stdout, /^\s*skipped\s+tests$/m)
 })
 

@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
 import { REPO } from './_repo.ts'
+import { allMarkup, MARKUP_EXTENSIONS } from '../scripts/_markup.mjs'
 
 // S-177: documents choose their own small checks. A code slice must name its approved tests with
 // `--slice`; a checker/configuration/unknown diff fails closed to the full suite. What must never
@@ -40,7 +49,7 @@ function scratch(): string {
   const dir = mkdtempSync(join(tmpdir(), 'check-changed-'))
   made.push(dir)
   mkdirSync(join(dir, 'scripts'))
-  for (const f of ['check.mjs', '_lib.mjs', '_verification.mjs']) {
+  for (const f of ['check.mjs', '_lib.mjs', '_verification.mjs', '_markup.mjs']) {
     copyFileSync(join(REPO, 'scripts', f), join(dir, 'scripts', f))
   }
   write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 1\n')
@@ -157,15 +166,21 @@ test('S-159. a change of documents only chooses the formatting, the scans and th
   const chosen = dryRun(dir, '--changed')
   assert.deepEqual(
     [...chosen.run].sort(),
-    ['copied docs', 'decisions pin', 'format', 'scans'],
+    ['copied docs', 'decisions pin', 'markup changed', 'scans'],
     `documents chose:\n${chosen.out}`,
   )
-  for (const label of ['typecheck', 'lint', 'boundaries', 'boundaries proven', 'tests']) {
+  for (const label of ['typecheck', 'code', 'boundaries', 'boundaries proven', 'tests']) {
     assert.ok(chosen.skipped.includes(label), `documents did not skip ${label}:\n${chosen.out}`)
   }
   // Every check of the full run is either run or said to be skipped: none is dropped unsaid.
+  // S-189: `markup changed` IS the full run's `markup` step, narrowed to the files that differ.
   assert.deepEqual(
-    [...chosen.run.filter((label) => label !== 'scans'), ...chosen.skipped].sort(),
+    [
+      ...chosen.run
+        .map((label) => (label === 'markup changed' ? 'markup' : label))
+        .filter((label) => label !== 'scans'),
+      ...chosen.skipped,
+    ].sort(),
     [...all].sort(),
   )
 })
@@ -179,4 +194,58 @@ test('S-177. modes cannot be combined', () => {
   })
   assert.notEqual(r.status, 0, 'check.mjs --changed --code was accepted')
   assert.match(r.stderr, /choose one mode/)
+})
+
+// ---------------------------------------------------------------- S-189. the markup check
+
+test('S-189. a slice narrows the markup check to the markup that differs, and drops it when none does', () => {
+  // prettier over all 126 markup files is 8.7 s; over two of them, 0.26 s (measured 2026-10-15).
+  // The narrowing must be visible as a step, and its absence must be printed as a skip — a check
+  // that quietly disappears is the failure mode this whole file exists to prevent.
+  const code = scratch()
+  write(code, 'packages/pipeline/src/stage.ts', 'export const stage = 2\n')
+  const codeOnly = dryRun(code, '--slice', 'tests/stage.test.ts')
+  assert.ok(
+    !codeOnly.run.some((label) => label.startsWith('markup')),
+    `a code-only slice ran a markup check over nothing:\n${codeOnly.out}`,
+  )
+  assert.ok(
+    codeOnly.skipped.includes('markup'),
+    `the markup check vanished without being named:\n${codeOnly.out}`,
+  )
+
+  const withDoc = scratch()
+  write(withDoc, 'packages/pipeline/src/stage.ts', 'export const stage = 2\n')
+  write(withDoc, 'docs/notes.md', '# Notes\n\nchanged\n')
+  const narrowed = dryRun(withDoc, '--slice', 'tests/stage.test.ts')
+  assert.ok(
+    narrowed.run.includes('markup changed'),
+    `a changed document was not checked:\n${narrowed.out}`,
+  )
+})
+
+test('S-189. the full run and --documents check ALL the markup, named file by file', () => {
+  // A glob is not enough: `**/*.yml` matches nothing here and prettier exits 2 on that, so the
+  // step would be red for a reason that is not a finding. And a journey resting on a recorded run
+  // has a clean tree, so narrowing `--documents` to what differs from HEAD would check nothing.
+  const dir = scratch()
+  assert.ok(dryRun(dir).run.includes('markup'), 'the full run skipped the markup check')
+  assert.ok(
+    dryRun(dir, '--documents').run.includes('markup'),
+    '--documents skipped the markup check',
+  )
+  // And what it names must be files that exist, not a pattern. A scratch repository cannot run
+  // the real step — `bin()` looks for prettier inside the repository being checked — so the
+  // enumeration is asked directly, here, where prettier does live.
+  const named = allMarkup(REPO)
+  assert.ok(named.length > 20, `only ${named.length} markup file(s) named for the full run`)
+  for (const path of named) {
+    assert.match(path, MARKUP_EXTENSIONS, `${path} is not markup`)
+    assert.doesNotMatch(path, /[*?]/, `${path} is a pattern, and prettier exits 2 on an empty one`)
+    assert.ok(existsSync(join(REPO, path)), `${path} does not exist`)
+  }
+  assert.ok(
+    named.includes('CLAUDE.md') && named.includes('pnpm-workspace.yaml'),
+    'the enumeration misses Markdown at the root or the workspace YAML',
+  )
 })

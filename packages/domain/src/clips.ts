@@ -313,30 +313,32 @@ function readTakes(db: Db, runId: string, where: SQL | undefined): TakeRecord[] 
     .where(where)
     .orderBy(sql`rowid`)
     .all()
-    .map((row): TakeRecord => ({
-      takeId: row.takeId,
-      attempt: row.attempt,
-      shotUnit: row.shotUnit,
-      number: takeNumber(row.number, row.takeId),
-      mode: row.mode,
-      pictureId: row.pictureId,
-      degraded: row.degraded,
-      prompt: row.prompt,
-      durationSeconds: row.requestedSeconds,
-      seed: row.seed,
-      requestId: row.requestId,
-      expandedPrompt: row.expandedPrompt,
-      path: row.path,
-      probe: parsed(row.probe),
-      scan: parsed(row.scan),
-      words: parsed(row.words),
-      sound: parsed(row.sound),
-      observation: observed.get(row.takeId) ?? null,
-      reconciliation: reconciled.get(row.takeId) ?? null,
-      verdicts: JSON.parse(row.verdicts) as TakeRecord['verdicts'],
-      outcome: row.outcome,
-      degradation: row.degradation,
-    }))
+    .map(
+      (row): TakeRecord => ({
+        takeId: row.takeId,
+        attempt: row.attempt,
+        shotUnit: row.shotUnit,
+        number: takeNumber(row.number, row.takeId),
+        mode: row.mode,
+        pictureId: row.pictureId,
+        degraded: row.degraded,
+        prompt: row.prompt,
+        durationSeconds: row.requestedSeconds,
+        seed: row.seed,
+        requestId: row.requestId,
+        expandedPrompt: row.expandedPrompt,
+        path: row.path,
+        probe: parsed(row.probe),
+        scan: parsed(row.scan),
+        words: parsed(row.words),
+        sound: parsed(row.sound),
+        observation: observed.get(row.takeId) ?? null,
+        reconciliation: reconciled.get(row.takeId) ?? null,
+        verdicts: JSON.parse(row.verdicts) as TakeRecord['verdicts'],
+        outcome: row.outcome,
+        degradation: row.degradation,
+      }),
+    )
 }
 
 /** The run's narration rows that `where` admits, in the order made. */
@@ -347,15 +349,17 @@ function readNarrations(db: Db, where: SQL | undefined): NarrationRecord[] {
     .where(where)
     .orderBy(sql`rowid`)
     .all()
-    .map((row): NarrationRecord => ({
-      narrationId: row.narrationId,
-      attempt: row.attempt,
-      shotUnit: row.shotUnit,
-      text: row.text,
-      path: row.path,
-      words: parsed(row.words),
-      probe: parsed(row.probe),
-    }))
+    .map(
+      (row): NarrationRecord => ({
+        narrationId: row.narrationId,
+        attempt: row.attempt,
+        shotUnit: row.shotUnit,
+        text: row.text,
+        path: row.path,
+        words: parsed(row.words),
+        probe: parsed(row.probe),
+      }),
+    )
 }
 
 /** A narration an earlier attempt FINISHED: made, measured, and its timings parsed (S-092). */
@@ -493,14 +497,16 @@ export function readRenderInputs(db: Db, runId: string): RenderInputs {
     .where(eq(stillHold.runId, runId))
     .orderBy(sql`still_hold.rowid`)
     .all()
-    .map((row): StillHold => ({
-      shotUnit: row.shotUnit,
-      pictureId: row.pictureId,
-      path: row.path,
-      probe: JSON.parse(row.probe) as MediaProbe,
-      takeIds: JSON.parse(row.takeIds) as string[],
-      reason: row.reason,
-    }))
+    .map(
+      (row): StillHold => ({
+        shotUnit: row.shotUnit,
+        pictureId: row.pictureId,
+        path: row.path,
+        probe: JSON.parse(row.probe) as MediaProbe,
+        takeIds: JSON.parse(row.takeIds) as string[],
+        reason: row.reason,
+      }),
+    )
 
   // The takes a render is made of: each shot's ACCEPTED take, and each HELD shot's three, by the ids
   // its ladder consumed — whichever attempt made them (S-092, S-098). A take a crash cut off has no

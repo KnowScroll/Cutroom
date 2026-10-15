@@ -601,8 +601,9 @@ test("6. only the witness's own schemas can fill observe's refused: a compile ch
   }
 
   // The builder refuses any schema but the witness's own two, by identity.
-  const { witnessRefusalsOf, witnessObservation, clipObservation } =
-    await import('@cutroom/contracts')
+  const { witnessRefusalsOf, witnessObservation, clipObservation } = await import(
+    '@cutroom/contracts'
+  )
   const lookalike = z.strictObject({ label: z.string() })
   assert.throws(() => witnessRefusalsOf({}, lookalike), /witness's own schemas/)
   assert.equal(witnessRefusalsOf({ nothing: true }, clipObservation)?.length !== 0, true)

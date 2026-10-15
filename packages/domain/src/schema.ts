@@ -51,9 +51,7 @@ export const run = sqliteTable(
     resumeRequest: text('resume_request'),
   },
   (t) => [
-    uniqueIndex('run_request_id_unique')
-      .on(t.requestId)
-      .where(sql`resumes IS NULL`),
+    uniqueIndex('run_request_id_unique').on(t.requestId).where(sql`resumes IS NULL`),
     uniqueIndex('run_resumes_unique').on(t.resumes),
   ],
 )

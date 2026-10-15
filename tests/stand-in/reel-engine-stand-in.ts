@@ -179,7 +179,8 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
 
   function status(runId: string): RunStatus | undefined {
     const run = runById.get(runId) as
-      { run_id: string; request_id: string; state: string } | undefined
+      | { run_id: string; request_id: string; state: string }
+      | undefined
     if (run === undefined) return undefined
     const { last } = lastSeq.get(runId) as { last: number }
     return {
@@ -471,7 +472,8 @@ export async function startStandIn(options: StandInOptions): Promise<StandIn> {
 
     const hash = hashOf(request)
     const existing = runByRequest.get(request.requestId) as
-      { run_id: string; body_hash: string } | undefined
+      | { run_id: string; body_hash: string }
+      | undefined
     if (existing !== undefined) {
       if (existing.body_hash === hash) {
         return [

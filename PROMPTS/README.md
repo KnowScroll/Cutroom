@@ -67,6 +67,7 @@ its `JOURNAL.md` entry says it did (S-065).
 | 079 | [079-benchmark-gates-round-4.md](079-benchmark-gates-round-4.md)                       | `yield-benchmark`     | the split, round 3, round 4     | 2026-10-12 | session 86                |
 | 080 | [080-yield-benchmark-build.md](080-yield-benchmark-build.md)                           | `yield-benchmark`     | build all four slices           | 2026-10-14 | session 87, 2026-10-14/15 |
 | 081 | [081-journey-reuse-receipt.md](081-journey-reuse-receipt.md)                           | checker tooling       | the receipt, and journey reuse  | 2026-10-15 | session 88, 2026-10-15    |
+| 082 | [082-biome-formatting.md](082-biome-formatting.md)                                     | checker tooling       | biome, changed-Markdown format  | 2026-10-15 | —                         |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

@@ -138,6 +138,13 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - **Measured on this repository, both branches**: `reel-plan` 0.277 s and `reel-contract` 0.248 s with no
   check run, and `reel-stills` **18.4 s** on a one-document delta — 51, 42 and 63 tests, each the count
   already on file, against ~25 min a journey before. Evidence commits `11a9698`, `621d608`, `4c58af6`.
+- **§4.1 built too, as S-189** (same session, owner’s word): **biome** replaces eslint and prettier for code —
+  the `code` step **0.492 s** against 6.25 s + 5.74 s — and prettier keeps Markdown, YAML and the one HTML page,
+  handed **file paths from git** (a glob matching nothing makes it exit 2). A full run and `--documents` check
+  all 126 markup files, 8.7 s; a slice and `--changed` check only what differs, 0.26 s, and drop the step when
+  nothing does. **Static cost: slice 30.3 s → 6.9 s, documents ~15 s → 1.2 s, full run 30.3 s → 15.4 s.**
+  Eslint and three packages gone, its three rules carried by name; biome’s other thirteen are `warn`, so the
+  gate did not widen. `biome check --write` refused: it rewrote imports in two verified features’ source.
 - **Proof**: `tests/check-receipt.test.ts` (25 checks), six S-188 cases in `tests/journey.test.ts` watching what the
   journey invokes, and **fifteen deliberate breaks each seen red and restored**. CLAUDE.md's full-run sentence and
   `PROMPTS/081` written. Nothing weakened; no bound, check or secrets journey touched.
@@ -231,52 +238,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 - No code, contract, test, provider, database, media, boundary rule or check was COMMITTED by this session, and
   nothing was weakened. `node scripts/check.mjs --changed` green over the documents. No reel was made and nothing
   was spent.
-
-### 2026-10-12 · session 84
-
-- **The repository is public, and so is the steering repository it answers to.** `docs/research/public-exposure-audit.md`
-  records the whole-history audit: 1857 blobs (reachable and not, via `git cat-file --batch-all-objects`), 287 commits,
-  599 paths ever committed, every commit message, 18 refs, 0 tags, every version of every `tests/fixtures/wire/*.json`,
-  and the steering clone’s 401 blobs, swept for key shapes, credential-named URL query parameters and D-022’s
-  presigned-OSS case. **No secret was found.** Every hit is a fixture (`sk-canary-not-a-real-key`,
-  `X-Amz-Signature=deadbeef`, `AKIAEXAMPLE`); `.env` was never committed and no media, database or archive ever was.
-  `Legend101Zz/Knowscroll-v2` is **public and was already public**, so `BUDGET.md`, the founding research and all 115
-  `D-` entries were readable before this repository was. Nothing rewritten — a scrub is not a fix. Public and not
-  secret: the author’s email on all 287 commits, every run’s cost, the provider and model choices.
-- **S-183 — a hosted run corroborates and never verifies.** `scripts/verification-status.mjs` is unchanged and no
-  trailer names a run; the record lives under `## Measurement`, never `## Evidence`, which `journey.mjs` owns (S-016),
-  and carries run id, head sha, tree, `run_attempt` and conclusion. Journeys stay local. **Linux is the primary
-  measurement and Windows the control** (owner, mid-session; S-179 makes Linux the deployment target): Linux red beside
-  Windows green is the port, red on both is the repository or the runner, a lone Linux run could say neither. Linux is
-  required to be measured, not to pass. `docs/features/hosted-checks.md` holds the four gates and nine choices.
-- **Gate review round 1 approved nothing** — 17 findings, all answered in the file, gates still NOT APPROVED. Two were
-  understated: eleven tests spawn a bounded PATH-only journey child at 300/360/600 s, not six, and this machine is 16
-  cores, so a hosted runner is a quarter of it. The blocking finding: a test grepping a workflow for `real-reel` must
-  contain that literal, which `paid-path`’s check 20 forbids any other test file from doing (S-111) — so it becomes an
-  amendment in `tests/paid-path-real-reel.test.ts` and `paid-path` takes a re-journey.
-- **Both platforms are measured.** `.github/workflows/measure-checks.yml` is report-only on branch
-  `ci-measurement` at `49b0686` and **not on `main`**. Setup costs **26 s on Linux against 116 s on Windows** (install
-  5 s against 71 s). Four runs were needed: the install failed because `better-sqlite3@13.0.3` **publishes no prebuilt
-  binary** while pnpm 10.15.1 bundles node-gyp 11.1.0, which cannot detect the image’s Visual Studio 2022 17.14 — class
-  2, the runner is wrong, answered with a pinned node-gyp 13.1.0 and no change to any check. Reading that line needed
-  choice 8: a job-log download answers `403 Must have admin rights to Repository`, so each job republishes its decisive
-  output as a check-run annotation. **Windows: `check.mjs` 2033 s against the local 1413 s reference — 1.40× slower,
-  not 4×, because S-176's aggregate runner is serial — nine of ten checks green, peak 1047 MiB, job 36 min, no child
-  bound fired.** The tenth failed on 1 test of 696, named as `tests/reel-takes-secrets.test.ts` test 26, line 106, its
-  PATH-only child killed at the `timeout: 300_000` bound on line 96; a local full run reproduces 696/695/1 exactly and
-  the file passes alone, so it is the known transient and **no hosted-specific defect was found on Windows**.
-  **Linux was cancelled at the 90-minute cap** 5394 s into `tests`, after static checks 2.29× faster and setup 4.5×
-  faster than Windows — faster at everything but the one thing that takes the time. The cap was not raised and no
-  bound, timeout or test was touched; its class stays **unresolved between class 2 (runner too small for the existing
-  contention) and class 3 (the port)**, class 2 leading, correcting an earlier port reading. **The measurement's most
-  useful result is an observability finding about `check.mjs`**: last-80-lines output and capture-not-stream, so
-  Windows could not name its own failing test and Linux emitted zero bytes across a 90-minute stall. Pre-existing,
-  exposed not caused, and deliberately unfixed — that file is checking infrastructure and needs a gate.
-- No code, contract, test, boundary rule or check changed, and nothing was weakened. `main` gains documents only.
-- **Hazard:** a second Claude session was committing to `main` in this same checkout, swept this session’s untracked
-  documents into its commits, and wrote files while this session had a branch checked out. One `--amend` landed on its
-  commit and was repaired by `git reset --soft` to its original object (same SHA, message and tree). Nothing lost,
-  nothing pushed. One working tree per session.
 
 ## Where to look
 

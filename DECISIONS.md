@@ -8462,3 +8462,84 @@ rest on and the saving vanished in exactly the chain this decision was written f
   no check, reporting the feature’s **51 tests** — the count session 87 got by running them.
 
 ---
+
+## S-189 | 2026-10-15 | Biome lints and formats the code in one pass; prettier keeps the markup, and is handed the files that differ
+
+**Supersedes.** Nothing. It replaces two tools with one for code and narrows what the second is asked to
+read; **S-188**'s document class and **S-177**'s modes keep their meaning, with the step renamed from
+`format` to `markup`.
+
+**Chose.**
+
+- **Biome 2.5.15 is the `code` step**, lint and format in one pass over `.ts`, `.mts`, `.cts`, `.js`,
+  `.mjs`, `.cjs` and `.json`. **Measured here, 2026-10-15: 0.492 s**, against eslint **6.25 s** plus
+  prettier's **5.74 s** over the same files — about twelve seconds a run, several times a session.
+- **Eslint is gone**, with `eslint.config.mjs`, `@eslint/js`, `typescript-eslint` and `globals`. Its three
+  explicit rules are kept by name: `@typescript-eslint/no-unused-vars` becomes biome's
+  `noUnusedVariables`, `noUnusedImports` and `noUnusedFunctionParameters` (all `error`; biome ignores a
+  parameter named with a leading underscore, as the old `argsIgnorePattern` did), `eqeqeq` becomes
+  `noDoubleEquals` (`error`), and `no-console: off` becomes `noConsole: off`.
+- **Prettier stays for markup, and only markup**: Markdown, YAML and the one HTML page, which biome cannot
+  format. The repository's `.prettierrc.json` and `.prettierignore` are unchanged, and `biome.json`
+  reproduces their code settings — line width 100, single quotes, no semicolons, trailing commas
+  everywhere, LF.
+- **Prettier is handed file paths, never globs.** `prettier --check "**/*.yml"` exits **2** here, because
+  no file matches it — a step red for something that is not a finding. `scripts/_markup.mjs` enumerates
+  the markup from git, tracked plus untracked-and-not-ignored, so the list cannot be empty while markup
+  exists and cannot silently miss a file nobody has committed.
+- **A full run and `--documents` check all 126 markup files, 8.7 s. A slice and `--changed` check only
+  the markup that differs, 0.26 s for two files**, and when none differs the step is **dropped and printed
+  as skipped**, never run over nothing. `--documents` is deliberately NOT narrowed: a journey resting on a
+  recorded run (S-188) has a clean tree, so "what differs from HEAD" there is empty and the check would be
+  green for the wrong reason.
+- **The thirteen biome rules that eslint never enforced are `warn`, not `off`**, each named in
+  `biome.json`: `noNonNullAssertion` (25 sites), `useLiteralKeys` (17), `useIterableCallbackReturn` (6),
+  `noTemplateCurlyInString` (6), `noShadowRestrictedNames` (5), `useTemplate` (3),
+  `noUnsafeOptionalChaining` (3), `useImportType` (2), `useIsArray`, `noImplicitAnyLet`,
+  `noAssignInExpressions`, `useOptionalChain` (1 each). Warnings do not fail `biome check`, so the gate is
+  exactly as wide as eslint's was — nothing that was caught stopped being caught, and nothing new became a
+  blocker without a decision. Enabling any of them is a change to source and belongs in its own slice.
+- **The reformat rides with the switch, in one commit, because the two cannot be separated**: at a tree
+  reformatted but not switched `prettier --check` is red on all 13 files, and at a tree switched but not
+  reformatted `biome check` is red on the same ones, so neither half has a green tree of its own and
+  verification is bound to a tree (S-177). §4.1's advice to commit the reformat separately was written
+  without that in view. Biome's formatter differs from prettier's on those 13 files; `biome format --write`
+  was the only writer and touched nothing else. **`biome check --write` was deliberately not used**: it also
+  applies safe lint fixes, and it had begun rewriting imports in `apps/api/src/server.ts` and
+  `tests/cutroom-sdk-routes.test.ts` as `import type` — a change to two verified features' source, which
+  was reverted. A formatting pass does not edit meaning.
+
+**Why.** `docs/research/test_fixes_and_research.md` §4.1, written from measurements, named this the first
+thing to do after the journey receipt and estimated the static total at **30.3 s → ≈11 s**. It came out
+better: a slice's static checks are now **≈6.9 s** (typecheck 0.226, code 0.492, markup-changed 0.259,
+boundaries 1.382, proven 3.974, audit 0.111, authority 0.48), and a documents-only `--changed` run is
+**≈1.2 s** against about 15 s. A full run's static part is **≈15.4 s** against 30.3 s; the suite's 1524 s
+of tests is untouched and is §4.2's problem. The three rules eslint actually enforced are cheap to carry,
+and no type-aware rule was in use — our config set no `parserOptions.project` — which is the only thing
+biome could not have replaced.
+
+**Rejected.** **Keeping eslint beside biome** — 6.25 s a run to re-ask questions biome answers in 0.49 s,
+and two configurations to keep in step. **Biome for Markdown** — it does not format Markdown, so prettier
+stays; a repository with 3.67 MB of tracked Markdown cannot drop that check. **Prettier over everything,
+as before** — 14.07 s a run, of which the code half is now biome's in half a second. **Globs for the markup
+step** — measured exit 2 on a pattern matching nothing. **Narrowing `--documents` to the changed set** —
+vacuously green at the clean tree a journey always has. **Turning biome's extra thirteen rules on** — that
+is new lint policy across verified features' source, not a cost change, and it would have put ~79 findings
+in this phase. **Turning them `off`** — a warning kept is a warning somebody can read; `off` hides what the
+tool already knows. **`biome check --write` as the reformat** — it edits meaning, as shown above.
+
+**Caught by.** `tests/check-changed.test.ts`, whose ten checks still compare the mode selection to the full
+run's own dry run — so a step added, renamed or dropped shows there rather than in a reader's memory — plus
+three S-189 checks: a code-only slice runs no markup step and says `markup` was skipped; a slice whose diff
+includes a document runs `markup changed`; and the full run's enumeration is asserted directly against this
+repository — more than twenty files, every one existing on disk, none containing a glob character, including
+`CLAUDE.md` and `pnpm-workspace.yaml`. `tests/check-receipt.test.ts` pins `--documents` to
+`markup, scans, decisions pin, copied docs`, so narrowing it there turns S-188's document class red. Three
+deliberate breaks, each alone, each seen red and restored: the slice narrowing removed, the enumeration
+replaced by `['**/*.yml']`, and `markupStep()` dropped from `DOCUMENTS_ONLY`.
+
+**Confirmed-by.** The owner, 2026-10-15: _"Actually just do everything here unless the context gets full"_,
+after §4.0 was built and committed — which is also why this decision and S-188 share one session, against
+S-160 rule 2's one-phase-per-session, at the owner's explicit word.
+
+---

@@ -29,7 +29,13 @@ export interface ReasonRows {
 }
 
 export type ReasonFamily =
-  'clipping' | 'count' | 'not shown' | 'must-show' | 'must-not-show' | 'technical' | 'other'
+  | 'clipping'
+  | 'count'
+  | 'not shown'
+  | 'must-show'
+  | 'must-not-show'
+  | 'technical'
+  | 'other'
 
 export const REASON_FAMILIES: readonly ReasonFamily[] = [
   'clipping',

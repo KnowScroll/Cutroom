@@ -17,7 +17,8 @@ import { sentUntilAvailable } from './transient.ts'
  * refused, where the stage's records hold only what was made.
  */
 export type RefusedCall =
-  { call: 'narration'; request: NarrationRequest } | { call: 'clip'; request: VideoRequest }
+  | { call: 'narration'; request: NarrationRequest }
+  | { call: 'clip'; request: VideoRequest }
 
 /** What both guards of one clips attempt compare with, and where each puts a call it refuses. */
 export interface ClipsLimits {

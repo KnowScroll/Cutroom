@@ -527,16 +527,18 @@ export function readStills(engine: Engine, runId: string, result: Record<string,
     const record = await engine.http.record(runId)
     const pictures = engine
       .query<Record<string, unknown>>('SELECT * FROM picture WHERE run_id = ? ORDER BY seq', runId)
-      .map((r): PictureRow => ({
-        ...(r as unknown as PictureRow),
-        reference_ids: json(r.reference_ids as string),
-        measure: json(r.measure as string | null),
-        words: json(r.words as string | null),
-        gate1: json(r.gate1 as string | null),
-        score: json(r.score as string | null),
-        gate1s: json(r.gate1s as string | null),
-        chosen: r.chosen === 1,
-      }))
+      .map(
+        (r): PictureRow => ({
+          ...(r as unknown as PictureRow),
+          reference_ids: json(r.reference_ids as string),
+          measure: json(r.measure as string | null),
+          words: json(r.words as string | null),
+          gate1: json(r.gate1 as string | null),
+          score: json(r.score as string | null),
+          gate1s: json(r.gate1s as string | null),
+          chosen: r.chosen === 1,
+        }),
+      )
     const planRow = engine.query<{ plan: string }>(
       'SELECT plan FROM plan WHERE run_id = ? AND selected = 1',
       runId,

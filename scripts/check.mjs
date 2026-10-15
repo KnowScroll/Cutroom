@@ -17,6 +17,7 @@ import { existsSync, rmSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
+import { allMarkup, markupAmong } from './_markup.mjs'
 import {
   DOCUMENT,
   ensureVerificationDir,
@@ -40,10 +41,23 @@ const RECEIPT_REPORTER = [
   `--test-reporter-destination=${testsRawPath(WHERE)}`,
 ]
 
+// S-189: biome lints AND formats every file of code in one pass; prettier keeps the markup it is
+// the only one of the two that can format — Markdown, YAML and the one HTML page.
+const BIOME = bin('@biomejs/biome', 'bin', 'biome')
+const PRETTIER = bin('prettier', 'bin', 'prettier.cjs')
+/** Prettier over all the markup there is: what a full run and a journey's document class owe. */
+const markupStep = () => ['markup', node, [PRETTIER, '--check', ...allMarkup(WHERE)]]
+/** Prettier over the markup that differs from HEAD: what a slice or a documents-only diff owes. */
+const changedMarkupStep = (paths) => [
+  'markup changed',
+  node,
+  [PRETTIER, '--check', ...markupAmong(paths)],
+]
+
 const CODE = [
   ['typecheck', node, [bin('typescript', 'bin', 'tsc'), '-b', '--pretty']],
-  ['lint', node, [bin('eslint', 'bin', 'eslint.js'), '.']],
-  ['format', node, [bin('prettier', 'bin', 'prettier.cjs'), '--check', '.']],
+  ['code', node, [BIOME, 'check', '.']],
+  markupStep(),
   ['boundaries', node, ['scripts/drift.mjs']],
   ['boundaries proven', node, ['scripts/drift.mjs', '--prove']],
   ['no dead rule', node, ['scripts/drift.mjs', '--audit']],
@@ -83,7 +97,7 @@ const AUTHORITY = [
 const CODE_PATH = [
   /^(packages|apps|tests|scripts|db)\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig(\.[a-z]+)?\.json)$/,
-  /^(eslint\.config\.mjs|drizzle\.config\.ts|\.prettierrc\.json|\.prettierignore)$/,
+  /^(biome\.json|drizzle\.config\.ts|\.prettierrc\.json|\.prettierignore)$/,
   /^(\.dependency-cruiser\.cjs|\.gitattributes|\.gitignore|\.editorconfig|\.npmrc)$/,
   /^\.claude\/(hooks\/.+\.sh|settings\.json)$/,
 ]
@@ -96,11 +110,26 @@ const SCANS = [
   'tests/context-file.test.ts',
 ]
 
-const DOCUMENTS_ONLY = [
-  CODE.find(([label]) => label === 'format'),
-  ['scans', node, ['--experimental-strip-types', '--test', ...SCANS]],
-  ...AUTHORITY,
-]
+const SCANS_STEP = ['scans', node, ['--experimental-strip-types', '--test', ...SCANS]]
+
+/**
+ * What a document alone can turn red. `--documents` runs it over ALL markup, because a journey
+ * resting on a recorded run (S-188) has a clean tree: "what changed since HEAD" is empty there and
+ * would make the check vacuous. `--changed`, which runs against a dirty tree, narrows it below.
+ */
+const DOCUMENTS_ONLY = [markupStep(), SCANS_STEP, ...AUTHORITY]
+
+/**
+ * Swap the whole-markup check for the markup that actually differs from HEAD, and drop it when
+ * none does — prettier over two files is 0.46 s against 7.00 s for all 3.67 MB of it (measured
+ * 2026-10-14). A dropped step is printed as such by `--dry-run`, never silently absent.
+ */
+function narrowMarkup(list, paths) {
+  const markup = markupAmong(paths)
+  return list.flatMap((step) =>
+    step[0] === 'markup' ? (markup.length === 0 ? [] : [changedMarkupStep(markup)]) : [step],
+  )
+}
 
 const kind = (path) =>
   DOCUMENT.some((re) => re.test(path))
@@ -165,7 +194,7 @@ const VERIFY_INFRASTRUCTURE = new Set([
 const FULL_ONLY = [
   /^scripts\//,
   /^(package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|tsconfig(\.[a-z]+)?\.json)$/,
-  /^(eslint\.config\.mjs|drizzle\.config\.ts|\.prettierrc\.json|\.prettierignore)$/,
+  /^(biome\.json|drizzle\.config\.ts|\.prettierrc\.json|\.prettierignore)$/,
   /^(\.dependency-cruiser\.cjs|\.gitattributes|\.gitignore|\.editorconfig|\.npmrc)$/,
   /^\.claude\//,
 ]
@@ -213,6 +242,7 @@ if (changed) {
   }
   steps = choice.steps
   partial = steps === DOCUMENTS_ONLY
+  if (partial) steps = narrowMarkup(steps, choice.paths)
   console.log(`  --changed: ${choice.paths.length} path(s) differ from HEAD`)
   for (const path of choice.paths.slice(0, 30))
     console.log(dim(`    ${kind(path).padEnd(9)} ${path}`))
@@ -235,20 +265,25 @@ if (slice) {
     console.error(`\n${red('FAIL')}  ${problem}\n`)
     process.exit(2)
   }
-  steps = [
-    ...CODE.filter(([label]) => label !== 'tests'),
+  steps = narrowMarkup(
     [
-      'slice tests',
-      node,
-      ['--experimental-strip-types', '--test', '--test-concurrency=1', ...sliceTests],
+      ...CODE.filter(([label]) => label !== 'tests'),
+      [
+        'slice tests',
+        node,
+        ['--experimental-strip-types', '--test', '--test-concurrency=1', ...sliceTests],
+      ],
+      ...AUTHORITY,
     ],
-    ...AUTHORITY,
-  ]
+    changedPaths() ?? [],
+  )
   console.log(`  --slice: ${sliceTests.join(', ')}\n`)
 }
 
 if (process.argv.includes('--dry-run')) {
   const chosen = new Set(steps.map(([label]) => label))
+  // A narrowed markup check still checks markup: it is not the skipped `markup` step.
+  if (chosen.has('markup changed')) chosen.add('markup')
   for (const [label] of steps) console.log(`  would run  ${label}`)
   for (const [label] of [...CODE, ...AUTHORITY]) {
     if (!chosen.has(label)) console.log(`  skipped    ${label}`)

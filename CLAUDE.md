@@ -161,11 +161,21 @@ node scripts/check.mjs --documents                # the document checks, asked f
 Seven code checks plus two about the authority. `--code` runs only the first seven. A red
 `decisions pin` is not yours to fix by editing anything here.
 
+**Biome lints and formats the code; prettier formats only the markup** (S-189). `biome check .` is the `code`
+step, 0.49 s for lint and format together, where eslint plus prettier over the same files cost about 12 s.
+Prettier keeps Markdown, YAML and the one HTML page, and is handed file paths — never a glob, which it exits 2
+on when it matches nothing. `biome format --write .` fixes code formatting alone; `biome check --write .` also
+applies safe lint fixes, which is a change to source and belongs in a slice, not in a formatting pass. Biome's
+warnings do not gate: the thirteen rules eslint never enforced are `warn` in `biome.json`, named there with the
+reason, so nothing that used to be caught stopped being caught and nothing new became a blocker without a
+decision.
+
 **`--changed` is enough for documents** (S-159, superseded in part by S-177): Markdown under `docs/` or `PROMPTS/`,
-the journal, decisions and this file run formatting, authority and the four file scans. A code diff cannot use it:
+the journal, decisions and this file run markup formatting — prettier over the files that differ, 0.26 s for two
+of them against 8.7 s for all 126 (S-189) — authority and the four file scans. A code diff cannot use it:
 it must name every approved affected test through `--slice`, or use the full run. `--slice` always runs typecheck,
-lint, format and all boundary checks, then only its named test files; it rejects an unlisted changed test, an unknown
-path, and verification infrastructure. `--dry-run` says which checks would run and why.
+the code check, the markup that differs and all boundary checks, then only its named test files; it rejects an
+unlisted changed test, an unknown path, and verification infrastructure. `--dry-run` says which checks would run and why.
 
 **The full run is reserved for integrity boundaries**: a change to checking/journey/boundary tooling, workspace or
 dependency configuration, an unclassified or broad diff, and a feature journey at content no recorded full run has

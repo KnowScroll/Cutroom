@@ -16,7 +16,14 @@ import {
 type Schema = { safeParse(x: unknown): { success: boolean } }
 
 export type Route =
-  'submit' | 'lookup' | 'status' | 'events' | 'result' | 'record' | 'cancel' | 'resume'
+  | 'submit'
+  | 'lookup'
+  | 'status'
+  | 'events'
+  | 'result'
+  | 'record'
+  | 'cancel'
+  | 'resume'
 
 /** The contract's route table: which schema each status code's body must parse under. */
 export const EXPECTED: Record<Route, Record<number, Schema>> = {

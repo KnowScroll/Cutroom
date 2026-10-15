@@ -36,8 +36,8 @@ Nine steps. The first seven are about this repository's code and must be green:
 | step                | what it proves                                              |
 | ------------------- | ----------------------------------------------------------- |
 | `typecheck`         | `tsc -b` over every referenced project                      |
-| `lint`              | eslint, flat config                                         |
-| `format`            | prettier, check only                                        |
+| `code`              | biome: lint AND format over every file of code, 0.5 s       |
+| `markup`            | prettier, check only, over every Markdown, YAML and HTML    |
 | `boundaries`        | no forbidden edge exists right now                          |
 | `boundaries proven` | each rule still **catches** a violation written to break it |
 | `no dead rule`      | no rule names a folder a package has since lost             |
@@ -54,9 +54,11 @@ The last two are about the authority, which lives in another repository:
 
 ```bash
 node node_modules/typescript/bin/tsc -b --pretty
-node node_modules/eslint/bin/eslint.js .
-node node_modules/prettier/bin/prettier.cjs --check .
-node node_modules/prettier/bin/prettier.cjs --write .     # fix formatting
+node node_modules/@biomejs/biome/bin/biome check .        # lint and format, code only
+node node_modules/@biomejs/biome/bin/biome check --write . # fix code (applies safe lint fixes too)
+node node_modules/@biomejs/biome/bin/biome format --write . # fix code formatting ONLY
+corepack pnpm format                                      # prettier --check over markup
+corepack pnpm format:write                                # fix markup formatting
 node scripts/drift.mjs                                    # boundaries now
 node scripts/drift.mjs --prove                            # boundaries can still bite
 node scripts/drift.mjs --audit                            # no rule has gone quietly inert

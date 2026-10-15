@@ -68,12 +68,7 @@ function git(cwd: string, ...args: string[]) {
 }
 
 function repo(
-  opts: {
-    text?: string
-    check?: string
-    tests?: Record<string, string>
-    dirty?: boolean
-  } = {},
+  opts: { text?: string; check?: string; tests?: Record<string, string>; dirty?: boolean } = {},
 ) {
   const dir = mkdtempSync(join(tmpdir(), 'journey-'))
   made.push(dir)

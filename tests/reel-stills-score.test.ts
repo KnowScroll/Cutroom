@@ -301,8 +301,9 @@ test('32. scoring a runs recorded terms with its recorded weights reproduces its
 
       // Replayed from the record alone: the entity the reconciler matched, the measure, the weights.
       const observed = ran.observations.find((o) => o.picture_id === row.picture_id)?.observation
-      const reconciled = ran.reconciliations.find((r) => r.picture_id === row.picture_id)
-        ?.answer as ReconcileAnswer | undefined
+      const reconciled = ran.reconciliations.find((r) => r.picture_id === row.picture_id)?.answer as
+        | ReconcileAnswer
+        | undefined
       const index = reconciled?.subjects.find((s) => s.id === 'seal')?.entity ?? -1
       const matched = observed?.entities[index]
       assert.ok(
