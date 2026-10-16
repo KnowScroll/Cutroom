@@ -9497,3 +9497,80 @@ data comes from without naming the comparison.
 benchmark."_
 
 ---
+
+## S-201 | 2026-10-17 | `benchmark-view` is a local server reading the engine's record directly, not a file you double-click — the owner specified it by answering, and approved it against a working mockup
+
+**Supersedes.** **S-184, in the one clause that described the page**: _"one self-contained HTML page with its data
+inlined, written by the benchmark under its gitignored output path … no CDN, no server, opens from the
+filesystem"_. Everything else S-184 settled — that the view is its own feature with its own four gates, and that it
+comes after the scoring half — stands. **S-200 is amended in one sentence**: it said the page reads the scoring
+half's `--out` record, and the page now opens `data/cutroom.sqlite` itself. S-200's other half is untouched and
+load-bearing: `yield-compare` stays stopped and **nothing here computes a band or a verdict**.
+
+**Why the "no server" form had to go, which is a fact rather than a preference.** The owner asked for it live —
+_"No we need it to be live, we send in json or any other form of data and it just gets feeded into that dashboard"_
+— and **a page opened from the filesystem cannot load a data file sitting beside it**: browsers refuse the fetch
+under file-origin rules. So "feed it data and it shows up" admits exactly two shapes, a server or data baked into
+the file at build time, and the second is what S-184 had and what the owner rejected. The server is therefore
+forced, and it is the smallest one that works: local, started by hand, read-only.
+
+**Chose**, every item an answer the owner gave rather than a choice made for him.
+
+- **A local server you start**: `node scripts/benchmark-serve.mjs`, opened on localhost. **Not hosted** — S-180's
+  _"Cutroom owns no deployment work"_ stands, and reaching it from another machine is not in scope.
+- **It opens `data/cutroom.sqlite` read-only and scores on the fly** with `packages/benchmark`, so a new run
+  appears on refresh with no export step. **Finished runs only**; a run in progress is out of scope.
+- **A comparison board of any number of runs as columns**, every figure a row, differences marked, best and worst
+  tinted where a row has a better direction. **Briefs and configs may differ and nothing is refused.** This is not
+  `yield-compare` returning: **no band, no verdict word, no comparability rule** — the owner asked for exactly the
+  side-by-side he described before the stop, _"i can select the reel we generated and i get numbers of those in
+  from of me … dont fucking care if they have different configs or different briefs"_.
+- **The fleet overview is the landing view**: headline figures, where reels die, scores over time, then the ledger.
+- **Runs are picked by checkbox in a filterable ledger** (world, ending, brief, made-a-reel, free-text search).
+- **The model's own words are shown, folded behind a click** — the prompt that asked for each picture, each gate's
+  refusal reasons in its own words, Gate 7 question by question. D-022's rule is unchanged: no key, URL or query
+  string is ever printed.
+- **Charts are ECharts, vendored into the repository and served by our own server** — no CDN and no network at
+  runtime. Simple bars stay hand-drawn. **ECharts is not on cdnjs at 5.5.1**; the vendored copy is the npm `dist`
+  build, 1,030,855 bytes.
+- **Where reels die is a plain column chart in stage order**, not a funnel, with each stage's count on the bar and
+  **the loss from the previous stage in red above it**. Stage order is kept rather than sorted, because the
+  sequence is the information.
+- **Scores over time carries six toggleable lines** — the five part scores and the overall rating — with a gap
+  where a run never reached that part, never a zero.
+- **Layout**: full bleed with a 16px gutter and no centred column; **never more than two charts across**; four size
+  presets and a drag handle on every chart.
+- **Dark theme is true black** (`#000000`, surfaces lifting by light alone, no hue cast) with one amber accent.
+- **Chart colours are the validated categorical palette**, assigned in fixed order, checked with the
+  colour-blindness and contrast validator in both themes rather than picked by eye. Re-colouring means
+  re-validating.
+
+**What this costs elsewhere, named now so no slice is surprised.** `tests/yield-benchmark-reader.test.ts` asserts
+the benchmark reader's **source text** holds exactly one `new DatabaseSync(`, opened `{ readOnly: true }`. A second
+reader breaks it. The fix is the one `yield-compare` had designed and never built: the read-only open, the
+held-column read, the row selection and the run-id prefix resolution **move into a shared module both readers
+import**, and that scan grows from one file to the set, clause by clause — every negative per file, the positive
+assertions over the concatenation. **That work changes owner from the stopped feature to this one.** Its exhaustive
+`assert.deepEqual(processes, ['git'])` is an order-exact list, so the serving reader starts **no process at all**.
+
+**Rejected.** **The self-contained file that opens by double-click** (S-184's form) — it cannot be live, which is
+the thing that was asked for. **Hosting it** — it reverses S-180 and adds auth, deploy and secret handling for an
+instrument one person runs. **Showing a run in progress** — more machinery for a view nobody asked for; refresh
+after it ends. **Reviving `yield-compare`'s arithmetic inside the page** — it would be the stopped feature under
+another name with its gates unreviewed (S-200). **Picking chart colours by eye** — the palette is validated, and a
+swap without re-validation silently breaks colour-blind separation. **Sorting the stage chart ascending** — it
+destroys the sequence the chart exists to show. **A funnel** — the owner refused it by name.
+
+**Caught by.** `docs/features/benchmark-view.md`'s four gates, which are **not written and not approved**, so no
+implementation file may exist yet (CLAUDE.md rule 1). The approved look is recorded twice over: in that file's own
+"The shape the owner approved" section, and as a working mockup built from all 52 real runs at
+`.artifacts/view-mockup/` — gitignored, with its source beside it — which the owner reviewed over four rounds and
+approved on 2026-10-17.
+
+**Confirmed-by.** The owner, 2026-10-16 and 2026-10-17, answering eleven questions and then, against the mockup:
+_"Alright now it looks good."_ The earlier answers that fix the shape: _"No we need it to be live"_;
+_"its for developers primarily but also for others to see"_; _"We need it to relay as much information as possible
+and also cleanly and clearly"_; _"Include graphs if something needs it dont hesitate"_; and, on the look,
+_"If youre going dark mode then choose black not this shitty blue"_.
+
+---

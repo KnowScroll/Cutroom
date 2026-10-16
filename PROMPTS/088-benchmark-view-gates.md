@@ -5,20 +5,27 @@
   (S-200): `yield-benchmark` is built and verified, and `yield-compare` is stopped
 - **Work:** the four gates written, one adversarial round, every finding applied or refused in writing. **No
   implementation file until the `Gates:` line says APPROVED four times** (CLAUDE.md rule 1)
-- **Written:** 2026-10-16
+- **Written:** 2026-10-16, rewritten 2026-10-17 against the approved shape (S-201)
 - **Run:** —
 
 > **The owner stopped `yield-compare` on 2026-10-16, in session 93** — _"No just leave it, we should just build the
 > view part of it and end the benchmark"_ — after three fresh adversarial rounds refused all four of its gates (22,
 > 24 and 11 findings; 57 in all, 56 applied, 1 refused). **S-200 records it, with what stopping costs.** So this
-> page reads the **scoring half's** `--out` record, which exists and holds 52 runs, and it draws no verdict, no
-> delta and no comparison of two sides. After it, the benchmark is complete and the queue is `self-heal`.
+> page draws no verdict, no delta and no comparison of two sides. **It reads `data/cutroom.sqlite` through a
+> local server you start** — S-201, which amends S-200 on that one point. After it, the benchmark is complete and
+> the queue is `self-heal`.
 
-## THE OWNER SPECIFIED THE SHAPE — it is not S-184’s any more
+## THE SHAPE IS APPROVED — S-201. Write the gates TO it, do not re-decide it
 
-Asked in session 93 and answered, so **none of this is open and none of it is yours to re-decide**. A mockup built
-against all 52 real runs is at `.artifacts/view-mockup/cutroom-benchmark.html` (gitignored, self-contained); the
-owner was still reviewing it when session 93 ended, so **read his verdict first and treat the mockup as the design**.
+Asked in session 93, answered, and then **approved on 2026-10-17 against a working mockup** — _"Alright now it
+looks good"_ — so **none of this is open**. **S-201** records it, supersedes S-184’s self-contained no-server page
+and amends S-200’s sentence about the `--out` record. The full specification is
+`docs/features/benchmark-view.md`, section **"The shape the owner approved"** — read that before anything else.
+
+The mockup is at `.artifacts/view-mockup/` (gitignored): `cutroom-benchmark.html` to open, `mockup-source.html`
+for the markup, CSS and chart options, `extract.mjs` for how its data was pulled and `build.mjs` for how it was
+assembled. **It is a mockup, not an implementation**: it reads a baked JSON, where the real page reads the
+database through a server. If that directory is gone, the feature file’s section is authoritative.
 
 | what               | the owner’s answer                                                                                                                    |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
@@ -111,6 +118,9 @@ approved, the owner's question if not.
 
 Write any implementation file of `benchmark-view` before the `Gates:` line says APPROVED four times. Revive
 `yield-compare` — it is stopped (S-200), its gates are kept only as a record, and a page that computed verdicts
-would be that feature under another name with its gates unreviewed. Design against the `--out` record as imagined
-rather than as the scoring half writes it. Weaken a check, a bound or a pinned value. Add a CDN, a server, a build
-step, a network call or an npm dependency to the page. Commit anything the page generates.
+would be that feature under another name with its gates unreviewed. Design against the record as imagined rather than as
+`packages/benchmark` actually scores it — open a real one first. Weaken a check, a bound or a pinned value.
+**Re-decide anything in "The shape the owner approved"** (S-201) — it cost four review rounds with the owner.
+Re-colour the charts without re-running the palette validator. Add a **CDN, a network call at runtime, or a build
+step** — the ECharts build is vendored and served by our own server, which is the one thing "no server" no longer
+forbids. Commit anything the page generates, or the vendored data.

@@ -40,9 +40,11 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   answered, on hold). **Gates not written, files only**: `benchmark-view` (S-184, S-200), `run-provenance`,
   `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: the owner's verdict on `benchmark-view`'s MOCKUP**, then `PROMPTS/088` rewritten against the shape he
-  specified, then an `S-` entry superseding S-184 and amending S-200, then the four gates (S-200). **The benchmark's
-  last part and the only one left**. The page reads `scripts/benchmark.mjs`' own `--out` record — which exists and holds 52 runs — draws no
+- **Next: `benchmark-view`'s four gates** (`PROMPTS/088`). **Its shape is APPROVED** — the owner signed off a
+  working mockup on 2026-10-17 and **S-201** records it, superseding S-184's self-contained no-server page and
+  amending S-200's `--out` sentence: it is **a local server you start, reading `data/cutroom.sqlite` directly**.
+  The full specification is `docs/features/benchmark-view.md`, "The shape the owner approved"; the mockup and its
+  source sit under the gitignored `.artifacts/view-mockup/`. **The benchmark's last part and the only one left**. The page reads `scripts/benchmark.mjs`' own `--out` record — which exists and holds 52 runs — draws no
   verdict and no delta, and **owns the stratification** that was `yield-compare`'s: session 82's 42% / 70% / 100%
   by subjects per shot, the one view needing no matched pairs. Its gates must settle where the data comes from and
   **whether a stratum carries an uncertainty band at all**, since that arithmetic went with the stopped feature.
@@ -154,7 +156,14 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   bar because **every picture is attempt 1**. It runs on all 52 real runs and reproduces session 82’s finding
   from the record (**42% / 70% / 100% / 100%** by subjects per shot). Feedback applied twice: full-bleed width,
   charts two across with S/M/L/XL presets and drag resize, **refusal by world** filling the empty slot. At
-  `.artifacts/view-mockup/cutroom-benchmark.html`, **gitignored**; **no implementation file exists**.
+  `.artifacts/view-mockup/`, **gitignored**, with its source beside it; **no implementation file exists**.
+- **The owner APPROVED it on 2026-10-17 — S-201.** Four rounds of look feedback, each a real defect: side margins
+  on a full-width instrument; charts clumped three-up and too small; a funnel nobody could read (now a plain
+  column chart in stage order with each previous stage’s loss in red); four group-by charts crowded in one panel
+  (now four cards); and a blue-cast dark theme (now true black). Everything scaled up with it. **The chart palette
+  is validated, not chosen** — both themes pass the colour-blindness and contrast checks, so re-colouring means
+  re-validating. **S-201 names what it costs elsewhere**: the shared row loader `yield-compare` designed and never
+  built moves to this feature, because one check asserts the reader holds exactly one `new DatabaseSync(`.
 
 ### 2026-10-16 — session 92
 
