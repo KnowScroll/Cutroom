@@ -35,10 +35,14 @@ git and the journal keep them.
   `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
   `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: two calls are the owner's, then `self-heal`** — the four file scans reading TRACKED files only, so a slice's new files escape them
-  during the suite that verifies it; and the three imprecise gate sentences. **Journey reuse is CLOSED (S-188,
-  session 88)**: a full run writes `.verification/receipt.json` and the journey re-runs nothing at that content,
-  or only the document checks when Markdown alone differs.
+- **Next: one older call is the owner's, then `self-heal`** — the three imprecise gate sentences session 87 found
+  in `yield-benchmark`'s approved gates. **The scan hole that stood beside it is CLOSED (S-195, session 89)**: both
+  file scans read tracked plus untracked-not-ignored files through `repoFiles()` in `tests/_files.ts`, so a slice's
+  new files are scanned by the run that verifies them. Two cost levers are open and are the owner's calls, neither
+  recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4 narrowing what each secrets child
+  re-runs, which supersedes S-028 and narrows a proven property for about 200 s of a 617 s suite. **Journey reuse is
+  CLOSED (S-188, session 88)**: a full run writes `.verification/receipt.json` and the journey re-runs nothing at
+  that content, or only the document checks when Markdown alone differs.
   `hosted-checks` stays on hold. SDK v1 is complete on Cutroom's side (S-180, superseding S-179's
   integration scope). The
   `PROMPTS/073-cutroom-sdk-format-finding.md` chain is complete: the SDK journey at `1c7c77d` PASSed at `6a95a8d`,
@@ -117,6 +121,19 @@ and its 1920×3416 frame; `4938925b` the planner's reasoning and no answer, `5df
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-16 · session 90
+
+- **The queue read, and this digest's stale "Next" corrected.** Line 38 still named the tracked-files scan hole
+  as an open owner call; **S-195 closed it in session 89**, so the bullet now names the one older call that
+  remains — the three imprecise `yield-benchmark` gate sentences — and records that §4.3 (`hosted-checks`) and
+  §4.4 (narrowing the secrets children) are open owner calls that this session recommends against taking now:
+  §4.4's own decision line in `docs/research/test_fixes_and_research.md` makes it conditional on §4.2 and §4.3
+  not having made the suite cheap enough, and S-192 did (1455 s → 617 s), so its ~200 s no longer buys the
+  narrowing of a proven property; §4.3 adds Ubuntu as a second platform for corroboration that carries no
+  trailer (S-183). No code touched; `check.mjs --changed` is the whole verification a Markdown-only change owes
+  (S-193). The journal was compacted to its 80-line budget first (sessions 72 and 73–75 merged, their detail in
+  the commits and feature files per S-177) — the same thing session 85 did, and the reason this entry exists.
 
 ### 2026-10-15/16 · session 89
 
