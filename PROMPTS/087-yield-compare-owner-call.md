@@ -6,7 +6,10 @@
 - **Work:** the owner answers; then either Slice 1 of `yield-compare` or `benchmark-view`'s four gates. **No
   implementation file of `yield-compare` until the `Gates:` line says APPROVED four times**
 - **Written:** 2026-10-16
-- **Run:** —
+- **Run:** session 93, 2026-10-16 — **answered the same session it was written.** The owner took neither of the two
+  answers below as phrased: _"No just leave it, we should just build the view part of it and end the benchmark."_
+  **`yield-compare` is STOPPED (S-200)**, not parked — `Status: stopped`, no implementation file ever — and
+  `benchmark-view` becomes the benchmark's last part and the only one left. `PROMPTS/088` is its gates
 
 > **Round 3 was the last round that runs unasked** (`PROMPTS/086`'s own instruction, and the cap this repository
 > keeps). Three fresh adversarial reviewers have now refused all four gates — **22, 24 and 11 findings, 57 in all,

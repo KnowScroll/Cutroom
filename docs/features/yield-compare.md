@@ -5,8 +5,8 @@ authority: plan
 
 # yield-compare — two sides of runs, compared under a rule fixed before any number is read
 
-Status: planned
-Decisions: D-022, D-025, D-027, D-043, D-047, D-050, D-062, D-086, D-088, D-094, D-096, D-100, D-102, S-016, S-017, S-020, S-028, S-035, S-046, S-070, S-072, S-090, S-098, S-099, S-111, S-115, S-129, S-149, S-150, S-153, S-155, S-158, S-161, S-162, S-163, S-164, S-172, S-176, S-177, S-178, S-182, S-184, S-185, S-186, S-188, S-191, S-192, S-193, S-196, S-197, S-198, S-199
+Status: stopped — the owner stopped it after three adversarial rounds refused all four gates; S-200
+Decisions: D-022, D-025, D-027, D-043, D-047, D-050, D-062, D-086, D-088, D-094, D-096, D-100, D-102, S-016, S-017, S-020, S-028, S-035, S-046, S-070, S-072, S-090, S-098, S-099, S-111, S-115, S-129, S-149, S-150, S-153, S-155, S-158, S-161, S-162, S-163, S-164, S-172, S-176, S-177, S-178, S-182, S-184, S-185, S-186, S-188, S-191, S-192, S-193, S-196, S-197, S-198, S-199, S-200
 Gates: product pending · architecture pending · program-design pending · slices pending
 
 > **Created 2026-10-12 at the owner's request**, in session 83, by S-184: the benchmark is three features, and this
@@ -85,6 +85,29 @@ Gates: product pending · architecture pending · program-design pending · slic
 > **Its gates were not written before this.** The sections above them record what the feature owns, what three
 > adversarial rounds in session 83 settled or left open, and the nine choices the gates had to make. No
 > implementation file until all four are approved (CLAUDE.md rule 1).
+>
+> ---
+>
+> **STOPPED 2026-10-16 by the owner, in session 93 — S-200.** After three fresh adversarial rounds refused all
+> four gates (22, 24 and 11 findings; 57 in all, 56 applied and 1 refused), the owner stopped the feature rather
+> than approve it by decision or run a fourth round: _"No just leave it, we should just build the view part of it
+> and end the benchmark."_ **No implementation file of this feature is ever written.** Everything below this line
+> is kept as the record of what the comparison would have been and of 57 real faults found in a specification,
+> several of which are facts about the engine that cost a reviewer each to establish — a degraded shot is filmed
+> from words, a shot cannot carry two degradation rows, a plan-stage death still writes a `model_receipt`, and a
+> widened `redact()` would have erased the scoring half's own run ids.
+>
+> **What stopping costs is in S-200 and is not softened here**: nothing in this repository will say whether an
+> engine change helped, and the engine's own spread on one brief with nothing changed is wider than most real
+> improvements — brief `f984199a` rates 3.0, 10.0, 10.0, 38.5 and 45.7 over five runs, and brief `db460dea`'s
+> higher-rated run made no reel while its lower-rated one did. **A later session that wants that claim back
+> reopens these gates**, which is why they are kept rather than deleted.
+>
+> **Two sections below are now void**, and are left in place rather than edited so the record reads as it was
+> reviewed: the Deferred section's claim that `benchmark-view` reads **this feature's** written record — it reads
+> the scoring half's `--out` instead (S-200) — and Gate 4's four slices, which will not be built. **The stratify
+> view survives as `benchmark-view`'s**, figures and all; only its uncertainty band was this feature's arithmetic,
+> and whether the page carries one is that feature's gates to settle.
 
 ## What it owns
 

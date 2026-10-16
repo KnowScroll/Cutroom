@@ -9426,3 +9426,74 @@ owner's**: approval by decision in S-185's form, or leaving the feature written 
 `benchmark-view`. No implementation file of this feature exists.
 
 ---
+
+## S-200 | 2026-10-16 | `yield-compare` is STOPPED after three refused rounds, and `benchmark-view` is the benchmark's last part — the page reads the scoring half's own record and nothing else
+
+**Supersedes.** **S-198 in its order** — `yield-compare` was first and is now not built at all. **S-184 in one
+part**: the comparison was one of three features and is now one of two, so "the order is scoring, then comparison,
+then view" becomes scoring, then view. **S-182's comparison clauses govern nothing that will be built**: its
+amendment moved every clause about putting two sets of runs beside each other to `yield-compare`'s address rather
+than withdrawing them, and that address is now a stopped feature — they are not revived here and nothing replaces
+them. S-199 and its two amendments stand as the record of what was designed; they approve nothing and bind no code.
+
+**Chose.**
+
+- **`yield-compare` is stopped, not deferred.** Its four gates stay written and unapproved, with all three review
+  tables and 57 findings intact, as the record of what the comparison would have been. **No implementation file of
+  it is ever written.** `Status: stopped` rather than a place in the queue, because a deferred feature reads as
+  work that is coming and this is not.
+- **`benchmark-view` is the benchmark's last part**, and after it the benchmark is complete. The queue then moves
+  to `self-heal` (S-169, S-170) with no benchmark work behind it.
+- **The page reads the SCORING half's record alone** — `scripts/benchmark.mjs`' `--out`, which exists and holds 52
+  runs — which is S-184's own wording (_"written by the benchmark under its gitignored output path"_). The claim in
+  `docs/features/yield-compare.md`'s Deferred section that the page reads the **comparison's** record is void, and
+  `docs/features/benchmark-view.md`'s _"Two sides (once `yield-compare` exists)"_ bullet is struck rather than left
+  as a premise that cannot come true.
+- **The stratification view survives and is the page's, not the comparison's.** `benchmark-view` already scopes
+  _"the refusal rate by subjects per shot, 42% / 70% / 100%"_ — session 82's finding, and the one view in
+  `yield-compare` that needed no matched pairs and no two sides. It keeps the figures. **Whether it carries an
+  uncertainty band is a question for its gates**, since the arithmetic for one was `yield-compare`'s: the gates may
+  compute a single-side band in the page's own writer, or print the figures and the member count with no band and
+  say so on the page. Either is honest; silently drawing a bare rate as if it were precise is not.
+
+**Why.** The owner stopped it, after the case for it had been made twice and after three adversarial rounds had
+refused all four of its gates: _"No just leave it, we should just build the view part of it and end the benchmark."_
+The reason the comparison existed was the owner's own standing one (S-184, S-182) — _"how would we know whether the
+new engine or new thing in the engine worked"_ — and **that question is now unanswered on purpose**, which is the
+cost this entry exists to record rather than to soften. Three rounds also cost three strongest-model reviews and
+produced a 1430-line gate document that was still refused, against an arithmetic core of a few hundred lines; the
+owner's judgement is that the ceremony outgrew the thing. The scoring half already prints every number for every
+run and the ledger holds all 52, so two runs **can** be put side by side by eye — which is what the owner said and
+is true.
+
+**What is lost, measured rather than asserted**, because this is the part a later session must not rediscover by
+accident. The engine's own run-to-run spread on **one brief with nothing changed** is larger than most real
+improvements, read from `docs/research/benchmark.md` this session: brief `f984199a`, five runs, ratings **3.0,
+10.0, 10.0, 38.5, 45.7** and cost **0¢ to 71¢**; brief `a366464a`, two runs, **35.5** and **94.4**; and brief
+`db460dea`, two runs, where **the higher-rated run (69.3) made no reel and the lower (60.0) did**. So any future
+claim that an engine change helped, made by reading two rows, sits inside that spread and can be exactly backwards.
+Nothing in this repository will now say otherwise, and no check can catch it, because the thing that would have
+caught it is the feature being stopped. **A later session that wants the claim must reopen `yield-compare`'s gates,
+which is why they are kept.**
+
+**Rejected.** **A fourth review round** — the owner declined it and the three rounds' trend (22, 24, 11 findings,
+56 of 57 applied) says a fourth would return narrower findings against the same document. **Approving the four
+gates by decision in S-185's form and building it** — offered twice with its precedent and its cost, and declined.
+**Deferring it with a place in the queue** — a parked feature reads as scheduled work and would be re-proposed
+every time the queue is read. **Deleting the feature file** — the three review tables are the record of 57 real
+faults found in a specification, several of which are facts about the engine (a degraded shot is filmed from words;
+a shot cannot carry two degradation rows; a plan-stage death still writes a `model_receipt`) that cost a reviewer
+each to establish and are useful to any later reader. **Moving the comparison's measures into
+`benchmark-view`** — a page that computed verdicts would be the stopped feature under another name, with its gates
+unreviewed.
+
+**Caught by.** `docs/features/yield-compare.md`'s `Status: stopped` line and `tests/feature-files.test.ts`, which
+holds every feature file to its front matter and its four-gate line; the absence of
+`packages/benchmark/src/compare.ts`, `scripts/benchmark-compare.mjs` and `scripts/_benchmark-rows.mjs`, verified at
+this commit; and `benchmark-view`'s own four gates, which refuse until approved and must now state where the page's
+data comes from without naming the comparison.
+
+**Confirmed-by.** The owner, 2026-10-16: _"No just leave it, we should just build the view part of it and end the
+benchmark."_
+
+---

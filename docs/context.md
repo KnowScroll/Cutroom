@@ -26,25 +26,26 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   `resume-failed`, `yield-benchmark` (S-161 to S-164, S-171 to S-174, S-182 to S-186). `cutroom-sdk` carries `Status: verified` from its Slice 4
   journey at `1c7c77d` (`6a95a8d`); its sole compatibility re-journey at `6a95a8d` PASSed at `c15b2d4` after the
   journey writer's format invariant was repaired in `1c7c77d`. The re-journey list is closed on file; nothing has
-  been weakened. **Stopped**: `one-subject` (S-149). **Planned, gates not written**: `caption-match` (S-165),
+  been weakened. **Stopped**: `one-subject` (S-149), **`yield-compare` (S-200)**. **Planned, gates not written**: `caption-match` (S-165),
   `composed-hold`, `diagram-shots` (S-166), `code-reels` (S-167), `self-heal` (S-169, S-170), `video-edits`,
   `parallel-shots` (S-115, no file yet). **Deferred, no place in the queue**: `clip-overlays` (S-167).
 - **`yield-benchmark` is BUILT and `Status: verified`** (session 87): every run scored part by part, the ledger at
   `docs/research/benchmark.md`. Its gates were approved by owner decision (S-185) and no reviewer, so **the slices
   carried the review**: 25 findings reported rather than built around, of which **three imprecise gate sentences
   are named in that file's amendment block** (S-197) and the other 22 are lost with session 87's hand-backs.
-  **Enforced boundary rules: 25.** **Gates written and NOT approved**: `yield-compare` (all four, refused by three
-  fresh rounds on 22, 24 and 11 findings — 57 in all, 56 applied and 1 refused; S-199 and its two amendments) and
-  `hosted-checks` (round 1 answered, on hold).
-  **Gates not written, files only**: `benchmark-view` (S-184), `run-provenance`, `picture-prompt`.
+  **Enforced boundary rules: 25.** **`yield-compare` is STOPPED (S-200)**: its four gates were written and refused
+  by three fresh rounds on 22, 24 and 11 findings — 57 in all, 56 applied and 1 refused, S-199 with two amendments —
+  and the owner stopped it rather than approve it by decision or run a fourth round. The file is kept as the record;
+  **no implementation file of it is ever written**. **Gates written and NOT approved**: `hosted-checks` (round 1
+  answered, on hold). **Gates not written, files only**: `benchmark-view` (S-184, S-200), `run-provenance`,
+  `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: the OWNER'S CALL on `yield-compare`** (`PROMPTS/087`), then `benchmark-view`'s gates
-  (S-184's split, S-198; the owner's word on 2026-10-16). **Three fresh adversarial rounds have refused all four
-  gates — 22, 24 and 11 findings, 57 in all, 56 applied and 1 refused** — and S-199 with its two amendments settles
-  the choices. Nothing is approved, so no implementation file may exist yet. **Round 3 was the last that runs
-  unasked**, so the two answers left are the owner's: approval by decision (S-185's form), or leaving the feature
-  written and unapproved and moving to `benchmark-view`. Each round is cheaper and narrower than the last, and each
-  still found a rule that could not fire or could not fail. Then `self-heal`, session 53's
+- **Next: `benchmark-view`'s four gates** (`PROMPTS/088`, S-200), **the benchmark's last part and the only one
+  left**. The page reads `scripts/benchmark.mjs`' own `--out` record — which exists and holds 52 runs — draws no
+  verdict and no delta, and **owns the stratification** that was `yield-compare`'s: session 82's 42% / 70% / 100%
+  by subjects per shot, the one view needing no matched pairs. Its gates must settle where the data comes from and
+  **whether a stratum carries an uncertainty band at all**, since that arithmetic went with the stopped feature.
+  **After it the benchmark is complete**, and the queue is `self-heal`, session 53's
   P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and `parallel-shots`'
   gates from `b15d203`. Both of session 87's older calls are closed (S-195, S-197). Two cost levers stay open and
   are the owner's, neither recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4
@@ -147,40 +148,36 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   than merely applied. **Markdown only**, so `check.mjs --changed` is the whole verification owed (S-193); no
   implementation file exists and the `Gates:` line reads pending four times; `JOURNAL.md` was compacted first
   (sessions 77 and 78 merged, their detail in the commits and the two feature files, S-177).
+- **Then the owner STOPPED `yield-compare` (S-200)** — _"No just leave it, we should just build the view part of it
+  and end the benchmark"_ — rather than approve it by decision or run a fourth round, after the case for it was
+  made twice. `Status: stopped`, the file kept as the record of 57 faults found in a specification, **no
+  implementation file ever**. **`benchmark-view` is now the benchmark's last part and the only one left**: it reads
+  the scoring half's `--out`, draws no verdict or delta, and **owns the stratification**, whose uncertainty band
+  went with the stopped feature and is a question for its gates. **What stopping costs is recorded rather than
+  softened**: nothing will say whether an engine change helped, and the engine's spread on ONE brief with nothing
+  changed is wider than most real improvements — `f984199a` rates 3.0, 10.0, 10.0, 38.5, 45.7 over five runs, and
+  `db460dea`'s higher-rated run (69.3) made **no** reel while its lower (60.0) did. Reopening the claim means
+  reopening those gates, which is why they are kept.
 
 ### 2026-10-16 — session 92
 
 - **A FRESH round 2 refused `yield-compare`'s four gates on twenty-four findings** (`PROMPTS/085`, CLAUDE.md rule
-  4), **twenty-three applied and one refused**, recorded as a table in the feature file beside round 1's; **S-199 is
-  amended for the eight choices that moved**. The main session recomputed all **eleven pinned band values** before
-  the round and handed them over measured, so the round went to the design: every finding with teeth was a rule that
-  **could not fire or could not fail**. (a) **The credit guard could never fire on `plannedShots` or
-  `plannedSeconds`** — four runs planning six shots against four planning four have variance zero on both sides, so
-  the measures' zero-band rule votes _no verdict_, while the floor returns `NaN` on a count (`pA' = 25/6`). Settled:
-  bare Welch for the guard, never the floor, and **a zero band FIRES it**, because withholding credit on no
-  uncertainty under-claims where claiming a verdict over-claims. (b) **The positive control could not read
-  _helped_** at the null's two runs a side, `0/2` against `2/2` being pinned inside the noise; it becomes its own
-  fixture of 24 runs, four a side, with identical attempted work so the guard cannot withhold. (c) **The zero-band
-  rule was undone one level up**, where {helped, no verdict, no verdict} fell through to _inside the noise_; a
-  no-verdict group is now surviving but not comparable. (d) **`planVaryOn` turns `yield-benchmark`'s check 1 red**,
-  since that check proves each `FIELD_COLUMNS` entry by mutating its column and **no committed fixture carries the
-  field**; one fixture's `options` gain it, an eleventh fixture being refused because check 4 pins `groups.size` at
-  9 and its shared pair by name.
-- **Four more holes, each verified in the source before it was applied**: the **five always-run scans do not run
-  under `--slice`** (`SCANS` is a step of the full suite and `--documents` alone, `scripts/check.mjs:138-157`) —
-  the S-195 hole again — so Slices 1 and 2 name those five plus `tests/yield-benchmark-schema.test.ts`;
-  `redact()` (`scripts/benchmark.mjs:187-191`) matches **no key shape**, so it moves into the shared module with the
-  loader and is widened; a **degraded shot is FILMED from words** and pays its video call, the still fallback being
-  measure 6, so Gate 1 had described one measure twice; and a shot **cannot carry two degradation rows**, both
-  tables being keyed `(run_id, shot_id)`, so check 4 pins the **inherited row outside the denominator** instead.
-  The reader's three-file scan splits clause by clause, its exhaustive `processes` deep-equal having been missing
-  from the amendment list entirely, and round 2 counted the live "twelve" claims as **twelve, not nine** — session
-  93 re-measured them as **eleven** (`scripts/_pools.mjs:7` holds no occurrence of the word) — `scripts/check.mjs:57`
-  and `scripts/_pools.mjs:4` and `:7` were missed, and three `docs/context.md` citations were stale.
-- **Refused, one of twenty-four**: `packages/reel-contract/src/request.ts:79-90` is exactly the `SubmitRequest`
-  declaration, re-counted in the source. Markdown only, so `check.mjs --changed` is the whole verification owed
-  (S-193). **No implementation file exists and no gate is approved** — the `Gates:` line reads pending four times,
-  and whether a round 3 runs is the owner's call.
+  4), **twenty-three applied and one refused**; **S-199 is amended** for the eight choices that moved, and that
+  amendment carries the detail. The eleven pinned band values were recomputed in the main session first, so the
+  round went to the design: every finding with teeth was a rule that **could not fire or could not fail**. The
+  credit guard **could never fire** on `plannedShots` or `plannedSeconds` — four runs planning six shots against
+  four planning four have variance zero on both sides, and the floor returns `NaN` on a count — so the guard takes
+  bare Welch and **a zero band FIRES it**. The positive control **could not read _helped_** at two runs a side, so
+  it became its own 24-run fixture, four a side. The zero-band rule was **undone one level up**, where {helped, no
+  verdict, no verdict} fell through to _inside the noise_. And **`planVaryOn` turns `yield-benchmark`'s check 1
+  red**, no committed fixture carrying the field, so one fixture's options gain it rather than a check being
+  touched.
+- **Four more holes, each verified in the source first**: the five always-run scans **do not run under `--slice`**
+  (the S-195 hole again), so Slices 1 and 2 name them; `redact()` matches **no key shape**, so it moves into the
+  shared module; a **degraded shot is FILMED from words** and pays its video call, so Gate 1 had described measure
+  6 twice and measure 5 not at all; and a shot **cannot** carry two degradation rows, both tables being keyed
+  `(run_id, shot_id)`. Markdown only (S-193). **Refused, one of twenty-four**: `request.ts:79-90` is exactly the
+  `SubmitRequest` declaration, re-counted in the source.
 
 ### 2026-10-16 — session 91
 
