@@ -36,9 +36,11 @@ git and the journal keep them.
   `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
   `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: `self-heal`, whose gates are not written** — both of session 87's older calls are closed. The three
-  imprecise gate sentences are named in `yield-benchmark`'s amendment block (S-197, session 90), the gates
-  themselves unedited; **the scan hole is CLOSED (S-195, session 89)**: both file scans read tracked plus
+- **Next, by the owner's word on 2026-10-16: the benchmark's other two parts, in order — `yield-compare`'s four
+  gates, then `benchmark-view`'s** (S-184's split, S-198). `self-heal` comes after them, not before. Both of session
+  87's older calls are closed: the three imprecise gate sentences are named in `yield-benchmark`'s amendment block
+  (S-197, session 90), the gates themselves unedited; **the scan hole is CLOSED (S-195, session 89)**: both file
+  scans read tracked plus
   untracked-not-ignored files through `repoFiles()` in `tests/_files.ts`, so a slice's new files are scanned by the
   run that verifies them. Two cost levers are open and are the owner's calls, neither
   recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4 narrowing what each secrets child
@@ -148,6 +150,12 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   one-line list would have held. `.claude/agents/slice-builder.md` now requires findings as a numbered list naming
   the sentence each contradicts. No mechanical check is claimed: the count lived in prose, and a regex over English
   would read as coverage.
+- **The queue was then corrected by the owner and written down (S-198)**: `yield-compare`'s four gates next, then
+  `benchmark-view`'s, then `self-heal` — session 90's `self-heal` recommendation is withdrawn, because every
+  feature behind this one is an engine change whose worth is a claim that runs got better, and the scoring half
+  puts no two sets of runs beside each other. `PROMPTS/084-yield-compare-gates.md` is written for it, with the nine
+  choices the gates must settle and the limit Gate 1 must state: **no verdict is available from the 52 runs already
+  made**.
 
 ### 2026-10-15/16 · session 89
 

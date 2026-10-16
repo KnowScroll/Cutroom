@@ -9099,3 +9099,50 @@ these sentences describe cannot drift silently even though their prose can.
 told that only two of the three were ever written down.
 
 ---
+
+## S-198 | 2026-10-16 | The benchmark's other two parts come next, in order — `yield-compare` then `benchmark-view`, and `self-heal` after both
+
+**Chose.**
+
+- **`yield-compare`'s four gates are the next phase**, then `benchmark-view`'s, then `self-heal`.
+  The owner set the order in as many words on 2026-10-16: _"Next is not self heal but part 2 of
+  benchmark, the comparison feature and then after that is visualization thing"_. Session 90 had
+  recommended `self-heal`; that recommendation is withdrawn, and the queue in `docs/context.md` says
+  so.
+- **This completes S-184's split in the order S-184 wrote it.** The benchmark was divided into
+  scoring (`yield-benchmark`, built and verified in session 87), comparison (`yield-compare`) and the
+  page (`benchmark-view`). Taking them in that order is what each file already says: the comparison
+  reads the scoring half's rows through the same pure package, and the page is explicitly _"built
+  after the scoring half, because a page that draws numbers which do not exist yet is designed
+  against guesses"_ and draws a two-sided delta only _"once `yield-compare` exists"_.
+
+**Why.** The owner's reason for refusing to defer the comparison stands unchanged from S-184:
+_"this is also the most important or else how would we know whether the new engine or new thing in
+the engine worked"_. Every feature after this one — `self-heal`, `caption-match`, `composed-hold`,
+`picture-prompt` above all — is a change to the engine whose worth is a claim about whether runs got
+better, and `yield-benchmark` deliberately cannot answer that: it scores runs and puts no two sets
+beside each other. Building engine changes first would mean judging them the way session 82 had to,
+against a baseline that was never a controlled measurement.
+
+**Rejected.** **`self-heal` first**, which session 90 recommended on the grounds that it is a real
+feature while the benchmark work is tooling — the owner's correction is that a measurement you cannot
+compare is not finished tooling. **Both gates in one phase**: four gates plus adversarial rounds is a
+session's work on its own, and `benchmark-view`'s gates have a choice to make about where the page's
+data comes from that reads differently once the comparison's output shape exists. **Starting
+`yield-compare`'s implementation from its existing file**: it records what it owns and what three
+rounds left open, and names nine choices the gates must settle — it is not a plan, and CLAUDE.md
+rule 1 binds.
+
+**Not handled.** No gate is written by this entry, and nothing about the nine open choices is
+settled here. `run-provenance` and `picture-prompt` stay unscheduled; the comparison reports the
+engine's code version as "not recorded" until the first of them exists, which S-182 already decided.
+The two open cost levers (§4.3, §4.4) stay owner calls and are not in this order.
+
+**Caught by.** `docs/context.md`'s "Next" bullet, which this entry rewrites and
+`tests/context-file.test.ts` keeps bound to the newest journal session; and `PROMPTS/`, where the
+next session's prompt is written and committed before it runs (S-065), so a session that starts on
+something else has no prompt to run.
+
+**Confirmed-by.** The owner, 2026-10-16, correcting session 90's recommendation.
+
+---
