@@ -7,7 +7,8 @@
   rejected and how each is caught, send a fresh adversarial round, and draft the `S-` entry. **No implementation
   file of any kind**
 - **Written:** 2026-10-16
-- **Run:** —
+- **Run:** session 91, 2026-10-16 — all four gates written, round 1 refused all four with 22 findings,
+  every one applied, S-199 written; round 2 is `PROMPTS/085`
 
 ```text
 Read docs/context.md first, then, in this order: docs/features/yield-compare.md whole (94 lines — it records what

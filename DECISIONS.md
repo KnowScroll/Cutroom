@@ -9146,3 +9146,116 @@ something else has no prompt to run.
 **Confirmed-by.** The owner, 2026-10-16, correcting session 90's recommendation.
 
 ---
+
+## S-199 | 2026-10-16 | `yield-compare`'s four gates settle the nine open choices: the run is the unit of evidence, a band is one standard error with a multiplier of two, nothing is pooled across briefs, and the guard gains the two quantities that catch a change which simply does less work
+
+**Supersedes.** **S-182, in six named parts, and in nothing else.** S-184 split the benchmark and said every other
+S-182 choice "stands unchanged and binds all three"; the five open questions it handed to this feature are the ones
+below, plus one the gates found while answering them.
+
+1. **The band.** S-182: _"A measure moves only beyond **twice its own band**: binomial from the counts for a share,
+   and from the two sides' sample variances for a per-run average, which needs two runs a side"_ — which defines no
+   standard error and no multiplier, so "twice its own band" is ambiguous, and the `4 × SE` reading that
+   `PROMPTS/084` carries comes from a session-83 draft rather than from the entry. **Settled: the band is ONE
+   standard error and the multiplier is two**, written once as `moved` when `|delta| > 2 × band`.
+2. **The unit of evidence is the RUN.** S-182's "binomial from the counts for a share" reads as counts of pictures,
+   takes and shots. **Settled: only `reels made` is a share over runs; the other seven measures are per-run figures
+   averaged over the side's runs.** Twenty pictures made by four runs are four pieces of evidence.
+3. **"Shots degraded per run" and "shots held at the take cap per run"** become **per-run rates over the shots that
+   attempted the thing** — a count per run is a total divided by runs, and the config mode exists to compare sides
+   whose plans hold different numbers of shots.
+4. **The pooling scope.** **Settled: nothing is pooled across brief groups**; only the direction is combined, over
+   **surviving** groups rather than S-182's _"two thirds of **the groups**"_, with no group permitted to vote the
+   other way.
+5. **The credit guard's "only when" three quantities become five**: the selected plan's shot count and its total
+   planned seconds join, in the **guard** and not the fingerprint.
+6. **The fingerprint's field set.** Four of S-182's conditions sit outside the request's `options` and are
+   therefore identical inside a brief group by construction, so they can refuse nothing; _"whether standalone
+   pictures exist"_ is dropped as redundant with the picture rule, which `yield-benchmark` as built **reads** from
+   `Plan.pictures` rather than reporting "not recorded". **Settled at seven conditions**, with each port's models
+   added, because the engine has already changed image model at a comparable rate and no condition read it.
+
+**Chose**, beyond the six above.
+
+- **A band that cannot be zero.** A share's band is the unpooled Wald form over Agresti–Caffo adjusted counts (one
+  success and one failure a side), and a per-run rate's band is Welch's floored at the run-level share band — a side
+  of four identical runs otherwise has a variance of exactly zero and licenses a claim with no uncertainty. Where no
+  floor exists, for cost and wall clock, **a band of exactly zero votes NO VERDICT, never "inside the noise"**:
+  that phrase means the sides differ by less than the measurement can see, and with a zero band it sees everything.
+- **Four words and a fifth state.** helped, hurt, inside the noise, no verdict — one per measure, **and no composed
+  overall word at all**, because composing eight needs weights and S-182 refused a number people optimise. A
+  measure the caller declined to judge reads **reported, not judged**, and the printed tally counts the judged
+  measures and says how many that is.
+- **A malformed side splits by what can know it**: shape faults need no record, record faults need the resolved run
+  set, **an ambiguous run-id prefix is a fault** rather than an undefined state, and every fault of both kinds is
+  named in one pass. A thin comparison is a RESULT — exit 0, no verdict, what is missing named — and never an error.
+- **The null comparison needs three groups and a control.** Five runs of one brief key are ONE group, and one
+  surviving group reads "no verdict" whatever the arithmetic does — so a one-group null passes with the band
+  hard-coded to zero. Fifteen constructed runs over three groups, the **group votes** asserted rather than only the
+  measure words, plus a positive control that must read helped.
+- **Where the code lives**: the arithmetic in `packages/benchmark/src/compare.ts`, pure, handed `RunRows[]` and a
+  `HashFn` as `scorecard()` already is, with **no npm dependency added** — the sides document's shape is validated
+  by hand, because `packages/benchmark` declares no `zod` and adding it would drag `package.json` and
+  `pnpm-lock.yaml` into `FULL_ONLY`. The reader is its own script, and the record's read-only open, held-column
+  read, row selection and run-id prefix resolution **move** into `scripts/_benchmark-rows.mjs` that both readers
+  import.
+- **Two amendments to the verified scoring half**, both in S-099's form and neither weakening a check:
+  `tests/yield-benchmark-reader.test.ts`' source scan grows from one reader file to **three**, with the
+  `new DatabaseSync(` count of 1 asserted over the three together; and `scorecard()` gains `planVaryOn` with its
+  `FIELD_COLUMNS` entry, because the field is in no scorecard field and the alternative is parsing the request
+  twice.
+- **The PATH-only children become thirteen.** `tests/check-pools.test.ts` asserts `secrets.length >= 12`, so no
+  bound breaks, but it also asserts every member builds its environment through a `bareEnvironment` function, and
+  nine live claims of "twelve" are enumerated in the feature file. The five in this file and the two measurement
+  lines in `docs/research/test_fixes_and_research.md` are **measurements at their date and are not edited** (S-197's
+  instrument): the count is now thirteen, and this sentence is where that is recorded.
+
+**Why.** The owner refused to defer the comparison because it is what can say whether an engine change worked, and
+the standing reason decides every tie in it: _"this is also the most important or else how would we know whether the
+new engine or new thing in the engine worked."_ A verdict reached wrongly is worse than no verdict, so each choice
+above is the more conservative of two that were available, and the two that are deliberately anti-conservative — the
+flat multiplier of two, and the group rules standing in for a t quantile — are named as such in the gates rather
+than left to be discovered. The unit-of-evidence choice is the one with teeth: pooling items shrinks a band like
+`1/sqrt(items)` while the evidence grows like `sqrt(runs)`, and this repository's own measurement says refusals
+cluster inside a run — session 82 found 42% / 70% / 100% of pictures refused by the subject count of their shot.
+Pinned both ways on the same rows: four runs with none of five pictures refused against four with two of five is
+`0/20` against `8/20` pooled — delta +0.3636, band 0.1138, **moved** — and delta +0.4000, band 0.2531, **inside the
+noise** as per-run rates. The second is the true answer.
+
+**Rejected.** **Pooling counts over items** (above) and **a cluster-robust band over the pooled counts**, which
+reaches the same place with more machinery than a per-run average. **Bare Welch** — four identical runs, band zero,
+a claim with no uncertainty. **Refusing every zero band** — none-then-all would be unclaimable forever. **A
+Student's t multiplier** — correct and more conservative, and it needs an inverse t in a package with no npm
+dependency at all. **Pooling across brief groups** — groups of 8, 5, 4, 4 and 4 runs can reverse the sign every
+per-group test sees. **Putting the plan's shot count and planned seconds in the fingerprint** — it would forbid the
+comparison the owner asked for by name, _"i would want to compare the reels if they have different number of planned
+shots"_, and hide a real regression behind an incomparability. **Treating an absent observed field as a distinct
+value, or as a refusal** — both drop the runs that died early, which are the runs the measures are about, and bias
+every verdict toward "helped" by construction. **A composed overall verdict word.** **A committed ledger of
+comparisons** — the sides are an argument rather than a property of the record, so a tracked file would hold one
+arbitrary pair and rot. **A second copy of the row loader** — two places that know the schema is the drift D-088 and
+S-017 exist to catch, and S-182 refused a separate repository for the same reason. **Claiming the scoring half's
+`MEASURES_VERSION`** — it names a different selection of figures, and S-197 already recorded that the gates never
+define it; this feature stamps `c1` alone. **Writing "exactly one brief reaches four matched runs"** — session 83
+measured five groups with two or more fingerprint-matching runs and a largest matching set of five, and never
+counted the groups reaching four; the reader prints it and no gate pins it.
+
+**Caught by.** `docs/features/yield-compare.md`'s fourteen checks, each in exactly one slice (4 + 6 + 4 + 0). The
+load-bearing ones: check 1 quotes the three formulas and pins eleven worked values, including the zero-band case as
+**no verdict**; check 2 pins the pooled and per-run answers on the same rows, holds the Simpson case, and asserts
+nothing cross-group exists in the output; check 9 is the null with its three groups, its asserted group votes and
+its positive control; check 6 asserts the fingerprint's exported field list **deep-equal** to the seven conditions,
+so a vacuous member cannot be added silently; check 8 splits shape faults from record faults and names the ambiguous
+prefix; check 12 holds the three boundary rules with `compare.ts` inside the package, the proof count at 25, no
+dependency added, and `yield-benchmark`'s check 5 asserting the same clauses over three reader files instead of one.
+
+**What this entry does NOT settle.** No gate is approved by it: round 1 refused all four and every one of its
+twenty-two findings is applied and recorded in the feature file, which is where a later round continues.
+`run-provenance` stays unscheduled, so the engine's code version still reads "not recorded". No condition reads a
+take's seed, its expansion mode, a receipt's resolution or a model's temperature, and the feature file's Deferred
+section says so.
+
+**Confirmed-by.** The owner, 2026-10-16, putting this phase next (S-198) and, on the comparison's worth, S-184's
+quoted refusal to defer it.
+
+---

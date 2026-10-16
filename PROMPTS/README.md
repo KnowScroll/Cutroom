@@ -69,7 +69,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 081 | [081-journey-reuse-receipt.md](081-journey-reuse-receipt.md)                           | checker tooling       | the receipt, and journey reuse       | 2026-10-15 | session 88, 2026-10-15    |
 | 082 | [082-biome-formatting.md](082-biome-formatting.md)                                     | checker tooling       | biome, changed-Markdown format       | 2026-10-15 | session 88, 2026-10-15    |
 | 083 | [083-measure-and-schedule.md](083-measure-and-schedule.md)                             | checker tooling       | finish §3, then size §4.2            | 2026-10-15 | session 89, 2026-10-15    |
-| 084 | [084-yield-compare-gates.md](084-yield-compare-gates.md)                               | `yield-compare`       | the four gates, written and reviewed | 2026-10-16 | —                         |
+| 084 | [084-yield-compare-gates.md](084-yield-compare-gates.md)                               | `yield-compare`       | the four gates, written and reviewed | 2026-10-16 | session 91, 2026-10-16    |
+| 085 | [085-yield-compare-round-2.md](085-yield-compare-round-2.md)                           | `yield-compare`       | round 2 of the gate review           | 2026-10-16 | —                         |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 
