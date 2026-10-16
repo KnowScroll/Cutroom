@@ -40,6 +40,10 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   answered, on hold). **Gates not written, files only**: `benchmark-view` (S-184, S-200), `run-provenance`,
   `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
+- **Agent models are a written choice at last (S-202)**: `gate-reviewer` moves **opus → sonnet**, halving a review's cost for a job that is cross-reading rather than invention and whose findings the main session verifies in the
+  source before applying; **`slice-builder` stays on opus as the only agent there**, because it writes rather than
+  reads. Haiku was refused for the reviewer — round 3's best finding needed four hops across three files. **No entry
+  had ever set any agent's model.** Watch the next round's findings: shallow ones are the signal to go back.
 - **Next: `benchmark-view`'s four gates** (`PROMPTS/088`). **Its shape is APPROVED** — the owner signed off a
   working mockup on 2026-10-17 and **S-201** records it, superseding S-184's self-contained no-server page and
   amending S-200's `--out` sentence: it is **a local server you start, reading `data/cutroom.sqlite` directly**.

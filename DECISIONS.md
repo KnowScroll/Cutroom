@@ -9574,3 +9574,52 @@ and also cleanly and clearly"_; _"Include graphs if something needs it dont hesi
 _"If youre going dark mode then choose black not this shitty blue"_.
 
 ---
+
+## S-202 | 2026-10-17 | `gate-reviewer` moves from Opus to Sonnet, `slice-builder` stays on Opus, and each agent's model is a written choice at last
+
+**Supersedes.** Nothing by entry, because **no entry ever set these models**. S-172 says `slice-builder` runs "on
+Opus" in a subordinate clause without arguing it, and `gate-reviewer`'s Opus was written only into
+`.claude/agents/gate-reviewer.md` and CLAUDE.md's table. CLAUDE.md claimed each model was "chosen by what a wrong
+answer costs"; **that reasoning existed nowhere**, which is the drift CLAUDE.md rule 2 exists to catch, in
+CLAUDE.md itself.
+
+**Chose.**
+
+- **`gate-reviewer`: `opus` → `sonnet`.** Halves its cost ($4/$20 to $2/$10 per million) for a job that is
+  **careful cross-reading rather than invention**, and whose output is **checkable before it is believed**: every
+  finding must name the sentence it contradicts and a `file:line`, and the main session verifies each one in the
+  source before applying it. A wrong finding is therefore caught by the process, not shipped.
+- **`slice-builder` stays on `opus`**, and is now the only agent on it. It **writes code** rather than reading
+  documents, it is handed the gates and left alone inside one slice, and a bad slice is caught only by the checks
+  that slice wrote itself. That is the most expensive wrong answer in this repository, so the ceiling stays until
+  the owner moves it.
+- **The other three are unchanged and now justified in writing**: `test-impact` on `sonnet` (careful reading of
+  many test files, no design judgement), `check-runner` and `run-reader` on `haiku` (run a command or read rows,
+  return the decisive lines).
+- **Every future agent names its model with its reason in this entry's form**, in CLAUDE.md's list.
+
+**Why.** The owner asked why the reviewer was on Opus after a session that spent 234,205 tokens on one review:
+_"who set it to use opus change it to sonnet or haiku."_ The answer was that nobody had decided it, which is
+reason enough to decide it now. The split between the two Opus agents is the split between **reading and
+writing**: a reviewer's mistake is a finding the main session checks against the source and can refuse — this
+repository has already refused one, round 2's `request.ts:79-90` citation — while a builder's mistake is code
+whose only guard is the test it wrote in the same pass. Cost follows that asymmetry rather than seniority.
+
+**Rejected.** **Haiku for `gate-reviewer`.** Its load-bearing findings need three or four hops across files:
+round 3's best one connected a widened regex shape, to a run id's format, to a `JSON.stringify` replacer in a
+second file that applies it to **every** string, to the fact that the only assertion which would have caught it
+reads a **third** file. A review that misses that shape and returns a short list reads as coverage while catching
+nothing — the exact failure this repository names again and again, and worse than no review because it would be
+trusted. **Moving `slice-builder` now**: it would change the model and the feature being built in the same step,
+so a bad slice could not be attributed. **Leaving the models undecided**: the condition that produced this entry.
+**Fable anywhere** ($10/$50).
+
+**Caught by.** `.claude/agents/*.md`' own `model:` lines and CLAUDE.md's list, which now carries the reason beside
+each. The real check is the next review's findings: if a Sonnet round returns only shallow or already-known
+findings on `benchmark-view`'s gates, that is the signal to put `gate-reviewer` back on Opus, and this sentence is
+where the next session is told to watch for it.
+
+**Confirmed-by.** The owner, 2026-10-17: _"Wait who set it to use opus change it to sonnet or haiku ( choose from
+both that is efficient and optimal for the job and cheap) fix that in our subagent docs."_
+
+---

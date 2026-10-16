@@ -91,19 +91,26 @@ forget, because an unreferenced package is one nothing typechecks.
 ## Subagents, and the model each one runs on
 
 `.claude/agents/` holds the five this repository uses most. Each one names its own model, chosen by what a wrong
-answer costs. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10, Haiku $1/$5. No agent here uses Fable
-($10/$50).
+answer costs **and written down as a decision** — S-202, which is where the reasoning lives, because until then
+two agents ran on Opus with no entry justifying either. Per million tokens in and out: Opus $4/$20, Sonnet $2/$10,
+Haiku $1/$5. No agent here uses Fable ($10/$50).
 
-- **`gate-reviewer`** — `opus`. The adversarial review of a feature's four gates; every review so far. Code is
-  written against what it approves, so it gets the strongest model this repository uses.
+- **`gate-reviewer`** — `sonnet` (**S-202**, down from `opus`). The adversarial review of a feature's four gates.
+  Code is written against what it approves, so it is the most expensive wrong answer here — but the work is
+  careful cross-reading rather than invention, and **its findings are checkable**: every one names the sentence it
+  contradicts and a `file:line` the main session verifies before applying it. **Haiku was refused** for this one:
+  its hardest findings need three or four hops across files, and a shallow review is worse than none because it
+  reads as coverage.
 - **`test-impact`** — `sonnet`. Which verified checks a planned change turns red or wrongly green. Careful reading of
   many test files, no design judgement.
 - **`check-runner`** — `haiku`. Runs `check.mjs`, one test file, a drift proof or a named journey, and returns the
   verdict and the decisive lines — never the whole stream.
 - **`run-reader`** — `haiku`. Reads a real run's rows from the database, read-only, after it finishes or fails.
-- **`slice-builder`** — `opus`. Builds ONE slice of an approved feature — tests, code, deliberate breaks — and hands
-  back a report and an uncommitted diff (S-172, S-177). One at a time; the main session runs the approved targeted
-  check and commits its tree-bound evidence, reserving the full suite for integrity boundaries.
+- **`slice-builder`** — `opus`, and **the one Opus agent left** (S-202 keeps it, for now). Builds ONE slice of an
+  approved feature — tests, code, deliberate breaks — and hands back a report and an uncommitted diff (S-172,
+  S-177). One at a time; the main session runs the approved targeted check and commits its tree-bound evidence,
+  reserving the full suite for integrity boundaries. It is kept on Opus because it **writes** rather than reads,
+  and a bad slice is caught only by the checks it wrote itself — the owner's call to move it is open.
 
 Only `slice-builder` edits code, within the slice it is handed, and it never commits. The reviewer's one allowed edit
 is the `Gates:` line of the file it approves.
