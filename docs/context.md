@@ -30,15 +30,17 @@ git and the journal keep them.
 - **`yield-benchmark` is BUILT and `Status: verified`** (session 87): its journey PASS at `d898693`, and
   `reel-stills`, `reel-render`, `paid-path` re-journeyed for the count (S-099's form, S-178's order). Gates
   approved by owner decision (S-185) and no reviewer, so **the slices carried the review**: 25 findings reported
-  rather than built around, three gate sentences now known imprecise. **Enforced boundary rules: 25.**
+  rather than built around, of which **three imprecise gate sentences are now named in that file's amendment
+  block** (S-197, session 90) and the other 22 are lost with session 87's hand-backs. **Enforced boundary rules: 25.**
   **Gates written and NOT approved**:
   `hosted-checks` (round 1 answered, on hold). **Gates not written, files only**: `yield-compare`,
   `benchmark-view` (both S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: one older call is the owner's, then `self-heal`** — the three imprecise gate sentences session 87 found
-  in `yield-benchmark`'s approved gates. **The scan hole that stood beside it is CLOSED (S-195, session 89)**: both
-  file scans read tracked plus untracked-not-ignored files through `repoFiles()` in `tests/_files.ts`, so a slice's
-  new files are scanned by the run that verifies them. Two cost levers are open and are the owner's calls, neither
+- **Next: `self-heal`, whose gates are not written** — both of session 87's older calls are closed. The three
+  imprecise gate sentences are named in `yield-benchmark`'s amendment block (S-197, session 90), the gates
+  themselves unedited; **the scan hole is CLOSED (S-195, session 89)**: both file scans read tracked plus
+  untracked-not-ignored files through `repoFiles()` in `tests/_files.ts`, so a slice's new files are scanned by the
+  run that verifies them. Two cost levers are open and are the owner's calls, neither
   recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4 narrowing what each secrets child
   re-runs, which supersedes S-028 and narrows a proven property for about 200 s of a 617 s suite. **Journey reuse is
   CLOSED (S-188, session 88)**: a full run writes `.verification/receipt.json` and the journey re-runs nothing at
@@ -134,6 +136,18 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   trailer (S-183). No code touched; `check.mjs --changed` is the whole verification a Markdown-only change owes
   (S-193). The journal was compacted to its 80-line budget first (sessions 72 and 73–75 merged, their detail in
   the commits and feature files per S-177) — the same thing session 85 did, and the reason this entry exists.
+- **Then the owner took the older call, and the three imprecise gate sentences are named at last (S-197).** They
+  are in `docs/features/yield-benchmark.md`'s amendment block, gates unedited, no assertion or title moved: Gate
+  3's two mentions of `tests/fixtures/benchmark/*.json` against Slice 3's recursing glob; **the ledger-column
+  table's three short value sets** — `ending` also `absent`, each part rating also `inherited` (S-162, S-164), `s`
+  also `absent`, all three accepted by check 7 at `tests/yield-benchmark-reader.test.ts:504-519` and none present
+  in the 52-run ledger, which is why no reader noticed; and "the measures version", which the gates never define
+  (`packages/benchmark` exports `RATING_VERSION` only; `scripts/benchmark.mjs` declares `m1` with its reason).
+  **Only two of session 87's 25 findings were ever written down and the lost third of the promised three cannot be
+  recovered**, so these are a fresh read of the gates against the built code — a 1104-line read to recover what a
+  one-line list would have held. `.claude/agents/slice-builder.md` now requires findings as a numbered list naming
+  the sentence each contradicts. No mechanical check is claimed: the count lived in prose, and a regex over English
+  would read as coverage.
 
 ### 2026-10-15/16 · session 89
 

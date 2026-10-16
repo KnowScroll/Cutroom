@@ -46,3 +46,9 @@ the function you change, not whole.
 
 The files changed; each check proved and its test's name; each deliberate break and which checks went red; every stale
 sentence amended; each amendment block written; anything the gates did not settle; and what you did not run.
+
+**Findings against the gates go in as a numbered list, never as a count** (S-197). One line each: the gate sentence it
+contradicts, quoted or located by its section and table row, and the file and line of the code that proves it. A
+report saying _"thirteen findings reported"_ with no list loses them — session 87's did, and recovering one of them
+cost a full read of a 1104-line gate document. The receiving session appends the list to the feature file's amendment
+block, so write it to be appended.

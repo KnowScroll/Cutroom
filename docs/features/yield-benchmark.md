@@ -18,6 +18,32 @@ Gates: product APPROVED 2026-10-14 owner-decision-S-185 · architecture APPROVED
 > nothing is loosened or skipped. Gate 3's two mentions of `tests/fixtures/benchmark/*.json` therefore understate
 > the set they describe; they are left exactly as written, because no amendment of them is listed for this slice.
 >
+> **The imprecise gate sentences, read out in full on 2026-10-16 in session 90 (S-197) — the gates below are still
+> not edited, and no assertion changes.** Slices 1 and 3 reported eleven and thirteen findings against these
+> approved gates and named only two of them in writing; the journal and `docs/context.md` carried the count _"three
+> gate sentences now known imprecise"_ and no list. **That third sentence cannot be recovered** — the hand-back
+> reports lived in session 87 and were never committed — so the three below are what a fresh read of the gates
+> against the built code finds, not that lost list:
+>
+> 1. **Gate 3's two mentions of `tests/fixtures/benchmark/*.json`** — "The checks", check 12, and "Fixtures, and
+>    what stands in for a database" — understate the set, because Slice 3's glob recurses. This is the finding the
+>    block above records; both sites are named here so the next reader need not re-derive which two they are.
+>    Check 12's own title is deliberately unchanged, for the same reason the gate text is.
+> 2. **Gate 3's ledger-column table understates three value sets, all three reachable and none present in the
+>    52-run ledger.** `ending` (column 4) also reads `absent`, from `ending.status` when no stored result carries
+>    one (`packages/benchmark/src/measures.ts:1070`); each part rating (columns 6–10) also reads `inherited`, for a
+>    part a resume copied in (S-162, S-164, `scripts/benchmark.mjs`'s `ledgerRow`); and `s` (column 14) also reads
+>    `absent`, from a run with no events (`measures.ts:1096`, `between()` at `:393`). Check 7's own formats accept
+>    exactly these three and nothing wider — `tests/yield-benchmark-reader.test.ts:504-519` — so the checks are
+>    right and the table is short. Nothing here widens a check; `docs/research/benchmark.md` holds no row of any of
+>    the three, which is why no reader noticed.
+> 3. **"the measures version"**, in the paragraph closing "The ledger's columns", names a version the gates never
+>    define. `packages/benchmark` exports `RATING_VERSION` and no measures version at all; `scripts/benchmark.mjs`
+>    declares `MEASURES_VERSION = 'm1'` with its reason — the package stamps a **rating**, while the figures around
+>    it are the reader's selection, so the ledger's header carries one version for each and a change to what is
+>    read moves only the reader's. The header does carry both, as that sentence says; what it does not say is whose
+>    they are.
+
 > **Created 2026-10-12 at the owner's request**, in session 83, out of `PROMPTS/077-benchmark-design.md`. Session 82
 > measured the engine's first 52 runs (`docs/research/yield-baseline.md`): 8 of 52 produced a reel, and the picture
 > check refused 53% of all pictures. The first fix is scoped (`docs/features/picture-prompt.md`) and cannot be

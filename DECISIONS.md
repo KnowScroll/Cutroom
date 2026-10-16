@@ -9041,3 +9041,61 @@ failed as it should. That is the kind of vacuous check this repository exists to
 **Confirmed-by.** The owner, 2026-10-16, asking twice for exactly this and then "yes do it".
 
 ---
+
+## S-197 | 2026-10-16 | A slice's findings against approved gates are written into the feature file when they are reported — a count in the journal is not a record
+
+**Chose.**
+
+- **The three imprecise sentences in `yield-benchmark`'s approved gates are now named in that file's
+  amendment block**, each with the site it is wrong about and the code that proves it: Gate 3's two
+  mentions of `tests/fixtures/benchmark/*.json` against Slice 3's recursing glob; the ledger-column
+  table's three short value sets (`ending` also `absent`, each part rating also `inherited`, `s` also
+  `absent`), with `tests/yield-benchmark-reader.test.ts:504-519` accepting exactly those three and
+  `measures.ts:1070`, `:1096` and `:393` being where each comes from; and "the measures version",
+  which names a version the gates never define, since the package exports `RATING_VERSION` only and
+  `scripts/benchmark.mjs` declares `MEASURES_VERSION = 'm1'` with its reason.
+- **The gates themselves are not edited**, and no assertion, title or bound moves. This is Slice 3's
+  own form (the block it wrote on 2026-10-14), applied to the whole set rather than to one slice's
+  one finding: approved text stays as approved, and what reality does differently is recorded beside
+  it where the next reader will see it.
+- **The count was wrong to carry alone.** Slice 1 reported eleven findings and Slice 3 thirteen; two
+  were written into commit messages and one into the feature file, and the journal and
+  `docs/context.md` then carried _"three gate sentences now known imprecise"_ with no list. **The
+  third is unrecoverable** — the `slice-builder` hand-backs lived in session 87's context and were
+  never committed — so the three recorded above are what a fresh read of the gates against the built
+  code finds. The repository now says so rather than implying the list exists somewhere.
+- **`.claude/agents/slice-builder.md` requires the findings as a numbered list**, each naming the
+  exact gate sentence it contradicts, so the receiving session has something to append rather than a
+  number to summarise.
+
+**Why.** A finding against an approved gate is the most perishable thing a slice produces: it is not
+a test, so nothing re-runs it, and it is not code, so no boundary rule holds it. Session 87's
+twenty-five findings were reported rather than built around — which is the behaviour this repository
+wants — and then twenty-two of them evaporated, including one of the three the journal promised. The
+cost was paid here: a full read of a 1104-line gate document to recover what a one-line list would
+have held.
+
+**Rejected.** **Editing the imprecise sentences in place**, which is what they most obviously need:
+the whole value of an approved gate is that the text code was written against cannot be revised
+afterwards to match the code, and three sentences being short is exactly the case where editing feels
+harmless. **Reopening the gates for a fifth review round** — nothing here is a design question; the
+code is verified and right, and four rounds plus S-185's owner decision already closed them.
+**Writing the findings only into `DECISIONS.md`**, which would leave the feature file reading as
+though its gates were exact. **A mechanical check that every reported finding is written down**: the
+count lives in prose, in a journal sentence a session composes, so any such check would be a regex
+over English and would read as coverage while catching nothing.
+
+**Not handled.** The twenty-two other findings of session 87 are gone and are not reconstructed here;
+only sentences about the gates were sought, because those are what a later reader is misled by. The
+same loss can have happened in any earlier feature whose slices reported findings; no audit of those
+is done.
+
+**Caught by.** The `slice-builder` brief, which now asks for the list in its report, and the feature
+file's amendment block, which is where the next session looks. Not by a test: see the rejection
+above. `tests/feature-files.test.ts` still holds the `Gates:` and `Status:` lines, so the gate state
+these sentences describe cannot drift silently even though their prose can.
+
+**Confirmed-by.** The owner, 2026-10-16: _"Do it"_, after asking what the sentences were and being
+told that only two of the three were ever written down.
+
+---
