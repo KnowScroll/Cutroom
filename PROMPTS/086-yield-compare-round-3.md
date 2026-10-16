@@ -9,13 +9,14 @@
 - **Written:** 2026-10-16
 - **Run:** —
 
-> **This prompt runs only if the owner says to continue.** Two rounds have refused all four gates — 22 findings in
+> **The owner said to continue, 2026-10-16, asked at the end of session 92: round 3 runs.** Two rounds have refused
+> all four gates — 22 findings in
 > session 91, 24 in session 92, 45 applied and 1 refused. The owner was asked at the end of session 92 rather than
 > a third round being spent unasked, because session 83 spent three rounds on this material as one feature and
-> session 86 a fourth on the other half. **The owner's other two answers each have a different prompt:** approving
-> the four gates by decision, in **S-185's form** (which waived rule 1's adversarial approval for `yield-benchmark`
-> alone, after four rounds), makes the next prompt Slice 1 of this feature; stopping here makes it `benchmark-view`'s
-> four gates (S-198's order), with `yield-compare` left written and unapproved.
+> session 86 a fourth on the other half. **The two answers that were not taken**, recorded because round 4 will put
+> them again: approving the four gates by decision in **S-185's form** (which waived rule 1's adversarial approval
+> for `yield-benchmark` alone, after four rounds), which makes the next prompt Slice 1; or stopping, which makes it
+> `benchmark-view`'s four gates (S-198's order), with `yield-compare` left written and unapproved.
 
 ```text
 Read docs/context.md first, then docs/features/yield-compare.md whole (its two review sections at the end are the

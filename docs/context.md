@@ -38,10 +38,11 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   `hosted-checks` (round 1 answered, on hold).
   **Gates not written, files only**: `benchmark-view` (S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: the owner's call on `yield-compare`'s round 3** (`PROMPTS/086`), then `benchmark-view`'s four gates
+- **Next: `yield-compare`'s round 3** (`PROMPTS/086`, the owner's word on 2026-10-16), then `benchmark-view`'s gates
   (S-184's split, S-198; the owner's word on 2026-10-16). Two adversarial rounds have refused all four gates,
   46 findings between them, 45 applied and 1 refused; S-199 and its amendment settle the choices. Nothing is
-  approved, so no implementation file may exist yet. Then `self-heal`, session 53's
+  approved, so no implementation file may exist yet. **Round 4 is where the owner is asked again**, with approval by
+  decision (S-185's form) and stopping as the two answers not taken at round 3. Then `self-heal`, session 53's
   P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and `parallel-shots`'
   gates from `b15d203`. Both of session 87's older calls are closed (S-195, S-197). Two cost levers stay open and
   are the owner's, neither recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4
