@@ -14,6 +14,34 @@
 > page reads the **scoring half's** `--out` record, which exists and holds 52 runs, and it draws no verdict, no
 > delta and no comparison of two sides. After it, the benchmark is complete and the queue is `self-heal`.
 
+## THE OWNER SPECIFIED THE SHAPE — it is not S-184’s any more
+
+Asked in session 93 and answered, so **none of this is open and none of it is yours to re-decide**. A mockup built
+against all 52 real runs is at `.artifacts/view-mockup/cutroom-benchmark.html` (gitignored, self-contained); the
+owner was still reviewing it when session 93 ended, so **read his verdict first and treat the mockup as the design**.
+
+| what               | the owner’s answer                                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| how it runs        | **a local server you start**: `node scripts/benchmark-serve.mjs`, open localhost. Not a file you double-click                         |
+| what feeds it      | **`data/cutroom.sqlite` directly**, read-only, scored on the fly by `packages/benchmark`. No export step                              |
+| which runs         | **finished runs only**. A run in progress is out of scope                                                                             |
+| who reaches it     | **localhost only for now**. No hosting, no auth                                                                                       |
+| comparison         | **any number of runs as columns**, every number a row, differences highlighted. **Briefs and configs may differ and nothing refuses** |
+| landing view       | the **fleet overview**: headline counts, the funnel, progress over time, ledger below                                                 |
+| picking runs       | **checkboxes in a filterable ledger** (world, ending, brief, made-a-reel, search)                                                     |
+| model’s words      | **shown, folded** behind a click                                                                                                      |
+| charts             | **ECharts, vendored into the repo**, served by our own server. No CDN at runtime. Simple bars as SVG                                  |
+| the progress graph | the **five part scores plus the overall rating**, six toggleable lines over time                                                      |
+| layout             | **full bleed, no side margins**; charts **at most two across**, with size presets and per-chart drag resize                           |
+
+**Two settled decisions this contradicts, and the `S-` entry that must be written before any gate is approved.**
+S-184 settled the page as **one self-contained HTML file with its data inlined, no server, opened from the
+filesystem**; S-200 said it reads the scoring half’s **`--out` record**. Both are superseded by “live”. The reason
+is not preference and must be stated in the entry: **a page opened from the filesystem cannot load a JSON file
+beside it** under browser file-origin rules, so “feed it data and it shows up” forces a server. Also record that
+**the comparison board is NOT `yield-compare` revived** (S-200): no band, no verdict word, no comparability
+refusal — raw numbers side by side, which is what the owner asked for before the stop.
+
 ## Read first
 
 `docs/context.md`, then `docs/features/benchmark-view.md` whole — it is 62 lines and already holds "What it shows"
@@ -38,8 +66,8 @@ The feature file names five open questions. **Two are new or changed by S-200 an
    band**, said on the page so a bare rate is not read as precise; or raw counts alone. **The failure to avoid is a
    stratum of one or two runs drawn as a confident bar** — session 82's 42% / 70% / 100% persuaded because those
    groups were large, and the record does not guarantee that for every property.
-2. **Where the page's data comes from**: inlined by the writer, or a sibling JSON file. Inlining opens from the
-   filesystem with no server; a sibling does not, under a browser's file-origin rules.
+2. **~~Where the page’s data comes from~~ — SETTLED by the owner**: a local server reads the database directly.
+   What remains is how the page receives it (one payload on load, or a route per view) and what the server exposes.
 
 And three the file already names, unchanged: **where the page is written** (one setting, gitignored default, D-086
 and D-087, nothing generated committed, and a run's blobs carry absolute artifact paths unless made relative

@@ -40,8 +40,9 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   answered, on hold). **Gates not written, files only**: `benchmark-view` (S-184, S-200), `run-provenance`,
   `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: `benchmark-view`'s four gates** (`PROMPTS/088`, S-200), **the benchmark's last part and the only one
-  left**. The page reads `scripts/benchmark.mjs`' own `--out` record — which exists and holds 52 runs — draws no
+- **Next: the owner's verdict on `benchmark-view`'s MOCKUP**, then `PROMPTS/088` rewritten against the shape he
+  specified, then an `S-` entry superseding S-184 and amending S-200, then the four gates (S-200). **The benchmark's
+  last part and the only one left**. The page reads `scripts/benchmark.mjs`' own `--out` record — which exists and holds 52 runs — draws no
   verdict and no delta, and **owns the stratification** that was `yield-compare`'s: session 82's 42% / 70% / 100%
   by subjects per shot, the one view needing no matched pairs. Its gates must settle where the data comes from and
   **whether a stratum carries an uncertainty band at all**, since that arithmetic went with the stopped feature.
@@ -114,40 +115,20 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-16 — session 93
 
-- **A FRESH round 3 refused `yield-compare`'s four gates on eleven findings** (`PROMPTS/086`, CLAUDE.md rule 4),
+- **A FRESH round 3 refused `yield-compare`’s four gates on eleven findings** (`PROMPTS/086`, CLAUDE.md rule 4),
   **all eleven applied and none refused**, recorded as a table in the feature file beside rounds 1 and 2; **S-199
-  is amended a second time** for the five choices that moved. Every pinned figure was recomputed in the main
-  session first — all eleven band values exact, both thin margins (0.0093, 0.0430) surviving four decimals, both
-  `NaN` claims confirmed — so the round went to the design. **Two findings would have broken working code.**
-  (a) **The widened `redact()` would have eaten the record's own identifiers**: `scripts/benchmark.mjs:912-916`
-  passes **every string** of the `--out` record through it and `:900` holds `run: card.run.runId`, while a run id
-  is a 36-character UUID and `run.briefKey` a full 64-character SHA-256 — both matching "20 or more
-  `[A-Za-z0-9_-]` with no space" — and **no check would have noticed**, the committed ledger being built without
-  `redact()` at all. The widening becomes `redactProse()` over the sides document alone, `redact()` moves unchanged,
-  and check 11 pins an identifier **surviving** the written record. (b) **The exhaustive `processes`
-  deep-equal forbids the compare reader the one process Gate 2 permitted it**: `assert.deepEqual(processes,
-['git'])` is an order-exact list, not a set, so a second `git rev-parse` reddens it — **the permission went, not
-  the assertion** (rule 3).
-- **Three more with teeth, and one fact corrected.** Slice 2 proved check 6 from a scorecard field Slice 3 added,
-  so `planVaryOn`, its `FIELD_COLUMNS` entry and the fixture edit **move to Slice 2** — left in place the case was
-  unbuildable, `card.run.planVaryOn` did not typecheck, and the workaround the gates allowed would have reddened
-  `yield-benchmark`'s check 1 with no slice running it. The guard's cross-group vote was imported as "the measure
-  rule's" with two clauses undecided; both are now chosen **against** the import, since `parts.plan.shots` is
-  `ABSENT` with no selected plan (`measures.ts:1159`) and the three-group minimum would have silenced the guard
-  exactly where a side died early. Check 3's only vote case reads no verdict under **both** the chosen rule and the
-  one Gate 2 rejects, so {helped, helped, no verdict} ⇒ helped is pinned. And **a run that died in the plan stage
-  HAS a receipt** (`taken-dead-in-plan.json`: zero `plan` rows, one `model_receipt`; `lost_call.model` is
-  `notNull`), so **three** observed conditions go absent on an early death, not four, and a planner model swap does
-  refuse. Slices 1 and 2 both now name `tests/yield-benchmark-schema.test.ts`, and Slice 2 keeps the arithmetic file.
-- **The "twelve" instrument was re-measured BEFORE the round and three of round 2's own faults corrected**, which
-  matters because S-197 established that no mechanical check can read an English count: **eleven live claims, not
-  twelve** (`scripts/_pools.mjs:7` holds no occurrence of the word — it carries the 274/153/121 figures, so counting
-  it inflated the instrument by one), these three citations stale a **second** time (`:183`/`:196`/`:203` are now
-  `:204`/`:217`/`:224`), and `DECISIONS.md:8671` a seventh children claim the list missed. Why this file is amended
-  where a decision entry is frozen — its own header keeps every line its work made untrue — is now stated rather
-  than merely applied. **Markdown only**, so `check.mjs --changed` is the whole verification owed (S-193); no
-  implementation file exists and the `Gates:` line reads pending four times; `JOURNAL.md` was compacted first
-  (sessions 77 and 78 merged, their detail in the commits and the two feature files, S-177).
+  is amended a second time** for the five choices that moved. Every pinned figure was recomputed first, so the
+  round went to the design. **Two findings would have broken working code.** The widened `redact()` would have
+  erased the record’s own run ids and brief keys — `scripts/benchmark.mjs:912-916` passes **every string** of the
+  `--out` record through it — **and no check would have noticed**, so the widening became `redactProse()` over the
+  sides document alone. And the exhaustive `processes` deep-equal is an **order-exact list, not a set**, so a
+  second `git rev-parse` reddens it: **the permission went, not the assertion** (rule 3). Three more with teeth:
+  `planVaryOn` moved to Slice 2 (left in Slice 3 its check was unbuildable), the guard’s cross-group vote was
+  imported with two clauses undecided and both are now chosen against the import, and check 3’s only vote case
+  read the same under the chosen rule **and** the one Gate 2 rejects. **Corrected as fact**: a plan-stage death
+  **has** a `model_receipt`, so **three** observed conditions go absent, not four. The “twelve” instrument was
+  re-measured before the round and three of round 2’s own faults corrected — **eleven live claims**, stale
+  citations, and a seventh `DECISIONS.md` children claim missed.
 - **Then the owner STOPPED `yield-compare` (S-200)** — _"No just leave it, we should just build the view part of it
   and end the benchmark"_ — rather than approve it by decision or run a fourth round, after the case for it was
   made twice. `Status: stopped`, the file kept as the record of 57 faults found in a specification, **no
@@ -158,6 +139,22 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   changed is wider than most real improvements — `f984199a` rates 3.0, 10.0, 10.0, 38.5, 45.7 over five runs, and
   `db460dea`'s higher-rated run (69.3) made **no** reel while its lower (60.0) did. Reopening the claim means
   reopening those gates, which is why they are kept.
+
+- **Then the owner specified `benchmark-view` by answering, and a MOCKUP was built before any gate** (session
+  93, second phase). Settled by asking: a **local server you start** (`node scripts/benchmark-serve.mjs`) reading
+  **`data/cutroom.sqlite` directly**, finished runs only, localhost for now; a **comparison board of any number of
+  runs as columns**, briefs and configs mixed, **no verdict words** — so it is not the stopped feature; fleet
+  overview as the landing; runs picked by checkbox in a filterable ledger; the model’s words **folded**;
+  **ECharts vendored locally**. **Two settled decisions are contradicted and NOT yet rewritten** — S-184’s
+  self-contained no-server file, and S-200’s "reads the scoring half’s `--out` record" — because a page opened
+  from the filesystem **cannot** load a JSON beside it under file-origin rules. Both need an `S-` entry once the
+  shape is approved.
+- **The mockup earned its cost in three faults no written spec would have caught**: ECharts is **not on cdnjs at
+  5.5.1** (404), the progress chart **built six series and never assigned them**, and "refusal by attempt" is one
+  bar because **every picture is attempt 1**. It runs on all 52 real runs and reproduces session 82’s finding
+  from the record (**42% / 70% / 100% / 100%** by subjects per shot). Feedback applied twice: full-bleed width,
+  charts two across with S/M/L/XL presets and drag resize, **refusal by world** filling the empty slot. At
+  `.artifacts/view-mockup/cutroom-benchmark.html`, **gitignored**; **no implementation file exists**.
 
 ### 2026-10-16 — session 92
 
@@ -220,66 +217,57 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 - **A recorded impact map answers "which tests" a code diff owes** (**S-196**, superseding S-177 in part).
   `node scripts/impact-map.mjs` (402 s, 156 files) runs each test file alone under `NODE_V8_COVERAGE` and records
-  what it and every process it spawned loaded, plus the repository paths it NAMES — which credits a tool a test
-  copies into a scratch repository. The twelve PATH-only children cannot be measured (coverage reaches a child
-  through the variable they exist to refuse) and are derived from their siblings. Worth **4 s against 617 s** for a
-  `packages/sdk` or `scripts/` change, and close to nothing inside the engine: **median 110 of 156 files**, because
-  D-094 means a package is entered only through its `src/index.ts`. A selection above eight files runs through the
-  pools. Function-level granularity is deliberately NOT built: a mapping mistake under-selects silently.
+  what it and every process it spawned loaded, plus the repository paths it NAMES. The twelve PATH-only children
+  cannot be measured and are derived from their siblings. Worth **4 s against 617 s** for a `packages/sdk` or
+  `scripts/` change, close to nothing inside the engine (**median 110 of 156 files**, since D-094 means a package
+  is entered only through its `src/index.ts`). Function-level granularity is deliberately NOT built: a mapping
+  mistake under-selects silently.
 - **The scan hole is closed** (**S-195**, open since session 87): both file scans enumerated tracked files, so a
   file a change ADDED was invisible to the run that verified it. Both now read `repoFiles(cwd)` in
   `tests/_files.ts` — tracked plus untracked-not-ignored.
 - **Markdown is a document wherever it lives** (**S-193**, superseding S-159 in part): `DOCUMENT` is `[/.md$/]`,
-  so prose anywhere runs the seven document checks instead of the full suite, while `.claude/settings.json` and
-  `.claude/hooks/*.sh` stay code by name. Verified targeted by the three files that read the rule, plus a full
-  suite that agreed (S-194, the owner's call against S-177).
+  while `.claude/settings.json` and `.claude/hooks/*.sh` stay code by name (S-194, the owner's call against S-177).
 - **The tests step is two pools that never overlap** (**S-192**, superseding S-176 in part): 142 ordinary files at
   4, then the twelve PATH-only children at 2. **617 s against 1455 s** over four green runs, nothing skipped, no
-  bound raised; the memory floor follows the machine (5431, 2483, 4142 MB), so judge a later change by the
-  receipt's own `freeMinMB`. Worst child margin 155.7 s. `--serial` restores S-176 for a bisect. The first
-  attempt's red was a real latent fault, not the scheduler: `cutroom-sdk-launcher`'s teardown took `write EPIPE`
-  from an async `error` event nothing listened for.
+  bound raised; the memory floor follows the machine, so judge a later change by the receipt's own `freeMinMB`.
+  `--serial` restores S-176 for a bisect. The first attempt's red was a real latent fault, not the scheduler:
+  `cutroom-sdk-launcher`'s teardown took `write EPIPE` from an async `error` event nothing listened for.
 - **The suite already costs what its files cost** (**S-191**, superseding S-190): 153 files alone 1501.7 s against
   the suite's 1455 s, so §4.2's whole case was real parallelism. **One full suite is 274 file executions of 153
-  files** — 121 nested inside the twelve secrets children, the largest block left and what §4.4 would narrow — and
-  **the cost is 35 files**, 742 s of it. Per-file table: `docs/research/test-file-costs.md`.
+  files** — 121 nested inside the twelve secrets children — and **the cost is 35 files**, 742 s of it. Per-file
+  table: `docs/research/test-file-costs.md`.
 
 ### 2026-10-15 · session 88
 
-- **The verification receipt, and a journey that reads it** (**S-188**, from `docs/research/test_fixes_and_research.md`
-  §4.0). `scripts/_verification.mjs` and `scripts/test-receipt.mjs` are new — the latter because **Node 22.14's tap
-  and junit reporters attribute nothing to a file**, measured here. `check.mjs` writes `.verification/receipt.json`,
-  gains `--documents`, and holds one document list; `journey.mjs` runs nothing at a tree a green full receipt
-  covers, `--documents` when only Markdown differs, and takes its count from the receipt. Measured: `reel-plan`
-  0.277 s, `reel-contract` 0.248 s, `reel-stills` 18.4 s on a one-document delta, against ~25 min before.
-- **The tested tree is the CONTENT, not the commit**: a dirty run records what `git add -A` would commit, through a
-  throwaway index, so change → full run → commit stays reusable. Two faults were found by running it rather than by
-  its tests, both in S-188: a `:(exclude)` pathspec made the tree undefined here while every scratch fixture
-  passed, and the `--changed` run between two journeys overwrote the reusable receipt — the last full run now keeps
-  `receipt-full.json`, which the journey alone reads.
-- **Biome replaces eslint and prettier for code** (**S-189**, same session at the owner's word): the `code` step
-  **0.492 s** against 6.25 s + 5.74 s; a slice's static checks 30.3 s → 6.9 s; documents ~15 s → 1.2 s. Prettier
-  keeps Markdown, YAML and the one HTML page and is handed file paths from git (a glob matching nothing exits 2).
-  Eslint's three rules are carried by name and biome's other thirteen are `warn`, so the gate did not widen.
+- **The verification receipt, and a journey that reads it** (**S-188**): `scripts/_verification.mjs` and
+  `scripts/test-receipt.mjs` are new — the latter because **Node 22.14's tap and junit reporters attribute nothing
+  to a file**, measured here. `check.mjs` writes `.verification/receipt.json` and gains `--documents`;
+  `journey.mjs` runs nothing at a tree a green full receipt covers. Measured: `reel-stills` **18.4 s** on a
+  one-document delta against ~25 min before. **The tested tree is the CONTENT, not the commit**, through a
+  throwaway index, so change → full run → commit stays reusable; the last full run keeps `receipt-full.json`,
+  which the journey alone reads.
+- **Biome replaces eslint and prettier for code** (**S-189**, the owner's word): the `code` step **0.492 s**
+  against 6.25 s + 5.74 s, a slice's static checks 30.3 s → 6.9 s. Prettier keeps Markdown, YAML and the one HTML
+  page. Eslint's three rules are carried by name and biome's other thirteen are `warn`, so the gate did not widen.
   `biome check --write` was refused: it rewrote imports in two verified features' source.
 
 ### 2026-10-14/15 · session 87
 
 - **`yield-benchmark` built and `Status: verified`**, four slices, one `slice-builder` each (S-172), its gates
   approved by owner decision (S-185). `d535a58` (full): `packages/benchmark` with the three boundary rules whose
-  `--prove` cases are generated from each rule's own enumeration, 10 row fixtures, and **every amendment taking the
-  rule count 22 to 25 in one tree**. `e9f1266` (targeted): `ratings.ts`, the thirteen terms, S-182's weights and
-  tolerances, the `r1` stamp, five worked fixtures at **0.0, 10.0, 10.0, 34.0, 89.7**, tie kept. `11f036e` (full):
+  `--prove` cases are generated from each rule’s own enumeration, 10 row fixtures, and **every amendment taking
+  the rule count 22 to 25 in one tree**. `e9f1266` (targeted): `ratings.ts`, the thirteen terms, S-182’s weights,
+  the `r1` stamp, five worked fixtures at **0.0, 10.0, 10.0, 34.0, 89.7**. `11f036e` (full):
   `scripts/benchmark.mjs` read-only through `node:sqlite` and `docs/research/benchmark.md`, **52 rows written by
-  the script**. Slice 4: four journeys PASS, 120 tests. `963be3c` carries S-182's second amendment and **S-186**;
-  `050536a` closed `pipeline-no-io`'s own gap (**S-187**) at the owner's word, its proof grown from 1 case to 30,
-  with `reel-plan` re-journeyed PASS. `--prove` now fires **25 rules over 131 cases**.
-- **A verification hole, reported not patched**: Slice 3's full suite passed with a D-086 violation in
+  the script**. Slice 4: four journeys PASS, 120 tests. `963be3c` carries S-182’s second amendment and **S-186**;
+  `050536a` closed `pipeline-no-io`’s own gap (**S-187**), its proof grown from 1 case to 30. `--prove` now fires
+  **25 rules over 131 cases**.
+- **A verification hole, reported not patched**: Slice 3’s full suite passed with a D-086 violation in
   `scripts/benchmark.mjs`, because the four file scans read **tracked** files and it was untracked when that suite
   ran. Source fixed at `d898693`, check untouched — **S-195** closed the hole itself in session 89.
 - **Of its 25 slice findings only two were ever written down**, which is what S-197 exists to prevent; the `hold`
-  table is **empty over all 52 runs**, the record being a migration behind `schema.ts`. Nothing weakened, nothing
-  spent, no reel made. Every commit, count and journey is in `docs/features/yield-benchmark.md` (S-177).
+  table is **empty over all 52 runs**. Nothing weakened, nothing spent, no reel made. Every commit, count and
+  journey is in `docs/features/yield-benchmark.md` (S-177).
 
 ## Where to look
 
