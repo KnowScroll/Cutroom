@@ -7,7 +7,11 @@
   writing, and — only if all four are approved — `PROMPTS/087` for Slice 1. **No implementation file of any kind
   until the `Gates:` line says APPROVED four times**
 - **Written:** 2026-10-16
-- **Run:** —
+- **Run:** session 93, 2026-10-16 — a fresh round 3 refused all four gates on 11 findings, **all eleven applied and
+  none refused**, with S-199 amended a second time for the five choices that moved. Two would have broken working
+  code: a widened `redact()` eating the record's own run ids and brief keys, and the exhaustive `processes`
+  deep-equal forbidding the new reader the one process the gates permitted it. No gate approved, no implementation
+  file written. `PROMPTS/087` puts the two remaining answers to the owner
 
 > **The owner said to continue, 2026-10-16, asked at the end of session 92: round 3 runs.** Two rounds have refused
 > all four gates — 22 findings in

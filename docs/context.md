@@ -33,16 +33,18 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   `docs/research/benchmark.md`. Its gates were approved by owner decision (S-185) and no reviewer, so **the slices
   carried the review**: 25 findings reported rather than built around, of which **three imprecise gate sentences
   are named in that file's amendment block** (S-197) and the other 22 are lost with session 87's hand-backs.
-  **Enforced boundary rules: 25.** **Gates written and NOT approved**: `yield-compare` (all four, refused by
-  round 1 on 22 findings and by a fresh round 2 on 24, every one answered; S-199 and its amendment) and
+  **Enforced boundary rules: 25.** **Gates written and NOT approved**: `yield-compare` (all four, refused by three
+  fresh rounds on 22, 24 and 11 findings — 57 in all, 56 applied and 1 refused; S-199 and its two amendments) and
   `hosted-checks` (round 1 answered, on hold).
   **Gates not written, files only**: `benchmark-view` (S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: `yield-compare`'s round 3** (`PROMPTS/086`, the owner's word on 2026-10-16), then `benchmark-view`'s gates
-  (S-184's split, S-198; the owner's word on 2026-10-16). Two adversarial rounds have refused all four gates,
-  46 findings between them, 45 applied and 1 refused; S-199 and its amendment settle the choices. Nothing is
-  approved, so no implementation file may exist yet. **Round 4 is where the owner is asked again**, with approval by
-  decision (S-185's form) and stopping as the two answers not taken at round 3. Then `self-heal`, session 53's
+- **Next: the OWNER'S CALL on `yield-compare`** (`PROMPTS/087`), then `benchmark-view`'s gates
+  (S-184's split, S-198; the owner's word on 2026-10-16). **Three fresh adversarial rounds have refused all four
+  gates — 22, 24 and 11 findings, 57 in all, 56 applied and 1 refused** — and S-199 with its two amendments settles
+  the choices. Nothing is approved, so no implementation file may exist yet. **Round 3 was the last that runs
+  unasked**, so the two answers left are the owner's: approval by decision (S-185's form), or leaving the feature
+  written and unapproved and moving to `benchmark-view`. Each round is cheaper and narrower than the last, and each
+  still found a rule that could not fire or could not fail. Then `self-heal`, session 53's
   P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and `parallel-shots`'
   gates from `b15d203`. Both of session 87's older calls are closed (S-195, S-197). Two cost levers stay open and
   are the owner's, neither recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4
@@ -109,6 +111,43 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-10-16 — session 93
+
+- **A FRESH round 3 refused `yield-compare`'s four gates on eleven findings** (`PROMPTS/086`, CLAUDE.md rule 4),
+  **all eleven applied and none refused**, recorded as a table in the feature file beside rounds 1 and 2; **S-199
+  is amended a second time** for the five choices that moved. Every pinned figure was recomputed in the main
+  session first — all eleven band values exact, both thin margins (0.0093, 0.0430) surviving four decimals, both
+  `NaN` claims confirmed — so the round went to the design. **Two findings would have broken working code.**
+  (a) **The widened `redact()` would have eaten the record's own identifiers**: `scripts/benchmark.mjs:912-916`
+  passes **every string** of the `--out` record through it and `:900` holds `run: card.run.runId`, while a run id
+  is a 36-character UUID and `run.briefKey` a full 64-character SHA-256 — both matching "20 or more
+  `[A-Za-z0-9_-]` with no space" — and **no check would have noticed**, the committed ledger being built without
+  `redact()` at all. The widening becomes `redactProse()` over the sides document alone, `redact()` moves unchanged,
+  and check 11 pins an identifier **surviving** the written record. (b) **The exhaustive `processes`
+  deep-equal forbids the compare reader the one process Gate 2 permitted it**: `assert.deepEqual(processes,
+['git'])` is an order-exact list, not a set, so a second `git rev-parse` reddens it — **the permission went, not
+  the assertion** (rule 3).
+- **Three more with teeth, and one fact corrected.** Slice 2 proved check 6 from a scorecard field Slice 3 added,
+  so `planVaryOn`, its `FIELD_COLUMNS` entry and the fixture edit **move to Slice 2** — left in place the case was
+  unbuildable, `card.run.planVaryOn` did not typecheck, and the workaround the gates allowed would have reddened
+  `yield-benchmark`'s check 1 with no slice running it. The guard's cross-group vote was imported as "the measure
+  rule's" with two clauses undecided; both are now chosen **against** the import, since `parts.plan.shots` is
+  `ABSENT` with no selected plan (`measures.ts:1159`) and the three-group minimum would have silenced the guard
+  exactly where a side died early. Check 3's only vote case reads no verdict under **both** the chosen rule and the
+  one Gate 2 rejects, so {helped, helped, no verdict} ⇒ helped is pinned. And **a run that died in the plan stage
+  HAS a receipt** (`taken-dead-in-plan.json`: zero `plan` rows, one `model_receipt`; `lost_call.model` is
+  `notNull`), so **three** observed conditions go absent on an early death, not four, and a planner model swap does
+  refuse. Slices 1 and 2 both now name `tests/yield-benchmark-schema.test.ts`, and Slice 2 keeps the arithmetic file.
+- **The "twelve" instrument was re-measured BEFORE the round and three of round 2's own faults corrected**, which
+  matters because S-197 established that no mechanical check can read an English count: **eleven live claims, not
+  twelve** (`scripts/_pools.mjs:7` holds no occurrence of the word — it carries the 274/153/121 figures, so counting
+  it inflated the instrument by one), these three citations stale a **second** time (`:183`/`:196`/`:203` are now
+  `:204`/`:217`/`:224`), and `DECISIONS.md:8671` a seventh children claim the list missed. Why this file is amended
+  where a decision entry is frozen — its own header keeps every line its work made untrue — is now stated rather
+  than merely applied. **Markdown only**, so `check.mjs --changed` is the whole verification owed (S-193); no
+  implementation file exists and the `Gates:` line reads pending four times; `JOURNAL.md` was compacted first
+  (sessions 77 and 78 merged, their detail in the commits and the two feature files, S-177).
+
 ### 2026-10-16 — session 92
 
 - **A FRESH round 2 refused `yield-compare`'s four gates on twenty-four findings** (`PROMPTS/085`, CLAUDE.md rule
@@ -135,7 +174,8 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   measure 6, so Gate 1 had described one measure twice; and a shot **cannot carry two degradation rows**, both
   tables being keyed `(run_id, shot_id)`, so check 4 pins the **inherited row outside the denominator** instead.
   The reader's three-file scan splits clause by clause, its exhaustive `processes` deep-equal having been missing
-  from the amendment list entirely, and the live "twelve" claims are **twelve, not nine** — `scripts/check.mjs:57`
+  from the amendment list entirely, and round 2 counted the live "twelve" claims as **twelve, not nine** — session
+  93 re-measured them as **eleven** (`scripts/_pools.mjs:7` holds no occurrence of the word) — `scripts/check.mjs:57`
   and `scripts/_pools.mjs:4` and `:7` were missed, and three `docs/context.md` citations were stale.
 - **Refused, one of twenty-four**: `packages/reel-contract/src/request.ts:79-90` is exactly the `SubmitRequest`
   declaration, re-counted in the source. Markdown only, so `check.mjs --changed` is the whole verification owed
@@ -160,41 +200,24 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-16 · session 90
 
-- **The queue read, and this digest's stale "Next" corrected.** Line 38 still named the tracked-files scan hole
-  as an open owner call; **S-195 closed it in session 89**, so the bullet now names the one older call that
-  remains — the three imprecise `yield-benchmark` gate sentences — and records that §4.3 (`hosted-checks`) and
-  §4.4 (narrowing the secrets children) are open owner calls that this session recommends against taking now:
-  §4.4's own decision line in `docs/research/test_fixes_and_research.md` makes it conditional on §4.2 and §4.3
-  not having made the suite cheap enough, and S-192 did (1455 s → 617 s), so its ~200 s no longer buys the
-  narrowing of a proven property; §4.3 adds Ubuntu as a second platform for corroboration that carries no
-  trailer (S-183). No code touched; `check.mjs --changed` is the whole verification a Markdown-only change owes
-  (S-193). The journal was compacted to its 80-line budget first (sessions 72 and 73–75 merged, their detail in
-  the commits and feature files per S-177) — the same thing session 85 did, and the reason this entry exists.
-- **Then the owner took the older call, and the three imprecise gate sentences are named at last (S-197).** They
-  are in `docs/features/yield-benchmark.md`'s amendment block, gates unedited, no assertion or title moved: Gate
-  3's two mentions of `tests/fixtures/benchmark/*.json` against Slice 3's recursing glob; **the ledger-column
-  table's three short value sets** — `ending` also `absent`, each part rating also `inherited` (S-162, S-164), `s`
-  also `absent`, all three accepted by check 7 at `tests/yield-benchmark-reader.test.ts:504-519` and none present
-  in the 52-run ledger, which is why no reader noticed; and "the measures version", which the gates never define
-  (`packages/benchmark` exports `RATING_VERSION` only; `scripts/benchmark.mjs` declares `m1` with its reason).
-  **Only two of session 87's 25 findings were ever written down and the lost third of the promised three cannot be
-  recovered**, so these are a fresh read of the gates against the built code — a 1104-line read to recover what a
-  one-line list would have held. `.claude/agents/slice-builder.md` now requires findings as a numbered list naming
-  the sentence each contradicts. No mechanical check is claimed: the count lived in prose, and a regex over English
-  would read as coverage.
-- **The queue was then corrected by the owner and written down (S-198)**: `yield-compare`'s four gates next, then
-  `benchmark-view`'s, then `self-heal` — session 90's `self-heal` recommendation is withdrawn, because every
-  feature behind this one is an engine change whose worth is a claim that runs got better, and the scoring half
-  puts no two sets of runs beside each other. `PROMPTS/084-yield-compare-gates.md` is written for it, with the nine
-  choices the gates must settle and the limit Gate 1 must state: **no verdict is available from the 52 runs already
-  made**.
-- **Then this file was trimmed to make room: 298 lines of its 300 to 231.** Nothing unique was dropped, only what
-  another file carries by name. **Runs** now lists 2026-09-25 onward and summarises the 33 earlier runs in a
-  paragraph with their `P-` numbers, because `docs/research/benchmark.md` scores every one of them, the
-  `run-reader` agent reads their rows, and `docs/reel-pitfalls.md` holds what each taught. Sessions 88 and 89 are
-  compressed to their decisions, figures and `S-` numbers, their narrative left in `JOURNAL.md` and the commits
-  (S-177). The SDK chain's journey commits and counts go the same way, to the two feature files. The rule is now in
-  this file's header, so the next session trims by it instead of re-deciding.
+- **The queue read, the digest's stale "Next" corrected, and two cost levers declined** — both still open and the
+  owner's, neither recommended: §4.3 `hosted-checks` buys corroboration that carries no trailer (S-183) at the
+  price of a second platform, and §4.4's own decision line makes it conditional on §4.2 and §4.3 not having made
+  the suite cheap enough, which S-192 did (1455 s to 617 s), so its ~200 s would now narrow a proven property and
+  supersede S-028 for nothing.
+- **Then the owner took session 87's older call, and S-197 names the three imprecise `yield-benchmark` gate
+  sentences at last** — in that file's amendment block, gates unedited, no assertion or bound moved: Gate 3's two
+  mentions of `tests/fixtures/benchmark/*.json` against Slice 3's recursing glob; the ledger-column table's three
+  short value sets (`ending` also `absent`, each part rating also `inherited`, `s` also `absent`), all three
+  accepted by check 7 and **none present in the 52-run ledger**, which is why no reader noticed; and "the measures
+  version", which the gates never define. **Only two of session 87's 25 findings were ever written down and the
+  promised third is unrecoverable**, so these are a fresh 1104-line read of the gates against the built code, and
+  `.claude/agents/slice-builder.md` now requires findings as a numbered list naming the sentence each contradicts.
+  No mechanical check is claimed: the count lives in prose, and a regex over English reads as coverage.
+- **Then the owner corrected the queue (S-198)**: `yield-compare`, then `benchmark-view`, then `self-heal` — session
+  90's `self-heal` recommendation withdrawn, because every feature behind this one is an engine change whose worth
+  is a claim that runs got better. **And this file was trimmed 298 lines of its 300 to 231**, by the rule now in
+  its own header: what another file carries by name is not kept here.
 
 ### 2026-10-15/16 · session 89
 
@@ -220,11 +243,9 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   attempt's red was a real latent fault, not the scheduler: `cutroom-sdk-launcher`'s teardown took `write EPIPE`
   from an async `error` event nothing listened for.
 - **The suite already costs what its files cost** (**S-191**, superseding S-190): 153 files alone 1501.7 s against
-  the suite's 1455 s, so §4.2's whole case was real parallelism. Table: `docs/research/test-file-costs.md`. **One
-  full suite is 274 file executions of 153 files** — 121 of them nested inside the twelve secrets children, which
-  is the largest block left and what §4.4 would narrow. **The cost is 35 files**: 67 under 3 s cost 90.7 s, 35 cost
-  742 s. One red is unexplained: `reel-render-secrets` failed once at 123.8 s with nothing else running, passed
-  alone at 100.6 s, and its lines were discarded.
+  the suite's 1455 s, so §4.2's whole case was real parallelism. **One full suite is 274 file executions of 153
+  files** — 121 nested inside the twelve secrets children, the largest block left and what §4.4 would narrow — and
+  **the cost is 35 files**, 742 s of it. Per-file table: `docs/research/test-file-costs.md`.
 
 ### 2026-10-15 · session 88
 
@@ -247,26 +268,21 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-14/15 · session 87
 
-- **`yield-benchmark` is built and `Status: verified`**, four slices, one `slice-builder` each (S-172).
-  **`d535a58`** (full): `packages/benchmark` — `index`, `measures`, `reasons` — its manifest, tsconfig,
-  root and tooling references, workspace dependency, 10 row fixtures, the three boundary rules with `--prove`
-  cases **generated from the rule's own enumeration**, and **every amendment taking 22 to 25 in one tree** (three
-  test files, seven documents, the tenth-member enumerations, amendment blocks in the three features) — session
-  86's discarded partial is why they are one commit. **`e9f1266`** (targeted): `ratings.ts`, the thirteen terms,
-  S-182's weights and tolerances, the `r1` stamp, five worked fixtures at **0.0, 10.0, 10.0, 34.0, 89.7**, tie
-  kept. **`11f036e`** (full): `scripts/benchmark.mjs` read-only through `node:sqlite`, its flags and four exit
-  codes, and `docs/research/benchmark.md` — **52 rows written by the script** — with `refusals.md` and
-  `yield-baseline.md` frozen onto it. **Slice 4**: four journeys PASS, 43 tests at `d898693`, then 63, 106, 120.
+- **`yield-benchmark` built and `Status: verified`**, four slices, one `slice-builder` each (S-172), its gates
+  approved by owner decision (S-185). `d535a58` (full): `packages/benchmark` with the three boundary rules whose
+  `--prove` cases are generated from each rule's own enumeration, 10 row fixtures, and **every amendment taking the
+  rule count 22 to 25 in one tree**. `e9f1266` (targeted): `ratings.ts`, the thirteen terms, S-182's weights and
+  tolerances, the `r1` stamp, five worked fixtures at **0.0, 10.0, 10.0, 34.0, 89.7**, tie kept. `11f036e` (full):
+  `scripts/benchmark.mjs` read-only through `node:sqlite` and `docs/research/benchmark.md`, **52 rows written by
+  the script**. Slice 4: four journeys PASS, 120 tests. `963be3c` carries S-182's second amendment and **S-186**;
+  `050536a` closed `pipeline-no-io`'s own gap (**S-187**) at the owner's word, its proof grown from 1 case to 30,
+  with `reel-plan` re-journeyed PASS. `--prove` now fires **25 rules over 131 cases**.
 - **A verification hole, reported not patched**: Slice 3's full suite passed with a D-086 violation in
-  `scripts/benchmark.mjs` — the four file scans read **tracked** files, and it was untracked when that suite ran.
-  Source fixed at `d898693`, check untouched. **`963be3c`**: S-182's second amendment (24.4 and "no tie"
-  superseded by 10.0 and a kept tie) and **S-186**, `benchmark-no-io` naming no `dependencyTypes` because bare
-  `sqlite` is not a builtin (31 of 32 spellings fire with it). **`050536a` then closed `pipeline-no-io`'s own
-  gap (S-187)** at the owner's word: the attribute dropped, its pattern untouched, its proof grown from one case
-  to 30, and `reel-plan` re-journeyed PASS at `050536a` with 51 tests. `--prove` now fires 25 rules over 131 cases.
-- Also reported: the `hold` table is **empty over all 52 runs**; the record is a migration behind `schema.ts`, so
-  the reader reports five columns absent, never zero. Sessions 79–82 dropped for the cap; git keeps them. Nothing
-  weakened, nothing spent, no reel made.
+  `scripts/benchmark.mjs`, because the four file scans read **tracked** files and it was untracked when that suite
+  ran. Source fixed at `d898693`, check untouched — **S-195** closed the hole itself in session 89.
+- **Of its 25 slice findings only two were ever written down**, which is what S-197 exists to prevent; the `hold`
+  table is **empty over all 52 runs**, the record being a migration behind `schema.ts`. Nothing weakened, nothing
+  spent, no reel made. Every commit, count and journey is in `docs/features/yield-benchmark.md` (S-177).
 
 ## Where to look
 

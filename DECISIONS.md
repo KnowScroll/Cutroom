@@ -9343,4 +9343,86 @@ in the source, `:79-90` is exactly the `SubmitRequest` declaration; the reviewer
 recorded, and whether a round 3 runs is the owner's call (CLAUDE.md rule 4 and the cap this repository keeps:
 session 83 spent three rounds on this material as one feature and session 86 a fourth on the other half).
 
+**Amended again 2026-10-16 — round 3, and the five choices it moved.** A second fresh reviewer refused all four
+gates on **eleven findings**, **all eleven applied and none refused**; every one is recorded in
+`docs/features/yield-compare.md`'s "Gate review 3" table. **No choice above is withdrawn**; five are made more
+precise or extended, and two of the five are places where this entry as written would have broken something that
+already works.
+
+1. **The widening of `redact()` becomes a SECOND function, because its call site is total.** This entry said
+   `redact()` "gains a bare query string and a run of 20 or more `[A-Za-z0-9_-]` characters". It cannot:
+   `scripts/benchmark.mjs:912-916` writes the `--out` record through
+   `JSON.stringify(record, (_key, value) => (typeof value === 'string' ? redact(value) : value), 2)` — **every
+   string the record holds** — and `:900` puts `run: card.run.runId` in it. A run id is a 36-character UUID and
+   `run.briefKey` is a full 64-character SHA-256 (`packages/benchmark/src/measures.ts:1055`), and **both match that
+   shape exactly**, so the widening would have rewritten the verified scoring half's own run ids, brief keys,
+   picture ids and take ids into the placeholder. **Nothing would have caught it**: the only assertion over the
+   written record is a prose prompt, and the committed ledger is built without `redact()` at all
+   (`benchmark.mjs:790-806`), so `yield-benchmark`'s check 7 would have stayed green while `--out` was silently
+   mangled. Settled: **`redact()` moves unchanged, byte for byte**, and **`redactProse()` joins it in the same
+   module** — `redact()` plus the query string and the key shape — applied **only to the strings taken from the
+   sides document**, as the document is read, so what enters either record is already redacted. One module, two
+   scopes, still one place that knows D-022. Check 11 asserts both halves: the three shapes firing on caller prose,
+   and **a run id and a brief key surviving the written record intact**.
+2. **The compare reader starts no process at all, and the permission to start `git rev-parse` is withdrawn.** This
+   entry's item 6 makes `assert.deepEqual(processes, ['git'])` run over the three reader files' concatenation
+   precisely so that "starts no process but git" stays exhaustive. That assertion is an **order- and count-exact
+   list, not a set** (`tests/yield-benchmark-reader.test.ts:249-250`), and `scripts/benchmark.mjs:850` is the one
+   existing `run('git', ['rev-parse', '--short', 'HEAD'])` — so a second one in the compare reader makes the
+   concatenation `['git', 'git']` and the clause **red**. The only alternatives were to loosen an exhaustive count,
+   which CLAUDE.md rule 3 forbids, or to forbid the reader a process. Settled: **the reader starts nothing**, and
+   its comparison record carries no commit stamp. **Also corrected in item 6**: the `readOnly` match is asserted
+   **against the one file that holds the open**, not over the concatenation — a concatenation would pass if any of
+   the three held a `readOnly` open, while naming the file pins which one does, so the feature file's stronger form
+   stands and this sentence is where the difference is recorded.
+3. **The guard's cross-group vote is decided rather than imported, in two clauses this entry left to "the measure
+   rule's".** A guard quantity does not survive in the same groups as the measure it guards — `parts.plan.shots` is
+   `ABSENT` with no selected plan (`measures.ts:1159`) — so: **the group-dropping minimum applies, the
+   three-surviving-group minimum does NOT**, because read as the measure rule's a quantity surviving in two groups
+   would read no verdict and the guard would never fire, letting a change buy its credit by dying early on one
+   side; and **"and none moving the other way" does NOT carry over**, because inside a guard it leaves the credit
+   standing where the work got smaller in most briefs, so a contrary group is **named** instead of silencing the
+   guard. Both choices make the guard fire more often than the import would, which is the same asymmetry as the
+   zero band: withholding credit on thin evidence under-claims. **Rejected**: importing either clause unexamined,
+   and firing on a single less-work group out of many, which the two-thirds threshold already excludes.
+4. **`planVaryOn` and its fixture edit belong to the slice that proves the fingerprint, not to the reader's slice.**
+   Check 6 asserts that each of the seven conditions refuses, `planVaryOn` is one of the seven, and the field is in
+   no scorecard field — its only occurrence in the package is a private options blob type (`measures.ts:436`) —
+   while this feature forbids `compare.ts` a second reading of `request_canonical`. Settled: the field, its
+   `FIELD_COLUMNS` entry and the one committed fixture's `options` move to **Slice 2**, which names
+   `tests/yield-benchmark-measures.test.ts` and `tests/yield-benchmark-schema.test.ts` in its targeted run. Left in
+   Slice 3, the field's absence made check 6's case unbuildable and `card.run.planVaryOn` untypecheckable, and the
+   workaround the gates allowed would have reddened `yield-benchmark`'s check 1 with no slice running it.
+5. **The live "twelve" claims are ELEVEN, and the enumeration's own completeness is the instrument.** This
+   amendment's item 8 said twelve. `scripts/_pools.mjs:7` **holds no occurrence of the word** — it carries "274
+   file executions of 153 files — 153 direct and 121 nested" — so it is a live **figure** claim, amended for the
+   same reason but not a count claim, and counting it inside an instrument defined as `grep -ri twelve` inflated
+   the instrument by one. `docs/context.md`'s three citations were stale a second time (`:183`/`:196`/`:203` are
+   now `:204`/`:217`/`:224`), `:224` carries those figures as well as the word, `:138` is session 92's own record
+   and is left, and `DECISIONS.md:8671` is a seventh children claim this entry's list missed — S-192's Rejected
+   clause _"a change to twelve verified test files"_ — left as a measurement at its date like the other six.
+   **Why `docs/context.md` is amended where `DECISIONS.md` is not**, which round 2 applied without stating: that
+   file's own header makes every session keep _"any row or line below its work made untrue"_, so its Changes
+   entries are a maintained digest, where a decision entry is a frozen record.
+
+**Also corrected, as a fact rather than a choice.** **A run that died in the plan stage HAS a receipt.**
+`tests/fixtures/benchmark/taken-dead-in-plan.json` — the real run `cd9648c9` — holds zero `plan` rows and **one
+`model_receipt`**, role `planner`, `model` `MiniMax-M2.7`; and `lost_call.model` is `notNull`
+(`packages/domain/src/schema.ts:273`), so even a run that only lost its planner call carries one. **Three of the
+four observed conditions go absent on an early death — `receiptRates`, `plannedImageCalls`, `pictureRule` — and
+`portModels` does not**, so a planner model swap DOES refuse. The gates had said four went absent and that "a model
+swap on the other side refuses nothing"; the hazard that is real is a price change, or a model swap on a port the
+run never reached. Check 6's absent case is pinned on the three, with `portModels` asserted present on the same
+run. Two smaller facts with it: `packages/benchmark/src/index.ts:8`' _"It computes no band, no delta and no
+verdict: those are `yield-compare`'s"_ is falsified by Slice 1 and joins the amendment list, while `ratings.ts:9`'s
+identical sentence stays true; and `packages/contracts/src/cinematic.ts`' `pictures` field is at **`:39`**, not
+`:38`.
+
+**What this second amendment does NOT settle.** No gate is approved by it. **Three adversarial rounds have now
+refused all four**, on 22, 24 and 11 findings — **57 in all, 56 applied and 1 refused** — and the trend is the
+honest argument for either answer: each round's findings are fewer and narrower, and each round still finds a rule
+that could not fire or could not fail. Round 3 was the last that runs unasked, so **the two answers left are the
+owner's**: approval by decision in S-185's form, or leaving the feature written and unapproved and moving to
+`benchmark-view`. No implementation file of this feature exists.
+
 ---
