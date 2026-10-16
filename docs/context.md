@@ -33,13 +33,15 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   `docs/research/benchmark.md`. Its gates were approved by owner decision (S-185) and no reviewer, so **the slices
   carried the review**: 25 findings reported rather than built around, of which **three imprecise gate sentences
   are named in that file's amendment block** (S-197) and the other 22 are lost with session 87's hand-backs.
-  **Enforced boundary rules: 25.** **Gates written and NOT approved**: `yield-compare` (all four, round 1
-  refused them on 22 findings, every one applied; S-199) and `hosted-checks` (round 1 answered, on hold).
+  **Enforced boundary rules: 25.** **Gates written and NOT approved**: `yield-compare` (all four, refused by
+  round 1 on 22 findings and by a fresh round 2 on 24, every one answered; S-199 and its amendment) and
+  `hosted-checks` (round 1 answered, on hold).
   **Gates not written, files only**: `benchmark-view` (S-184), `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
-- **Next: `yield-compare`'s gate review, round 2 (`PROMPTS/085`), then `benchmark-view`'s four gates**
-  (S-184's split, S-198; the owner's word on 2026-10-16). Its own four gates are written and S-199 settles
-  the nine choices; nothing is approved, so no implementation file may exist yet. Then `self-heal`, session 53's
+- **Next: the owner's call on `yield-compare`'s round 3** (`PROMPTS/086`), then `benchmark-view`'s four gates
+  (S-184's split, S-198; the owner's word on 2026-10-16). Two adversarial rounds have refused all four gates,
+  46 findings between them, 45 applied and 1 refused; S-199 and its amendment settle the choices. Nothing is
+  approved, so no implementation file may exist yet. Then `self-heal`, session 53's
   P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and `parallel-shots`'
   gates from `b15d203`. Both of session 87's older calls are closed (S-195, S-197). Two cost levers stay open and
   are the owner's, neither recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4
@@ -106,36 +108,54 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
 
+### 2026-10-16 — session 92
+
+- **A FRESH round 2 refused `yield-compare`'s four gates on twenty-four findings** (`PROMPTS/085`, CLAUDE.md rule
+  4), **twenty-three applied and one refused**, recorded as a table in the feature file beside round 1's; **S-199 is
+  amended for the eight choices that moved**. The main session recomputed all **eleven pinned band values** before
+  the round and handed them over measured, so the round went to the design: every finding with teeth was a rule that
+  **could not fire or could not fail**. (a) **The credit guard could never fire on `plannedShots` or
+  `plannedSeconds`** — four runs planning six shots against four planning four have variance zero on both sides, so
+  the measures' zero-band rule votes _no verdict_, while the floor returns `NaN` on a count (`pA' = 25/6`). Settled:
+  bare Welch for the guard, never the floor, and **a zero band FIRES it**, because withholding credit on no
+  uncertainty under-claims where claiming a verdict over-claims. (b) **The positive control could not read
+  _helped_** at the null's two runs a side, `0/2` against `2/2` being pinned inside the noise; it becomes its own
+  fixture of 24 runs, four a side, with identical attempted work so the guard cannot withhold. (c) **The zero-band
+  rule was undone one level up**, where {helped, no verdict, no verdict} fell through to _inside the noise_; a
+  no-verdict group is now surviving but not comparable. (d) **`planVaryOn` turns `yield-benchmark`'s check 1 red**,
+  since that check proves each `FIELD_COLUMNS` entry by mutating its column and **no committed fixture carries the
+  field**; one fixture's `options` gain it, an eleventh fixture being refused because check 4 pins `groups.size` at
+  9 and its shared pair by name.
+- **Four more holes, each verified in the source before it was applied**: the **five always-run scans do not run
+  under `--slice`** (`SCANS` is a step of the full suite and `--documents` alone, `scripts/check.mjs:138-157`) —
+  the S-195 hole again — so Slices 1 and 2 name those five plus `tests/yield-benchmark-schema.test.ts`;
+  `redact()` (`scripts/benchmark.mjs:187-191`) matches **no key shape**, so it moves into the shared module with the
+  loader and is widened; a **degraded shot is FILMED from words** and pays its video call, the still fallback being
+  measure 6, so Gate 1 had described one measure twice; and a shot **cannot carry two degradation rows**, both
+  tables being keyed `(run_id, shot_id)`, so check 4 pins the **inherited row outside the denominator** instead.
+  The reader's three-file scan splits clause by clause, its exhaustive `processes` deep-equal having been missing
+  from the amendment list entirely, and the live "twelve" claims are **twelve, not nine** — `scripts/check.mjs:57`
+  and `scripts/_pools.mjs:4` and `:7` were missed, and three `docs/context.md` citations were stale.
+- **Refused, one of twenty-four**: `packages/reel-contract/src/request.ts:79-90` is exactly the `SubmitRequest`
+  declaration, re-counted in the source. Markdown only, so `check.mjs --changed` is the whole verification owed
+  (S-193). **No implementation file exists and no gate is approved** — the `Gates:` line reads pending four times,
+  and whether a round 3 runs is the owner's call.
+
 ### 2026-10-16 — session 91
 
-- **`yield-compare`'s four gates are written, and S-199 settles the nine open choices** (`PROMPTS/084`,
-  S-198's order). `docs/features/yield-compare.md` is 903 lines: Gate 1 product, Gate 2 architecture with a
-  place-and-may-not table, Gate 3 program design with 14 numbered checks, Gate 4 four slices (4 + 6 + 4 + 0).
-  **S-199 supersedes S-182 in six named parts and nothing else**: the band is ONE standard error with a
-  multiplier of two; **the run is the unit of evidence**, so only `reels made` is a share over runs; the two
-  per-run counts become rates over attempted shots; nothing is pooled across brief groups; the guard gains the
-  plan's shot count and planned seconds; and the fingerprint settles at seven conditions, four of S-182's
-  dropped as vacuous by construction and each port's models added. Writing the gates against the scoring half
-  as BUILT corrected three inherited clauses, each named in the file's header block — the picture
-  rule is READ from `Plan.pictures`, the two per-run counts are not per-unit rates, and the "no verdict from
-  the 52 runs" limit is printed by the reader because **nobody ever counted how many brief groups reach four
-  matched runs**.
-- **Round 1 refused all four gates with 22 findings; every one is applied and none refused**, recorded as a
-  table in the feature file's "Gate review 1". The two that changed the design: **the null comparison could
-  not fail** (five runs of one brief key are one group, and one group reads "no verdict" whatever the
-  arithmetic does — now fifteen runs over three groups with the group votes asserted and a positive
-  control), and **the share band treated items inside a run as independent trials** (pinned both ways on the
-  same rows: 0/20 against 8/20 is delta +0.3636 band 0.1138 **moved** pooled, delta +0.4000 band 0.2531
-  **inside the noise** per run). Three code claims were verified against the source before being applied:
-  `tests/yield-benchmark-reader.test.ts` asserts exactly one `new DatabaseSync(` in the reader's **source
-  text** (so the loader move reddens it and blinds the rest of that scan — it now grows to three
-  reader files), `packages/benchmark` declares **no zod** (so the sides validator is hand-written and no
-  manifest or lockfile is touched), and `tests/check-pools.test.ts` requires a `bareEnvironment` function of
-  every secrets-pool member, which the **thirteenth** PATH-only child owes along with nine live "twelve"
-  claims. Markdown only, so `check.mjs --changed` is the whole verification owed (S-193).
-- **No gate is approved and no implementation file exists.** `PROMPTS/085` is round 2 with a FRESH reviewer
-  (CLAUDE.md rule 4), and the owner is asked before a round 3. A stopped subagent cannot be resumed, so round
-  1 was paid for twice — the first reviewer was interrupted after its arithmetic pass.
+- **`yield-compare`'s four gates were written, and S-199 settles its nine open choices** (`PROMPTS/084`,
+  S-198's order): 903 lines, Gate 2's place-and-may-not table, Gate 3's fourteen numbered checks, Gate 4's four
+  slices. **S-199 supersedes S-182 in six named parts** — one standard error with a multiplier of two; **the run
+  is the unit of evidence**, so only `reels made` is a share over runs; the two per-run counts become rates over
+  attempted shots; nothing pooled across brief groups; the guard gains the plan's shot count and planned seconds;
+  and the fingerprint settles at seven conditions. Writing them against the scoring half as BUILT corrected three
+  inherited clauses, named in the file's own header block.
+- **Round 1 refused all four gates on 22 findings, every one applied and none refused.** The two that changed the
+  design: the null comparison **could not fail** (one brief key is one group, so it now holds fifteen runs over
+  three groups with the group votes asserted), and the share band treated items inside a run as independent
+  trials — pinned both ways on the same rows, `0/20` against `8/20` is delta +0.3636 band 0.1138 **moved** pooled
+  and delta +0.4000 band 0.2531 **inside the noise** per run. A stopped subagent cannot be resumed, so round 1 was
+  paid for twice. Markdown only; no implementation file, no gate approved.
 
 ### 2026-10-16 · session 90
 

@@ -7,7 +7,9 @@
   — only if all four are approved — `PROMPTS/086` for Slice 1. **No implementation file of any kind until the
   `Gates:` line says APPROVED four times**
 - **Written:** 2026-10-16
-- **Run:** —
+- **Run:** session 92, 2026-10-16 — a fresh round 2 refused all four gates on 24 findings; 23 applied and 1
+  refused, recorded in the feature file; S-199 amended for the eight choices that moved; `PROMPTS/086` written
+  for round 3, which runs only if the owner says to continue
 
 ```text
 Read docs/context.md first, then docs/features/yield-compare.md whole (903 lines; its "Gate review 1" section at

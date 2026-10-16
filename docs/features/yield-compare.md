@@ -43,6 +43,23 @@ Gates: product pending · architecture pending · program-design pending · slic
 >    matching sets can only grow. Gate 1 therefore states what is known and **the reader prints the count; no gate
 >    pins it.**
 >
+> **Round 2, in session 92, refused all four again on twenty-four findings** — every one recorded at the end of
+> this file, twenty-three applied and one refused, with **S-199 amended** for the eight choices that moved. It
+> corrected two further facts about the engine that the first draft had wrong, and they are named here for the same
+> reason as the three above:
+>
+> 4. **A degraded shot IS filmed, from words.** `packages/pipeline/src/clips/index.ts:104` — _"the shots whose
+>    picture was degraded, which are made from words (D-050 step 2)"_ — and `packages/contracts/src/render.ts:66-67`
+>    gives it `{ kind: 'text-to-video', placed: true, degradation }`. It pays its video call. **The still fallback is
+>    measure 6**, `StillHoldShot` (`render.ts:76-91`, D-025 rung 2), a shot held on its gated keyframe with no take
+>    at all. Gate 1 described measure 6 twice and measure 5 not at all, and guard quantity 3's _"a degraded shot is
+>    a shot not filmed"_ rested on a mechanism the engine does not have.
+> 5. **A shot cannot carry two degradation rows.** `packages/domain/src/schema.ts:318` keys `degradation`
+>    `primaryKey({ columns: [runId, shotId] })` and `:559` keys `still_hold` the same way, so there is at most one
+>    row per shot per run. The distinct-shot numerator is kept as a defence, its stated reason is corrected, and the
+>    hazard that is real — a row whose shot is **outside** the denominator, which is the inherited case — is what
+>    check 4 pins instead of a fixture the record cannot hold.
+>
 > **Its gates were not written before this.** The sections above them record what the feature owns, what three
 > adversarial rounds in session 83 settled or left open, and the nine choices the gates had to make. No
 > implementation file until all four are approved (CLAUDE.md rule 1).
@@ -89,10 +106,19 @@ why the declared change is printed beside every verdict.
 ## What is already settled, and binds these gates
 
 From S-182, unchanged by the split: the brief key's construction; two runs a side in a group and three shared groups
-at the least; a zero delta counts as not moved; a group where the measure is undefined on one side is dropped; the
-fingerprint's fields; and that **the engine's code version is reported "not recorded"** on every comparison until
-`run-provenance` records it. (S-182's companion clause about the picture rule is corrected above, by the scoring
-half as built.)
+at the least; a zero delta counts as not moved; a group where the measure is undefined on one side is dropped; and
+that **the engine's code version is reported "not recorded"** on every comparison until `run-provenance` records it.
+(S-182's companion clause about the picture rule is corrected above, by the scoring half as built.)
+
+**The fingerprint's fields are NOT in that list, and round 2 was right that listing them was a contradiction.**
+S-199 part 6 supersedes exactly them: four of S-182's conditions are dropped as vacuous, _"whether standalone
+pictures exist"_ is dropped as redundant, and each port's models are added. Two more of S-182's comparability
+items go the same way and are named here rather than dropped in silence: its sentence reads _"Comparability is
+what the record holds: `until`, **the measures version, the rating stamp**, and a fingerprint of …"_
+(`DECISIONS.md:7846-7847`), and **neither is a condition here** — a comparison is one invocation of one reader, so
+this feature's own `c1` and the scoring half's stamps cannot differ between its two sides. They are printed, which
+is what the "Printed, not conditions" section below says. S-199's amendment records this as a seventh superseded
+part rather than letting "in six named parts, and in nothing else" stand while nine fields moved.
 
 **S-182's exact words on the two clauses these gates change** — quoted so the departure is visible rather than
 hidden: _"A measure moves only beyond **twice its own band**: binomial from the counts for a share, and from the two
@@ -136,8 +162,9 @@ engine worked."_
 
 **The job.** Name two sets of runs — a label and a list for each — and get back, for each of eight things, one of
 four words, with the figures and the uncertainty beside it. The eight are: how often a reel came out at all; how
-much of the pictures, the filmed takes and the finished cuts were refused; how often a shot fell back to a still;
-how often a shot ran out of attempts at the camera; what a run cost; and how long a run took. Every one of them is
+much of the pictures, the filmed takes and the finished cuts were refused; how often a shot was filmed from words
+instead of from a picture of its own; how often a shot ran out of attempts at the camera and was held on its picture
+as a still; what a run cost; and how long a run took. Every one of them is
 **a rate per unit of work, averaged over runs**, never a total, so a run that planned four shots and a run that
 planned six can appear in the same comparison without the bigger one looking worse.
 
@@ -184,7 +211,15 @@ This view prints figures and bands and **no verdict word**, because a verdict ne
   checks: a side where no run made a reel against a side where every run did, with **two** runs each, comes back
   _inside the noise_; and a side whose runs each had a fifth of their pictures refused against one at two fifths,
   four runs each, also comes back _inside the noise_ — because four runs is four pieces of evidence, however many
-  pictures they contain. Only an effect as large as none-against-all over four runs a side moves a measure.
+  pictures they contain. **What does move at four runs a side is one run in four against four in four**; two in
+  four against four in four does not. All three are pinned beside each other, so the line between a claim and no
+  claim is a check rather than a sentence.
+- **A side whose runs died early is comparable on almost everything, by construction.** Four of the seven
+  comparability conditions are read off what a run produced, and a run that died in the plan stage produced none of
+  them; an absent field matches any value, because refusing on absence would drop exactly the runs the first six
+  measures are about. The honest consequence is that **a price change or a model swap on the other side refuses
+  nothing when one side died early**. The output says which fields were absent on which side, and the declared
+  change is printed beside every verdict.
 - **Nothing records which engine made a run.** That reads as _not recorded_ and is printed beside the declared
   change, never as "the same". Making it airtight is `run-provenance`, which is not built.
 - **It checks seven things about whether two sides are alike, not everything the record holds.** A change that
@@ -203,15 +238,16 @@ and reads no key.
 
 ### Where each part lives
 
-| place                                     | what it gains                                                                                                                                                                    | what it still may not do                                                                                                       |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `packages/benchmark/src/compare.ts`       | sides, grouping by brief key, the fingerprint's fields, the eight measures, both bands, the per-group vote, each measure's word, the credit guard, stratify, the sides validator | no I/O, no database, no engine package, no app, **no npm package at all**, and no `node:crypto` — the hash is handed in        |
-| `packages/benchmark/src/measures.ts`      | one field: `planVaryOn` on the scorecard's run block, with its `FIELD_COLUMNS` entry                                                                                             | nothing else; this is an amendment to a verified feature and is listed below                                                   |
-| `packages/benchmark/src/index.ts`         | the new exports, since a package is entered only through it (D-094)                                                                                                              | nothing else; it re-exports and holds no logic                                                                                 |
-| `scripts/_benchmark-rows.mjs`             | the read-only open, the held-column read, one run's rows, and the run-id prefix resolution — **moved out of `scripts/benchmark.mjs`**, which imports them back                   | no measure, no verdict, no printing, no `process.exit` of its own — it returns rows and faults                                 |
-| `scripts/benchmark-compare.mjs`           | the reader: flags, the sides document, SHA-256 for the brief key and the fingerprint's label, redaction, the printed comparison, the written record                              | compute no measure of its own, write to the record, start any process but `git rev-parse`, construct a port, read a key, spend |
-| `tests/fixtures/benchmark/compare/*.json` | the constructed run sets the checks read                                                                                                                                         | hold any path but the literal placeholder, which `yield-benchmark`'s check 12 already enforces here because its glob recurses  |
-| `tests/yield-compare-*.test.ts`           | the fourteen checks                                                                                                                                                              | read `data/cutroom.sqlite`, need a key, or start the engine                                                                    |
+| place                                     | what it gains                                                                                                                                                                                                                   | what it still may not do                                                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/benchmark/src/compare.ts`       | sides, grouping by brief key, the fingerprint's fields, the eight measures, both bands, the per-group vote, each measure's word, the credit guard, stratify, the sides validator                                                | no I/O, no database, no engine package, no app, **no npm package at all**, and no `node:crypto` — the hash is handed in            |
+| `packages/benchmark/src/measures.ts`      | one field: `planVaryOn` on the scorecard's run block, with its `FIELD_COLUMNS` entry                                                                                                                                            | nothing else; this is an amendment to a verified feature and is listed below                                                       |
+| `packages/benchmark/src/index.ts`         | the new exports, since a package is entered only through it (D-094)                                                                                                                                                             | nothing else; it re-exports and holds no logic                                                                                     |
+| `scripts/_benchmark-rows.mjs`             | the read-only open, the held-column read, one run's rows, **every run's ids for the record-wide pass**, the run-id prefix resolution and **`redact()`** — all **moved out of `scripts/benchmark.mjs`**, which imports them back | no measure, no verdict, no printing, no `process.exit` of its own — it returns rows and faults                                     |
+| `scripts/benchmark-compare.mjs`           | the reader: flags, the sides document, SHA-256 for the brief key and the fingerprint's label, **the record-wide count of brief groups that could supply two runs a side**, the printed comparison, the written record           | compute no measure of its own, write to the record, start any process but `git rev-parse`, construct a port, read a key, spend     |
+| `scripts/check.mjs`, `scripts/_pools.mjs` | one comment each: the PATH-only children become **thirteen**, and `_pools.mjs`' "274 file executions of 153 files — 153 direct and 121 nested" is recomputed for the thirteenth child and this feature's four ordinary files    | nothing else — both are `VERIFY_INFRASTRUCTURE` (`scripts/check.mjs:213-228`), which is one of the reasons Slice 3 is a full suite |
+| `tests/fixtures/benchmark/compare/*.json` | the constructed run sets the checks read                                                                                                                                                                                        | hold any path but the literal placeholder, which `yield-benchmark`'s check 12 already enforces here because its glob recurses      |
+| `tests/yield-compare-*.test.ts`           | the fourteen checks                                                                                                                                                                                                             | read `data/cutroom.sqlite`, need a key, or start the engine                                                                        |
 
 **What `compare.ts` is handed, stated because it is the most basic open question of choice 8.** Each side arrives as
 a label and a `readonly RunRows[]` — the same row shape `scorecard()` takes — together with **a `HashFn`**, exactly
@@ -219,9 +255,28 @@ as `ScorecardOptions` already requires one (`measures.ts:855-861`). It calls `sc
 itself, so no column is read twice in two ways, and it imports no hashing of its own, which is what
 `benchmark-no-io`'s denial of `node:crypto` means here.
 
+**The record-wide count is the READER's, and it is not the surviving-group count in disguise.** Gate 1 promises
+that the first thing this feature does on the record is print how many brief groups could supply two runs a side,
+and `compare.ts` cannot answer it: it is handed two sides' rows and knows nothing of the runs on neither side.
+So the count is a pass of the reader's own, over every run in the record — the same enumeration `--stratify` with
+no `--sides` already needs — which asks the package for each run's brief key and fingerprint fields and counts the
+groups holding two or more runs whose fingerprints match, and the groups holding four or more beside it. It is
+printed on every comparison, in the limits block, labelled as being about **the record** and not about the sides.
+Check 11 pins it against a temporary database whose groups are known, which is the one place it can be shown not
+to be a restatement of the surviving groups.
+
+**`redact()` moves into the shared module with the loader, and it gains the shape check 11 asserts.** It exists
+once today, at `scripts/benchmark.mjs:187-191`: it strips the artifact and repository roots and replaces
+`/\bhttps?:\/\/\S*/g` with `<url>`. **It matches no key shape and no bare query string**, so a second copy in a
+second reader would be a second place that knows D-022 — the argument that moves the loader, applied to the same
+file. It moves, both readers import it, the three-file scan then covers it, and the shape it must also replace is
+stated here so check 11 asserts something that exists: a bare `?`-introduced query string, and a run of 20 or more
+characters from `[A-Za-z0-9_-]` carrying no space, which is what every key this repository has seen looks like.
+**It is widened, never narrowed**: the two existing replacements stay exactly as they are.
+
 **No npm dependency is added, and the sides document is validated by hand.** `packages/benchmark/package.json`
 declares `@cutroom/contracts` and `@cutroom/reel-contract` and **no `zod`**, so a `zod` schema would need that
-manifest and the root `pnpm-lock.yaml` — both in `check.mjs`'s `FULL_ONLY` (`scripts/check.mjs:229-233`), which
+manifest and the root `pnpm-lock.yaml` — both in `check.mjs`'s `FULL_ONLY` (`scripts/check.mjs:229-235`), which
 would make the slice carrying it a full suite. A five-field document's shape is thirty lines of pure TypeScript and
 reports every fault in one pass, which is what this feature needs anyway and what `zod` would have to be coaxed
 into. `benchmark-npm-only-zod` therefore stays exactly as it is, unexercised by this feature and already proven.
@@ -255,16 +310,16 @@ Every measure is computed from the scoring half's own reading of the rows — `s
 **Measure 1 is a share over runs. Measures 2 to 6 are per-run rates averaged over the side's runs. Measures 7 and 8
 are per-run figures averaged the same way.** The run is the unit of evidence in all eight.
 
-|   # | measure               | the figure one run contributes                                             | its denominator                        | better |
-| --: | --------------------- | -------------------------------------------------------------------------- | -------------------------------------- | ------ |
-|   1 | reels made            | made a watchable file, or did not — one count per run                      | the side's runs in the group           | up     |
-|   2 | pictures refused      | pictures Gate 1 decided that it did **not** accept, over those it decided  | pictures with a decided Gate 1 outcome | down   |
-|   3 | takes refused         | takes whose `take.outcome` is `fail`, over those with an outcome           | takes whose `outcome` is not null      | down   |
-|   4 | finished cuts refused | this run's Gate 7 outcome was not `accept`, with `render.finished_at` set  | one figure per finished run            | down   |
-|   5 | shots degraded        | **distinct shots** with a degradation row this run wrote, over shots tried | shots a picture was attempted for      | down   |
-|   6 | shots held at the cap | distinct shots with a `still_hold` this run wrote, over shots tried        | shots a take was made for              | down   |
-|   7 | cost per run          | this run's own receipts — image, video, speech and lost calls              | one figure per run                     | down   |
-|   8 | wall clock per run    | the run's created-to-last-event seconds                                    | one figure per run                     | down   |
+|   # | measure               | the figure one run contributes                                                       | its denominator                        | better |
+| --: | --------------------- | ------------------------------------------------------------------------------------ | -------------------------------------- | ------ |
+|   1 | reels made            | `run.reel.madeAFile` (`measures.ts:1077`): a result video path AND a readable render | the side's runs in the group           | up     |
+|   2 | pictures refused      | pictures Gate 1 decided that it did **not** accept, over those it decided            | pictures with a decided Gate 1 outcome | down   |
+|   3 | takes refused         | takes whose `take.outcome` is `fail`, over those with an outcome                     | takes whose `outcome` is not null      | down   |
+|   4 | finished cuts refused | this run's Gate 7 outcome was not `accept`, with `render.finished_at` set            | one figure per finished run            | down   |
+|   5 | shots degraded        | **distinct shots** with a degradation row this run wrote, over shots tried           | shots a picture was attempted for      | down   |
+|   6 | shots held at the cap | distinct shots with a `still_hold` this run wrote, over shots tried                  | shots a take was made for              | down   |
+|   7 | cost per run          | this run's own receipts — image, video, speech and lost calls                        | one figure per run                     | down   |
+|   8 | wall clock per run    | the run's created-to-last-event seconds                                              | one figure per run                     | down   |
 
 **Why measures 2 to 6 are averaged over runs rather than pooled over items.** Twenty pictures made by four runs are
 not twenty independent trials: one brief, one prompt, one model state and one picture rule produced all five
@@ -277,11 +332,17 @@ against four runs with two of five refused is, pooled over items, 0 of 20 agains
 0.1138, `2 × band` 0.2277, **moved**; as per-run rates it is delta +0.4000, band 0.2531, `2 × band` 0.5063,
 **inside the noise**. The same rows, two answers, and the second is the true one.
 
-**Measures 5 and 6 count distinct shots, not rows.** `scorecard().parts.pictures.shotsDegradedThisRunMade` counts
-degradation **rows** (`measures.ts:1192`), and a shot can carry more than one, which would put the share above 1
-with nothing to notice. The numerator is the distinct shots those rows name.
+**Measures 5 and 6 count distinct shots, not rows — and the reason the first draft gave was false.** It said a
+shot can carry more than one degradation row. It cannot: `packages/domain/src/schema.ts:318` keys `degradation`
+`primaryKey({ columns: [runId, shotId] })` and `:559` keys `still_hold` the same way, so there is **at most one row
+per shot per run** and rows and distinct shots are equal today. The distinct-shot numerator is kept anyway, as a
+defence that costs nothing against a migration that relaxes either key, and `scorecard().parts.pictures.shotsDegradedThisRunMade`
+counts rows (`measures.ts:1204`). **The hazard that is real is the other one**: a `degradation` or `still_hold` row
+whose shot is **outside** the measure's denominator, which is exactly what an inherited failure rewritten under the
+new run produces — the row is the new run's, the shot's pictures are not. The numerator is the distinct shots those
+rows name **that the denominator holds**, and check 4 pins that case instead of a fixture the record cannot hold.
 
-**Measure 4 reads the gate's own word.** `scorecard().parts.cut.gate7.outcome` (`measures.ts:1247`) is Gate 7's
+**Measure 4 reads the gate's own word.** `scorecard().parts.cut.gate7.outcome` (`measures.ts:1255`) is Gate 7's
 verdict; the scorecard's `answeredNo` list counts anything that is not `yes`, so an **unanswered** question reads as
 a no there, and it is computed without the `finished` guard. The measure reads the outcome, with
 `render.finished_at` set, and a run with no finished render contributes nothing.
@@ -297,7 +358,7 @@ such filter: a resume copies no receipt (`packages/domain/src/resume.ts:226-320`
 run's own.
 
 **A run contributes nothing to a measure whose denominator is zero for it, and nothing to an average whose value
-reads `absent`.** `wallClockSeconds` is `absent` for a run with no events (`measures.ts:393-399, 1097`), and
+reads `absent`.** `wallClockSeconds` is `absent` for a run with no events (`measures.ts:393-399, 1096`), and
 reading an absent figure as 0 would lower a down-is-better mean, which is "helped" — the bias this feature refuses
 two sections below. So: such a run is excluded from that measure, **its count is printed**, and a side left with
 fewer than two contributing runs drops the group for that measure.
@@ -325,6 +386,12 @@ band  = sqrt( pA'(1 - pA') / (nA + 2) + pB'(1 - pB') / (nB + 2) )
 delta = pB' - pA'               moved  ⇔  |delta| > 2 x band
 printed: each side's RAW share with its counts, the raw delta, the adjusted delta, the band
 ```
+
+**Two deltas exist for measure 1, and which one decides is one sentence: the ADJUSTED delta decides both `moved`
+and the direction; the RAW delta decides the zero rule alone.** Both are printed. The adjusted delta is what the
+band is an interval around, so comparing the raw delta against it would mix two estimates; and the raw delta is
+what "the two sides are the same" means to a reader, so the zero rule belongs to it. For measures 2 to 8 there is
+one delta — a difference of means — and nothing to choose.
 
 **Unpooled, and why.** The pooled form estimates one shared proportion under the hypothesis that the two sides are
 equal; it belongs to a p-value, not to an interval around the difference that was actually observed. One draft in
@@ -386,26 +453,51 @@ side's runs; across groups, only the **direction** of the answer is combined. Po
 and 4 runs can reverse the sign every per-group test sees — different briefs are different populations — and this is
 the one place in the feature where a wrong answer would look most like a strong one.
 
-That also answers S-182's second open question by removing it: _"whether a group dropped for one measure keeps its
-counts in that measure's pool"_ cannot arise, because that measure has no pool. A group is dropped for one measure
-and keeps every other.
+That also answers **the second of the five open questions S-182's amendment hands this feature — the pooling
+scope** (`DECISIONS.md:7915-7916`: _"the band's wording, the pooling scope, the guard's missing quantity, which
+comparability conditions are not vacuous, the verdict's unit"_) — by removing the question behind it. Whether a
+group dropped for one measure keeps its counts in that measure's pool cannot arise, because that measure has no
+pool. **Those words are this file's, not S-182's**: round 2 found them set as a quotation of an entry that does not
+contain them, which is round 1's finding 18 recurring, so they are stated plainly here instead. A group is dropped
+for one measure and keeps every other.
 
 **How a group votes, for one measure.**
 
+0. **The sign convention, once, because the guard reads it too**: `delta = B − A`, where A is the first side of the
+   sides document. The measure table's `better` column says which sign is the better one for that measure.
 1. The group is **dropped** when either side has fewer than two runs in it, or when fewer than two of a side's runs
    contribute to that measure.
 2. A surviving group votes **helped** or **hurt** when `|delta| > 2 × band` and the direction is the better or the
-   worse one for that measure (the measure table's last column). Otherwise it votes **inside the noise**.
+   worse one for that measure. Otherwise it votes **inside the noise**.
 3. A raw delta of exactly zero votes inside the noise, whatever the band (S-182, settled).
-4. A band of exactly zero votes **no verdict**, with its reason.
+4. A band of exactly zero **with a non-zero delta** votes **no verdict**, with its reason.
+
+**Clause 3 wins over clause 4, and that is the whole precedence.** A zero band with a zero delta is two sides that
+produced identical figures — two sides each `(15, 15)` on cost, which the record's three 15¢ runs make a real shape
+— and `|0| > 2 × 0` is false, so the arithmetic and S-182's settled rule already agree on _inside the noise_
+without clause 4 being consulted. Clause 4 exists for the other case alone: a zero band with a delta that is not
+zero, where the strict inequality would read **moved** on no uncertainty at all. Written as one rule: clause 4
+fires when `band = 0` and `delta ≠ 0`.
 
 **How a measure gets its word, from the groups' votes.**
 
 1. Fewer than three surviving groups ⇒ **no verdict**, naming how many survived and why each one dropped.
-2. **helped** when at least `ceil(2/3 × surviving)` groups vote helped **and no group votes hurt**.
-3. **hurt** when at least `ceil(2/3 × surviving)` groups vote hurt **and no group votes helped**.
-4. Otherwise **inside the noise** — and where both directions are voted, **no verdict**, naming the groups that
-   disagree. A group voting no verdict is counted as surviving and agrees with nothing.
+2. A group voting **no verdict** is surviving but **not comparable**. When fewer than `ceil(2/3 × surviving)` groups
+   cast a comparable vote — helped, hurt or inside the noise — the measure reads **no verdict**, naming the groups
+   whose band bounded nothing.
+3. **helped** when at least `ceil(2/3 × surviving)` groups vote helped **and no group votes hurt**.
+4. **hurt** when at least `ceil(2/3 × surviving)` groups vote hurt **and no group votes helped**.
+5. Otherwise **inside the noise** — and where both directions are voted, **no verdict**, naming the groups that
+   disagree.
+
+**Clause 2 is round 1's finding 10 one level up, and round 2 found it surviving there.** Without it, three
+surviving groups voting {helped, no verdict, no verdict} fail the two-thirds test and fall through to _inside the
+noise_ — "the two sides differ by less than the measurement can see" — although two of the three had a band of
+zero, where this feature's own words are that "the measurement sees everything". The zero-band rule would have been
+fixed at the group level and undone at the measure level. **Rejected: any zero-band group forcing the measure to no
+verdict**, which would make cost and wall clock unanswerable whenever one group of runs happened to cost the same
+integer cents; the two-thirds-of-comparable rule keeps the answer where two thirds of the groups could be compared
+and names the ones that could not.
 
 The ceiling makes the two-thirds rule exact: 2 of 3, 3 of 4, 4 of 5, 4 of 6. Clause 2's second half is stricter
 than S-182's words and deliberately so: two groups helped and one hurt is a sign reversal across briefs, and
@@ -413,16 +505,37 @@ calling that "helped" is the wrong-verdict failure the owner's reason rules out.
 
 ### The credit guard, and its five quantities
 
-**Credit is withheld when the work got smaller.** Each guard quantity is measured with the same arithmetic as a
-measure — per group, same band, same vote rule — and fires when it has **moved in the direction of less work**.
+**Credit is withheld when the work got smaller.** Each guard quantity is measured per group, over the same runs,
+with the band stated two paragraphs below — and fires when it has **moved in the direction of less work**, which by
+the sign convention above means `delta` has the sign the quantity's `less work is` column names.
 
 |   # | quantity                                       | the figure one run contributes                         | less work is | why it is in the guard                                                          |
 | --: | ---------------------------------------------- | ------------------------------------------------------ | ------------ | ------------------------------------------------------------------------------- |
 |   1 | shots the plan asked a picture for             | `parts.pictures` — shots with at least one own picture | down         | fewer pictures attempted lowers cost and lowers the refusal rates               |
 |   2 | accepted pictures per shot that ended accepted | own accepted pictures over those shots                 | down         | the picture rule's reach; S-182's own quantity                                  |
-|   3 | shots degraded (measure 5)                     | the same figure as measure 5                           | up           | a degraded shot is a shot not filmed: it lowers cost and raises reels made      |
-|   4 | the selected plan's shot count                 | `parts.plan.shots` (`measures.ts:1158`)                | down         | **the missing quantity** — fewer shots lowers cost, time and every refusal rate |
-|   5 | the selected plan's total planned seconds      | `parts.plan.totalSeconds` (`measures.ts:1160`)         | down         | **the missing quantity** — shorter shots do the same without changing the count |
+|   3 | shots degraded (measure 5)                     | the same figure as measure 5                           | up           | a degraded shot is filmed **from words**: no image spend, no gated keyframe     |
+|   4 | the selected plan's shot count                 | `parts.plan.shots` (`measures.ts:1159`)                | down         | **the missing quantity** — fewer shots lowers cost, time and every refusal rate |
+|   5 | the selected plan's total planned seconds      | `parts.plan.totalSeconds` (`measures.ts:1161`)         | down         | **the missing quantity** — shorter shots do the same without changing the count |
+
+**The guard's band, which is not the measures' band, and round 2 showed why it cannot be.** Quantities 1, 2, 4 and
+5 are **not bounded rates**: a shot count, a seconds total and a pictures-per-shot ratio are unbounded above. So:
+
+- **Their band is bare Welch, never the floor.** The floor is the share band built from `a = mean × n`, which is
+  defined only for a mean in `[0, 1]`: four runs each planning six shots give `pA' = (24 + 1) / 6 = 4.17`, whose
+  `pA'(1 − pA')` is negative and whose band is `NaN`. A rule that silently produces `NaN` is worse than a wrong
+  rule, because `NaN > x` is false and the guard would never fire while every check passed.
+- **A band of exactly zero FIRES the guard, where it votes no verdict for a measure.** This is the one place the
+  two arithmetics part, deliberately, and the asymmetry is the conservative direction in both halves: claiming a
+  verdict on no uncertainty over-claims, which is why clause 4 exists; **withholding credit on no uncertainty
+  under-claims**, which is the safe side of a guard whose whole purpose is to refuse a credit. Round 2's finding is
+  exactly this case and it is the guard's most important one: a side whose every run plans six shots against a side
+  whose every run plans four has a sample variance of zero on both sides, so bare Welch is zero, and under the
+  measures' clause 4 the group would vote _no verdict_ — **the guard would never fire on `plannedShots` or
+  `plannedSeconds` at all**, which are the two quantities that exist to catch a change that simply does less work.
+- **Quantity 3 keeps measure 5's own band**, floor included, because it is the same bounded rate read twice.
+- The vote across groups is the measure rule's, with "fires" in place of "helped": at least `ceil(2/3 × surviving)`
+  groups moving in the less-work direction and none moving the other way. A group that cannot be compared at all
+  does not fire.
 
 **Quantities 4 and 5 are the reviewer's finding, and they go in the guard rather than the fingerprint.** A change
 that plans fewer or shorter shots lowers cost and wall clock and raises reels made, and S-182's three quantities
@@ -464,15 +577,27 @@ key** and decide nothing.
 **The seven real conditions.** Three live in `options`, which is outside the brief key, so they can and do differ
 inside one group; four are observed on the run.
 
-|   # | condition                               | where it is read                       | why it is not vacuous                                                               |
-| --: | --------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------- |
-|   1 | `until`                                 | the stored request's options           | it decides which parts can exist, so it decides which measures are even defined     |
-|   2 | the ceiling (`budgetCents`)             | the stored request's options           | it decides when a run stops; S-182 named no condition for it at all                 |
-|   3 | `planVaryOn`                            | the stored request's options (D-062)   | it decides what the two fork plans differ on, so it changes what was selected       |
-|   4 | each receipt kind's rates               | `rate_cents` on each receipt, as a set | a price change moves cost per run with nothing about the engine having changed      |
-|   5 | **each port's models**                  | `model` on each receipt kind, as a set | a model swap at an unchanged price — nano-banana-2 to flux-2-pro happened here      |
-|   6 | the selected plan's `plannedImageCalls` | the selected plan                      | a service setting (`CUTROOM_PICTURES`, S-150, S-153) changes how many are attempted |
-|   7 | the picture rule                        | `Plan.pictures` on the selected plan   | **read, not "not recorded"** — the correction at the top of this file               |
+|   # | condition                               | where it is read                                                                                                                                           | why it is not vacuous                                                               |
+| --: | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+|   1 | `until`                                 | the stored request's options                                                                                                                               | it decides which parts can exist, so it decides which measures are even defined     |
+|   2 | the ceiling (`budgetCents`)             | the stored request's options                                                                                                                               | it decides when a run stops; S-182 named no condition for it at all                 |
+|   3 | `planVaryOn`                            | the stored request's options (D-062)                                                                                                                       | it decides what the two fork plans differ on, so it changes what was selected       |
+|   4 | each priced receipt kind's rates        | `rate_cents`, as a set, on the **three** kinds that carry one: `generation_receipt` (`schema.ts:245`), `speech_receipt` (`:365`), `video_receipt` (`:441`) | a price change moves cost per run with nothing about the engine having changed      |
+|   5 | **each port's models**                  | `model`, as a set, on the **five** kinds that carry one: those three plus `model_receipt` (`:137`) and `lost_call` (`:273`)                                | a model swap at an unchanged price — nano-banana-2 to flux-2-pro happened here      |
+|   6 | the selected plan's `plannedImageCalls` | the selected plan                                                                                                                                          | a service setting (`CUTROOM_PICTURES`, S-150, S-153) changes how many are attempted |
+|   7 | the picture rule                        | `Plan.pictures` on the selected plan                                                                                                                       | **read, not "not recorded"** — the correction at the top of this file               |
+
+**The seven identifiers, written once, because check 6 asserts a list deep-equal to them.** Four of the seven exist
+in the table above only as English, and a check cannot be deep-equal to a sentence. The exported field list is
+exactly, in this order:
+
+```text
+until  ceilingCents  planVaryOn  receiptRates  portModels  plannedImageCalls  pictureRule
+```
+
+These are the same seven names `declaredAxis` accepts, which is the point: one list, two readers. `ceilingCents` is
+the scorecard's own name for the request's ceiling (`measures.ts:1057`), not `budgetCents`, which is what the
+request calls it.
 
 **Condition 5 is new here, and it is why the modes table may say "the model".** The engine has already changed
 image model once at a comparable rate, and a swap that no condition reads would let a comparison proceed as though
@@ -528,7 +653,10 @@ What prints instead:
    _helped_ cancels it.
 5. **The limits**: the declared change, the engine version as _not recorded_, every comparability field that
    refused and every one that was absent, every group that dropped and why, the guard's quantities with their
-   figures, and the count of brief groups that could supply two runs a side.
+   figures, and **the record-wide count** of brief groups that could supply two runs a side with the count reaching
+   four beside it — the reader's own pass over every run in the record, labelled as such, because the surviving
+   groups of this comparison are a different number and printing one as the other would answer Gate 1's promise
+   with the wrong figure.
 
 ### A malformed side, and a thin one
 
@@ -562,21 +690,40 @@ id must never read as thin evidence, which is why an unknown id is a fault rathe
 ### Stratify
 
 One set, grouped by one recorded property, each stratum reported with its own figure and band, **and no verdict
-word**, because a stratum is one set and a verdict needs two sides. A stratum's band is the single-side form of the
-share band above (the same adjusted counts); a stratum with fewer than two members is reported with its count and
-no band.
+word**, because a stratum is one set and a verdict needs two sides. A stratum with fewer than two members is
+reported with its count and no band.
+
+**One band per figure KIND, not one band for stratify, because three of the five properties stratify per-run
+figures that are not shares.** Round 2 found the single rule produced `NaN`: the adjusted-count form on a mean of
+53¢ over four runs gives `p' = (212 + 1) / 6 = 35.5` and a negative variance under the root. So:
+
+- **a share** — the two picture-unit properties, and `reels made` wherever a run-unit stratum reports it — carries
+  the single-side adjusted band, `p' = (x + 1) / (n + 2)` and `band = sqrt( p'(1 − p') / (n + 2) )`, the same two
+  integers the comparison's share band adds;
+- **a per-run figure** — every other measure inside a run-unit stratum, cost and wall clock among them — carries
+  the standard error of its own mean, `s / sqrt(n)`, from the sample variance with the `n − 1` denominator;
+- **a band of exactly zero prints as zero with its reason**, never as absent and never suppressed: a stratum
+  carries no verdict word, so there is nothing for a zero band to over-claim, and hiding it would hide that every
+  member of the stratum held the same figure.
 
 **The unit is per property, because the record's properties are not all per run.** Session 82's finding strata
 **pictures**, not runs: `scorecard().parts.plan.subjectsPerShot` is an array with one entry per shot
 (`measures.ts:717-720`), so a run is in no single such stratum.
 
-| property            | the unit | the strata                                                        | the figure                      |
-| ------------------- | -------- | ----------------------------------------------------------------- | ------------------------------- |
-| `subjectsPerShot`   | pictures | the subject count of the shot each picture belongs to             | share of those pictures refused |
-| `pictureRule`       | pictures | the rule the run's selected plan carried                          | share of those pictures refused |
-| `shots`             | runs     | the selected plan's shot count                                    | each measure, over those runs   |
-| `plannedImageCalls` | runs     | the selected plan's planned image calls                           | each measure, over those runs   |
-| `imageToVideo`      | runs     | `none` (0), `mixed` (between), `all` (1) — stated, not continuous | each measure, over those runs   |
+| property            | the unit | the strata                                                       | the figure                      |
+| ------------------- | -------- | ---------------------------------------------------------------- | ------------------------------- |
+| `subjectsPerShot`   | pictures | the subject count of the shot each picture belongs to            | share of those pictures refused |
+| `pictureRule`       | pictures | the rule the run's selected plan carried                         | share of those pictures refused |
+| `shots`             | runs     | the selected plan's shot count                                   | each measure, over those runs   |
+| `plannedImageCalls` | runs     | the selected plan's planned image calls                          | each measure, over those runs   |
+| `imageToVideo`      | runs     | `none` (0), `mixed` (between), `all` (1), `no takes` — see below | each measure, over those runs   |
+
+**`imageToVideo`'s strata are a share this feature computes, and the scorecard exposes no such share.**
+`parts.clips.imageToVideo` (`measures.ts:1222`) is a **count** of the run's own takes whose mode is
+`image-to-video`, with `textToVideo` beside it at `:1223`. The share is that count over the sum of the two, and the
+four strata are `none` at exactly 0, `all` at exactly 1, `mixed` strictly between — and **`no takes` for a run
+where the sum is zero**, which is a stratum of its own rather than a division by zero or a silent exclusion,
+because a run that made no take is a real and common ending and the strata are supposed to cover the record.
 
 This is the view that answers _which config is good_ over the runs already made, and session 82's 42% / 70% / 100%
 is the first row's shape.
@@ -593,10 +740,22 @@ group is already "fewer than three ⇒ no verdict" — so a one-group null would
 with the multiplier at 0.001, or with the sign of the delta reversed. The group vote is the only place the band is
 exercised, so that is what the check reads.
 
-**And a positive control in the same check**, because a green null alone proves only that nothing was computed: one
+**And a positive control in the same check**, because a green null alone proves only that nothing was computed: a
 fixture of three groups where every group's runs differ by none-against-all, which must read **helped** on reels
 made. A null that passes while the control fails is an arithmetic that answers nothing; a control that passes while
 the null fails is an arithmetic that over-claims.
+
+**The control is its own fixture, at FOUR runs a side, and round 2 is why the size is stated.** The null's groups
+split two against two, and at two runs a side this feature's own check 1 pins `0/2` against `2/2` as _inside the
+noise_ (adjusted +0.5000, band 0.3062) — so a control built by re-reading the null's fixture could not read
+_helped_ whatever the arithmetic did, and the check would have been green with the control proving nothing. The
+control is therefore **twenty-four constructed runs over three brief keys, eight to a group, split four against
+four**, where check 1's third row (`0/4` against `4/4`, adjusted +0.6667, `2 × band` 0.4303) is what makes _helped_
+reachable. **Its two sides hold identical attempted work**, so no guard quantity moves and the guard cannot turn
+its _helped_ into _no verdict_: side A's runs plan the same shots and seconds, attempt the same pictures and takes
+and reach a finished render whose `output.readable` is `false`, which is the one way `run.reel.madeAFile`
+(`measures.ts:1077`) reads false on a run that attempted everything. That shape is the control's whole
+construction, and check 9 asserts the guard did not fire in it.
 
 **It runs over constructed rows, not over the live record.** The record's own candidate is group `4ce40e14`'s five
 same-fingerprint runs, and a check that read `data/cutroom.sqlite` would fail on a clean checkout and in the
@@ -614,50 +773,107 @@ conditions can only be exercised by constructed rows, which is why both kinds ex
 **Two verified features are touched, and one of them has an assertion edited.** The first draft of these gates
 claimed "no test file of `yield-benchmark` changes"; that was false, and round 1 proved it.
 
-**`yield-benchmark` — one test assertion must move and grow.** `tests/yield-benchmark-reader.test.ts` reads
-`scripts/benchmark.mjs`' **source text** (`:233-261`) and asserts, among other things, that it holds exactly one
-`new DatabaseSync(` and that the open is `{ readOnly: true }`. With the open in `scripts/_benchmark-rows.mjs` the
-count is 0 and both assertions go red — and worse than red: every other clause in that block is a scan of that one
-file, so code moved out of it would be **scanned by nothing** while the check stayed green. That is a check whose
-property is unguarded, which CLAUDE.md rule 3 exists to prevent.
+**`yield-benchmark` — one test assertion must move and grow, one fixture gains a field, and three scans split by
+clause.** `tests/yield-benchmark-reader.test.ts` reads `scripts/benchmark.mjs`' **source text** (`:234-266`) and
+asserts, among other things, that it holds exactly one `new DatabaseSync(` and that the open is
+`{ readOnly: true }`. With the open in `scripts/_benchmark-rows.mjs` the count is 0 and both assertions go red —
+and worse than red: every other clause in that block is a scan of that one file, so code moved out of it would be
+**scanned by nothing** while the check stayed green. That is a check whose property is unguarded, which CLAUDE.md
+rule 3 exists to prevent.
 
-| where                                            | what changes                                                                                                                                                                                                                       |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/yield-benchmark-reader.test.ts:233`       | `READER` becomes the three reader files; the source read becomes their concatenation, each clause asserted per file                                                                                                                |
-| `tests/yield-benchmark-reader.test.ts:234-239`   | the `new DatabaseSync(` count of **1** is asserted over the three files together, and the `readOnly` match against the one holding it                                                                                              |
-| `tests/yield-benchmark-reader.test.ts:240-261`   | every other clause — `openDatabase`, `@cutroom/domain`, `@cutroom/providers`, the five process starters, `run('git', ['rev-parse'`, the four environment names, the `.env` regex, the spender's name — runs over each of the three |
-| `packages/benchmark/src/measures.ts`             | the scorecard's run block gains `planVaryOn` from the stored request's options, with its `FIELD_COLUMNS` entry                                                                                                                     |
-| `tests/yield-benchmark-measures.test.ts:177-183` | unchanged in form; it asserts every scorecard field has a column named for it, and the new field's entry is what keeps it green                                                                                                    |
-| `docs/features/yield-benchmark.md`               | an amendment block recording both, in the form S-197 set — **its gates are not edited**                                                                                                                                            |
+**Round 2 found three things wrong with the first revision of this list, each verified in the source.**
 
-**The scan gets strictly wider, not narrower**: one file scanned today, three after. No assertion is removed, no
-regex loosened, no count lowered.
+1. **`READER` is the entry script, not the scanned set.** It is defined at `:41` and used four times: `:82` spawns
+   it, `:234` scans it, and `:412` and `:424` pass its own path as a not-a-database `--db` and read it back.
+   Turning `READER` itself into a list reddens the three behavioural uses. So the scan gets **its own constant**
+   and `READER` is left exactly as it is.
+2. **Three clauses are POSITIVE assertions and cannot run per file.** `:240`'s `readOnly` match, `:250`'s
+   `assert.deepEqual(processes, ['git'])` and `:251`'s `run('git', ['rev-parse'` match all fail against
+   `scripts/_benchmark-rows.mjs`, which starts no process at all and must not start one. Each clause therefore
+   states its own scope, and the strongest of the three — the `processes` deep-equal, which makes "starts no
+   process but git" exhaustive rather than exemplary — **was missing from the first revision's list entirely**,
+   which is how a clause is lost.
+3. **The `planVaryOn` field cannot be proved by the corpus as it stands, so `yield-benchmark`'s check 1 goes red.**
+   That check (`tests/yield-benchmark-measures.test.ts:155`) proves every `FIELD_COLUMNS` entry against its
+   columns: mutating the named column must move the field somewhere in the corpus. **No committed fixture carries
+   `planVaryOn`** (measured: zero occurrences under `tests/fixtures/`; every taken fixture's options are
+   `{"budgetCents":250,"until":"video"}`), each mutation in the ladder (`:131`) makes the blob unparseable so the
+   field reads `ABSENT` before and after, and the `undefined` rung cannot drop the single `run` row because
+   `mutate` (`:134-141`) requires an array and `rows.run` is one object (`measures.ts:291`). An empty column list
+   fails too: the no-column branch (`:186-200`) allows only `NOT_RECORDED`, `ESTIMATE_EXCLUDES`, `SHARED_SPAN`,
+   `REACHED_BY.*` and `undefined`, and not `ABSENT`.
+
+| where                                                       | what changes                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tests/yield-benchmark-reader.test.ts:41`                   | `READER` is **unchanged**; a new constant beside it names the three reader files, and `:234`'s read becomes a read of each                                                                                                                                                                                                                                                                             |
+| `tests/yield-benchmark-reader.test.ts:235-240`              | the `new DatabaseSync(` count of **1** is asserted over the three files **together**, and `:240`'s `readOnly` match against the one that holds the open                                                                                                                                                                                                                                                |
+| `tests/yield-benchmark-reader.test.ts:241-246`, `:252-255`  | every NEGATIVE clause runs over **each** of the three: `openDatabase`, `@cutroom/providers`, `@cutroom/domain`, the five process starters, the four environment names, the `.env` regex                                                                                                                                                                                                                |
+| `tests/yield-benchmark-reader.test.ts:249-251`              | `assert.deepEqual(processes, ['git'])` and `:251`'s `run('git', ['rev-parse'` match run over the **concatenation** of the three, so the set of processes stays exhaustive and the pure loader is not forced to start one                                                                                                                                                                               |
+| `tests/yield-benchmark-reader.test.ts:260-267`              | the spender's name, built rather than written, runs over **each** of the three and over this feature's reader test too                                                                                                                                                                                                                                                                                 |
+| `packages/benchmark/src/measures.ts`                        | the scorecard's run block gains `planVaryOn` from the stored request's options, with its `FIELD_COLUMNS` entry                                                                                                                                                                                                                                                                                         |
+| **one committed fixture under `tests/fixtures/benchmark/`** | its `request_canonical` options gain a `planVaryOn`, which is what lets `yield-benchmark`'s check 1 prove the new field. **An eleventh fixture is refused**: check 4 pins `groups.size` at **9** and the shared pair by name (`tests/yield-benchmark-measures.test.ts:693-694`), so a new file breaks it either way, while `options` sits outside the brief key and an edit there moves neither number |
+| `tests/yield-benchmark-measures.test.ts`                    | **not edited.** Check 1 and check 4 both stay exactly as written; the fixture edit is what keeps them green                                                                                                                                                                                                                                                                                            |
+| `docs/features/yield-benchmark.md`                          | an amendment block recording all of it, in the form S-197 set — **its gates are not edited**                                                                                                                                                                                                                                                                                                           |
+
+**The scan gets strictly wider, not narrower**: one file scanned today, three after, with the exhaustive clause
+still exhaustive over all three. No assertion is removed, no regex loosened, no count lowered, and no pinned value
+of a verified check is touched — the fixture is edited so that the checks can stay as they are.
+
+**`scripts/benchmark.mjs` is NOT "otherwise unchanged", and Gate 3's file table said it was.** The open
+(`:234`), `heldColumns()` (`:244`), `absentColumns()` (`:274`), `rowsOf()` (`:288`) and the `--run` prefix
+resolution (`:306-319`) are top-level and fault through `process.exit(1)` and `unusable()` (`:116-118`). A module
+that returns rows and faults instead of exiting means every call site and both fault paths are rewritten, and
+**`yield-benchmark`'s check 6 — `--run` on a prefix matching two runs exits 2 — is what must stay green through
+it**, along with its exit codes and messages unchanged.
 
 **The thirteenth PATH-only child.** `tests/yield-compare-secrets.test.ts` joins the secrets pool by name alone
-(`SECRETS_FILE` in `scripts/_pools.mjs:21`), and `tests/check-pools.test.ts:165` asserts `secrets.length >= 12`, so
+(`SECRETS_FILE` in `scripts/_pools.mjs:21`), and `tests/check-pools.test.ts:167` asserts `secrets.length >= 12`, so
 no bound breaks. Two things do:
 
-- **`tests/check-pools.test.ts:170-180` asserts every file in that pool contains `function bareEnvironment`.** A
-  child written in S-028's form without that exact function name turns a verified check red. Check 13 names the
-  requirement.
+- **`tests/check-pools.test.ts:174-187` asserts the `function bareEnvironment` marker in BOTH directions**, and the
+  first revision of these gates named one. Every file in the secrets pool must contain it, **and** `pathOnly` — the
+  ordinary files that contain it — must be deep-equal to `[]` (`:183-187`). So this feature's secrets child must
+  hold a function of exactly that name, and its **four ordinary test files must not**. Check 13 names both.
 - **The prose count of twelve becomes thirteen**, and the ordinary-file count rises by this feature's four other
-  test files. The claims about today:
+  test files. **Round 2 found the first revision's enumeration incomplete and three of its line numbers stale**,
+  which matters more here than anywhere else in this file: S-197 already established that no mechanical check can
+  read an English count, so **the enumeration IS the instrument**. Re-measured by
+  `grep -ri twelve` over the repository, excluding `.git`, `node_modules` and `steering-ref`:
 
-| where                                          | occurrences |
-| ---------------------------------------------- | ----------: |
-| `CLAUDE.md:184`, `:196`                        |           2 |
-| `docs/context.md:151`, `:164`, `:171`          |           3 |
-| `scripts/run-tests.mjs:4`                      |           1 |
-| `scripts/impact-map.mjs:133`                   |           1 |
-| `tests/check-pools.test.ts:170` (its comment)  |           1 |
-| `docs/research/test_fixes_and_research.md:252` |           1 |
+| where                                          | occurrences | what it claims                                                                                                                                                                     |
+| ---------------------------------------------- | ----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAUDE.md:184`, `:196`                        |           2 | the children, in both suite paragraphs                                                                                                                                             |
+| `docs/context.md:183`, `:196`, `:203`          |           3 | the children; **the first revision cited 151/164/171, stale by session 91's own entry**                                                                                            |
+| `scripts/run-tests.mjs:4`                      |           1 | the children, in the runner's own comment                                                                                                                                          |
+| `scripts/impact-map.mjs:133`                   |           1 | the children, in the derivation comment                                                                                                                                            |
+| `scripts/check.mjs:57`                         |           1 | **missed by the first revision** — the `tests` step's own comment                                                                                                                  |
+| `scripts/_pools.mjs:4`                         |           1 | **missed by the first revision** — the classifier that defines the pool                                                                                                            |
+| `scripts/_pools.mjs:7`                         |           1 | **missed by the first revision** — "274 file executions of 153 files — 153 direct and 121 nested", every figure of which moves with a thirteenth child and four new ordinary files |
+| `tests/check-pools.test.ts:170` (its comment)  |           1 | the children, beside the assertion                                                                                                                                                 |
+| `docs/research/test_fixes_and_research.md:252` |           1 | the children, and its "142 ordinary files" beside them                                                                                                                             |
 
-**What is deliberately NOT amended, each for a stated reason.** `DECISIONS.md`'s five occurrences (`:8611`,
-`:8632`, `:8654`, `:8694`, `:8964`) and `docs/research/test_fixes_and_research.md:98` and `:108` are **measurements
-at their date**, and S-197 refused editing a record to match a later state — S-199 records that the count is now
-thirteen instead. `tests/reel-render-pass.test.ts:139`' "each of the twelve" is twelve inputs to one ffmpeg
-invocation, not twelve children, and `docs/research/refusals.md:80`' twelve is a refusal count: neither is ours,
-and both are named here so the next reader need not re-derive it.
+**Twelve live claims, not nine.** The two `scripts/` files are the ones that matter most, because they are the
+runner and the classifier: a comment there that says twelve while thirteen run is the kind of wrong that reads as
+coverage. `scripts/check.mjs` and `scripts/_pools.mjs` are named in Gate 2's place table for exactly this, and both
+are `VERIFY_INFRASTRUCTURE`, so Slice 3 is a full suite on their account as well as on `scripts/`'.
+
+**`_pools.mjs:7`'s three figures are recomputed, not edited away**: one full suite today is 274 file executions of
+153 files, 153 direct and 121 nested; this feature adds one secrets child (whose nested suite re-runs its four
+siblings) and four ordinary files, so the recorded figures move and the slice recomputes them from the run rather
+than by arithmetic in a gate — the same rule as every other measured figure here.
+
+**`docs/research/test_fixes_and_research.md:252`'s "142 ordinary files" is amended with the "twelve" beside it**,
+because that sentence states what the runner does **now**, unlike `:98` and `:108`, which state what was measured
+on a date.
+
+**What is deliberately NOT amended, each for a stated reason.** `DECISIONS.md`'s occurrences (`:8611`, `:8632`,
+`:8654`, `:8694`, `:8964`, `:8966`) and `docs/research/test_fixes_and_research.md:98` and `:108` are **measurements
+at their date**, and S-197 refused editing a record to match a later state — S-199's amendment records that the
+count is now thirteen instead. `tests/reel-render-pass.test.ts:139`' "each of the twelve" is twelve inputs to one
+ffmpeg invocation, not twelve children, and `docs/research/refusals.md:80`' twelve is a refusal count: neither is
+ours, and both are named here so the next reader need not re-derive it. `DECISIONS.md:9032-9033`' twelve is
+`tests/check-receipt.test.ts`' check count, and the remaining hits across `docs/design/`, `docs/history/`,
+`docs/features/`, `PROMPTS/` and `packages/providers` are about reels, seeds, probe calls, blockers and agents.
 
 **What needs no change, verified rather than assumed.** `scripts/impact-map.mjs:140-147` derives a PATH-only child's
 coverage from its feature's siblings by name, so `tests/yield-compare-secrets.test.ts` is derived from
@@ -675,7 +891,7 @@ Change any engine behaviour; weaken a check; write to the engine's record; spend
 half reads, through the same pure package, and it may not reach a provider or a key. No absolute path, one setting
 per generated path defaulting inside the repository (D-086); no key, URL or query string printed or written
 (D-022) — **including the caller's own prose**, which is why every string taken from the sides document passes the
-reader's `redact()` before it is printed or written; no path in anything committed.
+shared module's widened `redact()` before it is printed or written; no path in anything committed.
 
 ## Gate 3 — Program design
 
@@ -686,10 +902,16 @@ packages/benchmark/src/compare.ts            sides, groups, the fingerprint's fi
                                              the votes, the words, the guard, stratify, the sides validator (no npm)
 packages/benchmark/src/measures.ts           one field added: planVaryOn, with its FIELD_COLUMNS entry
 packages/benchmark/src/index.ts              the new exports; the package's only entrance (D-094)
-scripts/_benchmark-rows.mjs                  the read-only open, the held columns, one run's rows, prefix resolution
-scripts/benchmark.mjs                        imports the above and is otherwise unchanged
-scripts/benchmark-compare.mjs                the reader: flags, the sides document, SHA-256, redaction, the printer
-tests/yield-benchmark-reader.test.ts         its source scan grows from one reader file to three
+scripts/_benchmark-rows.mjs                  the read-only open, the held columns, one run's rows, every run's ids,
+                                             prefix resolution, and the widened redact() both readers import
+scripts/benchmark.mjs                        imports the above; its call sites and both fault paths are rewritten
+                                             around a module that returns faults, its exit codes unchanged
+scripts/benchmark-compare.mjs                the reader: flags, the sides document, SHA-256, the record-wide group
+                                             count, the printer
+scripts/check.mjs, scripts/_pools.mjs        one comment each: thirteen children, and _pools.mjs' recomputed
+                                             274 / 153 / 121 figures
+tests/yield-benchmark-reader.test.ts         its source scan grows from one reader file to three, clause by clause
+tests/fixtures/benchmark/<one>.json          its request options gain planVaryOn, so check 1 can prove the field
 tests/yield-compare-arithmetic.test.ts       checks 1, 2, 3, 4
 tests/yield-compare-comparability.test.ts    checks 5, 6, 8, 9, 10, 14
 tests/yield-compare-reader.test.ts           checks 7, 11
@@ -765,22 +987,29 @@ nothing about that page is designed here.
 |    2 | a flag, the sides document's shape, or the resolved run set is unusable: no `--sides` and no `--stratify`, an unreadable document, an unknown `--stratify` property, or any shape or record fault of Gate 2 — **every fault of both kinds named in one pass** |
 |    3 | an output could not be written                                                                                                                                                                                                                                |
 
+**The order when two of them are true at once, because round 2 found it unstated.** The database is opened
+**first**: a missing or unreadable record is exit 1 and nothing is created, even when the sides document is also
+malformed, because every record fault is decided over a resolved run set and there is nothing to resolve against.
+The document's shape faults are collected on the way, and if the record then opens, exit 2 names the shape and
+record faults of both kinds in one pass. So exit 1 outranks exit 2, and the one-pass promise is a promise about
+exit 2's own faults.
+
 ### The checks
 
-1. `the band is one standard error and the multiplier is two — moved means |delta| > 2 x band — with measure 1's band the unpooled Wald form over counts of RUNS adjusted by one success and one failure a side, and measures 2 to 8's band Welch's over per-run figures, floored for measures 2 to 6 at the run-level share band; the four pinned measure-1 cases return 2/4 against 4/4 adjusted +0.3333 band 0.2546 inside the noise, 1/4 against 4/4 adjusted +0.5000 band 0.2453 moved, 0/4 against 4/4 adjusted +0.6667 band 0.2152 moved, and 0/2 against 2/2 adjusted +0.5000 band 0.3062 inside the noise; the four pinned per-run cases return (0,0,0,0) against (0.4,0.4,0.4,0.4) delta +0.4000 welch 0.0000 floor 0.2531 inside the noise, (0,0,0,0) against (1,1,1,1) delta +1.0000 welch 0.0000 floor 0.2152 MOVED, (0.2,0.4,0,0.6) against (0.8,0.6,1,0.8) delta +0.5000 welch 0.1528 floor 0.2715 inside the noise, and (53,52,58,73) against (49,53,54,51) delta -7.250 band 4.973 inside the noise; (75,71,73,58) against (53,52,49,51) delta -18.000 band 3.932 moved; (0,0) against (2,2) delta 2.000 band 0.000 NO VERDICT by the zero-band rule; and the check quotes the three formulas it checks`.
-2. `the same rows pooled over items and averaged over runs give different answers, and the run form is what is computed: four runs with none of five pictures refused against four runs with two of five refused is 0/20 against 8/20 pooled — delta +0.3636 band 0.1138 moved — and delta +0.4000 band 0.2531 inside the noise as per-run rates, which is what the measure returns; the Simpson case holds too, a three-group fixture whose per-group deltas all point one way while the figures summed across groups point the other returning the per-group direction; and nothing cross-group is computed, asserted over the output's own shape — every figure sits under a named group key, the record holds no field aggregating two groups, and each per-group figure equals the figure recomputed from that group's runs alone`.
-3. `the minimums and the vote rule, each case separately: a group with fewer than two runs on a side is dropped; a group where fewer than two of a side's runs contribute to a measure is dropped for that measure only and keeps the other seven; a run whose value reads absent contributes nothing and its count is printed; fewer than three surviving groups is no verdict naming the count; helped needs at least ceil(2/3 x surviving) helped votes AND no hurt vote, and 2 helped with 1 hurt is no verdict naming the disagreeing groups; a group voting no verdict counts as surviving and agrees with nothing; a raw delta of exactly zero votes inside the noise; a band of exactly zero votes no verdict; and ceil(2/3 x n) is 2, 3, 4, 4 for 3, 4, 5, 6 surviving groups`.
-4. `each of the eight measures is read from the per-run figure and denominator Gate 2 names for it, measure 1 as a share over runs and the other seven as per-run figures averaged over the side's runs, and every one is a rate per unit rather than a total: two sides whose plans hold four and six shots return the same figure when the same fraction degraded; measure 5's and 6's numerators are DISTINCT SHOTS, so a shot carrying two degradation rows cannot push the share above 1; measure 4 reads Gate 7's own outcome with render.finished_at set, never the answeredNo list, and a run with no finished render contributes nothing; an inherited picture, narration, take, degradation, still_hold or hold is excluded from the inheriting run and counted in the run that paid for it, while measure 7 needs no such filter because a resume copies no receipt; measure 1 is never undefined but is still dropped by the two-runs-a-side minimum; and cost per reel is reported beside cost per run and is not a measure`.
-5. `the credit guard's five quantities are exactly shots the plan asked a picture for, accepted pictures per accepted shot, shots degraded, the selected plan's shot count and the selected plan's total planned seconds, each measured with the same band and vote rule; when any of them moves in the less-work direction every helped becomes no verdict naming that quantity and its figures, a hurt is never withheld, a measure already inside the noise is unchanged, and a quantity named in declaredAxis does not fire and is reported; a constructed side that plans 4 shots against one that plans 6 withholds credit for reels made although reels made moved; and quantities 1 and 4 are reported separately on a run whose picture rule makes them differ`.
-6. `the fingerprint's exported field list is deep-equal to Gate 2's seven conditions, so a vacuous member cannot be added without the check failing; each of the seven refuses when both sides hold a value and the values differ, each case separately, including each port's models; an absent observed field refuses nothing and is named in the output; a differing Gate 7 question-set hash drops the finished-cuts-refused measure and keeps the other seven; the engine version reads not recorded; the picture rule is READ from the selected plan and never reads not recorded; whether standalone pictures exist is in no condition; the scoring half's measures version is not restamped; no comparison reads a rating; and two runs differing only in style version land in different brief groups, which is why the fields outside options are not conditions`.
-7. `the verdict's unit: one word per measure and NO composed overall word anywhere in the output; reels made prints first and is labelled the headline; a measure the caller declined to judge reads reported, not judged, which is not one of the four words; the tally counts only the judged measures, prints that count — 8 in the change-under-test mode and 6 by default in config mode — and names the declined ones; the stated reading rule is printed with it; and the limits block names the declared change, the engine version, every field that refused, every field that was absent, every dropped group with its reason, the guard's quantities, and the count of brief groups that could supply two runs a side`.
+1. `the band is one standard error and the multiplier is two — moved means |delta| > 2 x band, where measure 1's delta is the ADJUSTED one and the raw delta decides the zero rule alone — with measure 1's band the unpooled Wald form over counts of RUNS adjusted by one success and one failure a side, and measures 2 to 8's band Welch's over per-run figures, floored for measures 2 to 6 at the run-level share band and NEVER floored elsewhere, since the floor's adjusted counts are defined only for a mean in [0,1]; the four pinned measure-1 cases return 2/4 against 4/4 adjusted +0.3333 band 0.2546 inside the noise, 1/4 against 4/4 adjusted +0.5000 band 0.2453 moved, 0/4 against 4/4 adjusted +0.6667 band 0.2152 moved, and 0/2 against 2/2 adjusted +0.5000 band 0.3062 inside the noise; the four pinned per-run RATE cases return (0,0,0,0) against (0.4,0.4,0.4,0.4) delta +0.4000 welch 0.0000 floor 0.2531 inside the noise, (0,0,0,0) against (1,1,1,1) delta +1.0000 welch 0.0000 floor 0.2152 MOVED, (0.2,0.4,0,0.6) against (0.8,0.6,1,0.8) delta +0.5000 welch 0.1528 floor 0.2715 inside the noise, and (0.2,0.2,0.2,0.2) against (0.4,0.4,0.4,0.4) delta +0.2000 welch 0.0000 floor 0.2755 inside the noise, which is the case Gate 1's first risk states in words; the three pinned per-run FIGURE cases return (53,52,58,73) against (49,53,54,51) delta -7.250 band 4.973 inside the noise, (75,71,73,58) against (53,52,49,51) delta -18.000 band 3.932 moved, and (0,0) against (2,2) delta 2.000 band 0.000 NO VERDICT by the zero-band rule; eleven worked values in all; and the check quotes the three formulas it checks`.
+2. `the same rows pooled over items and averaged over runs give different answers, and the run form is what is computed: four runs with none of five pictures refused against four runs with two of five refused is 0/20 against 8/20 pooled — delta +0.3636 band 0.1138 moved — and delta +0.4000 band 0.2531 inside the noise as per-run rates, which is what the measure returns; the Simpson case holds too, a three-group fixture whose per-group deltas all point one way while the figures summed across groups point the other returning the per-group direction; and nothing cross-group is computed, asserted over the output's own shape — every figure sits under a named group key, the record holds no FIGURE aggregating two groups, which is the observable form of the claim — each measure's word, the tally and the limits aggregate the groups' votes by construction, and a literal reading of "no field" would have been dropped by whoever built it, and each per-group figure equals the figure recomputed from that group's runs alone`.
+3. `the minimums and the vote rule, each case separately: a group with fewer than two runs on a side is dropped; a group where fewer than two of a side's runs contribute to a measure is dropped for that measure only and keeps the other seven; a run whose value reads absent contributes nothing and its count is printed; fewer than three surviving groups is no verdict naming the count; helped needs at least ceil(2/3 x surviving) helped votes AND no hurt vote, and 2 helped with 1 hurt is no verdict naming the disagreeing groups; a group voting no verdict counts as surviving and is NOT comparable, so three groups voting helped, no verdict, no verdict read no verdict and never inside the noise, naming the two whose band bounded nothing; a raw delta of exactly zero votes inside the noise even where the band is also zero, because clause 3 outranks clause 4; a band of exactly zero with a non-zero delta votes no verdict; and ceil(2/3 x n) is 2, 3, 4, 4 for 3, 4, 5, 6 surviving groups`.
+4. `each of the eight measures is read from the per-run figure and denominator Gate 2 names for it, measure 1 as a share over runs from run.reel.madeAFile and the other seven as per-run figures averaged over the side's runs, and every one is a rate per unit rather than a total: two sides whose plans hold four and six shots return the same figure when the same fraction degraded; measure 5 counts the shots FILMED FROM WORDS and measure 6 the shots HELD ON THEIR PICTURE as a still, which are two different endings and not one described twice; each numerator is the distinct shots its rows name THAT ITS DENOMINATOR HOLDS, so a degradation or still_hold row the run rewrote for an inherited failure — whose shot ownPictures() excludes — cannot push the share above 1, while two rows for one shot is an impossible state because both tables are keyed (run_id, shot_id); measure 4 reads Gate 7's own outcome with render.finished_at set, never the answeredNo list, and a run with no finished render contributes nothing; an inherited picture, narration, take, degradation, still_hold or hold is excluded from the inheriting run and counted in the run that paid for it, while measure 7 needs no such filter because a resume copies no receipt; measure 1 is never undefined but is still dropped by the two-runs-a-side minimum; and cost per reel is reported beside cost per run and is not a measure`.
+5. `the credit guard's five quantities are exactly shots the plan asked a picture for, accepted pictures per accepted shot, shots degraded, the selected plan's shot count and the selected plan's total planned seconds; quantities 1, 2, 4 and 5 are banded by BARE WELCH and never by the floor, asserted by reading a finite band where the floor's adjusted counts would return NaN; a band of exactly zero FIRES the guard where it would vote no verdict for a measure — side A four runs planning 6 shots against side B four runs planning 4 is delta -2.000, both variances 0, band 0.000, and the guard FIRES on plannedShots and turns reels made's helped into no verdict naming that quantity and its figures although reels made moved; the same two sides exchanged, A planning 4 against B planning 6, is delta +2.000 and does NOT fire, so an implementation reading |delta| fails this check; quantity 3 keeps measure 5's own floored band; a hurt is never withheld, a measure already inside the noise or no verdict is unchanged, and a quantity named in declaredAxis does not fire and is reported; and quantities 1 and 4 are reported separately on a run whose picture rule makes them differ`.
+6. `the fingerprint's exported field list is deep-equal to the seven identifiers Gate 2 writes out — until, ceilingCents, planVaryOn, receiptRates, portModels, plannedImageCalls, pictureRule — so a vacuous member cannot be added without the check failing; each of the seven refuses when both sides hold a value and the values differ, each case separately, with receiptRates a set over the three receipt kinds that carry rate_cents and portModels a set over the five that carry a model; an absent observed field refuses nothing and is named in the output; a differing Gate 7 question-set hash drops the finished-cuts-refused measure and keeps the other seven; the engine version reads not recorded; the picture rule is READ from the selected plan and never reads not recorded; whether standalone pictures exist is in no condition; neither the scoring half's measures version nor its rating stamp is a condition, because one invocation cannot differ from itself; no comparison reads a rating; and two runs differing only in style version land in different brief groups, which is why the fields outside options are not conditions`.
+7. `the verdict's unit: one word per measure and NO composed overall word anywhere in the output; reels made prints first and is labelled the headline; a measure the caller declined to judge reads reported, not judged, which is not one of the four words; the tally counts only the judged measures, prints that count — 8 in the change-under-test mode and 6 by default in config mode — and names the declined ones; the stated reading rule is printed with it; and the limits block names the declared change, the engine version, every field that refused, every field that was absent, every dropped group with its reason, the guard's quantities, and the count of brief groups THE RECORD holds that could supply two runs a side, with the count reaching four beside it, both labelled as being about the record and not about the two sides`.
 8. `the sides validator refuses every SHAPE fault with no record at all and names them in one pass, not the first: a missing or empty label, two equal labels, a side with no runs, a non-string or empty run id, the same id written twice verbatim in one side or in both, an unknown declaredAxis name and an unknown judge name; the record faults are decided over a resolved run set and named in the same pass — an id matching no run, AN ID MATCHING MORE THAN ONE RUN, and two ids resolving to the same run in one side or across both; and a thin comparison is NOT a fault, returning no verdict with what is missing named`.
-9. `the null comparison and its control: fifteen constructed runs over three brief keys, each group's five sharing one fingerprint, split two against two with the fifth left out and the split stated in the fixture, return inside the noise or no verdict on every one of the eight measures, helped or hurt on none, AND every one of the three groups' own votes asserted; the control fixture, three groups whose runs differ by none-against-all, returns helped on reels made; and a one-group null is rejected by the check's own construction, because three surviving groups are what the band is read through`.
+9. `the null comparison and its control: fifteen constructed runs over three brief keys, each group's five sharing one fingerprint, split two against two with the fifth left out and the split stated in the fixture, return inside the noise or no verdict on every one of the eight measures, helped or hurt on none, AND every one of the three groups' own votes asserted; the control is its OWN fixture of twenty-four runs over three brief keys, eight to a group, split FOUR against four, with identical attempted work on both sides and side A's runs reaching a finished render whose output is unreadable, and it returns helped on reels made with the guard asserted not to have fired; a control re-read from the null's two-against-two split is refused by name, because 0/2 against 2/2 is pinned inside the noise and such a control could not fail whatever the arithmetic did; and a one-group null is rejected by the check's own construction, because three surviving groups are what the band is read through`.
 10. `the two committed real runs sharing brief key f984199a — cd9648c9 and fdff208b — form one group with one run a side, are dropped by the two-runs-a-side minimum, and yield no verdict with that reason named, on rows taken from the record rather than constructed`.
-11. `the reader: every flag behaves and defaults as Gate 3 states; --stratify prints strata with bands and no verdict word; --stratify alone covers every run in the record; no --sides and no --stratify exits 2; an unreadable document, a shape fault and a record fault each exit 2 naming every fault of both kinds; a missing --db exits 1 and creates no file; --out is written on every successful run, including an all-no-verdict one; the record's bytes are unchanged; it starts no process but git rev-parse, constructs no port and reads no key; a key-shaped and a query-string-shaped declaredChange are redacted in both the printed output and the written record; it writes no path into anything committed; and it contains no occurrence of the spending script's name, which this check BUILDS rather than writes` — behavioural, against a temporary database in `tests/yield-benchmark-reader.test.ts`' shape.
-12. `compare.ts is inside packages/benchmark and the three rules still hold on the real dependency graph — no engine package, no I/O, no npm package at all, node:crypto denied under both spellings — drift --prove still fires 25 rules with no rule added; packages/benchmark/package.json gains no dependency; and the moved loader leaves yield-benchmark's checks 6, 7 and 13 green while its check 5 holds the SAME assertions over three reader files instead of one, the new DatabaseSync count of 1 asserted over the three together`.
-13. `every other check of this feature passes in a child process whose environment holds only PATH and what the operating system needs to start Node, in S-028's form, and this file builds its environment through a function named as tests/check-pools.test.ts requires of every member of that pool`.
-14. `stratify: the unit is per property as Gate 2's table states — pictures for subjectsPerShot and pictureRule, runs for shots, plannedImageCalls and imageToVideo; imageToVideo's three strata are none, mixed and all; each stratum carries its own single-side band; no stratum carries a verdict word; a stratum of fewer than two members is reported with its count and no band; and a picture-unit fixture built in session 82's shape reproduces a refusal share rising with the subject count of the shot each picture belongs to`.
+11. `the reader: every flag behaves and defaults as Gate 3 states; --stratify prints strata with bands and no verdict word; --stratify alone covers every run in the record; no --sides and no --stratify exits 2; an unreadable document, a shape fault and a record fault each exit 2 naming every fault of both kinds; a missing --db exits 1 and creates no file; --out is written on every successful run, including an all-no-verdict one; the record's bytes are unchanged; it starts no process but git rev-parse, constructs no port and reads no key; a key-shaped declaredChange (a run of 20 or more characters of [A-Za-z0-9_-] with no space), a URL-shaped one and a query-string-shaped one are redacted in both the printed output and the written record, by the shared module's widened redact(), whose two existing replacements are asserted unchanged; the record-wide count of brief groups that could supply two runs a side is printed and pinned against a temporary database whose groups are known, and is asserted to differ from the same invocation's surviving-group count; it writes no path into anything committed; and it contains no occurrence of the spending script's name, which this check BUILDS rather than writes` — behavioural, against a temporary database in `tests/yield-benchmark-reader.test.ts`' shape.
+12. `compare.ts is inside packages/benchmark and the three rules still hold on the real dependency graph — no engine package, no I/O, node:crypto denied under both spellings — while benchmark-npm-only-zod PERMITS zod, so this feature's stricter no-npm-at-all is its own design rule and what enforces it is the assertion that packages/benchmark/package.json gains no dependency and compare.ts imports none; drift --prove still fires 25 rules with no rule added; and the moved loader leaves yield-benchmark's checks 6, 7 and 13 green, its CHECK 1 green through the one committed fixture whose options gain planVaryOn, its check 4's pinned groups.size of 9 and named shared pair untouched, and its check 5 holding the SAME assertions over three reader files — every negative per file, the new DatabaseSync count of 1 and the processes deepEqual over the three together`.
+13. `every other check of this feature passes in a child process whose environment holds only PATH and what the operating system needs to start Node, in S-028's form; this file builds its environment through a function named exactly as tests/check-pools.test.ts requires of every member of that pool; and none of this feature's four ordinary test files holds that function name, which the same check asserts in the other direction over the ordinary pool`.
+14. `stratify: the unit is per property as Gate 2's table states — pictures for subjectsPerShot and pictureRule, runs for shots, plannedImageCalls and imageToVideo; imageToVideo's four strata are none at exactly 0, all at exactly 1, mixed strictly between, and no takes where the run made none, over the share of the run's own takes whose mode is image-to-video; a share stratum carries the single-side adjusted band and a per-run-figure stratum carries s/sqrt(n), asserted by reading a finite band for a cost stratum where the adjusted form would be NaN; no stratum carries a verdict word; a stratum of fewer than two members is reported with its count and no band; a band of exactly zero prints as zero with its reason; and a picture-unit fixture built in session 82's shape reproduces a refusal share rising with the subject count of the shot each picture belongs to`.
 
 Checks 1 to 10, 12 and 14 need no database at all; none of them starts the engine or needs a key.
 
@@ -788,8 +1017,16 @@ Checks 1 to 10, 12 and 14 need no database at all; none of them starts the engin
 
 - **The floor under the per-run band.** It binds in every worked case, which means at four runs a side only an
   effect near none-against-all moves a measure. That is the honest consequence of the evidence available, and the
-  alternative — bare Welch — hands a claim with no uncertainty to four identical runs. If the control fixture ever
-  needs weakening to pass, this is the first thing to look at.
+  alternative — bare Welch — hands a claim with no uncertainty to four identical runs. **The first revision of this
+  bullet said that if the control fixture ever needed weakening to pass, the floor was the first thing to look at.
+  That sentence is withdrawn**: round 2 found it pre-authorising exactly what CLAUDE.md rule 3 forbids, and it was
+  wrong about the cause as well — the control could not read _helped_ because it had **two runs a side**, not
+  because the floor was too wide. If a control ever fails, the run count is what to read first, and the band is not
+  to be touched to make a check green.
+- **The guard firing on a band of exactly zero**, where a measure votes no verdict on the same band. The asymmetry
+  is stated and argued — withholding on no uncertainty is the safe side of a guard — but it is the one place where
+  two parts of this feature read one number two ways, and it is where to look first if the guard ever withholds
+  credit that should have been given.
 - **The flat multiplier of 2.** Anti-conservative at four runs a side, named as such, with the floor and the group
   rules carrying the conservatism. An inverse Student t is the alternative and needs an npm dependency this package
   does not have.
@@ -807,24 +1044,42 @@ Checks 1 to 10, 12 and 14 need no database at all; none of them starts the engin
 - [ ] **Slice 1 — the arithmetic.** `packages/benchmark/src/compare.ts` and its exports: sides as a data shape and
       their grouping by brief key, the eight measures with their per-run figures and denominators, both bands with
       every pinned worked value, the floor, the per-group vote and each measure's word — and the fixtures its own
-      checks read, including the three-group Simpson fixture. Checks 1, 2, 3, 4. **Targeted**, by
-      `--slice tests/yield-compare-arithmetic.test.ts`: `--changed` owes the full run for a new source file until
-      the map is re-recorded. **Proves: 1, 2, 3, 4.**
+      checks read, including the three-group Simpson fixture. Checks 1, 2, 3, 4. **Targeted**:
+      `--slice tests/yield-compare-arithmetic.test.ts tests/line-endings.test.ts tests/no-absolute-paths.test.ts tests/feature-files.test.ts tests/context-file.test.ts tests/file-scans.test.ts`.
+      `--changed` owes the full run for a new source file until the map is re-recorded. **Proves: 1, 2, 3, 4.**
 - [ ] **Slice 2 — the guard, comparability, the sides validator, stratify and the null comparison.** The five guard
-      quantities and their withholding, the fingerprint's exported field list compared one by one with the absent
-      rule and the question-set scoping, the hand-written sides validator with its shape and record faults, the
-      stratify units, and the fixtures under `tests/fixtures/benchmark/compare/` — the fifteen-run null, its
-      control, and the picture-unit stratify set. Checks 5, 6, 8, 9, 10, 14. **Targeted**, the same way.
-      **Proves: 5, 6, 8, 9, 10, 14.**
+      quantities with their own band and their withholding, the fingerprint's exported field list compared one by
+      one with the absent rule and the question-set scoping, the hand-written sides validator with its shape and
+      record faults, the stratify units and their two band forms, and the fixtures under
+      `tests/fixtures/benchmark/compare/` — the fifteen-run null, the twenty-four-run control, and the
+      picture-unit stratify set. Checks 5, 6, 8, 9, 10, 14. **Targeted**, the same way, with
+      `tests/yield-compare-comparability.test.ts` in place of the arithmetic file and
+      **`tests/yield-benchmark-schema.test.ts` added**, because that is the check whose recursing glob holds this
+      slice's new fixture directory to the path placeholder. **Proves: 5, 6, 8, 9, 10, 14.**
 - [ ] **Slice 3 — the reader, the shared loader, the amendments and the boundary.**
-      `scripts/benchmark-compare.mjs` with its flags, exit codes, redaction and printed output;
-      `scripts/_benchmark-rows.mjs` extracted from `scripts/benchmark.mjs` with the one-pass prefix resolution;
-      `planVaryOn` and its `FIELD_COLUMNS` entry; `tests/yield-benchmark-reader.test.ts`' scan grown to three
-      files; the thirteen-child enumeration; `yield-benchmark`'s amendment block. Checks 7, 11, 12, 13.
-      **Full suite** — `scripts/` is `FULL_ONLY` under both `--changed` and `--slice`, and this slice edits a
-      verified feature's test file. **Proves: 7, 11, 12, 13.**
+      `scripts/benchmark-compare.mjs` with its flags, exit codes, the record-wide group count and printed output;
+      `scripts/_benchmark-rows.mjs` extracted from `scripts/benchmark.mjs` with the one-pass prefix resolution and
+      the widened `redact()`, and `scripts/benchmark.mjs`' call sites and fault paths rewritten around it with its
+      exit codes unchanged; `planVaryOn` and its `FIELD_COLUMNS` entry, **with the one committed fixture whose
+      options gain it**; `tests/yield-benchmark-reader.test.ts`' scan grown to three files clause by clause; the
+      **twelve-claim** thirteen-child enumeration, including `scripts/check.mjs`, `scripts/_pools.mjs` and
+      `tests/check-pools.test.ts`' own comment; `yield-benchmark`'s amendment block. Checks 7, 11, 12, 13.
+      **Full suite**, on four counts now rather than one — `scripts/` is `FULL_ONLY`; `scripts/check.mjs`,
+      `scripts/_pools.mjs`, `scripts/run-tests.mjs` and `tests/check-pools.test.ts` are `VERIFY_INFRASTRUCTURE`
+      (`scripts/check.mjs:211-228`); it edits a verified feature's test file; and it edits a verified feature's
+      fixture. **Proves: 7, 11, 12, 13.**
 - [ ] **Slice 4 — the journeys.** `node scripts/journey.mjs yield-compare`, then `yield-benchmark` again for the
-      moved loader and the new field (S-099's form, S-178's order). **Proves: none** — it is the feature's proof.
+      moved loader, the new field and the edited fixture (S-099's form, S-178's order). **Proves: none** — it is
+      the feature's proof.
+
+**The five always-run scans are named in both slices deliberately** (`scripts/_impact.mjs:39-45`, `ALWAYS_RUN`).
+`--slice` runs `CODE` without its `tests` step, the files it is handed, and `AUTHORITY` (`sliceSteps`,
+`scripts/check.mjs:138-157`): `SCANS` is a step of its own that only the full suite and `--documents` run, so a
+targeted slice would otherwise add a source file, four test files and a directory of JSON fixtures **without any of
+D-086's absolute-path scan, the CRLF scan, the feature-file scan or the tracked-file scan running at all**. This
+repository has already paid for that hole once: S-195 records a full suite passing with a D-086 violation in
+`scripts/benchmark.mjs` because the scans read tracked files and the file was untracked. All six named files are
+seconds.
 
 Every check appears in exactly one slice: 4 + 6 + 4 + 0 = 14.
 
@@ -901,3 +1156,53 @@ measure 7 needs no inheritance filter because a resume copies no receipt; measur
 denominators; the three boundary rules carry `compare.ts` with no rule added; `yield-benchmark`'s recursing fixture
 glob already covers the new fixture directory; `scripts/` being `FULL_ONLY` makes Slice 3 right to be a full suite;
 `paid-path`'s check 20 already covers both new scripts; and Gate 1's register is within the house standard.
+
+## Gate review 2 — 2026-10-16, a FRESH adversarial reviewer, session 92
+
+**All four gates NOT APPROVED, twenty-four findings** (CLAUDE.md rule 4: the round that would approve all four is a
+fresh reviewer, and this one might have been). **Twenty-three are applied and one is refused**, below. Eleven were
+named sufficient on their own. The main session recomputed all eleven pinned band values before the round and
+handed them over as measured, so the round was spent on the design rather than on the arithmetic; the reviewer
+re-derived six of them independently and agreed.
+
+|   # | the finding                                                                   | answer                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --: | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   1 | the `planVaryOn` amendment turns `yield-benchmark`'s **check 1** red          | applied, and verified first: no fixture carries `planVaryOn`, so the field reads `ABSENT` before and after every mutation. **One committed fixture's `options` gain it**; an eleventh fixture is refused because check 4 pins `groups.size` at 9 and the shared pair by name                                                                                                                                               |
+|   2 | guard quantities 4 and 5 can never fire: zero variance, zero band             | applied: the guard gets **its own band** — bare Welch, never the floor (whose adjusted counts return `NaN` on a shot count), and **a zero band FIRES the guard** where it votes no verdict for a measure, with the asymmetry argued                                                                                                                                                                                        |
+|   3 | check 5's pinned guard case has the sides the wrong way round                 | applied: side A and side B named with the sign, and the exchanged case pinned as NOT firing, so an implementation reading `abs(delta)` fails                                                                                                                                                                                                                                                                               |
+|   4 | the positive control cannot read _helped_ at two runs a side                  | applied: the control is **its own fixture, twenty-four runs, four a side**, with identical attempted work so the guard cannot withhold; a control re-read from the null's split is refused by name                                                                                                                                                                                                                         |
+|   5 | no precedence between the zero-delta and zero-band clauses                    | applied: **clause 3 outranks clause 4**, and clause 4 is restated as `band = 0` **and** `delta != 0`                                                                                                                                                                                                                                                                                                                       |
+|   6 | the measure word re-admits "inside the noise" over zero-band groups           | applied: a no-verdict group is surviving but **not comparable**, and fewer than `ceil(2/3 × surviving)` comparable votes reads no verdict                                                                                                                                                                                                                                                                                  |
+|   7 | the record-wide group count has no input, no owner and no check               | applied: it is the **reader's** own pass over every run, the loader returns every run's ids, and check 11 pins it against a known database and asserts it differs from the surviving-group count                                                                                                                                                                                                                           |
+|   8 | the three-file scan drops the exhaustive clause and cannot run per file       | applied: the `processes` deep-equal `:250` is named at last, and each clause states its own scope: negatives per file, the three positives over the concatenation                                                                                                                                                                                                                                                          |
+|   9 | `READER` is used four times; "otherwise unchanged" is false                   | applied: `READER` is left as the entry script and a new constant names the scanned set; `scripts/benchmark.mjs`' call sites and both fault paths are named, with check 6 the thing that must stay green                                                                                                                                                                                                                    |
+|  10 | two copies of the D-022 instrument; `redact()` has no key shape               | applied: `redact()` **moves** into the shared module with the loader and is **widened** — its two existing replacements unchanged, a key shape and a bare query string added, both pinned in check 11                                                                                                                                                                                                                      |
+|  11 | Slices 1 and 2 omit the five always-run scans and the fixture scan            | applied: all six named in both `--slice` lists, with S-195 cited as what this hole already cost once                                                                                                                                                                                                                                                                                                                       |
+|  12 | a degraded shot IS filmed, from words; the still fallback is measure 6        | applied: Gate 1's eight restated, guard quantity 3's reason corrected, and the correction named in the file's header block                                                                                                                                                                                                                                                                                                 |
+|  13 | "a shot can carry two degradation rows" is false; check 4 pins the impossible | applied: both tables are keyed `(run_id, shot_id)`; the distinct-shot numerator is kept as a defence with the true reason, and check 4 pins the **inherited row outside the denominator** instead                                                                                                                                                                                                                          |
+|  14 | the "twelve" enumeration is incomplete and three citations are stale          | applied: **twelve live claims, not nine** — `scripts/check.mjs:57` and `scripts/_pools.mjs:4` and `:7` added, `docs/context.md` re-cited at `:183`/`:196`/`:203`, and both `scripts/` files put in Gate 2's place table                                                                                                                                                                                                    |
+|  15 | check 13 names one direction of a two-directional assertion                   | applied: the secrets child must hold `bareEnvironment` and the four ordinary files must not                                                                                                                                                                                                                                                                                                                                |
+|  16 | "the fingerprint's fields" is listed as unchanged while S-199 supersedes it   | applied: struck from the list, and S-182's measures-version and rating-stamp items named as a seventh superseded part                                                                                                                                                                                                                                                                                                      |
+|  17 | Gate 1 contradicts check 1 twice                                              | applied: the none-against-all sentence corrected to what is pinned, and the 0.2-against-0.4 case **added to check 1**, which takes its pinned values from ten to the eleven S-199's Caught-by already claimed                                                                                                                                                                                                              |
+|  18 | stratify's band is unspecified or `NaN` for three of five properties          | applied: one band per figure KIND — adjusted share band for a share, `s/sqrt(n)` for a per-run figure — with the zero case stated                                                                                                                                                                                                                                                                                          |
+|  19 | `imageToVideo` is a count, not a share; `0/0` has no rule                     | applied: the share's denominator named, and `no takes` made a fourth stratum rather than a division by zero                                                                                                                                                                                                                                                                                                                |
+|  20 | which delta decides is stated two ways for measure 1                          | applied: the adjusted delta decides `moved` and the direction, the raw delta decides the zero rule, both printed                                                                                                                                                                                                                                                                                                           |
+|  21 | check 12's "no npm package at all" misstates `benchmark-npm-only-zod`         | applied: the rule **permits** zod; the stricter claim is named as this feature's design rule and the manifest assertion is what enforces it                                                                                                                                                                                                                                                                                |
+|  22 | check 2's "no field aggregating two groups" is false of its own output        | applied: "no **figure**", with the reason the literal reading would have been dropped                                                                                                                                                                                                                                                                                                                                      |
+|  23 | nine wrong `file:line` claims                                                 | applied for eight — `measures.ts` 1096, 1159, 1161, 1204, 1255, the reader block's `:234-266` and its sub-rows, `check.mjs:229-235`. **REFUSED for one**: `packages/reel-contract/src/request.ts:79-90` is exactly the `SubmitRequest` declaration, re-counted in the source; the reviewer's `:78-87` is the wrong span                                                                                                    |
+|  24 | seven smaller precision faults                                                | applied, all seven: three receipt kinds carry `rate_cents` and **five** carry a `model` (re-measured, not four); the seven condition identifiers written out once; measure 1 names `run.reel.madeAFile`; check 1's count of its own cases fixed at eleven; the invented S-182 quotation replaced by the entry's real five open questions with its line; Gate 1 gains the absent-field risk; and the exit-code order stated |
+
+**What the reviewer verified and did not fault**, recorded so a later round need not redo it: all eleven pinned band
+values recompute exactly, six re-derived independently, and the two thin margins (0.0093 and 0.0430) survive
+rounding at four decimals; measures 2 to 6 can never have a zero band, since `p' = (mean×n + 1)/(n + 2)` is strictly
+inside `(0, 1)`; the zero-band case is exactly satisfiable for integer cents; `ceil(2/3 × n)` matches its table; the
+vacuous-by-construction list is exact field for field against `request.ts`; `planVaryOn` really is in no scorecard
+field, so the amendment's premise is right even though its cost was wrong; check 10's committed group recomputes to
+brief key `f984199a` from the two fixtures; measures 5 and 6 reuse the ratings' own denominators with no second
+reading; measure 7 needs no inheritance filter; measure 3's `fail` and measure 4's Gate 7 outcome read as described;
+`paid-path`'s check 20 covers both new scripts with no amendment; `impact-map.mjs` derives the new secrets child from
+its siblings; the three boundary rules carry `compare.ts` with no rule added and `benchmark-no-io` denies `crypto`
+under both spellings; `scripts/` being `FULL_ONLY` makes Slice 3 right to be a full suite; every check is in exactly
+one slice and Gate 3's file-to-check mapping agrees with Gate 4; round 1's finding 5 is genuinely answered, since
+Slice 1's four checks need no later slice's code; the decisions pin is current; both S-182 quotations are
+character-exact; and no implementation file of this feature exists.

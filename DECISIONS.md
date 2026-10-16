@@ -9258,4 +9258,89 @@ section says so.
 **Confirmed-by.** The owner, 2026-10-16, putting this phase next (S-198) and, on the comparison's worth, S-184's
 quoted refusal to defer it.
 
+**Amended 2026-10-16 — round 2, and the eight choices it moved.** A fresh reviewer refused all four gates again on
+**twenty-four findings** (CLAUDE.md rule 4). Twenty-three are applied and one is refused; every one is recorded in
+`docs/features/yield-compare.md`'s "Gate review 2" table. **No choice above is withdrawn**; eight are made more
+precise or extended, and the extensions are where a wrong answer was reachable:
+
+1. **The guard has its own band, and a zero band FIRES it.** This entry said the guard is measured "with the same
+   arithmetic as a measure". It cannot be: quantities 1, 2, 4 and 5 are **not bounded rates**, so the floor's
+   adjusted counts — built from `a = mean × n` — return `NaN` on a shot count (`pA' = 25/6`, a negative variance under
+   the root), and under the measures' own zero-band rule a side of four runs planning six shots against four
+   planning four has variance zero on both sides and would vote **no verdict**, so **the guard would never fire on
+   `plannedShots` or `plannedSeconds` at all** — the two quantities this entry added to catch a change that simply
+   does less work. Settled: **bare Welch for quantities 1, 2, 4 and 5, measure 5's floored band for quantity 3, and
+   a band of exactly zero fires the guard**. The asymmetry is deliberate and is the conservative direction in both
+   halves: claiming a verdict on no uncertainty over-claims, while **withholding** credit on no uncertainty
+   under-claims.
+2. **Precedence inside the vote rule.** A raw delta of zero with a band of zero is two sides that produced
+   identical figures, and `abs(0) > 0` is false, so the zero-delta clause outranks the zero-band clause and the
+   zero-band clause fires only when `band = 0` **and** `delta != 0`.
+3. **The zero-band rule is enforced one level up as well.** Three surviving groups voting {helped, no verdict, no
+   verdict} failed the two-thirds test and fell through to _inside the noise_ — the one word a zero band cannot
+   carry. Settled: a no-verdict group is **surviving but not comparable**, and fewer than `ceil(2/3 × surviving)`
+   comparable votes reads **no verdict**, naming the groups whose band bounded nothing. **Rejected**: any single
+   zero-band group forcing the measure to no verdict, which would make cost and wall clock unanswerable whenever one
+   group of runs cost the same integer cents.
+4. **The positive control is its own fixture at FOUR runs a side.** This entry's control was read through the null's
+   three groups "split two against two", and at two runs a side `0/2` against `2/2` is pinned _inside the noise_ —
+   so the control could not read _helped_ whatever the arithmetic did, and a green check would have proved nothing.
+   Settled: **twenty-four constructed runs, eight to a group, split four against four**, with identical attempted
+   work on both sides (side A's runs reach a finished render whose output is unreadable) so the guard cannot turn
+   its _helped_ into _no verdict_, and the guard asserted not to have fired.
+5. **Which delta decides, for measure 1**: the **adjusted** delta decides `moved` and the direction, the **raw**
+   delta decides the zero rule, and both are printed.
+6. **The two amendments to the verified scoring half are two amendments and one fixture edit.** `planVaryOn` with
+   its `FIELD_COLUMNS` entry turns `yield-benchmark`'s **check 1** red as this entry left it: that check proves
+   every entry against its columns by mutating them, **no committed fixture carries `planVaryOn`**, and the field
+   reads `ABSENT` before and after every mutation in the ladder. Settled: **one committed fixture's
+   `request_canonical` options gain a `planVaryOn`**, which is outside the brief key, so check 4's pinned
+   `groups.size` of 9 and its named shared pair do not move. **Rejected: an eleventh fixture**, which breaks check 4
+   either way, and **editing check 1 or check 4**, since the fixture is what lets both stay exactly as written.
+   The reader's three-file scan also splits **clause by clause** rather than running whole per file: its three
+   positive assertions — the `readOnly` match, the `run('git', ['rev-parse'` match and the
+   `assert.deepEqual(processes, ['git'])` that makes "starts no process but git" exhaustive, which this entry's
+   first list omitted entirely — run over the three files' concatenation, while every negative runs per file.
+   `scripts/benchmark.mjs` is **not** "otherwise unchanged": a module that returns faults instead of exiting
+   rewrites its call sites and both fault paths, with its exit codes and messages preserved.
+7. **`redact()` moves and is widened.** It lives once, strips the artifact and repository roots and replaces a URL,
+   and **matches no key shape and no bare query string** — so a second copy in the second reader would be a second
+   place that knows D-022, which is the argument that moves the loader. It moves into `scripts/_benchmark-rows.mjs`
+   with the loader, both readers import it, and it gains a bare query string and a run of 20 or more
+   `[A-Za-z0-9_-]` characters. Its two existing replacements are unchanged.
+8. **The record-wide count is the reader's own pass, and the PATH-only claims are twelve, not nine.**
+   `compare.ts` is handed two sides' rows and cannot count the brief groups of runs on neither side, so Gate 1's
+   promised count is a pass of the reader's over every run in the record, pinned in check 11 against a known
+   database and asserted to differ from the same invocation's surviving-group count. And the enumeration of live
+   "twelve" claims — which **is** the instrument, since S-197 established that no mechanical check can read an
+   English count — was missing `scripts/check.mjs:57`, `scripts/_pools.mjs:4` and `scripts/_pools.mjs:7`, the last
+   carrying "274 file executions of 153 files — 153 direct and 121 nested", every figure of which moves with a
+   thirteenth child and four new ordinary files. Twelve live claims; three stale `docs/context.md` citations
+   re-measured; and `tests/check-pools.test.ts`' `bareEnvironment` marker asserted in **both** directions, so this
+   feature's four ordinary test files must not hold that function name.
+
+**Also corrected, as facts rather than choices**, because code was going to be written against them: **a degraded
+shot IS filmed, from words** (`packages/pipeline/src/clips/index.ts:104`, `packages/contracts/src/render.ts:66-67`)
+and pays its video call, so the still fallback is **measure 6** (`StillHoldShot`, D-025 rung 2) and Gate 1 had
+described measure 6 twice and measure 5 not at all; **a shot cannot carry two degradation rows**, since
+`degradation` and `still_hold` are both keyed `(run_id, shot_id)` (`packages/domain/src/schema.ts:318`, `:559`), so
+the distinct-shot numerator is kept as a defence with a true reason and the hazard pinned instead is a row whose
+shot is **outside** the denominator, which is the inherited case; **three receipt kinds carry `rate_cents` and five
+carry a `model`**; `benchmark-npm-only-zod` **permits** zod, so "no npm package at all" is this feature's own
+design rule and the manifest assertion is what enforces it; and **the five always-run scans do not run under
+`--slice`** (`SCANS` is a step of the full suite and `--documents` alone, `scripts/check.mjs:138-157`), which is the
+S-195 hole and is why Slices 1 and 2 now name those five files and `tests/yield-benchmark-schema.test.ts`.
+
+**One of this entry's own claims is made true rather than corrected.** Its "Caught by" said check 1 pins **eleven**
+worked values where the check as written pinned ten; the eleventh is the case Gate 1's risk list states in words and
+nothing pinned, four runs each at a fifth of their pictures refused against four at two fifths (delta +0.2000, welch
+0.0000, floor 0.2755, inside the noise), and it is now in check 1.
+
+**Refused, one of twenty-four**: that `packages/reel-contract/src/request.ts:79-90` is a wrong citation. Re-counted
+in the source, `:79-90` is exactly the `SubmitRequest` declaration; the reviewer's `:78-87` is the wrong span.
+
+**What this amendment does NOT settle.** No gate is approved by it either. Round 2's findings are applied and
+recorded, and whether a round 3 runs is the owner's call (CLAUDE.md rule 4 and the cap this repository keeps:
+session 83 spent three rounds on this material as one feature and session 86 a fourth on the other half).
+
 ---
