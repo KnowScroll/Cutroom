@@ -488,7 +488,7 @@ that could only pass by pretending.
       Biome and Prettier; the workspace wiring. **Checks 1, 2, 4, 5.** **Verification: the full suite** — it touches
       `scripts/`, the root `tsconfig.json`, `.dependency-cruiser.cjs`, `biome.json` and `.prettierignore`, and every
       one of those is in `check.mjs`'s `FULL_ONLY`.
-- [ ] **Slice 2 — the server and its routes.** `GET /` (a minimal document), `/data` and `/run/<id>`; listening on
+- [x] **Slice 2 — the server and its routes.** `GET /` (a minimal document), `/data` and `/run/<id>`; listening on
       port 0; the two payload builders; the 404s and the traversal refusals; no writes. **Checks 3, 11, 12, 13, 16, 17.** **Verification: a targeted run** over
       `tests/benchmark-view-server.test.ts` alone — package-only, no `scripts/` path in the diff.
 - [ ] **Slice 3 — the page.** The four views, the eight charts, the four group-by cards, the comparison board, the run
@@ -592,6 +592,81 @@ slice that cannot make its check pass as written stops and reports (S-016) rathe
     `packages/benchmark-read/src/scrub.ts` each turn it red, including the widening that eats the two identifiers.
     **It is not check 9 and does not discharge it**: check 9 is the scrubber on the way out of the served payload
     and the served HTML, neither of which exists yet, and the test's own title and the file's header say so.
+
+> **Reported by Slice 2 on 2026-10-17**, eight more against the same unedited gates (S-197). Three of them are two
+> sentences of one gate contradicting each other; two changed what Slice 2 built, by the main session's call in
+> **S-208**; and one is a deliberate break that stayed green, which is the signal these checks exist to give.
+
+12. **Check 13 cannot be read over the server's whole lifetime: a read-only connection to a WAL record creates two
+    files.** Check 13 reads "the directory's file list and every file's bytes are identical before and after — the
+    database file included". The record is WAL (`packages/domain/src/db.ts:18`), and SQLite materialises a reader's
+    shared-memory index on its first read: `cutroom.sqlite-shm` at **32768 bytes** and an **empty**
+    `cutroom.sqlite-wal` appear while `openRecord` reads `sqlite_master`
+    (`packages/benchmark-read/src/loader.ts:102`, `:105`) under `{ readOnly: true }`, and both survive the close;
+    the database file's own bytes never change. **Reproduced by the main session before the finding was accepted.**
+    There is no way to decline them — Node 22.14's `node:sqlite` takes no URI filename, so `file:…?immutable=1`
+    answers "unable to open database file", and an immutable open would make check 3's flipped run invisible. Slice 1
+    passes an equivalent comparison only because its snapshot is taken **after** `openRecord`
+    (`tests/benchmark-view-loader.test.ts:461-462`, then `:478`). Settled by **S-208**: Slice 2 compares the window
+    check 13's own sentence names — started, then every route once — **and adds** a lifetime comparison against the
+    pristine copy that tolerates exactly those two entries by name, asserts the `-wal` empty and the record's bytes
+    unchanged. Nothing subtracted.
+13. **Gate 2's measured fleet size is wrong by more than twice.** The route table says "**39 KB for all 52 runs**"
+    and "3 KB typical, **40 KB** the largest". Measured with Slice 2's builder against `data/cutroom.sqlite`: the
+    payload carrying the fields that same table lists is **102.0 KB** for 52 runs and 127 decided pictures, and
+    **86.1 KB** after finding 14's resolution took `ending.detail` out; one run is **12.2 KB median and 42.2 KB
+    largest**. The largest fields are `rating` 20.7 KB, `pictures` 12.7 KB, `stages` 8.9 KB, `plan` 6.8 KB. No
+    check constrains either size and the two-route argument is untouched — the whole record is 2665 KB — but the
+    figure in S-204 is named here rather than left standing.
+14. **Gate 2 asks the fleet payload for the ending and, in the same gate, forbids the page a provider's raw response
+    body — and `ending.detail` is one.** "**Not rendered at all:** a provider's raw response body, any URL, any file
+    path, any environment value" stands against the route table's "every finished run's identity, **ending**, part
+    scores…". Measured: `ending.detail` for the planner deaths is MiniMax's 401/402 body verbatim, `request_id`
+    included (the scorecard field is `packages/benchmark/src/measures.ts:1073`, read from `run.result`), and the
+    URL-and-root scrubber does not touch it. Settled by **S-208**: `GET /data` carries the ending's outcome and the
+    stage it died at, never `detail` and never a raw body; `GET /run/<id>` keeps all of it. `failure` was kept,
+    measured first — it is a `FailureKind` enum word (`packages/domain/src/runs.ts:411`), not a body, and it is
+    empty in all 52 runs. Pinned by an assertion that `/data` holds no `detail` key at any depth and none of three
+    pieces of a real 402 body, while `/run/<id>` holds all three.
+15. **Check 6's verdict-word list contains `lost`, and `lost` is a scorecard key three times over.** Check 6: "The
+    served HTML and both payloads hold none of `better`, `worse`, … `won`, `lost`, `winner` …". Measured on the
+    real record, a word-boundary scan for `lost` matches **both** payloads: `run.costCents.lost`
+    (`packages/benchmark/src/measures.ts:1088`) and `run.lostCalls` (`:1118`) are scorecard keys, and
+    `parts.pictures.callsLost` (`:1194`) escapes a word-boundary scan but not a plain substring one. The check
+    cannot pass as written without renaming fields `yield-benchmark` already ships. Settled by **S-208**: every word
+    in the list stays, the scan runs over the served HTML's rendered text and the payloads' **string values** rather
+    than their key names, and a second assertion pins that the only `lost` in either payload is those three keys, so
+    a fourth occurrence fails. **Check 6 is Slice 3's** and is not discharged here.
+16. **Check 16's fourth key, `answer`, exists in no scorecard field.** Check 16 requires `GET /run/<id>` to hold
+    `prompt`, `words`, `reasons` and `answer`. The scorecard reduces Gate 7 to
+    `{ outcome, coverage, asked, yes, answeredNo }` (`packages/benchmark/src/measures.ts:1255-1263`) and names no
+    `answer` anywhere. The run payload therefore carries `gate7Answers: [{ question, answer }]` read from the
+    render's own blob (`packages/benchmark-read/src/payload.ts:251-254`), which is what Gate 2's "Gate 7's questions
+    with their answers" asks to be rendered. Slice 2's deliberate break 9 — emptying `gate7Answers` — turns check 16
+    red, which proves the key exists nowhere else in the scorecard.
+17. **Check 7 puts the groups "in the payload" while Gate 4 puts the payload builders in Slice 2 and check 7 in Slice 3.** Check 7: "Every group **in the payload** carries its `decided` count". No group is built in Slice 2 — a
+    payload field with no check behind it for a whole slice is the shape findings 11 and 18 are about. What Slice 3 is
+    handed instead is the raw material the route table names, plus `subjectsInShot` per picture row, indexed off the
+    integer `picture.shot_unit` into `subjectsPerShot(rows)` and `null` beyond the selected plan's shots or when no
+    plan was selected (`packages/benchmark-read/src/payload.ts:145`) — so the grouping needs no regex over an id.
+18. **The scrubber on the way out of a served payload was unchecked, and that is measured rather than assumed.**
+    Gate 2: "the scrubber moves into the loader and **every string the page serves passes through it**." Slice 2's
+    deliberate break 12 — `scrubbed()` returning each string unchanged
+    (`packages/benchmark-read/src/payload.ts:41`) — left **every one of Slice 2's seven tests green**, exactly as
+    Slice 1's break 11 did. Settled by **S-208** on S-207's precedent: a guard over both served payloads is built in
+    the slice that built the redaction, with the run id and brief key surviving as the positive control. Break 12 is
+    now red at `tests/benchmark-view-server.test.ts:628`, and a **widened** scrubber is red at `:638` — caught by
+    the positive control alone. **Check 9 is still Slice 3's** and covers the served HTML, which Slice 2's minimal
+    document carries no row of.
+19. **Gate 2 gives the launcher `--port` while Gate 4's Slice 2 says "listening on port 0, always".** The table row
+    reads "read `--db` and `--port`, call the package, print the URL". So `ViewOptions.port` exists and **defaults
+    to 0** (`packages/benchmark-read/src/server.ts:59`), giving Slice 4's launcher something to pass without Slice 2
+    needing a later slice's change; every check here starts with no port named and asserts the kernel named one
+    (`tests/benchmark-view-server.test.ts:150`).
+
+**Two choices Slice 2 made that the gates leave open, recorded in S-208**: the record is queried again on every
+request with **no cache**, which is what check 3's wording reads against; and a **non-GET answers 404** through the
+one refusal body, so nothing escapes the served set by a second door.
 
 ## Evidence
 

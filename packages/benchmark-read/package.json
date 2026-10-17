@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "The shared row loader: the read-only open of a path it is handed, the held column set per table, the row selection, and the artifact-prefix and URL scrubber. It resolves no path, scores nothing and writes nothing.",
+  "description": "The shared row loader and the benchmark page: the read-only open of a path it is handed, the held column set per table, the row selection, the artifact-prefix and URL scrubber, and the local server with its fleet and one-run payloads. It resolves no path, scores nothing and writes nothing.",
   "exports": {
     ".": "./src/index.ts"
   },

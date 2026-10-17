@@ -9932,3 +9932,81 @@ disagreement that produced the gap.
 builder reported the gap and asked rather than building an unnumbered check of its own (S-172).
 
 ---
+
+## S-208 | 2026-10-17 | Four questions `benchmark-view`'s gates left open or contradicted, settled from the built code: SQLite's reader files, the verdict-word scan, the provider's raw body, and a guard where a break stayed green
+
+**Supersedes.** Nothing. It settles four things Slice 2 reported rather than decided (S-016,
+S-172), two of them contradictions inside the approved gates that no reviewer and no owner read
+(S-203, S-205).
+
+**Chose.**
+
+- **Check 13's "identical before and after" is read over the window its own sentence names, and a
+  lifetime comparison is ADDED beside it.** A read-only open of a WAL record
+  (`packages/domain/src/db.ts:18`) materialises two reader files: **verified by the main session,
+  not taken on report** — a copy of the real record opened `{ readOnly: true }`, one read of
+  `sqlite_master`, closed, leaves `cutroom.sqlite-shm` at **32768 bytes** and an **empty**
+  `cutroom.sqlite-wal`, both surviving the close. There is no way to decline them: Node 22.14's
+  `node:sqlite` takes no URI filename, so `file:…?immutable=1` answers _"unable to open database
+  file"_, and an immutable open would make check 3's flipped run invisible. So the slice compares
+  the tree across "started, then every route exercised once" — check 13's literal window — **and
+  adds** a comparison against the pristine copy that tolerates exactly those two entries by name,
+  asserts the `-wal` empty and the record's own bytes unchanged. Nothing is subtracted and the
+  property gets stricter in a new direction.
+- **Check 6 scans what a reader is shown, and pins the three cost keys by name.** Its word list
+  holds `lost`, and `lost` is a scorecard key three times over —
+  `run.costCents.lost` (`packages/benchmark/src/measures.ts:1088`), `run.lostCalls` (`:1118`) and
+  `parts.pictures.callsLost` (`:1194`), all from a verified feature. The check cannot pass as
+  written without renaming fields `yield-benchmark` already ships. So **every word in the list
+  stays**, the scan runs over the served HTML's rendered text and over the payloads' **string
+  values**, not their key names — a key meaning "cents lost" is not a verdict about a run — and a
+  second assertion pins that the only `lost` in either payload is those three keys, **so a fourth
+  occurrence fails**. The positive control stays.
+- **`GET /data` carries the ending's outcome and the stage it died at, never `ending.detail` or
+  any provider raw body; `GET /run/<id>` keeps all of it.** Gate 2 asks the fleet payload for "every
+  finished run's … ending" and in the same gate forbids the page "a provider's raw response body" —
+  and `ending.detail` for the planner deaths is MiniMax's 401/402 body verbatim, `request_id`
+  included, which the URL-and-root scrubber does not touch. The two sentences reconcile by reading
+  "ending" as the **outcome**, which is the only sense the overview's "where reels die" chart uses.
+  A detail belongs in the detail view.
+- **The deep scrubber over the served payloads is guarded in Slice 2**, extending **S-207**'s call
+  to the slice that built the second redaction. Slice 2's deliberate break 12 — `scrubbed()`
+  returning each string unchanged — left **all seven of its tests green**, exactly as Slice 1's
+  break 11 did. Check 9 stays Slice 3's and is not discharged: it covers the served HTML too, and
+  the guard's own title says so.
+
+**Why.** Three of the four are contradictions between two sentences of the same approved gate
+document, which is the defect class an adversarial round exists to catch and which S-205 said
+plainly would reach the code. They are settled against measured facts — a file listing after a
+real open, three field names in a verified package, the content of `ending.detail` on the real
+record — rather than against preference. The fourth is a break that stayed green, which is the one
+signal this feature's checks were built to produce.
+
+**Rejected.** **Rebuilding Slice 2 against a non-WAL record**, which would test the server against
+a database unlike the real one. **Amending check 13 to name SQLite's two files**, which edits an
+approved gate instead of recording a finding (S-197). **Dropping `lost` from check 6's word list**,
+which is subtracting from a check to reach green (CLAUDE.md rule 3). **Renaming
+`yield-benchmark`'s scorecard fields** so the literal scan passes, which changes a verified
+feature's shape to suit a page. **Keeping `detail` in the fleet payload and relying on Slice 3 not
+to draw it**, which is a raw provider body on the wire with nothing but intent between it and the
+reader. **Leaving the payload scrubber for check 9**, which is two commits of a disable-able
+redaction, refused once already in S-207.
+
+**Caught by.** Slice 2's deliberate break 12, re-run against the new guard with its catching
+assertion named. An assertion that `/data` holds no `detail` key at any depth and none of the real
+record's provider error strings, while `/run/<id>` holds them. The three pinned `lost` keys, which
+fail on a fourth. And Slice 3's check 9, still owed over the served HTML.
+
+**Also recorded, from the same report.** **S-204's "39 KB for all 52 runs" is wrong**: the payload
+carrying the fields Gate 2's own route table lists measures **102.0 KB** for 52 runs and 127 decided
+pictures, and one run's is **12.2 KB median against the table's 3 KB typical, 42.2 KB largest
+against 40 KB**. No check constrains either, and the two-route argument is untouched — the whole
+record is 2665 KB — but the figure is named here rather than left standing. **Two choices Slice 2
+made and named**: the record is queried again on every request with no cache, which is what check
+3's wording reads against and is the smaller implementation; and a non-GET answers 404 through the
+one refusal body, so nothing escapes the served set by a second door.
+
+**Confirmed-by.** The main session, 2026-10-17, on `benchmark-view` Slice 2's findings 12, 14, 15
+and 18. The WAL file behaviour was reproduced by the main session before the finding was accepted.
+
+---
