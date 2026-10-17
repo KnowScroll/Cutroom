@@ -725,6 +725,28 @@ one refusal body, so nothing escapes the served set by a second door.
     main session kept the built design rather than edit a check Slice 2 had just committed, and 263.5 KB on
     localhost is not a defect — but **whether the page should fetch, and check 11 be made precise about server
     source versus client script, is the owner's call and is not settled here.**
+
+    **SETTLED, 2026-10-17 (session 96), by the owner: _"let fetch be allowed, it's only local always"_.** Check 11's
+    outbound scan is now **per file**, at `tests/benchmark-view-server.test.ts`: every source file of the package
+    names none of the four spellings, except `packages/benchmark-read/src/draw.ts` — the text of the page's own
+    browser script — which may name `fetch(`. `http.request`, `https.request` and `node-fetch` stay forbidden
+    there too, because a browser has none of them and one there is server code that leaked into the document. What
+    keeps a permitted `fetch(` local is the clause already in that check: **the served HTML holds no absolute
+    `http://` or `https://` URL at all**, and the script is inlined in that HTML — so the only thing it can ask is
+    this server. Two bounds were added rather than one removed: the exempted file must be a source file of the
+    package, and the document must carry **that file's own script text byte for byte**, or the exemption would sit
+    on a file the page does not use. Four deliberate breaks, each red: `fetch(` in `server.ts`, `http.request` in
+    the client script, an absolute URL in the client script, and a script text the document no longer carries.
+
+    **The page still embeds its payload, and that is now a measured choice rather than a check's doing.** Asking
+    for the data would not remove the copy: every figure is ALREADY in the document as a server-rendered table, so
+    the numbers travel once as HTML and once as JSON, and a route splits that second copy across two answers
+    instead of saving it. Measured on the real record, 2026-10-17 — the document **249.1 KB**, its JSON block
+    **131.6 KB**, `/data` **86.1 KB**, `/run/<id>` **5.1 KB**, 52 runs. Realising Gate 2's 39 KB landing load would
+    mean the client rendering the tables itself, and the tables are what a reader with no script reads (Gate 2,
+    "The accessibility floor of a chart beyond colour"). So `/data` and `/run/<id>` stay the machine-readable half
+    of the same local server — served, correct, checked, and read by whoever asks rather than by the page.
+
 24. **The three fonts "The look" names cannot be had, and the gates settle no substitute.** "Type: **Archivo** for
     display, **IBM Plex Sans** for body, **IBM Plex Mono** for every figure" — the mockup loaded all three from
     Google Fonts (`.artifacts/view-mockup/mockup-source.html:3`), which check 11 forbids ("the served HTML holds

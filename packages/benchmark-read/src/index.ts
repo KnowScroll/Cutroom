@@ -6,7 +6,9 @@
 // it. On top of that it serves the page: a local server on a port the kernel names, `GET /data`
 // for every finished run without a word of model text, and `GET /run/<id>` for one run's full
 // scorecard with its words. It resolves no database path, scores nothing, writes nothing, starts
-// no process, reaches no network and reads no key — `benchmark-read-no-engine` holds the engine
+// no process, reaches no network and reads no key — the page's own browser script may ask THIS
+// server for its own data by a relative url, which check 11 now permits in that one file and
+// nowhere else (finding 23) — `benchmark-read-no-engine` holds the engine
 // half of that on the real dependency graph, and `drift --prove` builds a violation of it. The
 // arithmetic is `@cutroom/benchmark`'s, which is pure and is handed rows, and
 // `benchmark-no-reader` stops that package reaching a database back through this one.

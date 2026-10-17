@@ -293,11 +293,28 @@ test('11. No registry dependency, no network', async () => {
     'a dependency of the package comes from a registry',
   )
 
-  // The source names no outbound call, under any of the four spellings.
+  // No outbound call, under any of the four spellings — but the scan is PER FILE now, because
+  // this package holds two different things and the old scan could not tell them apart: the
+  // server, which must reach nothing, and the text of the page's own browser script, where
+  // `fetch('/data')` is a call to this very local server and not network access at all
+  // (finding 23, settled by the owner 2026-10-17: "let fetch be allowed, it's only local
+  // always"). What keeps it local is the absolute-URL ban below, which reads the whole served
+  // document — the script included, because it is inlined in it.
   const OUTBOUND = ['fetch(', 'http.request', 'https.request', 'node-fetch'] as const
+  // The three Node spellings stay forbidden everywhere, the client script included: a browser
+  // has no `http.request`, so one there is server code that leaked into the document.
+  const NODE_ONLY = OUTBOUND.filter((token) => token !== 'fetch(')
+  const CLIENT = join(PACKAGE, 'src', 'draw.ts')
+  const read = sources()
+  const clientText = read.find(([file]) => file === CLIENT)?.[1]
+  assert.ok(
+    clientText !== undefined,
+    `${CLIENT} is not a source file of this package, so the exemption names nothing`,
+  )
   const named: string[] = []
-  for (const [file, text] of sources()) {
-    for (const token of OUTBOUND) if (text.includes(token)) named.push(`${file}: ${token}`)
+  for (const [file, text] of read) {
+    const tokens = file === CLIENT ? NODE_ONLY : OUTBOUND
+    for (const token of tokens) if (text.includes(token)) named.push(`${file}: ${token}`)
   }
   assert.deepEqual(named, [], 'the package names an outbound call')
   // The scan itself, against a text that holds every one of them: a scan that stopped matching
@@ -305,6 +322,14 @@ test('11. No registry dependency, no network', async () => {
   for (const token of OUTBOUND) {
     assert.ok(`a ${token} b`.includes(token), `the scan does not match ${token}`)
   }
+  // The script the exempted file holds, read out of its own text rather than imported: this
+  // package is entered only through its index (D-094), and the document below must carry this
+  // very text or the exemption is sitting on a file the page does not use.
+  const script = /export const PAGE_SCRIPT = `([\s\S]*)`\s*$/.exec(clientText as string)?.[1]
+  assert.ok(
+    script !== undefined && script.length > 500,
+    `${CLIENT} holds no page script, so there is nothing to find in the document`,
+  )
 
   // And the served HTML holds no absolute URL AT ALL. ECharts 5.5.1 is not on cdnjs — it 404s
   // there — which is the failure behind this clause: the mockup's first draft loaded it from one.
@@ -316,6 +341,13 @@ test('11. No registry dependency, no network', async () => {
     const html = page.body.toString('utf8')
     assert.match(html, /<html/i, 'GET / served no document')
     assert.doesNotMatch(html, /https?:\/\//i, 'the served HTML holds an absolute URL')
+    // The exempted file really is the browser script, byte for byte in this document: a rename or
+    // a moved script would leave the exemption sitting on a server file, and the absolute-URL ban
+    // above is what makes any `fetch(` in it necessarily a call to this same local server.
+    assert.ok(
+      html.includes(script as string),
+      'the exempted file is not the script the document holds',
+    )
   } finally {
     await view.stop()
     rmSync(made.dir, { recursive: true, force: true })

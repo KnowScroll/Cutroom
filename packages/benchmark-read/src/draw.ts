@@ -1,13 +1,18 @@
 // The page's own script: the chart configuration, and what a reader can move
 // (benchmark-view, "The charts" and "The look"; S-201).
 //
-// It is INLINE in the one document and it asks the network for nothing. The page is handed its
-// payload in a `<script type="application/json">` block the server wrote, because check 11 reads
-// this package's whole source — this string included — for the four outbound-call spellings and
-// must find none; the page's data is embedded rather than asked for over the wire a second time,
-// which is also one answer fewer to serve. Every figure it draws is already in the document as a
-// table, so a reader with no script, no colour and no pointer still gets the numbers (Gate 2,
-// "The accessibility floor of a chart beyond colour").
+// It is INLINE in the one document. It is handed its payload in a
+// `<script type="application/json">` block the server wrote, and that is now a MEASURED choice
+// rather than a check's doing: check 11 used to read this package's whole source — this string
+// included — for the four outbound-call spellings, so a `fetch('/data')` here turned it red.
+// Since finding 23 that scan is per file and this file may name `fetch(` (the owner, 2026-10-17:
+// a call to our own local server is not network access). The block stays because asking for the
+// data would not remove it: every figure is ALREADY in the document as a server-rendered table,
+// so the numbers travel once as HTML and once as JSON, and a second request splits that second
+// copy across two answers instead of saving it — measured on the real record, 2026-10-17: the
+// document 249.1 KB, its block 131.6 KB, `/data` 86.1 KB. Only a client that rendered the tables
+// itself would make the page smaller, and the tables are what a reader with no script, no colour
+// and no pointer reads (Gate 2, "The accessibility floor of a chart beyond colour").
 //
 // The drawing library arrives with Slice 4 as `vendor/echarts/echarts.min.js`, served at a
 // RELATIVE url. **Without it this script draws no chart and says so in each chart's place**,

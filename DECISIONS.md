@@ -10265,6 +10265,20 @@ repository, asserting the recorded mode and its four checks. Five deliberate bre
 the trailer unprinted, the empty-tests guard inverted, the scans without the reporter, and a non-full run allowed
 to overwrite the reusable receipt.
 
+**Amended, 2026-10-17, hours later, by the first thing the printed trailer caught — and it was not new.** **The
+mode is read off THE STEP THAT RAN, never off the flags that were typed.** A `--changed` run whose tests the
+impact map chose (S-196) has no `--slice` and no documents steps, so the flag ladder fell through to its last
+branch and **a twelve-file run recorded itself as `full`** — and `full` is also what writes
+`receipt-full.json`, the one record a journey may rest on, so a chosen set could stand where a run of everything
+belongs. **Measured live**: `node scripts/check.mjs --changed` over this very change selected 12 of 161 test
+files and printed `Verification: full`. The fault dates from S-196, not from this entry; it was invisible while
+sessions typed their own trailers from what they knew they had run, and the checker printing its own is what
+exposed it in one line. Now: `tests` is the whole suite and the only `full`; `slice tests` and `scans` are a
+chosen set and are `targeted`; a carry stays `full` for the reason S-214 gives. **Caught by**
+`tests/check-changed.test.ts`, which plants an impact map in a scratch repository, runs `--changed` for real and
+asserts the recorded mode, the step's own label, and that **no `receipt-full.json` is written**. The deliberate
+break is the flag ladder restored: red.
+
 ---
 
 ## S-214 | 2026-10-17 | Markdown written after a green full run is checked against THAT run, not against HEAD — and it is still `full`

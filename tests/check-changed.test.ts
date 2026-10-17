@@ -322,6 +322,36 @@ function recorded(dir: string, file = 'receipt.json') {
   return JSON.parse(readFileSync(join(dir, '.verification', file), 'utf8'))
 }
 
+test('S-213. a run whose tests the impact map chose records TARGETED, not a full suite', () => {
+  // Measured the moment the checker first printed its own trailer: `--changed` with code in the
+  // diff has neither `--slice` nor the documents steps, so the old flag ladder fell through to
+  // `full` and a twelve-file run called itself a full suite — and wrote `receipt-full.json`, where
+  // a journey looks for a run of everything. The mode is read off the step that ran instead.
+  const dir = scratch()
+  mkdirSync(join(dir, '.verification'), { recursive: true })
+  writeFileSync(join(dir, '.verification', '.gitignore'), '*\n')
+  writeFileSync(
+    join(dir, '.verification', 'impact.json'),
+    `${JSON.stringify({
+      impact: 1,
+      covers: { 'tests/stage.test.ts': ['packages/pipeline/src/stage.ts'] },
+    })}\n`,
+  )
+  write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 4\n')
+  spawnSync(process.execPath, ['scripts/check.mjs', '--changed'], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: { ...process.env, NO_COLOR: '1' },
+  })
+  const receipt = recorded(dir)
+  assert.equal(receipt.tests.label, 'slice tests', 'the chosen set did not run as a chosen set')
+  assert.equal(receipt.mode, 'targeted', 'a chosen set of tests recorded itself as a full suite')
+  assert.ok(
+    !existsSync(join(dir, '.verification', 'receipt-full.json')),
+    'a chosen set of tests wrote the record a journey rests on',
+  )
+})
+
 test('S-214. a recorded full run is carried over the documents written after it, code and all', () => {
   // The order every finished piece of work has: the suite runs, and THEN the prose that describes
   // it is written — a journey's verdict, the journal, the context file. None of it can change what

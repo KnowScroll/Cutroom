@@ -416,17 +416,23 @@ for (const [label, cmd, args] of steps) {
 // checker records that itself, so no trailer is ever typed (S-213). The mode says what ran, `ok`
 // says how it went: a red run of either kind records the same mode, and the receipt's own `ok` is
 // what disqualifies it.
-const mode =
-  carry !== undefined
-    ? 'full'
-    : slice || partial
-      ? 'targeted'
-      : process.argv.includes('--code')
-        ? 'code'
-        : 'full'
 const suite = verdicts.find(
   ({ label }) => label === 'tests' || label === 'slice tests' || label === 'scans',
 )
+// The mode is read off THE STEP THAT RAN, never off the flags that were typed. Measured the
+// moment the checker first printed its own trailer (S-213 amended, 2026-10-17): a `--changed` run
+// whose tests the impact map chose has neither `--slice` nor the documents steps, so the flag
+// ladder fell through to `full` and a 12-file run called itself a full suite — and, being `full`,
+// it also wrote `receipt-full.json`, where a journey looks for a run of everything. Only the
+// `tests` step is the whole suite; `slice tests` and `scans` are a chosen set.
+const mode =
+  carry !== undefined
+    ? 'full'
+    : process.argv.includes('--code')
+      ? 'code'
+      : suite?.label === 'tests'
+        ? 'full'
+        : 'targeted'
 const perFile = suite === undefined ? undefined : readTestsRaw(WHERE)
 const receipt = writeReceipt(WHERE, {
   mode,
