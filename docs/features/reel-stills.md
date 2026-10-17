@@ -32,6 +32,16 @@ Gates: product APPROVED 2026-09-16 adversarial-reviewer · architecture APPROVED
 > enforces it, so the gates as written could not be built without weakening that check. Gate 2's three prose lines and
 > Gate 3's signature say `brightness`; the `Gates:` line above was not touched, and nothing else changed.
 >
+> **Amended by `benchmark-view` on 2026-10-17, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-204**, **S-205**). **Check 3's printed line counts twenty-seven rules, not twenty-five.**
+> `benchmark-view` adds `benchmark-read-no-engine` and `benchmark-no-reader` in one change — two and not one,
+> because dependency-cruiser's rules are about DIRECT dependencies, so the rule stopping `packages/benchmark`
+> importing `node:sqlite` says nothing about it importing a package that does.
+> `tests/reel-stills-rules.test.ts` keeps check 3 in its exact form with its number corrected:
+> `assert.match(prove.out, /27 rules proven to fire/)`. **The count stays EXACT**, so cases for a twenty-eighth
+> still fail here. Nothing else in this feature changes: no contract, stand-in, helper, provider, setting or other
+> check, and `worker-no-providers` — check 2's subject — is untouched.
+>
 > **Amended by `yield-benchmark` on 2026-10-14, Slice 1 — the gates below are not edited, and no assertion is removed**
 > (**S-184**, **S-185**). **Check 3's printed line counts twenty-five rules, not twenty-two.**
 > `yield-benchmark` adds `benchmark-no-engine`, `benchmark-no-io` and `benchmark-npm-only-zod` in one change —

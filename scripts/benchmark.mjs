@@ -19,13 +19,19 @@
  * of the five, or `--rescore` beside `--run` or `--part`, since the ledger is the whole record or
  * nothing; 3 when an output could not be written.
  *
- * READ-ONLY, and it spends nothing. It opens the record with `node:sqlite` read-only — never
- * through the domain's opener, which opens for writing, migrates and creates a missing file — so
- * the record's bytes do not change and a wrong path creates nothing, exactly as
+ * READ-ONLY, and it spends nothing. It OPENS NOTHING ITSELF: `@cutroom/benchmark-read` holds
+ * the one read-only open, the held column set, the row selection and the scrubber, so this file
+ * and the page read one copy of the schema and not two (benchmark-view, Gate 2; S-204). The
+ * loader never goes through the domain's opener, which opens for writing, migrates and creates a
+ * missing file, so the record's bytes do not change and a wrong path creates nothing, exactly as
  * `scripts/refused.mjs` does. It reaches no provider, constructs no port, reads no key and starts
  * no process but `git rev-parse`, for the commit the reading was done at. The arithmetic is
- * `@cutroom/benchmark`'s, which is pure and is handed rows: this file selects, hashes, prints and
- * writes, and computes no measure of its own.
+ * `@cutroom/benchmark`'s, which is pure and is handed rows: this file hashes, prints and writes,
+ * and computes no measure of its own.
+ *
+ * The record it reads is the one `databasePath` names, from `scripts/_lib.mjs`: `--db`, then
+ * `CUTROOM_DB_PATH`, then the service's default. That order lives there and not in the loader,
+ * which may not import `apps/service` at all, and not here, which would be the second copy.
  *
  * A column the record does not hold is reported ABSENT and never as zero. This machine's record
  * predates migration 0007, so `run.resumes`, `run.failure` and the three `kept_from` columns are
@@ -40,10 +46,8 @@
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
-import { DatabaseSync } from 'node:sqlite'
 import {
   ABSENT,
-  FIELD_COLUMNS,
   INHERITED,
   NO_QUESTION_SET,
   PART_NAMES,
@@ -54,8 +58,9 @@ import {
   scorecard,
   verbatim,
 } from '@cutroom/benchmark'
-import { DEFAULT_DB_PATH, SETTING_NAMES } from '@cutroom/service'
-import { REPO, bold, dim, red, run } from './_lib.mjs'
+import { openRecord } from '@cutroom/benchmark-read'
+import { SETTING_NAMES } from '@cutroom/service'
+import { REPO, bold, databasePath, dim, red, run } from './_lib.mjs'
 
 /**
  * The measures' own version, beside the rating's `r1`. The package stamps a RATING; the figures
@@ -63,30 +68,6 @@ import { REPO, bold, dim, red, run } from './_lib.mjs'
  * later change to what is read moves this one.
  */
 const MEASURES_VERSION = 'm1'
-
-/** Every table one run's rows are read from, and how a row set names it. */
-const TABLES = [
-  'run_event',
-  'job',
-  'plan',
-  'model_receipt',
-  'picture',
-  'observation',
-  'reconciliation',
-  'generation_receipt',
-  'lost_call',
-  'refused_answer',
-  'degradation',
-  'narration',
-  'speech_receipt',
-  'take',
-  'video_receipt',
-  'take_observation',
-  'take_reconciliation',
-  'render',
-  'hold',
-  'still_hold',
-]
 
 /** The ledger's columns, in Gate 3's order. */
 const LEDGER_COLUMNS = [
@@ -146,7 +127,7 @@ if (given.rescore && (given.run !== undefined || given.part.length > 0)) {
 
 const parts =
   given.part.length > 0 ? PART_NAMES.filter((part) => given.part.includes(part)) : PART_NAMES
-const dbPath = given.db ?? process.env[SETTING_NAMES.dbPath] ?? DEFAULT_DB_PATH
+const dbPath = await databasePath(given.db)
 const instant = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15)
 const outPath = resolve(given.out ?? join(REPO, '.artifacts', 'benchmark', `${instant}.json`))
 const ledgerPath = resolve(given.ledger ?? join(REPO, 'docs', 'research', 'benchmark.md'))
@@ -157,37 +138,6 @@ const ledgerPath = resolve(given.ledger ?? join(REPO, 'docs', 'research', 'bench
 const shown = (path) => {
   const inside = relative(REPO, path)
   return inside.startsWith('..') || isAbsolute(inside) ? path : inside
-}
-
-/**
- * A piece of a root, as a pattern matches it literally — and a drive letter's `:` may arrive
- * with backslashes before it, because a Windows path inside an ffmpeg FILTERGRAPH has its `:`
- * and `\` escaped (S-075), so `invocations` holds a drive letter followed by
- * `\:/Users/...`, where every other column holds that letter followed by `:\Users\...`.
- * Neither spelling is written out whole here: D-086 forbids a machine path in committed source,
- * and tests/no-absolute-paths.test.ts matches one in a comment exactly as it would in code.
- */
-const quoted = (piece) => piece.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replaceAll(':', '[\\\\]*:')
-
-/**
- * Each root as a pattern that matches it UNDER EVERY SPELLING OF A SEPARATOR, together with the
- * separators that follow it. A pattern rather than a string because `render_manifest` and
- * `invocations` are columns that hold JSON TEXT: a root inside one of them arrives with its
- * separators escaped, and a reader that stripped only the plain spelling would leave every such
- * path whole.
- */
-const ROOTS = [ARTIFACT_ROOT, REPO].map(
-  (root) => new RegExp(`${root.split(/[\\/]/).map(quoted).join('[\\\\/]+')}[\\\\/]*`, 'g'),
-)
-
-/**
- * Every string printed or written passes through here: an artifact path becomes a path relative
- * to the artifact root, and a URL becomes `<url>` — no key, URL or query string anywhere (D-022).
- */
-function redact(text) {
-  let out = text
-  for (const root of ROOTS) out = out.replace(root, '')
-  return out.replace(/\bhttps?:\/\/\S*/g, '<url>')
 }
 
 /** A figure as a row prints it: a number to one decimal, a string as it reads. */
@@ -229,91 +179,36 @@ if (!existsSync(dbPath)) {
   process.exit(1)
 }
 
-let db
+let stored
 try {
-  db = new DatabaseSync(dbPath, { readOnly: true })
-  // A file that is not a database opens without complaint and fails on its first read, so the
-  // first read happens here, inside the one place that answers with exit 1.
-  db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all()
+  // The open is the loader's, read-only, and it does its own first read — a file that is not a
+  // database opens without complaint and fails on that read, which is why the call sits inside
+  // the one place here that answers with exit 1. The two roots are HANDED to it: the loader
+  // resolves no path and reads no setting.
+  stored = openRecord({ path: dbPath, roots: [ARTIFACT_ROOT, REPO] })
 } catch (error) {
   console.error(`\n${red('cannot read')} ${shown(dbPath)}: ${error.message}\n`)
   process.exit(1)
 }
 
-/** Which columns this record holds, per table — a table it does not hold at all reads empty. */
-function heldColumns() {
-  const columns = new Map()
-  const tables = new Set(
-    db
-      .prepare("SELECT name FROM sqlite_master WHERE type = 'table'")
-      .all()
-      .map((row) => String(row.name)),
-  )
-  for (const table of ['run', ...TABLES]) {
-    if (!tables.has(table)) continue
-    columns.set(
-      table,
-      new Set(
-        db
-          .prepare('SELECT name FROM pragma_table_info(?)')
-          .all(table)
-          .map((row) => String(row.name)),
-      ),
-    )
-  }
-  return columns
-}
-
-const columnsHeld = heldColumns()
+/**
+ * Every string printed or written passes through here: an artifact path becomes a path relative
+ * to the artifact root, and a URL becomes `<url>` — no key, URL or query string anywhere (D-022).
+ * The patterns are the loader's, built from the two roots it was handed.
+ */
+const redact = (text) => stored.scrub(text)
 
 /**
- * The columns the scorecard names that this record does not hold, read from the package's own
- * field-to-column map. Each is reported ABSENT by the scorecard, because the row simply has no
- * such property — never as zero, which is a figure a run can earn.
+ * The columns the scorecard names that this record does not hold, from the loader's reading of
+ * `sqlite_master` and `pragma_table_info` against the arithmetic's own field-to-column map. Each
+ * is reported ABSENT by the scorecard, because the row simply has no such property — never as
+ * zero, which is a figure a run can earn.
  */
-function absentColumns() {
-  const named = new Set()
-  for (const columns of Object.values(FIELD_COLUMNS))
-    for (const column of columns) named.add(column)
-  return [...named].sort().filter((pair) => {
-    const [table, column] = pair.split('.')
-    const columns = columnsHeld.get(table)
-    return columns === undefined || !columns.has(column)
-  })
-}
-
-const absent = absentColumns()
-
-/** One run's rows, as the schema stores them. `job` is joined through its correlation_id. */
-function rowsOf(runId) {
-  const read = (table, order) => {
-    if (!columnsHeld.has(table)) return []
-    const where = table === 'job' ? 'correlation_id' : 'run_id'
-    return (
-      db
-        .prepare(`SELECT * FROM ${table} WHERE ${where} = ? ORDER BY ${order}`)
-        .all(runId)
-        // A node:sqlite row has NO PROTOTYPE: it is spread into a plain object before anything
-        // else reads it.
-        .map((row) => ({ ...row }))
-    )
-  }
-  const rows = { run: { ...db.prepare('SELECT * FROM run WHERE run_id = ?').get(runId) } }
-  for (const table of TABLES) rows[table] = read(table, table === 'run_event' ? 'seq' : 'rowid')
-  return rows
-}
+const absent = stored.absentColumns()
 
 const runIds = (() => {
-  if (given.run === undefined) {
-    return db
-      .prepare('SELECT run_id FROM run ORDER BY created_at, run_id')
-      .all()
-      .map((row) => String(row.run_id))
-  }
-  const named = db
-    .prepare("SELECT run_id FROM run WHERE run_id LIKE ? || '%' ORDER BY run_id")
-    .all(given.run)
-    .map((row) => String(row.run_id))
+  if (given.run === undefined) return stored.runIds()
+  const named = stored.runIdsNamed(given.run)
   if (named.length === 0) unusable(`--run ${given.run} names no run in this record`)
   if (named.length > 1)
     unusable(`--run ${given.run} names ${named.length} runs: ${named.join(', ')}`)
@@ -866,7 +761,7 @@ try {
     say(2, dim('absent in this record'), absent.join(', '), dim('— reported absent, never zero'))
   }
   for (const runId of runIds) {
-    const rows = rowsOf(runId)
+    const rows = stored.rowsOf(runId)
     const card = scorecard(rows, { hash })
     const rating = runRating(rows, { hash })
     const blobs = blobsOf(rows)
@@ -876,7 +771,7 @@ try {
     for (const part of parts) printPart(card, rating, part, blobs, reasons)
   }
 } finally {
-  db.close()
+  stored.close()
 }
 
 // ---------------------------------------------------------------- what is written down

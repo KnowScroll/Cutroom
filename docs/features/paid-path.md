@@ -26,6 +26,19 @@ Supersedes, through the entries it rests on: D-005 for this engine's model layer
 Named only in the deferral list: D-010, D-037, D-058, S-032, S-048
 Gates: product APPROVED 2026-09-20 adversarial-reviewer · architecture APPROVED 2026-09-20 adversarial-reviewer · program-design APPROVED 2026-09-20 adversarial-reviewer · slices APPROVED 2026-09-20 adversarial-reviewer
 
+> **Amended by `benchmark-view` on 2026-10-17, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-204**, **S-205**). **Check 4 counts twenty-seven rules, and its dead guard is RAISED rather than
+> deleted, for the second time.** `benchmark-view` adds `benchmark-read-no-engine` and `benchmark-no-reader` in one
+> change, so in `tests/paid-path-keys.test.ts`: the two test titles read **twenty-seven**; the proof's printed line
+> is `/27 rules proven to fire/`; and the cross-read of `reel-stills-rules.test.ts` and `reel-render-rules.test.ts`
+> asserts the same. Its `assert.doesNotMatch(source, /22 rules proven to fire/)` becomes
+> `/25 rules proven to fire/`: once every file says twenty-seven, twenty-two is a number nobody could write and the
+> guard would be dead while reading as coverage, so it guards the change being made now exactly as it guarded the
+> last two. **Nothing is removed and no form is loosened**; `keys-only-in-providers`, check 4's own subject, is
+> untouched, and **check 20 is unchanged in form and in subject** — `packages/benchmark-read`, which this slice
+> adds, holds no occurrence of the spending script's name either, which `yield-benchmark`'s check 5 now asserts
+> over that package as well as over the script.
+
 > **Amended by `yield-benchmark` on 2026-10-14, Slice 1 — the gates below are not edited, and no assertion is removed**
 > (**S-184**, **S-185**). **Check 4 counts twenty-five rules, and its dead guard is RAISED rather than deleted.**
 > `yield-benchmark` adds `benchmark-no-engine`, `benchmark-no-io` and `benchmark-npm-only-zod` in one change, so

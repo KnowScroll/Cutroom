@@ -16,6 +16,7 @@
       "!.verification",
       "!.package-staging",
       "!steering-ref",
+      "!vendor",
       "!db/migrations"
     ]
   },

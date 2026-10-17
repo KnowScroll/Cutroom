@@ -9836,3 +9836,99 @@ suite, which is where fault 1 would have surfaced as an unbuildable import if th
 **Confirmed-by.** The owner, 2026-10-17: _"You read and aaprove them"_.
 
 ---
+
+## S-206 | 2026-10-17 | `benchmark-no-io`'s `from` gains a trailing slash, because unanchored it forbade the new loader the one thing the loader exists to do
+
+**Supersedes.** Nothing. It corrects a prefix in `.dependency-cruiser.cjs` that no entry ever
+stated and that was harmless until a second package's name began with the first one's.
+
+**Chose.**
+
+- **`benchmark-no-io`'s `from` becomes `'^packages/benchmark/'`.** It was `'^packages/benchmark'`,
+  which also matches `packages/benchmark-read/`, so the rule forbade the row loader the
+  `node:sqlite` it is built around (`packages/benchmark-read/src/loader.ts`). The package could not
+  have been built at all while the rule read that way. The trailing-slash form is the one
+  `benchmark-npm-only-zod` already used.
+- **`benchmark-no-engine` is deliberately LEFT unanchored** at `'^packages/benchmark'`, so it keeps
+  matching the new package too. Its extra reach forbids only what `benchmark-read-no-engine`
+  forbids anyway; narrowing it for symmetry would subtract coverage to look tidy.
+- **Nothing about `packages/benchmark` is weakened, and that is checked rather than asserted.**
+  Every path the rule was written over still matches it. `tests/yield-benchmark-boundary.test.ts`
+  still proves every enumerated builtin fires under both spellings from `packages/benchmark/src/`,
+  and `drift --prove` runs all of those cases.
+
+**Why.** This is the same class of fault S-205's read found once in Gate 2 — a rule's own text
+making the feature unbuildable — and it survived into the code because Gate 2's paragraph _"No
+third rule, and that is checked rather than assumed"_ reasoned about the two rules the new package
+**inherits** (`processes-only-in-providers`, `keys-only-in-providers`) and never asked which
+existing rules its **name** would fall under. A prefix is not a package.
+
+**Rejected.** **Naming the package something that does not prefix-match**, such as
+`packages/read-benchmark` — S-204 names `packages/benchmark-read` and the name is not the defect.
+**Carving `node:sqlite` out of `benchmark-no-io`'s `to` list** — that would weaken the rule for the
+package it was written for, which is CLAUDE.md rule 3. **Adding an exception path to the rule**,
+which would make the exception the widest thing about it, the shape S-205's fault 1 already
+rejected. **Leaving it unanchored and putting the loader elsewhere** — every elsewhere is one
+S-204 rejected with a measurement.
+
+**Caught by.** `drift --prove` at **27 rules across 141 cases**, with no `SILENT` and no `EAGER`:
+re-widening the `from` does not make the rule quietly broader, it turns **plain `drift` red on the
+real graph**, because the loader imports `node:sqlite` and that import is a real edge. So the
+mistake this entry fixes cannot be made again silently — it fails the ordinary boundary run, not
+only the proof.
+
+**Confirmed-by.** `benchmark-view` Slice 1's builder, as its finding 4 against the gates; verified
+against `.dependency-cruiser.cjs:78`, `:103`, `:121`, `:134` and `:375` by the main session before
+it was accepted. Written into `docs/features/benchmark-view.md`'s Amendments block.
+
+---
+
+## S-207 | 2026-10-17 | The scrubber is guarded in the slice that builds it, not left bare until the slice that serves it
+
+**Supersedes.** **Nothing.** It ADDS a check where `benchmark-view`'s gates have none. Gate 3's
+check 9 is untouched and is still owed by Slice 3; nothing is moved out of it and no bound of it
+changes.
+
+**Chose.**
+
+- **Slice 1 pins `artifactScrubber` the FUNCTION** in `tests/benchmark-view-loader.test.ts`: an
+  artifact root comes back stripped under the plain spelling **and** under the escaped-separator
+  spelling `render.invocations` holds (S-075); a presigned URL becomes `<url>` with its query
+  string gone (D-022); an empty root is dropped rather than compiled; and — **the positive
+  control** — a 36-character run id and a 64-character brief key in one string survive
+  **unchanged**, with both lengths asserted first so the control is really what it claims
+  (S-199's round-3 finding).
+- **Check 9 is not discharged and the test says so in its own title**, so a later session cannot
+  read it as done and skip it. Check 9 is the scrubber on the way out of the **served payload and
+  the served HTML**, which needs routes Slice 2 has not built yet.
+
+**Why.** The slice's own deliberate break — `artifactScrubber` returning its text unchanged — left
+**every** test in the repository green, `tests/yield-benchmark-reader.test.ts` included. And the
+function is not dormant until Slice 3: `scripts/benchmark.mjs:199` is
+`const redact = (text) => stored.scrub(text)` and `:809` passes every string of the written record
+through it, so from this commit `packages/benchmark-read` holds **the only redaction this
+repository performs**, with nothing behind it. The property was unchecked before the move too, so
+nothing was lost — but "nothing was lost" is not a reason to ship a live D-022 redaction that one
+line silently disables for two commits, and Gate 3 opens by saying a check that cannot fail is the
+defect.
+
+**Rejected.** **Waiting for Slice 3**, which is two commits of a disable-able redaction for the
+sake of a slice boundary. **Moving check 9 forward into Slice 1**, which cannot be built there —
+it needs Slice 2's routes, and pulling it in would be the "no slice needs anything a later slice
+adds" fault in the other direction. **Recording it as a known gap and building nothing**, which is
+the shape S-197 exists because of: a finding with no check behind it reads as coverage at the next
+read. **A guard without the positive control** — see below, where that is not a hypothetical.
+
+**Caught by.** Four deliberate breaks, each applied alone to `packages/benchmark-read/src/scrub.ts`
+and each now **red**: the scrubber returning its text unchanged; only the root patterns ceasing to
+apply, which a guard watching the URL alone would have passed; `quoted` ceasing to allow the
+escaped drive-letter colon; and — **the one that matters** — the scrubber WIDENED to erase
+`/\b[0-9a-f-]{8,}\b/`, S-199's round-3 shape, which **only the positive control catches** and which
+every other assertion in this slice passes. Check 9 remains Slice 3's, named in
+`docs/features/benchmark-view.md`'s Amendments block as finding 11 together with the gate
+disagreement that produced the gap.
+
+**Confirmed-by.** The main session, 2026-10-17, answering `benchmark-view` Slice 1's finding 9. The
+builder reported the gap and asked rather than building an unnumbered check of its own (S-172).
+
+---

@@ -11,8 +11,10 @@
     { "path": "./packages/contracts" },
     { "path": "./packages/pipeline" },
     { "path": "./packages/benchmark" },
+    { "path": "./packages/benchmark-read" },
     { "path": "./packages/providers" },
     { "path": "./apps/api" },
+    { "path": "./apps/service" },
     { "path": "./apps/worker" }
   ]
 }

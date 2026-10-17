@@ -78,7 +78,7 @@ test('3. drift, drift:prove and drift --audit pass', () => {
   // attributes and one blanket rule could not say "any builtin" and "any npm package but zod"
   // at the same time. The count stays exact, so a rule losing every one of its prove cases, or
   // cases for a twenty-sixth, still fails here (S-078).
-  assert.match(prove.out, /25 rules proven to fire/, prove.out)
+  assert.match(prove.out, /27 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)

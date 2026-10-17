@@ -11,7 +11,9 @@ import { REPO } from './_repo.ts'
 // graph, and drift --prove builds a deliberate violation of each — an import of domain, of
 // providers, of an app, of EVERY builtin benchmark-no-io enumerates INCLUDING node:crypto under
 // both spellings, and of an npm package other than zod — each seen red, every legal import still
-// resolving, and the proof's count now 25`.
+// resolving, and the proof's count now 25`. The count is 27 since benchmark-view's Slice 1
+// added benchmark-read-no-engine and benchmark-no-reader (S-204, S-205); this check's own
+// subject — the benchmark's three rules — is unchanged, and so is every assertion about them.
 //
 // Three rules and not one: dependency-cruiser ANDs a `to`'s attributes, so "any builtin" and
 // "any npm package but zod" cannot share one rule, and a bare-name regex for builtins also
@@ -160,16 +162,18 @@ test('11. drift --prove builds a deliberate violation of each — an import of d
   caught(prove.out, 'benchmark-npm-only-zod', 'packages/benchmark', 'better-sqlite3')
 })
 
-test('11. every legal import still resolving, and the proof count now 25', () => {
+test('11. every legal import still resolving, and the proof count now 27', () => {
   assert.equal(prove.status, 0, prove.out)
   assert.doesNotMatch(prove.out, /SILENT/, prove.out)
   assert.doesNotMatch(prove.out, /EAGER/, prove.out)
   assert.doesNotMatch(prove.out, /UNRESOLVED/, prove.out)
 
   // yield-benchmark's Slice 1 added the twenty-third, twenty-fourth and twenty-fifth rules:
-  // benchmark-no-engine, benchmark-no-io and benchmark-npm-only-zod (S-184, S-185). The count
-  // stays exact, so a rule losing every one of its prove cases still fails here (S-078).
-  assert.match(prove.out, /25 rules proven to fire/, prove.out)
+  // benchmark-no-engine, benchmark-no-io and benchmark-npm-only-zod (S-184, S-185), and
+  // benchmark-view's Slice 1 the twenty-sixth and twenty-seventh, benchmark-read-no-engine and
+  // benchmark-no-reader (S-204, S-205). The count stays exact, so a rule losing every one of its
+  // prove cases still fails here (S-078).
+  assert.match(prove.out, /27 rules proven to fire/, prove.out)
 
   // The legal shape the package will really have: zod, the contract, and its own folder.
   assert.match(prove.out, /clean\s+packages\/benchmark -> zod/, prove.out)

@@ -10,6 +10,28 @@ Decisions: D-001, D-014, D-022, D-025, D-027, D-028, D-031, D-042, D-044, D-046,
 Named only as what it cannot see, or as what waits: S-115, S-149, S-154
 Gates: product APPROVED 2026-10-14 owner-decision-S-185 · architecture APPROVED 2026-10-14 owner-decision-S-185 · program-design APPROVED 2026-10-14 owner-decision-S-185 · slices APPROVED 2026-10-14 owner-decision-S-185
 
+> **Amended by `benchmark-view` on 2026-10-17, Slice 1 — the gates below are not edited, no assertion is removed
+> and no bound moves** (**S-204**, **S-205**). **The read-only open, the held column set, the row selection and the
+> scrubber moved out of `scripts/benchmark.mjs` and into the new `packages/benchmark-read`, and the path precedence
+> into `scripts/_lib.mjs`.** Four amendments in `tests/yield-benchmark-reader.test.ts`, each either following a
+> property to the source that now holds it or growing to a second source: check 5's count of one
+> `new DatabaseSync(` and its `{ readOnly: true }` match now read the **loader**, and the reader's own count is
+> asserted at **zero**; the eleven source scans beside them — the domain's opener, `@cutroom/providers`,
+> `@cutroom/domain`, five process starters, four environment names and the `.env` regex — and the spending
+> script's name now run over **both** sources, the script and every file of the loader package, because each of
+> them would otherwise have read a wrapper while the real open sat in the other file; and check 6's
+> `DEFAULT_DB_PATH` match reads **`scripts/_lib.mjs`**, with the reader asserted to pass `--db` through to it,
+> since the loader may not import `@cutroom/service` at all. **Check 5's `processes` deep-equal of `['git']` is
+> unchanged and still reads the script alone**, because `git rev-parse --short HEAD` stayed there. **The rule
+> count is twenty-seven**: `benchmark-read-no-engine` and `benchmark-no-reader` join the three this feature added,
+> so `tests/yield-benchmark-boundary.test.ts`' comment, title and printed-line match read 27, and
+> `tests/yield-benchmark-secrets.test.ts`' bound comment with them — **this feature's own three rules are
+> untouched in subject, form and assertion**. One rule of this feature's did move, and only in anchoring:
+> **`benchmark-no-io`'s `from` gains a trailing slash**, `'^packages/benchmark/'`, because without it the pattern
+> also matched `packages/benchmark-read/` and forbade the loader the `node:sqlite` it exists for. Every path the
+> rule was written over still matches it, `drift --prove` still fires all sixty-four of its cases, and
+> `benchmark-no-engine` is left unanchored on purpose.
+
 > **Amended by this feature's own Slice 3 on 2026-10-14, at the owner's instruction — the gates below are not
 > edited, and no assertion is removed.** **Check 12's fixture glob RECURSES**: `readdirSync` is given
 > `{ recursive: true }`, so the placeholder rule reads `tests/fixtures/benchmark/ratings/*.json` — Slice 2's five

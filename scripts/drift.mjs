@@ -235,7 +235,7 @@ function check() {
 /**
  * One case per builtin an I/O rule enumerates, under BOTH spellings, with the enumeration read out
  * of the rule itself rather than copied here: a builtin dropped from the pattern takes its two
- * cases with it, the rule count stays 25, and the case count falls — which is what the tests that
+ * cases with it, the rule count stays 27, and the case count falls — which is what the tests that
  * pin the printed line are for (S-078). Bare `sqlite` is NOT a Node builtin (only `node:sqlite`
  * is), so it reaches the graph as an unresolved bare specifier; neither rule names
  * `dependencyTypes` for exactly that reason, the way `model-client-only-in-providers` catches a
@@ -386,6 +386,39 @@ const CASES = [
     '../../../apps/worker/src/index.ts',
   ],
   ...BENCHMARK_IO_CASES,
+  // benchmark-view, Slice 1: the row loader is handed a resolved path and reads rows, so it may
+  // reach no engine package and no app — `apps/` among them because `DEFAULT_DB_PATH` and
+  // `SETTING_NAMES` live in `apps/service`, which is why the path precedence sits in
+  // `scripts/_lib.mjs` and the loader is handed its path (S-204, S-205). Four targets in one
+  // regex, each with its own file for the reason the cases above need one.
+  [
+    'benchmark-read-no-engine',
+    'packages/benchmark-read/src/reaches-pipeline.ts',
+    '../../pipeline/src/index.ts',
+  ],
+  [
+    'benchmark-read-no-engine',
+    'packages/benchmark-read/src/reaches-domain.ts',
+    '../../domain/src/index.ts',
+  ],
+  [
+    'benchmark-read-no-engine',
+    'packages/benchmark-read/src/reaches-providers.ts',
+    '../../providers/src/index.ts',
+  ],
+  [
+    'benchmark-read-no-engine',
+    'packages/benchmark-read/src/reaches-service.ts',
+    '../../../apps/service/src/index.ts',
+  ],
+  // And the other direction, which no existing rule sees: `benchmark-no-io` is about DIRECT
+  // dependencies, so it stops the pure scorer importing `node:sqlite` and stays silent on it
+  // importing a package that does.
+  [
+    'benchmark-no-reader',
+    'packages/benchmark/src/reaches-reader.ts',
+    '../../benchmark-read/src/index.ts',
+  ],
 ]
 
 const EXTRA_FILES = [
@@ -465,6 +498,13 @@ const BY_NAME_CASES = [
   ['benchmark-no-engine', 'packages/benchmark', '@cutroom/api'],
   ['benchmark-npm-only-zod', 'packages/benchmark', 'drizzle-orm'],
   ['benchmark-npm-only-zod', 'packages/benchmark', 'better-sqlite3'],
+  // benchmark-view, Slice 1: by package name. The legal case below proves @cutroom/benchmark
+  // still resolves clean from the loader, which is the one workspace import it really makes.
+  ['benchmark-read-no-engine', 'packages/benchmark-read', '@cutroom/pipeline'],
+  ['benchmark-read-no-engine', 'packages/benchmark-read', '@cutroom/domain'],
+  ['benchmark-read-no-engine', 'packages/benchmark-read', '@cutroom/providers'],
+  ['benchmark-read-no-engine', 'packages/benchmark-read', '@cutroom/service'],
+  ['benchmark-no-reader', 'packages/benchmark', '@cutroom/benchmark-read'],
 ]
 
 /**
@@ -487,6 +527,9 @@ const BY_NAME_LEGAL = [
   // yield-benchmark, Slice 1: the two imports the benchmark really makes.
   ['packages/benchmark', '@cutroom/reel-contract'],
   ['packages/benchmark', 'zod'],
+  // benchmark-view, Slice 1: the loader reads FIELD_COLUMNS and the row types from the
+  // arithmetic, and nothing else of this repository.
+  ['packages/benchmark-read', '@cutroom/benchmark'],
 ]
 
 const PACKAGE_FOLDERS = [
@@ -496,8 +539,10 @@ const PACKAGE_FOLDERS = [
   'packages/domain',
   'packages/pipeline',
   'packages/benchmark',
+  'packages/benchmark-read',
   'packages/providers',
   'apps/api',
+  'apps/service',
   'apps/worker',
 ]
 
@@ -654,6 +699,12 @@ const LEGAL = [
   [
     'packages/benchmark/src/index.ts',
     "import type { Port } from '../../contracts/src/index.ts'\nexport type Measure = Port",
+  ],
+  // benchmark-view, Slice 1: the loader reads the arithmetic, through its index. The reverse
+  // edge is benchmark-no-reader's violating case above, so both directions are proven here.
+  [
+    'packages/benchmark-read/src/index.ts',
+    "import type { Measure } from '../../benchmark/src/index.ts'\nexport type Rows = Measure",
   ],
 ]
 

@@ -94,11 +94,45 @@ module.exports = {
         "yield-benchmark's Slice 1: 31 of the 32 spellings fired under `dependencyTypes: ['core']` " +
         'and that one did not, which also means `pipeline-no-io` does not hold bare `sqlite`. The ' +
         'pattern is anchored to exact builtin names, so it cannot reach an unresolved `zod` — the ' +
-        'trap that makes this three rules and not one.',
-      from: { path: '^packages/benchmark' },
+        'trap that makes this three rules and not one. The `from` carries a TRAILING SLASH and ' +
+        'that is load-bearing too: `^packages/benchmark` also matches `packages/benchmark-read`, ' +
+        'whose one job is to open a record read-only, so unanchored this rule forbade the loader ' +
+        'the `node:sqlite` the loader exists for. Nothing about `packages/benchmark` is weakened ' +
+        "— every path this rule was written over still matches it, and the loader's own limits " +
+        'are `benchmark-read-no-engine` below (benchmark-view, Slice 1).',
+      from: { path: '^packages/benchmark/' },
       to: {
         path: '^(node:)?(fs|fs/promises|child_process|net|http|https|http2|dgram|tls|dns|cluster|worker_threads|sqlite|repl|readline|crypto)$',
       },
+    },
+    {
+      name: 'benchmark-read-no-engine',
+      severity: 'error',
+      comment:
+        'The row loader is handed a resolved path and reads rows. It must not reach the domain — ' +
+        'whose opener opens for writing, migrates and creates a missing file — nor the pipeline, ' +
+        'nor a provider, which spends, nor an app. One regex, four targets, because ' +
+        "dependency-cruiser ANDs a `to`'s attributes and this is the only shape that forbids all " +
+        'four at once. The fourth target is what makes the package buildable at all: ' +
+        '`DEFAULT_DB_PATH` and `SETTING_NAMES` are exported by `@cutroom/service`, which is ' +
+        '`apps/service`, so a loader that resolved its own database path could not exist — the ' +
+        'precedence lives once in `scripts/_lib.mjs` and the loader is HANDED a path ' +
+        '(benchmark-view, Gate 2; S-204, S-205).',
+      from: { path: '^packages/benchmark-read/' },
+      to: { path: '^(packages/(pipeline|domain|providers)|apps)/' },
+    },
+    {
+      name: 'benchmark-no-reader',
+      severity: 'error',
+      comment:
+        'The arithmetic must not reach a database THROUGH the loader. This is not a repeat of ' +
+        "`benchmark-no-io`: dependency-cruiser's rules are about DIRECT dependencies, so that " +
+        'rule stops `packages/benchmark` importing `node:sqlite` itself and says nothing about ' +
+        'it importing a package that does. Without this one the pure scorer could reach the ' +
+        'record transitively and every existing rule would stay green — the hole a rule about ' +
+        'direct imports cannot see (benchmark-view, Gate 2; S-204).',
+      from: { path: '^packages/benchmark/' },
+      to: { path: '^packages/benchmark-read/' },
     },
     {
       name: 'api-no-providers',

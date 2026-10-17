@@ -35,6 +35,16 @@ import { stillsRequest } from './engine/stills.ts'
 // docs/research/ is NOT in .prettierignore and format runs on every check; and the file carries
 // its front matter, LF line endings and exactly one trailing newline`.
 //
+// AMENDED by benchmark-view's Slice 1, 2026-10-17 (S-204, S-205), with no check title touched, no
+// assertion removed and no bound moved. The read-only open, the held column set, the row selection
+// and the scrubber moved out of `scripts/benchmark.mjs` and into `packages/benchmark-read`, and
+// the path precedence moved into `scripts/_lib.mjs`. So: check 5's count of one `new DatabaseSync(`
+// and its read-only match now read the LOADER and the reader's own count is zero; the eleven source
+// scans beside them, and the spending script's name, run over BOTH sources; and check 6's
+// `DEFAULT_DB_PATH` match reads `scripts/_lib.mjs`, with the reader asserted to pass `--db` through.
+// Check 5's `processes` deep-equal of `['git']` is UNCHANGED and still reads the script alone,
+// because `git rev-parse --short HEAD` stayed there.
+//
 // Nothing here spends, reaches a provider, reads a key or starts the engine: every database below
 // is a temporary one, and the one tracked file is only ever read.
 
@@ -75,6 +85,27 @@ const TABLES = [
   'hold',
   'still_hold',
 ] as const
+
+/**
+ * Every `.ts` file of the loader package, by repository-relative path and its text.
+ *
+ * benchmark-view's Slice 1 moved the open out of the reader and into `packages/benchmark-read`
+ * (S-204). The scans below read both, because a scan over one of two sources reads as coverage.
+ */
+function loaderSources(): Array<[string, string]> {
+  const out: Array<[string, string]> = []
+  const walk = (at: string) => {
+    for (const entry of readdirSync(join(REPO, at), { withFileTypes: true })) {
+      const child = join(at, entry.name)
+      if (entry.isDirectory()) walk(child)
+      else if (entry.name.endsWith('.ts'))
+        out.push([child, readFileSync(join(REPO, child), 'utf8')])
+    }
+  }
+  walk(join('packages', 'benchmark-read', 'src'))
+  assert.ok(out.length > 0, 'the loader package holds no source file, so this scan reads nothing')
+  return out
+}
 
 function reader(args: string[], env?: Record<string, string>) {
   const result = spawnSync(
@@ -231,34 +262,56 @@ test('5. the reader opens every database read-only and leaves its bytes unchange
     // The source, read as bytes. The one process it starts is `git rev-parse`, for the commit
     // the reading was done at; it opens the record through node:sqlite read-only and never
     // through the domain's opener, which migrates and creates; and it constructs no port.
+    //
+    // benchmark-view's Slice 1 MOVED the open into `packages/benchmark-read`, so two things
+    // change here and nothing is given up (S-204, S-205). The count and the read-only match
+    // follow the open, and the reader's own count becomes ZERO. And every scan below runs over
+    // BOTH SOURCES — this script and every source file of the loader package — because each of
+    // them would otherwise read a wrapper while the real open sat in the other file, which is
+    // the wrongly-green half of that slice's amendment list.
     const source = readFileSync(join(REPO, READER), 'utf8')
+    const sources: Array<[string, string]> = [[READER, source], ...loaderSources()]
+    const loader = loaderSources()
+      .map(([, text]) => text)
+      .join('\n')
     assert.equal(
       (source.match(/new DatabaseSync\(/g) ?? []).length,
-      1,
-      'the reader opens a database more than once',
+      0,
+      'the reader still opens a database itself',
     )
-    assert.match(source, /new DatabaseSync\([^)]*\{ readOnly: true \}\)/, 'not opened read-only')
-    assert.ok(!source.includes('openDatabase'), "the reader uses the domain's opener")
-    assert.ok(!source.includes('@cutroom/providers'), 'the reader imports a provider')
-    assert.ok(!source.includes('@cutroom/domain'), 'the reader imports the domain')
-    for (const starter of ['spawnSync', 'spawn(', 'execSync', 'execFileSync', 'fork(']) {
-      assert.ok(!source.includes(starter), `the reader starts a process with ${starter}`)
+    assert.equal(
+      (loader.match(/new DatabaseSync\(/g) ?? []).length,
+      1,
+      'the loader opens a database more than once',
+    )
+    assert.match(loader, /new DatabaseSync\([^)]*\{ readOnly: true \}\)/, 'not opened read-only')
+    for (const [file, text] of sources) {
+      assert.ok(!text.includes('openDatabase'), `${file} uses the domain's opener`)
+      assert.ok(!text.includes('@cutroom/providers'), `${file} imports a provider`)
+      assert.ok(!text.includes('@cutroom/domain'), `${file} imports the domain`)
+      for (const starter of ['spawnSync', 'spawn(', 'execSync', 'execFileSync', 'fork(']) {
+        assert.ok(!text.includes(starter), `${file} starts a process with ${starter}`)
+      }
     }
     // Every process started through _lib.mjs's `run`, by the command it names. One, and it is
     // git; the arguments are asserted beside it.
     const processes = [...source.matchAll(/\brun\('([^']*)'/g)].map((found) => String(found[1]))
     assert.deepEqual(processes, ['git'], `the reader starts ${processes.join(', ')}`)
     assert.match(source, /run\('git', \['rev-parse'/, 'the one process is not git rev-parse')
-    for (const named of ['loadEnvFile', 'DEFAULT_ENV_FILE', 'CUTROOM_ENV_FILE', 'readSettings']) {
-      assert.ok(!source.includes(named), `the reader names ${named}`)
+    for (const [file, text] of sources) {
+      for (const named of ['loadEnvFile', 'DEFAULT_ENV_FILE', 'CUTROOM_ENV_FILE', 'readSettings']) {
+        assert.ok(!text.includes(named), `${file} names ${named}`)
+      }
+      assert.doesNotMatch(text, /['"`/\\]\.env\b/, `${file} names an environment file`)
     }
-    assert.doesNotMatch(source, /['"`/\\]\.env\b/, 'the reader names an environment file')
 
     // The spending script's name, BUILT rather than written: paid-path's check 20 reads every
     // .mjs in scripts/ and fails if one holds it, and forbids any other test file from holding
     // it either (S-111), so neither this file nor the reader may contain it as text.
     const spender = ['real', 'reel'].join('-')
-    assert.ok(!source.includes(spender), `the reader names the script that spends (${spender})`)
+    for (const [file, text] of sources) {
+      assert.ok(!text.includes(spender), `${file} names the script that spends (${spender})`)
+    }
     assert.ok(
       !readFileSync(join(REPO, 'tests', 'yield-benchmark-reader.test.ts'), 'utf8').includes(
         spender,
@@ -420,10 +473,19 @@ test('6. every flag in Gate 3’s table behaves as it states and defaults as it 
     assert.equal(byEnvironment.status, 0, byEnvironment.err)
     assert.ok(byEnvironment.out.includes(String(ids[0])), 'CUTROOM_DB_PATH was not read')
     assert.ok(readFileSync(join(REPO, LEDGER)).equals(tracked), 'the tracked ledger moved')
+    // benchmark-view's Slice 1 moved the precedence into `scripts/_lib.mjs`: the loader may not
+    // import `@cutroom/service` at all, so the fallback lives once, where both readers reach it.
+    // This assertion moves there with it, and the reader's own becomes that it passes `--db`
+    // through rather than resolving an order of its own.
+    assert.match(
+      readFileSync(join(REPO, 'scripts', '_lib.mjs'), 'utf8'),
+      /DEFAULT_DB_PATH/,
+      "the shared resolver does not fall back to the service's default",
+    )
     assert.match(
       readFileSync(join(REPO, READER), 'utf8'),
-      /DEFAULT_DB_PATH/,
-      "the reader does not fall back to the service's default",
+      /databasePath\(given\.db\)/,
+      'the reader does not pass --db through to the shared resolver',
     )
 
     // --out defaults under .artifacts/benchmark/, which is gitignored (D-086), and the instant

@@ -1,4 +1,5 @@
-// Shared by the scripts in this folder. No dependencies outside Node.
+// Shared by the scripts in this folder. Nothing outside Node is imported AT LOAD TIME, and the
+// one function below that needs a workspace package imports it inside itself for that reason.
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -55,6 +56,27 @@ export function setting(name) {
     if (match && match[1] === name) return match[2].trim().replace(/^["']|["']$/g, '')
   }
   return undefined
+}
+
+/**
+ * The record a reading tool opens, under the ONE precedence every one of them shares: a `--db`
+ * it was given, then `CUTROOM_DB_PATH`, then the service's `DEFAULT_DB_PATH`
+ * (benchmark-view, Gate 2; S-204, S-205).
+ *
+ * It lives here rather than in `packages/benchmark-read` because the loader may not reach it:
+ * `DEFAULT_DB_PATH` and `SETTING_NAMES` are exported by `@cutroom/service`, which is
+ * `apps/service`, and `benchmark-read-no-engine` forbids that package `apps/`. So the order is
+ * written down once, here, and the loader is HANDED a path it did not resolve — which is also
+ * why the second copy of this order cannot drift from the first: there is no second copy.
+ *
+ * The import is made INSIDE the function on purpose. `scripts/check.mjs` loads this file under
+ * plain node, where a top-level import of a TypeScript module would not load at all; a reader
+ * that was given `--db` never reaches the import either.
+ */
+export async function databasePath(given) {
+  if (given !== undefined) return given
+  const { DEFAULT_DB_PATH, SETTING_NAMES } = await import('@cutroom/service')
+  return process.env[SETTING_NAMES.dbPath] ?? DEFAULT_DB_PATH
 }
 
 export function fail(message) {

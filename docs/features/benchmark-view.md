@@ -481,7 +481,7 @@ document in Slice 2 and the real page in Slice 3, and why **`GET /echarts.min.js
 file it serves arrives in Slice 4, so a route for it in Slice 2 would be a route with nothing behind it and a check
 that could only pass by pretending.
 
-- [ ] **Slice 1 — one copy of the schema.** `packages/benchmark-read` with the read-only open, the held column set,
+- [x] **Slice 1 — one copy of the schema.** `packages/benchmark-read` with the read-only open, the held column set,
       the row selection and the scrubber; the path precedence into `scripts/_lib.mjs`, where both scripts reach it;
       `scripts/benchmark.mjs` calling it; the two boundary rules with their
       `drift --prove` cases; the seven rule-count sites; the reader test's four amendments; `vendor/` ignored by
@@ -514,7 +514,84 @@ finding for this file's amendment block, not a silent change.
 the exact gate sentence it contradicts and the `file:line` that proves it. The gates themselves are not edited. A
 slice that cannot make its check pass as written stops and reports (S-016) rather than adjusting the check.
 
-_None yet._
+> **Reported by Slice 1 on 2026-10-17, against the gates below, which are not edited** (S-197). Eleven findings,
+> each naming the sentence it contradicts and the line that proves it. Two of them changed what Slice 1 had to
+> build, and one — finding 11 — added a guard the gates do not list, by the main session's call.
+
+1. **Gate 3's table, the `25`-count row, names two sites that do not hold the count.** The row reads "the rule count
+   `25`, in `tests/paid-path-keys.test.ts:124` and `:146-147`, `tests/yield-benchmark-boundary.test.ts:172`,
+   **`tests/boundaries.test.ts:47` and `:59`**, and the two rule files those compare against". Neither of those two
+   lines carries a number: `tests/boundaries.test.ts:47` is `assert.match(out, /rules proven to fire/, out)` and
+   `:59` is `assert.doesNotMatch(out, /DEAD/, out)`. Slice 1 edited neither, and both stay green at twenty-seven.
+2. **The same row omits seven live sites that do carry the count**, every one of which Slice 1 had to change:
+   `tests/paid-path-keys.test.ts:115` and `:132` (two test titles reading "twenty-five"), `:138-145` (the comment
+   explaining the raised guard) and `:147` (the dead guard itself); `tests/yield-benchmark-boundary.test.ts:14`
+   (the comment quoting check 11) and `:163` (its test title); `tests/yield-benchmark-secrets.test.ts:43` (the
+   comment bounding the child); and **`CLAUDE.md:57` and `:70`**. The row's own instruction — "Slice 1 greps the
+   test tree for the literal `25 rules` first, so no site is missed" — is what found them.
+3. **An eighth site is named by no gate sentence and no earlier record: `AGENTS.md:78`**, "They are
+   **twenty-five** rules checked against the real dependency graph". It is live rather than historical —
+   `yield-benchmark`'s own Slice 1 set it, in the commit `d535a58` titled "the count taken to 25 in one change" —
+   and it is now twenty-seven.
+4. **Gate 2's "No third rule, and that is checked rather than assumed" missed two rules the new package already
+   inherits, and one of them made the package unbuildable.** The paragraph reasons only about
+   `processes-only-in-providers` and `keys-only-in-providers`. But `benchmark-no-io`'s `from` was
+   `'^packages/benchmark'` with **no trailing slash** (`.dependency-cruiser.cjs:98` before this slice), so it
+   matched `packages/benchmark-read/` too — and it forbids `node:sqlite`, which is the one thing the loader exists
+   to do (`packages/benchmark-read/src/loader.ts:7`). `benchmark-no-engine` (`:78`) matched it for the same reason.
+   This is the class of fault S-205's read found once in Gate 2 and fixed; it survived a second time. **Slice 1
+   anchored `benchmark-no-io`'s `from` to `'^packages/benchmark/'`** — the form `benchmark-npm-only-zod` already
+   used at `:341` — so every path the rule was written over still matches it and nothing about
+   `packages/benchmark` is weakened, while the loader's own limits are the new `benchmark-read-no-engine`.
+   `benchmark-no-engine` was deliberately **left unanchored**: its extra reach over the new package forbids only
+   what `benchmark-read-no-engine` forbids anyway, so narrowing it would subtract coverage for tidiness.
+5. **Gate 3's check 2 needs a file Gate 4 adds in Slice 4** — the exact fault Gate 4 claims to have avoided ("**No
+   slice needs anything a later slice adds** — that was round 3's finding against `yield-compare`"). Check 2 says
+   the precedence is "driven through **both scripts** as children" and Gate 4 assigns check 2 to Slice 1, while
+   `scripts/benchmark-serve.mjs` arrives in Slice 4. Slice 1 drove it through the one script that exists
+   (`tests/benchmark-view-loader.test.ts`, check 2's three children) and asserted **all three levels** directly
+   over `scripts/_lib.mjs`' resolver, which is stronger than either child; **Slice 4 owes the second child**.
+6. **Gate 3's check 2 says "A write through the loader's handle throws", and Gate 2's table gives the package no
+   handle to expose.** Building the clause as written needed one: `StoredRecord.handle`
+   (`packages/benchmark-read/src/loader.ts:66-74`), the read-only `DatabaseSync` itself, whose only caller is that
+   check. It widens the package's exported surface past what Gate 2 lists, and is named here rather than left for
+   a later reader to find.
+7. **Gate 3's `biome.json` row asks for a comment that biome refuses.** The row says `vendor/` is "ignored by both,
+   **named there as a third-party build**". `biome.json` is strict JSON, and biome rejects a comment in its own
+   configuration — measured: `biome check biome.json` answers "Expected an array, an object, or a literal but
+   instead found '// …'". So `biome.json:19` carries the bare `"!vendor"` and the naming lives in
+   `.prettierignore:6-10`, which does take a comment, and in this block.
+8. **Gate 3's check 4 cites a line range this slice removes.** It reads "each of `TABLES`' twenty tables in the
+   order `scripts/benchmark.mjs:68-89` lists them". That list moved into the loader with the open, which is Slice
+   1's own work: it is now `packages/benchmark-read/src/loader.ts:13-33`, and
+   `tests/benchmark-view-loader.test.ts` pins the order against both.
+9. **The scrubber moves in Slice 1 and nothing checks it until Slice 3, which Gate 4 does not say.** Gate 2 puts
+   "the artifact-prefix and URL scrubber" in the package, Gate 4 puts it in Slice 1, and Gate 3 puts its only
+   check — check 9, "The scrubber on the way out" — in **Slice 3**. **Measured, not assumed**: Slice 1's
+   deliberate break of `artifactScrubber` (`packages/benchmark-read/src/scrub.ts:44-51`, made to return its text
+   unchanged) left **every** test of this slice's set green, `tests/yield-benchmark-reader.test.ts` included. The
+   property was unchecked before the move too — the reader's `redact` had no check either — so nothing was lost,
+   but a D-022 redaction now sits in a package with no check behind it for two slices, and the first thing that
+   would catch a broken one is Slice 3. **Answered by finding 11**: Slice 1 reported this rather than deciding
+   it, and the main session's call was to build the guard in Slice 1.
+10. **Gate 3's `tests/workspace.test.ts` row says "all five done with the package's first file" and two more were
+    needed.** A test that imports the new package and the service also needs
+    `{ "path": "./packages/benchmark-read" }` and `{ "path": "./apps/service" }` in
+    **`tsconfig.tooling.json`** — without them `tsc -b` fails with TS6307 on `apps/service/src/env-file.ts` — and
+    a test that imports `scripts/_lib.mjs` needs a declaration beside it, so `scripts/_lib.d.mts` was written on
+    the pattern `scripts/_answers.d.mts` set. Neither file appears in Gate 4's Slice 1 scope list.
+11. **A guard the gates do not list was added in Slice 1, by the main session's call on finding 9, and check 9 is
+    still owed by Slice 3.** Gate 4 moves the scrubber into the package in Slice 1 and Gate 3 puts its only check
+    in Slice 3, so between the two commits `packages/benchmark-read`'s `artifactScrubber` is **the only redaction
+    this repository performs** — `scripts/benchmark.mjs:199` builds `redact` out of it and `:809` passes every
+    string of the written record through it — with nothing able to fail on it. Slice 1 therefore adds one test
+    over the **function**, in `tests/benchmark-view-loader.test.ts`: an artifact root stripped under both the
+    plain and the **escaped** spelling (`render.invocations` carries the escaped one, S-075), a presigned URL
+    reduced to `<url>` with its query string (D-022), and **the positive control** — a 36-character run id and a
+    64-character brief key in one string, unchanged (S-199's round-3 finding). Four deliberate breaks of
+    `packages/benchmark-read/src/scrub.ts` each turn it red, including the widening that eats the two identifiers.
+    **It is not check 9 and does not discharge it**: check 9 is the scrubber on the way out of the served payload
+    and the served HTML, neither of which exists yet, and the test's own title and the file's header say so.
 
 ## Evidence
 

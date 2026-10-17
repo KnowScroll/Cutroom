@@ -2,5 +2,13 @@ pnpm-lock.yaml
 db/migrations/
 docs/design/
 steering-ref/
+
+# A third-party build, not our code: vendor/echarts/echarts.min.js is served as a file by the
+# benchmark page and is never imported or edited. Excluding someone else's minified file from our
+# formatter is not a loosened rule about our code (benchmark-view, S-204); biome.json carries the
+# same exclusion as "!vendor", with no comment beside it, because biome refuses a comment in its
+# configuration and it is strict JSON.
+vendor/
+
 .artifacts/
 .tmp/

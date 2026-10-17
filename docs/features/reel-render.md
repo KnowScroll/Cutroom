@@ -10,6 +10,14 @@ authority: plan
 > answered by D-100** — the engine's admission is generation-only, against the per-reel cap and the caller's ceiling.
 > Its gates are written and reviewed here.
 >
+> **Amended by `benchmark-view` on 2026-10-17, Slice 1 — the gates below are not edited, and no assertion is
+> removed** (**S-204**, **S-205**). **Check 2's printed line counts twenty-seven rules, not twenty-five**, for the
+> same reason `reel-stills`' check 3 does: `benchmark-view` adds `benchmark-read-no-engine` and
+> `benchmark-no-reader` in one change. `tests/reel-render-rules.test.ts` keeps check 2 in its exact form with its
+> number corrected — `assert.match(prove.out, /27 rules proven to fire/)`. **The count stays EXACT.**
+> `processes-only-in-providers`, check 2's own subject, is unchanged in form and in subject, and the new
+> `packages/benchmark-read` inherits it like every other `packages/*` path and starts nothing.
+>
 > **Amended by `yield-benchmark` on 2026-10-14, Slice 1 — the gates below are not edited, and no assertion is removed**
 > (**S-184**, **S-185**). **Check 2's printed line counts twenty-five rules, not twenty-two**, for the same reason
 > `reel-stills`' check 3 does: `yield-benchmark` adds `benchmark-no-engine`, `benchmark-no-io` and

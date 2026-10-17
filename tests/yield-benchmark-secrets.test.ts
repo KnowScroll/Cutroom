@@ -40,7 +40,7 @@ const CHECKS = 12
 
 /**
  * How long the child is given. The set holds `drift --prove`, which builds a deliberate
- * violation of all 25 rules, and the reader's own checks, which score five constructed runs
+ * violation of all 27 rules, and the reader's own checks, which score five constructed runs
  * against half a dozen temporary records.
  *
  * The bound is far above both on purpose, for the reason S-107 recorded: a check that fails on

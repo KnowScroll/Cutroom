@@ -17,6 +17,9 @@ importers:
       '@cutroom/benchmark':
         specifier: workspace:*
         version: link:packages/benchmark
+      '@cutroom/benchmark-read':
+        specifier: workspace:*
+        version: link:packages/benchmark-read
       '@cutroom/contracts':
         specifier: workspace:*
         version: link:packages/contracts
@@ -117,6 +120,12 @@ importers:
       '@cutroom/reel-contract':
         specifier: workspace:*
         version: link:../reel-contract
+
+  packages/benchmark-read:
+    dependencies:
+      '@cutroom/benchmark':
+        specifier: workspace:*
+        version: link:../benchmark
 
   packages/contracts:
     dependencies:

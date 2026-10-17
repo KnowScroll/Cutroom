@@ -115,7 +115,7 @@ test('2. drift, drift:prove and drift --audit pass', () => {
   // twenty-third, twenty-fourth and twenty-fifth in one change — benchmark-no-engine,
   // benchmark-no-io and benchmark-npm-only-zod (S-184, S-185). The count stays exact here for
   // the same reason it does in reel-stills' check 3 (S-078).
-  assert.match(prove.out, /25 rules proven to fire/, prove.out)
+  assert.match(prove.out, /27 rules proven to fire/, prove.out)
 
   const audit = drift('--audit')
   assert.equal(audit.status, 0, audit.out)

@@ -26,6 +26,7 @@
     "@biomejs/biome": "^2.5.15",
     "@cutroom/api": "workspace:*",
     "@cutroom/benchmark": "workspace:*",
+    "@cutroom/benchmark-read": "workspace:*",
     "@cutroom/contracts": "workspace:*",
     "@cutroom/pipeline": "workspace:*",
     "@cutroom/providers": "workspace:*",
