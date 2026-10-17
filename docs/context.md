@@ -145,6 +145,18 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   because prose follows the journey as well. Nothing of it was applied: `scripts/journey.mjs` is unchanged.
 - **The rule is written where every session reads it** — CLAUDE.md, this file, and the stop-gate's own message.
 - Six deliberate breaks, every one red and naming the right test.
+- **Finding 23 SETTLED, by the owner — _"let fetch be allowed, it's only local always"_.** Check 11's outbound
+  scan is **per file**: the server and loader name none of the four spellings, and
+  `packages/benchmark-read/src/draw.ts` — the browser script's text — may name `fetch(`. The Node spellings stay
+  banned there, and the absolute-URL ban over the whole served document keeps a permitted `fetch(` same-origin.
+  **Two bounds added, none removed**: the exempted file must be a source file, and the document must carry its
+  own script text byte for byte. **The page is unchanged, measured** — its figures are already server-rendered
+  tables, so moving the block to `/data` sends the same bytes: document 249.1 KB, block 131.6 KB, `/data`
+  86.1 KB, `/run/<id>` 5.1 KB, 52 runs. Journey re-run PASS at `afe51b8`, nothing re-ran.
+- **S-213 AMENDED hours later by the first thing the printed trailer caught, and the fault was S-196's**: a
+  `--changed` run the impact map answers had neither `--slice` nor the documents steps, so the flag ladder fell
+  through and **a 12-of-161-file run printed `Verification: full`** — the word that also writes
+  `receipt-full.json`. **The mode is read off the step that ran.** Seven deliberate breaks this session.
 
 ### 2026-10-17 — session 95
 

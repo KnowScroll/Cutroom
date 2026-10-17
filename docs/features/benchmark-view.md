@@ -883,6 +883,7 @@ one refusal body, so nothing escapes the served set by a second door.
 
 ## Evidence
 
+- 2026-10-17 journey=PASS at afe51b8 — every check green; 25 tests in tests/benchmark-view-*.test.ts pass — from the full run recorded for this exact tree
 - 2026-10-17 journey=PASS at cd22b7e — every check green; 25 tests in tests/benchmark-view-*.test.ts pass — from the full run recorded for this exact tree
   _Written by `node scripts/journey.mjs benchmark-view` after Slice 4. Never typed by hand (S-016)._
 
