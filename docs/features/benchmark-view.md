@@ -63,6 +63,11 @@ boundary rule.
 
 ## The shape the owner approved (S-201)
 
+> **The BUILT page was ACCEPTED by the owner on 2026-10-17** — _"It looks perfect"_ — served by
+> `node --experimental-strip-types --no-warnings scripts/benchmark-serve.mjs` from `data/cutroom.sqlite`, 52 runs,
+> on a port the kernel named. The acceptance session 95 left outstanding is closed. Known and accepted as they
+> stand: the system font stack in place of the design's three (finding 24) and a 249.1 KB `GET /` (finding 23).
+
 **Settled by the owner answering eleven questions on 2026-10-16, then approved against a working mockup on
 2026-10-17** — _"Alright now it looks good"_. None of this is open, and the gates must be written to it rather than
 re-deciding it. The mockup is at `.artifacts/view-mockup/cutroom-benchmark.html` (gitignored, self-contained, built
@@ -71,13 +76,13 @@ this section is the specification.**
 
 ### How it runs
 
-|           |                                                                                                       |
-| --------- | ----------------------------------------------------------------------------------------------------- |
-| process   | **a local server you start**: `node scripts/benchmark-serve.mjs`, opened on localhost                 |
-| data      | **`data/cutroom.sqlite` opened read-only**, scored on the fly by `packages/benchmark`. No export step |
-| scope     | **finished runs only**; a run in progress is out of scope                                             |
-| reach     | **localhost only**. Not hosted — S-180 stands                                                         |
-| processes | the serving reader starts **none at all** (the exhaustive `processes` deep-equal)                     |
+|           |                                                                                                           |
+| --------- | --------------------------------------------------------------------------------------------------------- |
+| process   | **a local server you start**: `node --experimental-strip-types --no-warnings scripts/benchmark-serve.mjs` |
+| data      | **`data/cutroom.sqlite` opened read-only**, scored on the fly by `packages/benchmark`. No export step     |
+| scope     | **finished runs only**; a run in progress is out of scope                                                 |
+| reach     | **localhost only**. Not hosted — S-180 stands                                                             |
+| processes | the serving reader starts **none at all** (the exhaustive `processes` deep-equal)                         |
 
 ### The four views
 

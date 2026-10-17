@@ -153,6 +153,10 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   own script text byte for byte. **The page is unchanged, measured** — its figures are already server-rendered
   tables, so moving the block to `/data` sends the same bytes: document 249.1 KB, block 131.6 KB, `/data`
   86.1 KB, `/run/<id>` 5.1 KB, 52 runs. Journey re-run PASS at `afe51b8`, nothing re-ran.
+- **The page is ACCEPTED by the owner** — _"It looks perfect"_, 2026-10-17, served from `data/cutroom.sqlite`
+  at 52 runs. **The benchmark is COMPLETE**: `yield-benchmark` and `benchmark-view` verified, `yield-compare`
+  stopped (S-200), no finding open. The launcher row in the feature file now carries its real command line —
+  `--experimental-strip-types --no-warnings` — which the bare form in it had omitted since Slice 4.
 - **S-213 AMENDED hours later by the first thing the printed trailer caught, and the fault was S-196's**: a
   `--changed` run the impact map answers had neither `--slice` nor the documents steps, so the flag ladder fell
   through and **a 12-of-161-file run printed `Verification: full`** — the word that also writes
@@ -160,32 +164,20 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-17 — session 95
 
-- **`benchmark-view` is BUILT in four slices** — `1c958a1` (loader package, the precedence into
-  `scripts/_lib.mjs`, two boundary rules), `21e8705` (the server and its three routes), `6170ce3` (the page), and
-  Slice 4 (the vendored build, its route, the launcher, the thirteenth PATH-only child). Slices 1 and 4 full,
-  2 and 3 targeted, every commit tree-bound.
-- **Enforced boundary rules: 27** (`drift --prove`: 27 rules across 141 cases). `benchmark-read-no-engine` and
-  `benchmark-no-reader`, the second closing a hole no rule sees: cruiser rules are about DIRECT dependencies, so
-  `benchmark-no-io` says nothing about the pure scorer importing a package that imports `node:sqlite`.
-- **Forty findings against gates no reviewer and no owner read** (S-203, S-205), all in the feature file's
-  Amendments block with the gate text unedited (S-197): 11, 8, 10, 11 by slice. **The gates contradict themselves
-  in at least six places.**
-- **Six decisions. S-206** anchors `benchmark-no-io`'s `from`, which unanchored made the new package
-  unbuildable. **S-207**, **S-208**, **S-209** guard the scrubber where each slice built it, settle check 13
-  against SQLite's two WAL reader files, take `ending.detail` out of `/data`, and exempt six verbatim-model-text
-  fields from check 6 **by name with the list itself pinned**, scanning `data/cutroom.sqlite` itself. **S-210**
-  closes a **measured D-086 leak**: the launcher passed no roots, so an absolute artifact path inside a prompt was
-  served and printed; three slices of scrubber guards missed it because **each supplied its own roots**.
-- **S-211**: the post-Slice-4 `impact-map.mjs` found `tests/ask-again-record.test.ts` **red** on this package —
-  check 6 reports a `refused` landing in a refusal brand or in nothing typed, and the group tally was an untyped
-  literal. Fixed by declaring the type, which that check's own sentence permits; the check is untouched. **OPEN:
-  `--slice` runs every boundary check but only its NAMED test files**, so a repo-wide scan in another ordinary
-  test file is invisible to a targeted slice — and a new package most likely trips one.
-- **Three deliberate breaks stayed green on first attempt**, each a real hole; and a heredoc halving `[\\/]`, then
-  `biome check --write` reducing it to `[/]`, was caught **only** by a positive control.
-- **OPEN, and the owner's: finding 23.** Check 11 scans the package's whole source for `fetch(`, so the page cannot
-  ask `/data` for its data; it embeds both payloads and `GET /` is **263.5 KB** against the route table's 39 KB,
-  while both routes are served, correct and checked and **unread by the page** — Gate 2's rationale unrealised.
+- **Compressed (session 96, S-160's rule): its six decisions carry the detail.** `benchmark-view` BUILT in four
+  slices — `1c958a1` (loader package, the precedence into `scripts/_lib.mjs`, two boundary rules), `21e8705`
+  (server and three routes), `6170ce3` (the page), `cd22b7e` (vendored build, launcher, the thirteenth PATH-only
+  child). **Enforced boundary rules: 27** (`drift --prove`: 27 rules, 141 cases), `benchmark-no-reader` closing a
+  hole no cruiser rule sees, since its rules are about DIRECT dependencies. **Forty findings against gates no
+  reviewer and no owner read** (S-203, S-205), all in the file's Amendments block with the gate text unedited
+  (S-197); the gates contradict themselves in at least six places. **S-206 to S-211**, of which **S-210 closes a
+  measured D-086 leak** — the launcher passed no roots, so an absolute artifact path inside a prompt was served,
+  and three slices of scrubber guards missed it because each supplied its own roots. **S-211** found
+  `tests/ask-again-record.test.ts` red on the new package after Slice 4, and names the targeted regime's blind
+  spot: `--slice` runs every boundary check but only its NAMED test files, so a repo-wide scan in another
+  ordinary test file is invisible to it. Three deliberate breaks stayed green on first attempt, each a real hole;
+  a heredoc halving `[/]`, then `biome check --write` reducing it to `[/]`, was caught only by a positive
+  control.
 
 ### 2026-10-17 — session 94
 
