@@ -5,7 +5,7 @@ authority: plan
 
 # benchmark-view — one local page that shows what every run did, served from the engine's own database
 
-Status: planned — the four gates are approved, by a read the owner delegated; no implementation file exists (S-205)
+Status: verified
 Decisions: D-022, D-086, D-087, S-016, S-109, S-111, S-166, S-180, S-182, S-184, S-197, S-198, S-200, S-201, S-203, S-204, S-205
 Gates: product APPROVED 2026-10-17 owner-delegated-S-205 · architecture APPROVED 2026-10-17 owner-delegated-S-205 · program-design APPROVED 2026-10-17 owner-delegated-S-205 · slices APPROVED 2026-10-17 owner-delegated-S-205
 
@@ -861,8 +861,9 @@ one refusal body, so nothing escapes the served set by a second door.
 
 ## Evidence
 
-_Written by `node scripts/journey.mjs benchmark-view` after Slice 4. Never typed by hand (S-016)._
+- 2026-10-17 journey=PASS at cd22b7e — every check green; 25 tests in tests/benchmark-view-*.test.ts pass — from the full run recorded for this exact tree
+  _Written by `node scripts/journey.mjs benchmark-view` after Slice 4. Never typed by hand (S-016)._
 
 ## Divergence
 
-_Written by the journey. A FAIL is the finding: stop and report._
+none

@@ -91,3 +91,5 @@ carried to the session that writes those gates. Then the owner put two test reel
 `resume-failed` moved to 054, as committed at `b1ffcfd`. In session 53 the owner put two explainer reels first — video game graphics and JoJo's Bizarre
 Adventure, their briefs approved — so they are 054, and `resume-failed` moved to 055. Session 54 made neither — one stop its brief caused, then this
 machine's DNS (P-020) — and the owner asked for them again: they are 055, and `resume-failed` moved to 056.
+
+- [090 — the journey's own write must not cost a second full suite](090-journey-write-and-documents-evidence.md)

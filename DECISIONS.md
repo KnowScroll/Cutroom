@@ -10171,3 +10171,60 @@ full suite as the standing guard. Recorded as finding 41 in `docs/features/bench
 **Confirmed-by.** The main session, 2026-10-17, during `benchmark-view` Slice 4's verification.
 
 ---
+
+## S-212 | 2026-10-17 | A journey's own write must not cost a second full suite: documents-only evidence is the four scan test files, named as `targeted`
+
+**Supersedes.** Nothing yet. It names a **design flaw** in the order S-016 and S-177 imply together, and settles how
+a documents-only delta is recorded until the flaw is fixed.
+
+**The flaw, stated plainly.** `node scripts/journey.mjs <slug>` can only run **after** the last slice is committed —
+that is what it verifies. It then **writes its verdict into the feature file**: `Status:`, the Evidence line, the
+Divergence line. So every finished feature ends with a Markdown delta that arrives **after** the full run that
+covered the commit, and `verification-status.mjs` accepts only `full|targeted`, so recording it has cost a second
+full suite. **Session 94 paid 654 s for it. Session 95 was about to pay ~730 s more.** That is twice per feature,
+for ever, for three lines the journey generated itself. The owner called it: _"If the journey runs after the commit
+then that means each time it writes to the journal we will be running the suite twice after finishing the job.
+That's a design flaw."_
+
+**Chose.**
+
+- **A documents-only delta is recorded as `Verification: targeted`, naming the four scan test files** —
+  `tests/line-endings.test.ts`, `tests/no-absolute-paths.test.ts`, `tests/feature-files.test.ts`,
+  `tests/context-file.test.ts`. **No new trailer word is invented**, and `scripts/verification-status.mjs` is not
+  touched.
+- **This is not a loophole, because those four ARE the tests.** They are `SCANS` in `scripts/check.mjs`, they are
+  what `--documents` and a documents-only `--changed` already run, and they are the only tests a Markdown change
+  can turn red. Naming them is the literal truth of what verified the commit.
+- **The delta must really be documents-only**, which `check.mjs` decides from the `DOCUMENT` list in
+  `scripts/_verification.mjs` — not from a judgement. A code path in the diff makes the run something else, and
+  `verification-status.mjs` still refuses a tree that does not match HEAD.
+
+**Why.** The checks a Markdown edit owes cost **17 s** — markup 12.4 s, the four scans 4.0 s, the authority 0.3 s —
+and they pass. The 730 s bought nothing but a word the recorder would accept. 43× the cost for zero additional
+coverage is not rigour, it is ceremony, and CLAUDE.md rule 3 is about never **weakening** a check — it does not ask
+anyone to run checks that cannot fail.
+
+**Rejected.** **Paying the full suite again**, which is what was about to happen and is the thing this entry exists
+to stop. **Inventing `Verification: documents`** and teaching `verification-status.mjs` a third word — more
+vocabulary for a case the existing word already describes truthfully. **Leaving the feature file dirty** so a later
+commit absorbs it, which hides a finished feature's own verdict from the repository until something unrelated
+happens. **Having the journey write nothing**, which would mean typing a status by hand — S-016 forbids exactly
+that, and rightly.
+
+**Still owed, and it is the real fix (`PROMPTS/090`).** `check.mjs` should **emit** this rather than leave it to be
+written: when the delta is documents-only and green, the receipt should record `mode: 'targeted'` with the four
+scan files as its tests, so the trailer comes from the checker and not from a person. That touches
+`scripts/check.mjs`, `scripts/_verification.mjs` and its `.d.mts`, `scripts/journey.mjs`, and the assertions in
+`tests/check-receipt.test.ts` (9), `tests/check-changed.test.ts` (9) and `tests/journey.test.ts` — all verification
+infrastructure, so it owes **one** full run, once, instead of one per feature for ever. **The deeper fix is also
+open**: have the journey write its verdict **before** the commit, or have the commit carry it, so a finished
+feature does not produce a post-commit delta at all.
+
+**Caught by.** `node scripts/check.mjs --documents` green at this exact tree before the commit, and
+`verification-status.mjs` matching `Verification-Tree` against HEAD. If a code file is ever in such a diff,
+`--changed` refuses to choose tests for it and the full run is owed as before.
+
+**Confirmed-by.** The owner, 2026-10-17: _"we dont fucking need to run a suite just because a .md changed"_, and
+_"run the journey once, commit and stop"_.
+
+---
