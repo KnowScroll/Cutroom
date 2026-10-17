@@ -394,21 +394,26 @@ test('after a full run the count comes from the receipt that run wrote, not from
   )
 })
 
-test('a documents-only run after the full one does not take the reuse away', () => {
-  // The order every re-journey chain uses: journey, evidence line, `check.mjs --changed` before
-  // its commit, next journey. That middle run writes a receipt of its own, and until S-188's
-  // receipt-full.json it overwrote the reusable one — measured on the first real use.
-  const { dir, sha } = repo({ text: feature(), check: CHECK_RECORDS })
-  plant(
-    dir,
-    receipt(tree(dir)),
-    JSON.stringify({ receipt: 1, mode: 'documents', ok: true, testedTree: tree(dir) }),
-  )
-  const r = journey(dir)
-  assert.equal(r.status, 0, r.out)
-  assert.deepEqual(calls(dir), [], 'a documents run between two journeys cost the reuse')
-  assert.match(
-    section(read(dir), 'Evidence'),
-    new RegExp(`journey=PASS at ${sha} — every check green; 7 tests`),
-  )
-})
+// Since S-213 that middle run records `targeted` — the four scans ARE the tests a Markdown change
+// can fail (S-212) — and a receipt written before S-213 says `documents`. Neither may be reused,
+// and neither may take the reusable record away.
+for (const middle of ['documents', 'targeted'] as const) {
+  test(`a ${middle} run after the full one does not take the reuse away`, () => {
+    // The order every re-journey chain uses: journey, evidence line, `check.mjs --changed` before
+    // its commit, next journey. That middle run writes a receipt of its own, and until S-188's
+    // receipt-full.json it overwrote the reusable one — measured on the first real use.
+    const { dir, sha } = repo({ text: feature(), check: CHECK_RECORDS })
+    plant(
+      dir,
+      receipt(tree(dir)),
+      JSON.stringify({ receipt: 1, mode: middle, ok: true, testedTree: tree(dir) }),
+    )
+    const r = journey(dir)
+    assert.equal(r.status, 0, r.out)
+    assert.deepEqual(calls(dir), [], `a ${middle} run between two journeys cost the reuse`)
+    assert.match(
+      section(read(dir), 'Evidence'),
+      new RegExp(`journey=PASS at ${sha} — every check green; 7 tests`),
+    )
+  })
+}

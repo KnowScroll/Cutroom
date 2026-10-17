@@ -15,6 +15,7 @@ import { dirname, join } from 'node:path'
 import { after, test } from 'node:test'
 import { REPO } from './_repo.ts'
 import { allMarkup, MARKUP_EXTENSIONS } from '../scripts/_markup.mjs'
+import { testedTree } from '../scripts/_verification.mjs'
 
 // S-177: documents choose their own small checks. A code slice must name its approved tests with
 // `--slice`; a checker/configuration/unknown diff fails closed to the full suite. What must never
@@ -285,6 +286,128 @@ test('S-189. a slice narrows the markup check to the markup that differs, and dr
   assert.ok(
     narrowed.run.includes('markup changed'),
     `a changed document was not checked:\n${narrowed.out}`,
+  )
+})
+
+/** The tree at HEAD in `dir`. */
+function headTree(dir: string) {
+  const r = spawnSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: dir, encoding: 'utf8' })
+  assert.equal(r.status, 0, r.stderr)
+  return r.stdout.trim()
+}
+
+/**
+ * A green full-run receipt in `dir`, naming `tree`, in the reusable file a journey rests on
+ * (S-188). The folder holds a `.gitignore` of `*` exactly as the checker writes it, so the planted
+ * record is invisible to git — a receipt that read as a dirty path would change what is under test.
+ */
+function plantFullRun(dir: string, tree: string) {
+  mkdirSync(join(dir, '.verification'), { recursive: true })
+  writeFileSync(join(dir, '.verification', '.gitignore'), '*\n')
+  writeFileSync(
+    join(dir, '.verification', 'receipt-full.json'),
+    `${JSON.stringify({
+      receipt: 1,
+      mode: 'full',
+      ok: true,
+      testedTree: tree,
+      checks: [{ label: 'tests', ok: true, ms: 1 }],
+      tests: { ok: true, total: 9, files: { 'tests/stage.test.ts': { pass: 9, fail: 0 } } },
+    })}\n`,
+  )
+}
+
+/** What a real (not dry) run recorded about itself in `dir`. */
+function recorded(dir: string, file = 'receipt.json') {
+  return JSON.parse(readFileSync(join(dir, '.verification', file), 'utf8'))
+}
+
+test('S-214. a recorded full run is carried over the documents written after it, code and all', () => {
+  // The order every finished piece of work has: the suite runs, and THEN the prose that describes
+  // it is written — a journey's verdict, the journal, the context file. None of it can change what
+  // the suite observed, and the comparison that proves so is against the tree that run tested, not
+  // against HEAD. Here the code change is uncommitted and the recorded run covers it; only a
+  // journal line came after.
+  const dir = scratch()
+  write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 2\n')
+  const ran = testedTree(dir) as string
+  plantFullRun(dir, ran)
+  appendFileSync(join(dir, 'JOURNAL.md'), '\nwhat happened\n')
+
+  const chosen = dryRun(dir, '--changed')
+  assert.deepEqual(
+    chosen.run.sort(),
+    ['copied docs', 'decisions pin', 'markup', 'scans'],
+    `a carried run chose other checks:\n${chosen.out}`,
+  )
+  // ALL the markup, not the markup that differs from HEAD: the documents that differ from the
+  // recorded run are a different set, and HEAD's would leave one of them unchecked.
+  assert.ok(!chosen.run.includes('markup changed'), `the carried run narrowed its markup`)
+  for (const label of ['typecheck', 'code', 'boundaries', 'tests']) {
+    assert.ok(chosen.skipped.includes(label), `a carried run still ran ${label}:\n${chosen.out}`)
+  }
+  assert.match(chosen.out, /1 document\(s\) differ from the full run at/)
+
+  // And what it records is FULL evidence for this content, saying where the suite ran.
+  spawnSync(process.execPath, ['scripts/check.mjs', '--changed'], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: { ...process.env, NO_COLOR: '1' },
+  })
+  const receipt = recorded(dir)
+  assert.equal(
+    receipt.mode,
+    'full',
+    'a carried run recorded something less than the run it rests on',
+  )
+  assert.equal(receipt.carriedFrom, ran, 'the carried receipt does not say where the suite ran')
+  assert.deepEqual(
+    receipt.tests.files,
+    { 'tests/stage.test.ts': { pass: 9, fail: 0 } },
+    'a carried receipt names no test file, so no journey could rest on it',
+  )
+  // The steps cannot pass in a scratch repository with no node_modules, and that is the case worth
+  // pinning: a red run must not replace the green record it rests on.
+  assert.equal(receipt.ok, false)
+  assert.equal(recorded(dir, 'receipt-full.json').testedTree, ran, 'a red run ate the full receipt')
+})
+
+test('S-214. a carry is refused when any path that is not a document differs from the recorded run', () => {
+  const dir = scratch()
+  plantFullRun(dir, headTree(dir))
+  write(dir, 'packages/pipeline/src/stage.ts', 'export const stage = 3\n')
+  assertNeedsSlice(dir, 'a code change the recorded run never saw')
+  const r = spawnSync(process.execPath, ['scripts/check.mjs', '--changed', '--dry-run'], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: { ...process.env, NO_COLOR: '1' },
+  })
+  assert.match(
+    `${r.stdout}${r.stderr}`,
+    /could not be carried: packages\/pipeline\/src\/stage\.ts differs/,
+    'the refusal does not say which path took the cheap path away',
+  )
+})
+
+test('S-213. a documents-only run records targeted evidence naming the four scans', () => {
+  // The receipt is what a commit's trailer is copied from (S-212), so what a documents-only run
+  // RECORDS about itself is a property of the checker. This scratch repository has neither
+  // node_modules nor the authority's scripts, so the steps cannot pass here — and need not: the
+  // receipt is written whatever the verdict, because the mode says what RAN and `ok` says how it
+  // went.
+  const dir = scratch()
+  appendFileSync(join(dir, 'docs/notes.md'), 'another sentence\n')
+  spawnSync(process.execPath, ['scripts/check.mjs', '--changed'], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: { ...process.env, NO_COLOR: '1' },
+  })
+  const receipt = JSON.parse(readFileSync(join(dir, '.verification', 'receipt.json'), 'utf8'))
+  assert.equal(receipt.mode, 'targeted', 'a documents-only run recorded a mode nothing reads')
+  assert.deepEqual(
+    (receipt.checks as Array<{ label: string }>).map((check) => check.label).sort(),
+    ['copied docs', 'decisions pin', 'markup changed', 'scans'],
+    'a documents-only run chose checks other than the four a document can fail',
   )
 })
 

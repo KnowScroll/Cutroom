@@ -4,7 +4,7 @@
 - **Feature:** the checking machinery itself (`scripts/check.mjs`, `scripts/journey.mjs`), not a `docs/features/` slug
 - **Work:** make the checker EMIT documents-only evidence, and stop the journey producing a post-commit delta
 - **Written:** 2026-10-17, at the owner's call during session 95
-- **Run:** —
+- **Run:** 2026-10-17, session 96 — Part 1 built (S-213); Part 2 built as the CARRY (S-214); shape 1 refused by the owner mid-build and not applied
 
 > **Read `grep -n '^## S-212' DECISIONS.md` first.** It records the flaw, what session 95 did about it, and what is
 > still owed — which is this prompt.

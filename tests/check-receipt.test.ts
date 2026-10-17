@@ -7,6 +7,8 @@ import { pathToFileURL } from 'node:url'
 import { after, test } from 'node:test'
 import { REPO } from './_repo.ts'
 import {
+  carryVerdict,
+  evidenceTrailer,
   isDocument,
   readFullReceipt,
   readReceipt,
@@ -322,6 +324,163 @@ test('--documents runs what a document can fail and skips the suite', () => {
   assert.deepEqual(would, ['markup', 'scans', 'decisions pin', 'copied docs'])
   assert.match(r.stdout, /^\s*skipped\s+tests$/m)
 })
+
+// ---------------------------------------------------------------- the evidence a run IS
+
+test('S-213. full evidence names the tree; targeted evidence must name its test files', () => {
+  // The checker writes the trailer rather than leaving it to be typed (S-212's "still owed"), so
+  // what it may write is a property of its own: the two shapes every commit in this repository
+  // carries, and nothing scripts/verification-status.mjs would refuse.
+  const tree = 'a'.repeat(40)
+  assert.equal(
+    evidenceTrailer({ mode: 'full', tree, tests: ['tests/demo-one.test.ts'] }),
+    `Verification: full\nVerification-Tree: ${tree}`,
+    'a full run named test files, which no full commit here carries',
+  )
+  assert.equal(
+    evidenceTrailer({
+      mode: 'targeted',
+      tree,
+      tests: ['tests/line-endings.test.ts', 'tests/context-file.test.ts'],
+    }),
+    `Verification: targeted\nVerification-Tree: ${tree}\nVerification-Tests: tests/line-endings.test.ts tests/context-file.test.ts`,
+  )
+})
+
+const noTrailer: Array<[string, Parameters<typeof evidenceTrailer>[0]]> = [
+  // The first is exactly what scripts/verification-status.mjs:31 fails on: the checker prints
+  // nothing rather than a trailer the recorder would reject.
+  ['targeted evidence names no test file', { mode: 'targeted', tree: 'b'.repeat(40), tests: [] }],
+  ['no tree was recorded', { mode: 'full', tree: undefined, tests: [] }],
+  ['the run was --code', { mode: 'code', tree: 'c'.repeat(40), tests: [] }],
+  [
+    'the mode is one no recorder accepts',
+    { mode: 'documents', tree: 'd'.repeat(40), tests: ['tests/line-endings.test.ts'] },
+  ],
+]
+
+for (const [why, asked] of noTrailer) {
+  test(`S-213. no trailer is offered when ${why}`, () => {
+    assert.equal(evidenceTrailer(asked), undefined)
+  })
+}
+
+test('S-213. the checker prints the trailer from its receipt and formats none of its own', () => {
+  const source = readFileSync(join(REPO, 'scripts', 'check.mjs'), 'utf8')
+  assert.match(source, /evidenceTrailer\(\{/, 'check.mjs does not print the recorded trailer')
+  assert.doesNotMatch(source, /Verification-Tree:/, 'check.mjs grew a trailer format of its own')
+  // The four scans ARE the tests a documents-only run names (S-212), so the scans are a test step
+  // the receipt reads — and the mode nothing ever read is gone.
+  assert.match(source, /label === 'scans'/)
+  assert.doesNotMatch(source, /'documents'/, 'check.mjs still records a mode nothing reads')
+  // And the scans run under the receipt reporter, like every other test step, so those four names
+  // come with measured counts beside them. Without it the receipt would name no test file, the
+  // trailer would be one verification-status.mjs refuses, and the checker would print nothing —
+  // measured by hand on this repository, 2026-10-17: four files, 11 passing tests, 2.7 s.
+  assert.match(source, /const SCANS_STEP = \['scans', node, reportingTests\(SCANS\)\]/)
+  assert.match(source, /`--test-reporter=\$\{RECEIPT_REPORTER\}`/)
+  assert.match(source, /`--test-reporter-destination=\$\{testsRawPath\(WHERE\)\}`/)
+})
+
+// ---------------------------------------------------------------- what may be carried
+
+// S-214. The reuse verdict above answers a journey asking about HEAD. This one answers the checker
+// asking about the content in front of it, which is what stops the prose written AFTER a suite —
+// a journey's verdict, a journal entry — costing another suite. Same inference, same refusals.
+
+const RAN = {
+  receipt: 1,
+  mode: 'full',
+  ok: true,
+  testedTree: 'f'.repeat(40),
+  checks: [{ label: 'tests', ok: true, ms: 1 }],
+  tests: { ok: true, total: 9, files: { 'tests/demo-one.test.ts': { pass: 5, fail: 0 } } },
+}
+const HERE = { contentTree: 'e'.repeat(40) }
+
+test('S-214. a green full run is carried when every path that differs is a document', () => {
+  const verdict = carryVerdict({
+    ...HERE,
+    receipt: RAN,
+    delta: ['JOURNAL.md', 'docs/features/demo.md'],
+  })
+  assert.equal(verdict.kind, 'carry')
+  if (verdict.kind !== 'carry') return
+  assert.equal(verdict.from, RAN.testedTree, 'the carry does not say where the suite ran')
+  assert.deepEqual(
+    verdict.tests,
+    RAN.tests,
+    'the carried test rows are lost, so nothing may rest on it',
+  )
+})
+
+test('S-214. content identical to the recorded run carries nothing over', () => {
+  const verdict = carryVerdict({ contentTree: RAN.testedTree, receipt: RAN, delta: [] })
+  assert.equal(verdict.kind, 'carry')
+  if (verdict.kind !== 'carry') return
+  assert.equal(verdict.from, verdict.tree, 'identical content read as a carry from somewhere else')
+})
+
+const notCarried: Array<[string, Parameters<typeof carryVerdict>[0], RegExp]> = [
+  [
+    'there is no recorded full run',
+    { ...HERE, receipt: undefined, delta: [] },
+    /no recorded full run/,
+  ],
+  [
+    'the record is of another version',
+    { ...HERE, receipt: { ...RAN, receipt: 2 }, delta: [] },
+    /version 2/,
+  ],
+  [
+    'the recorded run was targeted, not full',
+    { ...HERE, receipt: { ...RAN, mode: 'targeted' }, delta: [] },
+    /'targeted', not a full run/,
+  ],
+  [
+    'the recorded run was not green',
+    { ...HERE, receipt: { ...RAN, ok: false }, delta: [] },
+    /not green/,
+  ],
+  [
+    'the recorded run records no passing tests',
+    { ...HERE, receipt: { ...RAN, tests: undefined }, delta: [] },
+    /no passing test run/,
+  ],
+  [
+    'the record names no tree',
+    { ...HERE, receipt: { ...RAN, testedTree: undefined }, delta: [] },
+    /names no tree/,
+  ],
+  [
+    'git could not name this content',
+    { ...HERE, contentTree: undefined, receipt: RAN, delta: [] },
+    /could not name this content/,
+  ],
+  [
+    'git could not compare the trees',
+    { ...HERE, receipt: RAN, delta: undefined },
+    /could not compare/,
+  ],
+  [
+    'a path of code differs from the recorded run',
+    { ...HERE, receipt: RAN, delta: ['JOURNAL.md', 'scripts/check.mjs'] },
+    /scripts\/check\.mjs differs/,
+  ],
+  [
+    'an unclassified path differs from the recorded run',
+    { ...HERE, receipt: RAN, delta: ['something-new.yaml'] },
+    /something-new\.yaml differs/,
+  ],
+]
+
+for (const [why, asked, message] of notCarried) {
+  test(`S-214. nothing is carried when ${why}`, () => {
+    const verdict = carryVerdict(asked)
+    assert.equal(verdict.kind, 'none', `a carry was allowed: ${JSON.stringify(verdict)}`)
+    assert.match(verdict.why as string, message)
+  })
+}
 
 test('--documents is a mode of its own, not combined with another', () => {
   const r = spawnSync(

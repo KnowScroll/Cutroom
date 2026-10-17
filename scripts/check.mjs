@@ -15,16 +15,21 @@
  */
 import { existsSync, rmSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { REPO, bold, dim, green, red, run } from './_lib.mjs'
 import { readImpact, selectTests } from './_impact.mjs'
 import { allMarkup, markupAmong } from './_markup.mjs'
 import { testFiles } from './_pools.mjs'
 import {
   DOCUMENT,
+  carryVerdict,
   ensureVerificationDir,
+  evidenceTrailer,
+  readFullReceipt,
   readTestsRaw,
   testedTree,
   testsRawPath,
+  treeDelta,
   writeReceipt,
 } from './_verification.mjs'
 
@@ -93,7 +98,23 @@ const SCANS = [
   'tests/context-file.test.ts',
 ]
 
-const SCANS_STEP = ['scans', node, ['--experimental-strip-types', '--test', ...SCANS]]
+/**
+ * The four scans run under the receipt reporter, exactly as every other test step does. A
+ * documents-only run records them as the tests that verified it (S-212), and a receipt may name no
+ * count it did not measure — so the names in its trailer come with pass counts beside them (S-213).
+ */
+const RECEIPT_REPORTER = pathToFileURL(join(REPO, 'scripts', 'test-receipt.mjs')).href
+const reportingTests = (args) => [
+  '--experimental-strip-types',
+  '--test',
+  '--test-reporter=tap',
+  '--test-reporter-destination=stdout',
+  `--test-reporter=${RECEIPT_REPORTER}`,
+  `--test-reporter-destination=${testsRawPath(WHERE)}`,
+  ...args,
+]
+
+const SCANS_STEP = ['scans', node, reportingTests(SCANS)]
 
 /**
  * What a document alone can turn red. `--documents` runs it over ALL markup, because a journey
@@ -145,15 +166,33 @@ function sliceSteps(tests, paths) {
       // pooled. Either way only these files run.
       tests.length > 8
         ? ['slice tests', node, ['scripts/run-tests.mjs', ...tests]]
-        : [
-            'slice tests',
-            node,
-            ['--experimental-strip-types', '--test', '--test-concurrency=1', ...tests],
-          ],
+        : ['slice tests', node, reportingTests(['--test-concurrency=1', ...tests])],
       ...AUTHORITY,
     ],
     paths,
   )
+}
+
+/** Why the recorded full run could not be carried, kept for the run to print (S-214). */
+let carryWhy
+
+/**
+ * The recorded full run when its evidence may be carried to the content here: every path that
+ * differs from the tree it tested is a document (S-214). The comparison is against THAT tree and
+ * not against HEAD, which is the whole point — a finished piece of work grows prose after the run
+ * that verified it, and none of it can change what the suite observed.
+ */
+function carried() {
+  const receipt = readFullReceipt(WHERE)
+  const contentTree = testedTree(WHERE)
+  const from = typeof receipt?.testedTree === 'string' ? receipt.testedTree : undefined
+  const delta =
+    from === undefined || contentTree === undefined
+      ? undefined
+      : treeDelta(WHERE, from, contentTree)
+  const verdict = carryVerdict({ receipt, contentTree, delta })
+  carryWhy = verdict.kind === 'carry' ? undefined : verdict.why
+  return verdict
 }
 
 function choose() {
@@ -161,6 +200,20 @@ function choose() {
   if (paths === null) {
     return { steps: undefined, paths: [], why: 'git could not list what changed' }
   }
+
+  // Before a single path is classified: the full run already recorded may have run on this exact
+  // code. Everything differing from the tree it tested is a document, so the document-class checks
+  // run live, the rest IS that run, and the receipt names where it came from. This is what stops a
+  // journey's own verdict — or a journal entry — costing a second suite (S-214).
+  const carry = carried()
+  if (carry.kind === 'carry') {
+    const why =
+      carry.delta.length === 0
+        ? 'this content is what the recorded full run tested'
+        : `${carry.delta.length} document(s) differ from the full run at ${carry.from.slice(0, 7)}`
+    return { steps: DOCUMENTS_ONLY, paths, why, carry }
+  }
+
   const code = paths.filter((path) => kind(path) !== 'document')
   if (code.length === 0) {
     const why = paths.length === 0 ? 'nothing differs from HEAD' : 'documents only'
@@ -264,6 +317,8 @@ function validateSlice() {
 
 let steps = process.argv.includes('--code') ? CODE : [...CODE, ...AUTHORITY]
 let partial = false
+/** The recorded full run this one rests on, when its evidence is carried here (S-214). */
+let carry
 
 console.log('')
 if (changed) {
@@ -273,16 +328,27 @@ if (changed) {
     console.error(
       `      Use --slice <approved affected .test.ts files>, or run the full check for broad/tooling work.\n`,
     )
+    // Why the cheap path was not available, which is the first thing anyone asks here.
+    if (carryWhy !== undefined) {
+      console.error(`      The recorded full run could not be carried: ${carryWhy}.\n`)
+    }
     process.exit(2)
   }
   steps = choice.steps
   partial = steps === DOCUMENTS_ONLY
+  carry = choice.carry
   if (choice.selected !== undefined) {
     console.log(`  --changed: the impact map chose ${choice.selected.length} test file(s)`)
     for (const test of choice.selected) console.log(dim(`    ${test}`))
     console.log('')
   }
-  if (partial) steps = narrowMarkup(steps, choice.paths)
+  // A carried run checks ALL the markup, not the markup that differs from HEAD: the documents that
+  // differ from the recorded run are a different set, and narrowing to HEAD's would leave one of
+  // them unchecked (S-214).
+  if (partial && carry === undefined) steps = narrowMarkup(steps, choice.paths)
+  if (carry === undefined && carryWhy !== undefined) {
+    console.log(dim(`  the recorded full run could not be carried: ${carryWhy}`))
+  }
   console.log(`  --changed: ${choice.paths.length} path(s) differ from HEAD`)
   for (const path of choice.paths.slice(0, 30))
     console.log(dim(`    ${kind(path).padEnd(9)} ${path}`))
@@ -344,36 +410,53 @@ for (const [label, cmd, args] of steps) {
   }
 }
 
-const mode = slice
-  ? 'targeted'
-  : partial
-    ? 'documents'
-    : process.argv.includes('--code')
-      ? 'code'
-      : 'full'
-const suite = verdicts.find(({ label }) => label === 'tests' || label === 'slice tests')
+// What this run is evidence of. A carried run is `full`, because the suite's own evidence covers
+// this content's code byte for byte (S-214). A documents-only run that cannot carry is `targeted`
+// naming the four scans, because those four ARE the tests a Markdown change can fail (S-212); the
+// checker records that itself, so no trailer is ever typed (S-213). The mode says what ran, `ok`
+// says how it went: a red run of either kind records the same mode, and the receipt's own `ok` is
+// what disqualifies it.
+const mode =
+  carry !== undefined
+    ? 'full'
+    : slice || partial
+      ? 'targeted'
+      : process.argv.includes('--code')
+        ? 'code'
+        : 'full'
+const suite = verdicts.find(
+  ({ label }) => label === 'tests' || label === 'slice tests' || label === 'scans',
+)
 const perFile = suite === undefined ? undefined : readTestsRaw(WHERE)
-writeReceipt(WHERE, {
+const receipt = writeReceipt(WHERE, {
   mode,
   testedTree: tree,
+  // Where the suite actually ran, when that is not here. Omitted when a carry found nothing to
+  // carry over, because then this content IS what the suite ran on.
+  carriedFrom: carry !== undefined && carry.from !== tree ? carry.from : undefined,
   ok: failures.length === 0,
   checks: verdicts,
+  // A carried receipt names the carried run's own test rows: a record claiming `full` must say
+  // which test files passed or no later journey can rest on it (S-188), and a test file that
+  // differed would have refused the carry, because a test is code.
   tests:
-    suite === undefined
-      ? undefined
-      : {
-          label: suite.label,
-          ok: suite.ok,
-          ms: suite.ms,
-          total: perFile?.total,
-          failed: perFile?.fail,
-          files: perFile?.files,
-          // What the two pools cost and how close the machine came to its limit: the evidence a
-          // contention change owes (§4.2), written by the runner rather than remembered.
-          freeMinMB: perFile?.freeMinMB,
-          totalMemoryMB: perFile?.totalMemoryMB,
-          pools: perFile?.pools,
-        },
+    carry !== undefined
+      ? carry.tests
+      : suite === undefined
+        ? undefined
+        : {
+            label: suite.label,
+            ok: suite.ok,
+            ms: suite.ms,
+            total: perFile?.total,
+            failed: perFile?.fail,
+            files: perFile?.files,
+            // What the two pools cost and how close the machine came to its limit: the evidence a
+            // contention change owes (§4.2), written by the runner rather than remembered.
+            freeMinMB: perFile?.freeMinMB,
+            totalMemoryMB: perFile?.totalMemoryMB,
+            pools: perFile?.pools,
+          },
 })
 
 // What the pools cost and how close the machine came to its limit. Printed on a green run too:
@@ -394,6 +477,18 @@ if (failures.length === 0) {
     ? 'green — documents only: the code checks were not run (S-159)'
     : 'everything green'
   console.log(`\n${green(bold(verdict))}\n`)
+  // The evidence this run IS, in the form a commit carries it: copied, never typed (S-213). It is
+  // printed only for a green run, and only for a mode verification-status.mjs accepts.
+  const trailer = evidenceTrailer({
+    mode,
+    tree,
+    tests: Object.keys(receipt.tests?.files ?? {}),
+  })
+  if (trailer !== undefined) {
+    console.log(dim('  the trailer a commit of this content carries:\n'))
+    for (const line of trailer.split('\n')) console.log(`  ${line}`)
+    console.log('')
+  }
   process.exit(0)
 }
 

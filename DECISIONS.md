@@ -10228,3 +10228,86 @@ feature does not produce a post-commit delta at all.
 _"run the journey once, commit and stop"_.
 
 ---
+
+## S-213 | 2026-10-17 | The checker emits the verification trailer it recorded, so none is ever typed
+
+**Supersedes.** S-212's _"still owed"_ clause, which named this as the work. S-212's choice itself stands: a
+documents-only delta is `targeted` naming the four scan test files.
+
+**Chose.**
+
+- **A documents-only run records `mode: 'targeted'` with the four scans as its tests**, written by
+  `scripts/check.mjs`. The mode `documents`, which nothing ever read, is no longer written by anything; the word
+  stays in the receipt's type because a receipt written before today may still be on disk and reading one must not
+  be a type error.
+- **The four scans run under the receipt reporter**, exactly as every other test step does, so the receipt names
+  those four files with measured pass counts rather than asserting them. Measured here: 4 files, 11 passing tests,
+  2.7 s. The small `--slice` step gained the same reporter, so a targeted slice's receipt now has per-file rows too
+  — it had none before.
+- **`evidenceTrailer()` in `scripts/_verification.mjs` is the one place a trailer is formatted**, and a green run
+  prints it. `full` names the tree alone; `targeted` must also name its test files, and the function returns
+  **undefined** rather than a trailer `verification-status.mjs` would refuse — targeted with no test file, no tree,
+  or a `--code` run, which is evidence of nothing a commit may claim.
+- **The mode says what RAN, not how it went.** A red documents-only run records `targeted` as well; the receipt's
+  own `ok` is what disqualifies it. Conditioning the mode on green would make one field mean two things.
+
+**Why.** Session 95 typed its `Verification: targeted` trailer and its four test file names by hand, from a
+decision it had just written. Anything typed can be mistyped, and the one thing that knows what ran is the thing
+that ran it. `verification-status.mjs` is untouched; no new trailer word exists.
+
+**Rejected.** **Deriving the trailer's test names from the step's arguments** rather than from the reporter's
+output — it would name a file that ran no test. **Dropping `documents` from the receipt's type**, which makes
+reading an older receipt a type error for no gain.
+
+**Caught by.** `tests/check-receipt.test.ts` — the trailer's two shapes, four refusals, and a source scan holding
+check.mjs to printing what it recorded; `tests/check-changed.test.ts` — a real documents-only run in a scratch
+repository, asserting the recorded mode and its four checks. Five deliberate breaks, each red: the old mode word,
+the trailer unprinted, the empty-tests guard inverted, the scans without the reporter, and a non-full run allowed
+to overwrite the reusable receipt.
+
+---
+
+## S-214 | 2026-10-17 | Markdown written after a green full run is checked against THAT run, not against HEAD — and it is still `full`
+
+**Supersedes.** S-212's _"deeper fix is also open"_ clause. It does **not** change S-016: the journey still runs
+after the commit and still writes the three lines nobody may type.
+
+**Chose.**
+
+- **`node scripts/check.mjs --changed` asks first whether the recorded full run can be CARRIED to the content in
+  front of it**: it compares the working content's tree against the tree that run tested — **not** against HEAD —
+  and when every path that differs is Markdown it runs the markup, the four scans and the authority, about 13 s,
+  and records **`mode: 'full'`** for the new tree, with `carriedFrom` naming where the suite ran.
+- **The word is `full` because the run was full.** The suite ran on this content's code byte for byte; only prose
+  came after it. **No new trailer line and no new trailer word**: the commit carries `Verification: full` and
+  `Verification-Tree:`, nothing else. `verification-status.mjs` is untouched.
+- **The carry is asked before any path is classified**, so a change to the checker itself — which otherwise fails
+  closed to the full suite — is carried like anything else once a full run has covered it. That is the commit that
+  needs it most.
+- **A carried receipt names the carried run's own test rows** and is written to `receipt-full.json`, so the next
+  journey rests on it. A test file that differed would have refused the carry, because a test is code.
+- **Only a GREEN full run writes `receipt-full.json`.** A red one used to replace the green record it rests on.
+- **The carried run checks ALL the markup**, not the markup that differs from HEAD: the documents that differ from
+  the recorded run are a different set, and narrowing to HEAD's would leave one of them unchecked.
+- **A refused carry says which path refused it**, printed where the full run is demanded.
+
+**Why.** The owner's standing instruction, and it is not to be relitigated: _"journal after the commit does not
+need another suite run"_, _"the carried record said full because it was a full run, only the journal entry was
+written"_. Every finished piece of work grows prose after the run that verified it — a journey's verdict, the
+journal, `docs/context.md` — and none of it can change what the suite observed. Session 94 paid 654 s for three
+generated lines; session 95 nearly paid 730 s more. 13 s, and the evidence is stronger than S-212's fallback,
+because it names the suite rather than four file scans.
+
+**Rejected.** **Reordering the journey to write before the commit**, which was this prompt's shape 1: it does not
+remove the delta — prose follows the journey too — and it would have cost a changed Evidence-line format and a
+deleted refusal for nothing. The owner stopped it mid-build. **A fourth `Verification-Carried-From:` trailer
+line**, offered and refused for the same reason: the run was full, and the line implies otherwise. **Comparing
+against HEAD**, which is the whole bug. **A new trailer word**, already rejected by S-212.
+
+**Caught by.** `tests/check-changed.test.ts` — a carry over an uncommitted code change plus a journal line, which
+asserts the four chosen checks, every skipped code check, whole markup rather than narrowed, `mode: 'full'`, the
+`carriedFrom` tree, the carried test rows, and that a red carried run leaves `receipt-full.json` alone; and a
+refusal naming the code path that differs. `tests/check-receipt.test.ts` — `carryVerdict`'s two carrying cases and
+**ten** refusals, mirroring the reuse verdict's table.
+
+---

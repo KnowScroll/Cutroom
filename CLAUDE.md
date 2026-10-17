@@ -182,10 +182,22 @@ wherever it lives** — `docs/`, `PROMPTS/`, the journal, decisions, this file, 
 `.claude/agents/`, a skill's `SKILL.md`, a package README, the copied authority — runs markup formatting
 (prettier over the files that differ, 0.26 s for two of them against 8.7 s for all 126, S-189), the authority
 and the four file scans, and nothing of code. Prose stops costing the suite; what executes does not become
-prose, so `.claude/settings.json` and `.claude/hooks/*.sh` are still code paths and a check holds that line. A code diff cannot use it:
+prose, so `.claude/settings.json` and `.claude/hooks/*.sh` are still code paths and a check holds that line. A code diff cannot use it, unless the recorded full run already
+covered that exact code (S-214, the carry):
 it must name every approved affected test through `--slice`, or use the full run. `--slice` always runs typecheck,
 the code check, the markup that differs and all boundary checks, then only its named test files; it rejects an
 unlisted changed test, an unknown path, and verification infrastructure. `--dry-run` says which checks would run and why.
+
+**Markdown written after a green full run NEVER costs a second suite** (S-214, and it is the owner's
+standing instruction — do not ask again and do not reason around it). The journal entry, this file,
+`docs/context.md`, a journey's three lines: write them, then run `node scripts/check.mjs --changed`. It
+compares the working content against **the tree the recorded full run tested**, not against HEAD, and when
+every path that differs is Markdown it runs the markup, the four scans and the authority — about 13 s — and
+records **`Verification: full`** for the new tree. That word is the truth: the suite ran, on this content's
+code, byte for byte; only prose came after it. The commit carries the ordinary `Verification: full` and
+`Verification-Tree:` and nothing else. **A code path in the diff that the recorded run never saw refuses the
+carry and says which path did it** — that case owes `--slice` or the full run exactly as before. The checker
+writes the trailer it recorded and prints it at the end of a green run (S-213): copy it, never type it.
 
 **The suite's `tests` step is two pools that never overlap** (S-192, superseding S-176 in part):
 `scripts/run-tests.mjs` runs the ordinary files at an outer concurrency of **4**, then the thirteen
@@ -233,7 +245,10 @@ counts — and the journey reads it: at the same content it runs nothing; where 
 `node scripts/check.mjs --documents` (format, the four scans, the authority) and nothing else; anything else is the
 full suite. Only a green `full` receipt naming the feature's own passing test files qualifies. The receipt is
 written by the checker, not typed, and the content it names is the content a commit of that working copy writes —
-so the usual order, change then full run then commit, stays reusable.
+so the usual order, change then full run then commit, stays reusable. **The same record is what `--changed`
+carries** (S-214): prose written after that run is checked against it, not against HEAD, which is why a journal
+entry or a journey's verdict costs 13 s and not 617 s. Only a green full run writes it, so a failed run cannot
+throw away the record it rests on.
 
 ## Prompts
 

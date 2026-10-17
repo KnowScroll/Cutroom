@@ -26,7 +26,7 @@ fi
 # --- 2. source must be committed; HEAD must carry evidence for its exact tree ---
 CHANGED_SOURCE="$(git status --porcelain -- packages apps tests scripts 2>/dev/null)"
 if [ -n "$CHANGED_SOURCE" ]; then
-  PROBLEMS="${PROBLEMS}  - source files are still uncommitted. Run the approved --slice or full check, commit its Verification trailers, then stop.\n"
+  PROBLEMS="${PROBLEMS}  - source files are still uncommitted. Run the approved check (--slice, or --changed when a recorded full run already covered this code -- S-214), commit its Verification trailers, then stop.\n"
 fi
 if ! OUTPUT="$(node scripts/verification-status.mjs 2>&1)"; then
   PROBLEMS="${PROBLEMS}  - HEAD has no valid commit-tree verification evidence:\n"

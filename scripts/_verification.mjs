@@ -37,8 +37,9 @@ export const receiptPath = (cwd) => join(verificationDir(cwd), 'receipt.json')
 /**
  * The last FULL run keeps a file of its own, because only a full run is reusable and the ordinary
  * order destroys it otherwise: a journey writes an evidence line, the documents-only `--changed`
- * run before its commit writes a receipt of its own, and the next journey would find a
- * `documents` record where the full one had been. Measured here, 2026-10-15, on the first real
+ * run before its commit writes a receipt of its own, and the next journey would find a non-full
+ * record where the full one had been — labelled `documents` then, `targeted` since S-213.
+ * Measured here, 2026-10-15, on the first real
  * use — one `--changed` run between two journeys took the reuse away.
  */
 export const fullReceiptPath = (cwd) => join(verificationDir(cwd), 'receipt-full.json')
@@ -153,10 +154,81 @@ export function writeReceipt(cwd, receipt) {
   }
   const text = `${JSON.stringify(body, null, 2)}\n`
   writeFileSync(receiptPath(cwd), text)
-  // Only a full run touches the full receipt, so a documents or targeted run after it cannot
-  // take a journey's reuse away.
-  if (body.mode === 'full') writeFileSync(fullReceiptPath(cwd), text)
+  // Only a GREEN full run touches the full receipt, so a targeted run after it — a slice, or the
+  // documents-only run that records the four scans (S-212) — cannot take a journey's reuse away,
+  // and neither can a full run that failed: a red record in that file would throw away the green
+  // one it replaces, and nothing may be reused from it anyway (S-214). A carried run writes it,
+  // because carried evidence IS full evidence for this content and the next journey rests on it.
+  if (body.mode === 'full' && body.ok === true) writeFileSync(fullReceiptPath(cwd), text)
   return body
+}
+
+/**
+ * The verification trailer a commit of the content this run saw must carry, derived from the run
+ * instead of typed (S-213).
+ *
+ * `full` evidence names the tree alone: the suite ran, every file of it. `targeted` evidence must
+ * also name the test files that ran — `verification-status.mjs` refuses it otherwise — and for a
+ * documents-only run those are the four scans (S-212). Returns undefined rather than a trailer the
+ * recorder would reject: a `code` run is evidence of nothing a commit may claim, a run with no
+ * tree names no content, and targeted evidence with no test file is exactly what that recorder
+ * fails on.
+ *
+ * A carried run's trailer is the ordinary `full` one and gains no extra line (S-214, the owner's
+ * call): the suite DID run, on this content's code, and only Markdown was written after it. Where
+ * it ran is in the receipt's `carriedFrom`, which costs nothing and is read by whoever is
+ * diagnosing rather than by every commit.
+ */
+export function evidenceTrailer({ mode, tree, tests }) {
+  if (mode !== 'full' && mode !== 'targeted') return undefined
+  if (typeof tree !== 'string' || tree === '') return undefined
+  const lines = [`Verification: ${mode}`, `Verification-Tree: ${tree}`]
+  if (mode === 'full') return lines.join('\n')
+  const named = (tests ?? []).filter((test) => typeof test === 'string' && test !== '')
+  if (named.length === 0) return undefined
+  return [...lines, `Verification-Tests: ${named.join(' ')}`].join('\n')
+}
+
+/**
+ * Whether the evidence of a recorded full run may be CARRIED to the content being checked now, and
+ * what that content still owes (S-214).
+ *
+ *   carry  every path that differs from the tree that run tested is a document: the code the suite
+ *          ran IS the code here, so the document-class checks run live and nothing else does
+ *   none   `why` says what disqualified the recorded run
+ *
+ * This is the same inference S-188 already lets a journey make, pointed at the content being
+ * committed rather than at HEAD — which is what removes the second suite. A finished piece of work
+ * always grows prose after the run that verified it: a journey's own verdict, the journal, this
+ * repository's context file. None of it can change what the suite observed, and until this existed
+ * every line of it cost 617 s or a trailer naming four scans for a commit full of code.
+ *
+ * The carried run's own test rows come back with the verdict, because a receipt that claims `full`
+ * must say which test files passed or no later journey can rest on it.
+ */
+export function carryVerdict({ receipt, contentTree, delta }) {
+  const no = (why) => ({ kind: 'none', why })
+  if (receipt === undefined) return no('no recorded full run')
+  if (receipt.receipt !== RECEIPT_VERSION) return no(`receipt version ${receipt.receipt}`)
+  if (receipt.mode !== 'full') return no(`recorded run was '${receipt.mode}', not a full run`)
+  if (receipt.ok !== true) return no('the recorded run was not green')
+  const tests = receipt.tests
+  if (
+    tests === undefined ||
+    tests.ok !== true ||
+    typeof tests.files !== 'object' ||
+    tests.files === null
+  ) {
+    return no('the recorded run records no passing test run')
+  }
+  if (typeof receipt.testedTree !== 'string' || receipt.testedTree === '')
+    return no('the receipt names no tree')
+  if (typeof contentTree !== 'string' || contentTree === '')
+    return no('git could not name this content')
+  if (delta === undefined) return no('git could not compare the trees')
+  const code = delta.find((path) => !isDocument(path))
+  if (code !== undefined) return no(`${code} differs from the recorded run`)
+  return { kind: 'carry', from: receipt.testedTree, tree: contentTree, delta, tests }
 }
 
 function read(path) {

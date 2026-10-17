@@ -74,9 +74,13 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   them. Timings, token counts and rules: `docs/research/hyperframes.md`, sessions 50 and 51.
 - **Checks**: S-177 binds verification to the exact commit tree, and **S-196** answers which tests a code diff owes
   from the recorded impact map (`node scripts/impact-map.mjs`); a full suite is **617 s** in two non-overlapping
-  pools (S-192, judge a later change by the receipt's own `freeMinMB`), a Markdown change costs
-  `node scripts/check.mjs --documents`, and a journey re-runs nothing at content a green full receipt covers
-  (S-188). The full run stays for checker, boundary, workspace/dependency work and an unclassified diff (S-188's
+  pools (S-192, judge a later change by the receipt's own `freeMinMB`), and a journey re-runs nothing at content a
+  green full receipt covers (S-188). **Markdown written after a green full run never costs a second suite
+  (S-214)**: `node scripts/check.mjs --changed` compares the content against the tree that run tested rather than
+  against HEAD, runs the markup, the four scans and the authority — 13 s — and records `full`, because the suite
+  ran on this code and only prose came after. The checker prints the trailer it recorded; nobody types one
+  (S-213). The full run stays for checker, boundary, workspace/dependency work and a diff no recorded run covers
+  (S-188's
   list). The known PATH-only child transient remains a full-suite signal; no child bound has moved. A hosted run is
   corroboration only and carries no trailer (S-183).
 
@@ -121,6 +125,26 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-17 — session 96
+
+- **The checker now writes the verification trailer it recorded, and prose written after a full run no longer
+  costs a second suite.** `scripts/check.mjs`, `scripts/_verification.mjs` and its `.d.mts`, plus
+  `tests/check-receipt.test.ts`, `tests/check-changed.test.ts` and `tests/journey.test.ts`. One full run bought
+  both, against one per feature for ever.
+- **S-213**: a documents-only run records `targeted` with the four scans as its tests, measured by the receipt
+  reporter the scans now run under (4 files, 11 tests, 2.7 s); `evidenceTrailer()` is the only place a trailer is
+  formatted, a green run prints it, and it returns nothing rather than a trailer `verification-status.mjs` would
+  refuse. The mode `documents` is written by nothing any more.
+- **S-214, and it is the owner's standing rule**: `--changed` carries a recorded green full run to the content in
+  front of it — comparing against **that run's tree, not HEAD** — and records **`full`** when every differing path
+  is Markdown. 13 s. **No fourth trailer line and no new word**: the run WAS full, only prose came after it. The
+  carry is asked before any path is classified, so a checker change is carried too; a carried receipt keeps the
+  carried test rows and reaches `receipt-full.json`; only a GREEN full run writes that file now.
+- **Shape 1 was refused mid-build.** Reordering the journey to write before the commit does not remove the delta,
+  because prose follows the journey as well. Nothing of it was applied: `scripts/journey.mjs` is unchanged.
+- **The rule is written where every session reads it** — CLAUDE.md, this file, and the stop-gate's own message.
+- Six deliberate breaks, every one red and naming the right test.
 
 ### 2026-10-17 — session 95
 
@@ -184,53 +208,17 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-16 — session 93
 
-- **A FRESH round 3 refused `yield-compare`’s four gates on eleven findings** (`PROMPTS/086`, CLAUDE.md rule 4),
-  **all eleven applied and none refused**, recorded as a table in the feature file beside rounds 1 and 2; **S-199
-  is amended a second time** for the five choices that moved. Every pinned figure was recomputed first, so the
-  round went to the design. **Two findings would have broken working code.** The widened `redact()` would have
-  erased the record’s own run ids and brief keys — `scripts/benchmark.mjs:912-916` passes **every string** of the
-  `--out` record through it — **and no check would have noticed**, so the widening became `redactProse()` over the
-  sides document alone. And the exhaustive `processes` deep-equal is an **order-exact list, not a set**, so a
-  second `git rev-parse` reddens it: **the permission went, not the assertion** (rule 3). Three more with teeth:
-  `planVaryOn` moved to Slice 2 (left in Slice 3 its check was unbuildable), the guard’s cross-group vote was
-  imported with two clauses undecided and both are now chosen against the import, and check 3’s only vote case
-  read the same under the chosen rule **and** the one Gate 2 rejects. **Corrected as fact**: a plan-stage death
-  **has** a `model_receipt`, so **three** observed conditions go absent, not four. The “twelve” instrument was
-  re-measured before the round and three of round 2’s own faults corrected — **eleven live claims**, stale
-  citations, and a seventh `DECISIONS.md` children claim missed.
-- **Then the owner STOPPED `yield-compare` (S-200)** — _"No just leave it, we should just build the view part of it
-  and end the benchmark"_ — rather than approve it by decision or run a fourth round, after the case for it was
-  made twice. `Status: stopped`, the file kept as the record of 57 faults found in a specification, **no
-  implementation file ever**. **`benchmark-view` is now the benchmark's last part and the only one left**: it reads
-  the scoring half's `--out`, draws no verdict or delta, and **owns the stratification**, whose uncertainty band
-  went with the stopped feature and is a question for its gates. **What stopping costs is recorded rather than
-  softened**: nothing will say whether an engine change helped, and the engine's spread on ONE brief with nothing
-  changed is wider than most real improvements — `f984199a` rates 3.0, 10.0, 10.0, 38.5, 45.7 over five runs, and
-  `db460dea`'s higher-rated run (69.3) made **no** reel while its lower (60.0) did. Reopening the claim means
-  reopening those gates, which is why they are kept.
-
-- **Then the owner specified `benchmark-view` by answering, and a MOCKUP was built before any gate** (session
-  93, second phase). Settled by asking: a **local server you start** (`node scripts/benchmark-serve.mjs`) reading
-  **`data/cutroom.sqlite` directly**, finished runs only, localhost for now; a **comparison board of any number of
-  runs as columns**, briefs and configs mixed, **no verdict words** — so it is not the stopped feature; fleet
-  overview as the landing; runs picked by checkbox in a filterable ledger; the model’s words **folded**;
-  **ECharts vendored locally**. **Two settled decisions are contradicted and NOT yet rewritten** — S-184’s
-  self-contained no-server file, and S-200’s "reads the scoring half’s `--out` record" — because a page opened
-  from the filesystem **cannot** load a JSON beside it under file-origin rules. Both need an `S-` entry once the
-  shape is approved.
-- **The mockup earned its cost in three faults no written spec would have caught**: ECharts is **not on cdnjs at
-  5.5.1** (404), the progress chart **built six series and never assigned them**, and "refusal by attempt" is one
-  bar because **every picture is attempt 1**. It runs on all 52 real runs and reproduces session 82’s finding
-  from the record (**42% / 70% / 100% / 100%** by subjects per shot). Feedback applied twice: full-bleed width,
-  charts two across with S/M/L/XL presets and drag resize, **refusal by world** filling the empty slot. At
-  `.artifacts/view-mockup/`, **gitignored**, with its source beside it; **no implementation file exists**.
-- **The owner APPROVED it on 2026-10-17 — S-201.** Four rounds of look feedback, each a real defect: side margins
-  on a full-width instrument; charts clumped three-up and too small; a funnel nobody could read (now a plain
-  column chart in stage order with each previous stage’s loss in red); four group-by charts crowded in one panel
-  (now four cards); and a blue-cast dark theme (now true black). Everything scaled up with it. **The chart palette
-  is validated, not chosen** — both themes pass the colour-blindness and contrast checks, so re-colouring means
-  re-validating. **S-201 names what it costs elsewhere**: the shared row loader `yield-compare` designed and never
-  built moves to this feature, because one check asserts the reader holds exactly one `new DatabaseSync(`.
+- **Compressed (session 96, S-160's rule): its decisions exist, so its reasoning lives there.** A FRESH round 3
+  refused `yield-compare`’s four gates on **eleven** findings (`PROMPTS/086`, CLAUDE.md rule 4), **all eleven
+  applied and none refused**, recorded as a table in the feature file beside rounds 1 and 2; **S-199 is amended a
+  second time** for the five choices that moved. **Two findings would have broken working code**: the widened
+  `redact()` would have erased the record’s own run ids and brief keys, with no check noticing, so it became
+  `redactProse()` over the sides document alone; and the exhaustive `processes` deep-equal is order-exact, so a
+  second `git rev-parse` reddens it — the permission went, not the assertion (rule 3). **S-201** names what the
+  round cost elsewhere: the shared row loader `yield-compare` designed and never built moves to `benchmark-view`,
+  because one check asserts the reader holds exactly one `new DatabaseSync(`. The rest — 57 findings over three
+  rounds, 56 applied — is in `docs/features/yield-compare.md`, which is kept as the record of a **STOPPED**
+  feature (S-200).
 
 ### 2026-10-16 — session 92
 
