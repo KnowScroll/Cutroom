@@ -10010,3 +10010,64 @@ one refusal body, so nothing escapes the served set by a second door.
 and 18. The WAL file behaviour was reproduced by the main session before the finding was accepted.
 
 ---
+
+## S-209 | 2026-10-17 | Check 6 exempts a model's own words by name and is proved against the real record; a scorecard field is NOT dropped to make a scan pass; and `?run=` gets the guard its shape has always needed
+
+**Supersedes.** **S-208's sentence** _"a second assertion pins that the only `lost` in either payload is those three
+keys, so a fourth occurrence fails"_ — there is a fourth, and it is a string **value**, not a key.
+
+**Chose.**
+
+- **Check 6's value scan exempts six verbatim-model-text fields by name** — `prompt`, `expandedPrompt`, `words`,
+  `reasons`, `text`, `detail` — and **the exemption list is itself pinned by a deep-equal**, so a seventh field
+  fails rather than quietly joining it. Every other string value is still scanned with all thirteen words, and the
+  page's own copy is scanned in full.
+- **The scan runs over `data/cutroom.sqlite` itself**, all 52 runs, through both payload builders. **Nothing is
+  skipped when the record is absent** (S-111): the clause fails and says why a scan green on five fixtures says
+  nothing about 52 real runs.
+- **The exemption is proved load-bearing in the same check.** With nothing exempted, the real record must still
+  report `expandedPrompt = significant` — so if that hit ever stops being found, the exempting clauses are passing
+  on an empty set and the check says so.
+- **`run.estimateExcludes` is restored to the run payload**, and the pinned `lost` allow-list becomes the three
+  keys **plus that one named constant**, so a **fifth** occurrence fails. It is deliberately **not** under the
+  model-text exemption: `ESTIMATE_EXCLUDES` is our own explanatory prose.
+- **`GET /?run=<id>` gets a guard**, marked in its title as **not one of Gate 3's eighteen**: a named run opens in
+  the One run view, an unknown name opens the newest run and says so on the page, and `GET /run/<that same unknown
+id>` still answers 404 so check 17 stays green.
+
+**Why.** Check 6's property is that **this page never says a run was better or worse**. A take's expanded prompt
+holding `significant` is the engine's evidence quoted verbatim (`packages/benchmark/src/measures.ts:1004`), not the
+page's verdict, and it reaches the reader folded behind a click. Measured over all 52 real runs, that is the only
+such hit. So the honest check is one that still fails on a verdict in our own words and does not fail on the
+record's. The rest follows from two things this feature has now been caught by three times — a check green on
+fixtures and unknown on real data, and a behaviour with nothing able to fail on it.
+
+**Rejected.** **Scrubbing a model's words** so the literal scan passes — the record is the evidence, and editing it
+to suit a page is the worst option on the table. **Accepting that the page is red against the real record** while
+green on fixtures, which is the exact shape findings 9, 18 and 20 are all about. **Dropping `run.estimateExcludes`
+from the payload**, which Slice 3 built first and the main session refused: removing a field from the route Gate 2
+calls "one run's **full scorecard**" so that a scan passes is subtracting to reach green (CLAUDE.md rule 3).
+**Renaming `ESTIMATE_EXCLUDES` or the three `lost` keys** in a verified package to suit this page, which S-208
+already refused for the keys. **Exempting by pattern rather than by name**, which cannot be pinned and would grow
+silently. **Leaving `?run=` unchecked**, refused for the third time in this feature (S-207, S-208).
+
+**Caught by.** The pinned six-field exemption list, which fails on a seventh. The pinned five-site `lost`
+allow-list, which fails on a sixth. The real-record clause, which fails when `data/cutroom.sqlite` is absent and
+fails again if its one known model-text hit disappears. And a deliberate break re-run by the main session after the
+rework — a verdict word put into the page's own copy (`packages/benchmark-read/src/charts.ts:91`) turns check 6 red
+at _"the served HTML says a run was better or worse"_, with the file restored byte-identical afterwards, so the
+exemption demonstrably did not blunt the scan.
+
+**Left open, and it is the owner's.** **Finding 23**: check 11 scans this package's whole source for `fetch(`, and
+the page's client script is part of that source, so the page cannot ask `/data` for its data. It embeds both
+payloads instead, making `GET /` **263.5 KB** where Gate 2's route table budgeted a 39 KB landing load — and
+`/data` and `/run/<id>` are served, correct and checked while **nothing the page draws comes through them**. Gate
+2's whole two-route rationale is therefore unrealised. The built design is kept here because changing it means
+editing a check committed one slice earlier, and 263.5 KB on localhost is not a defect — but whether the page
+should fetch, with check 11 made precise about server source versus client script, is not settled.
+
+**Confirmed-by.** The main session, 2026-10-17, on `benchmark-view` Slice 3's findings 20, 21 and 29. The
+real-record measurement and the post-rework break were reproduced by the main session before the slice was
+committed.
+
+---

@@ -491,7 +491,7 @@ that could only pass by pretending.
 - [x] **Slice 2 — the server and its routes.** `GET /` (a minimal document), `/data` and `/run/<id>`; listening on
       port 0; the two payload builders; the 404s and the traversal refusals; no writes. **Checks 3, 11, 12, 13, 16, 17.** **Verification: a targeted run** over
       `tests/benchmark-view-server.test.ts` alone — package-only, no `scripts/` path in the diff.
-- [ ] **Slice 3 — the page.** The four views, the eight charts, the four group-by cards, the comparison board, the run
+- [x] **Slice 3 — the page.** The four views, the eight charts, the four group-by cards, the comparison board, the run
       view with the words folded, the numbers table in every chart panel, the true-black theme and the validated
       palette. **Checks 6, 7, 8, 9, 14, 15.** **Verification: a targeted run** over
       `tests/benchmark-view-page.test.ts` alone.
@@ -667,6 +667,96 @@ slice that cannot make its check pass as written stops and reports (S-016) rathe
 **Two choices Slice 2 made that the gates leave open, recorded in S-208**: the record is queried again on every
 request with **no cache**, which is what check 3's wording reads against; and a **non-GET answers 404** through the
 one refusal body, so nothing escapes the served set by a second door.
+
+> **Reported by Slice 3 on 2026-10-17**, ten more against the same unedited gates (S-197). Two say a check cannot
+> be green against the real record as its words stand; four are two sentences of one gate contradicting each other;
+> three record where this slice went past what any gate names. Findings 20, 21 and 29 were resolved by the main
+> session's call in **S-209**; finding 23 is left open and is the owner's.
+
+20. **Check 6 cannot be green over `GET /run/<id>` on the REAL record, and no code of this feature can make it so:
+    a model's own words carry a verdict word.** Check 6, as S-208 settles it, scans "the payloads' **string
+    values**". Measured over all 52 runs of `data/cutroom.sqlite`: one hit,
+    `run.parts.clips.items[].expandedPrompt` — a take's expanded prompt holding `significant`, written straight
+    from the column (`packages/benchmark/src/measures.ts:1004`). The record quotes a model verbatim, so any of the
+    thirteen words a model writes lands in the run payload and, folded behind a click, on the page. **Settled by
+    S-209, option (a):** the value scan exempts six verbatim-model-text fields **by name** — `prompt`,
+    `expandedPrompt`, `words`, `reasons`, `text`, `detail` — the exemption list is itself **pinned by a
+    deep-equal** so a seventh field fails rather than quietly joining it, every other string value is still scanned
+    with all thirteen words, and the scan now runs over **`data/cutroom.sqlite` itself**, all 52 runs, through both
+    payload builders. Nothing is skipped when the record is absent (S-111): the clause fails and says why. The
+    exemption is proved **load-bearing** in the same check — with nothing exempted the real record must still report
+    `expandedPrompt = significant`, so the clauses above cannot be passing on an empty set. Scrubbing a model's
+    words was refused: the record is the evidence.
+21. **S-208 named three `lost` keys and missed a fourth occurrence, which is a string VALUE.** "a second assertion
+    pins that the only `lost` in either payload is those three keys, so a fourth occurrence fails" —
+    `run.estimateExcludes` carries `@cutroom/benchmark`'s `ESTIMATE_EXCLUDES` verbatim
+    (`packages/benchmark/src/measures.ts:332-336`), whose last clause is "and **every lost call**, whose cents are
+    paid and produce nothing", in all 52 runs. It is not a key and no renaming of a field reaches it. Slice 3 first
+    stopped serving that constant; **the main session refused that** — dropping a field from the route Gate 2 calls
+    "one run's **full scorecard**" so a scan passes is subtracting to reach green (CLAUDE.md rule 3). **Settled by
+    S-209:** the field is restored, and the pinned allow-list is extended to the three keys **plus that one named
+    constant**, so a **fifth** occurrence fails. `ESTIMATE_EXCLUDES` is our own explanatory prose, not model text,
+    so it is deliberately **not** under finding 20's exemption. The explanation Slice 3 added in the page's own
+    words under the run view's cost chart is kept.
+22. **Gate 2 gives the page no script of its own, and "The look" needs one in four places.** The route table:
+    "`GET /` | the page: one HTML document, its CSS inline, **no script of its own but the vendored file**". "The
+    look" requires "a **drag handle** on every chart, with a `ResizeObserver` redrawing it" and "**four chart-size
+    presets**", "The charts" requires "six **toggleable** lines", and "The four views" requires switching between
+    four. None exists without the page's own code. Built as **one inline script in the same document**
+    (`packages/benchmark-read/src/page.ts:713`), so the document still fetches exactly one asset besides itself —
+    the vendored file — which is the only reading of that sentence that can be built.
+23. **The page cannot USE the two routes Gate 2 designed for it, because check 11 scans this package's whole
+    source — and this one is left OPEN for the owner.** Check 11: "Its source names no `fetch(`, no
+    `http.request`, no `https.request`, no `node-fetch`" — and the page's script IS this package's source, so a
+    page asking `/data` for its data turns a verified check red (measured: one such token in a comment of
+    `draw.ts` turned check 11 red at `tests/benchmark-view-server.test.ts:276` during this slice). So the page
+    **embeds both payloads** in the document (`packages/benchmark-read/src/page.ts:650-666`) and asks for nothing.
+    Measured consequence against Gate 2's "Why not one payload on load": `GET /` is **263.5 KB** on the real record,
+    where the route table budgeted a 39 KB landing load. **`/data` and `/run/<id>` are served, correct and
+    checked — but nothing the page draws comes through them**, so Gate 2's two-route rationale is not realised. The
+    main session kept the built design rather than edit a check Slice 2 had just committed, and 263.5 KB on
+    localhost is not a defect — but **whether the page should fetch, and check 11 be made precise about server
+    source versus client script, is the owner's call and is not settled here.**
+24. **The three fonts "The look" names cannot be had, and the gates settle no substitute.** "Type: **Archivo** for
+    display, **IBM Plex Sans** for body, **IBM Plex Mono** for every figure" — the mockup loaded all three from
+    Google Fonts (`.artifacts/view-mockup/mockup-source.html:3`), which check 11 forbids ("the served HTML holds
+    **no absolute `http://` or `https://` URL at all**"), and Gate 2 vendors ECharts and nothing else. Built as
+    the smaller thing: a system stack with `tabular-nums` throughout (`packages/benchmark-read/src/style.ts:42-44`,
+    and `font-variant-numeric: tabular-nums` on `body` and every figure cell). A vendored font would be a change
+    to Slice 4's directory and to what Gate 2 vendors, so it is reported, not taken.
+25. **The mockup draws cost and wall clock as two charts; check 15 counts them as one.**
+    `.artifacts/view-mockup/mockup-source.html:566` and `:570` are two panels, "Cost" and "Wall clock". Check 15
+    names "cost and wall clock" as one of "**eight in all**", and "The charts" says "**one** stacked bar per run,
+    oldest first, split by port **and** by stage". Built as one panel, one chart, two y-axes — cents stacked by port
+    and seconds stacked by stage — so the page draws exactly the eight the check names. **This is a visible
+    difference from the approved mockup**, named here rather than changed silently, and it is one of the things the
+    owner's own acceptance after Slice 4 should look at.
+26. **Check 7's groups are in no payload Gate 2 lists, and this slice had to choose where they live.** Check 7:
+    "Every group **in the payload** carries its `decided` count"; amendment 17 already records that Slice 2 builds
+    none. They are built in `packages/benchmark-read/src/charts.ts:225-271` and travel in **the page's own embedded
+    block** (`<script id="benchmark-data" type="application/json">`), which is what the chart script and check 7
+    both read; `/data` and `/run/<id>` carry no group at all and are unchanged. If a later caller is meant to read
+    the groups over the wire, that is a route neither Gate 2 nor Gate 3 gives them.
+27. **Check 8's third clause reads two ways, and only one is buildable without losing information.** "a run whose
+    plan was never selected contributes to **no group at all**, because `subjectsPerShot()` is `[]` there" — the
+    reason clause is about the subjects grouping, but the words could be read over all four cards. Built narrowly:
+    such a run's pictures join no **subjects** group and no **shots-in-the-plan** group (`plan.shots` is the string
+    `absent` there), and they DO join the **world** and **picture-rule** cards, where a world and a rule still
+    exist. `tests/benchmark-view-page.test.ts` pins both halves — 8 decided, 6 grouped by subjects, 8 by world — so
+    the reading is visible rather than implied.
+28. **The page keeps a vocabulary of its own for one scorecard key, which no gate sentence anticipates.** The cost
+    port the scorecard spells `lost` is `paidNoAnswer` in the page's block and "paid, no answer" on screen
+    (`packages/benchmark-read/src/charts.ts:294-300`). This is forced by check 6 as S-208 settles it: the block's
+    `key` fields are string **values**, and a value of `lost` fails the scan even where the payload's own key is
+    allowed — measured, the first build of this slice was red on exactly that at two paths. The payload keys are
+    untouched and still pinned.
+29. **`GET /?run=<id>` is a route shape no gate names.** Gate 2's route table lists `/`, `/echarts.min.js`,
+    `/data` and `/run/<id>`. The run picker must change runs without the page fetching anything (finding 23), so
+    `GET /` reads one query parameter (`packages/benchmark-read/src/server.ts:84-95`). **Settled by S-209 on
+    S-207's precedent — a route shape nothing can fail on is the shape findings 9, 11, 18 and 23 are all about —
+    so it is given a guard**, marked in its own title as **not one of Gate 3's eighteen**: a named run opens in the
+    One run view; an unknown name opens the newest run and says so in one line on the page; and
+    `GET /run/<that same unknown id>` still answers **404**, so check 17 stays green.
 
 ## Evidence
 

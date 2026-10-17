@@ -13,6 +13,7 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { openRecord, type StoredRecord } from './loader.ts'
+import { benchmarkPage } from './page.ts'
 import { fleetPayload, runPayload } from './payload.ts'
 
 /**
@@ -26,29 +27,21 @@ const JSON_TYPE = 'application/json; charset=utf-8'
 const TEXT = 'text/plain; charset=utf-8'
 
 /**
- * The minimal document. The page itself — its views, its charts, its numbers tables and its
- * theme — is the next slice's; what stands here is a document naming the two payloads behind it,
- * so that this slice serves nothing it cannot answer for. There is NO absolute URL in it: a page
- * that reaches a CDN is a page that breaks when the CDN does, and ECharts 5.5.1 is not on cdnjs
- * at all — it 404s there, which the mockup found by loading it.
+ * Which run the One run view opens on: the one `?run=` names, or the NEWEST finished run, which
+ * is the last the loader returns (`ORDER BY created_at, run_id`). A name this record does not
+ * hold is not a 404 — the page opens on the newest run and says so in one line, because a stale
+ * link is a reader's mistake and a blank page is not an answer to it. `/run/<id>` itself answers
+ * 404 for the same id, which is check 17's clause and is untouched.
  */
-const MINIMAL_DOCUMENT = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cutroom benchmark</title>
-  </head>
-  <body>
-    <h1>Cutroom benchmark</h1>
-    <p>Every finished run of the record this was started against, read from the record itself.</p>
-    <p>
-      Two payloads stand behind this document: <code>/data</code> for the fleet, and
-      <code>/run/&lt;id&gt;</code> for one run with its words.
-    </p>
-  </body>
-</html>
-`
+function opensOn(
+  asked: string | undefined,
+  fleet: { runs: Array<{ runId: string }> },
+): { runId: string | undefined; unknown: string | undefined } {
+  const newest = fleet.runs[fleet.runs.length - 1]?.runId
+  if (asked === undefined || asked === '') return { runId: newest, unknown: undefined }
+  const held = fleet.runs.some((one) => one.runId === asked)
+  return held ? { runId: asked, unknown: undefined } : { runId: newest, unknown: asked }
+}
 
 export interface ViewOptions {
   /** The database file, ALREADY RESOLVED by the caller (Gate 2; the package resolves none). */
@@ -79,14 +72,39 @@ function answer(res: ServerResponse, status: number, type: string, body: string)
 const refuse = (res: ServerResponse): void => answer(res, 404, TEXT, 'not found')
 
 function handle(record: StoredRecord, req: IncomingMessage, res: ServerResponse): void {
-  const path = (req.url ?? '/').split('?')[0] ?? '/'
+  const asked = req.url ?? '/'
+  const path = asked.split('?')[0] ?? '/'
   if (req.method !== 'GET') {
     refuse(res)
     return
   }
 
   if (path === '/') {
-    answer(res, 200, HTML, MINIMAL_DOCUMENT)
+    const fleet = fleetPayload(record)
+    // One query, read by hand rather than through a URL: `node:http` hands the request line
+    // over verbatim, and a `?run=` that decodes to nothing is simply no run named.
+    const query = asked.includes('?') ? asked.slice(asked.indexOf('?') + 1) : ''
+    let named: string | undefined
+    for (const pair of query.split('&')) {
+      if (!pair.startsWith('run=')) continue
+      try {
+        named = decodeURIComponent(pair.slice('run='.length).replace(/\+/g, ' '))
+      } catch {
+        named = undefined
+      }
+    }
+    const opened = opensOn(named, fleet)
+    answer(
+      res,
+      200,
+      HTML,
+      benchmarkPage({
+        fleet,
+        run: opened.runId === undefined ? undefined : runPayload(record, opened.runId),
+        selectedRunId: opened.runId,
+        unknownRun: opened.unknown,
+      }),
+    )
     return
   }
 

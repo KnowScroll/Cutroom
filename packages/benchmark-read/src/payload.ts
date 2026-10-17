@@ -249,6 +249,14 @@ export function runPayload(record: StoredRecord, runId: string): RunPayload | un
   if (!finished(rows)) return undefined
   const card = scorecard(rows, { hash })
   const gate7 = parsed<Gate7Blob>(rows.render[0]?.gate7)
+  // THE WHOLE SCORECARD, `estimateExcludes` included. That field is the one whose value is a
+  // sentence rather than a figure, and the sentence names "every lost call"
+  // (`@cutroom/benchmark`'s ESTIMATE_EXCLUDES, `packages/benchmark/src/measures.ts:332-336`),
+  // which check 6's word list holds. Dropping it so a scan passes would be subtracting from
+  // what Gate 2 calls "one run's full scorecard" to reach green (CLAUDE.md rule 3), so it
+  // stays: it is OUR OWN explanatory constant, not a model's words, and check 6 allows it BY
+  // NAME beside the three cost keys, with a fifth occurrence failing (the main session's call
+  // on this slice's finding 21).
   const payload: RunPayload = {
     run: { ...card.run, createdAt: String(rows.run.created_at) },
     parts: card.parts,
