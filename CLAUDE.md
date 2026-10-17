@@ -188,7 +188,7 @@ the code check, the markup that differs and all boundary checks, then only its n
 unlisted changed test, an unknown path, and verification infrastructure. `--dry-run` says which checks would run and why.
 
 **The suite's `tests` step is two pools that never overlap** (S-192, superseding S-176 in part):
-`scripts/run-tests.mjs` runs the ordinary files at an outer concurrency of **4**, then the twelve
+`scripts/run-tests.mjs` runs the ordinary files at an outer concurrency of **4**, then the thirteen
 PATH-only journey children at a pool of **2**, each still spawning the 2 or 4 its own file ratifies.
 **617 s where the serial runner took 1455 s**, nothing skipped, with each pool's time and lowest free
 memory written into the receipt and printed on every run. The sizes rest on four consecutive green
@@ -200,7 +200,7 @@ Test files are enumerated from the filesystem, so an uncommitted one still runs.
 **A code diff asks the recorded impact map which tests to run** (S-196, superseding S-177 in part).
 `node scripts/impact-map.mjs` runs each test file alone under `NODE_V8_COVERAGE` — 402 s — and records
 every file of this repository that process or any process it spawned loaded, plus every repository path the
-test NAMES as a string, which is how a tool a test copies into a scratch repository is credited. The twelve
+test NAMES as a string, which is how a tool a test copies into a scratch repository is credited. The thirteen
 PATH-only children are derived from their feature's siblings and never measured, because coverage reaches a
 child through an environment variable and those files exist to prove none does. `--changed` then runs the
 static checks, the boundary proofs and exactly the covering tests, through the two pools when more than

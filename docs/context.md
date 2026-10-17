@@ -33,7 +33,7 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   `docs/research/benchmark.md`. Its gates were approved by owner decision (S-185) and no reviewer, so **the slices
   carried the review**: 25 findings reported rather than built around, of which **three imprecise gate sentences
   are named in that file's amendment block** (S-197) and the other 22 are lost with session 87's hand-backs.
-  **Enforced boundary rules: 25.** **`yield-compare` is STOPPED (S-200)**: its four gates were written and refused
+  **Enforced boundary rules: 27.** **`yield-compare` is STOPPED (S-200)**: its four gates were written and refused
   by three fresh rounds on 22, 24 and 11 findings — 57 in all, 56 applied and 1 refused, S-199 with two amendments —
   and the owner stopped it rather than approve it by decision or run a fourth round. The file is kept as the record;
   **no implementation file of it is ever written**. **Gates APPROVED, nothing built**: `benchmark-view`
@@ -121,6 +121,35 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-17 — session 95
+
+- **`benchmark-view` is BUILT in four slices** — `1c958a1` (loader package, the precedence into
+  `scripts/_lib.mjs`, two boundary rules), `21e8705` (the server and its three routes), `6170ce3` (the page), and
+  Slice 4 (the vendored build, its route, the launcher, the thirteenth PATH-only child). Slices 1 and 4 full,
+  2 and 3 targeted, every commit tree-bound.
+- **Enforced boundary rules: 27** (`drift --prove`: 27 rules across 141 cases). `benchmark-read-no-engine` and
+  `benchmark-no-reader`, the second closing a hole no rule sees: cruiser rules are about DIRECT dependencies, so
+  `benchmark-no-io` says nothing about the pure scorer importing a package that imports `node:sqlite`.
+- **Forty findings against gates no reviewer and no owner read** (S-203, S-205), all in the feature file's
+  Amendments block with the gate text unedited (S-197): 11, 8, 10, 11 by slice. **The gates contradict themselves
+  in at least six places.**
+- **Six decisions. S-206** anchors `benchmark-no-io`'s `from`, which unanchored made the new package
+  unbuildable. **S-207**, **S-208**, **S-209** guard the scrubber where each slice built it, settle check 13
+  against SQLite's two WAL reader files, take `ending.detail` out of `/data`, and exempt six verbatim-model-text
+  fields from check 6 **by name with the list itself pinned**, scanning `data/cutroom.sqlite` itself. **S-210**
+  closes a **measured D-086 leak**: the launcher passed no roots, so an absolute artifact path inside a prompt was
+  served and printed; three slices of scrubber guards missed it because **each supplied its own roots**.
+- **S-211**: the post-Slice-4 `impact-map.mjs` found `tests/ask-again-record.test.ts` **red** on this package —
+  check 6 reports a `refused` landing in a refusal brand or in nothing typed, and the group tally was an untyped
+  literal. Fixed by declaring the type, which that check's own sentence permits; the check is untouched. **OPEN:
+  `--slice` runs every boundary check but only its NAMED test files**, so a repo-wide scan in another ordinary
+  test file is invisible to a targeted slice — and a new package most likely trips one.
+- **Three deliberate breaks stayed green on first attempt**, each a real hole; and a heredoc halving `[\\/]`, then
+  `biome check --write` reducing it to `[/]`, was caught **only** by a positive control.
+- **OPEN, and the owner's: finding 23.** Check 11 scans the package's whole source for `fetch(`, so the page cannot
+  ask `/data` for its data; it embeds both payloads and `GET /` is **263.5 KB** against the route table's 39 KB,
+  while both routes are served, correct and checked and **unread by the page** — Gate 2's rationale unrealised.
 
 ### 2026-10-17 — session 94
 
@@ -241,48 +270,19 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
 
 ### 2026-10-16 · session 90
 
-- **The queue read, the digest's stale "Next" corrected, and two cost levers declined** — both still open and the
-  owner's, neither recommended: §4.3 `hosted-checks` buys corroboration that carries no trailer (S-183) at the
-  price of a second platform, and §4.4's own decision line makes it conditional on §4.2 and §4.3 not having made
-  the suite cheap enough, which S-192 did (1455 s to 617 s), so its ~200 s would now narrow a proven property and
-  supersede S-028 for nothing.
-- **Then the owner took session 87's older call, and S-197 names the three imprecise `yield-benchmark` gate
-  sentences at last** — in that file's amendment block, gates unedited, no assertion or bound moved: Gate 3's two
-  mentions of `tests/fixtures/benchmark/*.json` against Slice 3's recursing glob; the ledger-column table's three
-  short value sets (`ending` also `absent`, each part rating also `inherited`, `s` also `absent`), all three
-  accepted by check 7 and **none present in the 52-run ledger**, which is why no reader noticed; and "the measures
-  version", which the gates never define. **Only two of session 87's 25 findings were ever written down and the
-  promised third is unrecoverable**, so these are a fresh 1104-line read of the gates against the built code, and
-  `.claude/agents/slice-builder.md` now requires findings as a numbered list naming the sentence each contradicts.
-  No mechanical check is claimed: the count lives in prose, and a regex over English reads as coverage.
-- **Then the owner corrected the queue (S-198)**: `yield-compare`, then `benchmark-view`, then `self-heal` — session
-  90's `self-heal` recommendation withdrawn, because every feature behind this one is an engine change whose worth
-  is a claim that runs got better. **And this file was trimmed 298 lines of its 300 to 231**, by the rule now in
-  its own header: what another file carries by name is not kept here.
+- **Compressed to its decisions** (this file's own rule). **S-197** names the three imprecise `yield-benchmark`
+  gate sentences in that file's amendment block, gates unedited — only two of session 87's 25 findings were ever
+  written down and the third is unrecoverable, which is why `.claude/agents/slice-builder.md` now requires
+  findings as a numbered list naming the sentence each contradicts. **S-198** set the queue. **Two cost levers
+  stay open and are the owner's, neither recommended**: §4.3 `hosted-checks`, and §4.4's ~200 s, which S-192
+  (1455 s to 617 s) made conditional on nothing.
 
 ### 2026-10-15/16 · session 89
 
-- **A recorded impact map answers "which tests" a code diff owes** (**S-196**, superseding S-177 in part).
-  `node scripts/impact-map.mjs` (402 s, 156 files) runs each test file alone under `NODE_V8_COVERAGE` and records
-  what it and every process it spawned loaded, plus the repository paths it NAMES. The twelve PATH-only children
-  cannot be measured and are derived from their siblings. Worth **4 s against 617 s** for a `packages/sdk` or
-  `scripts/` change, close to nothing inside the engine (**median 110 of 156 files**, since D-094 means a package
-  is entered only through its `src/index.ts`). Function-level granularity is deliberately NOT built: a mapping
-  mistake under-selects silently.
-- **The scan hole is closed** (**S-195**, open since session 87): both file scans enumerated tracked files, so a
-  file a change ADDED was invisible to the run that verified it. Both now read `repoFiles(cwd)` in
-  `tests/_files.ts` — tracked plus untracked-not-ignored.
-- **Markdown is a document wherever it lives** (**S-193**, superseding S-159 in part): `DOCUMENT` is `[/.md$/]`,
-  while `.claude/settings.json` and `.claude/hooks/*.sh` stay code by name (S-194, the owner's call against S-177).
-- **The tests step is two pools that never overlap** (**S-192**, superseding S-176 in part): 142 ordinary files at
-  4, then the twelve PATH-only children at 2. **617 s against 1455 s** over four green runs, nothing skipped, no
-  bound raised; the memory floor follows the machine, so judge a later change by the receipt's own `freeMinMB`.
-  `--serial` restores S-176 for a bisect. The first attempt's red was a real latent fault, not the scheduler:
-  `cutroom-sdk-launcher`'s teardown took `write EPIPE` from an async `error` event nothing listened for.
-- **The suite already costs what its files cost** (**S-191**, superseding S-190): 153 files alone 1501.7 s against
-  the suite's 1455 s, so §4.2's whole case was real parallelism. **One full suite is 274 file executions of 153
-  files** — 121 nested inside the twelve secrets children — and **the cost is 35 files**, 742 s of it. Per-file
-  table: `docs/research/test-file-costs.md`.
+- **Compressed to its decisions** (this file's own rule), which now carry the detail: **S-196** the recorded impact
+  map, **S-195** the scan hole both file scans had, **S-193**/**S-194** Markdown as a document wherever it lives
+  while `.claude/settings.json` and `.claude/hooks/*.sh` stay code, **S-192** the two non-overlapping pools, and
+  **S-191** that the suite already costs what its files cost. Per-file table: `docs/research/test-file-costs.md`.
 
 ## Where to look
 

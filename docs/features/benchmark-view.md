@@ -495,7 +495,7 @@ that could only pass by pretending.
       view with the words folded, the numbers table in every chart panel, the true-black theme and the validated
       palette. **Checks 6, 7, 8, 9, 14, 15.** **Verification: a targeted run** over
       `tests/benchmark-view-page.test.ts` alone.
-- [ ] **Slice 4 — the vendored build, its route, the launcher and the PATH-only child.**
+- [x] **Slice 4 — the vendored build, its route, the launcher and the PATH-only child.**
       `vendor/echarts/echarts.min.js` with its pinned hash and `GET /echarts.min.js`; `scripts/benchmark-serve.mjs`;
       `tests/benchmark-view-secrets.test.ts`; `impact-map.mjs` re-run. **Checks 10, 18.** **Verification: the full suite** (a `scripts/` path and a new PATH-only child),
       then `node scripts/journey.mjs benchmark-view`.
@@ -551,6 +551,14 @@ slice that cannot make its check pass as written stops and reports (S-016) rathe
    `scripts/benchmark-serve.mjs` arrives in Slice 4. Slice 1 drove it through the one script that exists
    (`tests/benchmark-view-loader.test.ts`, check 2's three children) and asserted **all three levels** directly
    over `scripts/_lib.mjs`' resolver, which is stronger than either child; **Slice 4 owes the second child**.
+   **DISCHARGED by Slice 4**: `tests/benchmark-view-vendor.test.ts:474` drives the launcher as a child against
+   the same three records holding one, two and three runs — `--db` over `CUTROOM_DB_PATH` at `:486`,
+   `CUTROOM_DB_PATH` with no `--db` at `:491`, and the unchosen record at `:496`, each counted out of the
+   `/data` the launcher's own server answers, on three kernel-named ports asserted distinct at `:502`. The
+   **third level is not driven through a child** and `:504-517` says why: `DEFAULT_DB_PATH` is the real record,
+   which no check of this feature opens, so what is asserted there is that the launcher takes
+   `scripts/_lib.mjs`' resolver and reads no environment itself — the three levels themselves stay Slice 1's,
+   over the resolver.
 6. **Gate 3's check 2 says "A write through the loader's handle throws", and Gate 2's table gives the package no
    handle to expose.** Building the clause as written needed one: `StoredRecord.handle`
    (`packages/benchmark-read/src/loader.ts:66-74`), the read-only `DatabaseSync` itself, whose only caller is that
@@ -757,6 +765,99 @@ one refusal body, so nothing escapes the served set by a second door.
     so it is given a guard**, marked in its own title as **not one of Gate 3's eighteen**: a named run opens in the
     One run view; an unknown name opens the newest run and says so in one line on the page; and
     `GET /run/<that same unknown id>` still answers **404**, so check 17 stays green.
+
+> **Reported by Slice 4 on 2026-10-17**, eleven more against the same unedited gates (S-197). Three say a check
+> cannot hold as written and name what was built instead; one is a **measured leak** that was fixed by the main
+> session's call in **S-210**; and one is a fault in this session's own tooling that only a positive control caught.
+
+30. **Check 10's "no file under `packages/` or `apps/` imports or NAMES it" is false as of Slice 3, and no code of
+    Slice 4 can make it true.** The page must name the file it loads — `packages/benchmark-read/src/page.ts:711` is
+    `<script src="echarts.min.js"></script>` — `draw.ts:12` names it in a comment, and the route must name the file
+    it serves (`server.ts:42`, `:45`). Built as the three clauses that **are** true plus a pin, rather than a
+    reinterpretation: no file under either folder **imports** it (`tests/benchmark-view-vendor.test.ts:213`), none
+    holds a **byte** of it (`:226`), and the **exact set of three namers is pinned by a deep-equal** (`:233-241`) so
+    a fourth fails. The clause's purpose — that the minified text stays out of the folders the name scans read — is
+    asserted directly at `:244-248` and `:255-260`, the latter using **the same parser `reel-plan-shapes.test.ts`
+    reads source with**, which reports exactly two fields named `source` in the build.
+31. **Check 18's "it imports `@cutroom/benchmark-read` and `node:process` and nothing else" contradicts Gate 2 and
+    check 2.** Gate 2: "the precedence … lives **once** in `scripts/_lib.mjs`, which both `scripts/benchmark.mjs`
+    and `scripts/benchmark-serve.mjs` already import"; check 2: "driven through **both scripts** as children". The
+    launcher imports three things (`scripts/benchmark-serve.mjs:12-14`), pinned exhaustively by a deep-equal of all
+    three at `tests/benchmark-view-vendor.test.ts:338-342`, which still fails on a fourth.
+32. **Check 18's "it names no column" cannot hold beside Gate 2's own `--port`.** `port` is a column of the record
+    (`packages/domain/src/schema.ts:271`, `:292`) and Gate 2's launcher row reads "read `--db` and `--port`". The
+    scan carries exactly one exemption, `['port']`, **pinned by a deep-equal and asserted still to be a column**
+    (`tests/benchmark-view-vendor.test.ts:381-388`); the other 98 are scanned over the whole file, comments
+    included. `error`, the only other collision, was **removed from the launcher** (`console.error` →
+    `process.stderr.write`) rather than exempted.
+33. **The launcher could not hand the loader an artifact root, so D-086's half of the scrubber was inert the one way
+    the page is actually started — RESOLVED by S-210.** Gate 2: "the scrubber moves into the loader and **every
+    string the page serves passes through it**: an artifact root becomes a relative path (D-086)". **Measured before
+    the fix**, with a crafted absolute artifact path in `picture.prompt`: with no roots the path was served in
+    `GET /run/<id>` **and printed on the page**; with roots it was stripped from both. The cause: `roots` is the
+    caller's (`packages/benchmark-read/src/server.ts:68`; `loader.ts:59-64`, "Given none, only URLs are scrubbed"),
+    the artifact root is `@cutroom/service`'s `SETTING_NAMES.artifactRoot` which check 18 forbids the launcher
+    importing, and Gate 2's launcher row lists only two flags. **Resolved by `artifactRoots()` in
+    `scripts/_lib.mjs:98-100`** — `async`, importing the service inside itself, returning the artifact root and the
+    repository root — handed over at `scripts/benchmark-serve.mjs:37`. Check 18 is untouched: three imports, 39
+    lines, no table, no route path, no column but `port`. Guarded **end to end through the launcher as a child** at
+    `tests/benchmark-view-vendor.test.ts:557`, red when the launcher passes no roots and red when the resolver
+    returns none.
+34. **Gate 3's thirteenth-child row omits four live "twelve" sites and names one that holds no number.** The row
+    reads "`scripts/_pools.mjs:21`, and CLAUDE.md's 'twelve PATH-only journey children'". `:21` is
+    `export const SECRETS_FILE = /-secrets\.test\.ts$/` and carries no count; the sites that do are
+    `scripts/_pools.mjs:4`, `scripts/check.mjs:57`, `scripts/run-tests.mjs:4` and `tests/check-pools.test.ts:170`,
+    all four amended beside CLAUDE.md's two. **Two are left standing deliberately**: `scripts/impact-map.mjs:133`
+    ("all **twelve** fail … measured 2026-10-16") is a dated measurement this child was not part of, and
+    `scripts/_pools.mjs:7` ("274 file executions of **153** files") is S-191's figure, which this slice's new files
+    move and which no gate sentence asks to be re-measured.
+35. **"the pool becomes thirteen children" had no mechanical assertion behind it — RESOLVED.** The only bound was
+    `tests/check-pools.test.ts`'s `secrets.length >= 12`, which a regression to twelve satisfied silently. **Raised
+    to `>= 13`** by the main session's call, as adding strictness (CLAUDE.md rule 3, "a count only goes up"), with
+    S-204 named beside it. Proved by a break: with the thirteenth child renamed away, "only 12 secrets children
+    found".
+36. **Check 2's third level cannot be driven through either script as a child.** Check 2 asks for "`--db` wins over
+    `CUTROOM_DB_PATH`, which wins over `DEFAULT_DB_PATH`" through **both scripts as children**, and
+    `DEFAULT_DB_PATH` is `data/cutroom.sqlite` — the real record, which every test file of this feature forbids
+    opening for this purpose. The launcher's child drives the two observable levels against three temporary records
+    holding one, two and three runs; the fall-through stays Slice 1's direct assertion over the resolver, and
+    `tests/benchmark-view-vendor.test.ts:504-517` asserts in its place that the launcher takes that resolver and
+    holds no `process.env` read of its own.
+37. **Gate 4's Slice 4 names `tests/benchmark-view-secrets.test.ts` and no file for checks 10 and 18.** They are in
+    `tests/benchmark-view-vendor.test.ts`, on the feature's established `benchmark-view-*` pattern (the main
+    session's instruction) — recorded because Gate 3 names the test file for every other check of this feature.
+38. **Gate 2's route table says the vendored build is "served once"; the server re-reads and re-sends it on every
+    ask.** `packages/benchmark-read/src/server.ts:129-135` reads the file per request with nothing cached —
+    deliberately, so what is served is always the committed bytes — and `tests/benchmark-view-vendor.test.ts:282-287`
+    asks twice to prove no cache is written. Wording only: no size, route or payload changes.
+39. **The pinned build is ECharts 5.6.0, while check 11 and S-204 both name 5.5.1.** Check 11: "the mockup's first
+    draft loaded ECharts from cdnjs, which **404s at 5.5.1**"; S-204's rejected list: "**A CDN** — ECharts 5.5.1 is
+    not on cdnjs". The committed file reports `version:"5.6.0"` in its own source, and it is the copy the approved
+    mockup ran on. Nothing about the CDN argument changes; the version in those two sentences is wrong by one minor
+    release, and the test's comment records 5.6.0 beside the SHA-256.
+40. **A Git Bash heredoc halved `[\\/]` to `[\/]` even with a quoted delimiter, and `biome check --write`'s safe
+    fix then reduced it to `[/]` — a class that matches no Windows path.** It happened inside this slice, to the
+    very guard finding 33 asked for, and **was caught only by that guard's positive control** ("the absolute-path
+    shapes match no absolute path, so this guard reads nothing"). This is CLAUDE.md's "shell tooling can halve
+    backslashes in transit … verify the file, not the command you typed" with a second link added: **a `--write`
+    lint pass turns the halved escape into a semantic change**, which is an argument for the existing rule that
+    `biome check --write` belongs in a slice where a test can fail on it. The class is restored, written by a file
+    write and **verified in all three files by the main session** by lifting the literal out of the source text
+    rather than retyping it — `tests/no-absolute-paths.test.ts`, `tests/benchmark-view-vendor.test.ts` and
+    `tests/benchmark-view-page.test.ts` each match a backslash path, a forward-slash path and no plain text.
+41. **A verified check of another feature went red on this package, and no targeted run of Slices 2 or 3 could have
+    caught it — found by the main session's post-Slice-4 `impact-map.mjs`.** `tests/ask-again-record.test.ts`'
+    check 6 reports every object property named `refused` that lands in a refusal brand **or in nothing typed**,
+    anywhere under `packages/` or `apps/`, and fails on any file but four named ones. `charts.ts`' group tally
+    was an object literal with no contextual type — `{ label, order, decided: 0, refused: 0 }` — so its `refused`
+    landed in nothing typed and the check failed with "writes a refused property that lands in nothing typed: 0".
+    **Resolved by S-211 without touching the check**: the tally type is named `Tally` and `at` is annotated with
+    it, so the property lands in a **declared non-brand type**, which is what check 6's own sentence permits. The
+    field keeps the word `refused`, which is the engine's own word for what Gate 1 did. **The regime gap is the
+    real finding and is left open for the owner**: Slices 2 and 3 were package-only targeted runs, `--slice` runs
+    typecheck, the code check, the markup and all boundary checks but **only its named test files**, so a
+    repo-wide scan living in another ordinary test file is invisible to them — and a brand-new package is exactly
+    the diff most likely to trip one. The full suite found it the moment it ran.
 
 ## Evidence
 

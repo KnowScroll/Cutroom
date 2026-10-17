@@ -19,5 +19,8 @@ export function setting(name: string): string | undefined
 /** `--db`, then `CUTROOM_DB_PATH`, then the service's `DEFAULT_DB_PATH`. */
 export function databasePath(given: string | undefined): Promise<string>
 
+/** The artifact root and the repository root, stripped from every string a reader serves. */
+export function artifactRoots(): Promise<string[]>
+
 export function fail(message: string): void
 export function pass(message: string): void

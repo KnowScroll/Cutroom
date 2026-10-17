@@ -54,7 +54,7 @@ const CODE = [
   ['boundaries', node, ['scripts/drift.mjs']],
   ['boundaries proven', node, ['scripts/drift.mjs', '--prove']],
   ['no dead rule', node, ['scripts/drift.mjs', '--audit']],
-  // Two pools that never overlap: the ordinary files several at a time, then the twelve PATH-only
+  // Two pools that never overlap: the ordinary files several at a time, then the thirteen PATH-only
   // journey children fewer at a time, each still spawning its own ratified nested suite (S-192,
   // superseding S-176 in part). The runner owns the per-file reporter, the pool sizes and the
   // free-memory floor it records; it enumerates test files from the filesystem, so an uncommitted

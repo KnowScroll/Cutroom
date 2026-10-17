@@ -181,13 +181,32 @@ interface Keyed {
   refused: boolean
 }
 
+/**
+ * One group's running count while `gather` walks the keyed pictures.
+ *
+ * NAMED rather than written inline, and `at` below is ANNOTATED with it, because
+ * `tests/ask-again-record.test.ts`' check 6 reports every object property named `refused` that
+ * lands in a refusal brand **or in nothing typed** — and an object literal with no contextual type
+ * lands in nothing typed. That check guards `packages/contracts/src/refusals.ts`' brands, which
+ * this count has nothing to do with; a `refused` that lands in a declared non-brand type is what
+ * the check's own sentence permits, so the type is declared rather than the field renamed.
+ */
+interface Tally {
+  label: string
+  order: number
+  decided: number
+  refused: number
+}
+
 function gather(keyed: readonly Keyed[]): GroupPoint[] {
-  const groups = new Map<
-    string,
-    { label: string; order: number; decided: number; refused: number }
-  >()
+  const groups = new Map<string, Tally>()
   for (const one of keyed) {
-    const at = groups.get(one.key) ?? { label: one.label, order: one.order, decided: 0, refused: 0 }
+    const at: Tally = groups.get(one.key) ?? {
+      label: one.label,
+      order: one.order,
+      decided: 0,
+      refused: 0,
+    }
     at.decided += 1
     if (one.refused) at.refused += 1
     groups.set(one.key, at)

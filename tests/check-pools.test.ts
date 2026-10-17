@@ -164,10 +164,12 @@ test('3. every PATH-only journey child is in the secrets pool, named or not', ()
     0,
     'a file is in both pools',
   )
-  assert.ok(secrets.length >= 12, `only ${secrets.length} secrets children found`)
+  // Thirteen since `benchmark-view`'s own child (S-204): the bound only ever goes up, and at
+  // twelve a child that stopped being one would have satisfied it.
+  assert.ok(secrets.length >= 13, `only ${secrets.length} secrets children found`)
   for (const file of secrets) assert.match(file, SECRETS_FILE)
 
-  // A PATH-only child is recognised by what it does, not by its name: each of the twelve builds
+  // A PATH-only child is recognised by what it does, not by its name: each of the thirteen builds
   // the environment it hands its nested suite through a `bareEnvironment` of its own, and nothing
   // else in the repository does. One of these in the ordinary pool is S-176's cause, returned.
   // Assembled from parts so that this file, which names the marker, is not its own match.

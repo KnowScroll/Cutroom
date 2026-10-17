@@ -79,6 +79,27 @@ export async function databasePath(given) {
   return process.env[SETTING_NAMES.dbPath] ?? DEFAULT_DB_PATH
 }
 
+/**
+ * Every prefix a stored path may carry, for a reader that SERVES what it finds: the artifact
+ * root — one setting with its default inside this repository (D-086) — and the repository root
+ * itself. `packages/benchmark-read` strips both from every string that leaves it, so an
+ * artifact path becomes a relative one (D-086) and no machine path reaches a page.
+ *
+ * It lives here for the same reason `databasePath` does, and is HANDED to the package for the
+ * same reason a resolved record is: `SETTING_NAMES` is `@cutroom/service`'s — that is
+ * `apps/service` — and `benchmark-read-no-engine` forbids the package `apps/` (benchmark-view,
+ * Gate 2; S-204). **Rejected:** the package defaulting its roots from its own module URL, which
+ * would be the package resolving a SETTING for itself — the artifact root is one setting per
+ * generated path, not something derivable from where a module sits; and leaving the launcher to
+ * pass none, which serves an absolute path out of a prompt, measured (this feature's finding
+ * 33). The import is INSIDE the function for the reason above: `scripts/check.mjs` loads this
+ * file under plain node.
+ */
+export async function artifactRoots() {
+  const { SETTING_NAMES } = await import('@cutroom/service')
+  return [process.env[SETTING_NAMES.artifactRoot] ?? join(REPO, '.artifacts'), REPO]
+}
+
 export function fail(message) {
   console.error(`\n${red('FAIL')}  ${message}\n`)
   process.exitCode = 1

@@ -10071,3 +10071,103 @@ real-record measurement and the post-rework break were reproduced by the main se
 committed.
 
 ---
+
+## S-210 | 2026-10-17 | The launcher hands the loader its artifact root, because the scrubber's D-086 half was inert the one way the page is actually started — and the thirteenth child's bound goes up rather than staying satisfiable by twelve
+
+**Supersedes.** Nothing. It closes a **measured leak** that three slices of guards did not catch, because all three
+guarded the scrubber with roots supplied by a test.
+
+**Chose.**
+
+- **`scripts/_lib.mjs` gains `artifactRoots()`, in `databasePath`'s exact shape** — `async`, importing
+  `@cutroom/service` **inside** the function so `scripts/check.mjs` still loads the file under plain node —
+  returning the artifact root from `SETTING_NAMES.artifactRoot` and the repository root.
+  **`scripts/benchmark-serve.mjs` awaits it and passes `roots`.** Both things the launcher hands the package are
+  now resolved once, in the one place the package may not reach.
+- **The guard is end to end, through the launcher as a child**, not a source scan: a crafted temporary record whose
+  `picture.prompt` holds an absolute artifact path, the launcher started against it, and the four absolute-path
+  shapes of `tests/no-absolute-paths.test.ts` asserted to match neither the served page nor `GET /run/<id>` — with
+  two controls, that the shapes **do** match the planted path and that each body **does** carry the crafted prompt,
+  so nothing passes on an empty page.
+- **`tests/check-pools.test.ts`' `secrets.length >= 12` becomes `>= 13`.** A bound a regression to twelve satisfies
+  is not a bound.
+
+**Why.** Gate 2 says "the scrubber moves into the loader and **every string the page serves passes through it**: an
+artifact root becomes a relative path (D-086)". But `roots` is the caller's, and the launcher passed none — so
+`openRecord` scrubbed URLs only. **Measured, not inferred**: with no roots an absolute artifact path inside a
+prompt was served in `GET /run/<id>` and printed on the page; with roots it was stripped from both. `picture.path`
+itself is never served (check 14), so what leaked was a path inside a prompt, a hold reason or a render manifest.
+Slices 1, 2 and 3 each built a scrubber guard (S-207, S-208, S-209) and **every one of them supplied its own
+roots**, which is exactly why none of them saw this: the production path had no test behind it. Raising the pool
+bound is the same lesson in miniature — the gates' sentence "the pool becomes thirteen children" had no mechanical
+assertion at all.
+
+**Rejected.** **The package defaulting its roots from its own module URL** — that is the package resolving a
+_setting_ for itself; the artifact root is one setting per generated path (D-086), not something derivable from
+where a module sits, and "the package resolves none" is Gate 2's whole arrangement. **Amending Gate 2 to say the
+launcher scrubs URLs only**, which accepts a measured leak and edits an approved gate to fit the code (S-197).
+**Giving the launcher a `--roots` flag**, which puts a second copy of a setting's resolution in a script Gate 2
+says holds no logic a package could hold. **Leaving the pool bound at twelve** because raising a verified bound was
+not a slice's call — it is the main session's, and a count only goes up (CLAUDE.md rule 3).
+
+**Caught by.** Two deliberate breaks, both red: the launcher passing no `roots`, and `artifactRoots()` returning an
+empty list — so the resolver itself is load-bearing, not just the call site. A third break renamed the thirteenth
+child away and the raised bound reported "only 12 secrets children found".
+
+**Also recorded: a fault in our own tooling that only a positive control caught.** Writing that very guard, a Git
+Bash heredoc halved `[\\/]` to `[\/]` **even with a quoted delimiter**, and `biome check --write`'s safe fix then
+reduced it to `[/]` — a character class matching no Windows path, so the guard read nothing while looking correct.
+Nothing but its positive control ("the absolute-path shapes match no absolute path") would have noticed. This is
+CLAUDE.md's existing backslash trap with a second link: **a `--write` lint pass turns a halved escape into a
+semantic change**, which is a further argument for the standing rule that `biome check --write` belongs in a slice
+where a test can fail on it. All three copies of that class were then verified **in the file** by the main session,
+by lifting the literal out of the source text rather than retyping it through a shell.
+
+**Confirmed-by.** The main session, 2026-10-17, on `benchmark-view` Slice 4's findings 33, 35 and 40. The leak was
+reproduced and the restored regex re-verified by the main session before the slice was committed.
+
+---
+
+## S-211 | 2026-10-17 | A `refused` count gets a declared type rather than a new name, and the targeted regime's blind spot for repo-wide scans is named
+
+**Supersedes.** Nothing.
+
+**Chose.**
+
+- **`packages/benchmark-read/src/charts.ts`' group tally becomes a named `Tally` interface and `at` is annotated
+  with it**, so the property named `refused` lands in a **declared non-brand type**. `tests/ask-again-record.test.ts`'
+  check 6 reports a `refused` that lands in a refusal brand **or in nothing typed**, and an object literal with no
+  contextual type lands in nothing typed — so the fix is to give it a type, which is exactly what that check's own
+  sentence permits. **The check is untouched.**
+- **The field keeps the word `refused`.** It is the engine's own word for what Gate 1 did to a picture, it is what
+  the page says on screen, and renaming it would be renaming domain vocabulary to dodge a scan.
+
+**Why.** The check exists to stop an unbranded value reaching `packages/contracts/src/refusals.ts`' brands. A
+plainly-typed integer counting Gate 1 refusals has nothing to do with those brands, and the check says so itself by
+reporting only what lands in a brand **or in nothing typed**. Conforming to it costs one interface.
+
+**Rejected.** **Renaming the field** — the precedent exists (finding 28 renamed a `lost` cost port to
+`paidNoAnswer`), but that rename was forced by check 6 of _this_ feature scanning string **values** a reader sees,
+where `lost` really would have read as a verdict. This is a property name the type checker reads, no reader sees
+it, and the engine's word is the right one. **Adding `packages/benchmark-read` to the four exempt files** in
+`ask-again-record.test.ts` — that widens a verified check's allowance for a package that does not need it
+(CLAUDE.md rule 3). **Leaving it red**, which is not an option.
+
+**Named and LEFT OPEN for the owner: the targeted regime does not see repo-wide scans.** Slices 2 and 3 were
+package-only and verified by `node scripts/check.mjs --slice <one file>`, which runs typecheck, the code check,
+the markup that differs and **all** boundary checks — but **only its named test files**. `ask-again-record.test.ts`
+is an ordinary test file holding a repo-wide type-checker scan over everything under `packages/` and `apps/`, so
+no targeted run of those slices could have selected it, and the impact map had no coverage for a package that did
+not exist when it was last recorded. **A brand-new package is the diff most likely to trip a scan like this, and it
+is the diff the regime is least able to check.** Two shapes of answer suggest themselves and neither is taken here:
+teach `--slice` a standing set of repo-wide scans it always runs, the way it always runs the boundary checks; or
+require the full suite for a commit that adds a package's first files. S-196's "every uncertainty still owes the
+full run" already points at the second.
+
+**Caught by.** `node scripts/impact-map.mjs` after Slice 4, which runs every test file and reported
+`RED: tests/ask-again-record.test.ts`; then the test alone, red before the annotation and green after, with the
+full suite as the standing guard. Recorded as finding 41 in `docs/features/benchmark-view.md`'s Amendments block.
+
+**Confirmed-by.** The main session, 2026-10-17, during `benchmark-view` Slice 4's verification.
+
+---

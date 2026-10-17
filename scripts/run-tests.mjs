@@ -1,7 +1,7 @@
 /**
  * The suite's `tests` step: two pools that never overlap (S-192, §4.2).
  *
- * The ordinary files run first, several at a time; then the twelve PATH-only journey children run,
+ * The ordinary files run first, several at a time; then the thirteen PATH-only journey children run,
  * fewer at a time, each still spawning the nested suite its own file ratifies. Nothing is skipped,
  * no bound is raised and no child's internal concurrency changes — S-176's four rejections stand.
  * What changes is that ordinary work no longer runs BESIDE a nested child suite, which is the cause

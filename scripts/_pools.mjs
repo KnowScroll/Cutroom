@@ -1,7 +1,7 @@
 /**
  * Which class each test file belongs to, and how many of each class may run at once.
  *
- * S-192, from `docs/research/test_fixes_and_research.md` §4.2. Twelve files are PATH-only journey
+ * S-192, from `docs/research/test_fixes_and_research.md` §4.2. Thirteen files are PATH-only journey
  * checks: each one re-runs its own feature's other test files inside a child process whose
  * environment holds only PATH, at an internal concurrency its own file ratifies (S-028, S-075).
  * One full suite is therefore 274 file executions of 153 files — 153 direct and 121 nested.

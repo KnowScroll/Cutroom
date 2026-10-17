@@ -6,12 +6,16 @@
 // browser, no fixed port, no process started (Gate 2, "How it is checked without a browser").
 //
 // It writes nothing, anywhere: no cache, no export, no generated page, no temporary file. The
-// record is opened READ-ONLY by the loader, and no route of this file reaches the filesystem at
-// all — a path is matched against the three routes below and answers 404 otherwise, so there is
-// nothing for a `..` to climb out of.
+// record is opened READ-ONLY by the loader, and NO PATH OF A REQUEST EVER REACHES THE
+// FILESYSTEM — a path is matched against the four routes below and answers 404 otherwise, so
+// there is nothing for a `..` to climb out of. The one file this server reads is the committed
+// vendored drawing build, whose place is computed from this module's own URL and is the same on
+// every machine (D-086); a request names no part of it (benchmark-view, Slice 4, check 10).
 
+import { readFileSync } from 'node:fs'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import type { AddressInfo } from 'node:net'
+import { fileURLToPath } from 'node:url'
 import { openRecord, type StoredRecord } from './loader.ts'
 import { benchmarkPage } from './page.ts'
 import { fleetPayload, runPayload } from './payload.ts'
@@ -25,6 +29,20 @@ const LOOPBACK = '127.0.0.1'
 const HTML = 'text/html; charset=utf-8'
 const JSON_TYPE = 'application/json; charset=utf-8'
 const TEXT = 'text/plain; charset=utf-8'
+const JS = 'text/javascript; charset=utf-8'
+
+/**
+ * The drawing build this page loads, COMMITTED rather than fetched and served from disk by
+ * this server (Gate 2, "Where the vendored build may NOT live, measured"): it is at the
+ * repository root, under `vendor/`, because the minified file holds `source:` as an object key
+ * twice and `tests/reel-plan-shapes.test.ts` reads every source file under `packages/` and
+ * `apps/` for exactly that. Its place is computed from this module's own URL, so no absolute
+ * path is written down (D-086), and nothing here fetches anything (check 11).
+ */
+const DRAWING = new URL('../../../vendor/echarts/echarts.min.js', import.meta.url)
+
+/** The route the page's one `<script src=...>` asks for, and the only file served from disk. */
+const DRAWING_ROUTE = '/echarts.min.js'
 
 /**
  * Which run the One run view opens on: the one `?run=` names, or the NEWEST finished run, which
@@ -59,13 +77,13 @@ export interface BenchmarkView {
   stop(): Promise<void>
 }
 
-function answer(res: ServerResponse, status: number, type: string, body: string): void {
+function answer(res: ServerResponse, status: number, type: string, body: string | Buffer): void {
   res.writeHead(status, { 'content-type': type, 'content-length': Buffer.byteLength(body) })
   res.end(body)
 }
 
 /**
- * One refusal, one short body, for every path that is not one of the three routes — an unknown
+ * One refusal, one short body, for every path that is not one of the four routes — an unknown
  * run id, a traversal, a method that is not a GET. It names nothing it was asked for: a refusal
  * that echoes the request back is a refusal that can be made to say anything.
  */
@@ -105,6 +123,15 @@ function handle(record: StoredRecord, req: IncomingMessage, res: ServerResponse)
         unknownRun: opened.unknown,
       }),
     )
+    return
+  }
+
+  // The committed build, BYTE FOR BYTE, read as bytes rather than as text so that what is
+  // served is what was pinned. It is read on each ask rather than held in memory: a copy kept
+  // at startup is a second copy of a file whose whole point is that it is the committed one,
+  // and a reader of a local page asks for it once.
+  if (path === DRAWING_ROUTE) {
+    answer(res, 200, JS, readFileSync(fileURLToPath(DRAWING)))
     return
   }
 
