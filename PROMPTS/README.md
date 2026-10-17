@@ -73,7 +73,8 @@ its `JOURNAL.md` entry says it did (S-065).
 | 085 | [085-yield-compare-round-2.md](085-yield-compare-round-2.md)                           | `yield-compare`       | round 2 of the gate review           | 2026-10-16 | session 92, 2026-10-16    |
 | 086 | [086-yield-compare-round-3.md](086-yield-compare-round-3.md)                           | `yield-compare`       | round 3 of the gate review           | 2026-10-16 | session 93, 2026-10-16    |
 | 087 | [087-yield-compare-owner-call.md](087-yield-compare-owner-call.md)                     | `yield-compare`       | the owner's call after three rounds  | 2026-10-16 | session 93, 2026-10-16    |
-| 088 | [088-benchmark-view-gates.md](088-benchmark-view-gates.md)                             | `benchmark-view`      | its four gates, one round            | 2026-10-16 | —                         |
+| 088 | [088-benchmark-view-gates.md](088-benchmark-view-gates.md)                             | `benchmark-view`      | its four gates, no round (S-203)     | 2026-10-16 | 2026-10-17, session 94    |
+| 089 | [089-benchmark-view-slice-1.md](089-benchmark-view-slice-1.md)                         | `benchmark-view`      | Slice 1, one copy of the schema      | 2026-10-17 | —                         |
 
 **No 024.** Session 24 opened with a question — _"What is next?"_ — pushed Slice 3 and wrote 025; it ran no prompt.
 

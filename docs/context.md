@@ -36,23 +36,26 @@ figures once its `S-` entries exist, and Runs lists 2026-09-25 onward — every 
   **Enforced boundary rules: 25.** **`yield-compare` is STOPPED (S-200)**: its four gates were written and refused
   by three fresh rounds on 22, 24 and 11 findings — 57 in all, 56 applied and 1 refused, S-199 with two amendments —
   and the owner stopped it rather than approve it by decision or run a fourth round. The file is kept as the record;
-  **no implementation file of it is ever written**. **Gates written and NOT approved**: `hosted-checks` (round 1
-  answered, on hold). **Gates not written, files only**: `benchmark-view` (S-184, S-200), `run-provenance`,
-  `picture-prompt`.
+  **no implementation file of it is ever written**. **Gates APPROVED, nothing built**: `benchmark-view`
+  (`owner-delegated-S-205`, session 94). **Gates written and NOT approved**: `hosted-checks` (round 1 answered, on
+  hold). **Gates not written, files only**: `run-provenance`, `picture-prompt`.
 - **Three kinds of reel** (S-167): footage (built), hybrid (`diagram-shots`), code-only (`code-reels`).
 - **Agent models are a written choice at last (S-202)**: `gate-reviewer` moves **opus → sonnet**, halving a review's cost for a job that is cross-reading rather than invention and whose findings the main session verifies in the
   source before applying; **`slice-builder` stays on opus as the only agent there**, because it writes rather than
   reads. Haiku was refused for the reviewer — round 3's best finding needed four hops across three files. **No entry
   had ever set any agent's model.** Watch the next round's findings: shallow ones are the signal to go back.
-- **Next: `benchmark-view`'s four gates** (`PROMPTS/088`). **Its shape is APPROVED** — the owner signed off a
-  working mockup on 2026-10-17 and **S-201** records it, superseding S-184's self-contained no-server page and
-  amending S-200's `--out` sentence: it is **a local server you start, reading `data/cutroom.sqlite` directly**.
-  The full specification is `docs/features/benchmark-view.md`, "The shape the owner approved"; the mockup and its
-  source sit under the gitignored `.artifacts/view-mockup/`. **The benchmark's last part and the only one left**. The page reads `scripts/benchmark.mjs`' own `--out` record — which exists and holds 52 runs — draws no
-  verdict and no delta, and **owns the stratification** that was `yield-compare`'s: session 82's 42% / 70% / 100%
-  by subjects per shot, the one view needing no matched pairs. Its gates must settle where the data comes from and
-  **whether a stratum carries an uncertainty band at all**, since that arithmetic went with the stopped feature.
-  **After it the benchmark is complete**, and the queue is `self-heal`, session 53's
+- **Next: `benchmark-view` Slice 1 (`PROMPTS/089`).** Its four gates are **APPROVED** as `owner-delegated-S-205`
+  (session 94): **no reviewer round — S-203**, the owner's call, and then **the approving read delegated to the
+  session itself**, which found and fixed four faults in its own text. Its shape was APPROVED against a working
+  mockup on 2026-10-17 (**S-201**, superseding S-184's no-server page): **a local server you start, reading
+  `data/cutroom.sqlite` directly**, specified in `docs/features/benchmark-view.md`, "The shape the owner
+  approved", with the mockup under the gitignored `.artifacts/view-mockup/`. **S-204 settles the eight open
+  questions**: one new package `packages/benchmark-read` for the loader and the page, two routes (a 39 KB fleet
+  payload, a 40 KB worst-case run), **no band** but every group's decided count with a group under ten drawn
+  outlined, the scrubber into the loader, ECharts vendored at `vendor/` and never `packages/`, no browser in the
+  suite, and two new boundary rules taking the enforced count to **27**. **Then four slices** — 1 full, 2 and 3
+  targeted, 4 full plus the journey. **After it the benchmark is complete**, and the queue is `self-heal`, session
+  53's
   P-013/P-014 findings, `caption-match`, `composed-hold`, `diagram-shots`, `code-reels`, and `parallel-shots`'
   gates from `b15d203`. Both of session 87's older calls are closed (S-195, S-197). Two cost levers stay open and
   are the owner's, neither recommended now (session 90): §4.3 `hosted-checks` (CI, gates on hold) and §4.4
@@ -118,6 +121,37 @@ comes from the `run-reader` agent; a pitfall's, from `docs/reel-pitfalls.md`.
 ## Changes
 
 Newest first. Each: where, what, and the decision or the reason — enough that an agent need not diff to know.
+
+### 2026-10-17 — session 94
+
+- **`benchmark-view`'s four gates are WRITTEN, and no reviewer read them — S-203**, the owner's call. It supersedes
+  S-185's clause reserving that waiver to `yield-benchmark`, for this feature only; rule 1 stands everywhere else,
+  and **the slices carry the review** in S-197's form.
+- **The owner then delegated the approving read, and the gates are APPROVED as `owner-delegated-S-205`** — a third
+  token no other feature carries, because **no reviewer read them and neither did the owner**. **That read found
+  four faults in this session's own text and fixed all four before approving**: Gate 2 was **unbuildable**
+  (`DEFAULT_DB_PATH` and `SETTING_NAMES` come from `@cutroom/service`, which is `apps/service`, and
+  `benchmark-read-no-engine` forbids `apps/` — so the precedence moves to `scripts/_lib.mjs`); check 11 forbade the
+  house form's own `workspace:*` dependency; **Slice 2 needed a file Slice 4 adds**, round 3's exact fault against
+  `yield-compare`; check 15 counted six charts where there are eight. **S-205 states what the read could not do** —
+  same model, same text, so a design fault would have gone through.
+- **The feature file's stale section is gone**, struck through with what happened to it: its data-source choice was
+  decided against by S-201, and its two live clauses moved into "What the gates still have to settle", now eight.
+- **S-204 settles those eight, each against a measured fact**: **one new package** `packages/benchmark-read` for the
+  loader and the page, because `FULL_ONLY` sends every `scripts/` path to the 617 s full run and `drift.mjs` cruises
+  only `packages` and `apps`, so **no boundary rule reaches a script**; **two routes**, 39 KB for all 52 runs and
+  40 KB for the worst run, against **2665 KB** whole; **no band**, every group carrying its decided count and one
+  under ten drawn outlined (today's world groups are 33 and 5); the **scrubber into the loader**, because
+  **nothing in `packages/providers` redacts anything** and the record's only redaction is at its write boundary,
+  which a server bypasses; ECharts at **`vendor/`, never `packages/`** (the build holds `source:` twice and
+  `tests/reel-plan-shapes.test.ts` would go red); **no browser**, port 0 instead; and two rules taking the count to
+  **27**, the second stopping `packages/benchmark` reaching `sqlite` **transitively** — a hole no rule sees, since
+  cruiser rules are about direct imports.
+- **Two sentences this repository believed are false**: S-200 and S-201 both say
+  `tests/yield-benchmark-reader.test.ts` holds a clause-by-clause scan of the held column set. **It holds none.**
+  What catches the loader's move is its count of one `new DatabaseSync(` (`:235-240`), and **eleven of its source
+  scans (`:241-255`) would go wrongly green**. The gates build the scan and grow all eleven.
+- **No implementation file exists**, and Markdown only: `check.mjs --changed` is all that is owed (S-193).
 
 ### 2026-10-16 — session 93
 
@@ -249,38 +283,6 @@ Newest first. Each: where, what, and the decision or the reason — enough that 
   the suite's 1455 s, so §4.2's whole case was real parallelism. **One full suite is 274 file executions of 153
   files** — 121 nested inside the twelve secrets children — and **the cost is 35 files**, 742 s of it. Per-file
   table: `docs/research/test-file-costs.md`.
-
-### 2026-10-15 · session 88
-
-- **The verification receipt, and a journey that reads it** (**S-188**): `scripts/_verification.mjs` and
-  `scripts/test-receipt.mjs` are new — the latter because **Node 22.14's tap and junit reporters attribute nothing
-  to a file**, measured here. `check.mjs` writes `.verification/receipt.json` and gains `--documents`;
-  `journey.mjs` runs nothing at a tree a green full receipt covers. Measured: `reel-stills` **18.4 s** on a
-  one-document delta against ~25 min before. **The tested tree is the CONTENT, not the commit**, through a
-  throwaway index, so change → full run → commit stays reusable; the last full run keeps `receipt-full.json`,
-  which the journey alone reads.
-- **Biome replaces eslint and prettier for code** (**S-189**, the owner's word): the `code` step **0.492 s**
-  against 6.25 s + 5.74 s, a slice's static checks 30.3 s → 6.9 s. Prettier keeps Markdown, YAML and the one HTML
-  page. Eslint's three rules are carried by name and biome's other thirteen are `warn`, so the gate did not widen.
-  `biome check --write` was refused: it rewrote imports in two verified features' source.
-
-### 2026-10-14/15 · session 87
-
-- **`yield-benchmark` built and `Status: verified`**, four slices, one `slice-builder` each (S-172), its gates
-  approved by owner decision (S-185). `d535a58` (full): `packages/benchmark` with the three boundary rules whose
-  `--prove` cases are generated from each rule’s own enumeration, 10 row fixtures, and **every amendment taking
-  the rule count 22 to 25 in one tree**. `e9f1266` (targeted): `ratings.ts`, the thirteen terms, S-182’s weights,
-  the `r1` stamp, five worked fixtures at **0.0, 10.0, 10.0, 34.0, 89.7**. `11f036e` (full):
-  `scripts/benchmark.mjs` read-only through `node:sqlite` and `docs/research/benchmark.md`, **52 rows written by
-  the script**. Slice 4: four journeys PASS, 120 tests. `963be3c` carries S-182’s second amendment and **S-186**;
-  `050536a` closed `pipeline-no-io`’s own gap (**S-187**), its proof grown from 1 case to 30. `--prove` now fires
-  **25 rules over 131 cases**.
-- **A verification hole, reported not patched**: Slice 3’s full suite passed with a D-086 violation in
-  `scripts/benchmark.mjs`, because the four file scans read **tracked** files and it was untracked when that suite
-  ran. Source fixed at `d898693`, check untouched — **S-195** closed the hole itself in session 89.
-- **Of its 25 slice findings only two were ever written down**, which is what S-197 exists to prevent; the `hold`
-  table is **empty over all 52 runs**. Nothing weakened, nothing spent, no reel made. Every commit, count and
-  journey is in `docs/features/yield-benchmark.md` (S-177).
 
 ## Where to look
 

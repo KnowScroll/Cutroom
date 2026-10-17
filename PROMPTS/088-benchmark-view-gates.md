@@ -3,10 +3,12 @@
 - **For:** session 94
 - **Feature:** `benchmark-view` (`docs/features/benchmark-view.md`). **It is the only part of the benchmark left**
   (S-200): `yield-benchmark` is built and verified, and `yield-compare` is stopped
-- **Work:** the four gates written, one adversarial round, every finding applied or refused in writing. **No
+- **Work:** the four gates written, approved on the owner's reading, **and no adversarial round — S-203**. **No
   implementation file until the `Gates:` line says APPROVED four times** (CLAUDE.md rule 1)
-- **Written:** 2026-10-16, rewritten 2026-10-17 against the approved shape (S-201)
-- **Run:** —
+- **Written:** 2026-10-16, rewritten 2026-10-17 against the approved shape (S-201), and again the same day when the
+  owner waived the round (S-203)
+- **Run:** 2026-10-17, session 94 — four gates written, no round (S-203); the owner then delegated the approving
+  read, which found and fixed four faults, and the gates are APPROVED as `owner-delegated-S-205`
 
 > **The owner stopped `yield-compare` on 2026-10-16, in session 93** — _"No just leave it, we should just build the
 > view part of it and end the benchmark"_ — after three fresh adversarial rounds refused all four of its gates (22,
@@ -51,8 +53,10 @@ refusal — raw numbers side by side, which is what the owner asked for before t
 
 ## Read first
 
-`docs/context.md`, then `docs/features/benchmark-view.md` whole — it is 62 lines and already holds "What it shows"
-and "What the gates must settle", both amended by S-200. Then, by heading and only the entry's lines:
+`docs/context.md`, then `docs/features/benchmark-view.md` whole — its open questions are **"What the gates still
+have to settle"**; the old "What the gates must settle" below it is struck through and superseded, emptied on
+2026-10-17, and is kept only as a marker. Then, by heading and only the entry's lines: `grep -n '^## S-203'
+DECISIONS.md` (why there is no round and what carries the review instead), then
 `grep -n '^## S-200' DECISIONS.md` (what this feature inherited from the stopped one), then `^## S-184` (the split
 and the page's proven form), `^## S-182` (the three outputs and the hashing-in-the-reader rule), `^## S-166`
 (headless Chrome as a machine dependency) and `^## S-111` (a check that silently skips when a browser is absent was
@@ -65,7 +69,7 @@ record**, so the gates name fields that exist. `docs/research/benchmark.md` is t
 
 ## What the gates must settle, beyond what the file already lists
 
-The feature file names five open questions. **Two are new or changed by S-200 and are the ones with teeth:**
+The feature file's "What the gates still have to settle" names **eight** open questions. **Two have teeth:**
 
 1. **Whether a stratum carries an uncertainty band at all, and what computes it.** The figures are the scoring
    half's; the band was `yield-compare`'s and is gone. Three answers, each with a cost, and the gates must pick one:
@@ -73,15 +77,26 @@ The feature file names five open questions. **Two are new or changed by S-200 an
    band**, said on the page so a bare rate is not read as precise; or raw counts alone. **The failure to avoid is a
    stratum of one or two runs drawn as a confident bar** — session 82's 42% / 70% / 100% persuaded because those
    groups were large, and the record does not guarantee that for every property.
-2. **~~Where the page’s data comes from~~ — SETTLED by the owner**: a local server reads the database directly.
-   What remains is how the page receives it (one payload on load, or a route per view) and what the server exposes.
+2. **The shared row loader** — the open, the held columns, the row selection and the prefix resolution moving out of
+   `scripts/benchmark.mjs` so two readers do not hold two copies of the schema, with
+   `tests/yield-benchmark-reader.test.ts`' scan growing to the set clause by clause. **It is the one place this
+   feature can break something already verified**, it moved here from the stopped feature, and with no round it is
+   the thing to design most carefully: say in Gate 2 which package owns the loader and what each reader may still
+   do for itself, and in Gate 3 what fails if the two drift apart again.
 
-And three the file already names, unchanged: **where the page is written** (one setting, gitignored default, D-086
-and D-087, nothing generated committed, and a run's blobs carry absolute artifact paths unless made relative
-first); **what of a model's words the page may show** (D-022's form — the scorecard prints them only when asked, and
-a page is a different surface); and **how it is checked without a browser in the suite** (assert structure from the
-emitted HTML's text, or drive headless Chrome — S-166 made it a machine dependency like ffmpeg, and a check that
-skips when it is absent is what S-111 refused).
+**~~Where the page's data comes from~~ is SETTLED by the owner** — a local server reads the database directly
+(S-201) — and is no longer a gate question at all.
+
+And six the file names without teeth: **how the page receives its data** (one payload on load, or a route per
+view, and what the server exposes); **whether anything at all is written to disk** — with a server reading the
+database there is no generated page, so say so, and if any file is written it is one setting with a gitignored
+default (D-086, D-087), nothing generated is committed, and anything carrying a run's blobs holds absolute artifact
+paths unless made relative first; **where the vendored ECharts build lives** and what holds it to its pinned
+version; **what of a model's words the page may show** (D-022's form — the scorecard prints them only when asked,
+and a page is a different surface); **how it is checked without a browser in the suite** (assert structure from the
+served HTML's text, or drive headless Chrome — S-166 made it a machine dependency like ffmpeg, and a check that
+skips when it is absent is what S-111 refused); and **a chart's accessibility floor beyond colour**, since the look
+is settled and every figure is written.
 
 ## What this session owes
 
@@ -91,13 +106,21 @@ slices with each check in exactly one slice and each slice's verification route 
 affected test file, or the full suite, per S-188 and S-196). **Every choice between real alternatives becomes a
 written `S-` entry** with what was rejected and how a violation is caught (S-017).
 
-**Then one adversarial round** with a fresh `gate-reviewer`, and **measure every figure the round would otherwise
-spend itself deriving and hand them over** — that is what made session 92's and 93's rounds go to the design
-instead of the arithmetic. Apply or refuse every finding in writing, in the table form the feature files use.
+**No adversarial round — S-203, the owner's call**: _"No adversarial gate-reviewer round for that session we dont
+need it."_ Do not spawn a `gate-reviewer`. The gates are approved on the owner's reading and the `Gates:` line
+records `owner-decision-S-203`, never `adversarial-reviewer`. Two things follow and both are owed here:
 
-**Learn from the three rounds that just happened.** Their findings were almost all one kind: **a rule that can
-never fire, or a check that can never fail.** Before writing any check, ask what implementation it would let
-through. Concretely, from rounds 1 to 3 of `yield-compare`:
+- **Nothing downstream will catch a gate that is wrong**, so the discipline a round would have supplied is yours
+  while writing. Measure every figure before you write a sentence that depends on it — open a real `--out` record,
+  read `packages/benchmark`'s actual columns — because there is no round to correct a number taken on faith.
+- **The slices carry the review** (S-185's mechanism, S-197's form): this file gets an amendment block, and every
+  `slice-builder` hand-back's findings go into it **as a numbered list naming the gate sentence each contradicts,
+  when they are reported**. A count in the journal is not a record — twenty-two of session 87's twenty-five
+  findings were lost exactly that way.
+
+**Write the checks against the three rounds that just happened.** Their findings were almost all one kind: **a rule
+that can never fire, or a check that can never fail.** Before writing any check, ask what implementation it would
+let through. Concretely, from rounds 1 to 3 of `yield-compare`:
 
 - a check whose pinned case gives the same answer under the rule you chose **and** the rule you rejected proves
   nothing — pin the case where they disagree;
@@ -109,10 +132,10 @@ through. Concretely, from rounds 1 to 3 of `yield-compare`:
 
 ## Done is
 
-Four gates written; one round answered in full, with the `Gates:` line reading APPROVED four times or the findings
-recorded for the next round; `node scripts/check.mjs --changed` green (Markdown only, S-193); the `S-` entries for
-the choices; the journal entry and this session's entry in `docs/context.md`; and `PROMPTS/089` — Slice 1 if
-approved, the owner's question if not.
+Four gates written and read by the owner, with the `Gates:` line reading `APPROVED 2026-10-17 owner-decision-S-203`
+four times; an amendment block in the file for the slices' findings; `node scripts/check.mjs --changed` green
+(Markdown only, S-193); the `S-` entries for every choice between real alternatives (S-017); the journal entry and
+this session's entry in `docs/context.md`; and `PROMPTS/089` for Slice 1.
 
 ## Do not
 

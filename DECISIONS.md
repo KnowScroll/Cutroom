@@ -9623,3 +9623,216 @@ where the next session is told to watch for it.
 both that is efficient and optimal for the job and cheap) fix that in our subagent docs."_
 
 ---
+
+## S-203 | 2026-10-17 | `benchmark-view`'s four gates get no adversarial round — the owner waives it, the approved mockup stands in for the product review, and the slices carry the rest
+
+**Supersedes.** **S-185's closing clause in part** — _"This waiver is for `yield-benchmark` alone. CLAUDE.md rule 1
+stands for every other feature, including `yield-compare` and `benchmark-view`"_ — for `benchmark-view` only.
+CLAUDE.md rule 1 stands for every other feature, `self-heal`, `caption-match`, `composed-hold`, `diagram-shots`,
+`code-reels` and `parallel-shots` included, and `hosted-checks`' round 2 is still owed.
+
+**Chose.**
+
+- **No `gate-reviewer` round is run for `benchmark-view`, in any number.** The owner's instruction, 2026-10-17:
+  _"No adversarial gate-reviewer round for that session we dont need it."_
+- **The four gates are still written in full**, in this repository's form — product with no technical language,
+  architecture with a place-and-may-not table, program design with numbered checks, slices with each check in
+  exactly one slice and its verification route named. **The waiver is of the review, not of the gates**: the gate
+  text is what each slice is built against and what `scripts/journey.mjs` reads.
+- **They are approved on the owner's reading**, and the `Gates:` line records that as
+  `owner-decision-S-203` where every reviewed feature names `adversarial-reviewer` — the form `yield-benchmark`
+  already carries as `owner-decision-S-185`. **No reviewer approved them and the line says so**, so nobody later
+  reads this feature as having passed the review the other verified features passed.
+- **The slices carry the review** (S-185's mechanism), recorded in **S-197's** form: each `slice-builder`
+  hand-back's findings are written into this feature file's amendment block **when they are reported**, as a
+  numbered list naming the exact gate sentence each contradicts. A count in the journal is not a record — that is
+  how twenty-two of session 87's twenty-five findings were lost. A slice that cannot make its check pass as written
+  **stops and reports** (S-016); it never adjusts the check to fit.
+- **S-202's observation point moves.** Its `Caught by` named `benchmark-view`'s round as where a Sonnet reviewer's
+  findings would be judged. There is now no such round, so that judgement moves to the next feature that gets one —
+  `hosted-checks`' round 2, or `self-heal`'s first — and S-202's model choice stands unobserved until then.
+
+**Why.** **Seven adversarial rounds across the benchmark's two planned halves have produced one built feature and
+one abandoned one.** `yield-benchmark`: four rounds, about 890,000 reviewer tokens over five sessions, not one
+implementation file, closed by owner decision (S-185). `yield-compare`: three fresh rounds, 57 findings, all four
+gates refused every time, and the owner stopped the feature rather than run a fourth (S-200) — zero code for the
+whole of it. **This page is the weakest case for a prose review of the three.** It derives nothing: every figure it
+draws is `packages/benchmark`'s, already scored by code the suite checks, and the defect class the rounds actually
+caught — _"the column named does not implement the term written"_, twelve of round 4's nineteen (S-185) — needs a
+term to be wrong about. The only arithmetic question here is whether an uncertainty band exists at all, and the
+gates answer it by naming none. **And its product gate has already had the one review a reviewer cannot give**:
+four iterations of a working mockup built from all 52 real runs, read by the owner and approved — _"Alright now it
+looks good"_ (S-201). That is the gate a reviewer refused most often, settled against a thing rather than against
+prose. **The remaining risk is named and accepted, and it is not the page**: the shared row loader moving out of
+`scripts/benchmark.mjs`, which is the one place this feature can break something verified. **What catches it today
+was measured rather than assumed, and it is less than this repository believed**: only
+`tests/yield-benchmark-reader.test.ts:235-240`, its count of exactly one `new DatabaseSync(` and its `{ readOnly:
+true }` match, go red when the open moves. **The clause-by-clause column scan S-200 and S-201 both describe does not
+exist** — the held column set, `TABLES`, the join keys and the scrubber are pinned by no test at all — and eleven of
+that file's source scans (`:241-255`: the domain's opener, a provider import, five process starters, four
+environment-file names) would go **wrongly green**, reading a wrapper while the real open sat elsewhere. So this
+feature **builds that scan** rather than inheriting it, and Gate 3 carries it as a check of its own.
+
+**Rejected.** **One round anyway, as a floor** — this session recommended it and the owner refused; the price is a
+whole session against a feature with four open questions and a settled shape. **Approving the gates without writing
+them** — `journey.mjs` reads the `Gates:` line and every slice's tick, the slices are built against the gate text,
+and S-197 exists precisely because a finding against a gate that was never written cannot be recorded. **Treating
+the mockup's approval as the gates** — it settles the shape and names no check, no boundary, no slice order and no
+verification route. **Waiving rule 1 generally**, which is what a second per-feature waiver starts to look like:
+both are named features, both named their reason, and the rule is otherwise untouched. **Deleting the superseded
+_"What the gates must settle"_ section silently** — it is struck through with what happened to it, in the same
+commit as this entry.
+
+**Caught by.** The `Gates:` line reading `owner-decision-S-203` and never `adversarial-reviewer`, with
+`tests/feature-files.test.ts` holding it to one line naming all four gates. Every slice hand-back's numbered
+findings appended to the feature file's amendment block at the time it is reported (S-197, which
+`.claude/agents/slice-builder.md` already requires). And `node scripts/journey.mjs benchmark-view`, which refuses on
+an unapproved gate, an unticked slice or a missing `## Evidence` section, and whose FAIL is the finding.
+
+**Confirmed-by.** The owner, 2026-10-17: _"No adversarial gate-reviewer round for that session we dont need it. and
+fix the stale session."_ The second clause is the superseded section above, fixed in this commit.
+
+---
+
+## S-204 | 2026-10-17 | `benchmark-view`'s gates choose one new package for the loader and the page, two routes, no band but a group's size on every bar, and a vendored build the formatter leaves alone
+
+**Supersedes.** Nothing. It amends **S-200 and S-201 on one fact each**: both say
+`tests/yield-benchmark-reader.test.ts` holds a clause-by-clause scan of the held column set that this feature would
+grow. **That scan does not exist** — the held set, `TABLES`, the join keys and the scrubber are pinned by no test at
+all — so `benchmark-view` **builds** it (Gate 3's check 4) rather than inheriting it, and what actually catches the
+loader's move today is that file's count of exactly one `new DatabaseSync(` (`:235-240`) and nothing else.
+
+**Chose.**
+
+- **One new package, `packages/benchmark-read`**, holding both the shared row loader and the page's server, routes,
+  payloads and markup. `scripts/benchmark.mjs` calls the loader; `scripts/benchmark-serve.mjs` is a launcher of at
+  most forty lines. **Two measured reasons.** `check.mjs`'s `FULL_ONLY` holds `/^scripts\//`
+  (`scripts/check.mjs:229-235`), so a feature built in a script makes **every** slice a 617 s full run; and
+  `scripts/drift.mjs:45` cruises `['packages', 'apps']` only, so **no boundary rule reaches a script** — a server
+  left there could import a provider, the domain or `child_process` and only a hand-written text scan in one test
+  file would notice.
+- **Two routes, not one payload and not one per view.** `GET /data` carries every finished run without model text —
+  **39 KB for all 52 runs, measured** — and `GET /run/<id>` carries one run's full scorecard, **3 KB typical and 40 KB
+  at the largest**. The whole record is **2665 KB** and nine tenths of it is words for runs nobody asked to open.
+- **No uncertainty band anywhere. Every group carries its decided count, and a group below ten decisions is drawn
+  outlined rather than solid**, with the boundary pinned at nine against ten. The arithmetic for a band went with the
+  stopped feature (S-200) and is not rebuilt; a count beside a figure is the honest substitute. **Why ten:** today's
+  world groups are 33 decisions and 5 — `game-graphics` 82% of 33, `tsunamis` 0% of 5 — and that 5 is exactly the bar
+  that must not read as confident.
+- **The scrubber moves into the loader and every string the page serves passes through it.** **Nothing under
+  `packages/providers` redacts anything**: the benchmark's only redaction is at the record's **write** boundary
+  (`scripts/benchmark.mjs:187-191`, applied at `:910-916`), so a server reading the database directly bypasses the
+  only redaction there is. An artifact root becomes a relative path (D-086) and `https?://…` becomes `<url>` (D-022),
+  while a run id and a brief key survive unchanged (S-199's round-3 finding, kept as check 9's positive control).
+- **The vendored ECharts build lives at `vendor/echarts/echarts.min.js`, at the repository root, and `vendor/` is
+  ignored by Biome and Prettier.** **Not under `packages/` or `apps/`**, because
+  `tests/reel-plan-shapes.test.ts:116-130` reads every source file there and fails on an object key named `source`,
+  and the minified build contains `source:` twice — so a copy under `packages/` would turn a verified check red. The
+  formatter exclusion is **an exclusion of someone else's minified file from our formatter, not a loosened rule about
+  our code**: no lint rule changes, no check becomes conditional, and the two tracked-file scans that do reach the
+  file (`tests/no-absolute-paths.test.ts:34-46`, `tests/line-endings.test.ts:40-56`) keep reading it and pass, as
+  measured on the mockup's copy.
+- **No browser in the suite.** The server is a package export, so a check starts it **on port 0**, makes real HTTP
+  requests and asserts the served HTML's structure and the payloads' values. Headless Chrome stays what S-166 made it
+  — a machine dependency behind a port in `packages/providers`, for engine features that draw frames.
+- **Nothing is written to disk, no blob is served and no path is printed.** `picture.path` is absolute in the real
+  database, and the page shows a picture as its words, its verdicts and its cost — the shape the owner approved.
+- **Two new boundary rules, and the enforced count becomes 27**: `benchmark-read-no-engine`, and
+  **`benchmark-no-reader`**, which stops `packages/benchmark` importing the loader. The second is not redundant:
+  dependency-cruiser's rules are about **direct** dependencies, so `benchmark-no-io` stops the pure package importing
+  `node:sqlite` itself and says nothing about it importing a package that does. Without the rule the arithmetic could
+  reach a database transitively and every existing rule would stay green.
+- **A thirteenth PATH-only child**, `tests/benchmark-view-secrets.test.ts`, which runs the feature's other test files
+  with PATH alone; `scripts/_pools.mjs:21` puts it in the second pool only because of that name, and CLAUDE.md's
+  "twelve" is amended with it.
+
+**Why.** These are the six questions `docs/features/benchmark-view.md` left open plus two the measuring turned up,
+and **no adversarial round will catch a wrong answer** (S-203), so each one is settled against a measured fact rather
+than a preference: a line count in `check.mjs`, a folder list in `drift.mjs`, three payload sizes, two real group
+sizes, the absence of any redaction in `providers`, an object key in a minified file, and the eleven source scans that
+would have gone wrongly green. The one choice with no measurement behind it is the **ten-decision threshold**, which
+is named as arbitrary-but-stated rather than dressed up: any threshold is a judgement, and the alternative — leaving
+every bar to look alike — is the failure the owner's own Gate 1 forbids.
+
+**Rejected.** **The loader inside `packages/benchmark`** — `benchmark-no-io` forbids `sqlite` under both spellings,
+and round 3 of `yield-benchmark`'s review deliberately emptied that package of I/O. **The loader left in
+`scripts/benchmark.mjs`** — a script importing a script, outside every boundary rule, with every slice a full run.
+**Two packages**, one for the loader and one for the page — doubling the workspace and rule cost for a seam no rule
+needs. **A new repository** — a second copy of the schema, which is the drift D-088 and S-182 exist to catch. **One
+payload on load** — 2665 KB for a landing view that needs 39 KB. **A route per view** — the same rows sent four times
+and the grouping in four places. **A single-side band computed in the server** — it is the stopped feature's
+arithmetic under another name, and S-200 says no implementation file of it is ever written. **Raw counts with no
+rate** — the owner asked for the refusal rates by name. **A CDN** — ECharts 5.5.1 is not on cdnjs and 404s there,
+which the mockup found by screenshot. **Headless Chrome in the suite** — S-111 refused a check that skips when a
+browser is absent, and there is nothing here that needs one. **Narrowing `tests/reel-plan-shapes.test.ts` so a
+vendored build could sit under `packages/`** — CLAUDE.md rule 3; the file moves instead.
+
+**Caught by.** Gate 3's eighteen checks, each of which names what it would let through if it were written the lazy
+way, and `drift --prove`'s two new deliberate violations. The seven `25`-to-`27` sites are found by grepping the test
+tree for the literal before any of them is edited, so a missed site is a red rather than a silent gap. The gates'
+amendment block (S-197) carries every finding a slice reports against the sentences above.
+
+**Confirmed-by.** The owner's instruction to write the gates with no round, 2026-10-17 (S-203). **The gates' own
+approval is not recorded here**: the `Gates:` line stays `pending` until the owner has read them, and then names
+`owner-decision-S-203`.
+
+---
+
+## S-205 | 2026-10-17 | The owner delegates `benchmark-view`'s approving read to this session, which found four faults in its own gates and fixed them before approving — and the `Gates:` line says whose read it was
+
+**Supersedes.** **S-203's last sentence in part** — _"They are approved on the owner's reading"_. The owner, asked to
+read them, answered _"You read and aaprove them"_ on 2026-10-17. So the read was delegated, the approval is still the
+owner's call, and **the `Gates:` line names `owner-delegated-S-205`**, never `owner-decision-S-203` and never
+`adversarial-reviewer`. The distinction is the whole point: `yield-benchmark`'s line records an owner who had read
+four rounds of findings; this one records an owner who read none, and a session that read its own work.
+
+**Chose.**
+
+- **The four gates of `docs/features/benchmark-view.md` are APPROVED, dated 2026-10-17, as `owner-delegated-S-205`.**
+  **This is the weakest approval in this repository's history and the line says so**: no reviewer read the gates, and
+  neither did the owner. A later session reading `owner-delegated-S-205` is being told to trust the slices' own
+  checks and nothing else.
+- **The approving read was adversarial against the session's own text, and it found four faults. All four are fixed
+  in the gates**, before any implementation file, and each is named here because a self-read that reported nothing
+  would have been worth nothing:
+  1. **Gate 2 was unbuildable as written.** `DEFAULT_DB_PATH` and `SETTING_NAMES` are exported by
+     `@cutroom/service` — that is `apps/service` (`apps/service/src/settings.ts:47`, `:86`) — and
+     `benchmark-read-no-engine` forbids `apps/`, so **a loader that resolved its own database path could not have
+     been built at all**. `scripts/benchmark.mjs:57` imports them today only because no boundary rule reaches a
+     script. The precedence now lives once in `scripts/_lib.mjs`, which both scripts already import, and the loader
+     is handed a resolved path. Check 2 and the `:424-427` amendment moved with it.
+  2. **Check 11 forbade what the house form requires.** It said the package declares "no dependency of any kind",
+     while `packages/benchmark/package.json` declares `@cutroom/contracts` and `@cutroom/reel-contract` at
+     `workspace:*` — and this package needs `@cutroom/benchmark` for `FIELD_COLUMNS`. The check now forbids a
+     **registry** dependency and requires every declared one to be `@cutroom/…` at `workspace:*`.
+  3. **Slice 2 needed a file Slice 4 adds** — the exact fault round 3 found in `yield-compare`. It listed
+     `GET /echarts.min.js` among its routes while `vendor/echarts/echarts.min.js` arrives in Slice 4, so the route
+     would have had nothing behind it and its check could only have passed by pretending. The route moved to Slice 4
+     with the file.
+  4. **Check 15 counted the charts wrong.** "The six charts" is eight: where reels die, scores over time, four
+     group-by cards, cost and wall clock, and the run view's seconds-and-cents bar. The check now **names** them
+     instead of counting, and says why.
+- **The read's limits are stated rather than implied.** It re-derived nothing about the engine that session 94 had
+  not already measured, and it is the same model that wrote the sentences it was checking — which is why the four
+  faults it found are all of one kind, **a claim contradicted by a file**, and why nothing here claims the design is
+  sound. **A design fault would not have been caught by this read**, and the first thing that will catch one is
+  Slice 1's full suite.
+
+**Why.** The owner's instruction is unambiguous and is theirs to give; the honest cost is that two independent reads
+of these gates — a reviewer's and the owner's — were both skipped, and a record that implied otherwise would be worse
+than the skip. So the `Gates:` line carries a third token nobody has used before, and the four faults above stand as
+the evidence that the read happened at all.
+
+**Rejected.** **Writing `owner-decision-S-203`**, which would say the owner read the gate text. **Approving without a
+read**, which would make the instruction a formality and leave the loader's rule contradiction in the file to be
+discovered by a `slice-builder` that cannot fix it. **A `gate-reviewer` round anyway**, which the owner refused twice
+(S-203). **Recording the four faults in the Amendments block**, which is for findings against **approved** gates
+(S-197); these were found before approval, so they are fixed in place and listed here.
+
+**Caught by.** The `Gates:` line's `owner-delegated-S-205`, which is grep-able and belongs to no other feature. Gate
+3's eighteen checks, which are now the only thing standing between these gates and the code. And Slice 1's full
+suite, which is where fault 1 would have surfaced as an unbuildable import if this read had missed it.
+
+**Confirmed-by.** The owner, 2026-10-17: _"You read and aaprove them"_.
+
+---
